@@ -2,7 +2,8 @@ import React from 'react';
 import { ImportProgressTracker } from '../ImportProgressTracker';
 import { ImportUploadStep } from './ImportUploadStep';
 import { ImportCompleteStep } from './ImportCompleteStep';
-import { ImportPreviewStep } from './ImportPreviewStep';
+import { DetectionTypeStep } from './DetectionTypeStep';
+import { DetectionReviewStep } from './DetectionReviewStep';
 import { useExcelImport } from './useExcelImport';
 
 interface ImportDialogContentProps {
@@ -14,13 +15,14 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
 }) => {
   const {
     currentStep,
-    headers,
-    aiAnalysis,
+    detectionType,
+    detectionResult,
     importProgress,
     importErrors,
     importWarnings,
     importSuggestions,
     handleFileUpload,
+    handleDetection,
     confirmAndImport,
     downloadTemplate,
     setCurrentStep
@@ -35,15 +37,25 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
         />
       );
 
-    case 'preview':
+    case 'detection':
       return (
-        <ImportPreviewStep
-          headers={headers}
-          aiAnalysis={aiAnalysis}
-          onConfirm={confirmAndImport}
+        <DetectionTypeStep
+          onDetect={handleDetection}
           onCancel={() => setCurrentStep('upload')}
         />
       );
+
+    case 'review':
+      return detectionResult ? (
+        <DetectionReviewStep
+          detectionType={detectionType}
+          detected={detectionResult.detected}
+          confidence={detectionResult.confidence}
+          location={detectionResult.location}
+          onConfirm={confirmAndImport}
+          onCancel={() => setCurrentStep('detection')}
+        />
+      ) : null;
 
     case 'progress':
       return (

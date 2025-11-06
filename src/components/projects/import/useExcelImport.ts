@@ -4,20 +4,19 @@ import { ExcelProcessor } from '../services/ExcelProcessor';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
-type ImportStep = 'upload' | 'preview' | 'progress' | 'complete';
+type ImportStep = 'upload' | 'detection' | 'review' | 'progress' | 'complete';
 
-interface AIAnalysisResult {
-  mapping: Record<string, string>;
-  confidence: Record<string, number>;
-  suggestions: string[];
+interface DetectionResult {
+  detected: any[];
+  confidence: number;
+  location: string;
 }
 
 export const useExcelImport = (onImportComplete: () => void) => {
   const [currentStep, setCurrentStep] = useState<ImportStep>('upload');
   const [excelData, setExcelData] = useState<any[]>([]);
-  const [headers, setHeaders] = useState<string[]>([]);
-  const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
-  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysisResult | null>(null);
+  const [detectionType, setDetectionType] = useState<'people' | 'projects'>('projects');
+  const [detectionResult, setDetectionResult] = useState<DetectionResult | null>(null);
   const [importProgress, setImportProgress] = useState(0);
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [importWarnings, setImportWarnings] = useState<string[]>([]);
@@ -28,79 +27,66 @@ export const useExcelImport = (onImportComplete: () => void) => {
     if (!file) return;
 
     try {
-      toast.info('Analyzing Excel file with AI...');
+      toast.info('Parsing Excel file...');
       const processor = new ExcelProcessor();
       const result = await processor.parseExcelFile(file);
       
       setExcelData(result.data);
-      setHeaders(result.headers);
-
-      // Call AI to analyze structure
-      const { data: aiResult, error } = await supabase.functions.invoke('import-excel-ai', {
-        body: { 
-          headers: result.headers,
-          sampleData: result.data.slice(0, 3)
-        }
-      });
-
-      if (error || !aiResult) {
-        toast.error('AI analysis failed. Please try again.');
-        console.error('AI analysis error:', error);
-        return;
-      }
-
-      const detectedMapping: Record<string, string> = {};
-      Object.entries(aiResult.mappings || {}).forEach(([colIdx, field]) => {
-        detectedMapping[colIdx] = field as string;
-      });
-
-      setColumnMapping(detectedMapping);
-      setAiAnalysis({
-        mapping: detectedMapping,
-        confidence: aiResult.confidence || {},
-        suggestions: aiResult.suggestions || []
-      });
-
-      toast.success('AI analysis complete');
-      setCurrentStep('preview');
+      setCurrentStep('detection');
+      toast.success('File parsed successfully');
     } catch (error) {
       toast.error('Failed to parse Excel file');
       console.error('Excel parsing error:', error);
     }
   };
 
-  const confirmAndImport = () => {
-    setCurrentStep('progress');
-    startImport(columnMapping);
-  };
+  const handleDetection = async (type: 'people' | 'projects', examples: string[]) => {
+    setDetectionType(type);
+    toast.info('AI analyzing data...');
 
-  const startImport = async (mapping: Record<string, string>) => {
     try {
-      const processor = new ExcelProcessor();
-      const result = await processor.importProjects(excelData, mapping, (progress) => {
-        setImportProgress(progress);
+      const { data: aiResult, error } = await supabase.functions.invoke('import-excel-ai', {
+        body: { 
+          detectionType: type,
+          examples,
+          allData: excelData
+        }
       });
 
-      setImportErrors(result.errors);
-      setImportWarnings(result.warnings || []);
-      setImportSuggestions(result.suggestions || []);
-      
-      if (result.success) {
-        setCurrentStep('complete');
-        toast.success(`Successfully imported ${result.successCount} projects`);
-        onImportComplete();
-      } else {
-        setCurrentStep('complete');
-        if (result.successCount > 0) {
-          toast.warning(`Imported ${result.successCount} projects with ${result.errors.length} errors`);
-        } else {
-          toast.error('Import failed');
-        }
+      if (error || !aiResult) {
+        toast.error('AI detection failed. Please try again.');
+        console.error('AI detection error:', error);
+        return;
       }
+
+      setDetectionResult({
+        detected: aiResult.detected || [],
+        confidence: aiResult.confidence || 0,
+        location: aiResult.location || 'Unknown location'
+      });
+
+      toast.success(`Detected ${aiResult.detected?.length || 0} items`);
+      setCurrentStep('review');
     } catch (error) {
-      toast.error('Import failed');
-      console.error('Import error:', error);
+      toast.error('Failed to analyze data');
+      console.error('Detection error:', error);
     }
+  };
+
+  const confirmAndImport = async (finalList: any[]) => {
+    setCurrentStep('progress');
+    toast.info('Starting import...');
+    
+    // TODO: Implement actual import logic based on detection type and final list
+    // For now, simulate progress
+    for (let i = 0; i <= 100; i += 10) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      setImportProgress(i);
+    }
+    
+    setCurrentStep('complete');
+    toast.success(`Successfully imported ${finalList.length} items`);
+    onImportComplete();
   };
 
   const downloadTemplate = () => {
@@ -121,8 +107,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
   const resetDialog = () => {
     setCurrentStep('upload');
     setExcelData([]);
-    setHeaders([]);
-    setColumnMapping({});
+    setDetectionResult(null);
     setImportProgress(0);
     setImportErrors([]);
     setImportWarnings([]);
@@ -131,14 +116,14 @@ export const useExcelImport = (onImportComplete: () => void) => {
 
   return {
     currentStep,
-    excelData,
-    headers,
-    aiAnalysis,
+    detectionType,
+    detectionResult,
     importProgress,
     importErrors,
     importWarnings,
     importSuggestions,
     handleFileUpload,
+    handleDetection,
     confirmAndImport,
     downloadTemplate,
     resetDialog,

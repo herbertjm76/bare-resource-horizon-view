@@ -7,70 +7,66 @@ serve(async (req) => {
   }
 
   try {
-    const { headers, sampleData } = await req.json();
+    const { detectionType, examples, allData } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are an expert data mapping assistant for a project management system. 
-Analyze Excel column headers and sample data to suggest mappings to our system fields.
+    let systemPrompt = "";
+    let userPrompt = "";
 
-Available target fields:
-- code: Project Code (required) - unique identifier
-- name: Project Name (required) - descriptive name
-- status: Status (optional) - project status (active, completed, on-hold, cancelled)
-- country: Country (optional) - location
-- target_profit_percentage: Target Profit % (optional) - numeric percentage
-- currency: Currency (optional) - ISO currency code (USD, EUR, GBP, etc.)
-- project_manager_name: Project Manager Name (optional) - full name
-- office_name: Office Name (optional) - office location
+    if (detectionType === "people") {
+      systemPrompt = `You are an expert at detecting person names from Excel data.
+Analyze the data and extract ALL person names you can find.
+Look for patterns like:
+- Full names (First Last)
+- Names with titles (Mr., Dr., etc.)
+- Names in dedicated columns or rows
+- Names mixed with other data
 
-SPECIAL CASE - Matrix Format Detection:
-If the first column contains project codes (patterns like "00120.068" or similar numbering) 
-followed by project names in the same cell, this is a PROJECT MATRIX format.
-
-For matrix format, return:
+Return a JSON object with:
 {
-  "mappings": {
-    "0": "code_and_name"
-  },
-  "confidence": { "0": 0.95 },
-  "suggestions": ["Detected project matrix format. Column 0 contains project codes and names that will be split automatically."]
-}
-
-For standard format, return:
-{
-  "mappings": {
-    "columnIndex": "targetField"
-  },
-  "confidence": {
-    "columnIndex": 0.0-1.0
-  },
-  "suggestions": [
-    "Human-readable suggestion or warning"
-  ]
+  "detected": ["Name 1", "Name 2", ...],
+  "confidence": 0.0-1.0,
+  "location": "description of where names were found"
 }`;
 
-    const userPrompt = `Analyze these Excel columns and suggest mappings:
+      userPrompt = `Find all person names in this Excel data:
+${JSON.stringify(allData.slice(0, 50))}
 
-Headers: ${JSON.stringify(headers)}
-Sample Data (first 3 rows): ${JSON.stringify(sampleData)}
+${examples && examples.length > 0 ? `Examples of names to look for: ${examples.join(", ")}` : ""}
 
-DETECTION RULES:
-1. Check if column 0 has values matching pattern: number/code followed by text (e.g., "00120.068 Regional SE Asia Admin")
-2. If YES → return "code_and_name" mapping for column 0
-3. If NO → provide standard column mappings
+Return ONLY the JSON object, no markdown.`;
 
-Standard mapping variations:
-- "Proj Code", "Project ID", "Code" → code
-- "Project Title", "Name", "Project" → name
-- "PM", "Manager", "Lead" → project_manager_name
-- "Location", "Office", "Site" → office_name
-- "Profit", "Margin", "Target %" → target_profit_percentage
+    } else if (detectionType === "projects") {
+      systemPrompt = `You are an expert at detecting project codes and names from Excel data.
+Analyze the data and extract ALL project codes and names you can find.
+Look for patterns like:
+- Numeric codes (e.g., "00120.068", "PRJ-001")
+- Code + Name combinations
+- Project identifiers in rows or columns
 
-Return ONLY the JSON object, no markdown or explanations.`;
+Return a JSON object with:
+{
+  "detected": [
+    {"code": "project code", "name": "project name"},
+    ...
+  ],
+  "confidence": 0.0-1.0,
+  "location": "description of where projects were found"
+}`;
+
+      userPrompt = `Find all project codes and names in this Excel data:
+${JSON.stringify(allData.slice(0, 50))}
+
+${examples && examples.length > 0 ? `Examples of project codes to look for: ${examples.join(", ")}` : ""}
+
+Return ONLY the JSON object, no markdown.`;
+    } else {
+      throw new Error("Invalid detection type");
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
