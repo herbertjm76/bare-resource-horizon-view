@@ -14,6 +14,29 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Smart data sampling to avoid context window limits
+    // Include the specific range the user mentioned, plus surrounding context
+    let sampledData = allData;
+    const dataSize = JSON.stringify(allData).length;
+    const MAX_SIZE = 500000; // ~500KB limit for AI context
+    
+    if (dataSize > MAX_SIZE) {
+      // If data is too large, intelligently sample it
+      const totalRows = allData.length;
+      
+      // Always include first 20 rows (likely headers and structure)
+      const headerRows = allData.slice(0, 20);
+      
+      // Include middle and end samples
+      const middleStart = Math.floor(totalRows / 2) - 10;
+      const middleRows = allData.slice(middleStart, middleStart + 20);
+      const endRows = allData.slice(-20);
+      
+      sampledData = [...headerRows, ...middleRows, ...endRows];
+      
+      console.log(`Data too large (${dataSize} bytes). Sampled from ${totalRows} rows to ${sampledData.length} rows.`);
+    }
+
     let systemPrompt = "";
     let userPrompt = "";
 
@@ -48,14 +71,15 @@ ${explanation ? `"${explanation}"\n\nYou MUST prioritize these instructions abov
 
 ${examples && examples.length > 0 ? `\nExamples of names to look for: ${examples.join(", ")}` : ""}
 
-Complete dataset (ALL rows and columns):
-${JSON.stringify(allData)}
+Dataset (${sampledData.length} rows sampled from ${allData.length} total rows):
+${JSON.stringify(sampledData)}
 
 Important:
 - ALWAYS follow the user's explicit cell range instructions if provided
 - If a single row contains many names spread across columns, extract ALL non-empty name cells from that row
 - Look for rows with high density of name-like values (2-word combinations with capitals)
 - Remove duplicates, trim whitespace, and exclude empty cells
+- The sampled data shows the structure - apply the same pattern to detect ALL names
 - Return ONLY the JSON object, no markdown.`;
 
     } else if (detectionType === "projects") {
@@ -87,12 +111,13 @@ ${explanation ? `"${explanation}"\n\nYou MUST prioritize these instructions abov
 
 ${examples && examples.length > 0 ? `\nExamples of project codes to look for: ${examples.join(", ")}` : ""}
 
-Complete dataset (ALL rows and columns):
-${JSON.stringify(allData)}
+Dataset (${sampledData.length} rows sampled from ${allData.length} total rows):
+${JSON.stringify(sampledData)}
 
 Important:
 - ALWAYS follow the user's explicit instructions if provided
 - Look for consistent patterns in project codes (numeric, alphanumeric, specific formats)
+- The sampled data shows the structure - apply the same pattern to detect ALL projects
 - Return ONLY the JSON object, no markdown.`;
     } else {
       throw new Error("Invalid detection type");
