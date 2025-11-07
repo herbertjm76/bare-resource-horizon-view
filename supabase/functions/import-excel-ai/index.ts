@@ -48,8 +48,8 @@ ${explanation ? `"${explanation}"\n\nYou MUST prioritize these instructions abov
 
 ${examples && examples.length > 0 ? `\nExamples of names to look for: ${examples.join(", ")}` : ""}
 
-Dataset (first 150 rows for context):
-${JSON.stringify(allData.slice(0, 150))}
+Complete dataset (ALL rows and columns):
+${JSON.stringify(allData)}
 
 Important:
 - ALWAYS follow the user's explicit cell range instructions if provided
@@ -87,8 +87,8 @@ ${explanation ? `"${explanation}"\n\nYou MUST prioritize these instructions abov
 
 ${examples && examples.length > 0 ? `\nExamples of project codes to look for: ${examples.join(", ")}` : ""}
 
-Dataset (first 150 rows for context):
-${JSON.stringify(allData.slice(0, 150))}
+Complete dataset (ALL rows and columns):
+${JSON.stringify(allData)}
 
 Important:
 - ALWAYS follow the user's explicit instructions if provided
