@@ -18,8 +18,34 @@ serve(async (req) => {
     let userPrompt = "";
 
     if (detectionType === "people") {
+      // Heuristic: find the row with the highest count of name-like tokens (e.g., "First Last")
+      const nameRowInfo = (() => {
+        try {
+          let bestIdx = -1;
+          let bestCount = -1;
+          let bestRow: any[] = [];
+          const isLikelyName = (v: any) => {
+            if (typeof v !== "string") return false;
+            const s = v.trim();
+            if (s.length < 3 || s.length > 60) return false;
+            // Two words with starting capitals or contains a comma separating last/first
+            const words = s.split(/\s+/);
+            const capWords = words.filter(w => /^[A-Z][a-zA-Z.\-']+$/.test(w));
+            const hasComma = /,/.test(s);
+            return (capWords.length >= 2) || hasComma;
+          };
+          (allData as any[]).forEach((row: any[], idx: number) => {
+            if (!Array.isArray(row)) return;
+            const count = row.filter(isLikelyName).length;
+            if (count > bestCount) { bestCount = count; bestIdx = idx; bestRow = row; }
+          });
+          return { index1Based: bestIdx + 1, row: bestRow, count: bestCount };
+        } catch { return { index1Based: -1, row: [], count: 0 }; }
+      })();
+
       systemPrompt = `You are an expert at detecting person names from Excel data.
 Analyze the data and extract ALL person names you can find.
+Names may be laid out across columns in a single header row (e.g., D3–CB3).
 Look for patterns like:
 - Full names (First Last)
 - Names with titles (Mr., Dr., etc.)
@@ -33,13 +59,23 @@ Return a JSON object with:
   "location": "description of where names were found"
 }`;
 
-      userPrompt = `Find all person names in this Excel data:
-${JSON.stringify(allData.slice(0, 50))}
+      const denseRowNote = nameRowInfo.count > 0
+        ? `Most name-dense row detected (row ${nameRowInfo.index1Based}): ${JSON.stringify(nameRowInfo.row)}`
+        : "";
+
+      userPrompt = `Find all person names in this Excel data.
+${denseRowNote}
+
+Dataset sample (first 100 rows):
+${JSON.stringify(allData.slice(0, 100))}
 
 ${examples && examples.length > 0 ? `Examples of names to look for: ${examples.join(", ")}` : ""}
 ${explanation ? `\n\nAdditional context: ${explanation}` : ""}
 
-Return ONLY the JSON object, no markdown.`;
+Important:
+- If a single row contains many names spread across columns, extract ALL non-empty name cells from that row.
+- Remove duplicates and trim whitespace.
+- Return ONLY the JSON object, no markdown.`;
 
     } else if (detectionType === "projects") {
       systemPrompt = `You are an expert at detecting project codes and names from Excel data.
