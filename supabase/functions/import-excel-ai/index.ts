@@ -18,34 +18,16 @@ serve(async (req) => {
     let userPrompt = "";
 
     if (detectionType === "people") {
-      // Heuristic: find the row with the highest count of name-like tokens (e.g., "First Last")
-      const nameRowInfo = (() => {
-        try {
-          let bestIdx = -1;
-          let bestCount = -1;
-          let bestRow: any[] = [];
-          const isLikelyName = (v: any) => {
-            if (typeof v !== "string") return false;
-            const s = v.trim();
-            if (s.length < 3 || s.length > 60) return false;
-            // Two words with starting capitals or contains a comma separating last/first
-            const words = s.split(/\s+/);
-            const capWords = words.filter(w => /^[A-Z][a-zA-Z.\-']+$/.test(w));
-            const hasComma = /,/.test(s);
-            return (capWords.length >= 2) || hasComma;
-          };
-          (allData as any[]).forEach((row: any[], idx: number) => {
-            if (!Array.isArray(row)) return;
-            const count = row.filter(isLikelyName).length;
-            if (count > bestCount) { bestCount = count; bestIdx = idx; bestRow = row; }
-          });
-          return { index1Based: bestIdx + 1, row: bestRow, count: bestCount };
-        } catch { return { index1Based: -1, row: [], count: 0 }; }
-      })();
-
       systemPrompt = `You are an expert at detecting person names from Excel data.
+Your PRIMARY DIRECTIVE is to follow the user's explicit instructions about WHERE names are located.
+
+If the user specifies cell ranges (e.g., "D3 to CB3", "row 3 columns D-CB"), you MUST:
+1. Identify that specific row and column range in the data
+2. Extract ALL names from exactly that location
+3. Do NOT rely solely on heuristics - the user knows their file structure
+
 Analyze the data and extract ALL person names you can find.
-Names may be laid out across columns in a single header row (e.g., D3–CB3).
+Names may be laid out across columns in a single header row or scattered throughout.
 Look for patterns like:
 - Full names (First Last)
 - Names with titles (Mr., Dr., etc.)
@@ -59,26 +41,29 @@ Return a JSON object with:
   "location": "description of where names were found"
 }`;
 
-      const denseRowNote = nameRowInfo.count > 0
-        ? `Most name-dense row detected (row ${nameRowInfo.index1Based}): ${JSON.stringify(nameRowInfo.row)}`
-        : "";
-
       userPrompt = `Find all person names in this Excel data.
-${denseRowNote}
 
-Dataset sample (first 100 rows):
-${JSON.stringify(allData.slice(0, 100))}
+**CRITICAL USER INSTRUCTIONS:**
+${explanation ? `"${explanation}"\n\nYou MUST prioritize these instructions above all else. If the user specified a cell range or row/column location, extract names from EXACTLY that location.` : ""}
 
-${examples && examples.length > 0 ? `Examples of names to look for: ${examples.join(", ")}` : ""}
-${explanation ? `\n\nAdditional context: ${explanation}` : ""}
+${examples && examples.length > 0 ? `\nExamples of names to look for: ${examples.join(", ")}` : ""}
+
+Dataset (first 150 rows for context):
+${JSON.stringify(allData.slice(0, 150))}
 
 Important:
-- If a single row contains many names spread across columns, extract ALL non-empty name cells from that row.
-- Remove duplicates and trim whitespace.
+- ALWAYS follow the user's explicit cell range instructions if provided
+- If a single row contains many names spread across columns, extract ALL non-empty name cells from that row
+- Look for rows with high density of name-like values (2-word combinations with capitals)
+- Remove duplicates, trim whitespace, and exclude empty cells
 - Return ONLY the JSON object, no markdown.`;
 
     } else if (detectionType === "projects") {
       systemPrompt = `You are an expert at detecting project codes and names from Excel data.
+Your PRIMARY DIRECTIVE is to follow the user's explicit instructions about WHERE projects are located.
+
+If the user specifies cell ranges or structural hints, you MUST prioritize that information.
+
 Analyze the data and extract ALL project codes and names you can find.
 Look for patterns like:
 - Numeric codes (e.g., "00120.068", "PRJ-001")
@@ -95,13 +80,20 @@ Return a JSON object with:
   "location": "description of where projects were found"
 }`;
 
-      userPrompt = `Find all project codes and names in this Excel data:
-${JSON.stringify(allData.slice(0, 50))}
+      userPrompt = `Find all project codes and names in this Excel data.
 
-${examples && examples.length > 0 ? `Examples of project codes to look for: ${examples.join(", ")}` : ""}
-${explanation ? `\n\nAdditional context: ${explanation}` : ""}
+**CRITICAL USER INSTRUCTIONS:**
+${explanation ? `"${explanation}"\n\nYou MUST prioritize these instructions above all else.` : ""}
 
-Return ONLY the JSON object, no markdown.`;
+${examples && examples.length > 0 ? `\nExamples of project codes to look for: ${examples.join(", ")}` : ""}
+
+Dataset (first 150 rows for context):
+${JSON.stringify(allData.slice(0, 150))}
+
+Important:
+- ALWAYS follow the user's explicit instructions if provided
+- Look for consistent patterns in project codes (numeric, alphanumeric, specific formats)
+- Return ONLY the JSON object, no markdown.`;
     } else {
       throw new Error("Invalid detection type");
     }
