@@ -38,10 +38,10 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* Modern gradient system - easily customizable */
-    --gradient-start: 220 90% 56%;      /* Modern blue */
-    --gradient-mid: 280 90% 60%;        /* Vibrant purple */
-    --gradient-end: 340 90% 55%;        /* Accent pink */
+    /* Modern gradient system - matches "Modern Dark" theme */
+    --gradient-start: 245 60% 30%;      /* Indigo */
+    --gradient-mid: 275 60% 35%;        /* Violet */
+    --gradient-end: 305 60% 38%;        /* Purple */
     
     /* Alternative theme options (uncomment to switch) */
     /* Ocean theme */

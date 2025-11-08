@@ -2,10 +2,13 @@ import { useEffect } from 'react';
 
 export const useTheme = () => {
   useEffect(() => {
-    // Load and apply saved theme on mount
-    const savedTheme = localStorage.getItem('app-theme');
-    if (savedTheme) {
-      applyThemeById(savedTheme);
+    // Load and apply saved theme on mount, or default to "default" theme
+    const savedTheme = localStorage.getItem('app-theme') || 'default';
+    applyThemeById(savedTheme);
+    
+    // Save the default theme if none was saved before
+    if (!localStorage.getItem('app-theme')) {
+      localStorage.setItem('app-theme', 'default');
     }
   }, []);
 };
