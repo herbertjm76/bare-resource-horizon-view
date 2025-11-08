@@ -1,4 +1,5 @@
 import React from 'react';
+import { StandardizedBadge } from '@/components/ui/standardized-badge';
 
 interface TotalHoursCellProps {
   totalHours: number;
@@ -28,16 +29,14 @@ export const TotalHoursCell: React.FC<TotalHoursCellProps> = ({
         borderRight: 'none',
         borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
         verticalAlign: 'middle',
-        fontWeight: '600'
       }}
     >
-      <span style={{ 
-        fontSize: '14px',
-        fontWeight: '700',
-        color: '#1f2937'
-      }}>
+      <StandardizedBadge 
+        variant={utilizationRate > 100 ? "error" : utilizationRate > 80 ? "warning" : "metric"} 
+        size="sm"
+      >
         {utilizationRate}%
-      </span>
+      </StandardizedBadge>
     </td>
   );
 };

@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { TableCell } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { StandardizedBadge } from '@/components/ui/standardized-badge';
 
 interface TotalHoursCellProps {
   totalHours: number;
@@ -17,12 +16,12 @@ export const TotalHoursCell: React.FC<TotalHoursCellProps> = ({ totalHours, week
   return (
     <TableCell className="text-center p-0">
       <div className="flex flex-col items-center py-1">
-        <Badge 
-          variant={utilization > 100 ? "destructive" : utilization > 80 ? "warning" : "outline"} 
-          className="text-xs py-0 px-1.5 h-5"
+        <StandardizedBadge 
+          variant={utilization > 100 ? "error" : utilization > 80 ? "warning" : "metric"} 
+          size="sm"
         >
           {utilization}%
-        </Badge>
+        </StandardizedBadge>
       </div>
     </TableCell>
   );

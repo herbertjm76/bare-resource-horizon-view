@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { TableCell } from '@/components/ui/table';
+import { StandardizedBadge } from '@/components/ui/standardized-badge';
 
 interface DisplayPillCellProps {
   value: number;
@@ -17,11 +17,9 @@ export const DisplayPillCell: React.FC<DisplayPillCellProps> = ({
 }) => {
   return (
     <TableCell className={`text-center border-r p-1 ${className}`}>
-      <div
-        className={`inline-flex items-center justify-center w-8 h-6 text-xs font-medium rounded-lg ${pillClassName}`}
-      >
+      <StandardizedBadge variant="metric" size="sm">
         {value || 0}{label}
-      </div>
+      </StandardizedBadge>
     </TableCell>
   );
 };

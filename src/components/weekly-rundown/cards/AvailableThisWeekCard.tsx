@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserCheck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -154,9 +154,9 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
                     <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
                   </Avatar>
                   <span className="text-xs font-medium text-foreground">{member.firstName}</span>
-                  <Badge variant="secondary" className="text-xs px-2 py-0.5 h-5 font-bold">
+                  <StandardizedBadge variant="metric" size="sm">
                     {member.availableHours}h
-                  </Badge>
+                  </StandardizedBadge>
                 </div>
               );
             })}

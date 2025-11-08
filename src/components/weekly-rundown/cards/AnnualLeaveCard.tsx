@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Umbrella } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -98,9 +98,9 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
                   <span className="text-xs font-medium text-foreground">{firstName}</span>
                   <div className="flex flex-wrap gap-1 justify-center">
                     {leaveDays.map((day, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs px-2 py-0.5 h-5 font-bold">
+                      <StandardizedBadge key={idx} variant="metric" size="sm">
                         {getDayInitial(day.date)}-{day.hours}h
-                      </Badge>
+                      </StandardizedBadge>
                     ))}
                   </div>
                 </div>

@@ -4,6 +4,7 @@ import { format, addWeeks, subWeeks } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StandardizedBadge } from '@/components/ui/standardized-badge';
 
 interface ProjectResourceOverviewProps {
   projectId: string;
@@ -107,7 +108,11 @@ export const ProjectResourceOverview: React.FC<ProjectResourceOverviewProps> = (
                             </div>
                           </div>
                         </td>
-                        <td className="py-2 px-3 text-right font-medium">{allocation.hours}h</td>
+                        <td className="py-2 px-3 text-right font-medium">
+                          <StandardizedBadge variant="metric" size="sm">
+                            {allocation.hours}h
+                          </StandardizedBadge>
+                        </td>
                       </tr>
                     );
                   })}
@@ -115,7 +120,11 @@ export const ProjectResourceOverview: React.FC<ProjectResourceOverviewProps> = (
                 <tfoot>
                   <tr className="bg-muted/30 border-t">
                     <td className="py-2 px-3 font-medium">Total</td>
-                    <td className="py-2 px-3 text-right font-medium">{totalHours}h</td>
+                    <td className="py-2 px-3 text-right font-medium">
+                      <StandardizedBadge variant="metric" size="sm">
+                        {totalHours}h
+                      </StandardizedBadge>
+                    </td>
                   </tr>
                 </tfoot>
               </table>
