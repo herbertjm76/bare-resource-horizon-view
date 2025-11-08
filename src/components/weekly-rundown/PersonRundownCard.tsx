@@ -217,14 +217,14 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
             {person.projects && person.projects.length > 0 && (
               <div className="mt-3 space-y-1.5 max-h-48 overflow-y-auto">
                 {person.projects.slice(0, 8).map((project, idx) => (
-                  <div key={`${project.id}-list-${idx}`} className="flex items-center gap-2 text-xs">
+                  <div key={`${project.id}-list-${idx}`} className="flex items-center text-xs">
                     <div
-                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      className="w-2 h-2 rounded-full flex-shrink-0 mr-2"
                       style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
                     />
-                    <span className="font-semibold text-foreground">{project.code}</span>
-                    <span className="truncate text-muted-foreground flex-1 min-w-0">{project.name}</span>
-                    <span className="font-mono text-muted-foreground flex-shrink-0">{project.hours}h</span>
+                    <span className="font-semibold text-foreground mr-2">{project.code}</span>
+                    <span className="text-muted-foreground mr-2 truncate max-w-[200px]">{project.name}</span>
+                    <span className="font-mono text-muted-foreground">{project.hours}h</span>
                   </div>
                 ))}
                 {person.projects.length > 8 && (
