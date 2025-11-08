@@ -9,6 +9,7 @@ import { OtherLeaveSection } from './OtherLeaveSection';
 import { format, startOfWeek } from 'date-fns';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
+import { StandardizedBadge } from '@/components/ui/standardized-badge';
 
 interface PersonRundownCardProps {
   person: {
@@ -224,7 +225,9 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
                     />
                     <span className="font-semibold text-foreground mr-2">{project.code}</span>
                     <span className="text-muted-foreground mr-2 truncate max-w-[200px]">{project.name}</span>
-                    <span className="font-mono text-muted-foreground">{project.hours}h</span>
+                    <StandardizedBadge variant="metric" size="sm">
+                      {project.hours}h
+                    </StandardizedBadge>
                   </div>
                 ))}
                 {person.projects.length > 8 && (
