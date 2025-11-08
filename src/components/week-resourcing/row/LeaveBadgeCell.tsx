@@ -1,7 +1,7 @@
 
 import React from "react";
 import { TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { EnhancedTooltip } from "../EnhancedTooltip";
 
 interface LeaveBadgeCellProps {
@@ -43,9 +43,9 @@ export const LeaveBadgeCell: React.FC<LeaveBadgeCellProps> = ({
         leaveDays={leaveDays}
       >
         <div className="flex justify-center">
-          <Badge variant="outline" className="truncate max-w-[104px] text-xs font-semibold px-2 py-0.5 leading-tight whitespace-nowrap">
+          <StandardizedBadge variant="secondary" size="sm" className="truncate max-w-[104px]">
             {text}
-          </Badge>
+          </StandardizedBadge>
         </div>
       </EnhancedTooltip>
     </TableCell>

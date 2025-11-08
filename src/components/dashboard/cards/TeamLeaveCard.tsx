@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Calendar } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -134,9 +134,9 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
           </div>
           
           <div className="flex justify-center mt-3">
-            <Badge variant="outline" className="text-xs bg-card text-muted-foreground border-border px-3 py-1">
+            <StandardizedBadge variant="secondary" size="sm">
               {badgeText}
-            </Badge>
+            </StandardizedBadge>
           </div>
         </div>
       </CardContent>

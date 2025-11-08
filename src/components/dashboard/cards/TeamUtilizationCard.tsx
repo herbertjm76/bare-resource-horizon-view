@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { TrendingUp, TrendingDown, Activity, Users } from 'lucide-react';
 
 interface TeamUtilizationCardProps {
@@ -150,9 +150,13 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         {/* Footer metrics - Responsive grid */}
         <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 mt-4 sm:mt-6">
           <div className="flex flex-col items-center p-2 sm:p-3 lg:p-4 rounded-xl sm:rounded-2xl bg-white/60 backdrop-blur-sm border border-white/40 shadow-sm">
-            <Badge className={`mb-1 sm:mb-2 text-[10px] sm:text-xs font-bold border-0 bg-gradient-to-r ${config.gradient} text-white shadow-lg whitespace-nowrap px-2 py-0.5`}>
+            <StandardizedBadge 
+              variant={actualUtilizationRate <= 70 ? "secondary" : actualUtilizationRate <= 100 ? "success" : "error"} 
+              size="sm" 
+              className="mb-1 sm:mb-2"
+            >
               {config.status}
-            </Badge>
+            </StandardizedBadge>
             <span className="text-[10px] sm:text-xs text-muted-foreground text-center">Status</span>
           </div>
           

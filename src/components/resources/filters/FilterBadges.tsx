@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { X } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Button } from "@/components/ui/button";
 
 interface FilterBadgesProps {
@@ -39,10 +39,7 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
   return (
     <div className="flex flex-wrap gap-2">
       {filters.office !== 'all' && (
-        <Badge 
-          variant="outline" 
-          className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
-        >
+        <StandardizedBadge variant="secondary" size="sm" className="flex items-center gap-1">
           Office: {filters.office}
           <Button 
             variant="ghost"
@@ -52,14 +49,11 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           >
             <X className="h-3 w-3" />
           </Button>
-        </Badge>
+        </StandardizedBadge>
       )}
       
       {filters.country !== 'all' && (
-        <Badge 
-          variant="outline" 
-          className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
-        >
+        <StandardizedBadge variant="secondary" size="sm" className="flex items-center gap-1">
           Country: {filters.country}
           <Button 
             variant="ghost"
@@ -69,14 +63,11 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           >
             <X className="h-3 w-3" />
           </Button>
-        </Badge>
+        </StandardizedBadge>
       )}
       
       {filters.manager !== 'all' && (
-        <Badge 
-          variant="outline" 
-          className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
-        >
+        <StandardizedBadge variant="secondary" size="sm" className="flex items-center gap-1">
           Manager: {managerOptions.find(m => m.id === filters.manager)?.name || filters.manager}
           <Button 
             variant="ghost"
@@ -86,14 +77,11 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           >
             <X className="h-3 w-3" />
           </Button>
-        </Badge>
+        </StandardizedBadge>
       )}
       
       {searchTerm && searchTerm.trim() !== '' && onSearchChange && (
-        <Badge 
-          variant="outline" 
-          className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
-        >
+        <StandardizedBadge variant="secondary" size="sm" className="flex items-center gap-1">
           Search: {searchTerm}
           <Button 
             variant="ghost"
@@ -103,7 +91,7 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           >
             <X className="h-3 w-3" />
           </Button>
-        </Badge>
+        </StandardizedBadge>
       )}
     </div>
   );

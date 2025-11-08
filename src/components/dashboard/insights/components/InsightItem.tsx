@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { InsightData } from '../types';
 
 interface InsightItemProps {
@@ -39,9 +39,9 @@ export const InsightItem: React.FC<InsightItemProps> = ({ insight }) => {
           <h4 className="font-medium text-sm text-gray-900">
             {insight.title}
           </h4>
-          <Badge variant="outline" className="text-xs px-2 py-1">
+          <StandardizedBadge variant="secondary" size="sm">
             {insight.category}
-          </Badge>
+          </StandardizedBadge>
         </div>
         <p className="text-xs text-gray-600 leading-relaxed">
           {insight.description}

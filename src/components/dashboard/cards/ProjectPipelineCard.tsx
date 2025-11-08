@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { BarChart3, TrendingUp } from 'lucide-react';
 import { ProjectPipelineBubbleGraph } from './ProjectPipelineBubbleGraph';
 
@@ -112,9 +112,9 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
             
             {/* Time range badge */}
             <div className="flex justify-center">
-              <Badge variant="outline" className="text-xs bg-card text-muted-foreground border-border">
+              <StandardizedBadge variant="secondary" size="sm">
                 {timeRange}
-              </Badge>
+              </StandardizedBadge>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Clock } from 'lucide-react';
 
 interface OverCapacityKPIProps {
@@ -17,9 +17,9 @@ export const OverCapacityKPI: React.FC<OverCapacityKPIProps> = ({
           <div className="flex-1 min-w-0 space-y-2">
             <p className="text-xs font-semibold text-white/90 mb-2 tracking-wide">OVER CAPACITY</p>
             <p className="text-3xl font-bold text-white mb-2 tracking-tight">{overCapacityHours}h</p>
-            <Badge className="text-xs glass-card border-white/20 text-red-400 bg-red-500/20">
+            <StandardizedBadge variant="error" size="sm" className="glass-card border-white/20">
               Over Capacity
-            </Badge>
+            </StandardizedBadge>
             <p className="text-sm font-medium text-white/80">This Month</p>
           </div>
           <div className="h-10 w-10 rounded-xl glass-card flex items-center justify-center flex-shrink-0 ml-3">

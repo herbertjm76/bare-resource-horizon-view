@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, TrendingUp, Users, Target, ArrowRight } from 'lucide-react';
 
@@ -38,10 +38,10 @@ export const InsightCard: React.FC<InsightCardProps> = ({
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
-      case 'critical': return <Badge variant="destructive">Critical</Badge>;
-      case 'high': return <Badge className="bg-orange-500 text-white">High Priority</Badge>;
-      case 'medium': return <Badge className="bg-yellow-500 text-white">Medium</Badge>;
-      case 'low': return <Badge variant="secondary">Low Priority</Badge>;
+      case 'critical': return <StandardizedBadge variant="error" size="sm">Critical</StandardizedBadge>;
+      case 'high': return <StandardizedBadge variant="warning" size="sm">High Priority</StandardizedBadge>;
+      case 'medium': return <StandardizedBadge variant="info" size="sm">Medium</StandardizedBadge>;
+      case 'low': return <StandardizedBadge variant="secondary" size="sm">Low Priority</StandardizedBadge>;
       default: return null;
     }
   };

@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
@@ -209,7 +209,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                     <div className="flex items-center justify-between w-full">
                       <span>{member.name}</span>
                       {member.type === 'pre-registered' && (
-                        <Badge variant="outline" className="ml-2 text-xs">Pending</Badge>
+                        <StandardizedBadge variant="warning" size="sm" className="ml-2">Pending</StandardizedBadge>
                       )}
                     </div>
                   </SelectItem>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Briefcase } from 'lucide-react';
 
 interface ProjectsCardProps {
@@ -20,9 +20,9 @@ export const ProjectsCard: React.FC<ProjectsCardProps> = ({
           <div className="flex-1 min-w-0 space-y-2">
             <p className="text-xs font-semibold text-white/90 mb-2 tracking-wide">ACTIVE PROJECTS</p>
             <p className="text-3xl font-bold text-white mb-2 tracking-tight">{activeProjects}</p>
-            <Badge className="text-xs glass-card border-white/20 text-white/90">
+            <StandardizedBadge variant="success" size="sm" className="glass-card border-white/20">
               Active
-            </Badge>
+            </StandardizedBadge>
             <p className="text-sm font-medium text-white/80">
               {activeResources > 0 
                 ? `${(activeProjects / activeResources).toFixed(1)} per person` 

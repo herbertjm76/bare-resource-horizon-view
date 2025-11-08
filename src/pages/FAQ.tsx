@@ -3,7 +3,7 @@ import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { 
   Accordion, 
   AccordionContent, 
@@ -223,9 +223,9 @@ const FAQ = () => {
           description="Find answers to common questions about resource planning and project management"
           icon={HelpCircle}
         >
-          <Badge variant="outline" className="text-sm">
+          <StandardizedBadge variant="secondary" size="sm">
             {filteredFAQs.length} {filteredFAQs.length === 1 ? 'Question' : 'Questions'}
-          </Badge>
+          </StandardizedBadge>
         </StandardizedPageHeader>
 
         {/* Search */}
@@ -305,16 +305,17 @@ const FAQ = () => {
                               {faq.question}
                             </h3>
                             <div className="flex items-center gap-2 mt-2">
-                              <Badge 
-                                variant="outline" 
-                                className={`text-xs ${getCategoryColor(faq.category)}`}
+                              <StandardizedBadge 
+                                variant="secondary"
+                                size="sm"
+                                className={getCategoryColor(faq.category)}
                               >
                                 {faq.category}
-                              </Badge>
+                              </StandardizedBadge>
                               {faq.tags.slice(0, 2).map(tag => (
-                                <Badge key={tag} variant="secondary" className="text-xs">
+                                <StandardizedBadge key={tag} variant="secondary" size="sm">
                                   {tag}
-                                </Badge>
+                                </StandardizedBadge>
                               ))}
                             </div>
                           </div>
@@ -328,9 +329,9 @@ const FAQ = () => {
                           {faq.tags.length > 2 && (
                             <div className="flex flex-wrap gap-1 mt-3">
                               {faq.tags.slice(2).map(tag => (
-                                <Badge key={tag} variant="secondary" className="text-xs">
+                                <StandardizedBadge key={tag} variant="secondary" size="sm">
                                   {tag}
-                                </Badge>
+                                </StandardizedBadge>
                               ))}
                             </div>
                           )}

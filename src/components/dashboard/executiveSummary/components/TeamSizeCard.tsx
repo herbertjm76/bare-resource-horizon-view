@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Users } from 'lucide-react';
 
 interface TeamSizeCardProps {
@@ -20,9 +20,13 @@ export const TeamSizeCard: React.FC<TeamSizeCardProps> = ({
           <div className="flex-1 min-w-0 space-y-2">
             <p className="text-xs font-semibold text-white/90 mb-2 tracking-wide">TEAM SIZE</p>
             <p className="text-3xl font-bold text-white mb-2 tracking-tight">{activeResources}</p>
-            <Badge className="text-xs glass-card border-white/20 text-white/90">
+            <StandardizedBadge 
+              variant={utilizationRate > 85 ? "warning" : "success"} 
+              size="sm" 
+              className="glass-card border-white/20"
+            >
               {utilizationRate > 85 ? 'Consider Hiring' : 'Stable'}
-            </Badge>
+            </StandardizedBadge>
             <p className="text-sm font-medium text-white/80">Active resources</p>
           </div>
           <div className="h-10 w-10 rounded-xl glass-card flex items-center justify-center flex-shrink-0 ml-3">

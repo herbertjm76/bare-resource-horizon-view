@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { TrendingUp } from 'lucide-react';
 import { BalancedGauge } from "@/components/dashboard/gauges/BalancedGauge";
 
@@ -75,9 +75,17 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         </div>
         
         <div className="flex items-center justify-between">
-          <Badge className="text-[10px] border-white/30 text-white bg-white/15 px-2 py-0.5">
+          <StandardizedBadge 
+            variant={
+              utilizationRate > 100 ? "error" :
+              utilizationRate > 80 ? "warning" :
+              "success"
+            } 
+            size="sm" 
+            className="border-white/30 text-white bg-white/15"
+          >
             {utilizationStatus.label}
-          </Badge>
+          </StandardizedBadge>
           <span className="text-[10px] text-white/70">This Month</span>
         </div>
       </CardContent>

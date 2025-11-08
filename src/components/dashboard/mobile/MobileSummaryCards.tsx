@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Briefcase, TrendingUp, Clock } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface MobileSummaryCardsProps {
   activeResources: number;
@@ -40,9 +40,12 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-600 mb-1">Team Size</p>
               <p className="text-2xl font-bold text-gray-900 mb-1">{activeResources}</p>
-              <Badge className={utilizationRate > 85 ? 'bg-orange-200 text-orange-800 border-orange-300' : 'bg-green-200 text-green-800 border-green-300'}>
+              <StandardizedBadge 
+                variant={utilizationRate > 85 ? "warning" : "success"} 
+                size="sm"
+              >
                 {utilizationRate > 85 ? 'Consider Hiring' : 'Stable'}
-              </Badge>
+              </StandardizedBadge>
             </div>
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600 flex items-center justify-center flex-shrink-0 ml-2">
               <Users className="h-4 w-4 text-white" />
@@ -78,9 +81,17 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-gray-600 mb-1">Utilization</p>
                 <p className="text-2xl font-bold text-gray-900 mb-1">{Math.round(utilizationRate)}%</p>
-                <Badge className={`text-xs ${utilizationStatus.color}`}>
+                <StandardizedBadge 
+                  variant={
+                    utilizationRate >= 90 ? "error" :
+                    utilizationRate >= 75 ? "warning" :
+                    utilizationRate >= 50 ? "success" :
+                    "secondary"
+                  } 
+                  size="sm"
+                >
                   {utilizationStatus.label}
-                </Badge>
+                </StandardizedBadge>
               </div>
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-fuchsia-500 to-fuchsia-600 flex items-center justify-center flex-shrink-0 ml-2">
                 <TrendingUp className="h-4 w-4 text-white" />

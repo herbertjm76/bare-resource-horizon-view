@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Clock } from 'lucide-react';
 import { TimeRange } from '../TimeRangeSelector';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
@@ -197,9 +197,9 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           </div>
           
           <div className="flex justify-center">
-            <Badge variant="outline" className="text-xs bg-card text-muted-foreground border-border">
+            <StandardizedBadge variant="secondary" size="sm">
               {timeConfig.label}
-            </Badge>
+            </StandardizedBadge>
           </div>
         </div>
       </CardContent>

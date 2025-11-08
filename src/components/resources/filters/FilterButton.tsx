@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Filter } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface FilterButtonProps {
@@ -37,12 +37,9 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
             <Filter className="h-4 w-4 mr-2" />
             <span>{buttonText}</span>
             {activeFiltersCount > 0 && (
-              <Badge 
-                className="ml-2 bg-brand-primary text-white" 
-                variant="default"
-              >
+              <StandardizedBadge variant="primary" size="sm" className="ml-2">
                 {activeFiltersCount}
-              </Badge>
+              </StandardizedBadge>
             )}
           </Button>
         </PopoverTrigger>
@@ -77,12 +74,9 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
       <Filter className="h-4 w-4 mr-2" />
       <span>{buttonText}</span>
       {activeFiltersCount > 0 && (
-        <Badge 
-          className="ml-2 bg-brand-primary text-white" 
-          variant="default"
-        >
+        <StandardizedBadge variant="primary" size="sm" className="ml-2">
           {activeFiltersCount}
-        </Badge>
+        </StandardizedBadge>
       )}
     </Button>
   );

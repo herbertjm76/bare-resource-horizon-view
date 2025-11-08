@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Invite } from './types';
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Send, Trash2, Mail } from 'lucide-react';
 import { getStatusStyle } from './utils/statusColors';
 
@@ -62,6 +62,7 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
               invite.status?.toLowerCase() === 'active' 
                 ? getStatusStyle('active')
                 : getStatusStyle('invited');
+            const role = invite.role;
               
             return (
               <tr key={invite.id} className="hover:bg-gray-50">
@@ -78,17 +79,27 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <Badge className={`${getRoleBadgeColor(invite.role)} border`}>
+                  <StandardizedBadge 
+                    variant={
+                      role?.toLowerCase() === 'owner' ? 'primary' :
+                      role?.toLowerCase() === 'admin' ? 'info' :
+                      role?.toLowerCase() === 'manager' ? 'success' :
+                      'secondary'
+                    }
+                    size="sm"
+                  >
                     {invite.role?.charAt(0).toUpperCase() + invite.role?.slice(1) || 'Member'}
-                  </Badge>
+                  </StandardizedBadge>
                 </td>
                 <td className="px-4 py-3">
-                  <Badge 
-                    variant={statusStyle.variant}
-                    className={statusStyle.className}
+                  <StandardizedBadge 
+                    variant={
+                      statusStyle.variant === 'default' ? 'success' : 'secondary'
+                    }
+                    size="sm"
                   >
                     {invite.status || 'Invited'}
-                  </Badge>
+                  </StandardizedBadge>
                 </td>
                 {editMode && (
                   <td className="px-4 py-3">

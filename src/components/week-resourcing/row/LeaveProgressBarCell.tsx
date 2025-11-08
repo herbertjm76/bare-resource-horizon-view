@@ -1,6 +1,6 @@
 import React from "react";
 import { TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { EnhancedTooltip } from "../EnhancedTooltip";
 
 interface LeaveProgressBarCellProps {
@@ -104,12 +104,9 @@ export const LeaveProgressBarCell: React.FC<LeaveProgressBarCellProps> = ({
           </div>
           {/* Remarks if present */}
           {remarks && (
-            <Badge
-              variant="outline"
-              className="w-fit px-2 py-0.5 text-gray-500 border-gray-300 truncate max-w-[92px] mt-1"
-            >
+            <StandardizedBadge variant="secondary" size="sm" className="truncate max-w-[92px] mt-1">
               {remarks}
-            </Badge>
+            </StandardizedBadge>
           )}
         </div>
       </EnhancedTooltip>

@@ -2,7 +2,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, TrendingUp, TrendingDown, Users, Calendar, Clock, Target } from 'lucide-react';
 
 interface SummaryMetric {

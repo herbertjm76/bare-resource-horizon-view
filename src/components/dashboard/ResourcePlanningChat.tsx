@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Bot, User, Lightbulb, TrendingUp, Users, AlertTriangle } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface Message {
   id: string;
@@ -149,7 +149,7 @@ export const ResourcePlanningChat: React.FC<ResourcePlanningChatProps> = ({
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-blue-600" />
           Resource Planning Assistant
-          <Badge variant="secondary" className="ml-auto">AI Powered</Badge>
+          <StandardizedBadge variant="info" size="sm" className="ml-auto">AI Powered</StandardizedBadge>
         </CardTitle>
       </CardHeader>
       

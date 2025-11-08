@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Clock } from 'lucide-react';
 
 interface OverCapacityCardProps {
@@ -32,9 +32,9 @@ export const OverCapacityCard: React.FC<OverCapacityCardProps> = ({
         </div>
         
         <div className="flex items-center justify-between">
-          <Badge className="text-[10px] glass-card border-white/20 text-white px-2 py-0.5">
+          <StandardizedBadge variant="error" size="sm" className="glass-card border-white/20">
             Over Capacity
-          </Badge>
+          </StandardizedBadge>
           <span className="text-[10px] text-white/70">{timeRange}</span>
         </div>
       </CardContent>

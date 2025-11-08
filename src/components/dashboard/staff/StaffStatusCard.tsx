@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Users, AlertTriangle, Target } from 'lucide-react';
 import { StaffStatusCardProps } from './types';
@@ -52,9 +52,9 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
             <Users className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
           </div>
           <span className="text-brand-violet font-semibold">Staff Status</span>
-          <Badge variant="outline" className="bg-muted text-muted-foreground border-border text-xs">
+          <StandardizedBadge variant="secondary" size="sm">
             {getTimeRangeText()}
-          </Badge>
+          </StandardizedBadge>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden p-0">

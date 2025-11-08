@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, Briefcase, Calendar, User } from 'lucide-react';
 import { StaffMember } from './types';
@@ -112,9 +112,9 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
               <div className="text-sm text-gray-500 font-normal flex items-center gap-4">
                 <span>{memberDetails.role}</span>
                 {memberDetails.isPending && (
-                  <Badge variant="outline" className="text-orange-600 border-orange-200">
+                  <StandardizedBadge variant="warning" size="sm">
                     Pending
-                  </Badge>
+                  </StandardizedBadge>
                 )}
               </div>
             </div>
@@ -196,9 +196,9 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
                             Week of {new Date(allocation.weekStartDate).toLocaleDateString()}
                           </div>
                         </div>
-                        <Badge variant="secondary" className="ml-2">
+                        <StandardizedBadge variant="metric" size="sm" className="ml-2">
                           {allocation.hours}h
-                        </Badge>
+                        </StandardizedBadge>
                       </div>
                     </CardContent>
                   </Card>
