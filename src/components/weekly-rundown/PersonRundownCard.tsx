@@ -223,8 +223,8 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
                       style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
                     />
                     <span className="font-semibold text-foreground">{project.code}</span>
-                    <span className="truncate text-muted-foreground">{project.name}</span>
-                    <span className="font-mono text-muted-foreground ml-auto">{project.hours}h</span>
+                    <span className="truncate text-muted-foreground flex-1 min-w-0">{project.name}</span>
+                    <span className="font-mono text-muted-foreground flex-shrink-0">{project.hours}h</span>
                   </div>
                 ))}
                 {person.projects.length > 8 && (
