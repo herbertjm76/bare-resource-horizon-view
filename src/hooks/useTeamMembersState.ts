@@ -14,7 +14,7 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
   // Fetch invites effect
   useEffect(() => {
     const fetchInvites = async () => {
-      if (!companyId || !(userRole === 'owner' || userRole === 'admin')) {
+      if (!companyId) {
         return;
       }
       

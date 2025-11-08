@@ -72,12 +72,6 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
     error: teamMembersError
   } = useTeamMembersData(false);
 
-  // Fetch pre-registered members
-  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
-
-  // Combine active members and pre-registered members
-  const allMembers = [...teamMembers, ...preRegisteredMembers];
-
   // Fetch user profile
   const {
     data: userProfile,
@@ -114,6 +108,12 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
     retry: 1,
     refetchOnWindowFocus: false,
   });
+
+  // Fetch pre-registered members - allow all users to view
+  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'member');
+
+  // Combine active members and pre-registered members
+  const allMembers = [...teamMembers, ...preRegisteredMembers];
 
   // Set up realtime subscriptions only after permissions are confirmed and user has access
   useTeamMembersRealtime(
