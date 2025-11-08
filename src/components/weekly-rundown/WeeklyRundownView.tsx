@@ -5,6 +5,7 @@ import { RundownControls } from './RundownControls';
 import { RundownCarousel } from './RundownCarousel';
 import { RundownGridView } from './RundownGridView';
 import { WeeklySummaryCards } from './WeeklySummaryCards';
+import { AvailableMembersRow } from './AvailableMembersRow';
 import { useRundownData } from './hooks/useRundownData';
 import { useCarouselNavigation } from './hooks/useCarouselNavigation';
 import { useCardVisibility } from '@/hooks/useCardVisibility';
@@ -120,6 +121,11 @@ export const WeeklyRundownView: React.FC = () => {
     );
   }
 
+  const weekStartString = useMemo(() => 
+    format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
+    [selectedWeek]
+  );
+
   return (
     <div className={`space-y-6 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8' : ''}`}>
       <WeeklySummaryCards 
@@ -130,6 +136,11 @@ export const WeeklyRundownView: React.FC = () => {
         toggleCard={toggleCard}
         moveCard={moveCard}
         reorderCards={reorderCards}
+      />
+
+      <AvailableMembersRow 
+        weekStartDate={weekStartString}
+        threshold={80}
       />
 
       <RundownControls

@@ -9,7 +9,6 @@ import { HolidaysCard } from './cards/HolidaysCard';
 import { AnnualLeaveCard } from './cards/AnnualLeaveCard';
 import { OtherLeaveCard } from './cards/OtherLeaveCard';
 import { NotesCard } from './cards/NotesCard';
-import { AvailableThisWeekCard } from './cards/AvailableThisWeekCard';
 import { CustomRundownCard } from './cards/CustomRundownCard';
 import { WeekInfoCard } from './cards/WeekInfoCard';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
@@ -157,12 +156,6 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       id: 'notes', 
       component: <NotesCard key="notes" notes={weeklyNotes} weekStartDate={weekStartString} />,
       isVisible: cardVisibility.notes 
-    });
-    
-    allCards.push({ 
-      id: 'available', 
-      component: <AvailableThisWeekCard key="available" weekStartDate={weekStartString} threshold={80} />,
-      isVisible: cardVisibility.available 
     });
 
     // Add custom cards
