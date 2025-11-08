@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { useMemberPermissions } from '@/hooks/team/useMemberPermissions';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
+import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
 import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
 
@@ -70,6 +71,12 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
     isLoading: isTeamMembersLoading,
     error: teamMembersError
   } = useTeamMembersData(false);
+
+  // Fetch pre-registered members
+  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
+
+  // Combine active members and pre-registered members
+  const allMembers = [...teamMembers, ...preRegisteredMembers];
 
   // Fetch user profile
   const {
@@ -148,7 +155,7 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
     <TeamMemberContent
       userProfile={userProfile}
       isProfileLoading={isLoading}
-      teamMembers={teamMembers || []}
+      teamMembers={allMembers || []}
       onRefresh={triggerRefresh}
     />
   );
