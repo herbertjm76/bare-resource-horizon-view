@@ -1,5 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { MapPin, Users, Clock, Activity, Briefcase, Building, Palette, Code, Sparkles, Rocket, Target, Zap, TrendingUp, Circle } from 'lucide-react';
 import { TeamMemberAvatar } from './TeamMemberAvatar';
 import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
@@ -111,10 +112,10 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               
               {/* Badges - Upper Right */}
               <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                <Badge variant="outline" className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold">
+                <StandardizedBadge variant="metric" size="sm" className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
                   {project.totalHours}h
-                </Badge>
+                </StandardizedBadge>
                 {project.office && (
                   <Badge variant="outline" className="flex items-center gap-1 px-2.5 py-1 text-xs">
                     {project.office}

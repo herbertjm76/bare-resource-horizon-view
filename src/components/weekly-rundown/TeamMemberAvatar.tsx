@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Check, X, Trash2 } from 'lucide-react';
@@ -202,9 +202,9 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
                 {/* Name and hours below avatar */}
                 <div className="flex flex-col items-center gap-1">
                   <p className="font-semibold text-sm text-foreground">{firstName}</p>
-                  <Badge className="bg-primary text-primary-foreground shadow-md px-3 py-1 text-sm font-bold">
+                  <StandardizedBadge variant="metric" size="sm">
                     {member.hours}h
-                  </Badge>
+                  </StandardizedBadge>
                 </div>
               </div>
             </TooltipTrigger>

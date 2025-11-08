@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Clock, Users, Calendar, Building, Pencil, Circle } from 'lucide-react';
 import { RundownMode } from './WeeklyRundownView';
@@ -135,7 +136,7 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
                   {project.name}
                 </span>
               </div>
-              <span className="font-mono text-muted-foreground ml-2">{project.hours}h</span>
+              <StandardizedBadge variant="metric" size="sm" className="ml-2">{project.hours}h</StandardizedBadge>
             </div>
           ))}
           {person.projects.length > 5 && (
@@ -246,9 +247,9 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                           </Avatar>
                           <div className="flex flex-col items-center gap-0.5">
                             <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
-                            <Badge className="bg-primary text-primary-foreground shadow-md px-2 py-0.5 text-[10px] font-bold">
+                            <StandardizedBadge variant="metric" size="sm">
                               {Math.round(member.hours || 0)}h
-                            </Badge>
+                            </StandardizedBadge>
                           </div>
                         </div>
                       </TooltipTrigger>
@@ -336,7 +337,7 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                       <span className="truncate">{member.name}</span>
                     </div>
                     <div className="flex items-center gap-2 ml-2">
-                      <span className="font-mono">{Math.round(member.hours || 0)}h</span>
+                      <StandardizedBadge variant="metric" size="sm">{Math.round(member.hours || 0)}h</StandardizedBadge>
                       <Badge
                         variant={member.capacityPercentage > 100 ? 'destructive' : 'secondary'}
                         className="text-xs px-1 py-0"
