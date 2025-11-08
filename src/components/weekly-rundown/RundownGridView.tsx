@@ -78,16 +78,16 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
             <span className="truncate">{person.department || 'No Department'}</span>
           </div>
         </div>
-        <Badge 
+        <StandardizedBadge 
           variant={
-            person.utilization >= 100 ? "default" : 
+            person.utilization >= 100 ? "metric" : 
             person.utilization >= 70 ? "warning" : 
-            "destructive"
+            "error"
           }
-          className="text-xs font-semibold px-2 py-1"
+          size="sm"
         >
           {Math.round(person.utilization || 0)}%
-        </Badge>
+        </StandardizedBadge>
       </div>
 
       {/* Stacked Bar Graph */}
@@ -224,9 +224,9 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                 <p className="text-[10px] text-muted-foreground truncate">{project.department}</p>
               )}
             </div>
-            <Badge variant="secondary" className="text-xs font-bold px-2.5 py-1 flex-shrink-0">
+            <StandardizedBadge variant="metric" size="sm" className="flex-shrink-0">
               {((project.totalHours || 0) / 40).toFixed(1)} FTE
-            </Badge>
+            </StandardizedBadge>
           </div>
 
           <div className="space-y-3 relative z-10">
@@ -338,12 +338,12 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                     </div>
                     <div className="flex items-center gap-2 ml-2">
                       <StandardizedBadge variant="metric" size="sm">{Math.round(member.hours || 0)}h</StandardizedBadge>
-                      <Badge
-                        variant={member.capacityPercentage > 100 ? 'destructive' : 'secondary'}
-                        className="text-xs px-1 py-0"
+                      <StandardizedBadge
+                        variant={member.capacityPercentage > 100 ? 'error' : 'secondary'}
+                        size="sm"
                       >
                         {Math.round(member.capacityPercentage || 0)}%
-                      </Badge>
+                      </StandardizedBadge>
                     </div>
                   </div>
                 ))}
