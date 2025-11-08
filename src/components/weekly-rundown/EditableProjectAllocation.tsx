@@ -171,7 +171,10 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
           </div>
         ) : (
           <>
-            <span>{projectCode} • {hours}h</span>
+            {/* Only show text label if segment is wide enough */}
+            {percentage > 10 && (
+              <span>{projectCode} • {hours}h</span>
+            )}
             <Button
               size="sm"
               variant="ghost"
