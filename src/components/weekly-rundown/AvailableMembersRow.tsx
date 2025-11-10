@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowUpDown } from 'lucide-react';
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
   threshold?: number;
 }
+
+type SortBy = 'hours' | 'name';
 
 interface AvailableMember {
   id: string;
@@ -23,6 +27,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   threshold = 80
 }) => {
   const { company } = useCompany();
+  const [sortBy, setSortBy] = useState<SortBy>('hours');
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['available-members-profiles', company?.id],
@@ -113,33 +118,56 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         };
       })
       .filter(m => m.utilization < threshold)
-      .sort((a, b) => b.availableHours - a.availableHours);
+      .sort((a, b) => {
+        if (sortBy === 'hours') {
+          return b.availableHours - a.availableHours;
+        } else {
+          return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+        }
+      });
 
     return available;
-  }, [profiles, invites, allocations, threshold]);
+  }, [profiles, invites, allocations, threshold, sortBy]);
 
   if (availableMembers.length === 0) {
     return null;
   }
 
   return (
-    <div className="flex gap-3 items-center pb-2 overflow-x-auto scrollbar-grey px-1">
-      {availableMembers.map((member) => {
-        const initials = `${member.firstName[0] || ''}${member.lastName[0] || ''}`.toUpperCase();
-        
-        return (
-          <div key={member.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-            <Avatar className="h-9 w-9">
-              <AvatarImage src={member.avatarUrl} />
-              <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
-            </Avatar>
-            <span className="text-xs font-medium text-foreground">{member.firstName}</span>
-            <StandardizedBadge variant="metric" size="sm">
-              {member.availableHours}h
-            </StandardizedBadge>
-          </div>
-        );
-      })}
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
+          <SelectTrigger className="w-[160px] h-9">
+            <ArrowUpDown className="h-4 w-4 mr-2" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="hours">By Available Hours</SelectItem>
+            <SelectItem value="name">By Name</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="flex justify-center">
+        <div className="flex gap-3 items-center pb-2 overflow-x-auto scrollbar-grey px-1 max-w-full">
+          {availableMembers.map((member) => {
+            const initials = `${member.firstName[0] || ''}${member.lastName[0] || ''}`.toUpperCase();
+            
+            return (
+              <div key={member.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={member.avatarUrl} />
+                  <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
+                </Avatar>
+                <span className="text-xs font-medium text-foreground">{member.firstName}</span>
+                <StandardizedBadge variant="metric" size="sm">
+                  {member.availableHours}h
+                </StandardizedBadge>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
