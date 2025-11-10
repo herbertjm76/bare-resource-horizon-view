@@ -118,7 +118,11 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     return available;
   }, [profiles, invites, allocations, threshold]);
 
-  return availableMembers.length === 0 ? null : (
+  if (availableMembers.length === 0) {
+    return null;
+  }
+
+  return (
     <div className="flex gap-3 items-center pb-2 overflow-x-auto scrollbar-grey px-1">
       {availableMembers.map((member) => {
         const initials = `${member.firstName[0] || ''}${member.lastName[0] || ''}`.toUpperCase();
