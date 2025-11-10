@@ -66,6 +66,12 @@ export const WeeklyRundownView: React.FC = () => {
     return `Week of ${format(weekStart, 'MMM d, yyyy')}`;
   }, [selectedWeek]);
 
+  // Precompute week start string before any early returns to keep hooks order stable
+  const weekStartString = useMemo(() => 
+    format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
+    [selectedWeek]
+  );
+
   // Get all member IDs for summary cards
   const memberIds = useMemo(() => 
     allMembers.map(m => m.id),
@@ -121,10 +127,6 @@ export const WeeklyRundownView: React.FC = () => {
     );
   }
 
-  const weekStartString = useMemo(() => 
-    format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
-    [selectedWeek]
-  );
 
   return (
     <div className={`space-y-6 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8' : ''}`}>
