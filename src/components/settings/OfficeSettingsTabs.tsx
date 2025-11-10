@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Folder, Layers, Building, Briefcase, Currency, Calendar, Palette } from 'lucide-react';
+import { MapPin, Folder, Layers, Building, Briefcase, Currency, Calendar, Palette, Building2 } from 'lucide-react';
 import { CountriesTab } from '@/components/settings/CountriesTab';
 import { StagesTab } from '@/components/settings/StagesTab';
 import { LocationsTab } from '@/components/settings/LocationsTab';
@@ -16,11 +16,13 @@ import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
 import { DepartmentsTab } from '@/components/settings/DepartmentsTab';
 import { ThemeTab } from '@/components/settings/ThemeTab';
+import { CompanyTab } from '@/components/settings/CompanyTab';
 
 export const OfficeSettingsTabs: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState('locations');
+  const [selectedTab, setSelectedTab] = useState('company');
 
   const tabs = [
+    { value: 'company', label: 'Company', icon: Building2 },
     { value: 'locations', label: 'Office Locations', icon: MapPin },
     { value: 'areas', label: 'Project Areas', icon: Folder },
     { value: 'stages', label: 'Stages', icon: Layers },
@@ -50,6 +52,7 @@ export const OfficeSettingsTabs: React.FC = () => {
       </Select>
       
       <div>
+        {selectedTab === 'company' && <CompanyTab />}
         {selectedTab === 'locations' && <LocationsTab />}
         {selectedTab === 'areas' && <CountriesTab />}
         {selectedTab === 'stages' && <StagesTab />}
