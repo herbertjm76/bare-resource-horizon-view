@@ -6,13 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Pencil, Save, X, AlertCircle, ExternalLink } from 'lucide-react';
+import { Pencil, Save, X, AlertCircle, ExternalLink, Network } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export const CompanyTab: React.FC = () => {
   const { company, refreshCompany } = useCompany();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [settingUpDns, setSettingUpDns] = useState(false);
   const [formData, setFormData] = useState({
     name: company?.name || '',
     subdomain: company?.subdomain || '',
@@ -40,6 +41,44 @@ export const CompanyTab: React.FC = () => {
 
   const handleCancel = () => {
     setEditing(false);
+  };
+
+  const handleSetupDns = async () => {
+    if (!company?.subdomain) {
+      toast.error('No subdomain configured');
+      return;
+    }
+
+    setSettingUpDns(true);
+
+    try {
+      toast.info('Setting up DNS records...', { duration: 3000 });
+
+      const { data: dnsResult, error: dnsError } = await supabase.functions.invoke(
+        'create-subdomain-dns',
+        {
+          body: { subdomain: company.subdomain }
+        }
+      );
+
+      if (dnsError) {
+        console.error('DNS setup error:', dnsError);
+        toast.error('Failed to setup DNS records. Please try again or contact support.', {
+          duration: 7000
+        });
+      } else {
+        toast.success('DNS records created successfully! Your subdomain will be accessible within a few minutes.', {
+          duration: 7000
+        });
+      }
+    } catch (error) {
+      console.error('DNS setup error:', error);
+      toast.error('Failed to setup DNS records. Please try again or contact support.', {
+        duration: 7000
+      });
+    } finally {
+      setSettingUpDns(false);
+    }
   };
 
   const validateSubdomain = (subdomain: string): boolean => {
@@ -116,10 +155,36 @@ export const CompanyTab: React.FC = () => {
 
       toast.success('Company information updated successfully');
       
+      // If subdomain changed, create DNS records
       if (subdomainChanged) {
-        toast.info('Subdomain changed. You may need to update your DNS settings.', {
-          duration: 5000
+        toast.info('Setting up DNS records for new subdomain...', {
+          duration: 3000
         });
+
+        try {
+          const { data: dnsResult, error: dnsError } = await supabase.functions.invoke(
+            'create-subdomain-dns',
+            {
+              body: { subdomain: formData.subdomain.trim().toLowerCase() }
+            }
+          );
+
+          if (dnsError) {
+            console.error('DNS setup error:', dnsError);
+            toast.warning('Subdomain updated but DNS setup failed. Please contact support or try again later.', {
+              duration: 7000
+            });
+          } else {
+            toast.success('DNS records created successfully! Your subdomain will be accessible shortly.', {
+              duration: 5000
+            });
+          }
+        } catch (dnsError) {
+          console.error('DNS setup error:', dnsError);
+          toast.warning('Subdomain updated but DNS setup failed. Please contact support.', {
+            duration: 7000
+          });
+        }
       }
 
       await refreshCompany();
@@ -221,6 +286,16 @@ export const CompanyTab: React.FC = () => {
                 >
                   <ExternalLink className="h-4 w-4" />
                 </a>
+                <Button
+                  onClick={handleSetupDns}
+                  disabled={settingUpDns}
+                  variant="outline"
+                  size="sm"
+                  className="ml-2"
+                >
+                  <Network className="h-4 w-4 mr-2" />
+                  {settingUpDns ? 'Setting up...' : 'Setup DNS'}
+                </Button>
               </div>
             )}
           </div>
