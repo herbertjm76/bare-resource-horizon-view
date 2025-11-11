@@ -26,13 +26,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create A record pointing to Lovable's IP
+    // Create A record pointing to Lovable's IP with proxying enabled
     const dnsRecord = {
       type: 'A',
       name: subdomain,
       content: '185.158.133.1',
-      ttl: 3600,
-      proxied: false
+      ttl: 1, // Auto when proxied
+      proxied: true
     };
 
     console.log(`Creating DNS record for ${subdomain}.bareresource.com`);
