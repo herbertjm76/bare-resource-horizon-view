@@ -26,7 +26,31 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create A record pointing to Lovable's IP with proxying enabled
+    // First, check if a DNS record already exists for this subdomain
+    console.log(`Checking for existing DNS record for ${subdomain}.bareresource.com`);
+    
+    const listResponse = await fetch(
+      `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/dns_records?name=${subdomain}.bareresource.com&type=A`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const listResult = await listResponse.json();
+
+    if (!listResponse.ok) {
+      console.error('Failed to check existing DNS records:', listResult);
+      return new Response(
+        JSON.stringify({ error: 'Failed to check existing DNS records', details: listResult }),
+        { status: listResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // DNS record configuration
     const dnsRecord = {
       type: 'A',
       name: subdomain,
@@ -35,31 +59,63 @@ Deno.serve(async (req) => {
       proxied: true
     };
 
-    console.log(`Creating DNS record for ${subdomain}.bareresource.com`);
-
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/dns_records`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dnsRecord),
-      }
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error('Cloudflare API error:', result);
-      return new Response(
-        JSON.stringify({ error: 'Failed to create DNS record', details: result }),
-        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    let result;
+    
+    // If record exists, update it; otherwise create new one
+    if (listResult.result && listResult.result.length > 0) {
+      const existingRecord = listResult.result[0];
+      console.log(`Updating existing DNS record for ${subdomain}.bareresource.com`);
+      
+      const updateResponse = await fetch(
+        `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/dns_records/${existingRecord.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dnsRecord),
+        }
       );
-    }
 
-    console.log(`DNS record created successfully for ${subdomain}.bareresource.com`);
+      result = await updateResponse.json();
+
+      if (!updateResponse.ok) {
+        console.error('Cloudflare API error:', result);
+        return new Response(
+          JSON.stringify({ error: 'Failed to update DNS record', details: result }),
+          { status: updateResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log(`DNS record updated successfully for ${subdomain}.bareresource.com`);
+    } else {
+      console.log(`Creating new DNS record for ${subdomain}.bareresource.com`);
+      
+      const createResponse = await fetch(
+        `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/dns_records`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dnsRecord),
+        }
+      );
+
+      result = await createResponse.json();
+
+      if (!createResponse.ok) {
+        console.error('Cloudflare API error:', result);
+        return new Response(
+          JSON.stringify({ error: 'Failed to create DNS record', details: result }),
+          { status: createResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log(`DNS record created successfully for ${subdomain}.bareresource.com`);
+    }
 
     return new Response(
       JSON.stringify({ success: true, record: result.result }),
