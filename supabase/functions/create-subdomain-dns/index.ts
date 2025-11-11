@@ -50,13 +50,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    // DNS record configuration
+    // DNS record configuration (DNS only, not proxied)
     const dnsRecord = {
       type: 'A',
       name: subdomain,
       content: '185.158.133.1',
-      ttl: 1, // Auto when proxied
-      proxied: true
+      ttl: 3600, // 1 hour TTL for DNS-only records
+      proxied: false // DNS only to avoid Cloudflare proxy issues
     };
 
     let result;
