@@ -54,9 +54,9 @@ export const useDashboardAuth = () => {
         if (companyData) {
           const baseUrl = window.location.hostname === 'localhost' 
             ? `http://localhost:${window.location.port}` 
-            : `https://${companyData.subdomain}.bareresource.com`;
+            : `https://bareresource.com`;
           
-          setInviteUrl(`${baseUrl}/join/invite-code-placeholder`);
+          setInviteUrl(`${baseUrl}/join/${companyData.subdomain}/invite-code-placeholder`);
         }
       }
     } catch (error) {

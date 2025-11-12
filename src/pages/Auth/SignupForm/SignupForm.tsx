@@ -133,7 +133,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           }, { onConflict: 'id' });
       }
 
-      toast.success('Account created! Please check your email to confirm your account, then you can log in.');
+      toast.success(`Account created! Your company portal: bareresource.com/${company.subdomain}. Check your email to verify your account.`, { duration: 8000 });
       setOwnerFirstName('');
       setOwnerLastName('');
       setOwnerEmail('');
