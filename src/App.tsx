@@ -49,8 +49,45 @@ function App() {
         <BrowserRouter>
           <CompanyProvider>
             <Routes>
+              {/* Public marketing routes */}
               <Route path="/" element={<Index />} />
+              <Route path="/solutions" element={<SolutionsPage />} />
+              <Route path="/app-tour" element={<AppTourPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/documentation" element={<Documentation />} />
+              <Route path="/contact-support" element={<ContactSupport />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              
+              {/* Auth routes */}
               <Route path="/auth" element={<Auth />} />
+              
+              {/* Company-scoped join route: /join/:companySlug */}
+              <Route path="/join/:companySlug" element={<Join />} />
+              
+              {/* Company-scoped app routes: /:companySlug/* */}
+              <Route path="/:companySlug/dashboard" element={<Dashboard />} />
+              <Route path="/:companySlug/profile" element={<Profile />} />
+              <Route path="/:companySlug/projects" element={<Projects />} />
+              <Route path="/:companySlug/projects/onboarding" element={<ProjectsOnboarding />} />
+              <Route path="/:companySlug/team-members" element={<TeamMembers />} />
+              <Route path="/:companySlug/team-members/:id" element={<TeamMemberDetail />} />
+              <Route path="/:companySlug/office-settings" element={<OfficeSettings />} />
+              <Route path="/:companySlug/weekly-overview" element={<WeeklyOverview />} />
+              <Route path="/:companySlug/weekly-rundown" element={<WeeklyRundown />} />
+              <Route path="/:companySlug/team-workload" element={<TeamWorkload />} />
+              <Route path="/:companySlug/team-annual-leave" element={<TeamAnnualLeave />} />
+              <Route path="/:companySlug/project-resourcing" element={<ProjectResourcing />} />
+              <Route path="/:companySlug/financial-control" element={<FinancialControl />} />
+              <Route path="/:companySlug/help-center" element={<HelpCenter />} />
+              <Route path="/:companySlug/workflow" element={<WorkflowPage />} />
+              <Route path="/:companySlug/financial-overview" element={<FinancialOverview />} />
+              <Route path="/:companySlug/project-profit-dashboard" element={<ProjectProfitDashboard />} />
+              <Route path="/:companySlug/project-billing" element={<ProjectBilling />} />
+              <Route path="/:companySlug/aging-invoices" element={<AgingInvoices />} />
+              
+              {/* Fallback for legacy routes without company slug - redirect to auth */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/projects" element={<Projects />} />
@@ -70,15 +107,7 @@ function App() {
               <Route path="/project-profit-dashboard" element={<ProjectProfitDashboard />} />
               <Route path="/project-billing" element={<ProjectBilling />} />
               <Route path="/aging-invoices" element={<AgingInvoices />} />
-              <Route path="/documentation" element={<Documentation />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/contact-support" element={<ContactSupport />} />
-              <Route path="/solutions" element={<SolutionsPage />} />
-              <Route path="/app-tour" element={<AppTourPage />} />
-              <Route path="/pricing" element={<PricingPage />} />
-              <Route path="/join" element={<Join />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </CompanyProvider>

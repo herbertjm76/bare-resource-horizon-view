@@ -89,7 +89,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
             });
           
           toast.success('Account created successfully! Please check your email for verification.');
-          navigate('/dashboard');
+          navigate(`/${company?.subdomain}/dashboard`);
         }
       } else {
         // Validate login inputs
@@ -134,7 +134,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
         }
 
         toast.success('Login successful!');
-        navigate('/dashboard');
+        navigate(`/${company?.subdomain}/dashboard`);
       }
     } catch (error: any) {
       console.error('Authentication error:', error);

@@ -7,17 +7,17 @@ import { useDemoAuth } from '@/hooks/useDemoAuth';
 type CompanyContextType = {
   company: any | null;
   loading: boolean;
-  subdomain: string | null;
+  companySlug: string | null;
   refreshCompany: () => Promise<void>;
-  isSubdomainMode: boolean;
+  isPathMode: boolean;
   error: string | null;
 };
 
 const CompanyContext = createContext<CompanyContextType>({
   company: null,
   loading: true,
-  subdomain: null,
-  isSubdomainMode: false,
+  companySlug: null,
+  isPathMode: false,
   error: null,
   refreshCompany: async () => {},
 });
@@ -27,73 +27,71 @@ export const useCompany = () => useContext(CompanyContext);
 export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [company, setCompany] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const [subdomain, setSubdomain] = useState<string | null>(null);
-  const [isSubdomainMode, setIsSubdomainMode] = useState(false);
+  const [companySlug, setCompanySlug] = useState<string | null>(null);
+  const [isPathMode, setIsPathMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
   
   const { isDemoMode, profile: demoProfile } = useDemoAuth();
 
-  const extractSubdomain = () => {
-    const hostname = window.location.hostname;
-    const params = new URLSearchParams(window.location.search);
+  const extractCompanySlugFromPath = () => {
+    const pathname = window.location.pathname;
+    const pathParts = pathname.split('/').filter(Boolean);
     
-    const querySubdomain = params.get('subdomain');
-    if (querySubdomain) {
-      return querySubdomain;
+    // Check if path starts with a company slug pattern
+    // Skip public routes like 'auth', 'solutions', 'pricing', etc.
+    const publicRoutes = ['auth', 'solutions', 'app-tour', 'pricing', 'help', 'faq', 'documentation', 'contact-support', 'privacy-policy'];
+    
+    if (pathParts.length === 0) {
+      return null; // Home page
     }
     
-    if (hostname === 'localhost' || hostname.endsWith('.localhost') || hostname === '127.0.0.1') {
-      const localParts = window.location.host.split('.');
-      if (localParts.length > 1 && (localParts[1] === 'localhost' || localParts[1].includes('localhost:'))) {
-        return localParts[0];
-      }
+    const firstSegment = pathParts[0];
+    
+    // Check if it's a /join/:companySlug route
+    if (firstSegment === 'join' && pathParts.length > 1) {
+      return pathParts[1];
     }
     
-    const hostParts = hostname.split('.');
-    
-    // Handle custom domain bareresource.com (no subdomain)
-    if (hostname === 'bareresource.com') {
-      return null; // Will fall back to user company lookup
+    // Check if first segment is a public route
+    if (publicRoutes.includes(firstSegment)) {
+      return null;
     }
     
-    // Handle subdomain pattern like subdomain.bareresource.com
-    if (hostParts.length === 3 && hostParts[1] === 'bareresource') {
-      return hostParts[0];
-    }
-    
-    return null;
+    // Otherwise, treat first segment as company slug
+    // This handles routes like /:companySlug/dashboard, /:companySlug/projects, etc.
+    return firstSegment;
   };
 
-  const fetchCompanyBySubdomain = async (subdomainValue: string) => {
+  const fetchCompanyBySlug = async (slugValue: string) => {
     try {
-      console.log('CompanyProvider: fetchCompanyBySubdomain start', subdomainValue);
+      console.log('CompanyProvider: fetchCompanyBySlug start', slugValue);
       setLoading(true);
       setError(null);
       
       const { data, error } = await supabase
         .from('companies')
         .select('*')
-        .eq('subdomain', subdomainValue)
+        .eq('subdomain', slugValue)
         .single();
 
       if (error) {
-        console.error('Error fetching company by subdomain:', error);
+        console.error('Error fetching company by slug:', error);
         setCompany(null);
-        setError(`Company not found for subdomain "${subdomainValue}"`);
+        setError(`Company not found: "${slugValue}"`);
         toast.error('Company not found');
         return;
       }
 
       setCompany(data);
-      console.log('CompanyProvider: fetchCompanyBySubdomain success', data?.id);
+      console.log('CompanyProvider: fetchCompanyBySlug success', data?.id);
     } catch (error: any) {
-      console.error('Error in fetchCompanyBySubdomain:', error);
+      console.error('Error in fetchCompanyBySlug:', error);
       setCompany(null);
       setError(error.message || 'Failed to fetch company data');
     } finally {
       setLoading(false);
-      console.log('CompanyProvider: fetchCompanyBySubdomain end -> loading=false');
+      console.log('CompanyProvider: fetchCompanyBySlug end -> loading=false');
     }
   };
 
@@ -174,14 +172,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const refreshCompany = async () => {
-    const currentSubdomain = extractSubdomain();
-    setSubdomain(currentSubdomain);
+    const currentSlug = extractCompanySlugFromPath();
+    setCompanySlug(currentSlug);
     
-    if (currentSubdomain) {
-      setIsSubdomainMode(true);
-      await fetchCompanyBySubdomain(currentSubdomain);
+    if (currentSlug) {
+      setIsPathMode(true);
+      await fetchCompanyBySlug(currentSlug);
     } else {
-      setIsSubdomainMode(false);
+      setIsPathMode(false);
       const profile = userProfile || await fetchUserProfile();
       if (profile) {
         await fetchCompanyByProfile(profile);
@@ -189,21 +187,21 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  // Update company data when auth changes
+  // Update company data when auth changes or path changes
   useEffect(() => {
     console.log('CompanyProvider: Main useEffect triggered');
-    const currentSubdomain = extractSubdomain();
-    setSubdomain(currentSubdomain);
+    const currentSlug = extractCompanySlugFromPath();
+    setCompanySlug(currentSlug);
     
-    if (currentSubdomain) {
-      // Subdomain mode
-      console.log('CompanyProvider: Using subdomain mode:', currentSubdomain);
-      setIsSubdomainMode(true);
-      fetchCompanyBySubdomain(currentSubdomain);
+    if (currentSlug) {
+      // Path mode - company slug in URL
+      console.log('CompanyProvider: Using path mode:', currentSlug);
+      setIsPathMode(true);
+      fetchCompanyBySlug(currentSlug);
     } else {
       // User profile mode
       console.log('CompanyProvider: Using profile mode');
-      setIsSubdomainMode(false);
+      setIsPathMode(false);
       
       // Handle demo mode
       if (isDemoMode && demoProfile) {
@@ -229,7 +227,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       initAuth();
     }
-  }, [isDemoMode, demoProfile]);
+  }, [isDemoMode, demoProfile, window.location.pathname]);
 
   // Listen for auth state changes and refetch company
   useEffect(() => {
@@ -239,8 +237,8 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       // Only refetch on SIGNED_IN / INITIAL_SESSION / TOKEN_REFRESHED with valid session
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session?.user) {
-        const currentSubdomain = extractSubdomain();
-        if (!currentSubdomain) {
+        const currentSlug = extractCompanySlugFromPath();
+        if (!currentSlug) {
           console.log('CompanyProvider: Auth changed, scheduling profile/company refetch...');
           // Defer Supabase calls to avoid auth deadlocks
           setTimeout(async () => {
@@ -264,8 +262,8 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     <CompanyContext.Provider value={{ 
       company, 
       loading, 
-      subdomain, 
-      isSubdomainMode,
+      companySlug, 
+      isPathMode,
       error,
       refreshCompany 
     }}>

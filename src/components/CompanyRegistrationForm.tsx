@@ -100,24 +100,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
 
       if (profileError) throw profileError;
 
-      // Create DNS record for subdomain
-      try {
-        const { error: dnsError } = await supabase.functions.invoke('create-subdomain-dns', {
-          body: { subdomain: data.subdomain.toLowerCase() }
-        });
-
-        if (dnsError) {
-          console.error('DNS creation error:', dnsError);
-          toast.warning('Company registered, but DNS setup may take a few moments.');
-        } else {
-          console.log('DNS record created successfully');
-        }
-      } catch (dnsError) {
-        console.error('Failed to create DNS record:', dnsError);
-        toast.warning('Company registered, but DNS setup may take a few moments.');
-      }
-
-      toast.success('Company registered successfully!');
+      toast.success(`Company registered! Access your portal at: bareresource.com/${data.subdomain}`, { duration: 6000 });
       onSuccess(company.id);
     } catch (error: any) {
       toast.error(error.message);

@@ -13,29 +13,32 @@ interface SubdomainFieldProps {
 const SubdomainField: React.FC<SubdomainFieldProps> = ({ register, errors, isChecking }) => (
   <div>
     <label htmlFor="subdomain" className="block text-sm font-medium text-gray-200">
-      Subdomain
+      Company Identifier (URL Slug)
     </label>
-    <div className="flex items-center mt-1">
+    <div className="mt-1 space-y-2">
       <Input
         id="subdomain"
         type="text"
         {...register('subdomain', {
-          required: 'Subdomain is required',
+          required: 'Company identifier is required',
           pattern: {
             value: /^[a-zA-Z0-9-]+$/,
-            message: 'Subdomain can only contain letters, numbers, and hyphens'
+            message: 'Can only contain letters, numbers, and hyphens'
           },
           minLength: {
             value: 3,
-            message: 'Subdomain must be at least 3 characters long'
+            message: 'Must be at least 3 characters long'
           },
           maxLength: {
             value: 63,
-            message: 'Subdomain must be less than 64 characters long'
+            message: 'Must be less than 64 characters long'
           }
         })}
+        placeholder="yourcompany"
       />
-      <span className="ml-2 text-gray-300">.bareresource.com</span>
+      <p className="text-xs text-gray-400">
+        Your company URL will be: bareresource.com/<span className="font-medium">yourcompany</span>
+      </p>
     </div>
     {errors.subdomain && (
       <p className="text-red-500 text-sm mt-1">{errors.subdomain.message}</p>

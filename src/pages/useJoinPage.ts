@@ -6,7 +6,7 @@ import { useCompany } from '@/context/CompanyContext';
 export function useJoinPage() {
   const [companyName, setCompanyName] = useState('');
   const { company } = useCompany();
-  const { inviteCode } = useParams<{ inviteCode?: string }>();
+  const { companySlug, inviteCode } = useParams<{ companySlug: string; inviteCode?: string }>();
 
   useEffect(() => {
     if (company) {
@@ -17,6 +17,7 @@ export function useJoinPage() {
   return {
     companyName,
     company,
+    companySlug,
     inviteCode,
   };
 }
