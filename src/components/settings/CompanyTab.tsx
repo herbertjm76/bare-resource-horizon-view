@@ -13,7 +13,6 @@ export const CompanyTab: React.FC = () => {
   const { company, refreshCompany } = useCompany();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [settingUpDns, setSettingUpDns] = useState(false);
   const [formData, setFormData] = useState({
     name: company?.name || '',
     subdomain: company?.subdomain || '',
@@ -41,44 +40,6 @@ export const CompanyTab: React.FC = () => {
 
   const handleCancel = () => {
     setEditing(false);
-  };
-
-  const handleSetupDns = async () => {
-    if (!company?.subdomain) {
-      toast.error('No subdomain configured');
-      return;
-    }
-
-    setSettingUpDns(true);
-
-    try {
-      toast.info('Setting up DNS records...', { duration: 3000 });
-
-      const { data: dnsResult, error: dnsError } = await supabase.functions.invoke(
-        'create-subdomain-dns',
-        {
-          body: { subdomain: company.subdomain }
-        }
-      );
-
-      if (dnsError) {
-        console.error('DNS setup error:', dnsError);
-        toast.error('Failed to setup DNS records. Please try again or contact support.', {
-          duration: 7000
-        });
-      } else {
-        toast.success('DNS records created successfully! Your subdomain will be accessible within a few minutes.', {
-          duration: 7000
-        });
-      }
-    } catch (error) {
-      console.error('DNS setup error:', error);
-      toast.error('Failed to setup DNS records. Please try again or contact support.', {
-        duration: 7000
-      });
-    } finally {
-      setSettingUpDns(false);
-    }
   };
 
   const validateSubdomain = (subdomain: string): boolean => {
@@ -154,39 +115,6 @@ export const CompanyTab: React.FC = () => {
       }
 
       toast.success('Company information updated successfully');
-      
-      // If subdomain changed, create DNS records
-      if (subdomainChanged) {
-        toast.info('Setting up DNS records for new subdomain...', {
-          duration: 3000
-        });
-
-        try {
-          const { data: dnsResult, error: dnsError } = await supabase.functions.invoke(
-            'create-subdomain-dns',
-            {
-              body: { subdomain: formData.subdomain.trim().toLowerCase() }
-            }
-          );
-
-          if (dnsError) {
-            console.error('DNS setup error:', dnsError);
-            toast.warning('Subdomain updated but DNS setup failed. Please contact support or try again later.', {
-              duration: 7000
-            });
-          } else {
-            toast.success('DNS records created successfully! Your subdomain will be accessible shortly.', {
-              duration: 5000
-            });
-          }
-        } catch (dnsError) {
-          console.error('DNS setup error:', dnsError);
-          toast.warning('Subdomain updated but DNS setup failed. Please contact support.', {
-            duration: 7000
-          });
-        }
-      }
-
       await refreshCompany();
       setEditing(false);
     } catch (error) {
@@ -212,7 +140,7 @@ export const CompanyTab: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold">Company Information</h3>
             <p className="text-sm text-muted-foreground">
-              Manage your company details and subdomain
+              Manage your company details and URL identifier
             </p>
           </div>
           {!editing ? (
@@ -238,7 +166,7 @@ export const CompanyTab: React.FC = () => {
           <Alert className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Changing the subdomain will affect how users access your company. Make sure to update any bookmarks or links.
+              Changing the company identifier will affect your company's URL. Make sure to update any bookmarks or shared links.
             </AlertDescription>
           </Alert>
         )}
@@ -259,9 +187,9 @@ export const CompanyTab: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="subdomain">Subdomain *</Label>
+            <Label htmlFor="subdomain">Company Identifier (URL Slug) *</Label>
             {editing ? (
-              <div className="flex items-center gap-2">
+              <div className="space-y-2">
                 <Input
                   id="subdomain"
                   value={formData.subdomain}
@@ -269,33 +197,28 @@ export const CompanyTab: React.FC = () => {
                   placeholder="yourcompany"
                   className="flex-1"
                 />
-                <span className="text-sm text-muted-foreground whitespace-nowrap">
-                  .bareresource.com
-                </span>
+                <p className="text-xs text-muted-foreground">
+                  Used in your company URL: bareresource.com/<span className="font-medium">{formData.subdomain || 'yourcompany'}</span>
+                </p>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-medium py-2">
-                  {company.subdomain}.bareresource.com
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium py-2">
+                    bareresource.com/{company.subdomain}
+                  </p>
+                  <a
+                    href={`https://bareresource.com/${company.subdomain}/dashboard`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Team members join at: bareresource.com/join/{company.subdomain}
                 </p>
-                <a
-                  href={`https://${company.subdomain}.bareresource.com`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-                <Button
-                  onClick={handleSetupDns}
-                  disabled={settingUpDns}
-                  variant="outline"
-                  size="sm"
-                  className="ml-2"
-                >
-                  <Network className="h-4 w-4 mr-2" />
-                  {settingUpDns ? 'Setting up...' : 'Setup DNS'}
-                </Button>
               </div>
             )}
           </div>
