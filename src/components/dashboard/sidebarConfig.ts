@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard,
   Calendar,
@@ -11,105 +10,79 @@ import {
   Presentation
 } from "lucide-react"
 
-export const navigationItems = [
-  {
-    label: "OVERVIEW",
-    items: [
-      {
-        title: "Dashboard",
-        url: "/dashboard",
-        icon: LayoutDashboard,
-      },
-      {
-        title: "Weekly Overview",
-        url: "/weekly-overview",
-        icon: Calendar,
-      },
-      {
-        title: "Weekly Rundown",
-        url: "/weekly-rundown",
-        icon: Presentation,
-      },
-    ],
-  },
-  {
-    label: "PROJECT LIFECYCLE",
-    items: [
-      {
-        title: "Projects",
-        url: "/projects",
-        icon: FolderKanban,
-      },
-      {
-        title: "Resources",
-        url: "/project-resourcing",
-        icon: GanttChartSquare,
-      },
-      // {
-      //   title: "Financials",
-      //   url: "/financial-control",
-      //   icon: DollarSign,
-      // },
-    ],
-  },
-  // {
-  //   label: "FINANCIALS",
-  //   items: [
-  //     {
-  //       title: "Financial Overview",
-  //       url: "/financial-overview",
-  //       icon: Receipt,
-  //     },
-  //     {
-  //       title: "Project Profit Dashboard",
-  //       url: "/project-profit-dashboard",
-  //       icon: TrendingUp,
-  //     },
-  //     {
-  //       title: "Project Billing",
-  //       url: "/project-billing",
-  //       icon: Receipt,
-  //     },
-  //     {
-  //       title: "Aging Invoices",
-  //       url: "/aging-invoices",
-  //       icon: Clock,
-  //     },
-  //   ],
-  // },
-  {
-    label: "RESOURCES",
-    items: [
-      {
-        title: "Team Members",
-        url: "/team-members",
-        icon: UserSquare2,
-      },
-      {
-        title: "Team Workload",
-        url: "/team-workload",
-        icon: Briefcase,
-      },
-      {
-        title: "Team Annual Leave",
-        url: "/team-annual-leave",
-        icon: Calendar,
-      },
-    ],
-  },
-  {
-    label: "SETTINGS",
-    items: [
-      {
-        title: "Office Settings",
-        url: "/office-settings",
-        icon: Flag,
-      },
-      {
-        title: "Help Center",
-        url: "/help-center",
-        icon: HelpCircle,
-      },
-    ],
-  },
-]
+export const getNavigationItems = (companySlug: string | null) => {
+  const baseUrl = companySlug ? `/${companySlug}` : '';
+  
+  return [
+    {
+      label: "OVERVIEW",
+      items: [
+        {
+          title: "Dashboard",
+          url: `${baseUrl}/dashboard`,
+          icon: LayoutDashboard,
+        },
+        {
+          title: "Weekly Overview",
+          url: `${baseUrl}/weekly-overview`,
+          icon: Calendar,
+        },
+        {
+          title: "Weekly Rundown",
+          url: `${baseUrl}/weekly-rundown`,
+          icon: Presentation,
+        },
+      ],
+    },
+    {
+      label: "PROJECT LIFECYCLE",
+      items: [
+        {
+          title: "Projects",
+          url: `${baseUrl}/projects`,
+          icon: FolderKanban,
+        },
+        {
+          title: "Resources",
+          url: `${baseUrl}/project-resourcing`,
+          icon: GanttChartSquare,
+        },
+      ],
+    },
+    {
+      label: "RESOURCES",
+      items: [
+        {
+          title: "Team Members",
+          url: `${baseUrl}/team-members`,
+          icon: UserSquare2,
+        },
+        {
+          title: "Team Workload",
+          url: `${baseUrl}/team-workload`,
+          icon: Briefcase,
+        },
+        {
+          title: "Team Annual Leave",
+          url: `${baseUrl}/team-annual-leave`,
+          icon: Calendar,
+        },
+      ],
+    },
+    {
+      label: "SETTINGS",
+      items: [
+        {
+          title: "Office Settings",
+          url: `${baseUrl}/office-settings`,
+          icon: Flag,
+        },
+        {
+          title: "Help Center",
+          url: `${baseUrl}/help-center`,
+          icon: HelpCircle,
+        },
+      ],
+    },
+  ];
+};
