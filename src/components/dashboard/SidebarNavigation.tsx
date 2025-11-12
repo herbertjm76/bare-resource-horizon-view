@@ -2,8 +2,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { navigationItems } from './sidebarConfig';
+import { getNavigationItems } from './sidebarConfig';
 import { useSidebar } from '@/components/ui/sidebar';
+import { useCompany } from '@/context/CompanyContext';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -16,7 +17,10 @@ import {
 export const SidebarNavigation: React.FC = () => {
   const location = useLocation();
   const { state } = useSidebar();
+  const { companySlug } = useCompany();
   const collapsed = state === "collapsed";
+  
+  const navigationItems = getNavigationItems(companySlug);
 
   return (
     <nav className="mt-4 px-2 space-y-1">
