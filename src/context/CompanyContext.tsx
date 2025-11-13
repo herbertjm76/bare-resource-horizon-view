@@ -37,30 +37,42 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const extractCompanySlugFromPath = () => {
     const pathname = window.location.pathname;
     const pathParts = pathname.split('/').filter(Boolean);
-    
-    // Check if path starts with a company slug pattern
-    // Skip public routes like 'auth', 'solutions', 'pricing', etc.
+
+    // Public marketing routes that should never be treated as company slugs
     const publicRoutes = ['auth', 'solutions', 'app-tour', 'pricing', 'help', 'faq', 'documentation', 'contact-support', 'privacy-policy'];
-    
-    if (pathParts.length === 0) {
-      return null; // Home page
-    }
-    
-    const firstSegment = pathParts[0];
-    
-    // Check if it's a /join/:companySlug route
-    if (firstSegment === 'join' && pathParts.length > 1) {
+
+    // Company-scoped app routes (must be prefixed by a company slug)
+    const companyRoutes = [
+      'dashboard', 'profile', 'projects', 'team-members', 'office-settings', 'weekly-overview',
+      'weekly-rundown', 'team-workload', 'team-annual-leave', 'project-resourcing', 'financial-control',
+      'help-center', 'workflow', 'financial-overview', 'project-profit-dashboard', 'project-billing',
+      'aging-invoices'
+    ];
+
+    if (pathParts.length === 0) return null; // Home page
+
+    const first = pathParts[0];
+
+    // /join/:companySlug
+    if (first === 'join' && pathParts.length > 1) {
       return pathParts[1];
     }
-    
-    // Check if first segment is a public route
-    if (publicRoutes.includes(firstSegment)) {
-      return null;
+
+    // If first segment is a public route, not a company slug
+    if (publicRoutes.includes(first)) return null;
+
+    // If URL is exactly "/:companySlug" (single segment) and it's not a known company route, treat as slug
+    if (pathParts.length === 1) {
+      return companyRoutes.includes(first) ? null : first;
     }
-    
-    // Otherwise, treat first segment as company slug
-    // This handles routes like /:companySlug/dashboard, /:companySlug/projects, etc.
-    return firstSegment;
+
+    // If URL is "/:companySlug/:route" and route is a known company route, treat first segment as slug
+    if (companyRoutes.includes(pathParts[1])) {
+      return first;
+    }
+
+    // Otherwise, do not assume it's a company slug (prevents false positives like "/profile")
+    return null;
   };
 
   const fetchCompanyBySlug = async (slugValue: string) => {
