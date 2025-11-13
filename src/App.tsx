@@ -36,6 +36,7 @@ import PricingPage from "./pages/Pricing";
 import FinancialControl from "./pages/FinancialControl";
 import { WorkflowPage } from "./pages/WorkflowPage";
 import WeeklyRundown from "./pages/WeeklyRundown";
+import CompanyLanding from "./pages/CompanyLanding";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,9 @@ function App() {
               <Route path="/project-profit-dashboard" element={<ProjectProfitDashboard />} />
               <Route path="/project-billing" element={<ProjectBilling />} />
               <Route path="/aging-invoices" element={<AgingInvoices />} />
+              
+              {/* Company landing page with smart redirect */}
+              <Route path="/:companySlug" element={<CompanyLanding />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
