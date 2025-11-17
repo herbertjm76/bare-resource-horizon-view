@@ -51,8 +51,38 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
 
         const validatedData = validationResult.data;
 
-        // The invitation code would typically be checked server-side; for now, assume it's valid if present
-        // Optionally: fetch company info here using inviteCodeInput
+        // Validate invite code if provided
+        let inviteRecord = null;
+        if (effectiveInviteCode) {
+          const { data: invite, error: inviteError } = await supabase
+            .from('invites')
+            .select('*')
+            .eq('code', effectiveInviteCode)
+            .eq('company_id', company?.id)
+            .eq('status', 'pending')
+            .maybeSingle();
+
+          if (inviteError) {
+            toast.error('Error validating invite code');
+            setLoading(false);
+            return;
+          }
+
+          if (!invite) {
+            toast.error('Invalid or expired invite code');
+            setLoading(false);
+            return;
+          }
+
+          // Validate email match for email_invite type
+          if (invite.invitation_type === 'email_invite' && invite.email !== validatedData.email) {
+            toast.error('This invite is for a different email address');
+            setLoading(false);
+            return;
+          }
+
+          inviteRecord = invite;
+        }
 
         // Register new user as a member of existing company
         const { data, error } = await supabase.auth.signUp({
@@ -87,6 +117,18 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
               role: 'member',
               company_id: company?.id
             });
+
+          // Mark invite as accepted if it was used
+          if (inviteRecord) {
+            await supabase
+              .from('invites')
+              .update({
+                status: 'accepted',
+                accepted_by: data.user.id,
+                accepted_at: new Date().toISOString()
+              })
+              .eq('id', inviteRecord.id);
+          }
           
           toast.success('Account created successfully! Please check your email for verification.');
           navigate(`/${company?.subdomain}/dashboard`);
