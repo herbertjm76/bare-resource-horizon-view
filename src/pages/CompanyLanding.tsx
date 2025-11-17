@@ -53,6 +53,8 @@ const CompanyLanding: React.FC = () => {
         }
       } catch (error) {
         console.error('Error checking membership:', error);
+        setCompanyExists(false);
+        setCompanyName(companySlug || 'this company');
       } finally {
         setLoading(false);
       }

@@ -80,6 +80,16 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       console.log('CompanyProvider: fetchCompanyBySlug start', slugValue);
       setLoading(true);
       setError(null);
+
+      // If user is not authenticated, skip querying companies to avoid RLS errors
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        setCompany(null);
+        // Do NOT toast here; unauthenticated users may just be visiting a public slug
+        setLoading(false);
+        console.log('CompanyProvider: unauthenticated visit, skipping company fetch');
+        return;
+      }
       
       const { data, error } = await supabase
         .from('companies')
