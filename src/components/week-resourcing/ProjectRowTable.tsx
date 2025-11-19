@@ -57,19 +57,19 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
         <TableHeader>
           <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-b-2 border-slate-200">
             {/* Project Column */}
-            <TableHead className="text-left font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm px-4" style={{ width: 220, minWidth: 220, background: 'hsl(var(--gradient-start))' }}>
+            <TableHead className="text-left font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm px-1" style={{ width: 220, minWidth: 220, background: 'hsl(var(--gradient-start))' }}>
               Project
             </TableHead>
             
             {/* FTE Column */}
-            <TableHead className="text-center font-semibold text-white border-r border-white/20 text-xs px-2" style={{ width: 80, minWidth: 80, background: 'hsl(var(--gradient-start))' }}>
+            <TableHead className="text-center font-semibold text-white border-r border-white/20 text-xs px-0" style={{ width: 80, minWidth: 80, background: 'hsl(var(--gradient-start))' }}>
               FTE
             </TableHead>
             
             {/* Member Columns */}
             {members.map(member => (
-              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-1" style={{ width: 40, minWidth: 40, background: 'hsl(var(--gradient-start))' }}>
-                <div className="flex flex-col items-center gap-2 py-2">
+              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-0" style={{ width: 40, minWidth: 40, background: 'hsl(var(--gradient-start))' }}>
+                <div className="flex flex-col items-center gap-1 py-1">
                   <div 
                     className="text-[10px] font-medium"
                     style={{
@@ -95,7 +95,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             ))}
             
             {/* Total Column */}
-            <TableHead className="text-center font-semibold text-white border-l-2 border-white/40 text-xs px-1" style={{ width: 60, minWidth: 60, background: 'hsl(var(--gradient-start))' }}>
+            <TableHead className="text-center font-semibold text-white border-l-2 border-white/40 text-xs px-0" style={{ width: 60, minWidth: 60, background: 'hsl(var(--gradient-start))' }}>
               Total
             </TableHead>
           </TableRow>
@@ -107,8 +107,8 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               className={`${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'} hover:bg-blue-50/80 transition-all duration-150`}
               style={{ height: 48, minHeight: 48 }}
             >
-              <TableCell className="sticky left-0 z-10 bg-inherit border-r border-slate-200 px-4 py-2">
-                <div className="flex items-center gap-2">
+              <TableCell className="sticky left-0 z-10 bg-inherit border-r border-slate-200 px-1 py-1">
+                <div className="flex items-center gap-1">
                   <span className="text-xs font-semibold text-muted-foreground">{project.code}</span>
                   <span className="text-sm font-medium">{project.name}</span>
                 </div>
@@ -130,7 +130,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                 return (
                   <TableCell
                     key={member.id}
-                    className="text-center border-r border-slate-200 px-0.5 py-0.5 project-column bg-gradient-to-r from-purple-50 to-violet-50"
+                    className="text-center border-r border-slate-200 p-0 project-column bg-gradient-to-r from-purple-50 to-violet-50"
                     style={{ width: 40, minWidth: 40 }}
                   >
                     {hours > 0 && (
@@ -156,7 +156,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
           ))}
           {/* Totals Row */}
           <TableRow style={{ background: 'hsl(var(--gradient-start))', height: 48 }} className="border-t-2 border-slate-300">
-            <TableCell className="sticky left-0 z-10 text-left font-semibold text-white border-r border-white/20 px-4" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
+            <TableCell className="sticky left-0 z-10 text-left font-semibold text-white border-r border-white/20 px-1" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
               Weekly Total
             </TableCell>
             <TableCell className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
