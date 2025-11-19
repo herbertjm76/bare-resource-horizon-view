@@ -38,11 +38,11 @@ export const WeekResourceHeader: React.FC<WeekResourceHeaderProps> = ({
   return (
     <div className="space-y-4 mb-6">
       {/* Standardized Purple Header */}
-      <StandardizedPageHeader
-        title="Weekly Overview"
-        description="View and manage weekly resource allocations for your team"
-        icon={Calendar}
-      />
+        <StandardizedPageHeader
+          title="Weekly Resources"
+          description="View and manage weekly resource allocations with table, grid, and carousel views"
+          icon={Calendar}
+        />
       
       {/* Enhanced Controls Section */}
       <Card className="p-4 bg-gradient-to-r from-white to-gray-50/50 border shadow-sm">

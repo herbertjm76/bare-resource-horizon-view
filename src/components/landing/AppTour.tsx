@@ -20,8 +20,8 @@ const AppTour = () => {
     },
     {
       icon: <Calendar className="w-16 h-16" />,
-      title: "Weekly Overview", 
-      description: "Visual capacity planning",
+      title: "Weekly Resources", 
+      description: "Visual capacity planning with table, grid & carousel views",
       bgColor: "from-blue-600 to-blue-700"
     },
     {

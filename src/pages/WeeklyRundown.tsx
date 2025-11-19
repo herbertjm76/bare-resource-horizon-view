@@ -1,20 +1,15 @@
-import React from 'react';
-import { StandardLayout } from '@/components/layout';
-import { WeeklyRundownView } from '@/components/weekly-rundown/WeeklyRundownView';
-import { OfficeSettingsProvider } from '@/context/officeSettings';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const WeeklyRundown: React.FC = () => {
-  return (
-    <StandardLayout 
-      title="Weekly Rundown"
-      className="bg-background"
-      contentClassName="p-4 sm:p-6 lg:p-8"
-    >
-      <OfficeSettingsProvider>
-        <WeeklyRundownView />
-      </OfficeSettingsProvider>
-    </StandardLayout>
-  );
+// Redirect to unified weekly overview page
+const WeeklyRundown = () => {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    navigate('/weekly-overview', { replace: true });
+  }, [navigate]);
+  
+  return null;
 };
 
 export default WeeklyRundown;

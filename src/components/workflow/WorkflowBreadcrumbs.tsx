@@ -42,7 +42,10 @@ export const WorkflowBreadcrumbs: React.FC = () => {
         breadcrumbs.push({ label: 'Team Annual Leave' });
         break;
       case '/weekly-overview':
-        breadcrumbs.push({ label: 'Weekly Overview' });
+        breadcrumbs.push({ label: 'Weekly Resources' });
+        break;
+      case '/weekly-rundown':
+        breadcrumbs.push({ label: 'Weekly Resources' });
         break;
       default:
         // Don't show breadcrumbs for unknown routes
