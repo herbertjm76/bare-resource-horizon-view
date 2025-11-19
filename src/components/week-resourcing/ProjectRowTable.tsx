@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ProjectRowTableProps {
   projects: any[];
@@ -41,6 +42,14 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
     return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
   };
 
+  const getAvatarUrl = (member: any): string | undefined => {
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  const getFirstName = (member: any): string => {
+    return member.first_name || 'Unnamed';
+  };
+
   return (
     <div className="overflow-x-auto">
       <Table className="min-w-full">
@@ -53,20 +62,23 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             
             {/* Member Columns */}
             {members.map(member => (
-              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 120, minWidth: 120, background: 'hsl(var(--gradient-start))' }}>
+              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-2" style={{ width: 80, minWidth: 80, background: 'hsl(var(--gradient-start))' }}>
                 <div className="flex flex-col items-center gap-1">
-                  <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold text-white">
-                    {getUserInitials(member.first_name, member.last_name)}
-                  </div>
-                  <div className="text-xs truncate max-w-[100px]">
-                    {member.first_name} {member.last_name}
+                  <Avatar className="h-6 w-6 border border-white/30">
+                    <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
+                    <AvatarFallback className="bg-white/20 text-white text-[10px]">
+                      {getUserInitials(member.first_name, member.last_name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="text-[10px] truncate max-w-[70px]">
+                    {getFirstName(member)}
                   </div>
                 </div>
               </TableHead>
             ))}
             
             {/* Total Column */}
-            <TableHead className="text-center font-semibold text-white border-l-2 border-white/40 text-sm" style={{ width: 100, minWidth: 100, background: 'hsl(var(--gradient-start))' }}>
+            <TableHead className="text-center font-semibold text-white border-l-2 border-white/40 text-xs px-2" style={{ width: 80, minWidth: 80, background: 'hsl(var(--gradient-start))' }}>
               Total
             </TableHead>
           </TableRow>
@@ -84,16 +96,16 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                 const key = `${member.id}:${project.id}`;
                 const hours = allocationMap.get(key) || 0;
                 return (
-                  <TableCell key={member.id} className="text-center border-r border-slate-200">
+                  <TableCell key={member.id} className="text-center border-r border-slate-200 px-2 py-2">
                     {hours > 0 ? (
-                      <span className="text-sm font-medium">{hours}</span>
+                      <span className="text-xs font-medium">{hours}</span>
                     ) : (
-                      <span className="text-xs text-muted-foreground">-</span>
+                      <span className="text-[10px] text-muted-foreground">-</span>
                     )}
                   </TableCell>
                 );
               })}
-              <TableCell className="text-center font-semibold bg-muted/30 border-l-2 border-slate-300">
+              <TableCell className="text-center font-semibold bg-muted/30 border-l-2 border-slate-300 px-2 py-2 text-xs">
                 {getProjectTotal(project.id)}
               </TableCell>
             </TableRow>
@@ -104,11 +116,11 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               FTE/Week
             </TableCell>
             {members.map(member => (
-              <TableCell key={member.id} className="text-center font-semibold text-white border-r border-white/20" style={{ background: 'hsl(var(--gradient-start))' }}>
+              <TableCell key={member.id} className="text-center font-semibold text-white border-r border-white/20 px-2 py-2 text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
                 {getMemberTotal(member.id)}
               </TableCell>
             ))}
-            <TableCell className="text-center font-semibold text-white border-l-2 border-white/40" style={{ background: 'hsl(var(--gradient-start))' }}>
+            <TableCell className="text-center font-semibold text-white border-l-2 border-white/40 px-2 py-2 text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
               {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
             </TableCell>
           </TableRow>
