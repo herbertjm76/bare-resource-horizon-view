@@ -2,7 +2,6 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ResourceAllocationCell } from './ResourceAllocationCell';
-import { AllocationRing } from './AllocationRing';
 
 interface ProjectRowTableProps {
   projects: any[];
@@ -138,9 +137,9 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                     style={{ width: 40, minWidth: 40 }}
                   >
                     {hours > 0 && (
-                      <div className="flex items-center justify-center h-full">
-                        <AllocationRing hours={hours} size={32} strokeWidth={3} />
-                      </div>
+                      <span className="inline-flex items-center justify-center w-7 h-7 bg-emerald-500 text-white rounded-sm font-semibold text-xs hover:bg-emerald-600 transition-colors duration-100">
+                        {hours}
+                      </span>
                     )}
                   </TableCell>
                 );
