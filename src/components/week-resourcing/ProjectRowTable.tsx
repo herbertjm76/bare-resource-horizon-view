@@ -68,14 +68,8 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             
             {/* Member Columns */}
             {members.map(member => (
-              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-2" style={{ width: 60, minWidth: 60, background: 'hsl(var(--gradient-start))' }}>
+              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-1" style={{ width: 40, minWidth: 40, background: 'hsl(var(--gradient-start))' }}>
                 <div className="flex flex-col items-center gap-2 py-2">
-                  <Avatar className="h-7 w-7 border border-white/30">
-                    <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
-                    <AvatarFallback className="bg-white/20 text-white text-[10px]">
-                      {getUserInitials(member.first_name, member.last_name)}
-                    </AvatarFallback>
-                  </Avatar>
                   <div 
                     className="text-[10px] font-medium"
                     style={{
@@ -90,12 +84,18 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   >
                     {getFirstName(member)}
                   </div>
+                  <Avatar className="h-7 w-7 border border-white/30">
+                    <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
+                    <AvatarFallback className="bg-white/20 text-white text-[10px]">
+                      {getUserInitials(member.first_name, member.last_name)}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
               </TableHead>
             ))}
             
             {/* Total Column */}
-            <TableHead className="text-center font-semibold text-white border-l-2 border-white/40 text-xs px-2" style={{ width: 60, minWidth: 60, background: 'hsl(var(--gradient-start))' }}>
+            <TableHead className="text-center font-semibold text-white border-l-2 border-white/40 text-xs px-1" style={{ width: 60, minWidth: 60, background: 'hsl(var(--gradient-start))' }}>
               Total
             </TableHead>
           </TableRow>
@@ -131,10 +131,10 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   <TableCell
                     key={member.id}
                     className="text-center border-r border-slate-200 px-0.5 py-0.5 project-column bg-gradient-to-r from-purple-50 to-violet-50"
-                    style={{ width: 60, minWidth: 60 }}
+                    style={{ width: 40, minWidth: 40 }}
                   >
                     {hours > 0 && (
-                      <span className="inline-flex items-center justify-center w-8 h-7 bg-emerald-500 text-white rounded-sm font-semibold text-sm hover:bg-emerald-600 transition-colors duration-100">
+                      <span className="inline-flex items-center justify-center w-7 h-7 bg-emerald-500 text-white rounded-sm font-semibold text-xs hover:bg-emerald-600 transition-colors duration-100">
                         {hours}
                       </span>
                     )}
