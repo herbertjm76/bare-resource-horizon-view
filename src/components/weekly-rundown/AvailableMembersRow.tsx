@@ -190,7 +190,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }
 
   return (
-    <div className="flex items-start gap-3 py-1">
+    <div className="flex items-start gap-3">
       {/* Compact Stacked Filters */}
       <div className="flex flex-col gap-1.5 flex-shrink-0 min-w-[150px]">
         {/* Filter Type Selector */}
