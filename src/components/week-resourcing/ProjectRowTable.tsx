@@ -52,8 +52,9 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto flex justify-center">
-      <Table className="weekly-table" style={{ width: 'auto' }}>
+    <div className="w-full flex justify-center overflow-x-auto">
+      <div className="inline-block">
+        <Table className="weekly-table" style={{ width: 'auto' }}>
         <TableHeader>
           <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-b-2 border-slate-200">
             {/* Project Column */}
@@ -191,6 +192,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
           </TableRow>
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 };
