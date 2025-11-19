@@ -101,7 +101,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
     // Calculate allocated hours per member
     const allocationMap = new Map<string, number>();
     allocations.forEach(alloc => {
-      const key = `${alloc.resource_id}:${alloc.resource_type}`;
+      const key = alloc.resource_id; // key only by member id so all resource types are counted
       const current = allocationMap.get(key) || 0;
       allocationMap.set(key, current + Number(alloc.hours));
     });
@@ -109,7 +109,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
     // Filter and calculate availability
     const available = allMembers
       .map(member => {
-        const key = `${member.id}:${member.type}`;
+        const key = member.id;
         const allocatedHours = allocationMap.get(key) || 0;
         const availableHours = member.capacity - allocatedHours;
         const utilization = (allocatedHours / member.capacity) * 100;
