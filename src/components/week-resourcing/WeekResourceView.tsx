@@ -1,12 +1,9 @@
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Users, Clock, TrendingUp, Calendar } from 'lucide-react';
-import { WeekResourceHeader } from './WeekResourceHeader';
 import { NewResourceTable } from './NewResourceTable';
 import { useStreamlinedWeekResourceData } from './hooks/useStreamlinedWeekResourceData';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { calculateMemberProjectHours, calculateUtilizationPercentage } from './utils/utilizationCalculations';
 
 interface WeekResourceViewProps {
@@ -167,94 +164,22 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header Controls */}
-      <WeekResourceHeader
-        selectedWeek={selectedWeek}
-        onWeekChange={handleWeekChange}
-        weekLabel={weekLabel}
-        filters={filters}
-        onFilterChange={onFilterChange}
-        activeFiltersCount={activeFiltersCount}
-        clearFilters={clearFilters}
+    <div>
+      {/* Resource Table - Header, filters, and metrics shown in parent */}
+      <NewResourceTable 
+        members={filteredMembers}
+        projects={projects}
+        allocationMap={allocationMap}
+        annualLeaveData={annualLeaveData}
+        holidaysData={holidaysData}
+        otherLeaveData={otherLeaveData}
+        getMemberTotal={getMemberTotal}
+        getProjectCount={getProjectCount}
+        getWeeklyLeave={getWeeklyLeave}
+        updateOtherLeave={updateOtherLeave}
         viewMode={viewMode}
-        onViewModeChange={setViewMode}
+        selectedWeek={selectedWeek}
       />
-
-      {/* Weekly Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-blue-500" />
-              <div>
-                <p className="text-sm font-medium">Week Utilization</p>
-                <p className="text-2xl font-bold">{metrics.utilizationRate}%</p>
-                <p className="text-xs text-gray-500">{Math.round(metrics.totalAllocated)}h / {metrics.totalCapacity}h</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-green-500" />
-              <div>
-                <p className="text-sm font-medium">Available Hours</p>
-                <p className="text-2xl font-bold">{Math.round(metrics.availableHours)}h</p>
-                <p className="text-xs text-gray-500">This week</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-orange-500" />
-              <div>
-                <p className="text-sm font-medium">Overloaded</p>
-                <p className="text-2xl font-bold">{metrics.overloadedMembers}</p>
-                <p className="text-xs text-gray-500">Over 100% capacity</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-purple-500" />
-              <div>
-                <p className="text-sm font-medium">Under-utilized</p>
-                <p className="text-2xl font-bold">{metrics.underUtilizedMembers}</p>
-                <p className="text-xs text-gray-500">Under 60% capacity</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Weekly Resource Table */}
-      <Card className="border-none shadow-sm">
-        <CardContent className="p-0">
-          <NewResourceTable 
-            members={filteredMembers}
-            projects={projects}
-            allocationMap={allocationMap}
-            annualLeaveData={annualLeaveData}
-            holidaysData={holidaysData}
-            otherLeaveData={otherLeaveData}
-            getMemberTotal={getMemberTotal}
-            getProjectCount={getProjectCount}
-            getWeeklyLeave={getWeeklyLeave}
-            updateOtherLeave={updateOtherLeave}
-            viewMode={viewMode}
-            selectedWeek={selectedWeek}
-          />
-        </CardContent>
-      </Card>
     </div>
   );
 };
