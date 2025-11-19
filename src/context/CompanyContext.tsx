@@ -98,10 +98,13 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .single();
 
       if (error) {
-        console.error('Error fetching company by slug:', error);
+        console.warn('CompanyProvider: no company found for slug, continuing without company', {
+          slugValue,
+          error,
+        });
         setCompany(null);
-        setError(`Company not found: "${slugValue}"`);
-        toast.error('Company not found');
+        // Do not surface a toast or error for unknown slugs – auth page should work for any company name
+        setError(null);
         return;
       }
 
