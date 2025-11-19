@@ -109,7 +109,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                       {getProjectTotal(project.id)}
                     </div>
                   ) : (
-                    <span className="text-muted-foreground text-sm">—</span>
+                    <span className="text-transparent select-none">0</span>
                   )}
                 </div>
               </TableCell>
@@ -134,7 +134,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                       {getProjectTotal(project.id)}
                     </div>
                   ) : (
-                    <span className="text-muted-foreground text-sm">—</span>
+                    <span className="text-transparent select-none">0</span>
                   )}
                 </div>
               </TableCell>
@@ -160,7 +160,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                       {getMemberTotal(member.id)}
                     </div>
                   ) : (
-                    <span className="text-white text-sm">—</span>
+                    <span className="text-transparent select-none">0</span>
                   )}
                 </div>
               </TableCell>
