@@ -42,26 +42,31 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto border rounded-lg">
-      <Table>
+    <div className="overflow-x-auto">
+      <Table className="min-w-full">
         <TableHeader>
-          <TableRow>
-            <TableHead className="sticky left-0 z-10 bg-muted font-semibold min-w-[200px]">
+          <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-b-2 border-slate-200">
+            {/* Project Column */}
+            <TableHead className="text-center font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm" style={{ width: 180, minWidth: 180, background: 'hsl(var(--gradient-start))' }}>
               Project
             </TableHead>
+            
+            {/* Member Columns */}
             {members.map(member => (
-              <TableHead key={member.id} className="text-center min-w-[80px] font-medium">
+              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 120, minWidth: 120, background: 'hsl(var(--gradient-start))' }}>
                 <div className="flex flex-col items-center gap-1">
-                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                  <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold text-white">
                     {getUserInitials(member.first_name, member.last_name)}
                   </div>
-                  <div className="text-xs truncate max-w-[80px]">
+                  <div className="text-xs truncate max-w-[100px]">
                     {member.first_name} {member.last_name}
                   </div>
                 </div>
               </TableHead>
             ))}
-            <TableHead className="text-center font-semibold bg-muted/50">
+            
+            {/* Total Column */}
+            <TableHead className="text-center font-semibold text-white border-l-2 border-white/40 text-sm" style={{ width: 100, minWidth: 100, background: 'hsl(var(--gradient-start))' }}>
               Total
             </TableHead>
           </TableRow>
@@ -69,7 +74,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
         <TableBody>
           {projects.map((project, index) => (
             <TableRow key={project.id} className={index % 2 === 0 ? 'bg-muted/20' : ''}>
-              <TableCell className="sticky left-0 z-10 bg-background font-medium">
+              <TableCell className="sticky left-0 z-10 bg-background font-medium border-r border-slate-200">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">{project.code}</span>
                   <span className="text-sm">{project.name}</span>
@@ -79,7 +84,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                 const key = `${member.id}:${project.id}`;
                 const hours = allocationMap.get(key) || 0;
                 return (
-                  <TableCell key={member.id} className="text-center">
+                  <TableCell key={member.id} className="text-center border-r border-slate-200">
                     {hours > 0 ? (
                       <span className="text-sm font-medium">{hours}</span>
                     ) : (
@@ -88,22 +93,22 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   </TableCell>
                 );
               })}
-              <TableCell className="text-center font-semibold bg-muted/30">
+              <TableCell className="text-center font-semibold bg-muted/30 border-l-2 border-slate-300">
                 {getProjectTotal(project.id)}
               </TableCell>
             </TableRow>
           ))}
           {/* Totals Row */}
-          <TableRow className="bg-muted font-semibold">
-            <TableCell className="sticky left-0 z-10 bg-muted">
+          <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-t-2 border-slate-300">
+            <TableCell className="sticky left-0 z-10 text-center font-semibold text-white border-r border-white/20" style={{ background: 'hsl(var(--gradient-start))' }}>
               FTE/Week
             </TableCell>
             {members.map(member => (
-              <TableCell key={member.id} className="text-center">
+              <TableCell key={member.id} className="text-center font-semibold text-white border-r border-white/20" style={{ background: 'hsl(var(--gradient-start))' }}>
                 {getMemberTotal(member.id)}
               </TableCell>
             ))}
-            <TableCell className="text-center">
+            <TableCell className="text-center font-semibold text-white border-l-2 border-white/40" style={{ background: 'hsl(var(--gradient-start))' }}>
               {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
             </TableCell>
           </TableRow>
