@@ -21,9 +21,9 @@ export const AvatarWithHourDial: React.FC<AvatarWithHourDialProps> = ({
   const percentage = Math.min((hours / maxHours) * 100, 100);
 
   const sizeClasses = {
-    sm: { avatar: 'h-8 w-8', svg: 'h-12 w-12', strokeWidth: 9 },
-    md: { avatar: 'h-10 w-10', svg: 'h-14 w-14', strokeWidth: 9 },
-    lg: { avatar: 'h-12 w-12', svg: 'h-16 w-16', strokeWidth: 9 }
+    sm: { avatar: 'h-8 w-8', svg: 'h-12 w-12', strokeWidth: 6 },
+    md: { avatar: 'h-10 w-10', svg: 'h-14 w-14', strokeWidth: 6 },
+    lg: { avatar: 'h-12 w-12', svg: 'h-16 w-16', strokeWidth: 6 }
   } as const;
 
   const sizes = sizeClasses[size];
