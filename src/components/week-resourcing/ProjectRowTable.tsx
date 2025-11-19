@@ -52,8 +52,8 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <Table className="min-w-full weekly-table">
+    <div className="overflow-x-auto flex justify-center">
+      <Table className="weekly-table" style={{ width: 'auto' }}>
         <TableHeader>
           <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-b-2 border-slate-200">
             {/* Project Column */}
