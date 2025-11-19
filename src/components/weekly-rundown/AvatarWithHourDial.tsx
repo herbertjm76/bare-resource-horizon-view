@@ -45,7 +45,7 @@ export const AvatarWithHourDial: React.FC<AvatarWithHourDialProps> = ({
           cy="24"
           r={radius}
           fill="none"
-          stroke="hsl(var(--muted))"
+          stroke="hsl(var(--muted-foreground))"
           strokeWidth={strokeWidth}
           opacity="0.3"
         />
