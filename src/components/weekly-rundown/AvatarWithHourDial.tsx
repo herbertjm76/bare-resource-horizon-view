@@ -23,9 +23,9 @@ export const AvatarWithHourDial: React.FC<AvatarWithHourDialProps> = ({
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   const sizeClasses = {
-    sm: { avatar: 'h-8 w-8', svg: 'h-12 w-12', strokeWidth: '3' },
-    md: { avatar: 'h-10 w-10', svg: 'h-14 w-14', strokeWidth: '3' },
-    lg: { avatar: 'h-12 w-12', svg: 'h-16 w-16', strokeWidth: '4' }
+    sm: { avatar: 'h-8 w-8', svg: 'h-12 w-12', strokeWidth: '9' },
+    md: { avatar: 'h-10 w-10', svg: 'h-14 w-14', strokeWidth: '9' },
+    lg: { avatar: 'h-12 w-12', svg: 'h-16 w-16', strokeWidth: '9' }
   };
 
   const sizes = sizeClasses[size];

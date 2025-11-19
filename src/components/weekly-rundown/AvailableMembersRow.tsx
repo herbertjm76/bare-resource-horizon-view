@@ -265,10 +265,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           
           // Calculate color based on utilization
           const getUtilizationColor = () => {
-            if (member.utilization >= 100) return 'hsl(var(--destructive))';
-            if (member.utilization >= 80) return 'hsl(var(--warning))';
-            if (member.utilization >= 50) return 'hsl(var(--success))';
-            return 'hsl(var(--muted-foreground))';
+            if (member.utilization > 100) return 'hsl(var(--destructive))'; // Red for over 100%
+            if (member.utilization === 100) return 'hsl(var(--success))'; // Green for exactly 100%
+            return 'hsl(var(--warning))'; // Yellow for under 100%
           };
           
           return (
