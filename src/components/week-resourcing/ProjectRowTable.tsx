@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ResourceAllocationCell } from './ResourceAllocationCell';
 
 interface ProjectRowTableProps {
   projects: any[];
@@ -60,6 +61,11 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               Project
             </TableHead>
             
+            {/* FTE Column */}
+            <TableHead className="text-center font-semibold text-white border-r border-white/20 text-xs px-2" style={{ width: 60, minWidth: 60, background: 'hsl(var(--gradient-start))' }}>
+              FTE
+            </TableHead>
+            
             {/* Member Columns */}
             {members.map(member => (
               <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-2" style={{ width: 80, minWidth: 80, background: 'hsl(var(--gradient-start))' }}>
@@ -92,16 +98,20 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   <span className="text-sm">{project.name}</span>
                 </div>
               </TableCell>
+              <TableCell className="text-center border-r border-slate-200 px-2 py-2 font-semibold text-xs">
+                {getProjectTotal(project.id)}
+              </TableCell>
               {members.map(member => {
                 const key = `${member.id}:${project.id}`;
                 const hours = allocationMap.get(key) || 0;
                 return (
-                  <TableCell key={member.id} className="text-center border-r border-slate-200 px-2 py-2">
-                    {hours > 0 ? (
-                      <span className="text-xs font-medium">{hours}</span>
-                    ) : (
-                      <span className="text-[10px] text-muted-foreground">-</span>
-                    )}
+                  <TableCell key={member.id} className="text-center border-r border-slate-200 p-0 align-middle">
+                    <ResourceAllocationCell
+                      hours={hours}
+                      resourceId={member.id}
+                      projectId={project.id}
+                      weekStartDate={weekStartDate}
+                    />
                   </TableCell>
                 );
               })}
@@ -113,7 +123,10 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
           {/* Totals Row */}
           <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-t-2 border-slate-300">
             <TableCell className="sticky left-0 z-10 text-center font-semibold text-white border-r border-white/20" style={{ background: 'hsl(var(--gradient-start))' }}>
-              FTE/Week
+              Total
+            </TableCell>
+            <TableCell className="text-center font-semibold text-white border-r border-white/20 px-2 py-2 text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
+              {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
             </TableCell>
             {members.map(member => (
               <TableCell key={member.id} className="text-center font-semibold text-white border-r border-white/20 px-2 py-2 text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
