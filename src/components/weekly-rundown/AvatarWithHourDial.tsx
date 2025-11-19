@@ -21,21 +21,21 @@ export const AvatarWithHourDial: React.FC<AvatarWithHourDialProps> = ({
   const percentage = Math.min((hours / maxHours) * 100, 100);
 
   const sizeClasses = {
-    sm: { avatar: 'h-8 w-8', svg: 'h-12 w-12', strokeWidth: 6 },
-    md: { avatar: 'h-10 w-10', svg: 'h-14 w-14', strokeWidth: 6 },
-    lg: { avatar: 'h-12 w-12', svg: 'h-16 w-16', strokeWidth: 6 }
+    sm: { avatar: 'h-8 w-8', container: 'h-12 w-12', strokeWidth: 6 },
+    md: { avatar: 'h-10 w-10', container: 'h-14 w-14', strokeWidth: 6 },
+    lg: { avatar: 'h-12 w-12', container: 'h-16 w-16', strokeWidth: 6 }
   } as const;
 
   const sizes = sizeClasses[size];
   const strokeWidth = sizes.strokeWidth;
-  const radius = 24 - strokeWidth / 2; // keep ring fully visible within viewBox while surrounding avatar
+  const radius = 20; // fixed radius so the 6px ring sits fully inside the container
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="relative inline-flex items-center justify-center">
+    <div className={`relative inline-flex items-center justify-center ${sizes.container} shrink-0`}>
       <svg
-        className={`${sizes.svg} absolute -rotate-90`}
+        className="absolute inset-0 -rotate-90"
         viewBox="0 0 48 48"
         preserveAspectRatio="xMidYMid meet"
       >

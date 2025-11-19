@@ -271,7 +271,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           };
           
           return (
-            <div key={member.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+            <div key={member.id} className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16">
               <AvatarWithHourDial
                 avatar={member.avatarUrl}
                 fallback={initials}
@@ -280,7 +280,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                 size="sm"
                 color={getUtilizationColor()}
               />
-              <span className="text-xs font-medium text-foreground">{member.firstName}</span>
+              <span className="text-xs font-medium text-foreground w-full text-center truncate">{member.firstName}</span>
             </div>
           );
         })}
