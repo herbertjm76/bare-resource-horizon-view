@@ -21,6 +21,7 @@ interface AvailableMember {
   avatarUrl?: string;
   availableHours: number;
   utilization: number;
+  capacity: number;
   department?: string;
   sectors: string[];
 }
@@ -139,6 +140,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           avatarUrl: member.avatarUrl,
           availableHours,
           utilization,
+          capacity: member.capacity,
           department: member.department,
           sectors
         };
@@ -260,7 +262,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       <div className="flex gap-3 items-center overflow-x-auto scrollbar-grey px-1 flex-1">
         {filteredMembers.map((member) => {
           const initials = `${member.firstName[0] || ''}${member.lastName[0] || ''}`.toUpperCase();
-          const capacity = 40; // Standard weekly capacity
+          const capacity = member.capacity || 40; // Use individual weekly capacity when available
           const allocatedHours = capacity - member.availableHours;
           
           // Calculate color based on utilization
