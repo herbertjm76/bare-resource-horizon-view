@@ -21,11 +21,17 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
 
       console.log('Fetching projects for company:', company.id);
       
-      const { data, error } = await supabase
+      let query = supabase
         .from('projects')
         .select('id, code, name, status, department')
-        .eq('company_id', company.id)
-        .order('code');
+        .eq('company_id', company.id);
+      
+      // Apply department filter
+      if (filters?.department && filters.department !== 'all') {
+        query = query.eq('department', filters.department);
+      }
+      
+      const { data, error } = await query.order('code');
 
       if (error) {
         console.error('Error fetching projects:', error);

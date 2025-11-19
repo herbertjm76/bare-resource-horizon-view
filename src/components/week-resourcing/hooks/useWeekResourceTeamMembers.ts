@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 
-export const useWeekResourceTeamMembers = () => {
+export const useWeekResourceTeamMembers = (filters?: { department?: string; location?: string }) => {
   const { company } = useCompany();
 
   const { data: session } = useQuery({
@@ -17,14 +17,26 @@ export const useWeekResourceTeamMembers = () => {
 
   // Get active team members from profiles table
   const { data: activeMembers = [], isLoading: isLoadingActive, error: activeError } = useQuery({
-    queryKey: ['active-team-members', company?.id],
+    queryKey: ['active-team-members', company?.id, filters],
     queryFn: async () => {
       if (!company?.id) return [];
       
-      const { data, error } = await supabase
+      let query = supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, location, weekly_capacity, avatar_url')
+        .select('id, first_name, last_name, email, location, department, weekly_capacity, avatar_url')
         .eq('company_id', company.id);
+      
+      // Apply department filter
+      if (filters?.department && filters.department !== 'all') {
+        query = query.eq('department', filters.department);
+      }
+      
+      // Apply location filter
+      if (filters?.location && filters.location !== 'all') {
+        query = query.eq('location', filters.location);
+      }
+        
+      const { data, error } = await query;
         
       if (error) {
         console.error("Error fetching active team members:", error);
@@ -40,6 +52,7 @@ export const useWeekResourceTeamMembers = () => {
         last_name: member.last_name || '',
         email: member.email || '',
         location: member.location || null,
+        department: member.department || null,
         weekly_capacity: member.weekly_capacity || 40,
         avatar_url: member.avatar_url || null,
         status: 'active'
@@ -50,16 +63,28 @@ export const useWeekResourceTeamMembers = () => {
 
   // Get pre-registered team members
   const { data: preRegisteredMembers = [], isLoading: isLoadingPreRegistered, error: preRegisteredError } = useQuery({
-    queryKey: ['pre-registered-members', session?.user?.id, company?.id],
+    queryKey: ['pre-registered-members', session?.user?.id, company?.id, filters],
     queryFn: async () => {
       if (!session?.user?.id || !company?.id) return [];
       
-      const { data, error } = await supabase
+      let query = supabase
         .from('invites')
         .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
         .eq('company_id', company.id)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
+      
+      // Apply department filter
+      if (filters?.department && filters.department !== 'all') {
+        query = query.eq('department', filters.department);
+      }
+      
+      // Apply location filter
+      if (filters?.location && filters.location !== 'all') {
+        query = query.eq('location', filters.location);
+      }
+        
+      const { data, error } = await query;
         
       if (error) {
         console.error("Error fetching pre-registered members:", error);
@@ -75,6 +100,7 @@ export const useWeekResourceTeamMembers = () => {
         last_name: member.last_name || '',
         email: member.email || '',
         location: member.location || null,
+        department: member.department || null,
         weekly_capacity: member.weekly_capacity || 40,
         avatar_url: null, // Pre-registered members don't have avatars yet
         status: 'pre_registered'

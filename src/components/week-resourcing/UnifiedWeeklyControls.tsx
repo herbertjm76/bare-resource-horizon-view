@@ -28,6 +28,8 @@ interface UnifiedWeeklyControlsProps {
   // Filters
   filters: {
     office: string;
+    department: string;
+    location: string;
     searchTerm: string;
   };
   onFilterChange: (key: string, value: string) => void;
@@ -265,12 +267,20 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
       </div>
 
       {/* Filters Row */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
         {/* Search */}
-        <div className="relative flex-1 max-w-md">
+        <div className="relative flex-1 min-w-[250px] max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search members..."
+            placeholder={
+              tableOrientation === 'per-project' 
+                ? "Search projects..." 
+                : viewType === 'table' 
+                  ? "Search members or projects..."
+                  : rundownMode === 'projects' 
+                    ? "Search projects..."
+                    : "Search members..."
+            }
             value={filters.searchTerm}
             onChange={(e) => onFilterChange('searchTerm', e.target.value)}
             className="pl-10 h-9"
@@ -284,6 +294,26 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Offices</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Department Filter */}
+        <Select value={filters.department} onValueChange={(value) => onFilterChange('department', value)}>
+          <SelectTrigger className="w-40 h-9">
+            <SelectValue placeholder="All Departments" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Departments</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Location Filter */}
+        <Select value={filters.location} onValueChange={(value) => onFilterChange('location', value)}>
+          <SelectTrigger className="w-36 h-9">
+            <SelectValue placeholder="All Locations" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Locations</SelectItem>
           </SelectContent>
         </Select>
 
