@@ -98,8 +98,16 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   <span className="text-sm">{project.name}</span>
                 </div>
               </TableCell>
-              <TableCell className="text-center border-r border-slate-200 px-2 py-2 font-semibold text-xs">
-                {getProjectTotal(project.id)}
+              <TableCell className="text-center border-r border-slate-200 p-0 align-middle">
+                <div className="flex items-center justify-center h-full py-2">
+                  {getProjectTotal(project.id) > 0 ? (
+                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+                      {getProjectTotal(project.id)}
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">—</span>
+                  )}
+                </div>
               </TableCell>
               {members.map(member => {
                 const key = `${member.id}:${project.id}`;
@@ -115,8 +123,16 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   </TableCell>
                 );
               })}
-              <TableCell className="text-center font-semibold bg-muted/30 border-l-2 border-slate-300 px-2 py-2 text-xs">
-                {getProjectTotal(project.id)}
+              <TableCell className="text-center font-semibold bg-muted/30 border-l-2 border-slate-300 p-0 align-middle">
+                <div className="flex items-center justify-center h-full py-2">
+                  {getProjectTotal(project.id) > 0 ? (
+                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+                      {getProjectTotal(project.id)}
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">—</span>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -125,16 +141,32 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             <TableCell className="sticky left-0 z-10 text-center font-semibold text-white border-r border-white/20" style={{ background: 'hsl(var(--gradient-start))' }}>
               Total
             </TableCell>
-            <TableCell className="text-center font-semibold text-white border-r border-white/20 px-2 py-2 text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
-              {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
+            <TableCell className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))' }}>
+              <div className="flex items-center justify-center h-full py-2">
+                <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+                  {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
+                </div>
+              </div>
             </TableCell>
             {members.map(member => (
-              <TableCell key={member.id} className="text-center font-semibold text-white border-r border-white/20 px-2 py-2 text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
-                {getMemberTotal(member.id)}
+              <TableCell key={member.id} className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))' }}>
+                <div className="flex items-center justify-center h-full py-2">
+                  {getMemberTotal(member.id) > 0 ? (
+                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+                      {getMemberTotal(member.id)}
+                    </div>
+                  ) : (
+                    <span className="text-white text-xs">—</span>
+                  )}
+                </div>
               </TableCell>
             ))}
-            <TableCell className="text-center font-semibold text-white border-l-2 border-white/40 px-2 py-2 text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
-              {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
+            <TableCell className="text-center border-l-2 border-white/40 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))' }}>
+              <div className="flex items-center justify-center h-full py-2">
+                <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+                  {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
+                </div>
+              </div>
             </TableCell>
           </TableRow>
         </TableBody>
