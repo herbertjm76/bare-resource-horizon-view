@@ -68,16 +68,16 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             
             {/* Member Columns */}
             {members.map(member => (
-              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-0" style={{ width: 40, minWidth: 40, background: 'hsl(var(--gradient-start))' }}>
-                <div className="flex flex-col items-center gap-1 py-1">
+              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-0 align-bottom" style={{ width: 40, minWidth: 40, background: 'hsl(var(--gradient-start))', verticalAlign: 'bottom' }}>
+                <div className="flex flex-col items-center gap-1 pb-1">
                   <div 
-                    className="text-[10px] font-medium"
+                    className="text-xs font-medium"
                     style={{
                       writingMode: 'vertical-rl',
                       textOrientation: 'mixed',
                       transform: 'rotate(180deg)',
                       whiteSpace: 'nowrap',
-                      maxHeight: '80px',
+                      maxHeight: '120px',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis'
                     }}
