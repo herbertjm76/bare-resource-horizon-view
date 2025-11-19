@@ -53,16 +53,16 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
 
   return (
     <div className="overflow-x-auto">
-      <Table className="min-w-full">
+      <Table className="min-w-full weekly-table">
         <TableHeader>
           <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-b-2 border-slate-200">
             {/* Project Column */}
-            <TableHead className="text-center font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm" style={{ width: 180, minWidth: 180, background: 'hsl(var(--gradient-start))' }}>
+            <TableHead className="text-left font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm px-4" style={{ width: 220, minWidth: 220, background: 'hsl(var(--gradient-start))' }}>
               Project
             </TableHead>
             
             {/* FTE Column */}
-            <TableHead className="text-center font-semibold text-white border-r border-white/20 text-xs px-2" style={{ width: 60, minWidth: 60, background: 'hsl(var(--gradient-start))' }}>
+            <TableHead className="text-center font-semibold text-white border-r border-white/20 text-xs px-2" style={{ width: 80, minWidth: 80, background: 'hsl(var(--gradient-start))' }}>
               FTE
             </TableHead>
             
@@ -91,21 +91,25 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
         </TableHeader>
         <TableBody>
           {projects.map((project, index) => (
-            <TableRow key={project.id} className={index % 2 === 0 ? 'bg-muted/20' : ''}>
-              <TableCell className="sticky left-0 z-10 bg-background font-medium border-r border-slate-200">
+            <TableRow 
+              key={project.id} 
+              className={`${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'} hover:bg-blue-50/80 transition-all duration-150`}
+              style={{ height: 48, minHeight: 48 }}
+            >
+              <TableCell className="sticky left-0 z-10 bg-inherit border-r border-slate-200 px-4 py-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{project.code}</span>
-                  <span className="text-sm">{project.name}</span>
+                  <span className="text-xs font-semibold text-muted-foreground">{project.code}</span>
+                  <span className="text-sm font-medium">{project.name}</span>
                 </div>
               </TableCell>
-              <TableCell className="text-center border-r border-slate-200 p-0 align-middle">
-                <div className="flex items-center justify-center h-full py-2">
+              <TableCell className="text-center border-r border-slate-200 p-0 align-middle" style={{ height: 48 }}>
+                <div className="flex items-center justify-center h-full">
                   {getProjectTotal(project.id) > 0 ? (
-                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                       {getProjectTotal(project.id)}
                     </div>
                   ) : (
-                    <span className="text-muted-foreground text-xs">—</span>
+                    <span className="text-muted-foreground text-sm">—</span>
                   )}
                 </div>
               </TableCell>
@@ -123,47 +127,47 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   </TableCell>
                 );
               })}
-              <TableCell className="text-center font-semibold bg-muted/30 border-l-2 border-slate-300 p-0 align-middle">
-                <div className="flex items-center justify-center h-full py-2">
+              <TableCell className="text-center bg-slate-100/80 border-l-2 border-slate-300 p-0 align-middle" style={{ height: 48 }}>
+                <div className="flex items-center justify-center h-full">
                   {getProjectTotal(project.id) > 0 ? (
-                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                       {getProjectTotal(project.id)}
                     </div>
                   ) : (
-                    <span className="text-muted-foreground text-xs">—</span>
+                    <span className="text-muted-foreground text-sm">—</span>
                   )}
                 </div>
               </TableCell>
             </TableRow>
           ))}
           {/* Totals Row */}
-          <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-t-2 border-slate-300">
-            <TableCell className="sticky left-0 z-10 text-center font-semibold text-white border-r border-white/20" style={{ background: 'hsl(var(--gradient-start))' }}>
-              Total
+          <TableRow style={{ background: 'hsl(var(--gradient-start))', height: 48 }} className="border-t-2 border-slate-300">
+            <TableCell className="sticky left-0 z-10 text-left font-semibold text-white border-r border-white/20 px-4" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
+              Weekly Total
             </TableCell>
-            <TableCell className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))' }}>
-              <div className="flex items-center justify-center h-full py-2">
-                <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+            <TableCell className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
+              <div className="flex items-center justify-center h-full">
+                <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                   {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
                 </div>
               </div>
             </TableCell>
             {members.map(member => (
-              <TableCell key={member.id} className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))' }}>
-                <div className="flex items-center justify-center h-full py-2">
+              <TableCell key={member.id} className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
+                <div className="flex items-center justify-center h-full">
                   {getMemberTotal(member.id) > 0 ? (
-                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+                    <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                       {getMemberTotal(member.id)}
                     </div>
                   ) : (
-                    <span className="text-white text-xs">—</span>
+                    <span className="text-white text-sm">—</span>
                   )}
                 </div>
               </TableCell>
             ))}
-            <TableCell className="text-center border-l-2 border-white/40 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))' }}>
-              <div className="flex items-center justify-center h-full py-2">
-                <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2 py-1 text-xs min-w-[32px]">
+            <TableCell className="text-center border-l-2 border-white/40 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
+              <div className="flex items-center justify-center h-full">
+                <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                   {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
                 </div>
               </div>
