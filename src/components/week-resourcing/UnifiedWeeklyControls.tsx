@@ -94,11 +94,11 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   return (
     <div className="space-y-4">
       {/* Main Controls Row */}
-      <div className="flex flex-col lg:flex-row gap-4 lg:items-center bg-card rounded-lg border p-4">
+      <div className="flex flex-col lg:flex-row gap-3 lg:items-center bg-card rounded-lg border p-3">
         {/* Left section - Week and Progress */}
-        <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="h-4 w-4 text-muted-foreground hidden sm:block" />
             <WeekStartSelector
               selectedWeek={selectedWeek}
               onWeekChange={onWeekChange}
@@ -106,42 +106,42 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
           </div>
           
           {showProgress && (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground whitespace-nowrap">
               {rundownMode === 'people' ? 'Person' : 'Project'} {currentIndex! + 1} of {totalItems}
             </div>
           )}
         </div>
 
         {/* Right section - View Controls */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:items-center ml-auto">
+        <div className="flex flex-wrap gap-2 items-center ml-auto">
           {/* View Type Toggle */}
           <div className="flex rounded-lg border p-1 bg-muted">
             <Button
               variant={viewType === 'table' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onViewTypeChange('table')}
-              className={`flex items-center gap-2 h-8 ${viewType === 'table' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+              className={`flex items-center gap-1.5 h-7 px-2 ${viewType === 'table' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
             >
-              <TableIcon className="h-4 w-4" />
-              <span className="hidden sm:inline">Table</span>
+              <TableIcon className="h-3.5 w-3.5" />
+              <span className="hidden xl:inline text-xs">Table</span>
             </Button>
             <Button
               variant={viewType === 'grid' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onViewTypeChange('grid')}
-              className={`flex items-center gap-2 h-8 ${viewType === 'grid' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+              className={`flex items-center gap-1.5 h-7 px-2 ${viewType === 'grid' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
             >
-              <LayoutGrid className="h-4 w-4" />
-              <span className="hidden sm:inline">Grid</span>
+              <LayoutGrid className="h-3.5 w-3.5" />
+              <span className="hidden xl:inline text-xs">Grid</span>
             </Button>
             <Button
               variant={viewType === 'carousel' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onViewTypeChange('carousel')}
-              className={`flex items-center gap-2 h-8 ${viewType === 'carousel' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+              className={`flex items-center gap-1.5 h-7 px-2 ${viewType === 'carousel' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
             >
-              <Presentation className="h-4 w-4" />
-              <span className="hidden sm:inline">Carousel</span>
+              <Presentation className="h-3.5 w-3.5" />
+              <span className="hidden xl:inline text-xs">Carousel</span>
             </Button>
           </div>
 
@@ -152,19 +152,19 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
                 variant={rundownMode === 'people' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onModeChange('people')}
-                className={`flex items-center gap-2 h-8 ${rundownMode === 'people' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                className={`flex items-center gap-1.5 h-7 px-2 ${rundownMode === 'people' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
               >
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">People</span>
+                <Users className="h-3.5 w-3.5" />
+                <span className="hidden xl:inline text-xs">People</span>
               </Button>
               <Button
                 variant={rundownMode === 'projects' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onModeChange('projects')}
-                className={`flex items-center gap-2 h-8 ${rundownMode === 'projects' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                className={`flex items-center gap-1.5 h-7 px-2 ${rundownMode === 'projects' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
               >
-                <FolderOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Projects</span>
+                <FolderOpen className="h-3.5 w-3.5" />
+                <span className="hidden xl:inline text-xs">Projects</span>
               </Button>
             </div>
           )}
@@ -176,19 +176,19 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
                 variant={tableOrientation === 'per-person' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onTableOrientationChange('per-person')}
-                className={`flex items-center gap-2 h-8 ${tableOrientation === 'per-person' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                className={`flex items-center gap-1.5 h-7 px-2 ${tableOrientation === 'per-person' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
               >
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Person</span>
+                <Users className="h-3.5 w-3.5" />
+                <span className="hidden xl:inline text-xs">Person</span>
               </Button>
               <Button
                 variant={tableOrientation === 'per-project' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onTableOrientationChange('per-project')}
-                className={`flex items-center gap-2 h-8 ${tableOrientation === 'per-project' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                className={`flex items-center gap-1.5 h-7 px-2 ${tableOrientation === 'per-project' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
               >
-                <FolderOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Project</span>
+                <FolderOpen className="h-3.5 w-3.5" />
+                <span className="hidden xl:inline text-xs">Project</span>
               </Button>
             </div>
           )}
@@ -200,19 +200,19 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
                 variant={viewMode === 'compact' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onViewModeChange('compact')}
-                className={`flex items-center gap-2 h-8 ${viewMode === 'compact' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                className={`flex items-center gap-1.5 h-7 px-2 ${viewMode === 'compact' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
               >
-                <Minimize2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Compact</span>
+                <Minimize2 className="h-3.5 w-3.5" />
+                <span className="hidden xl:inline text-xs">Compact</span>
               </Button>
               <Button
                 variant={viewMode === 'expanded' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onViewModeChange('expanded')}
-                className={`flex items-center gap-2 h-8 ${viewMode === 'expanded' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                className={`flex items-center gap-1.5 h-7 px-2 ${viewMode === 'expanded' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
               >
-                <Expand className="h-4 w-4" />
-                <span className="hidden sm:inline">Expanded</span>
+                <Expand className="h-3.5 w-3.5" />
+                <span className="hidden xl:inline text-xs">Expanded</span>
               </Button>
             </div>
           )}
@@ -220,7 +220,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
           {/* Sort Options - Grid & Carousel only */}
           {showSortOptions && sortOption && onSortChange && (
             <Select value={sortOption} onValueChange={onSortChange}>
-              <SelectTrigger className="w-36 h-8">
+              <SelectTrigger className="w-28 h-7 text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -238,12 +238,12 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
               variant="outline"
               size="sm"
               onClick={onAutoAdvanceToggle}
-              className="h-8"
+              className="h-7 px-2"
             >
               {isAutoAdvance ? (
-                <><PauseCircle className="h-4 w-4 mr-2" /> Pause</>
+                <><PauseCircle className="h-3.5 w-3.5 xl:mr-1.5" /> <span className="hidden xl:inline text-xs">Pause</span></>
               ) : (
-                <><PlayCircle className="h-4 w-4 mr-2" /> Auto</>
+                <><PlayCircle className="h-3.5 w-3.5 xl:mr-1.5" /> <span className="hidden xl:inline text-xs">Auto</span></>
               )}
             </Button>
           )}
@@ -254,12 +254,12 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
               variant="outline"
               size="sm"
               onClick={onFullscreenToggle}
-              className="h-8"
+              className="h-7 px-2"
             >
               {isFullscreen ? (
-                <Minimize className="h-4 w-4" />
+                <Minimize className="h-3.5 w-3.5" />
               ) : (
-                <Maximize className="h-4 w-4" />
+                <Maximize className="h-3.5 w-3.5" />
               )}
             </Button>
           )}
