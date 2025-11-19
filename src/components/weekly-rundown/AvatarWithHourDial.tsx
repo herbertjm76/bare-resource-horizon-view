@@ -23,9 +23,9 @@ export const AvatarWithHourDial: React.FC<AvatarWithHourDialProps> = ({
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   const sizeClasses = {
-    sm: { avatar: 'h-8 w-8', svg: 'h-10 w-10' },
-    md: { avatar: 'h-10 w-10', svg: 'h-12 w-12' },
-    lg: { avatar: 'h-12 w-12', svg: 'h-14 w-14' }
+    sm: { avatar: 'h-8 w-8', svg: 'h-12 w-12', strokeWidth: '3' },
+    md: { avatar: 'h-10 w-10', svg: 'h-14 w-14', strokeWidth: '3' },
+    lg: { avatar: 'h-12 w-12', svg: 'h-16 w-16', strokeWidth: '4' }
   };
 
   const sizes = sizeClasses[size];
@@ -40,8 +40,8 @@ export const AvatarWithHourDial: React.FC<AvatarWithHourDialProps> = ({
           r="18"
           fill="none"
           stroke="hsl(var(--muted))"
-          strokeWidth="2"
-          opacity="0.2"
+          strokeWidth={sizes.strokeWidth}
+          opacity="0.3"
         />
         {/* Progress circle */}
         <circle
@@ -50,7 +50,7 @@ export const AvatarWithHourDial: React.FC<AvatarWithHourDialProps> = ({
           r="18"
           fill="none"
           stroke={color}
-          strokeWidth="2"
+          strokeWidth={sizes.strokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
