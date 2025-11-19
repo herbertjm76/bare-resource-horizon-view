@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUpDown } from 'lucide-react';
+import { Filter } from 'lucide-react';
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
@@ -13,6 +13,7 @@ interface AvailableMembersRowProps {
 }
 
 type SortBy = 'hours' | 'name';
+type FilterBy = 'all' | 'department' | 'sector';
 
 interface AvailableMember {
   id: string;
@@ -20,6 +21,9 @@ interface AvailableMember {
   lastName: string;
   avatarUrl?: string;
   availableHours: number;
+  utilization: number;
+  department?: string;
+  sectors: string[];
 }
 
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
@@ -28,6 +32,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 }) => {
   const { company } = useCompany();
   const [sortBy, setSortBy] = useState<SortBy>('hours');
+  const [filterBy, setFilterBy] = useState<FilterBy>('all');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
+  const [selectedSector, setSelectedSector] = useState<string>('all');
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['available-members-profiles', company?.id],
@@ -35,7 +42,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity')
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department')
         .eq('company_id', company.id);
       if (error) throw error;
       return data || [];
@@ -49,7 +56,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('invites')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity')
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department')
         .eq('company_id', company.id)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
@@ -65,7 +72,12 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('project_resource_allocations')
-        .select('resource_id, resource_type, hours')
+        .select(`
+          resource_id, 
+          resource_type, 
+          hours,
+          projects:project_id (department)
+        `)
         .eq('company_id', company.id)
         .eq('week_start_date', weekStartDate);
       if (error) throw error;
@@ -82,6 +94,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         lastName: p.last_name || '',
         avatarUrl: p.avatar_url,
         capacity: p.weekly_capacity || 40,
+        department: p.department || undefined,
         type: 'active' as const
       })),
       ...invites.map(i => ({
@@ -90,15 +103,26 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         lastName: i.last_name || '',
         avatarUrl: i.avatar_url,
         capacity: i.weekly_capacity || 40,
+        department: i.department || undefined,
         type: 'pre_registered' as const
       }))
     ];
 
     const allocationMap = new Map<string, number>();
+    const memberSectorsMap = new Map<string, Set<string>>();
+    
     allocations.forEach(alloc => {
       const key = `${alloc.resource_id}:${alloc.resource_type}`;
       const current = allocationMap.get(key) || 0;
       allocationMap.set(key, current + Number(alloc.hours));
+      
+      // Track sectors (project departments) for each member
+      if (alloc.projects?.department) {
+        if (!memberSectorsMap.has(key)) {
+          memberSectorsMap.set(key, new Set());
+        }
+        memberSectorsMap.get(key)!.add(alloc.projects.department);
+      }
     });
 
     const available = allMembers
@@ -107,6 +131,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         const allocatedHours = allocationMap.get(key) || 0;
         const availableHours = member.capacity - allocatedHours;
         const utilization = (allocatedHours / member.capacity) * 100;
+        const sectors = Array.from(memberSectorsMap.get(key) || []);
 
         return {
           id: member.id,
@@ -114,10 +139,12 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           lastName: member.lastName,
           avatarUrl: member.avatarUrl,
           availableHours,
-          utilization
+          utilization,
+          department: member.department,
+          sectors
         };
       })
-      .filter(m => m.utilization < threshold)
+      .filter(member => member.utilization < threshold)
       .sort((a, b) => {
         if (sortBy === 'hours') {
           return b.availableHours - a.availableHours;
@@ -129,44 +156,117 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     return available;
   }, [profiles, invites, allocations, threshold, sortBy]);
 
-  if (availableMembers.length === 0) {
+  // Get unique departments and sectors for filters
+  const { departments, sectors } = React.useMemo(() => {
+    const depts = new Set<string>();
+    const sects = new Set<string>();
+    
+    availableMembers.forEach(member => {
+      if (member.department) depts.add(member.department);
+      member.sectors.forEach(sector => sects.add(sector));
+    });
+    
+    return {
+      departments: Array.from(depts).sort(),
+      sectors: Array.from(sects).sort()
+    };
+  }, [availableMembers]);
+
+  // Apply filters
+  const filteredMembers = React.useMemo(() => {
+    return availableMembers.filter(member => {
+      if (filterBy === 'department' && selectedDepartment !== 'all') {
+        return member.department === selectedDepartment;
+      }
+      if (filterBy === 'sector' && selectedSector !== 'all') {
+        return member.sectors.includes(selectedSector);
+      }
+      return true;
+    });
+  }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
+
+  if (filteredMembers.length === 0) {
     return null;
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex justify-end">
-        <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-          <SelectTrigger className="w-[160px] h-9">
-            <ArrowUpDown className="h-4 w-4 mr-2" />
+    <div className="flex items-center gap-3 py-2">
+      {/* Inline Filters */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <Filter className="h-4 w-4 text-muted-foreground" />
+        
+        <Select value={filterBy} onValueChange={(value) => {
+          setFilterBy(value as FilterBy);
+          setSelectedDepartment('all');
+          setSelectedSector('all');
+        }}>
+          <SelectTrigger className="w-[130px] h-8 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="hours">By Available Hours</SelectItem>
+            <SelectItem value="all">All Available</SelectItem>
+            <SelectItem value="department">By Department</SelectItem>
+            <SelectItem value="sector">By Sector</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {filterBy === 'department' && departments.length > 0 && (
+          <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+            <SelectTrigger className="w-[140px] h-8 text-xs">
+              <SelectValue placeholder="Select dept" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Departments</SelectItem>
+              {departments.map(dept => (
+                <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {filterBy === 'sector' && sectors.length > 0 && (
+          <Select value={selectedSector} onValueChange={setSelectedSector}>
+            <SelectTrigger className="w-[140px] h-8 text-xs">
+              <SelectValue placeholder="Select sector" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Sectors</SelectItem>
+              {sectors.map(sector => (
+                <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
+          <SelectTrigger className="w-[120px] h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="hours">By Hours</SelectItem>
             <SelectItem value="name">By Name</SelectItem>
           </SelectContent>
         </Select>
       </div>
       
-      <div className="flex justify-center">
-        <div className="flex gap-3 items-center pb-2 overflow-x-auto scrollbar-grey px-1 max-w-full">
-          {availableMembers.map((member) => {
-            const initials = `${member.firstName[0] || ''}${member.lastName[0] || ''}`.toUpperCase();
-            
-            return (
-              <div key={member.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                <Avatar className="h-9 w-9">
-                  <AvatarImage src={member.avatarUrl} />
-                  <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
-                </Avatar>
-                <span className="text-xs font-medium text-foreground">{member.firstName}</span>
-                <StandardizedBadge variant="metric" size="sm">
-                  {member.availableHours}h
-                </StandardizedBadge>
-              </div>
-            );
-          })}
-        </div>
+      {/* Avatars Row */}
+      <div className="flex gap-3 items-center overflow-x-auto scrollbar-grey px-1 flex-1">
+        {filteredMembers.map((member) => {
+          const initials = `${member.firstName[0] || ''}${member.lastName[0] || ''}`.toUpperCase();
+          
+          return (
+            <div key={member.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={member.avatarUrl} />
+                <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
+              </Avatar>
+              <span className="text-xs font-medium text-foreground">{member.firstName}</span>
+              <StandardizedBadge variant="metric" size="sm">
+                {member.availableHours}h
+              </StandardizedBadge>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
