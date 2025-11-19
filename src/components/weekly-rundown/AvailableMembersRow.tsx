@@ -272,7 +272,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           };
           
           return (
-            <div key={member.id} className="flex flex-col items-center gap-1 flex-shrink-0">
+            <div key={member.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
               <AvatarWithHourDial
                 avatar={member.avatarUrl}
                 fallback={initials}
@@ -282,7 +282,6 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                 color={getUtilizationColor()}
               />
               <span className="text-xs font-medium text-foreground">{member.firstName}</span>
-              <span className="text-[10px] text-muted-foreground">{member.availableHours}h</span>
             </div>
           );
         })}
