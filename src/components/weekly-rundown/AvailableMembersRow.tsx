@@ -112,7 +112,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     const memberSectorsMap = new Map<string, Set<string>>();
     
     allocations.forEach(alloc => {
-      const key = `${alloc.resource_id}:${alloc.resource_type}`;
+      const key = alloc.resource_id; // key only by member id so all resource types are counted
       const current = allocationMap.get(key) || 0;
       allocationMap.set(key, current + Number(alloc.hours));
       
@@ -127,7 +127,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
     const available = allMembers
       .map(member => {
-        const key = `${member.id}:${member.type}`;
+        const key = member.id;
         const allocatedHours = allocationMap.get(key) || 0;
         const availableHours = member.capacity - allocatedHours;
         const utilization = (allocatedHours / member.capacity) * 100;
