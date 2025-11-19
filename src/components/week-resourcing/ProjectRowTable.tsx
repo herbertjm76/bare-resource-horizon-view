@@ -108,8 +108,10 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               style={{ height: 48, minHeight: 48 }}
             >
               <TableCell className="sticky left-0 z-10 bg-inherit border-r border-slate-200 px-1 py-1">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-semibold text-muted-foreground">{project.code}</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-8 h-8 bg-slate-600 text-white font-bold text-[10px] rounded">
+                    {project.code}
+                  </div>
                   <span className="text-sm font-medium">{project.name}</span>
                 </div>
               </TableCell>
