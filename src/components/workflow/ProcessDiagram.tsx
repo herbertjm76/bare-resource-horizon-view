@@ -150,7 +150,7 @@ export const ProcessDiagram: React.FC = () => {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>• Start with setting up 1-2 projects to get familiar with the system</li>
             <li>• Add team members early so you can begin planning resource allocation</li>
-            <li>• Use the Weekly Resources view to get a snapshot across table, grid, or carousel</li>
+            <li>• Use the Weekly Overview to get a snapshot across table, grid, or carousel</li>
             <li>• Regular monitoring helps catch issues before they become problems</li>
             <li>• The Dashboard provides a bird's-eye view of everything happening</li>
           </ul>

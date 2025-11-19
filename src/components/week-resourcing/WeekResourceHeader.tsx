@@ -39,7 +39,7 @@ export const WeekResourceHeader: React.FC<WeekResourceHeaderProps> = ({
     <div className="space-y-4 mb-6">
       {/* Standardized Purple Header */}
         <StandardizedPageHeader
-          title="Weekly Resources"
+          title="Weekly Overview"
           description="View and manage weekly resource allocations with table, grid, and carousel views"
           icon={Calendar}
         />
