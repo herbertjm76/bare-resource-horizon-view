@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { StandardizedBadge } from '@/components/ui/standardized-badge';
+import { AvatarWithHourDial } from './AvatarWithHourDial';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -261,17 +260,29 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       <div className="flex gap-3 items-center overflow-x-auto scrollbar-grey px-1 flex-1">
         {filteredMembers.map((member) => {
           const initials = `${member.firstName[0] || ''}${member.lastName[0] || ''}`.toUpperCase();
+          const capacity = 40; // Standard weekly capacity
+          const allocatedHours = capacity - member.availableHours;
+          
+          // Calculate color based on utilization
+          const getUtilizationColor = () => {
+            if (member.utilization >= 100) return 'hsl(var(--destructive))';
+            if (member.utilization >= 80) return 'hsl(var(--warning))';
+            if (member.utilization >= 50) return 'hsl(var(--success))';
+            return 'hsl(var(--muted-foreground))';
+          };
           
           return (
-            <div key={member.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-              <Avatar className="h-9 w-9">
-                <AvatarImage src={member.avatarUrl} />
-                <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
-              </Avatar>
+            <div key={member.id} className="flex flex-col items-center gap-1 flex-shrink-0">
+              <AvatarWithHourDial
+                avatar={member.avatarUrl}
+                fallback={initials}
+                hours={allocatedHours}
+                maxHours={capacity}
+                size="sm"
+                color={getUtilizationColor()}
+              />
               <span className="text-xs font-medium text-foreground">{member.firstName}</span>
-              <StandardizedBadge variant="metric" size="sm">
-                {member.availableHours}h
-              </StandardizedBadge>
+              <span className="text-[10px] text-muted-foreground">{member.availableHours}h</span>
             </div>
           );
         })}
