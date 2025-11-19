@@ -13,9 +13,10 @@ interface JoinFormProps {
   companyName: string;
   company?: { id: string; [k: string]: any };
   inviteCode?: string;
+  onAuthModeChange?: (isSignup: boolean) => void;
 }
 
-const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode }) => {
+const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, onAuthModeChange }) => {
   const [inviteCodeInput, setInviteCodeInput] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,6 +25,11 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
   const [loading, setLoading] = useState(false);
   const [isSignup, setIsSignup] = useState(true);
   const navigate = useNavigate();
+
+  const handleAuthModeChange = (newIsSignup: boolean) => {
+    setIsSignup(newIsSignup);
+    onAuthModeChange?.(newIsSignup);
+  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,8 +194,8 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
 
   return (
     <form onSubmit={handleAuth} className="space-y-4">
-      {/* Only show invite code field if inviteCode is NOT present */}
-      {!inviteCode && (
+      {/* Only show invite code field if inviteCode is NOT present AND user is signing up */}
+      {!inviteCode && isSignup && (
         <div>
           <label htmlFor="inviteCode" className="block text-white/80 mb-2">Invite Code</label>
           <input
@@ -222,7 +228,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
       >
         {loading ? 'Processing...' : isSignup ? 'Join Company' : 'Sign In'}
       </Button>
-      <JoinAuthToggle isSignup={isSignup} setIsSignup={setIsSignup} />
+      <JoinAuthToggle isSignup={isSignup} setIsSignup={handleAuthModeChange} />
     </form>
   );
 };
