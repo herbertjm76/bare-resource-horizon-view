@@ -99,6 +99,12 @@
     --glass-shadow-color: 0 0 0;
     --glass-shadow-opacity: 0.15;
     --glass-blur: 20px;
+
+    /* Status semantic colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 10%;
   }
 
   .dark {
@@ -134,6 +140,12 @@
     --sidebar-accent-foreground: 210 20% 98%;
     --sidebar-border: 216 34% 17%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Status semantic colors (dark) */
+    --success: 142 76% 40%;
+    --success-foreground: 210 40% 98%;
+    --warning: 45 97% 51%;
+    --warning-foreground: 222.2 84% 4.9%;
   }
 }
 
