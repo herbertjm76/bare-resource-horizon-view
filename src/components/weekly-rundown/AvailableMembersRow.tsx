@@ -190,29 +190,30 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-3 py-2">
-      {/* Inline Filters */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <Filter className="h-4 w-4 text-muted-foreground" />
-        
-        <Select value={filterBy} onValueChange={(value) => {
-          setFilterBy(value as FilterBy);
-          setSelectedDepartment('all');
-          setSelectedSector('all');
-        }}>
-          <SelectTrigger className="w-[130px] h-8 text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Available</SelectItem>
-            <SelectItem value="department">By Department</SelectItem>
-            <SelectItem value="sector">By Sector</SelectItem>
-          </SelectContent>
-        </Select>
+    <div className="flex items-start gap-3 py-2">
+      {/* Stacked Filters */}
+      <div className="flex flex-col gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <Select value={filterBy} onValueChange={(value) => {
+            setFilterBy(value as FilterBy);
+            setSelectedDepartment('all');
+            setSelectedSector('all');
+          }}>
+            <SelectTrigger className="w-[130px] h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Available</SelectItem>
+              <SelectItem value="department">By Department</SelectItem>
+              <SelectItem value="sector">By Sector</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {filterBy === 'department' && departments.length > 0 && (
           <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-            <SelectTrigger className="w-[140px] h-8 text-xs">
+            <SelectTrigger className="w-full h-8 text-xs">
               <SelectValue placeholder="Select dept" />
             </SelectTrigger>
             <SelectContent>
@@ -226,7 +227,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
         {filterBy === 'sector' && sectors.length > 0 && (
           <Select value={selectedSector} onValueChange={setSelectedSector}>
-            <SelectTrigger className="w-[140px] h-8 text-xs">
+            <SelectTrigger className="w-full h-8 text-xs">
               <SelectValue placeholder="Select sector" />
             </SelectTrigger>
             <SelectContent>
@@ -239,7 +240,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         )}
 
         <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-          <SelectTrigger className="w-[120px] h-8 text-xs">
+          <SelectTrigger className="w-full h-8 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
