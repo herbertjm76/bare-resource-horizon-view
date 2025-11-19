@@ -23,7 +23,7 @@ export const getNavigationItems = (companySlug: string | null) => {
           icon: LayoutDashboard,
         },
         {
-          title: "Weekly Resources",
+          title: "Weekly Overview",
           url: `${baseUrl}/weekly-overview`,
           icon: Calendar,
         },

@@ -29,7 +29,7 @@ const tourSteps: TourStep[] = [
   },
   {
     id: 2,
-    title: "Weekly Resources",
+    title: "Weekly Overview",
     description: "Visual capacity planning with multiple views. Switch between detailed table, quick-scan grid, and presentation-ready carousel to optimize resource allocation.",
     category: "Planning",
     screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",

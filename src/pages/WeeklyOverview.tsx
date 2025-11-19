@@ -183,11 +183,11 @@ const WeeklyOverview = () => {
         <div className={`space-y-6 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
           {/* Page Header - Hidden in fullscreen */}
           {!isFullscreen && (
-            <StandardizedPageHeader
-              title="Weekly Resources"
-              description="Switch between table, grid, and carousel views to manage your team's weekly resource allocation"
-              icon={Calendar}
-            />
+          <StandardizedPageHeader
+            title="Weekly Overview"
+            description="Switch between table, grid, and carousel views to manage your team's weekly resource allocation"
+            icon={Calendar}
+          />
           )}
 
           {/* Summary Cards - Always visible except fullscreen */}
