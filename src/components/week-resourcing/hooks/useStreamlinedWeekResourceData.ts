@@ -13,7 +13,10 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
   const weekStartDate = useMemo(() => format(selectedWeek, 'yyyy-MM-dd'), [selectedWeek]);
   
   // Fetch team members first - this is the foundation
-  const { members, loadingMembers, membersError } = useWeekResourceTeamMembers();
+  const { members, loadingMembers, membersError } = useWeekResourceTeamMembers({
+    department: filters?.department,
+    location: filters?.location
+  });
   
   // Only proceed with other data fetching if we have members
   const memberIds = useMemo(() => {

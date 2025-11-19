@@ -29,6 +29,8 @@ const WeeklyOverview = () => {
   
   const [filters, setFilters] = useState({
     office: "all",
+    department: "all",
+    location: "all",
     searchTerm: ""
   });
 
@@ -48,8 +50,10 @@ const WeeklyOverview = () => {
   // Stable filters for data fetching
   const stableFilters = useMemo(() => ({ 
     office: filters.office === 'all' ? '' : filters.office,
+    department: filters.department === 'all' ? '' : filters.department,
+    location: filters.location === 'all' ? '' : filters.location,
     searchTerm: filters.searchTerm 
-  }), [filters.office, filters.searchTerm]);
+  }), [filters.office, filters.department, filters.location, filters.searchTerm]);
 
   // Get raw data
   const { 
@@ -113,14 +117,18 @@ const WeeklyOverview = () => {
   const clearFilters = useCallback(() => {
     setFilters({
       office: 'all',
+      department: 'all',
+      location: 'all',
       searchTerm: ''
     });
   }, []);
 
   const activeFiltersCount = useMemo(() => [
     filters.office !== 'all' ? 'office' : '',
+    filters.department !== 'all' ? 'department' : '',
+    filters.location !== 'all' ? 'location' : '',
     filters.searchTerm ? 'search' : ''
-  ].filter(Boolean).length, [filters.office, filters.searchTerm]);
+  ].filter(Boolean).length, [filters.office, filters.department, filters.location, filters.searchTerm]);
 
   const handleViewTypeChange = useCallback((view: ViewType) => {
     setViewType(view);
