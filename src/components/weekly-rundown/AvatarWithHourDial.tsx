@@ -28,7 +28,7 @@ export const AvatarWithHourDial: React.FC<AvatarWithHourDialProps> = ({
 
   const sizes = sizeClasses[size];
   const strokeWidth = sizes.strokeWidth;
-  const radius = 18 - strokeWidth / 2; // keep ring fully visible
+  const radius = 24 - strokeWidth / 2; // keep ring fully visible within viewBox while surrounding avatar
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
