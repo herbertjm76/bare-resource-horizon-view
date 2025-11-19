@@ -15,13 +15,16 @@ const JoinMainSection: React.FC<JoinMainSectionProps> = ({
   company,
   inviteCode
 }) => {
+  const [isSignup, setIsSignup] = React.useState(true);
+
   return (
     <JoinContainer>
-      <JoinHeader companyName={companyName} />
+      <JoinHeader companyName={companyName} isSignup={isSignup} />
       <JoinForm
         companyName={companyName}
         company={company}
         inviteCode={inviteCode}
+        onAuthModeChange={setIsSignup}
       />
     </JoinContainer>
   );

@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import JoinContainer from './JoinContainer';
-import JoinHeader from './JoinHeader';
-import JoinForm from './JoinForm';
+import JoinMainSection from './JoinMainSection';
 
 const CompanyLanding: React.FC = () => {
   const { companySlug } = useParams<{ companySlug: string }>();
@@ -72,14 +70,11 @@ const CompanyLanding: React.FC = () => {
 
   // Show unified login/signup form for everyone
   return (
-    <JoinContainer>
-      <JoinHeader companyName={companyName} />
-      <JoinForm
-        companyName={companyName}
-        company={companyData}
-        inviteCode=""
-      />
-    </JoinContainer>
+    <JoinMainSection
+      companyName={companyName}
+      company={companyData}
+      inviteCode=""
+    />
   );
 };
 
