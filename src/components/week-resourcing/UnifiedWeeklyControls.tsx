@@ -177,7 +177,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
                 className={`flex items-center gap-2 h-8 ${tableOrientation === 'per-person' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
               >
                 <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Per Person</span>
+                <span className="hidden sm:inline">Person</span>
               </Button>
               <Button
                 variant={tableOrientation === 'per-project' ? 'default' : 'ghost'}
@@ -186,7 +186,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
                 className={`flex items-center gap-2 h-8 ${tableOrientation === 'per-project' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
               >
                 <FolderOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Per Project</span>
+                <span className="hidden sm:inline">Project</span>
               </Button>
             </div>
           )}
