@@ -29,11 +29,11 @@ const tourSteps: TourStep[] = [
   },
   {
     id: 2,
-    title: "Weekly Overview",
-    description: "Visual capacity planning and team coordination with intuitive weekly views that help you optimize resource allocation.",
+    title: "Weekly Resources",
+    description: "Visual capacity planning with multiple views. Switch between detailed table, quick-scan grid, and presentation-ready carousel to optimize resource allocation.",
     category: "Planning",
     screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
-    features: ["Visual capacity planning", "Weekly resource allocation", "Team coordination tools"],
+    features: ["Table view for detailed data", "Grid view for quick scanning", "Carousel for presentations", "Team coordination tools"],
     icon: <Calendar className="w-16 h-16" />,
     bgColor: "from-blue-600 to-blue-700"
   },

@@ -23,14 +23,9 @@ export const getNavigationItems = (companySlug: string | null) => {
           icon: LayoutDashboard,
         },
         {
-          title: "Weekly Overview",
+          title: "Weekly Resources",
           url: `${baseUrl}/weekly-overview`,
           icon: Calendar,
-        },
-        {
-          title: "Weekly Rundown",
-          url: `${baseUrl}/weekly-rundown`,
-          icon: Presentation,
         },
       ],
     },
