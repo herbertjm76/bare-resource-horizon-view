@@ -1,10 +1,12 @@
 
 import React, { useMemo, useCallback, useState } from 'react';
 import { NewResourceTable } from './NewResourceTable';
+import { ProjectRowTable } from './ProjectRowTable';
 import { useStreamlinedWeekResourceData } from './hooks/useStreamlinedWeekResourceData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { calculateMemberProjectHours, calculateUtilizationPercentage } from './utils/utilizationCalculations';
+import { format, startOfWeek } from 'date-fns';
 
 interface WeekResourceViewProps {
   selectedWeek: Date;
@@ -16,6 +18,7 @@ interface WeekResourceViewProps {
     searchTerm: string;
   };
   onFilterChange: (key: string, value: string) => void;
+  tableOrientation?: 'per-person' | 'per-project';
 }
 
 export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
@@ -24,7 +27,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   onWeekChange,
   weekLabel,
   filters,
-  onFilterChange
+  onFilterChange,
+  tableOrientation = 'per-person'
 }) => {
   // View mode state for expand/collapse functionality
   const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
@@ -166,20 +170,29 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   return (
     <div>
       {/* Resource Table - Header, filters, and metrics shown in parent */}
-      <NewResourceTable 
-        members={filteredMembers}
-        projects={projects}
-        allocationMap={allocationMap}
-        annualLeaveData={annualLeaveData}
-        holidaysData={holidaysData}
-        otherLeaveData={otherLeaveData}
-        getMemberTotal={getMemberTotal}
-        getProjectCount={getProjectCount}
-        getWeeklyLeave={getWeeklyLeave}
-        updateOtherLeave={updateOtherLeave}
-        viewMode={viewMode}
-        selectedWeek={selectedWeek}
-      />
+      {tableOrientation === 'per-person' ? (
+        <NewResourceTable 
+          members={filteredMembers}
+          projects={projects}
+          allocationMap={allocationMap}
+          annualLeaveData={annualLeaveData}
+          holidaysData={holidaysData}
+          otherLeaveData={otherLeaveData}
+          getMemberTotal={getMemberTotal}
+          getProjectCount={getProjectCount}
+          getWeeklyLeave={getWeeklyLeave}
+          updateOtherLeave={updateOtherLeave}
+          viewMode={viewMode}
+          selectedWeek={selectedWeek}
+        />
+      ) : (
+        <ProjectRowTable
+          projects={projects}
+          members={filteredMembers}
+          allocationMap={allocationMap}
+          weekStartDate={format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd')}
+        />
+      )}
     </div>
   );
 };

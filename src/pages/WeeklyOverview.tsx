@@ -4,7 +4,7 @@ import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHead
 import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
 import { RundownGridView } from '@/components/weekly-rundown/RundownGridView';
 import { RundownCarousel } from '@/components/weekly-rundown/RundownCarousel';
-import { UnifiedWeeklyControls, ViewType, RundownMode, SortOption } from '@/components/week-resourcing/UnifiedWeeklyControls';
+import { UnifiedWeeklyControls, ViewType, RundownMode, SortOption, TableOrientation } from '@/components/week-resourcing/UnifiedWeeklyControls';
 import { WeeklySummaryCards } from '@/components/weekly-rundown/WeeklySummaryCards';
 import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
@@ -34,6 +34,7 @@ const WeeklyOverview = () => {
 
   // Table-specific state
   const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
+  const [tableOrientation, setTableOrientation] = useState<TableOrientation>('per-person');
 
   // Grid/Carousel-specific state
   const [rundownMode, setRundownMode] = useState<RundownMode>('people');
@@ -224,6 +225,8 @@ const WeeklyOverview = () => {
             clearFilters={clearFilters}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
+            tableOrientation={tableOrientation}
+            onTableOrientationChange={setTableOrientation}
             rundownMode={rundownMode}
             onModeChange={handleModeChange}
             sortOption={sortOption}
@@ -245,6 +248,7 @@ const WeeklyOverview = () => {
               weekLabel={weekLabel}
               filters={filters}
               onFilterChange={handleFilterChange}
+              tableOrientation={tableOrientation}
             />
           )}
 

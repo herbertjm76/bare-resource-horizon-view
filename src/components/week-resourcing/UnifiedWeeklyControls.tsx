@@ -13,6 +13,7 @@ import {
 export type ViewType = 'table' | 'grid' | 'carousel';
 export type RundownMode = 'people' | 'projects';
 export type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
+export type TableOrientation = 'per-person' | 'per-project';
 
 interface UnifiedWeeklyControlsProps {
   // Week selection
@@ -36,6 +37,8 @@ interface UnifiedWeeklyControlsProps {
   // Table-specific
   viewMode?: 'compact' | 'expanded';
   onViewModeChange?: (mode: 'compact' | 'expanded') => void;
+  tableOrientation?: TableOrientation;
+  onTableOrientationChange?: (orientation: TableOrientation) => void;
   
   // Grid/Carousel-specific
   rundownMode?: RundownMode;
@@ -66,6 +69,8 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   clearFilters,
   viewMode,
   onViewModeChange,
+  tableOrientation,
+  onTableOrientationChange,
   rundownMode,
   onModeChange,
   sortOption,
@@ -80,6 +85,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   const showPeopleProjectToggle = viewType !== 'table';
   const showSortOptions = viewType !== 'table';
   const showCompactExpanded = viewType === 'table';
+  const showTableOrientation = viewType === 'table';
   const showAutoAdvance = viewType === 'carousel';
   const showProgress = viewType === 'carousel' && totalItems && totalItems > 0;
 
@@ -157,6 +163,30 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
               >
                 <FolderOpen className="h-4 w-4" />
                 <span className="hidden sm:inline">Projects</span>
+              </Button>
+            </div>
+          )}
+
+          {/* Table Orientation Toggle - Only for table view */}
+          {showTableOrientation && onTableOrientationChange && tableOrientation && (
+            <div className="flex rounded-lg border p-1 bg-muted">
+              <Button
+                variant={tableOrientation === 'per-person' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => onTableOrientationChange('per-person')}
+                className={`flex items-center gap-2 h-8 ${tableOrientation === 'per-person' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+              >
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Per Person</span>
+              </Button>
+              <Button
+                variant={tableOrientation === 'per-project' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => onTableOrientationChange('per-project')}
+                className={`flex items-center gap-2 h-8 ${tableOrientation === 'per-project' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+              >
+                <FolderOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">Per Project</span>
               </Button>
             </div>
           )}
