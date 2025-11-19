@@ -117,13 +117,16 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                 const key = `${member.id}:${project.id}`;
                 const hours = allocationMap.get(key) || 0;
                 return (
-                  <TableCell key={member.id} className="text-center border-r border-slate-200 p-0 align-middle">
-                    <ResourceAllocationCell
-                      hours={hours}
-                      resourceId={member.id}
-                      projectId={project.id}
-                      weekStartDate={weekStartDate}
-                    />
+                  <TableCell
+                    key={member.id}
+                    className="text-center border-r border-slate-200 px-0.5 py-0.5 project-column bg-gradient-to-r from-purple-50 to-violet-50"
+                    style={{ width: 60, minWidth: 60 }}
+                  >
+                    {hours > 0 && (
+                      <span className="inline-flex items-center justify-center w-8 h-7 bg-emerald-500 text-white rounded-sm font-semibold text-sm hover:bg-emerald-600 transition-colors duration-100">
+                        {hours}
+                      </span>
+                    )}
                   </TableCell>
                 );
               })}
