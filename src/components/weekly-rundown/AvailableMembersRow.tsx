@@ -191,18 +191,17 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-4">
-      {/* Minimal Controls */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        {/* Filter */}
+    <div className="flex items-center gap-3">
+      {/* Icon Controls */}
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        {/* Filter Icon */}
         <Select value={filterBy} onValueChange={(value) => {
           setFilterBy(value as FilterBy);
           setSelectedDepartment('all');
           setSelectedSector('all');
         }}>
-          <SelectTrigger className="h-8 text-xs border-0 bg-transparent hover:bg-muted/50 shadow-none focus:ring-0 px-2 gap-1.5 text-muted-foreground">
-            <Filter className="h-3.5 w-3.5" />
-            <SelectValue />
+          <SelectTrigger className="h-7 w-7 p-0 border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 flex items-center justify-center">
+            <Filter className="h-3.5 w-3.5 text-muted-foreground" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Available</SelectItem>
@@ -214,8 +213,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         {/* Department Filter */}
         {filterBy === 'department' && departments.length > 0 && (
           <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-            <SelectTrigger className="h-8 text-xs border-0 bg-transparent hover:bg-muted/50 shadow-none focus:ring-0 px-2 text-muted-foreground">
-              <SelectValue placeholder="Select dept" />
+            <SelectTrigger className="h-7 min-w-[100px] text-xs border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 px-2">
+              <SelectValue placeholder="Dept" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Departments</SelectItem>
@@ -229,8 +228,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         {/* Sector Filter */}
         {filterBy === 'sector' && sectors.length > 0 && (
           <Select value={selectedSector} onValueChange={setSelectedSector}>
-            <SelectTrigger className="h-8 text-xs border-0 bg-transparent hover:bg-muted/50 shadow-none focus:ring-0 px-2 text-muted-foreground">
-              <SelectValue placeholder="Select sector" />
+            <SelectTrigger className="h-7 min-w-[100px] text-xs border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 px-2">
+              <SelectValue placeholder="Sector" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Sectors</SelectItem>
@@ -241,14 +240,12 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           </Select>
         )}
 
-        {/* Divider */}
-        <div className="h-4 w-px bg-border/50" />
-
-        {/* Sort */}
+        {/* Sort Icon */}
         <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-          <SelectTrigger className="h-8 text-xs border-0 bg-transparent hover:bg-muted/50 shadow-none focus:ring-0 px-2 gap-1.5 text-muted-foreground">
-            <span className="text-[10px] uppercase tracking-wider">Sort:</span>
-            <SelectValue />
+          <SelectTrigger className="h-7 w-7 p-0 border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 flex items-center justify-center">
+            <svg className="h-3.5 w-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="hours">By Hours</SelectItem>
