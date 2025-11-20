@@ -198,20 +198,13 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
   return (
-    <div className="my-6 p-6 border rounded-lg bg-gradient-to-br from-card to-accent/20">
-      {/* Header with count and filters */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold">Available This Week</h3>
-          <Badge variant="secondary" className="font-medium">
-            {filteredMembers.length}
-          </Badge>
-          {threshold && (
-            <span className="text-xs text-muted-foreground">
-              (Under {threshold}% capacity)
-            </span>
-          )}
-        </div>
+    <div className="h-[50px] flex items-center gap-3 px-4 border rounded-lg bg-gradient-to-br from-card to-accent/20">
+      {/* Compact inline header and filters */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <h3 className="text-sm font-semibold whitespace-nowrap">Available</h3>
+        <Badge variant="secondary" className="h-5 text-[10px] font-medium">
+          {filteredMembers.length}
+        </Badge>
         
         <AvailabilityFilters
           sortBy={sortBy}
@@ -230,8 +223,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       </div>
 
       {/* Member Cards with scroll container */}
-      <div className="relative">
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+      <div className="flex-1 relative h-full">
+        <div className="flex gap-3 items-center h-full overflow-x-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
           {filteredMembers.map((member) => (
             <MemberAvailabilityCard
               key={member.id}
@@ -246,31 +239,22 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
             />
           ))}
         </div>
-        
-        {/* Fade indicators for scrolling */}
-        {filteredMembers.length > 5 && (
-          <>
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-card to-transparent pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none" />
-          </>
-        )}
       </div>
 
-      {/* Empty state */}
+      {/* Empty state - compact version */}
       {filteredMembers.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground mb-2">No available members found</p>
-          {activeFilterCount > 0 && (
-            <p className="text-sm text-muted-foreground">
-              Try adjusting your filters or{' '}
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-xs text-muted-foreground">
+            No available members
+            {activeFilterCount > 0 && (
               <button 
                 onClick={handleClearFilters}
-                className="text-primary hover:underline font-medium"
+                className="ml-1 text-primary hover:underline font-medium"
               >
-                clear all filters
+                - clear filters
               </button>
-            </p>
-          )}
+            )}
+          </p>
         </div>
       )}
     </div>
