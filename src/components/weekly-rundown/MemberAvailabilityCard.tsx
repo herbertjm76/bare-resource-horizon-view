@@ -27,11 +27,11 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
   
-  // Calculate progress for the ring
-  const progress = Math.min((utilization / 100) * maxHours, maxHours);
+  
+  // Calculate progress for the ring based on utilization percentage
   const radius = 15;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progress / maxHours) * circumference;
+  const strokeDashoffset = circumference - (Math.min(utilization, 100) / 100) * circumference;
   
   // Determine color based on utilization
   const getUtilizationColor = () => {
