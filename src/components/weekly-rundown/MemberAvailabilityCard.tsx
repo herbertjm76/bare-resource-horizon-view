@@ -29,7 +29,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   
   // Calculate progress for the ring
   const progress = Math.min((utilization / 100) * maxHours, maxHours);
-  const radius = 28;
+  const radius = 22;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / maxHours) * circumference;
   
@@ -52,21 +52,21 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 hover:bg-accent/50 hover:scale-105 hover:shadow-md cursor-pointer min-w-[100px]">
+          <div className="transition-all duration-200 hover:scale-110 cursor-pointer">
             {/* Avatar with utilization ring */}
             <div className="relative">
-              <svg className="absolute inset-0 -rotate-90" width="64" height="64">
+              <svg className="absolute inset-0 -rotate-90" width="52" height="52">
                 <circle
-                  cx="32"
-                  cy="32"
+                  cx="26"
+                  cy="26"
                   r={radius}
                   fill="none"
                   stroke="hsl(var(--muted))"
                   strokeWidth="3"
                 />
                 <circle
-                  cx="32"
-                  cy="32"
+                  cx="26"
+                  cy="26"
                   r={radius}
                   fill="none"
                   stroke={getUtilizationColor()}
@@ -77,35 +77,11 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
                   className="transition-all duration-300"
                 />
               </svg>
-              <Avatar className="h-14 w-14">
+              <Avatar className="h-11 w-11 m-0.5">
                 <AvatarImage src={avatarUrl || ''} alt={fullName} />
-                <AvatarFallback className="text-sm font-medium">{initials}</AvatarFallback>
+                <AvatarFallback className="text-xs font-medium">{initials}</AvatarFallback>
               </Avatar>
-              
-              {/* Utilization percentage badge */}
-              <div className="absolute -bottom-1 -right-1 bg-background rounded-full px-1.5 py-0.5 border border-border shadow-sm">
-                <span className="text-[10px] font-bold" style={{ color: getUtilizationColor() }}>
-                  {Math.round(utilization)}%
-                </span>
-              </div>
             </div>
-            
-            {/* Name */}
-            <div className="text-center">
-              <p className="text-xs font-medium text-foreground truncate max-w-[90px]">
-                {firstName || 'Unknown'}
-              </p>
-              <p className="text-[10px] text-muted-foreground font-medium">
-                {availableHours}h free
-              </p>
-            </div>
-            
-            {/* Department badge (if present) */}
-            {department && (
-              <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4">
-                {department}
-              </Badge>
-            )}
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="max-w-[250px]">

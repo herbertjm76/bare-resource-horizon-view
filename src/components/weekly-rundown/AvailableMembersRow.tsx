@@ -231,7 +231,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
       {/* Member Cards with scroll container */}
       <div className="relative">
-        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
           {filteredMembers.map((member) => (
             <MemberAvailabilityCard
               key={member.id}
