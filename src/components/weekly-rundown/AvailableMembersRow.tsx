@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { AvailabilityFilters } from './AvailabilityFilters';
-import { Badge } from '@/components/ui/badge';
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
@@ -14,16 +13,25 @@ interface AvailableMembersRowProps {
 type SortBy = 'hours' | 'name';
 type FilterBy = 'all' | 'department' | 'sector';
 
+interface ProjectAllocation {
+  projectId: string;
+  projectName: string;
+  projectCode: string;
+  hours: number;
+}
+
 interface AvailableMember {
   id: string;
   firstName: string;
   lastName: string;
   avatarUrl?: string;
   availableHours: number;
+  allocatedHours: number;
   utilization: number;
   capacity: number;
   department?: string;
   sectors: string[];
+  projectAllocations: ProjectAllocation[];
 }
 
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
@@ -81,16 +89,30 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     queryKey: ['available-allocations', weekStartDate, company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
+      
+      // Calculate the full week range (Monday to Sunday)
+      const weekStart = new Date(weekStartDate);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      const weekEndDate = weekEnd.toISOString().split('T')[0];
+      
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select(`
           resource_id, 
           resource_type, 
           hours,
-          projects:project_id (department)
+          week_start_date,
+          projects:project_id (
+            id,
+            name,
+            code,
+            department
+          )
         `)
         .eq('company_id', company.id)
-        .eq('week_start_date', weekStartDate);
+        .gte('week_start_date', weekStartDate)
+        .lte('week_start_date', weekEndDate);
       if (error) throw error;
       return data || [];
     },
@@ -121,9 +143,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
     const allocationMap = new Map<string, number>();
     const memberSectorsMap = new Map<string, Set<string>>();
+    const memberProjectsMap = new Map<string, Map<string, { name: string; code: string; hours: number }>>();
     
     allocations.forEach(alloc => {
-      const key = alloc.resource_id; // key only by member id so all resource types are counted
+      const key = alloc.resource_id;
       const current = allocationMap.get(key) || 0;
       allocationMap.set(key, current + Number(alloc.hours));
       
@@ -134,6 +157,26 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         }
         memberSectorsMap.get(key)!.add(alloc.projects.department);
       }
+      
+      // Track project allocations for each member
+      if (alloc.projects) {
+        if (!memberProjectsMap.has(key)) {
+          memberProjectsMap.set(key, new Map());
+        }
+        const projectsMap = memberProjectsMap.get(key)!;
+        const projectId = alloc.projects.id;
+        
+        if (projectsMap.has(projectId)) {
+          const existing = projectsMap.get(projectId)!;
+          existing.hours += Number(alloc.hours);
+        } else {
+          projectsMap.set(projectId, {
+            name: alloc.projects.name,
+            code: alloc.projects.code || alloc.projects.name,
+            hours: Number(alloc.hours)
+          });
+        }
+      }
     });
 
     const available = allMembers
@@ -143,6 +186,17 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         const availableHours = member.capacity - allocatedHours;
         const utilization = (allocatedHours / member.capacity) * 100;
         const sectors = Array.from(memberSectorsMap.get(key) || []);
+        
+        // Get project allocations
+        const projectsMap = memberProjectsMap.get(key);
+        const projectAllocations: ProjectAllocation[] = projectsMap 
+          ? Array.from(projectsMap.entries()).map(([projectId, data]) => ({
+              projectId,
+              projectName: data.name,
+              projectCode: data.code,
+              hours: data.hours
+            }))
+          : [];
 
         return {
           id: member.id,
@@ -150,10 +204,12 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           lastName: member.lastName,
           avatarUrl: member.avatarUrl,
           availableHours,
+          allocatedHours,
           utilization,
           capacity: member.capacity,
           department: member.department,
-          sectors
+          sectors,
+          projectAllocations
         };
       })
       .filter(member => member.utilization < threshold)
@@ -208,11 +264,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               avatarUrl={member.avatarUrl}
               firstName={member.firstName}
               lastName={member.lastName}
-              availableHours={member.availableHours}
+              allocatedHours={member.allocatedHours}
+              projectAllocations={member.projectAllocations}
               utilization={member.utilization}
-              department={member.department}
-              sectors={member.sectors}
-              maxHours={member.capacity}
               threshold={threshold}
             />
           ))}
