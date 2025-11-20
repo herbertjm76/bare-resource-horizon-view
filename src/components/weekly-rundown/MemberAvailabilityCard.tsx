@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
 
 interface MemberAvailabilityCardProps {
   avatarUrl?: string | null;
@@ -26,6 +27,8 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
 }) => {
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
+  const [hoursToAdd, setHoursToAdd] = useState<string>('');
+  const [showInput, setShowInput] = useState(false);
   
   
   // Calculate progress for the ring based on utilization percentage
@@ -55,15 +58,17 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
           <div className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer">
             {/* Avatar with utilization ring */}
             <div className="relative w-12 h-12 flex items-center justify-center">
+              {/* Full light grey background circle */}
               <svg className="absolute inset-0 -rotate-90" width="48" height="48">
                 <circle
                   cx="24"
                   cy="24"
                   r={radius}
                   fill="none"
-                  stroke="hsl(var(--muted))"
+                  stroke="hsl(var(--border))"
                   strokeWidth="6"
                 />
+                {/* Color-coded utilization ring */}
                 <circle
                   cx="24"
                   cy="24"
@@ -83,10 +88,36 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
               </Avatar>
             </div>
             
-            {/* First name - negative margin to eliminate gap */}
+            {/* First name */}
             <span className="text-xs font-medium text-foreground truncate max-w-[50px] -mt-2">
               {firstName}
             </span>
+            
+            {/* Add hours input */}
+            {showInput ? (
+              <Input
+                type="number"
+                value={hoursToAdd}
+                onChange={(e) => setHoursToAdd(e.target.value)}
+                onBlur={() => {
+                  setShowInput(false);
+                  setHoursToAdd('');
+                }}
+                className="h-5 w-12 text-[10px] px-1 mt-0.5"
+                placeholder="hrs"
+                autoFocus
+              />
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowInput(true);
+                }}
+                className="text-[9px] text-primary hover:underline mt-0.5"
+              >
+                +hrs
+              </button>
+            )}
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="max-w-[250px]">
