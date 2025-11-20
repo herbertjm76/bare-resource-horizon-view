@@ -192,16 +192,16 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
   return (
     <div className="flex items-center gap-3">
-      {/* Icon Controls */}
-      <div className="flex items-center gap-1.5 flex-shrink-0">
+      {/* Stacked Icon Controls */}
+      <div className="flex flex-col gap-1 flex-shrink-0">
         {/* Filter Icon */}
         <Select value={filterBy} onValueChange={(value) => {
           setFilterBy(value as FilterBy);
           setSelectedDepartment('all');
           setSelectedSector('all');
         }}>
-          <SelectTrigger className="h-7 w-7 p-0 border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 flex items-center justify-center">
-            <Filter className="h-3.5 w-3.5 text-muted-foreground" />
+          <SelectTrigger className="h-8 w-8 p-0 bg-primary hover:bg-primary/90 shadow-none focus:ring-0 border-0 flex items-center justify-center rounded-md">
+            <Filter className="h-4 w-4 text-primary-foreground" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Available</SelectItem>
@@ -210,40 +210,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           </SelectContent>
         </Select>
 
-        {/* Department Filter */}
-        {filterBy === 'department' && departments.length > 0 && (
-          <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-            <SelectTrigger className="h-7 min-w-[100px] text-xs border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 px-2">
-              <SelectValue placeholder="Dept" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              {departments.map(dept => (
-                <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {/* Sector Filter */}
-        {filterBy === 'sector' && sectors.length > 0 && (
-          <Select value={selectedSector} onValueChange={setSelectedSector}>
-            <SelectTrigger className="h-7 min-w-[100px] text-xs border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 px-2">
-              <SelectValue placeholder="Sector" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Sectors</SelectItem>
-              {sectors.map(sector => (
-                <SelectItem key={sector} value={sector}>{sector}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
         {/* Sort Icon */}
         <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-          <SelectTrigger className="h-7 w-7 p-0 border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 flex items-center justify-center">
-            <svg className="h-3.5 w-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <SelectTrigger className="h-8 w-8 p-0 bg-primary hover:bg-primary/90 shadow-none focus:ring-0 border-0 flex items-center justify-center rounded-md">
+            <svg className="h-4 w-4 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
             </svg>
           </SelectTrigger>
@@ -253,6 +223,36 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Department Filter */}
+      {filterBy === 'department' && departments.length > 0 && (
+        <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+          <SelectTrigger className="h-7 min-w-[100px] text-xs border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 px-2">
+            <SelectValue placeholder="Dept" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Departments</SelectItem>
+            {departments.map(dept => (
+              <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      {/* Sector Filter */}
+      {filterBy === 'sector' && sectors.length > 0 && (
+        <Select value={selectedSector} onValueChange={setSelectedSector}>
+          <SelectTrigger className="h-7 min-w-[100px] text-xs border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 px-2">
+            <SelectValue placeholder="Sector" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Sectors</SelectItem>
+            {sectors.map(sector => (
+              <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       
       {/* Avatars Row */}
       <div className="flex gap-3 items-center overflow-x-auto scrollbar-grey px-1 flex-1">
