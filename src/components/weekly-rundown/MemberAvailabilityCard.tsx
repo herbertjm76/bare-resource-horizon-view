@@ -99,11 +99,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
               </div>
               <div className="flex justify-between gap-4">
                 <span className="text-muted-foreground">Available:</span>
-                <span className="font-medium">{availableHours}h this week</span>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-muted-foreground">Capacity:</span>
-                <span className="font-medium">{maxHours}h/week</span>
+                <span className="font-medium">{availableHours}h remaining</span>
               </div>
             </div>
             {sectors.length > 0 && (
