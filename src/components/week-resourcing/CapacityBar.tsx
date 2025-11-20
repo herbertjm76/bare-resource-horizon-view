@@ -18,14 +18,16 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   // Calculate available hours - can be negative if over capacity
   const availableHours = totalCapacity - totalUsedHours;
 
-  // Get color based on utilization
+  // Get color based on utilization (for bars <= 100%)
   const getUtilizationColor = () => {
-    if (utilizationRate > 100) return '#ef4444'; // red - overallocated
     if (utilizationRate >= 95) return '#22c55e'; // green - fully utilized
     if (utilizationRate >= 80) return '#f97316'; // orange - well utilized
     if (utilizationRate >= 50) return '#3b82f6'; // blue - moderate utilization
     return '#6b7280'; // gray - low utilization
   };
+  
+  // For overflow bars (>100%), use green for base and red for overflow
+  const getBaseColorForOverflow = () => '#22c55e'; // green base for full capacity
 
   // Get text color for the percentage based on utilization
   const getPercentageTextColor = () => {
@@ -68,12 +70,12 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
             ) : (
               /* Dual-tone bar for > 100%: base (0-100%) + overflow (100%+) in red */
               <>
-                {/* Base capacity bar (0-100%) */}
+                {/* Base capacity bar (0-100%) in green */}
                 <div 
                   className="h-full transition-all duration-300 absolute left-0"
                   style={{
                     width: '100%',
-                    backgroundColor: utilizationColor
+                    backgroundColor: getBaseColorForOverflow()
                   }} 
                 />
                 {/* Overflow portion in red */}
