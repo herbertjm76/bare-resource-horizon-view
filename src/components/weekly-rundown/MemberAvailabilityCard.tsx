@@ -84,7 +84,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
             </div>
             
             {/* First name - negative margin to eliminate gap */}
-            <span className="text-[10px] font-medium text-foreground truncate max-w-[50px] -mt-1">
+            <span className="text-[10px] font-medium text-foreground truncate max-w-[50px] -mt-2">
               {firstName}
             </span>
           </div>
