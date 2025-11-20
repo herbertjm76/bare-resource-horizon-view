@@ -1,17 +1,21 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+interface ProjectAllocation {
+  projectId: string;
+  projectName: string;
+  projectCode: string;
+  hours: number;
+}
 
 interface MemberAvailabilityCardProps {
   avatarUrl?: string | null;
   firstName?: string | null;
   lastName?: string | null;
-  availableHours: number;
+  allocatedHours: number;
+  projectAllocations: ProjectAllocation[];
   utilization: number;
-  department?: string | null;
-  sectors: string[];
-  maxHours?: number;
   threshold?: number;
 }
 
@@ -19,11 +23,9 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   avatarUrl,
   firstName,
   lastName,
-  availableHours,
+  allocatedHours,
+  projectAllocations,
   utilization,
-  department,
-  sectors,
-  maxHours = 40,
   threshold = 80,
 }) => {
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
@@ -42,14 +44,6 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
     if (utilization < 100 && utilization >= threshold) return 'hsl(38, 92%, 50%)'; // Amber - slightly available
     return 'hsl(221, 83%, 53%)'; // Blue - highly available
   };
-
-  const getUtilizationBadgeVariant = () => {
-    if (utilization > 100) return 'destructive'; // Red - overbooked
-    if (utilization === 100) return 'default'; // Green - fully booked
-    if (utilization < 100 && utilization >= threshold) return 'warning'; // Yellow - slightly available
-    return 'secondary'; // Blue - highly available
-  };
-
   return (
     <TooltipProvider>
       <Tooltip>
@@ -93,35 +87,39 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
             </span>
           </div>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-[250px]">
-          <div className="space-y-2">
+        <TooltipContent side="bottom" className="max-w-[280px]">
+          <div className="space-y-3">
+            {/* Full name */}
             <div>
-              <p className="font-semibold">{fullName}</p>
-              {department && <p className="text-xs text-muted-foreground">{department}</p>}
+              <p className="font-semibold text-base">{fullName}</p>
             </div>
-            <div className="space-y-1 text-xs">
-              <div className="flex justify-between gap-4">
-                <span className="text-muted-foreground">Utilization:</span>
-                <Badge variant={getUtilizationBadgeVariant()} className="text-[10px] h-5">
-                  {Math.round(utilization)}%
-                </Badge>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-muted-foreground">Available:</span>
-                <span className="font-medium">{availableHours}h remaining</span>
-              </div>
+            
+            {/* Total hours */}
+            <div className="flex justify-between items-center pb-2 border-b">
+              <span className="text-sm text-muted-foreground">Total Hours:</span>
+              <span className="font-semibold text-sm">{allocatedHours}h</span>
             </div>
-            {sectors.length > 0 && (
-              <div className="pt-2 border-t">
-                <p className="text-xs text-muted-foreground mb-1">Sectors:</p>
-                <div className="flex flex-wrap gap-1">
-                  {sectors.map((sector) => (
-                    <Badge key={sector} variant="secondary" className="text-[9px] px-1.5 py-0 h-4">
-                      {sector}
-                    </Badge>
+            
+            {/* Project allocations */}
+            {projectAllocations.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-medium">Projects:</p>
+                <div className="space-y-1.5">
+                  {projectAllocations.map((project) => (
+                    <div key={project.projectId} className="flex justify-between items-center text-xs">
+                      <span className="font-medium truncate flex-1 mr-2">
+                        {project.projectCode}
+                      </span>
+                      <span className="text-muted-foreground shrink-0">{project.hours}h</span>
+                    </div>
                   ))}
                 </div>
               </div>
+            )}
+            
+            {/* Empty state */}
+            {projectAllocations.length === 0 && (
+              <p className="text-xs text-muted-foreground italic">No project allocations</p>
             )}
           </div>
         </TooltipContent>
