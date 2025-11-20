@@ -29,7 +29,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   
   
   // Calculate progress for the ring based on utilization percentage
-  const radius = 15;
+  const radius = 18;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (Math.min(utilization, 100) / 100) * circumference;
   
@@ -54,19 +54,19 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
         <TooltipTrigger asChild>
           <div className="flex flex-col items-center gap-1 transition-all duration-200 hover:scale-105 cursor-pointer">
             {/* Avatar with utilization ring */}
-            <div className="relative">
-              <svg className="absolute inset-0 -rotate-90" width="42" height="42">
+            <div className="relative w-12 h-12 flex items-center justify-center">
+              <svg className="absolute inset-0 -rotate-90" width="48" height="48">
                 <circle
-                  cx="21"
-                  cy="21"
+                  cx="24"
+                  cy="24"
                   r={radius}
                   fill="none"
                   stroke="hsl(var(--muted))"
                   strokeWidth="6"
                 />
                 <circle
-                  cx="21"
-                  cy="21"
+                  cx="24"
+                  cy="24"
                   r={radius}
                   fill="none"
                   stroke={getUtilizationColor()}
@@ -77,7 +77,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
                   className="transition-all duration-300"
                 />
               </svg>
-              <Avatar className="h-8 w-8 m-2">
+              <Avatar className="h-7 w-7">
                 <AvatarImage src={avatarUrl || ''} alt={fullName} />
                 <AvatarFallback className="text-[10px] font-medium">{initials}</AvatarFallback>
               </Avatar>
