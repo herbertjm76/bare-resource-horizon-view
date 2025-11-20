@@ -12,6 +12,7 @@ interface MemberAvailabilityCardProps {
   department?: string | null;
   sectors: string[];
   maxHours?: number;
+  threshold?: number;
 }
 
 export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
@@ -23,6 +24,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   department,
   sectors,
   maxHours = 40,
+  threshold = 80,
 }) => {
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
@@ -33,19 +35,19 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (Math.min(utilization, 100) / 100) * circumference;
   
-  // Determine color based on utilization
+  // Determine color based on utilization zones
   const getUtilizationColor = () => {
-    if (utilization > 100) return 'hsl(var(--destructive))';
-    if (utilization >= 80) return 'hsl(var(--warning))';
-    if (utilization >= 50) return 'hsl(var(--success))';
-    return 'hsl(var(--primary))';
+    if (utilization > 100) return 'hsl(var(--destructive))'; // Red - overbooked
+    if (utilization === 100) return 'hsl(var(--success))'; // Green - fully booked
+    if (utilization < 100 && utilization >= threshold) return 'hsl(var(--warning))'; // Yellow - slightly available
+    return 'hsl(var(--primary))'; // Blue - highly available
   };
 
   const getUtilizationBadgeVariant = () => {
-    if (utilization > 100) return 'destructive';
-    if (utilization >= 80) return 'warning';
-    if (utilization >= 50) return 'default';
-    return 'secondary';
+    if (utilization > 100) return 'destructive'; // Red - overbooked
+    if (utilization === 100) return 'default'; // Green - fully booked
+    if (utilization < 100 && utilization >= threshold) return 'warning'; // Yellow - slightly available
+    return 'secondary'; // Blue - highly available
   };
 
   return (

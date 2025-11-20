@@ -232,6 +232,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               department={member.department}
               sectors={member.sectors}
               maxHours={member.capacity}
+              threshold={threshold}
             />
           ))}
         </div>
