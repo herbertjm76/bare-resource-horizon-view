@@ -13,6 +13,9 @@ import { CustomRundownCard } from './cards/CustomRundownCard';
 import { WeekInfoCard } from './cards/WeekInfoCard';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { CardVisibility, CardOrder } from '@/hooks/useCardVisibility';
+import { Settings, Plus } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ManageCustomCardsDialog } from './ManageCustomCardsDialog';
 
 interface WeeklySummaryCardsProps {
   selectedWeek: Date;
@@ -130,7 +133,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     // Build all available cards
     allCards.push({ 
       id: 'weekInfo', 
-      component: <WeekInfoCard key="weekInfo" selectedWeek={selectedWeek} visibility={cardVisibility} onToggle={toggleCard} />,
+      component: <WeekInfoCard key="weekInfo" selectedWeek={selectedWeek} />,
       isVisible: true // WeekInfoCard is always visible
     });
 
@@ -245,69 +248,139 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   // Don't return null as we always want to show the WeekInfoCard
 
   return (
-    <div className="relative group mb-6">
-      {/* Left Arrow */}
-      {showLeftArrow && (
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
-          onClick={scrollLeft}
+    <div className="mb-6 flex items-center gap-3 px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20">
+      {/* Cards Container - LEFT ALIGNED */}
+      <div className="flex-1 relative group">
+        {/* Left Arrow */}
+        {showLeftArrow && (
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
+            onClick={scrollLeft}
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+        )}
+        
+        {/* Scrollable Container */}
+        <div 
+          ref={scrollRef}
+          className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-3 scrollbar-hide"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-      )}
-      
-      {/* Scrollable Container */}
-      <div 
-        ref={scrollRef}
-        className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-3 pb-2 scrollbar-hide px-1"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        {cards.map((card, index) => (
-          <div key={card.id} className="relative flex-shrink-0 min-w-fit h-[180px] snap-center group/card">
-            {card.component}
-            
-            {/* Reorder buttons - show on hover, except for WeekInfoCard */}
-            {card.id !== 'weekInfo' && (
-              <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity z-20">
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-6 w-6 shadow-lg"
-                  onClick={() => handleMove(card.id, 'left')}
-                  disabled={index === 0 || (index === 1 && cards[0].id === 'weekInfo')}
-                  title="Move left"
-                >
-                  <ChevronLeft className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-6 w-6 shadow-lg"
-                  onClick={() => handleMove(card.id, 'right')}
-                  disabled={index === cards.length - 1}
-                  title="Move right"
-                >
-                  <ChevronRight className="h-3 w-3" />
-                </Button>
-              </div>
-            )}
-          </div>
-        ))}
+          {cards.map((card, index) => (
+            <div key={card.id} className="relative flex-shrink-0 min-w-fit h-[180px] snap-center group/card">
+              {card.component}
+              
+              {/* Reorder buttons - show on hover, except for WeekInfoCard */}
+              {card.id !== 'weekInfo' && (
+                <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity z-20">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-6 w-6 shadow-lg"
+                    onClick={() => handleMove(card.id, 'left')}
+                    disabled={index === 0 || (index === 1 && cards[0].id === 'weekInfo')}
+                    title="Move left"
+                  >
+                    <ChevronLeft className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-6 w-6 shadow-lg"
+                    onClick={() => handleMove(card.id, 'right')}
+                    disabled={index === cards.length - 1}
+                    title="Move right"
+                  >
+                    <ChevronRight className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        {/* Right Arrow */}
+        {showRightArrow && (
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
+            onClick={scrollRight}
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        )}
       </div>
-      
-      {/* Right Arrow */}
-      {showRightArrow && (
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
-          onClick={scrollRight}
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
-      )}
+
+      {/* Controls - RIGHT ALIGNED */}
+      <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+        {/* Settings Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="h-9 w-9">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 bg-popover z-50">
+            <DropdownMenuLabel>Visible Cards</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            
+            <DropdownMenuCheckboxItem 
+              checked={cardVisibility.holidays} 
+              onCheckedChange={(v) => toggleCard('holidays', v)}
+            >
+              Holidays
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
+              checked={cardVisibility.annualLeave} 
+              onCheckedChange={(v) => toggleCard('annualLeave', v)}
+            >
+              Annual Leave
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
+              checked={cardVisibility.otherLeave} 
+              onCheckedChange={(v) => toggleCard('otherLeave', v)}
+            >
+              Other Leave
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
+              checked={cardVisibility.notes} 
+              onCheckedChange={(v) => toggleCard('notes', v)}
+            >
+              Notes
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
+              checked={cardVisibility.available} 
+              onCheckedChange={(v) => toggleCard('available', v)}
+            >
+              Available This Week
+            </DropdownMenuCheckboxItem>
+            
+            {customCardTypes.length > 0 && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Custom Cards</DropdownMenuLabel>
+                {customCardTypes.map(card => (
+                  <DropdownMenuCheckboxItem 
+                    key={card.id}
+                    checked={cardVisibility[`custom_${card.id}`] !== false}
+                    onCheckedChange={(v) => toggleCard(`custom_${card.id}`, v)}
+                  >
+                    {card.icon && <span className="mr-2">{card.icon}</span>}
+                    {card.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Add Card Button */}
+        <ManageCustomCardsDialog iconOnly />
+      </div>
     </div>
   );
 };
