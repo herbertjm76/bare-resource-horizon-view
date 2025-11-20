@@ -54,24 +54,37 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
         {/* Horizontal progress bar */}
         <div className="relative">
           <div 
-            className="w-12 h-3 rounded border border-gray-300 overflow-hidden bg-gray-100"
+            className="w-12 h-3 rounded border border-gray-300 overflow-hidden bg-gray-100 relative"
           >
-            {/* Fill bar that can exceed 100% by showing overflow */}
-            <div 
-              className="h-full transition-all duration-300 rounded"
-              style={{
-                width: `${Math.min(100, utilizationPercentage)}%`,
-                backgroundColor: utilizationColor
-              }} 
-            />
-            {/* Show overflow indicator if over 100% */}
-            {utilizationPercentage > 100 && (
+            {utilizationPercentage <= 100 ? (
+              /* Single bar for <= 100% */
               <div 
-                className="absolute top-0 right-0 h-full w-1 bg-red-500"
+                className="h-full transition-all duration-300 rounded"
                 style={{
-                  transform: 'translateX(50%)'
-                }}
+                  width: `${utilizationPercentage}%`,
+                  backgroundColor: utilizationColor
+                }} 
               />
+            ) : (
+              /* Dual-tone bar for > 100%: base (0-100%) + overflow (100%+) in red */
+              <>
+                {/* Base capacity bar (0-100%) */}
+                <div 
+                  className="h-full transition-all duration-300 absolute left-0"
+                  style={{
+                    width: '100%',
+                    backgroundColor: utilizationColor
+                  }} 
+                />
+                {/* Overflow portion in red */}
+                <div 
+                  className="h-full transition-all duration-300 absolute right-0"
+                  style={{
+                    width: `${((utilizationPercentage - 100) / utilizationPercentage) * 100}%`,
+                    backgroundColor: '#ef4444'
+                  }} 
+                />
+              </>
             )}
           </div>
         </div>
