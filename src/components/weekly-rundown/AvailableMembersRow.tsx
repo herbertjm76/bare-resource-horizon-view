@@ -212,7 +212,6 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           projectAllocations
         };
       })
-      .filter(member => member.utilization < threshold)
       .sort((a, b) => {
         if (sortBy === 'hours') {
           return b.availableHours - a.availableHours;
