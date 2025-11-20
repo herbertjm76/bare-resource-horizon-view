@@ -35,12 +35,12 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (Math.min(utilization, 100) / 100) * circumference;
   
-  // Determine color based on utilization zones
+  // Determine color based on utilization zones with actual HSL colors
   const getUtilizationColor = () => {
-    if (utilization > 100) return 'hsl(var(--destructive))'; // Red - overbooked
-    if (utilization === 100) return 'hsl(var(--success))'; // Green - fully booked
-    if (utilization < 100 && utilization >= threshold) return 'hsl(var(--warning))'; // Yellow - slightly available
-    return 'hsl(var(--primary))'; // Blue - highly available
+    if (utilization > 100) return 'hsl(0, 84%, 60%)'; // Red - overbooked
+    if (utilization === 100) return 'hsl(142, 71%, 45%)'; // Green - fully booked
+    if (utilization < 100 && utilization >= threshold) return 'hsl(38, 92%, 50%)'; // Amber - slightly available
+    return 'hsl(221, 83%, 53%)'; // Blue - highly available
   };
 
   const getUtilizationBadgeVariant = () => {
