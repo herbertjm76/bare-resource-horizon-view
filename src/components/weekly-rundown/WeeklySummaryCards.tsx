@@ -16,6 +16,7 @@ import { CardVisibility, CardOrder } from '@/hooks/useCardVisibility';
 import { Settings, Plus } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ManageCustomCardsDialog } from './ManageCustomCardsDialog';
+import './css/weekly-cards-scroll.css';
 
 interface WeeklySummaryCardsProps {
   selectedWeek: Date;
@@ -266,8 +267,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         {/* Scrollable Container */}
         <div 
           ref={scrollRef}
-          className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-3 scrollbar-hide"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-3 weekly-cards-scroll"
         >
           {cards.map((card, index) => (
             <div key={card.id} className="relative flex-shrink-0 min-w-fit h-[180px] snap-center group/card">
