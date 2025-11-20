@@ -199,26 +199,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
   return (
     <div className="h-[75px] flex items-center gap-3 px-4 border rounded-lg bg-gradient-to-br from-card to-accent/20">
-      {/* Compact inline header and filters */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        
-        <AvailabilityFilters
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          filterBy={filterBy}
-          onFilterChange={setFilterBy}
-          selectedDepartment={selectedDepartment}
-          onDepartmentChange={setSelectedDepartment}
-          selectedSector={selectedSector}
-          onSectorChange={setSelectedSector}
-          departments={departments}
-          sectors={sectors}
-          activeFilterCount={activeFilterCount}
-          onClearFilters={handleClearFilters}
-        />
-      </div>
-
-      {/* Member Cards with scroll container */}
+      {/* Member Cards with scroll container - LEFT ALIGNED */}
       <div className="flex-1 relative h-full">
         <div className="flex gap-3 items-center h-full overflow-x-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
           {filteredMembers.map((member) => (
@@ -236,6 +217,24 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
             />
           ))}
         </div>
+      </div>
+
+      {/* Filters and Sort - RIGHT ALIGNED */}
+      <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+        <AvailabilityFilters
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          filterBy={filterBy}
+          onFilterChange={setFilterBy}
+          selectedDepartment={selectedDepartment}
+          onDepartmentChange={setSelectedDepartment}
+          selectedSector={selectedSector}
+          onSectorChange={setSelectedSector}
+          departments={departments}
+          sectors={sectors}
+          activeFilterCount={activeFilterCount}
+          onClearFilters={handleClearFilters}
+        />
       </div>
 
       {/* Empty state - compact version */}
