@@ -249,9 +249,9 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   // Don't return null as we always want to show the WeekInfoCard
 
   return (
-    <div className="mb-6 flex items-center gap-3 px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20">
+    <div className="mb-6 flex items-center gap-3 px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden">
       {/* Cards Container - LEFT ALIGNED */}
-      <div className="flex-1 relative group">
+      <div className="flex-1 relative group min-w-0">
         {/* Left Arrow */}
         {showLeftArrow && (
           <Button 
