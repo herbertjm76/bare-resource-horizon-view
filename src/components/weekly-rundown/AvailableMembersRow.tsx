@@ -198,7 +198,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
   return (
-    <div className="h-[50px] flex items-center gap-3 px-4 border rounded-lg bg-gradient-to-br from-card to-accent/20">
+    <div className="h-[75px] flex items-center gap-3 px-4 border rounded-lg bg-gradient-to-br from-card to-accent/20">
       {/* Compact inline header and filters */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <h3 className="text-sm font-semibold whitespace-nowrap">Available</h3>
