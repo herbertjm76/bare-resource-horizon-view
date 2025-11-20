@@ -201,9 +201,6 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     <div className="h-[75px] flex items-center gap-3 px-4 border rounded-lg bg-gradient-to-br from-card to-accent/20">
       {/* Compact inline header and filters */}
       <div className="flex items-center gap-2 flex-shrink-0">
-        <Badge variant="secondary" className="h-5 text-[10px] font-medium">
-          {filteredMembers.length}
-        </Badge>
         
         <AvailabilityFilters
           sortBy={sortBy}
