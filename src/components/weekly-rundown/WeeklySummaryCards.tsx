@@ -249,9 +249,9 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   // Don't return null as we always want to show the WeekInfoCard
 
   return (
-    <div className="mb-6 flex items-center gap-3 px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden">
-      {/* Cards Container - LEFT ALIGNED */}
-      <div className="flex-1 relative group min-w-0">
+    <div className="mb-6 relative px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden">
+      {/* Cards Container */}
+      <div className="relative group pr-20">
         {/* Left Arrow */}
         {showLeftArrow && (
           <Button 
@@ -315,12 +315,12 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         )}
       </div>
 
-      {/* Controls - RIGHT ALIGNED */}
-      <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+      {/* Controls - TOP RIGHT ALIGNED */}
+      <div className="absolute top-3 right-3 flex flex-col gap-2 z-20">
         {/* Settings Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="h-9 w-9">
+            <Button variant="ghost" size="icon" className="h-8 w-8 bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background">
               <Settings className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

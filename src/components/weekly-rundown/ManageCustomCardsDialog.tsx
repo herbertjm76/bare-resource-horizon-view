@@ -81,8 +81,8 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         {iconOnly ? (
-          <Button variant="outline" size="icon" className="h-7 w-7">
-            <Plus className="h-3.5 w-3.5" />
+          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background">
+            <Plus className="h-4 w-4" />
           </Button>
         ) : (
           <Button variant="outline" size="sm" className="h-9">
