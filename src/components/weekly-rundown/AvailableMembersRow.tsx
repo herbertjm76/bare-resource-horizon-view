@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { AvatarWithHourDial } from './AvatarWithHourDial';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Filter } from 'lucide-react';
+import { MemberAvailabilityCard } from './MemberAvailabilityCard';
+import { AvailabilityFilters } from './AvailabilityFilters';
+import { Badge } from '@/components/ui/badge';
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
@@ -33,8 +33,19 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const { company } = useCompany();
   const [sortBy, setSortBy] = useState<SortBy>('hours');
   const [filterBy, setFilterBy] = useState<FilterBy>('all');
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
-  const [selectedSector, setSelectedSector] = useState<string>('all');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+  const [selectedSector, setSelectedSector] = useState<string>('');
+
+  const handleClearFilters = () => {
+    setFilterBy('all');
+    setSelectedDepartment('');
+    setSelectedSector('');
+  };
+
+  const activeFilterCount = [
+    selectedDepartment !== '',
+    selectedSector !== '',
+  ].filter(Boolean).length;
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['available-members-profiles', company?.id],
@@ -176,113 +187,92 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   // Apply filters
   const filteredMembers = React.useMemo(() => {
     return availableMembers.filter(member => {
-      if (filterBy === 'department' && selectedDepartment !== 'all') {
+      if (filterBy === 'department' && selectedDepartment !== '') {
         return member.department === selectedDepartment;
       }
-      if (filterBy === 'sector' && selectedSector !== 'all') {
+      if (filterBy === 'sector' && selectedSector !== '') {
         return member.sectors.includes(selectedSector);
       }
       return true;
     });
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
-  if (filteredMembers.length === 0) {
-    return null;
-  }
-
   return (
-    <div className="flex items-center gap-3">
-      {/* Stacked Icon Controls */}
-      <div className="flex flex-col gap-1 flex-shrink-0">
-        {/* Filter Icon */}
-        <Select value={filterBy} onValueChange={(value) => {
-          setFilterBy(value as FilterBy);
-          setSelectedDepartment('all');
-          setSelectedSector('all');
-        }}>
-          <SelectTrigger className="h-8 w-8 p-0 bg-primary hover:bg-primary/90 shadow-none focus:ring-0 border-0 flex items-center justify-center rounded-md">
-            <Filter className="h-4 w-4 text-primary-foreground" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Available</SelectItem>
-            <SelectItem value="department">By Department</SelectItem>
-            <SelectItem value="sector">By Sector</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Sort Icon */}
-        <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-          <SelectTrigger className="h-8 w-8 p-0 bg-primary hover:bg-primary/90 shadow-none focus:ring-0 border-0 flex items-center justify-center rounded-md">
-            <svg className="h-4 w-4 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-            </svg>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="hours">By Hours</SelectItem>
-            <SelectItem value="name">By Name</SelectItem>
-          </SelectContent>
-        </Select>
+    <div className="my-6 p-6 border rounded-lg bg-gradient-to-br from-card to-accent/20">
+      {/* Header with count and filters */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-semibold">Available This Week</h3>
+          <Badge variant="secondary" className="font-medium">
+            {filteredMembers.length}
+          </Badge>
+          {threshold && (
+            <span className="text-xs text-muted-foreground">
+              (Under {threshold}% capacity)
+            </span>
+          )}
+        </div>
+        
+        <AvailabilityFilters
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          filterBy={filterBy}
+          onFilterChange={setFilterBy}
+          selectedDepartment={selectedDepartment}
+          onDepartmentChange={setSelectedDepartment}
+          selectedSector={selectedSector}
+          onSectorChange={setSelectedSector}
+          departments={departments}
+          sectors={sectors}
+          activeFilterCount={activeFilterCount}
+          onClearFilters={handleClearFilters}
+        />
       </div>
 
-      {/* Department Filter */}
-      {filterBy === 'department' && departments.length > 0 && (
-        <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-          <SelectTrigger className="h-7 min-w-[100px] text-xs border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 px-2">
-            <SelectValue placeholder="Dept" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Departments</SelectItem>
-            {departments.map(dept => (
-              <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-
-      {/* Sector Filter */}
-      {filterBy === 'sector' && sectors.length > 0 && (
-        <Select value={selectedSector} onValueChange={setSelectedSector}>
-          <SelectTrigger className="h-7 min-w-[100px] text-xs border border-border/50 bg-muted/30 hover:bg-muted/50 shadow-none focus:ring-0 px-2">
-            <SelectValue placeholder="Sector" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Sectors</SelectItem>
-            {sectors.map(sector => (
-              <SelectItem key={sector} value={sector}>{sector}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-      
-      {/* Avatars Row */}
-      <div className="flex gap-3 items-center overflow-x-auto scrollbar-grey px-1 flex-1">
-        {filteredMembers.map((member) => {
-          const initials = `${member.firstName[0] || ''}${member.lastName[0] || ''}`.toUpperCase();
-          const capacity = member.capacity || 40; // Use individual weekly capacity when available
-          const allocatedHours = capacity - member.availableHours;
-          
-          // Calculate color based on utilization
-          const getUtilizationColor = () => {
-            if (member.utilization > 100) return 'hsl(var(--destructive))'; // Red for over 100%
-            if (member.utilization === 100) return 'hsl(var(--success))'; // Green for exactly 100%
-            return 'hsl(var(--warning))'; // Yellow for under 100%
-          };
-          
-          return (
-            <div key={member.id} className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16">
-              <AvatarWithHourDial
-                avatar={member.avatarUrl}
-                fallback={initials}
-                hours={allocatedHours}
-                maxHours={capacity}
-                size="sm"
-                color={getUtilizationColor()}
-              />
-              <span className="text-xs font-medium text-foreground w-full text-center truncate">{member.firstName}</span>
-            </div>
-          );
-        })}
+      {/* Member Cards with scroll container */}
+      <div className="relative">
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+          {filteredMembers.map((member) => (
+            <MemberAvailabilityCard
+              key={member.id}
+              avatarUrl={member.avatarUrl}
+              firstName={member.firstName}
+              lastName={member.lastName}
+              availableHours={member.availableHours}
+              utilization={member.utilization}
+              department={member.department}
+              sectors={member.sectors}
+              maxHours={member.capacity}
+            />
+          ))}
+        </div>
+        
+        {/* Fade indicators for scrolling */}
+        {filteredMembers.length > 5 && (
+          <>
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-card to-transparent pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none" />
+          </>
+        )}
       </div>
+
+      {/* Empty state */}
+      {filteredMembers.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground mb-2">No available members found</p>
+          {activeFilterCount > 0 && (
+            <p className="text-sm text-muted-foreground">
+              Try adjusting your filters or{' '}
+              <button 
+                onClick={handleClearFilters}
+                className="text-primary hover:underline font-medium"
+              >
+                clear all filters
+              </button>
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
