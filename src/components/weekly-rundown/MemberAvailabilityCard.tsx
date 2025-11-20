@@ -52,9 +52,9 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer leading-none">
+          <div className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer">
             {/* Avatar with utilization ring */}
-            <div className="relative w-12 h-12 flex items-center justify-center mb-0">
+            <div className="relative w-12 h-12 flex items-center justify-center">
               <svg className="absolute inset-0 -rotate-90" width="48" height="48">
                 <circle
                   cx="24"
@@ -83,8 +83,8 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
               </Avatar>
             </div>
             
-            {/* First name */}
-            <span className="text-[10px] font-medium text-foreground truncate max-w-[50px] leading-tight mt-0">
+            {/* First name - negative margin to eliminate gap */}
+            <span className="text-[10px] font-medium text-foreground truncate max-w-[50px] -mt-1">
               {firstName}
             </span>
           </div>
