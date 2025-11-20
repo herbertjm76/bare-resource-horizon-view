@@ -92,28 +92,36 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
 
       {/* Stacked Bar Graph */}
       <div className="mb-3">
-        <div className="w-full h-6 bg-muted/30 rounded-lg overflow-hidden flex">
+        <div className="w-full h-6 bg-muted/30 rounded-lg overflow-hidden flex relative">
           {person.projects && person.projects.length > 0 ? (
-            person.projects.map((project: any, idx: number) => {
-              const percentage = (project.hours / capacity) * 100;
-              return (
-                <Tooltip key={idx}>
-                  <TooltipTrigger asChild>
-                    <div
-                      className="h-full transition-all hover:opacity-80 cursor-pointer"
-                      style={{
-                        width: `${percentage}%`,
-                        backgroundColor: generateMonochromaticShades(idx, person.projects.length),
-                      }}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="text-xs">
-                    <p className="font-medium">{project.name}</p>
-                    <p>{project.hours}h ({Math.round(percentage)}%)</p>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })
+            (() => {
+              let cumulative = 0;
+              return person.projects.map((project: any, idx: number) => {
+                const percentage = (project.hours / capacity) * 100;
+                const startPercent = cumulative;
+                cumulative += percentage;
+                const isOverflow = startPercent >= 100; // This segment starts after 100%
+                const isPartialOverflow = startPercent < 100 && cumulative > 100; // This segment crosses 100%
+                
+                return (
+                  <Tooltip key={idx}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className="h-full transition-all hover:opacity-80 cursor-pointer"
+                        style={{
+                          width: `${percentage}%`,
+                          backgroundColor: isOverflow ? '#ef4444' : generateMonochromaticShades(idx, person.projects.length),
+                        }}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="text-xs">
+                      <p className="font-medium">{project.name}</p>
+                      <p>{project.hours}h ({Math.round(percentage)}%)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              });
+            })()
           ) : (
             <div className="w-full h-full bg-muted/50 flex items-center justify-center">
               <span className="text-xs text-muted-foreground">No projects</span>
