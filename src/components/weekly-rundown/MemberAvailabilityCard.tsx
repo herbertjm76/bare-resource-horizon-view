@@ -29,7 +29,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   
   // Calculate progress for the ring
   const progress = Math.min((utilization / 100) * maxHours, maxHours);
-  const radius = 18;
+  const radius = 15;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / maxHours) * circumference;
   
@@ -52,7 +52,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="transition-all duration-200 hover:scale-110 cursor-pointer">
+          <div className="flex flex-col items-center gap-1 transition-all duration-200 hover:scale-105 cursor-pointer">
             {/* Avatar with utilization ring */}
             <div className="relative">
               <svg className="absolute inset-0 -rotate-90" width="42" height="42">
@@ -62,7 +62,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
                   r={radius}
                   fill="none"
                   stroke="hsl(var(--muted))"
-                  strokeWidth="3"
+                  strokeWidth="6"
                 />
                 <circle
                   cx="21"
@@ -70,18 +70,23 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
                   r={radius}
                   fill="none"
                   stroke={getUtilizationColor()}
-                  strokeWidth="3"
+                  strokeWidth="6"
                   strokeDasharray={circumference}
                   strokeDashoffset={strokeDashoffset}
                   strokeLinecap="round"
                   className="transition-all duration-300"
                 />
               </svg>
-              <Avatar className="h-9 w-9 m-1.5">
+              <Avatar className="h-8 w-8 m-2">
                 <AvatarImage src={avatarUrl || ''} alt={fullName} />
                 <AvatarFallback className="text-[10px] font-medium">{initials}</AvatarFallback>
               </Avatar>
             </div>
+            
+            {/* First name */}
+            <span className="text-[10px] font-medium text-foreground truncate max-w-[50px]">
+              {firstName}
+            </span>
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="max-w-[250px]">
