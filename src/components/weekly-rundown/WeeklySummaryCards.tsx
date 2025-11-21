@@ -251,26 +251,26 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   return (
     <div className="mb-6 relative px-2 sm:px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
       {/* Cards Container */}
-      <div className="relative group pr-12 sm:pr-20">
-        {/* Left Arrow */}
+      <div className="relative group pr-0 sm:pr-20">
+        {/* Left Arrow - Hidden on Mobile */}
         {showLeftArrow && (
           <Button 
             variant="ghost" 
             size="icon"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
+            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
             onClick={scrollLeft}
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
         )}
         
-        {/* Scrollable Container */}
+        {/* Scrollable Container - Vertical on Mobile, Horizontal on Desktop */}
         <div 
           ref={scrollRef}
-          className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-3 weekly-cards-scroll"
+          className="flex flex-col sm:flex-row gap-3 sm:overflow-x-auto sm:scroll-smooth sm:snap-x sm:snap-mandatory weekly-cards-scroll"
         >
           {cards.map((card, index) => (
-            <div key={card.id} className="relative flex-shrink-0 min-w-fit h-[180px] snap-center group/card">
+            <div key={card.id} className="relative w-full sm:flex-shrink-0 sm:min-w-fit h-[180px] sm:snap-center group/card">
               {card.component}
               
               {/* Reorder buttons - show on hover, except for WeekInfoCard */}
@@ -302,12 +302,12 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           ))}
         </div>
         
-        {/* Right Arrow */}
+        {/* Right Arrow - Hidden on Mobile */}
         {showRightArrow && (
           <Button 
             variant="ghost" 
             size="icon"
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
+            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
             onClick={scrollRight}
           >
             <ChevronRight className="h-5 w-5" />
@@ -315,8 +315,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         )}
       </div>
 
-      {/* Controls - TOP RIGHT ALIGNED */}
-      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex flex-col gap-1.5 sm:gap-2 z-20 weekly-summary-controls">
+      {/* Controls - TOP RIGHT ALIGNED on Desktop, Top on Mobile */}
+      <div className="flex sm:absolute sm:top-3 sm:right-3 flex-row sm:flex-col gap-2 mb-3 sm:mb-0 justify-end z-20 weekly-summary-controls">
         {/* Settings Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

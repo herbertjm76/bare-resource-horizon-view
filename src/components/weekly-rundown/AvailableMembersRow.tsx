@@ -252,27 +252,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
   return (
-    <div className="min-h-[60px] sm:h-[75px] flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 sm:py-0 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden available-members-container">
-      {/* Member Cards with scroll container - LEFT ALIGNED */}
-      <div className="flex-1 relative w-full sm:h-full min-w-0 order-2 sm:order-1">
-        <div className="flex gap-2 sm:gap-3 items-center h-full overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent member-avatars-scroll">
-          {filteredMembers.map((member) => (
-            <MemberAvailabilityCard
-              key={member.id}
-              avatarUrl={member.avatarUrl}
-              firstName={member.firstName}
-              lastName={member.lastName}
-              allocatedHours={member.allocatedHours}
-              projectAllocations={member.projectAllocations}
-              utilization={member.utilization}
-              threshold={threshold}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Filters and Sort - RIGHT ALIGNED / TOP ON MOBILE */}
-      <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 order-1 sm:order-2 self-end sm:self-auto">
+    <div className="bg-card rounded-lg border shadow-sm p-4 overflow-hidden">
+      {/* Header with Title and Filters */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <h3 className="text-sm font-semibold text-foreground">Team Availability</h3>
         <AvailabilityFilters
           sortBy={sortBy}
           onSortChange={setSortBy}
@@ -288,6 +271,26 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           onClearFilters={handleClearFilters}
         />
       </div>
+      
+      {/* Members Avatars - Horizontal Scroll */}
+      {filteredMembers.length > 0 && (
+        <div className="overflow-x-auto overflow-y-hidden -mx-4 px-4">
+          <div className="flex gap-2 sm:gap-3 items-center member-avatars-scroll min-h-[60px]">
+            {filteredMembers.map((member) => (
+              <MemberAvailabilityCard
+                key={member.id}
+                avatarUrl={member.avatarUrl}
+                firstName={member.firstName}
+                lastName={member.lastName}
+                allocatedHours={member.allocatedHours}
+                projectAllocations={member.projectAllocations}
+                utilization={member.utilization}
+                threshold={threshold}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Empty state - compact version */}
       {filteredMembers.length === 0 && (
