@@ -320,7 +320,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         {/* Settings Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 shadow-lg">
+            <Button variant="secondary" size="icon" className="h-8 w-8 shadow-lg">
               <Settings className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
