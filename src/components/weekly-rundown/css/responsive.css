@@ -358,24 +358,27 @@ table tbody td {
    =========================== */
 
 @media (max-width: 640px) {
-  /* Vertical stack for cards on mobile */
+  /* Horizontal carousel for cards on mobile */
   .weekly-cards-scroll {
-    overflow-x: visible !important;
-    overflow-y: visible !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
     gap: 1rem !important;
-    padding: 0 !important;
+    padding: 0 5% !important;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
   
-  /* Full width cards on mobile */
+  /* Carousel-style cards on mobile */
   .weekly-cards-scroll > div {
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
+    flex: 0 0 90% !important;
+    min-width: 90% !important;
+    max-width: 90% !important;
+    scroll-snap-align: center;
   }
   
-  /* Hide horizontal scroll indicators */
+  /* Hide scrollbar but keep functionality */
   .weekly-cards-scroll::-webkit-scrollbar {
     display: none;
   }

@@ -126,7 +126,7 @@ export const NotesCard: React.FC<NotesCardProps> = ({ notes, weekStartDate }) =>
 
   return (
     <>
-      <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-card/50 backdrop-blur-sm w-full sm:min-w-[200px] sm:max-w-[280px]">
+      <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-card/50 backdrop-blur-sm sm:min-w-[200px] sm:max-w-[280px]">
         <CardHeader className="pb-2 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
