@@ -252,7 +252,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
   return (
-    <div className="bg-card rounded-lg border shadow-sm p-4 overflow-hidden">
+    <div className="w-full max-w-md mx-auto sm:max-w-none bg-card rounded-lg border shadow-sm p-4 overflow-hidden animate-fade-in">
       {/* Header with Title and Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <h3 className="text-sm font-semibold text-foreground">Team Availability</h3>
@@ -275,7 +275,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       {/* Members Avatars - Horizontal Scroll */}
       {filteredMembers.length > 0 && (
         <div className="overflow-x-auto overflow-y-hidden -mx-4 px-4">
-          <div className="flex gap-2 sm:gap-3 items-center member-avatars-scroll min-h-[60px]">
+          <div className="flex gap-2 sm:gap-3 items-center justify-start member-avatars-scroll min-h-[60px]">
             {filteredMembers.map((member) => (
               <MemberAvailabilityCard
                 key={member.id}
