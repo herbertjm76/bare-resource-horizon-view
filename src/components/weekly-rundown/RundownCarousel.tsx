@@ -195,7 +195,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
               onClick={() => onGoTo(index)}
               className={`rounded-full transition-all duration-300 hover:scale-125 ${
                 index === currentIndex 
-                  ? 'bg-primary w-12 h-3 shadow-lg shadow-primary/30' 
+                  ? 'bg-primary w-4 h-4 shadow-lg shadow-primary/30' 
                   : 'bg-muted-foreground/30 w-3 h-3 hover:bg-muted-foreground/60'
               }`}
               aria-label={`Go to slide ${index + 1}`}
