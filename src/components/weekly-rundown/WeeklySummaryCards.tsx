@@ -39,8 +39,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 }) => {
   const { company } = useCompany();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(false);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekStartString = format(weekStart, 'yyyy-MM-dd');
@@ -204,6 +203,32 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     return visibleCards;
   }, [selectedWeek, cardVisibility, cardOrder, holidays, annualLeaves, otherLeaves, weeklyNotes, weekStartString, customCardTypes, toggleCard]);
 
+  // Carousel navigation
+  const goToCard = (index: number) => {
+    if (index >= 0 && index < cards.length) {
+      setCurrentCardIndex(index);
+    }
+  };
+
+  const goToNext = () => {
+    if (currentCardIndex < cards.length - 1) {
+      setCurrentCardIndex(currentCardIndex + 1);
+    }
+  };
+
+  const goToPrev = () => {
+    if (currentCardIndex > 0) {
+      setCurrentCardIndex(currentCardIndex - 1);
+    }
+  };
+
+  // Reset carousel index when cards change
+  useEffect(() => {
+    if (currentCardIndex >= cards.length && cards.length > 0) {
+      setCurrentCardIndex(0);
+    }
+  }, [cards.length, currentCardIndex]);
+
   // Helper: move a card by computing order from currently rendered cards
   const handleMove = (cardId: string, direction: 'left' | 'right') => {
     const currentOrder = cards.map(c => c.id);
@@ -217,106 +242,103 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     reorderCards(newOrder);
   };
 
-  // Handle scroll and show/hide arrows
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setShowLeftArrow(scrollLeft > 0);
-    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
-  };
-
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
-    }
-  };
-
-  useEffect(() => {
-    handleScroll();
-    const ref = scrollRef.current;
-    if (ref) {
-      ref.addEventListener('scroll', handleScroll);
-      return () => ref.removeEventListener('scroll', handleScroll);
-    }
-  }, [cards]);
-
   // Don't return null as we always want to show the WeekInfoCard
+
+  const currentCard = cards[currentCardIndex];
+  const canGoPrev = currentCardIndex > 0;
+  const canGoNext = currentCardIndex < cards.length - 1;
+
+  // Get card label for menu
+  const getCardLabel = (cardId: string) => {
+    if (cardId === 'weekInfo') return 'Week Info';
+    if (cardId === 'holidays') return 'Holidays';
+    if (cardId === 'annualLeave') return 'Annual Leave';
+    if (cardId === 'otherLeave') return 'Other Leave';
+    if (cardId === 'notes') return 'Notes';
+    if (cardId.startsWith('custom_')) {
+      const customCard = customCardTypes.find(c => `custom_${c.id}` === cardId);
+      return customCard?.label || 'Custom Card';
+    }
+    return cardId;
+  };
 
   return (
     <div className="mb-6 relative px-2 sm:px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
-      {/* Cards Container */}
-      <div className="relative group">
-        {/* Left Arrow - Hidden on Mobile */}
-        {showLeftArrow && (
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
-            onClick={scrollLeft}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-        )}
-        
-        {/* Scrollable Container - Vertical Stack on Mobile, Horizontal on Desktop */}
-        <div 
-          ref={scrollRef}
-          className="flex flex-col sm:flex-row gap-4 sm:overflow-x-auto sm:scroll-smooth sm:snap-x sm:snap-mandatory sm:pr-20 weekly-cards-scroll"
+      {/* Carousel Container */}
+      <div className="relative">
+        {/* Navigation Arrows */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-background/90 backdrop-blur-sm shadow-lg hover:scale-110 transition-all disabled:opacity-30"
+          onClick={goToPrev}
+          disabled={!canGoPrev}
         >
-          {cards.map((card, index) => (
-            <div key={card.id} className="relative w-full sm:flex-shrink-0 sm:w-[300px] h-[180px] sm:snap-center group/card animate-fade-in">
-              {card.component}
-              
-              {/* Reorder buttons - Desktop only */}
-              {card.id !== 'weekInfo' && (
-                <div className="hidden sm:flex absolute top-2 right-2 flex-col gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity z-20">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="h-6 w-6 shadow-lg"
-                    onClick={() => handleMove(card.id, 'left')}
-                    disabled={index === 0 || (index === 1 && cards[0].id === 'weekInfo')}
-                    title="Move left"
-                  >
-                    <ChevronLeft className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="h-6 w-6 shadow-lg"
-                    onClick={() => handleMove(card.id, 'right')}
-                    disabled={index === cards.length - 1}
-                    title="Move right"
-                  >
-                    <ChevronRight className="h-3 w-3" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
         
-        {/* Right Arrow - Hidden on Mobile */}
-        {showRightArrow && (
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
-            onClick={scrollRight}
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-background/90 backdrop-blur-sm shadow-lg hover:scale-110 transition-all disabled:opacity-30"
+          onClick={goToNext}
+          disabled={!canGoNext}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Button>
+
+        {/* Card Display */}
+        <div className="px-12 py-2">
+          <div className="relative h-[180px] animate-fade-in" key={currentCard?.id}>
+            {currentCard?.component}
+          </div>
+        </div>
+
+        {/* Card Indicator Dots */}
+        {cards.length > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-3">
+            {cards.map((card, index) => (
+              <button
+                key={card.id}
+                onClick={() => goToCard(index)}
+                className={`rounded-full transition-all duration-300 ${
+                  index === currentCardIndex 
+                    ? 'bg-primary w-3 h-3' 
+                    : 'bg-muted-foreground/30 w-2 h-2 hover:bg-muted-foreground/60'
+                }`}
+                aria-label={`Go to ${getCardLabel(card.id)}`}
+              />
+            ))}
+          </div>
         )}
       </div>
 
       {/* Controls - TOP RIGHT ALIGNED on Desktop, Top on Mobile */}
-      <div className="flex sm:absolute sm:top-3 sm:right-3 flex-row sm:flex-col gap-2 mb-3 sm:mb-0 justify-end z-20 weekly-summary-controls">
+      <div className="flex sm:absolute sm:top-3 sm:right-3 flex-row sm:flex-col gap-2 mb-3 sm:mb-0 justify-end z-30 weekly-summary-controls">
+        {/* Jump to Card Menu */}
+        {cards.length > 1 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary" size="sm" className="h-8 shadow-lg">
+                <span className="text-xs">{getCardLabel(currentCard?.id || '')}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-popover z-50">
+              <DropdownMenuLabel>Jump to Card</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {cards.map((card, index) => (
+                <DropdownMenuCheckboxItem
+                  key={card.id}
+                  checked={index === currentCardIndex}
+                  onCheckedChange={() => goToCard(index)}
+                >
+                  {getCardLabel(card.id)}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
         {/* Settings Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
