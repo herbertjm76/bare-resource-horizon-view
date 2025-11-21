@@ -313,17 +313,18 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         )}
       </div>
 
-      {/* Controls - TOP RIGHT ALIGNED on Desktop, Top on Mobile */}
-      <div className="flex sm:absolute sm:top-3 sm:right-3 flex-row sm:flex-col gap-2 mb-3 sm:mb-0 justify-end z-30 weekly-summary-controls">
-        {/* Jump to Card Menu */}
+      {/* Controls - Bottom Right */}
+      <div className="absolute bottom-3 right-3 flex items-center gap-2 z-30">
+        {/* Jump to Card Menu - Subtle dropdown */}
         {cards.length > 1 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="sm" className="h-8 shadow-lg">
-                <span className="text-xs">{getCardLabel(currentCard?.id || '')}</span>
+              <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
+                {getCardLabel(currentCard?.id || '')}
+                <ChevronRight className="h-3 w-3 ml-1 opacity-50" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-popover z-50">
+            <DropdownMenuContent align="end" className="w-48 bg-popover border shadow-lg z-50">
               <DropdownMenuLabel>Jump to Card</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {cards.map((card, index) => (
@@ -339,14 +340,14 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           </DropdownMenu>
         )}
 
-        {/* Settings Dropdown */}
+        {/* Settings Dropdown - Icon only */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="h-8 w-8 shadow-lg">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
               <Settings className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-popover z-50">
+          <DropdownMenuContent align="end" className="w-56 bg-popover border shadow-lg z-50">
             <DropdownMenuLabel>Visible Cards</DropdownMenuLabel>
             <DropdownMenuSeparator />
             
@@ -400,7 +401,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Add Card Button */}
+        {/* Add Card Button - Icon only */}
         <ManageCustomCardsDialog iconOnly />
       </div>
     </div>
