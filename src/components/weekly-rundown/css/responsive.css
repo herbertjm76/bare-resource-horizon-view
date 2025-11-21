@@ -14,15 +14,20 @@
   /* Main controls row */
   .unified-weekly-controls .flex.gap-3 {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
   }
   
   /* Right section controls */
   .unified-weekly-controls .ml-auto {
     margin-left: 0;
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
+  }
+  
+  /* Center all button groups */
+  .unified-weekly-controls .flex.items-center {
+    justify-content: center;
   }
   
   /* Ensure buttons and selects fit within container */
@@ -48,10 +53,11 @@
 }
 
 @media (max-width: 640px) {
-  /* Filters row - stack on mobile */
+  /* Filters row - stack on mobile and center align */
   .unified-weekly-controls .flex-wrap {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    justify-content: center;
   }
   
   /* Search input full width on mobile */
@@ -66,6 +72,22 @@
   .unified-weekly-controls .w-40,
   .unified-weekly-controls .w-28 {
     width: 100% !important;
+  }
+  
+  /* Prevent button container overflow */
+  .unified-weekly-controls > div {
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  /* Ensure view toggle buttons fit */
+  .unified-weekly-controls .border.rounded-md {
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
   }
 }
 
