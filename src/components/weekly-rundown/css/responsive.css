@@ -358,15 +358,49 @@ table tbody td {
    =========================== */
 
 @media (max-width: 640px) {
-  .available-members-container {
-    padding: 0.5rem;
+  /* Vertical stack for cards on mobile */
+  .weekly-cards-scroll {
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
   
-  /* Ensure avatars don't overflow vertically */
+  /* Full width cards on mobile */
+  .weekly-cards-scroll > div {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+  
+  /* Hide horizontal scroll indicators */
+  .weekly-cards-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Available Members - Full Card Style */
+@media (max-width: 640px) {
+  /* Horizontal scroll for avatars within card */
   .member-avatars-scroll {
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  
+  .member-avatars-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .member-avatars-scroll::-webkit-scrollbar-track {
+    background: hsl(var(--muted) / 0.3);
+    border-radius: 3px;
+  }
+  
+  .member-avatars-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.4);
+    border-radius: 3px;
   }
   
   /* Make filter icons smaller on mobile */
