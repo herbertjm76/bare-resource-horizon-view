@@ -332,6 +332,60 @@ table tbody td {
 }
 
 /* ===========================
+   Weekly Summary Cards Mobile
+   =========================== */
+
+@media (max-width: 640px) {
+  /* Reduce card container padding on mobile */
+  .weekly-cards-container {
+    padding: 0.5rem;
+  }
+  
+  /* Make card controls more compact */
+  .weekly-summary-controls {
+    gap: 0.375rem;
+  }
+  
+  /* Ensure cards scroll properly */
+  .weekly-cards-scroll {
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+}
+
+/* ===========================
+   Available Members Row Mobile
+   =========================== */
+
+@media (max-width: 640px) {
+  .available-members-container {
+    padding: 0.5rem;
+  }
+  
+  /* Ensure avatars don't overflow vertically */
+  .member-avatars-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Make filter icons smaller on mobile */
+  .availability-filters-mobile {
+    gap: 0.375rem;
+  }
+  
+  .availability-filters-mobile button {
+    height: 2rem;
+    width: 2rem;
+  }
+  
+  .availability-filters-mobile svg {
+    height: 0.875rem;
+    width: 0.875rem;
+  }
+}
+
+/* ===========================
    Performance Optimizations
    =========================== */
 

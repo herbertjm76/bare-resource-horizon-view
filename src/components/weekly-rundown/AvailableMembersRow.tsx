@@ -252,10 +252,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
   return (
-    <div className="h-[75px] flex items-center gap-3 px-4 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden">
+    <div className="min-h-[60px] sm:h-[75px] flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 sm:py-0 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden available-members-container">
       {/* Member Cards with scroll container - LEFT ALIGNED */}
-      <div className="flex-1 relative h-full min-w-0">
-        <div className="flex gap-3 items-center h-full overflow-x-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+      <div className="flex-1 relative w-full sm:h-full min-w-0 order-2 sm:order-1">
+        <div className="flex gap-2 sm:gap-3 items-center h-full overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent member-avatars-scroll">
           {filteredMembers.map((member) => (
             <MemberAvailabilityCard
               key={member.id}
@@ -271,8 +271,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         </div>
       </div>
 
-      {/* Filters and Sort - RIGHT ALIGNED */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      {/* Filters and Sort - RIGHT ALIGNED / TOP ON MOBILE */}
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 order-1 sm:order-2 self-end sm:self-auto">
         <AvailabilityFilters
           sortBy={sortBy}
           onSortChange={setSortBy}
@@ -291,8 +291,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
       {/* Empty state - compact version */}
       {filteredMembers.length === 0 && (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-xs text-muted-foreground">
+        <div className="flex-1 flex items-center justify-center py-4 sm:py-0 order-2">
+          <p className="text-xs sm:text-sm text-muted-foreground text-center">
             No available members
             {activeFilterCount > 0 && (
               <button 
