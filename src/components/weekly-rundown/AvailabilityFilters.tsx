@@ -41,16 +41,16 @@ export const AvailabilityFilters: React.FC<AvailabilityFiltersProps> = ({
   onClearFilters,
 }) => {
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-1.5 sm:gap-2 availability-filters-mobile">
       {/* Filter Popover */}
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="default"
             size="icon"
-            className="h-9 w-9 relative bg-primary text-primary-foreground hover:bg-primary/90"
+            className="h-8 w-8 sm:h-9 sm:w-9 relative bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            <Filter className="h-4 w-4" />
+            <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             {activeFilterCount > 0 && (
               <Badge 
                 variant="destructive" 
@@ -154,9 +154,9 @@ export const AvailabilityFilters: React.FC<AvailabilityFiltersProps> = ({
           <Button
             variant="default"
             size="icon"
-            className="h-9 w-9 bg-primary text-primary-foreground hover:bg-primary/90"
+            className="h-8 w-8 sm:h-9 sm:w-9 bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            <ArrowUpDown className="h-4 w-4" />
+            <ArrowUpDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-56" align="start">
@@ -178,9 +178,9 @@ export const AvailabilityFilters: React.FC<AvailabilityFiltersProps> = ({
 
       {/* Active Filter Pills */}
       {activeFilterCount > 0 && (
-        <div className="flex items-center gap-1 ml-2">
+        <div className="flex items-center gap-1 ml-1 sm:ml-2">
           {selectedDepartment && (
-            <Badge variant="secondary" className="text-xs h-7 gap-1">
+            <Badge variant="secondary" className="text-[10px] sm:text-xs h-6 sm:h-7 gap-1 px-1.5 sm:px-2">
               {selectedDepartment}
               <X 
                 className="h-3 w-3 cursor-pointer hover:text-destructive" 
@@ -189,7 +189,7 @@ export const AvailabilityFilters: React.FC<AvailabilityFiltersProps> = ({
             </Badge>
           )}
           {selectedSector && (
-            <Badge variant="secondary" className="text-xs h-7 gap-1">
+            <Badge variant="secondary" className="text-[10px] sm:text-xs h-6 sm:h-7 gap-1 px-1.5 sm:px-2">
               {selectedSector}
               <X 
                 className="h-3 w-3 cursor-pointer hover:text-destructive" 
