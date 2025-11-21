@@ -250,7 +250,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   return (
     <div className="mb-6 relative px-2 sm:px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
-      {/* Cards Container - Centered on Mobile */}
+      {/* Cards Container */}
       <div className="relative group">
         {/* Left Arrow - Hidden on Mobile */}
         {showLeftArrow && (
@@ -267,10 +267,10 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         {/* Scrollable Container - Vertical Stack on Mobile, Horizontal on Desktop */}
         <div 
           ref={scrollRef}
-          className="flex flex-col items-center sm:flex-row sm:items-start gap-4 sm:overflow-x-auto sm:scroll-smooth sm:snap-x sm:snap-mandatory sm:pr-20 weekly-cards-scroll"
+          className="flex flex-col sm:flex-row gap-4 sm:overflow-x-auto sm:scroll-smooth sm:snap-x sm:snap-mandatory sm:pr-20 weekly-cards-scroll"
         >
           {cards.map((card, index) => (
-            <div key={card.id} className="relative w-full max-w-md sm:max-w-none sm:flex-shrink-0 sm:w-[300px] h-[180px] sm:snap-center group/card animate-fade-in">
+            <div key={card.id} className="relative w-full sm:flex-shrink-0 sm:w-[300px] h-[180px] sm:snap-center group/card animate-fade-in">
               {card.component}
               
               {/* Reorder buttons - Desktop only */}

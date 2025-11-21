@@ -252,7 +252,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
   return (
-    <div className="w-full max-w-md mx-auto sm:max-w-none bg-card rounded-lg border shadow-sm p-4 overflow-hidden animate-fade-in">
+    <div className="w-full bg-card rounded-lg border shadow-sm p-4 overflow-hidden animate-fade-in">
       {/* Header with Title and Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <h3 className="text-sm font-semibold text-foreground">Team Availability</h3>

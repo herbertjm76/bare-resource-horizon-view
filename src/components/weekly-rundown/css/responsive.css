@@ -358,23 +358,21 @@ table tbody td {
    =========================== */
 
 @media (max-width: 640px) {
-  /* Vertical stack for cards on mobile - centered */
+  /* Vertical stack for cards on mobile */
   .weekly-cards-scroll {
     overflow-x: visible !important;
     overflow-y: visible !important;
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;
     gap: 1rem !important;
     padding: 0 !important;
   }
   
-  /* Full width centered cards on mobile */
+  /* Full width cards on mobile */
   .weekly-cards-scroll > div {
     width: 100% !important;
-    max-width: 28rem !important; /* max-w-md */
-    min-width: auto !important;
-    margin: 0 auto !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
   }
   
   /* Hide horizontal scroll indicators */
