@@ -147,7 +147,7 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
           variant="outline"
           size="sm"
           onClick={onFullscreenToggle}
-          className="h-9 w-9 p-0"
+          className="h-9 w-9 p-0 hidden md:flex"
         >
           {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
         </Button>
