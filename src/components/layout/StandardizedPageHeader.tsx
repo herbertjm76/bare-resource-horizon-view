@@ -27,7 +27,7 @@ export const StandardizedPageHeader: React.FC<StandardizedPageHeaderProps> = ({
               {title}
             </h1>
           </div>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-lg hidden sm:block">
             {description}
           </p>
         </div>

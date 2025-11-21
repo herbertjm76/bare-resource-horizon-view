@@ -252,9 +252,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
   return (
-    <div className="h-[75px] flex items-center gap-3 px-4 border rounded-lg bg-gradient-to-br from-card to-accent/20">
+    <div className="h-[75px] flex items-center gap-3 px-4 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden">
       {/* Member Cards with scroll container - LEFT ALIGNED */}
-      <div className="flex-1 relative h-full">
+      <div className="flex-1 relative h-full min-w-0">
         <div className="flex gap-3 items-center h-full overflow-x-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
           {filteredMembers.map((member) => (
             <MemberAvailabilityCard
@@ -272,7 +272,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       </div>
 
       {/* Filters and Sort - RIGHT ALIGNED */}
-      <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+      <div className="flex items-center gap-2 flex-shrink-0">
         <AvailabilityFilters
           sortBy={sortBy}
           onSortChange={setSortBy}
