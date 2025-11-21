@@ -245,7 +245,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
               variant="outline"
               size="sm"
               onClick={onFullscreenToggle}
-              className="h-7 px-2 hidden sm:flex"
+              className="h-7 px-2 hidden md:flex"
             >
               {isFullscreen ? (
                 <Minimize className="h-3.5 w-3.5" />
