@@ -264,8 +264,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   return (
     <div className="mb-6 relative px-2 sm:px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
-      {/* Carousel Container */}
-      <div className="relative">
+      {/* Mobile Carousel - Only on small screens */}
+      <div className="block md:hidden relative">
         {/* Card Indicator Dots - Top */}
         {cards.length > 1 && (
           <div className="flex justify-center items-center gap-2 mb-3">
@@ -311,6 +311,15 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             {currentCard?.component}
           </div>
         </div>
+      </div>
+
+      {/* Desktop Grid - Multiple cards on larger screens */}
+      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {cards.map((card) => (
+          <div key={card.id}>
+            {card.component}
+          </div>
+        ))}
       </div>
 
       {/* Controls - Bottom Right */}
