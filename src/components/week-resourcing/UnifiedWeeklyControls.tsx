@@ -240,20 +240,24 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
           )}
 
           {/* Fullscreen - Hidden on mobile */}
-          {isFullscreen !== undefined && onFullscreenToggle && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onFullscreenToggle}
-              className="h-7 px-2 hidden md:flex"
-            >
-              {isFullscreen ? (
-                <Minimize className="h-3.5 w-3.5" />
-              ) : (
-                <Maximize className="h-3.5 w-3.5" />
-              )}
-            </Button>
-          )}
+          {typeof window !== 'undefined' &&
+            window.innerWidth >= 768 &&
+            isFullscreen !== undefined &&
+            onFullscreenToggle && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onFullscreenToggle}
+                className="h-7 px-2"
+              >
+                {isFullscreen ? (
+                  <Minimize className="h-3.5 w-3.5" />
+                ) : (
+                  <Maximize className="h-3.5 w-3.5" />
+                )}
+              </Button>
+            )}
+
         </div>
       </div>
 
