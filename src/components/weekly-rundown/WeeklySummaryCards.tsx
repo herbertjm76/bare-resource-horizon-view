@@ -314,7 +314,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       </div>
 
       {/* Desktop Horizontal Row - Single row on larger screens */}
-      <div className="hidden md:flex md:flex-nowrap gap-0 overflow-x-auto pb-2">
+      <div className="hidden md:flex md:flex-nowrap gap-[3px] overflow-x-auto pb-2">
         {cards.map((card) => (
           <div key={card.id} className="flex-shrink-0">
             {card.component}
