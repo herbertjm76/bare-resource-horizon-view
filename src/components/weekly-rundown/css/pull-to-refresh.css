@@ -1,0 +1,39 @@
+/* Pull to Refresh Styling */
+
+.pull-to-refresh-container {
+  min-height: 100%;
+  width: 100%;
+}
+
+/* Only enable pull-to-refresh on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .pull-to-refresh-container {
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Disable on desktop */
+@media (hover: hover) and (pointer: fine) {
+  .pull-to-refresh-container {
+    pointer-events: none;
+  }
+  
+  .pull-to-refresh-container > div {
+    pointer-events: auto;
+  }
+}
+
+/* Refreshing spinner styling */
+.pull-to-refresh-container .animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
