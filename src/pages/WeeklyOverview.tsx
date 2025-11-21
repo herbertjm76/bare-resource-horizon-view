@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
+import '@/components/weekly-rundown/index.css';
 import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
 import { RundownGridView } from '@/components/weekly-rundown/RundownGridView';
 import { RundownCarousel } from '@/components/weekly-rundown/RundownCarousel';
