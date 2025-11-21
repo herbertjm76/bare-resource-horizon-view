@@ -38,7 +38,6 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80
 }) => {
-  const { company } = useCompany();
   const [sortBy, setSortBy] = useState<SortBy>('hours');
   const [filterBy, setFilterBy] = useState<FilterBy>('all');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
@@ -56,39 +55,40 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   ].filter(Boolean).length;
 
   const { data: profiles = [] } = useQuery({
-    queryKey: ['available-members-profiles', company?.id],
+    queryKey: ['available-members-profiles'],
     queryFn: async () => {
-      if (!company?.id) return [];
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department')
-        .eq('company_id', company.id);
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department');
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    staleTime: 60_000,
   });
 
   const { data: invites = [] } = useQuery({
-    queryKey: ['available-members-invites', company?.id],
+    queryKey: ['available-members-invites'],
     queryFn: async () => {
-      if (!company?.id) return [];
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return [];
       const { data, error } = await supabase
         .from('invites')
         .select('id, first_name, last_name, avatar_url, weekly_capacity, department')
-        .eq('company_id', company.id)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    staleTime: 60_000,
   });
 
   const { data: allocations = [] } = useQuery({
-    queryKey: ['available-allocations', weekStartDate, company?.id],
+    queryKey: ['available-allocations', weekStartDate],
     queryFn: async () => {
-      if (!company?.id) return [];
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return [];
       
       // Calculate the full week range (Monday to Sunday)
       const weekStart = new Date(weekStartDate);
@@ -110,13 +110,12 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
             department
           )
         `)
-        .eq('company_id', company.id)
         .gte('week_start_date', weekStartDate)
         .lte('week_start_date', weekEndDate);
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    staleTime: 60_000,
   });
 
   const availableMembers: AvailableMember[] = React.useMemo(() => {
