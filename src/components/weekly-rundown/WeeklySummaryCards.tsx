@@ -250,8 +250,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   return (
     <div className="mb-6 relative px-2 sm:px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
-      {/* Cards Container */}
-      <div className="relative group pr-0 sm:pr-20">
+      {/* Cards Container - Centered on Mobile */}
+      <div className="relative group">
         {/* Left Arrow - Hidden on Mobile */}
         {showLeftArrow && (
           <Button 
@@ -264,18 +264,18 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           </Button>
         )}
         
-        {/* Scrollable Container - Vertical on Mobile, Horizontal on Desktop */}
+        {/* Scrollable Container - Vertical Stack on Mobile, Horizontal on Desktop */}
         <div 
           ref={scrollRef}
-          className="flex flex-col sm:flex-row gap-3 sm:overflow-x-auto sm:scroll-smooth sm:snap-x sm:snap-mandatory weekly-cards-scroll"
+          className="flex flex-col items-center sm:flex-row sm:items-start gap-4 sm:overflow-x-auto sm:scroll-smooth sm:snap-x sm:snap-mandatory sm:pr-20 weekly-cards-scroll"
         >
           {cards.map((card, index) => (
-            <div key={card.id} className="relative w-full sm:flex-shrink-0 sm:min-w-fit h-[180px] sm:snap-center group/card">
+            <div key={card.id} className="relative w-full max-w-md sm:max-w-none sm:flex-shrink-0 sm:w-[300px] h-[180px] sm:snap-center group/card animate-fade-in">
               {card.component}
               
-              {/* Reorder buttons - show on hover, except for WeekInfoCard */}
+              {/* Reorder buttons - Desktop only */}
               {card.id !== 'weekInfo' && (
-                <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity z-20">
+                <div className="hidden sm:flex absolute top-2 right-2 flex-col gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity z-20">
                   <Button
                     variant="secondary"
                     size="icon"
