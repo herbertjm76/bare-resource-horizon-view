@@ -114,7 +114,7 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
   };
 
   return (
-    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-card/50 backdrop-blur-sm min-w-[200px] max-w-[260px]">
+    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-card/50 backdrop-blur-sm w-full sm:min-w-[200px] sm:max-w-[260px]">
       <CardHeader className="flex-shrink-0 pb-2">
         <CardTitle className="flex items-center justify-between text-xs font-semibold text-foreground">
           <span className="flex items-center gap-1.5">
