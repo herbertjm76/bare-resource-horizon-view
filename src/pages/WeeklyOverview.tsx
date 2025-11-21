@@ -14,10 +14,14 @@ import { useCarouselNavigation } from '@/components/weekly-rundown/hooks/useCaro
 import { useCardVisibility } from '@/hooks/useCardVisibility';
 import { OfficeSettingsProvider } from '@/context/officeSettings';
 import { startOfWeek, format } from 'date-fns';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { Calendar } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import PullToRefresh from 'react-simple-pull-to-refresh';
 
 const WeeklyOverview = () => {
+  const queryClient = useQueryClient();
+  
   // View state - persist in localStorage
   const [viewType, setViewType] = useState<ViewType>(() => {
     const saved = localStorage.getItem('weekly-view-type');
@@ -164,6 +168,19 @@ const WeeklyOverview = () => {
     }
   }, [isFullscreen]);
 
+  const handleRefresh = useCallback(async () => {
+    // Invalidate all relevant queries to trigger a refetch
+    await queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+    await queryClient.invalidateQueries({ queryKey: ['active-team-members'] });
+    await queryClient.invalidateQueries({ queryKey: ['pre-registered-members'] });
+    await queryClient.invalidateQueries({ queryKey: ['available-members-profiles'] });
+    await queryClient.invalidateQueries({ queryKey: ['available-members-invites'] });
+    await queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
+    await queryClient.invalidateQueries({ queryKey: ['weekly-summary'] });
+    
+    toast.success('Weekly data refreshed!');
+  }, [queryClient]);
+
   if (isLoading) {
     return (
       <StandardLayout>
@@ -190,7 +207,17 @@ const WeeklyOverview = () => {
   return (
     <StandardLayout>
       <OfficeSettingsProvider>
-        <div className={`space-y-6 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
+        <PullToRefresh 
+          onRefresh={handleRefresh}
+          pullingContent=""
+          refreshingContent={
+            <div className="flex items-center justify-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          }
+          className="pull-to-refresh-container"
+        >
+          <div className={`space-y-6 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
           {/* Page Header - Hidden in fullscreen */}
           {!isFullscreen && (
           <StandardizedPageHeader
@@ -282,7 +309,8 @@ const WeeklyOverview = () => {
               selectedWeek={selectedWeek}
             />
           )}
-        </div>
+          </div>
+        </PullToRefresh>
       </OfficeSettingsProvider>
       <Toaster position="top-right" />
     </StandardLayout>
