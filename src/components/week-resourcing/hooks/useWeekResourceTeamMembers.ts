@@ -1,10 +1,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
 
 export const useWeekResourceTeamMembers = (filters?: { department?: string; location?: string }) => {
-  const { company } = useCompany();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -17,14 +15,15 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
 
   // Get active team members from profiles table
   const { data: activeMembers = [], isLoading: isLoadingActive, error: activeError } = useQuery({
-    queryKey: ['active-team-members', company?.id, filters],
+    queryKey: ['active-team-members', filters],
     queryFn: async () => {
-      if (!company?.id) return [];
+      // Ensure user is authenticated; rely on RLS for company scoping
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return [];
       
       let query = supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, location, department, weekly_capacity, avatar_url')
-        .eq('company_id', company.id);
+        .select('id, first_name, last_name, email, location, department, weekly_capacity, avatar_url');
       
       // Apply department filter
       if (filters?.department && filters.department !== 'all') {
@@ -58,19 +57,20 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
         status: 'active'
       })) || [];
     },
-    enabled: !!company?.id
+    enabled: true,
+    staleTime: 60_000,
   });
 
   // Get pre-registered team members
   const { data: preRegisteredMembers = [], isLoading: isLoadingPreRegistered, error: preRegisteredError } = useQuery({
-    queryKey: ['pre-registered-members', session?.user?.id, company?.id, filters],
+    queryKey: ['pre-registered-members', filters],
     queryFn: async () => {
-      if (!session?.user?.id || !company?.id) return [];
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return [];
       
       let query = supabase
         .from('invites')
         .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
-        .eq('company_id', company.id)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
       
@@ -106,7 +106,8 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
         status: 'pre_registered'
       }));
     },
-    enabled: !!session?.user?.id && !!company?.id
+    enabled: true,
+    staleTime: 60_000,
   });
 
   // Combine both active and pre-registered members
