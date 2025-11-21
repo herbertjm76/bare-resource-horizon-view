@@ -1,0 +1,105 @@
+/* Carousel View - Enhanced Mobile Responsiveness */
+
+/* Base carousel container */
+.carousel-container {
+  position: relative;
+  width: 100%;
+  min-height: 70vh;
+}
+
+/* Navigation buttons positioning */
+@media (max-width: 1024px) {
+  /* Tablet adjustments */
+  .carousel-container .absolute.left-4,
+  .carousel-container .absolute.right-4 {
+    button {
+      height: 3.5rem;
+      width: 3.5rem;
+    }
+    
+    svg {
+      height: 1.75rem;
+      width: 1.75rem;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  /* Mobile: smaller buttons, positioned at edges */
+  .carousel-container {
+    min-height: 60vh;
+  }
+  
+  .carousel-container .absolute.left-4 {
+    left: 0.25rem;
+  }
+  
+  .carousel-container .absolute.right-4 {
+    right: 0.25rem;
+  }
+  
+  /* Adjust carousel cards for mobile */
+  .carousel-container .glass-card {
+    padding: 1rem;
+    max-height: 75vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) hsl(var(--muted));
+  }
+  
+  .carousel-container .glass-card::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .carousel-container .glass-card::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  .carousel-container .glass-card::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 2px;
+  }
+  
+  /* Dots indicator adjustments */
+  .carousel-container .flex.justify-center.gap-3 {
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .carousel-container .flex.justify-center.gap-3 button {
+    height: 0.625rem;
+    width: 0.625rem;
+  }
+  
+  .carousel-container .flex.justify-center.gap-3 button.w-12 {
+    width: 2rem;
+    height: 0.625rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Very small screens */
+  .carousel-container {
+    min-height: 50vh;
+  }
+  
+  .carousel-container .glass-card {
+    max-height: 65vh;
+    padding: 0.875rem;
+  }
+  
+  /* Hide less important info on very small screens */
+  .carousel-container .text-\[10px\] {
+    font-size: 0.625rem;
+  }
+}
+
+/* Center alignment for carousel content */
+.carousel-container .flex.items-center {
+  align-items: center;
+}
+
+.carousel-container .mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}

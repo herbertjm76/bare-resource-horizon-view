@@ -92,7 +92,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   const showProgress = viewType === 'carousel' && totalItems && totalItems > 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 unified-weekly-controls">
       {/* Main Controls Row */}
       <div className="flex flex-col lg:flex-row gap-3 lg:items-center bg-card rounded-lg border p-3">
         {/* Left section - Week and Progress */}

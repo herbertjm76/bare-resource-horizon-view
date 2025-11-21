@@ -1,0 +1,328 @@
+/* Weekly Resource Views - Mobile Responsive Styles */
+
+/* ===========================
+   Unified Controls Responsive
+   =========================== */
+
+/* Controls container - prevent overflow */
+.unified-weekly-controls {
+  overflow: hidden;
+}
+
+/* Mobile: Stack controls vertically, ensure icons stay within container */
+@media (max-width: 1024px) {
+  /* Main controls row */
+  .unified-weekly-controls .flex.gap-3 {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  /* Right section controls */
+  .unified-weekly-controls .ml-auto {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  /* Ensure buttons and selects fit within container */
+  .unified-weekly-controls .overflow-x-auto {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) hsl(var(--muted));
+  }
+  
+  .unified-weekly-controls .overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .unified-weekly-controls .overflow-x-auto::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  .unified-weekly-controls .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Filters row - stack on mobile */
+  .unified-weekly-controls .flex-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  /* Search input full width on mobile */
+  .unified-weekly-controls .min-w-\[250px\] {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Filter selects full width */
+  .unified-weekly-controls select,
+  .unified-weekly-controls .w-36,
+  .unified-weekly-controls .w-40,
+  .unified-weekly-controls .w-28 {
+    width: 100% !important;
+  }
+}
+
+/* ===========================
+   Grid View Responsive
+   =========================== */
+
+@media (max-width: 1024px) {
+  /* Adjust grid columns for tablets */
+  .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  /* Single column on mobile */
+  .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3,
+  .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3.xl\:grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Adjust card padding */
+  .glass-card {
+    padding: 1rem;
+  }
+  
+  /* Center align card content */
+  .glass-card .flex.items-center {
+    align-items: center;
+  }
+}
+
+/* ===========================
+   Carousel View Responsive
+   =========================== */
+
+@media (max-width: 1024px) {
+  /* Adjust carousel perspective */
+  .perspective-\[2000px\] {
+    perspective: 1500px;
+  }
+  
+  /* Reduce carousel item scale on tablets */
+  .flex-\[0_0_60\%\] {
+    flex: 0 0 80%;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Full width carousel items on mobile */
+  .flex-\[0_0_60\%\],
+  .flex-\[0_0_80\%\] {
+    flex: 0 0 95%;
+  }
+  
+  /* Smaller navigation buttons */
+  .absolute.left-4 button,
+  .absolute.right-4 button {
+    height: 3rem !important;
+    width: 3rem !important;
+  }
+  
+  .absolute.left-4 button svg,
+  .absolute.right-4 button svg {
+    height: 1.5rem !important;
+    width: 1.5rem !important;
+  }
+  
+  /* Position buttons closer to edges */
+  .absolute.left-4 {
+    left: 0.5rem !important;
+  }
+  
+  .absolute.right-4 {
+    right: 0.5rem !important;
+  }
+  
+  /* Disable 3D transforms on mobile for better performance */
+  .perspective-\[2000px\],
+  .perspective-\[1500px\] {
+    perspective: none;
+  }
+  
+  /* Simple scale-only transforms on mobile */
+  [style*="rotateY"] {
+    transform: scale(0.9) !important;
+  }
+  
+  /* Hide keyboard navigation hint on mobile */
+  .flex.justify-center.mt-4.text-xs {
+    display: none;
+  }
+}
+
+/* ===========================
+   Table View Responsive
+   =========================== */
+
+/* Wrapper with horizontal scroll */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.4) hsl(var(--muted));
+}
+
+.table-responsive-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 4px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.6);
+}
+
+@media (max-width: 1024px) {
+  /* Force horizontal scroll for tables on tablets */
+  .table-responsive-wrapper table {
+    min-width: 800px;
+  }
+  
+  /* Reduce padding in table cells */
+  .table-responsive-wrapper th,
+  .table-responsive-wrapper td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Center align table rows */
+  .table-responsive-wrapper tbody tr {
+    align-items: center;
+  }
+  
+  .table-responsive-wrapper tbody td {
+    vertical-align: middle;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Smaller table on mobile */
+  .table-responsive-wrapper table {
+    min-width: 600px;
+    font-size: 0.75rem;
+  }
+  
+  .table-responsive-wrapper th,
+  .table-responsive-wrapper td {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  /* Compact badges */
+  .table-responsive-wrapper .badge {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+  }
+  
+  /* Smaller avatars */
+  .table-responsive-wrapper .avatar {
+    height: 1.75rem;
+    width: 1.75rem;
+  }
+  
+  /* Hide less important columns on mobile if needed */
+  .table-responsive-wrapper .hide-mobile {
+    display: none;
+  }
+}
+
+/* ===========================
+   Center Alignment for Rows
+   =========================== */
+
+/* Ensure all table rows are vertically centered */
+table tbody tr {
+  align-items: center;
+}
+
+table tbody td {
+  vertical-align: middle;
+}
+
+/* Center align flex containers */
+.flex.items-center {
+  align-items: center;
+}
+
+/* Center align grid items */
+.grid > * {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* ===========================
+   Scrollbar Consistency
+   =========================== */
+
+/* Apply consistent scrollbar styling across all scrollable containers */
+.overflow-x-auto,
+.overflow-y-auto,
+.overflow-auto {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.4) hsl(var(--muted));
+}
+
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track,
+.overflow-y-auto::-webkit-scrollbar-track,
+.overflow-auto::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb,
+.overflow-y-auto::-webkit-scrollbar-thumb,
+.overflow-auto::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover,
+.overflow-y-auto::-webkit-scrollbar-thumb:hover,
+.overflow-auto::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.6);
+}
+
+/* ===========================
+   Performance Optimizations
+   =========================== */
+
+@media (max-width: 640px) {
+  /* Reduce animations on mobile */
+  * {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+  }
+  
+  /* Disable complex transforms on mobile for better performance */
+  .backdrop-blur-md {
+    backdrop-filter: none;
+    background-color: hsl(var(--background) / 0.95);
+  }
+}
