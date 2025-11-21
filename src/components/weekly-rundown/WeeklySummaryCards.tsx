@@ -266,6 +266,24 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     <div className="mb-6 relative px-2 sm:px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
       {/* Carousel Container */}
       <div className="relative">
+        {/* Card Indicator Dots - Top */}
+        {cards.length > 1 && (
+          <div className="flex justify-center items-center gap-2 mb-3">
+            {cards.map((card, index) => (
+              <button
+                key={card.id}
+                onClick={() => goToCard(index)}
+                className={`rounded-full transition-all duration-300 ${
+                  index === currentCardIndex 
+                    ? 'bg-primary w-3 h-3' 
+                    : 'bg-muted-foreground/30 w-2 h-2 hover:bg-muted-foreground/60'
+                }`}
+                aria-label={`Go to ${getCardLabel(card.id)}`}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Navigation Arrows */}
         <Button 
           variant="ghost" 
@@ -293,24 +311,6 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             {currentCard?.component}
           </div>
         </div>
-
-        {/* Card Indicator Dots */}
-        {cards.length > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-3">
-            {cards.map((card, index) => (
-              <button
-                key={card.id}
-                onClick={() => goToCard(index)}
-                className={`rounded-full transition-all duration-300 ${
-                  index === currentCardIndex 
-                    ? 'bg-primary w-3 h-3' 
-                    : 'bg-muted-foreground/30 w-2 h-2 hover:bg-muted-foreground/60'
-                }`}
-                aria-label={`Go to ${getCardLabel(card.id)}`}
-              />
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Controls - Bottom Right */}
