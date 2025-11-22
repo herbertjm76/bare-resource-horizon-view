@@ -323,12 +323,12 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       </div>
 
       {/* Controls - Bottom Right */}
-      <div className="absolute bottom-3 right-3 flex items-center gap-2 z-30">
-        {/* Jump to Card Menu - Subtle dropdown */}
+      <div className="absolute bottom-3 right-3 flex items-center gap-2 z-30 mt-4">
+        {/* Jump to Card Menu - Subtle dropdown - Only on mobile */}
         {cards.length > 1 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
+              <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all md:hidden">
                 {getCardLabel(currentCard?.id || '')}
                 <ChevronRight className="h-3 w-3 ml-1 opacity-50" />
               </Button>
