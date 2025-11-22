@@ -132,7 +132,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
   }, [profiles, invites, allocations, threshold]);
 
   return (
-    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-card/50 backdrop-blur-sm sm:min-w-[220px] sm:max-w-[280px]">
+    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-white sm:min-w-[220px] sm:max-w-[280px]">
       <CardHeader className="flex-shrink-0 pb-2">
         <CardTitle className="flex items-center gap-2 text-xs font-semibold text-foreground uppercase">
           <UserCheck className="h-3.5 w-3.5 text-muted-foreground" />

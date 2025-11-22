@@ -68,11 +68,10 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
 
   return (
     <div className={`
-      relative rounded-3xl glass-card glass-hover shadow-2xl
-      ${isActive ? 'ring-2 ring-primary/50 glass-elevated scale-[1.02]' : ''}
+      relative rounded-3xl bg-white shadow-2xl border border-border
+      ${isActive ? 'ring-2 ring-primary/50 scale-[1.02]' : ''}
       ${isFullscreen ? 'h-[50vh]' : 'min-h-[400px]'}
       transition-all duration-500 ease-out
-      before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
       overflow-hidden
       flex flex-col
     `}>
