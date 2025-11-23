@@ -11,7 +11,6 @@ interface ProjectAllocationRowProps {
   projectIndex: number;
   selectedDate?: Date;
   periodToShow?: number;
-  onDataChange?: () => void;
 }
 
 export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
@@ -21,8 +20,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
   isEven,
   projectIndex,
   selectedDate,
-  periodToShow,
-  onDataChange
+  periodToShow
 }) => {
   const rowBgColor = isEven ? '#f9fafb' : '#ffffff';
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
@@ -43,8 +41,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
     periodToShow,
     onAllocationChange: (resourceId, dayKey, hours) => {
       console.log(`Person ${resourceId} allocation changed for project ${project.projectId} on ${dayKey}: ${hours}h`);
-      // Trigger refetch to update totals
-      setTimeout(() => onDataChange?.(), 500);
+      // Real-time subscription will handle updates automatically, no need for manual refetch
     }
   });
 

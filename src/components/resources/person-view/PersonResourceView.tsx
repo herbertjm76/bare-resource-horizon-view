@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PersonResourceGrid } from './PersonResourceGrid';
 import { usePersonResourceData } from '@/hooks/usePersonResourceData';
 import { useGridDays } from '../hooks/useGridDays';
@@ -10,6 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
+import { useCompany } from '@/context/CompanyContext';
 
 interface PersonResourceViewProps {
   startDate: Date;
@@ -30,6 +32,31 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   const days = useGridDays(startDate, periodToShow, displayOptions);
   const [expandedPeople, setExpandedPeople] = useState<string[]>([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const { company } = useCompany();
+
+  // Setup real-time subscription for allocation changes to update person totals instantly
+  useEffect(() => {
+    if (!company?.id) return;
+
+    console.log('🔔 Setting up real-time subscription for person totals');
+    
+    const channel = supabase
+      .channel('person-allocations-updates')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'project_resource_allocations',
+        filter: `company_id=eq.${company.id}`
+      }, (payload) => {
+        console.log('🔔 Allocation changed, refreshing person totals:', payload);
+        refetch();
+      })
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [company?.id, refetch]);
 
   const handleTogglePersonExpand = (personId: string) => {
     setExpandedPeople(prev => 
@@ -207,7 +234,6 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
           onTogglePersonExpand={handleTogglePersonExpand}
           selectedDate={startDate}
           periodToShow={periodToShow}
-          onDataChange={refetch}
         />
       </div>
     </div>
