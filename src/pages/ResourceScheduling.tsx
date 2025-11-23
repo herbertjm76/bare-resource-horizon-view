@@ -120,18 +120,18 @@ const ResourceScheduling = () => {
         />
 
         {/* Tabs */}
-        <div className="bg-background border-b">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full max-w-2xl h-14 bg-muted/50 p-1">
-              <TabsTrigger value="by-project" className="flex-1 flex items-center justify-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm">
+        <div className="bg-background border-b flex justify-center py-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-4xl px-4">
+            <TabsList className="w-full h-12 bg-muted p-1 grid grid-cols-3">
+              <TabsTrigger value="by-project" className="flex items-center justify-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <GanttChartSquare className="h-4 w-4" />
                 <span className="font-medium">By Project</span>
               </TabsTrigger>
-              <TabsTrigger value="by-person" className="flex-1 flex items-center justify-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <TabsTrigger value="by-person" className="flex items-center justify-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <Users className="h-4 w-4" />
                 <span className="font-medium">By Person</span>
               </TabsTrigger>
-              <TabsTrigger value="timeline" className="flex-1 flex items-center justify-center gap-2 h-full" disabled>
+              <TabsTrigger value="timeline" className="flex items-center justify-center gap-2" disabled>
                 <Calendar className="h-4 w-4" />
                 <span className="font-medium">Timeline</span>
                 <span className="ml-1 text-xs opacity-60">(Soon)</span>
