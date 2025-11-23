@@ -29,32 +29,43 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
   const tableWidth = 250 + (days.length * 30);
 
   return (
-    <div className={`workload-resource-grid-container ${shouldCenterAlign ? 'center-aligned' : ''}`}>
-      <div className="workload-resource-table-wrapper">
-        <table 
-          className="workload-resource-table"
-          style={{ 
-            width: `${tableWidth}px`,
-            minWidth: `${tableWidth}px`
-          }}
-        >
-          <PersonGridHeader days={days} />
-          
-          <tbody>
-            {personData.map((person, index) => (
-              <PersonRow
-                key={person.personId}
-                person={person}
-                days={days}
-                isExpanded={expandedPeople.includes(person.personId)}
-                onToggleExpand={() => onTogglePersonExpand(person.personId)}
-                isEven={index % 2 === 0}
-                selectedDate={selectedDate}
-                periodToShow={periodToShow}
-              />
-            ))}
-          </tbody>
-        </table>
+    <div className="bg-white rounded-lg shadow-sm border">
+      <div className="p-4 border-b">
+        <h3 className="text-lg font-semibold text-gray-900">Team Resources</h3>
+        <p className="text-sm text-gray-600 mt-1">
+          Team members with project allocations
+        </p>
+      </div>
+      
+      <div className="p-4">
+        <div className={`workload-resource-grid-container ${shouldCenterAlign ? 'center-aligned' : ''}`}>
+          <div className="workload-resource-table-wrapper">
+            <table 
+              className="workload-resource-table"
+              style={{ 
+                width: `${tableWidth}px`,
+                minWidth: `${tableWidth}px`
+              }}
+            >
+              <PersonGridHeader days={days} />
+              
+              <tbody>
+                {personData.map((person, index) => (
+                  <PersonRow
+                    key={person.personId}
+                    person={person}
+                    days={days}
+                    isExpanded={expandedPeople.includes(person.personId)}
+                    onToggleExpand={() => onTogglePersonExpand(person.personId)}
+                    isEven={index % 2 === 0}
+                    selectedDate={selectedDate}
+                    periodToShow={periodToShow}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
