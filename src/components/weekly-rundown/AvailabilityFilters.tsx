@@ -46,11 +46,11 @@ export const AvailabilityFilters: React.FC<AvailabilityFiltersProps> = ({
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            variant="default"
+            variant="ghost"
             size="icon"
-            className="h-8 w-8 sm:h-9 sm:w-9 relative bg-primary text-primary-foreground hover:bg-primary/90"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all relative"
           >
-            <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <Filter className="h-4 w-4" />
             {activeFilterCount > 0 && (
               <Badge 
                 variant="destructive" 
@@ -152,11 +152,11 @@ export const AvailabilityFilters: React.FC<AvailabilityFiltersProps> = ({
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            variant="default"
+            variant="ghost"
             size="icon"
-            className="h-8 w-8 sm:h-9 sm:w-9 bg-primary text-primary-foreground hover:bg-primary/90"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
           >
-            <ArrowUpDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <ArrowUpDown className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-56" align="start">
