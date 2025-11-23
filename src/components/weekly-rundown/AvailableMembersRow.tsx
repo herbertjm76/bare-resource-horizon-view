@@ -252,30 +252,11 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
   return (
-    <div className="w-full bg-card rounded-lg border shadow-sm p-4 overflow-hidden animate-fade-in">
-      {/* Header with Title and Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <h3 className="text-sm font-semibold text-foreground">Team Availability</h3>
-        <AvailabilityFilters
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          filterBy={filterBy}
-          onFilterChange={setFilterBy}
-          selectedDepartment={selectedDepartment}
-          onDepartmentChange={setSelectedDepartment}
-          selectedSector={selectedSector}
-          onSectorChange={setSelectedSector}
-          departments={departments}
-          sectors={sectors}
-          activeFilterCount={activeFilterCount}
-          onClearFilters={handleClearFilters}
-        />
-      </div>
-      
+    <div className="w-full bg-card rounded-lg border shadow-sm p-2 overflow-hidden animate-fade-in relative">
       {/* Members Avatars - Horizontal Scroll */}
       {filteredMembers.length > 0 && (
-        <div className="overflow-x-auto overflow-y-hidden -mx-4 px-4">
-          <div className="flex gap-2 sm:gap-3 items-center justify-start member-avatars-scroll min-h-[60px]">
+        <div className="overflow-x-auto overflow-y-hidden -mx-2 px-2">
+          <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[52px]">
             {filteredMembers.map((member) => (
               <MemberAvailabilityCard
                 key={member.id}
@@ -294,7 +275,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
       {/* Empty state - compact version */}
       {filteredMembers.length === 0 && (
-        <div className="flex-1 flex items-center justify-center py-4 sm:py-0 order-2">
+        <div className="flex-1 flex items-center justify-center py-3 sm:py-0">
           <p className="text-xs sm:text-sm text-muted-foreground text-center">
             No available members
             {activeFilterCount > 0 && (
@@ -308,6 +289,24 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           </p>
         </div>
       )}
+
+      {/* Filters - Bottom Right */}
+      <div className="absolute bottom-2 right-2">
+        <AvailabilityFilters
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          filterBy={filterBy}
+          onFilterChange={setFilterBy}
+          selectedDepartment={selectedDepartment}
+          onDepartmentChange={setSelectedDepartment}
+          selectedSector={selectedSector}
+          onSectorChange={setSelectedSector}
+          departments={departments}
+          sectors={sectors}
+          activeFilterCount={activeFilterCount}
+          onClearFilters={handleClearFilters}
+        />
+      </div>
     </div>
   );
 };
