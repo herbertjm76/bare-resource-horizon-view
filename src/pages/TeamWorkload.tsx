@@ -46,7 +46,7 @@ const TeamWorkload: React.FC = () => {
     return Array.from(locs) as string[];
   }, [teamMembers]);
 
-  // Combine active and pre-registered members
+  // Combine active and pre-registered members for display
   const allMembers = useMemo(() => {
     const preRegAsTeamMembers: TeamMember[] = preRegisteredMembers.map(invite => ({
       ...invite,
@@ -57,7 +57,7 @@ const TeamWorkload: React.FC = () => {
     return [...teamMembers, ...preRegAsTeamMembers];
   }, [teamMembers, preRegisteredMembers]);
 
-  // Filter members based on active filters
+  // Filter members based on active filters (for display)
   const filteredMembers = useMemo(() => {
     return allMembers.filter(member => {
       // Search filter
@@ -82,6 +82,11 @@ const TeamWorkload: React.FC = () => {
     });
   }, [allMembers, searchQuery, activeFilter, filterValue]);
 
+  // Active members only for workload data (pre-registered don't have allocations yet)
+  const activeMembersForData = useMemo(() => {
+    return filteredMembers.filter(member => !('isPending' in member && member.isPending));
+  }, [filteredMembers]);
+
   const weekLabel = useMemo(
     () => `${selectedWeeks} weeks from ${startOfWeek(selectedWeek, { weekStartsOn: 1 }).toLocaleDateString()}`,
     [selectedWeek, selectedWeeks]
@@ -103,6 +108,7 @@ const TeamWorkload: React.FC = () => {
           onWeeksChange={setSelectedWeeks}
           isLoading={isLoadingMembers}
           filteredMembers={filteredMembers}
+          activeMembersForData={activeMembersForData}
           departments={departments}
           locations={locations}
           activeFilter={activeFilter}

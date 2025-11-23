@@ -15,6 +15,7 @@ interface TeamWorkloadContentProps {
   onWeeksChange: (weeks: number) => void;
   isLoading: boolean;
   filteredMembers: TeamMember[];
+  activeMembersForData: TeamMember[];
   departments: string[];
   locations: string[];
   activeFilter: string;
@@ -36,6 +37,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   onWeeksChange,
   isLoading,
   filteredMembers,
+  activeMembersForData,
   departments,
   locations,
   activeFilter,
@@ -49,11 +51,10 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   onPreviousWeek,
   onNextWeek
 }) => {
-  // Use the selected week period instead of fixed 36 weeks
-  // Use unified workload data hook - ensures consistency across all views
+  // Use active members only for data fetch (pre-registered don't have allocations)
   const { weeklyWorkloadData, isLoading: isLoadingWorkload, weekStartDates } = useUnifiedWorkloadData(
     selectedWeek,
-    filteredMembers, 
+    activeMembersForData, 
     selectedWeeks
   );
 
