@@ -217,7 +217,7 @@ const WeeklyOverview = () => {
           }
           className="pull-to-refresh-container"
         >
-          <div className={`space-y-6 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
+          <div className={`space-y-2 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
           {/* Page Header - Hidden in fullscreen */}
           {!isFullscreen && (
           <StandardizedPageHeader

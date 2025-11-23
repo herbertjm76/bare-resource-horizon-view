@@ -293,8 +293,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   };
 
   return (
-    <div className="w-full space-y-1">
-      <div className="bg-card rounded-lg border shadow-sm p-1.5 overflow-hidden animate-fade-in relative">
+    <div className="w-full space-y-0.5">
+      <div className="rounded-lg p-1.5 overflow-hidden animate-fade-in relative">
         {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
         {filteredMembers.length > 0 && (
           <div className="hidden sm:block relative">
@@ -402,7 +402,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       </div>
 
       {/* Mobile Filters Row - Only on mobile */}
-      <div className="flex sm:hidden justify-end items-center gap-2 px-1.5 py-0.5 border rounded-lg bg-card/50">
+      <div className="flex sm:hidden justify-end items-center gap-2 px-1.5 py-0.5 rounded-lg">
         <AvailabilityFilters
           sortBy={sortBy}
           onSortChange={setSortBy}
