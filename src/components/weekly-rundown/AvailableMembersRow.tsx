@@ -255,7 +255,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     <div className="w-full bg-card rounded-lg border shadow-sm p-2 overflow-hidden animate-fade-in relative">
       {/* Members Avatars - Horizontal Scroll */}
       {filteredMembers.length > 0 && (
-        <div className="overflow-x-auto overflow-y-hidden -mx-2 px-2">
+        <div className="overflow-x-auto overflow-y-hidden -mx-2 px-2 pr-20 sm:pr-2">
           <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[52px]">
             {filteredMembers.map((member) => (
               <MemberAvailabilityCard
@@ -291,7 +291,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       )}
 
       {/* Filters - Bottom Right */}
-      <div className="absolute bottom-2 right-2">
+      <div className="absolute bottom-2 right-2 z-10">
         <AvailabilityFilters
           sortBy={sortBy}
           onSortChange={setSortBy}
