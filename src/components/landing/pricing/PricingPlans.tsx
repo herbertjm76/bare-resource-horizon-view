@@ -17,7 +17,7 @@ export const PricingPlans = () => {
         "Basic reporting",
         "Email support"
       ],
-      cta: "Start 14-Day Trial",
+      cta: "Get Started",
       popular: false,
       note: "No setup fees • Cancel anytime",
       color: "from-gray-600 to-gray-700",
@@ -36,7 +36,7 @@ export const PricingPlans = () => {
         "Team utilization dashboard",
         "Priority support"
       ],
-      cta: "Start 14-Day Trial", 
+      cta: "Get Started", 
       popular: true,
       note: "No setup fees • Cancel anytime",
       color: "from-purple-600 to-blue-600",

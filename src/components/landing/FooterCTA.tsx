@@ -18,7 +18,7 @@ const FooterCTA = () => {
             onClick={() => navigate('/auth')}
             className="bg-white text-purple-600 px-12 py-4 rounded-2xl font-bold text-xl hover:bg-purple-50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl"
           >
-            Start Free Trial
+            Get Started
           </button>
         </AnimatedSection>
       </div>
