@@ -6,7 +6,6 @@ import { WeeklyWorkloadCalendar } from './WeeklyWorkloadCalendar';
 import { useUnifiedWorkloadData } from './hooks/useUnifiedWorkloadData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WorkloadHeaderControls } from './components/WorkloadHeaderControls';
-import { WorkloadMetricsCards } from './components/WorkloadMetricsCards';
 import { PopulateDummyDataButton } from './PopulateDummyDataButton';
 
 interface TeamWorkloadContentProps {
@@ -88,13 +87,6 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
         onWeekChange={onWeekChange}
         selectedWeeks={selectedWeeks}
         onWeeksChange={onWeeksChange}
-      />
-
-      {/* Workload Summary Stats */}
-      <WorkloadMetricsCards
-        weeklyWorkloadData={weeklyWorkloadData}
-        filteredMembers={filteredMembers}
-        periodWeeks={selectedWeeks}
       />
 
       {/* Weekly Workload Calendar */}
