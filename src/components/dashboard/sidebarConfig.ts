@@ -6,7 +6,6 @@ import {
   UserSquare2,
   Flag,
   HelpCircle,
-  TrendingUp,
   Layers
 } from "lucide-react"
 
@@ -36,18 +35,6 @@ export const getNavigationItems = (companySlug: string | null) => {
           title: "Schedule",
           url: `${baseUrl}/resource-scheduling`,
           icon: GanttChartSquare,
-        },
-        {
-          title: "Timeline",
-          url: `${baseUrl}/timeline`,
-          icon: GanttChartSquare,
-          comingSoon: true,
-        },
-        {
-          title: "Capacity Planning",
-          url: `${baseUrl}/capacity-planning`,
-          icon: TrendingUp,
-          comingSoon: true,
         },
       ],
     },
