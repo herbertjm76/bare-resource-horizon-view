@@ -82,11 +82,6 @@ const TeamWorkload: React.FC = () => {
     });
   }, [allMembers, searchQuery, activeFilter, filterValue]);
 
-  // Active members only for workload data (pre-registered don't have allocations yet)
-  const activeMembersForData = useMemo(() => {
-    return filteredMembers.filter(member => !('isPending' in member && member.isPending));
-  }, [filteredMembers]);
-
   const weekLabel = useMemo(
     () => `${selectedWeeks} weeks from ${startOfWeek(selectedWeek, { weekStartsOn: 1 }).toLocaleDateString()}`,
     [selectedWeek, selectedWeeks]
@@ -108,7 +103,6 @@ const TeamWorkload: React.FC = () => {
           onWeeksChange={setSelectedWeeks}
           isLoading={isLoadingMembers}
           filteredMembers={filteredMembers}
-          activeMembersForData={activeMembersForData}
           departments={departments}
           locations={locations}
           activeFilter={activeFilter}
