@@ -58,33 +58,52 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   });
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>, currentDayKey: string, currentIndex: number) => {
-    if (e.key === 'Tab' && !e.shiftKey) {
+    if (e.key === 'Tab') {
       e.preventDefault();
-      const nextIndex = currentIndex + 1;
-      if (nextIndex < days.length) {
-        const nextDayKey = days[nextIndex].date.toISOString().split('T')[0];
-        inputRefs.current[nextDayKey]?.focus();
-      }
-    } else if (e.key === 'Tab' && e.shiftKey) {
-      e.preventDefault();
-      const prevIndex = currentIndex - 1;
-      if (prevIndex >= 0) {
-        const prevDayKey = days[prevIndex].date.toISOString().split('T')[0];
-        inputRefs.current[prevDayKey]?.focus();
+      e.stopPropagation();
+      
+      if (!e.shiftKey) {
+        // Tab forward
+        const nextIndex = currentIndex + 1;
+        if (nextIndex < days.length) {
+          const nextDayKey = days[nextIndex].date.toISOString().split('T')[0];
+          const nextInput = inputRefs.current[nextDayKey];
+          if (nextInput) {
+            setTimeout(() => nextInput.focus(), 0);
+          }
+        }
+      } else {
+        // Shift+Tab backward
+        const prevIndex = currentIndex - 1;
+        if (prevIndex >= 0) {
+          const prevDayKey = days[prevIndex].date.toISOString().split('T')[0];
+          const prevInput = inputRefs.current[prevDayKey];
+          if (prevInput) {
+            setTimeout(() => prevInput.focus(), 0);
+          }
+        }
       }
     } else if (e.key === 'Enter') {
       e.currentTarget.blur();
     } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
       const nextIndex = currentIndex + 1;
       if (nextIndex < days.length) {
         const nextDayKey = days[nextIndex].date.toISOString().split('T')[0];
-        inputRefs.current[nextDayKey]?.focus();
+        const nextInput = inputRefs.current[nextDayKey];
+        if (nextInput) {
+          setTimeout(() => nextInput.focus(), 0);
+        }
       }
     } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
       const prevIndex = currentIndex - 1;
       if (prevIndex >= 0) {
         const prevDayKey = days[prevIndex].date.toISOString().split('T')[0];
-        inputRefs.current[prevDayKey]?.focus();
+        const prevInput = inputRefs.current[prevDayKey];
+        if (prevInput) {
+          setTimeout(() => prevInput.focus(), 0);
+        }
       }
     }
   }, [days]);
