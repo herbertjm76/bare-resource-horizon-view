@@ -43,26 +43,13 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">Project Resources</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            Team workload styled grid with sticky # and Project/Resource columns
-          </p>
-        </div>
-        
-        <div className="p-4">
-          <WorkloadStyleResourceGrid
-            projects={filteredProjects}
-            days={days}
-            expandedProjects={expandedProjects}
-            onToggleProjectExpand={onToggleProjectExpand}
-            selectedDate={startDate}
-            periodToShow={periodToShow}
-          />
-        </div>
-      </div>
-    </div>
+    <WorkloadStyleResourceGrid
+      projects={filteredProjects}
+      days={days}
+      expandedProjects={expandedProjects}
+      onToggleProjectExpand={onToggleProjectExpand}
+      selectedDate={startDate}
+      periodToShow={periodToShow}
+    />
   );
 };
