@@ -327,7 +327,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               className="overflow-x-auto overflow-y-hidden -mx-2 px-2 scrollbar-hide"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[52px]">
+              <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[52px]">
                 {filteredMembers.map((member) => (
                   <MemberAvailabilityCard
                     key={member.id}
