@@ -96,15 +96,6 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
       
-      {/* Streamlined Header Section */}
-      <StreamlinedProjectResourcingHeader 
-        projectCount={totalProjects}
-        periodToShow={filters.periodToShow}
-        availableResources={availableThisMonth.count}
-        overloadedResources={overloadedResources.count}
-        multiProjectResources={multiProjectLoad.count}
-      />
-
       {/* Compact Action Bar */}
       <StreamlinedActionBar
         selectedDate={selectedMonth}
