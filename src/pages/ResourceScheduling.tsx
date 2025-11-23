@@ -7,13 +7,7 @@ import { ProjectResourcingContent } from './ProjectResourcing/components/Project
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
-import { TeamWorkloadContent } from '@/components/workload/TeamWorkloadContent';
-import { useTeamMembersData } from '@/hooks/useTeamMembersData';
-import { useTeamMembersState } from '@/hooks/useTeamMembersState';
-import { useCompany } from '@/context/CompanyContext';
-import { useTeamFilters } from '@/hooks/useTeamFilters';
-import { startOfWeek, addWeeks, subWeeks } from 'date-fns';
-import { TeamMember, PendingMember } from '@/components/dashboard/types';
+import { PersonResourceView } from '@/components/resources/person-view/PersonResourceView';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
@@ -50,65 +44,6 @@ const ResourceScheduling = () => {
     setDisplayOptions,
     filters.periodToShow
   );
-
-  // Team Workload State
-  const [selectedWeek, setSelectedWeek] = useState<Date>(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
-  );
-  const [selectedWeeks, setSelectedWeeks] = useState<number>(24);
-  
-  const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
-  const { company } = useCompany();
-  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
-  
-  const transformedPreRegisteredMembers: PendingMember[] = preRegisteredMembers.map(member => ({
-    ...member,
-    isPending: true as const
-  }));
-  
-  const allMembers: TeamMember[] = [...teamMembers, ...transformedPreRegisteredMembers];
-  
-  const {
-    activeFilter,
-    setActiveFilter,
-    filterValue,
-    setFilterValue,
-    searchQuery,
-    setSearchQuery,
-    departments,
-    locations,
-    filteredMembers,
-    clearFilters: clearTeamFilters
-  } = useTeamFilters(allMembers);
-  
-  // Create wrapper functions for team filter handlers
-  const handleTeamFilterChange = (filter: string) => {
-    setActiveFilter(filter as 'all' | 'department' | 'location');
-  };
-  
-  const handleTeamFilterValueChange = (value: string) => {
-    setFilterValue(value);
-  };
-  
-  const handleTeamSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
-  
-  const handleWeekChange = (newWeek: Date) => {
-    setSelectedWeek(startOfWeek(newWeek, { weekStartsOn: 1 }));
-  };
-
-  const handleWeeksChange = (weeks: number) => {
-    setSelectedWeeks(weeks);
-  };
-
-  const handlePreviousWeek = () => {
-    setSelectedWeek(prev => subWeeks(prev, 1));
-  };
-
-  const handleNextWeek = () => {
-    setSelectedWeek(prev => addWeeks(prev, 1));
-  };
 
   return (
     <StandardLayout>
@@ -169,25 +104,10 @@ const ResourceScheduling = () => {
           </TabsContent>
 
           <TabsContent value="by-person" className="mt-0 py-6">
-            <TeamWorkloadContent
-              filteredMembers={filteredMembers}
-              isLoading={isLoadingTeamMembers}
-              selectedWeek={selectedWeek}
-              selectedWeeks={selectedWeeks}
-              activeFilter={activeFilter}
-              filterValue={filterValue}
-              searchQuery={searchQuery}
-              departments={departments}
-              locations={locations}
-              weekLabel={`Week of ${selectedWeek.toLocaleDateString()}`}
-              onWeekChange={handleWeekChange}
-              onWeeksChange={handleWeeksChange}
-              onPreviousWeek={handlePreviousWeek}
-              onNextWeek={handleNextWeek}
-              setActiveFilter={handleTeamFilterChange}
-              setFilterValue={handleTeamFilterValueChange}
-              setSearchQuery={handleTeamSearchChange}
-              clearFilters={clearTeamFilters}
+            <PersonResourceView
+              startDate={selectedMonth}
+              periodToShow={filters.periodToShow}
+              displayOptions={displayOptions}
             />
           </TabsContent>
 
