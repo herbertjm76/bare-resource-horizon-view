@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { getNavigationItems } from './sidebarConfig';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useCompany } from '@/context/CompanyContext';
+import { Badge } from '@/components/ui/badge';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -59,22 +60,33 @@ export const SidebarNavigation: React.FC = () => {
                         WebkitBackdropFilter: 'blur(10px)',
                       } : {}}
                     >
-                      <Link to={item.url} className={cn(
+                      <Link to={item.comingSoon ? '#' : item.url} className={cn(
                         "flex items-center",
-                        collapsed ? "justify-center w-full h-full" : "w-full"
-                      )}>
+                        collapsed ? "justify-center w-full h-full" : "w-full",
+                        item.comingSoon && "cursor-not-allowed opacity-60"
+                      )} onClick={(e) => item.comingSoon && e.preventDefault()}>
                         <Icon className={cn(
                           "h-5 w-5 transition-all duration-300",
                           isActive ? "text-white drop-shadow-sm" : "text-indigo-200 group-hover:text-white",
                           collapsed ? "mr-0" : "mr-3"
                         )} />
                         {!collapsed && (
-                          <span className={cn(
-                            "font-medium transition-all duration-300",
-                            isActive ? "text-white drop-shadow-sm" : ""
-                          )}>{item.title}</span>
+                          <>
+                            <span className={cn(
+                              "font-medium transition-all duration-300",
+                              isActive ? "text-white drop-shadow-sm" : ""
+                            )}>{item.title}</span>
+                            {item.comingSoon && (
+                              <Badge 
+                                variant="secondary" 
+                                className="ml-auto text-[10px] px-1.5 py-0 bg-indigo-400/20 text-indigo-100 border-indigo-300/30"
+                              >
+                                Soon
+                              </Badge>
+                            )}
+                          </>
                         )}
-                        {isActive && (
+                        {isActive && !item.comingSoon && (
                           <div 
                             className="absolute inset-0 rounded-lg opacity-20 sidebar-shimmer"
                           />
