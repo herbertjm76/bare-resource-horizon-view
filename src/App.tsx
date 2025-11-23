@@ -18,6 +18,7 @@ import WeeklyOverview from "./pages/WeeklyOverview";
 import TeamWorkload from "./pages/TeamWorkload";
 import TeamAnnualLeave from "./pages/TeamAnnualLeave";
 import ProjectResourcing from "./pages/ProjectResourcing";
+import ResourceScheduling from "./pages/ResourceScheduling";
 import HelpCenter from "./pages/HelpCenter";
 import Help from "./pages/Help";
 import FAQ from "./pages/FAQ";
@@ -77,9 +78,11 @@ function App() {
               <Route path="/:companySlug/office-settings" element={<OfficeSettings />} />
               <Route path="/:companySlug/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/:companySlug/weekly-rundown" element={<WeeklyRundown />} />
-              <Route path="/:companySlug/team-workload" element={<TeamWorkload />} />
+              <Route path="/:companySlug/resource-scheduling" element={<ResourceScheduling />} />
+              {/* Legacy routes - redirect to unified scheduling */}
+              <Route path="/:companySlug/team-workload" element={<ResourceScheduling />} />
+              <Route path="/:companySlug/project-resourcing" element={<ResourceScheduling />} />
               <Route path="/:companySlug/team-annual-leave" element={<TeamAnnualLeave />} />
-              <Route path="/:companySlug/project-resourcing" element={<ProjectResourcing />} />
               <Route path="/:companySlug/financial-control" element={<FinancialControl />} />
               <Route path="/:companySlug/help-center" element={<HelpCenter />} />
               <Route path="/:companySlug/workflow" element={<WorkflowPage />} />
@@ -98,9 +101,11 @@ function App() {
               <Route path="/office-settings" element={<OfficeSettings />} />
               <Route path="/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/weekly-rundown" element={<WeeklyRundown />} />
-              <Route path="/team-workload" element={<TeamWorkload />} />
+              <Route path="/resource-scheduling" element={<ResourceScheduling />} />
+              {/* Legacy routes - redirect to unified scheduling */}
+              <Route path="/team-workload" element={<ResourceScheduling />} />
+              <Route path="/project-resourcing" element={<ResourceScheduling />} />
               <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
-              <Route path="/project-resourcing" element={<ProjectResourcing />} />
               <Route path="/financial-control" element={<FinancialControl />} />
               <Route path="/help-center" element={<HelpCenter />} />
               <Route path="/workflow" element={<WorkflowPage />} />

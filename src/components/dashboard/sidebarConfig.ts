@@ -4,10 +4,8 @@ import {
   GanttChartSquare,
   FolderKanban,
   UserSquare2,
-  Briefcase,
   Flag,
-  HelpCircle,
-  Presentation
+  HelpCircle
 } from "lucide-react"
 
 export const getNavigationItems = (companySlug: string | null) => {
@@ -30,22 +28,27 @@ export const getNavigationItems = (companySlug: string | null) => {
       ],
     },
     {
-      label: "PROJECT LIFECYCLE",
+      label: "RESOURCE SCHEDULING",
+      items: [
+        {
+          title: "Schedule",
+          url: `${baseUrl}/resource-scheduling`,
+          icon: GanttChartSquare,
+        },
+      ],
+    },
+    {
+      label: "PROJECTS",
       items: [
         {
           title: "Projects",
           url: `${baseUrl}/projects`,
           icon: FolderKanban,
         },
-        {
-          title: "Resources",
-          url: `${baseUrl}/project-resourcing`,
-          icon: GanttChartSquare,
-        },
       ],
     },
     {
-      label: "RESOURCES",
+      label: "TEAM",
       items: [
         {
           title: "Team Members",
@@ -53,12 +56,7 @@ export const getNavigationItems = (companySlug: string | null) => {
           icon: UserSquare2,
         },
         {
-          title: "Team Workload",
-          url: `${baseUrl}/team-workload`,
-          icon: Briefcase,
-        },
-        {
-          title: "Team Annual Leave",
+          title: "Annual Leave",
           url: `${baseUrl}/team-annual-leave`,
           icon: Calendar,
         },
@@ -68,7 +66,7 @@ export const getNavigationItems = (companySlug: string | null) => {
       label: "SETTINGS",
       items: [
         {
-          title: "Office Settings",
+          title: "Company Settings",
           url: `${baseUrl}/office-settings`,
           icon: Flag,
         },
