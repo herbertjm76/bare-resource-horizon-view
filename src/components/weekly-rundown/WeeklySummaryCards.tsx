@@ -265,7 +265,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   return (
     <div className="mb-6 relative px-2 sm:px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
       {/* Mobile Carousel - Only on small screens */}
-      <div className="block md:hidden relative">
+      <div className="block sm:hidden relative">
         {/* Card Indicator Dots - Top */}
         {cards.length > 1 && (
           <div className="flex justify-center items-center gap-2 mb-3">
@@ -313,8 +313,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         </div>
       </div>
 
-      {/* Desktop Horizontal Row - Single row on larger screens */}
-      <div className="hidden md:flex md:flex-nowrap gap-[3px] overflow-x-auto pb-2">
+      {/* Desktop/Tablet Horizontal Row - Single row on larger screens */}
+      <div className="hidden sm:flex sm:flex-nowrap gap-[3px] overflow-x-auto pb-2">
         {cards.map((card) => (
           <div key={card.id} className="flex-shrink-0">
             {card.component}
@@ -328,7 +328,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         {cards.length > 1 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all md:hidden">
+              <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all sm:hidden">
                 {getCardLabel(currentCard?.id || '')}
                 <ChevronRight className="h-3 w-3 ml-1 opacity-50" />
               </Button>
