@@ -76,7 +76,8 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
   const periodOptions = [
     { value: '4', label: '1 Month' },
     { value: '8', label: '2 Months' },
-    { value: '12', label: '3 Months' }
+    { value: '12', label: '3 Months' },
+    { value: '16', label: '4 Months' }
   ];
 
   const allExpanded = expandedProjects.length === totalProjects && totalProjects > 0;
