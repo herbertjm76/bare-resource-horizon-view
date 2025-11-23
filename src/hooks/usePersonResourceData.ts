@@ -35,7 +35,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
       console.log('Fetching person resource data for company:', company.id);
 
       try {
-        // Fetch all team members (profiles)
+        // Fetch all active team members (profiles)
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, avatar_url, location, job_title, weekly_capacity')
@@ -48,8 +48,27 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           throw profilesError;
         }
 
-        if (!profiles || profiles.length === 0) {
-          console.log('No profiles found');
+        // Fetch pre-registered members (pending invites)
+        const { data: invites, error: invitesError } = await supabase
+          .from('invites')
+          .select('id, first_name, last_name, avatar_url, location, job_title, weekly_capacity')
+          .eq('company_id', company.id)
+          .eq('invitation_type', 'pre_registered')
+          .eq('status', 'pending')
+          .order('first_name', { ascending: true });
+
+        if (invitesError) {
+          console.error('Error fetching invites:', invitesError);
+        }
+
+        // Combine profiles and invites
+        const allMembers = [
+          ...(profiles || []),
+          ...(invites || [])
+        ];
+
+        if (allMembers.length === 0) {
+          console.log('No team members found');
           return [];
         }
 
@@ -57,11 +76,12 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         const endDate = new Date(startDate);
         endDate.setDate(endDate.getDate() + (periodToShow * 7));
 
-        // Fetch all allocations for this date range and company
+        // Fetch all allocations for this date range and company (both active and pre-registered)
         const { data: allocations, error: allocationsError } = await supabase
           .from('project_resource_allocations')
           .select(`
             resource_id,
+            resource_type,
             project_id,
             week_start_date,
             hours,
@@ -72,7 +92,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             )
           `)
           .eq('company_id', company.id)
-          .eq('resource_type', 'active')
+          .in('resource_type', ['active', 'pre_registered'])
           .gte('week_start_date', startDate.toISOString().split('T')[0])
           .lte('week_start_date', endDate.toISOString().split('T')[0]);
 
@@ -87,16 +107,16 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         // Process data: group allocations by person, then by project
         const personMap = new Map<string, PersonResourceData>();
 
-        // Initialize all profiles
-        profiles.forEach(profile => {
-          personMap.set(profile.id, {
-            personId: profile.id,
-            firstName: profile.first_name || '',
-            lastName: profile.last_name || '',
-            avatarUrl: profile.avatar_url || undefined,
-            location: profile.location || undefined,
-            jobTitle: profile.job_title || undefined,
-            weeklyCapacity: profile.weekly_capacity || 40,
+        // Initialize all members (both profiles and invites)
+        allMembers.forEach(member => {
+          personMap.set(member.id, {
+            personId: member.id,
+            firstName: member.first_name || '',
+            lastName: member.last_name || '',
+            avatarUrl: member.avatar_url || undefined,
+            location: member.location || undefined,
+            jobTitle: member.job_title || undefined,
+            weeklyCapacity: member.weekly_capacity || 40,
             projects: []
           });
         });
