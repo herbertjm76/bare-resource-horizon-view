@@ -23,11 +23,12 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     return <LoadingDashboard />;
   }
 
-  // Calculate metrics
+  // Calculate metrics - use time-range-filtered data from metrics
   const utilizationRate = data.currentUtilizationRate;
-  const activeProjects = data.projects.filter(p => p.status === 'Active').length;
+  const activeProjects = data.metrics?.activeProjects || 0;
   const totalProjects = data.projects.length;
   const teamSize = data.teamMembers.length + data.preRegisteredMembers.length;
+  const activeResources = data.metrics?.activeResources || teamSize;
   
   // Calculate overloaded resources (>100% utilization)
   const overloadedResources = data.memberUtilizations.filter(m => m.utilization > 100);
@@ -39,19 +40,36 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   // Simulate capacity gaps (weeks where utilization > 100%)
   const upcomingGaps = utilizationRate > 100 ? 2 : 0;
 
-  // Sparkline trends (simulate 7-day trend)
-  const utilizationTrend = [
-    utilizationRate - 20,
-    utilizationRate - 15,
-    utilizationRate - 10,
-    utilizationRate - 5,
-    utilizationRate,
-    utilizationRate + 2,
-    utilizationRate + 3
-  ];
+  // Sparkline trends - use actual utilization trends from database
+  const utilizationTrend = data.metrics?.utilizationTrends 
+    ? [
+        data.metrics.utilizationTrends.days90,
+        data.metrics.utilizationTrends.days90,
+        data.metrics.utilizationTrends.days30,
+        data.metrics.utilizationTrends.days30,
+        data.metrics.utilizationTrends.days7,
+        utilizationRate,
+        utilizationRate
+      ]
+    : [utilizationRate, utilizationRate, utilizationRate, utilizationRate, utilizationRate, utilizationRate, utilizationRate];
 
-  // Project pipeline data
+  // Project pipeline data - use time-range-filtered metrics
   const projectsByStatus = useMemo(() => {
+    // Use metrics data if available (time-range filtered), otherwise fall back to all projects
+    const statusData = data.metrics?.projectsByStatus || [];
+    
+    if (statusData.length > 0) {
+      return statusData.map(s => ({
+        label: s.name,
+        value: s.value,
+        max: totalProjects,
+        color: s.name === 'Active' ? 'hsl(var(--primary))' : 
+               s.name === 'Planning' ? 'hsl(var(--chart-1))' :
+               s.name === 'On Hold' ? 'hsl(var(--warning))' : 'hsl(var(--chart-4))'
+      }));
+    }
+    
+    // Fallback to counting all projects
     const statusCount = data.projects.reduce((acc, p) => {
       acc[p.status] = (acc[p.status] || 0) + 1;
       return acc;
@@ -63,7 +81,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
       { label: 'On Hold', value: statusCount['On Hold'] || 0, max: totalProjects, color: 'hsl(var(--warning))' },
       { label: 'Completed', value: statusCount['Completed'] || 0, max: totalProjects, color: 'hsl(var(--chart-4))' }
     ];
-  }, [data.projects, totalProjects]);
+  }, [data.projects, data.metrics?.projectsByStatus, totalProjects]);
 
   // Top overloaded resources
   const topOverloadedResources = useMemo(() => {
