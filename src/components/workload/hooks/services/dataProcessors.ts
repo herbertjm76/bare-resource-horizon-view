@@ -30,15 +30,18 @@ export const processProjectAllocations = (
     const allocationWeekStart = startOfWeek(allocationDate, { weekStartsOn: 1 });
     const weekKey = format(allocationWeekStart, 'yyyy-MM-dd');
     
-    // Debug specific member (Rob Night's ID from logs)
-    if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e') {
+    // Debug specific members (Rob Night + Paul Julius)
+    if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e' || memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82') {
       debugProcessedRecords.push({
+        memberId,
+        memberName: memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' ? 'Paul Julius' : 'Rob Night',
         originalWeekStart: allocation.week_start_date,
         parsedDate: allocationDate.toISOString(),
         normalizedWeekStart: allocationWeekStart.toISOString(),
         weekKey,
         hours,
-        projectId
+        projectId,
+        projectName: allocation.projects?.name
       });
     }
     
@@ -68,12 +71,13 @@ export const processProjectAllocations = (
     }
   }
 
-  // Log debug info for Rob Night
+  // Log debug info for tracked members
   if (debugProcessedRecords.length > 0) {
-    console.log('🔍 ROB NIGHT ALLOCATION PROCESSING:', {
+    console.log('🔍 ALLOCATION PROCESSING DEBUG:', {
       totalRecords: debugProcessedRecords.length,
       records: debugProcessedRecords,
-      weeklyTotals: Array.from(memberWeekHours.get('fc351fa0-b6df-447a-bc27-b6675db2622e')?.entries() || [])
+      paulJuliusWeeklyTotals: Array.from(memberWeekHours.get('b06b0c9d-70c5-49cd-aae9-fcf9016ebe82')?.entries() || []),
+      robNightWeeklyTotals: Array.from(memberWeekHours.get('fc351fa0-b6df-447a-bc27-b6675db2622e')?.entries() || [])
     });
   }
 
@@ -86,9 +90,10 @@ export const processProjectAllocations = (
         const projectsMap = memberWeekProjects.get(memberId)?.get(weekKey);
         result[memberId][weekKey].projects = projectsMap ? Array.from(projectsMap.values()) : [];
         
-        // Debug Rob Night's week updates  
-        if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e') {
-          console.log('🔍 UPDATING ROB NIGHT WEEK:', {
+        // Debug tracked members' week updates  
+        if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e' || memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82') {
+          console.log('🔍 UPDATING MEMBER WEEK:', {
+            memberName: memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' ? 'Paul Julius' : 'Rob Night',
             weekKey,
             totalHours,
             existsInResult: !!result[memberId][weekKey],
@@ -97,11 +102,13 @@ export const processProjectAllocations = (
         }
       } else {
         // Debug weeks that fall outside the requested date range
-        if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e') {
-          console.log('🔍 ROB NIGHT WEEK OUTSIDE DATE RANGE (FILTERED OUT):', {
+        if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e' || memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82') {
+          console.log('🔍 MEMBER WEEK OUTSIDE DATE RANGE (FILTERED OUT):', {
+            memberName: memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' ? 'Paul Julius' : 'Rob Night',
             weekKey,
             totalHours,
             memberExists: !!result[memberId],
+            availableWeeks: result[memberId] ? Object.keys(result[memberId]) : [],
             reason: 'Week falls outside requested date range'
           });
         }
