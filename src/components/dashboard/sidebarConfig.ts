@@ -63,6 +63,11 @@ export const getNavigationItems = (companySlug: string | null) => {
           icon: UserSquare2,
         },
         {
+          title: "Team Workload",
+          url: `${baseUrl}/team-workload`,
+          icon: GanttChartSquare,
+        },
+        {
           title: "Annual Leave",
           url: `${baseUrl}/team-annual-leave`,
           icon: Calendar,

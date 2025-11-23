@@ -79,6 +79,7 @@ function App() {
               <Route path="/:companySlug/pipeline" element={<Pipeline />} />
               <Route path="/:companySlug/team-members" element={<TeamMembers />} />
               <Route path="/:companySlug/team-members/:id" element={<TeamMemberDetail />} />
+              <Route path="/:companySlug/team-workload" element={<TeamWorkload />} />
               <Route path="/:companySlug/office-settings" element={<OfficeSettings />} />
               <Route path="/:companySlug/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/:companySlug/weekly-rundown" element={<WeeklyRundown />} />
@@ -105,6 +106,7 @@ function App() {
               <Route path="/pipeline" element={<Pipeline />} />
               <Route path="/team-members" element={<TeamMembers />} />
               <Route path="/team-members/:id" element={<TeamMemberDetail />} />
+              <Route path="/team-workload" element={<TeamWorkload />} />
               <Route path="/office-settings" element={<OfficeSettings />} />
               <Route path="/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/weekly-rundown" element={<WeeklyRundown />} />
