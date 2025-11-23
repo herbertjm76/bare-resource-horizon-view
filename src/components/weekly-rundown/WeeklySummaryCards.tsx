@@ -354,7 +354,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       </div>
 
         {/* Desktop/Tablet Horizontal Row with Arrow Navigation */}
-        <div className="hidden sm:block relative">
+        <div className="hidden sm:block relative pb-10">
           {/* Left Arrow */}
           {canScrollLeft && (
             <Button
@@ -382,7 +382,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           {/* Scrollable Container */}
           <div 
             ref={desktopScrollRef}
-            className="flex flex-nowrap gap-[3px] overflow-x-auto pb-2 scrollbar-hide"
+            className="flex flex-nowrap gap-[3px] overflow-x-auto scrollbar-hide"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {cards.map((card) => (
@@ -394,7 +394,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         </div>
 
         {/* Controls - Bottom Right - Desktop/Tablet only */}
-        <div className="hidden sm:flex absolute bottom-3 right-3 items-center gap-2 z-30">
+        <div className="hidden sm:flex absolute bottom-2 right-3 items-center gap-2 z-30">
           {/* Jump to Card Menu - Subtle dropdown */}
           {cards.length > 1 && (
             <DropdownMenu>
