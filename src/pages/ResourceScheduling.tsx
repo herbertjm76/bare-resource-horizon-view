@@ -120,31 +120,31 @@ const ResourceScheduling = () => {
         />
 
         {/* Tabs */}
-        <div className="bg-background border-b flex justify-center py-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-4xl px-2 sm:px-4">
-            <TabsList className="w-full h-12 bg-muted p-1 grid grid-cols-3">
+        <div className="bg-background border-b flex justify-center py-4 px-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-4xl">
+            <TabsList className="w-full h-12 bg-secondary/50 p-1 grid grid-cols-3 gap-1">
               <TabsTrigger 
                 value="by-project" 
-                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
+                className="flex items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md transition-all"
               >
-                <GanttChartSquare className="h-4 w-4" />
-                <span className="font-medium hidden sm:inline">By Project</span>
+                <GanttChartSquare className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium text-xs sm:text-sm truncate">By Project</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="by-person" 
-                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
+                className="flex items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md transition-all"
               >
-                <Users className="h-4 w-4" />
-                <span className="font-medium hidden sm:inline">By Person</span>
+                <Users className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium text-xs sm:text-sm truncate">By Person</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="timeline" 
-                className="flex items-center justify-center gap-2" 
+                className="flex items-center justify-center gap-1 sm:gap-2 rounded-md" 
                 disabled
               >
-                <Calendar className="h-4 w-4" />
-                <span className="font-medium hidden sm:inline">Timeline</span>
-                <span className="ml-1 text-xs opacity-60 hidden md:inline">(Soon)</span>
+                <Calendar className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium text-xs sm:text-sm truncate">Timeline</span>
+                <span className="ml-1 text-xs opacity-60 hidden lg:inline">(Soon)</span>
               </TabsTrigger>
             </TabsList>
 
