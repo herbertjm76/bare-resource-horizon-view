@@ -19,7 +19,7 @@ export const fetchProjectAllocations = async (
     dateRange: `${startDateStr} to ${endDateStr}`
   });
 
-  // FIX: Remove restrictive date filtering - fetch ALL allocations and let frontend filter
+  // Fetch regular allocations
   const result = await supabase
     .from('project_resource_allocations')
     .select(`
@@ -42,21 +42,35 @@ export const fetchProjectAllocations = async (
     dateRange: result.data ? `${result.data[0]?.week_start_date} to ${result.data[result.data.length - 1]?.week_start_date}` : 'none'
   });
 
-  // Log Rob Night's specific records
-  const robNightRecords = result.data?.filter(r => r.resource_id === 'fc351fa0-b6df-447a-bc27-b6675db2622e') || [];
-  if (robNightRecords.length > 0) {
-    console.log('🔍 ROB NIGHT ALLOCATION RECORDS FETCHED (ALL):', {
-      totalRecords: robNightRecords.length,
-      records: robNightRecords.map(r => ({
-        project_id: r.project_id,
-        project_name: r.projects?.name,
-        hours: r.hours,
-        week_start_date: r.week_start_date
-      })).slice(0, 10) // Show first 10 records
-    });
-  }
+  // Also fetch pending resource allocations for pre-registered members
+  const pendingResult = await supabase
+    .from('pending_resources')
+    .select(`
+      invite_id,
+      project_id,
+      hours,
+      projects!inner(id, name, code)
+    `)
+    .eq('company_id', companyId)
+    .in('invite_id', memberIds)
+    .gt('hours', 0);
 
-  return result;
+  console.log('🔍 PENDING RESOURCE ALLOCATIONS:', {
+    totalRecords: pendingResult.data?.length || 0,
+    error: pendingResult.error
+  });
+
+  return { 
+    ...result, 
+    data: [...(result.data || []), ...(pendingResult.data || []).map(pr => ({
+      resource_id: pr.invite_id,
+      project_id: pr.project_id,
+      hours: pr.hours,
+      week_start_date: startDateStr, // Use start date as placeholder for pending resources
+      resource_type: 'pending',
+      projects: pr.projects
+    }))]
+  };
 };
 
 export const fetchAnnualLeaves = async (
