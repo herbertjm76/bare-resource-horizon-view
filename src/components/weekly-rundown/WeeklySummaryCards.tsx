@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,7 +39,10 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 }) => {
   const { company } = useCompany();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const desktopScrollRef = useRef<HTMLDivElement>(null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekStartString = format(weekStart, 'yyyy-MM-dd');
@@ -229,6 +232,42 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     }
   }, [cards.length, currentCardIndex]);
 
+  // Check scroll position for desktop/tablet arrows
+  const checkScrollPosition = useCallback(() => {
+    const container = desktopScrollRef.current;
+    if (!container) return;
+    
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    setCanScrollLeft(scrollLeft > 0);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    const container = desktopScrollRef.current;
+    if (!container) return;
+
+    checkScrollPosition();
+    container.addEventListener('scroll', checkScrollPosition);
+    window.addEventListener('resize', checkScrollPosition);
+
+    return () => {
+      container.removeEventListener('scroll', checkScrollPosition);
+      window.removeEventListener('resize', checkScrollPosition);
+    };
+  }, [checkScrollPosition, cards]);
+
+  const scrollDesktop = (direction: 'left' | 'right') => {
+    const container = desktopScrollRef.current;
+    if (!container) return;
+    
+    const scrollAmount = 300;
+    const targetScroll = direction === 'left' 
+      ? container.scrollLeft - scrollAmount 
+      : container.scrollLeft + scrollAmount;
+    
+    container.scrollTo({ left: targetScroll, behavior: 'smooth' });
+  };
+
   // Helper: move a card by computing order from currently rendered cards
   const handleMove = (cardId: string, direction: 'left' | 'right') => {
     const currentOrder = cards.map(c => c.id);
@@ -314,13 +353,44 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         </div>
       </div>
 
-        {/* Desktop/Tablet Horizontal Row - Single row on larger screens */}
-        <div className="hidden sm:flex sm:flex-nowrap gap-[3px] overflow-x-auto pb-2">
-          {cards.map((card) => (
-            <div key={card.id} className="flex-shrink-0">
-              {card.component}
-            </div>
-          ))}
+        {/* Desktop/Tablet Horizontal Row with Arrow Navigation */}
+        <div className="hidden sm:block relative">
+          {/* Left Arrow */}
+          {canScrollLeft && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+              onClick={() => scrollDesktop('left')}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          )}
+          
+          {/* Right Arrow */}
+          {canScrollRight && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+              onClick={() => scrollDesktop('right')}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
+          
+          {/* Scrollable Container */}
+          <div 
+            ref={desktopScrollRef}
+            className="flex flex-nowrap gap-[3px] overflow-x-auto pb-2 scrollbar-hide"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {cards.map((card) => (
+              <div key={card.id} className="flex-shrink-0">
+                {card.component}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Controls - Bottom Right - Desktop/Tablet only */}
