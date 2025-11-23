@@ -53,7 +53,7 @@
 
 /* Header styles - matching Project Resourcing with fixed widths */
 .workload-grid-header {
-  background: #6465F0;
+  background: hsl(var(--primary));
   color: white;
   font-weight: 600;
   font-size: 14px;
@@ -64,12 +64,18 @@
   z-index: 25;
 }
 
+/* Dark background for header row */
+.workload-resource-table thead {
+  background: linear-gradient(135deg, hsl(243, 75%, 30%) 0%, hsl(243, 75%, 25%) 100%);
+  position: relative;
+}
+
 /* Sticky Member Column Header */
 .workload-grid-header.member-column {
   position: sticky;
   left: 0;
   z-index: 30;
-  background: #6465F0 !important;
+  background: transparent !important;
   color: white !important;
 }
 

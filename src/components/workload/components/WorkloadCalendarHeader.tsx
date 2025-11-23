@@ -19,7 +19,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
         <th 
           className="workload-grid-header member-column"
           style={{ 
-            backgroundColor: '#6465F0',
+            backgroundColor: 'transparent',
             color: 'white',
             width: '250px',
             minWidth: '250px',
@@ -29,8 +29,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
             zIndex: shouldCenterAlign ? 25 : 30,
             textAlign: 'left',
             padding: '12px 16px',
-            borderRight: '2px solid rgba(255, 255, 255, 0.2)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRight: '2px solid rgba(156, 163, 175, 0.8)',
+            borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
             fontWeight: '600'
           }}
         >
@@ -43,10 +43,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
           const isFirstOfMonth = week.date.getDate() <= 7;
           const isNewMonth = index === 0 || weekStartDates[index - 1].date.getMonth() !== week.date.getMonth();
           
-          let backgroundColor = '#6465F0';
-          if (isTodayWeek) {
-            backgroundColor = '#f6ad55';
-          }
+          let backgroundColor = 'transparent';
           
           return (
             <th 
@@ -60,8 +57,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
                 color: 'white',
                 textAlign: 'center',
                 padding: '4px 2px',
-                borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRight: '1px solid rgba(156, 163, 175, 0.6)',
+                borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
                 borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined,
                 fontSize: '12px',
                 fontWeight: '600',
@@ -155,12 +152,12 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
             width: '120px', 
             minWidth: '120px',
             maxWidth: '120px',
-            backgroundColor: '#7c3aed',
+            backgroundColor: 'transparent',
             color: 'white',
             textAlign: 'center',
             padding: '12px 8px',
             borderRight: 'none',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+            borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
             fontWeight: '600'
           }}
         >

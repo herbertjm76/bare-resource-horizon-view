@@ -4,10 +4,15 @@ import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHead
 import { GanttChartSquare } from 'lucide-react';
 import { startOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
+import { useTeamMembersState } from '@/hooks/useTeamMembersState';
+import { useCompany } from '@/context/CompanyContext';
 import { TeamWorkloadContent } from '@/components/workload/TeamWorkloadContent';
+import { TeamMember } from '@/components/dashboard/types';
 
 const TeamWorkload: React.FC = () => {
+  const { company } = useCompany();
   const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
+  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'member');
   const [selectedWeek, setSelectedWeek] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
@@ -41,9 +46,20 @@ const TeamWorkload: React.FC = () => {
     return Array.from(locs) as string[];
   }, [teamMembers]);
 
+  // Combine active and pre-registered members
+  const allMembers = useMemo(() => {
+    const preRegAsTeamMembers: TeamMember[] = preRegisteredMembers.map(invite => ({
+      ...invite,
+      isPending: true as const,
+      fullName: `${invite.first_name || 'Pre-registered'} ${invite.last_name || 'Member'}`
+    }));
+    
+    return [...teamMembers, ...preRegAsTeamMembers];
+  }, [teamMembers, preRegisteredMembers]);
+
   // Filter members based on active filters
   const filteredMembers = useMemo(() => {
-    return teamMembers.filter(member => {
+    return allMembers.filter(member => {
       // Search filter
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
@@ -64,7 +80,7 @@ const TeamWorkload: React.FC = () => {
 
       return true;
     });
-  }, [teamMembers, searchQuery, activeFilter, filterValue]);
+  }, [allMembers, searchQuery, activeFilter, filterValue]);
 
   const weekLabel = useMemo(
     () => `${selectedWeeks} weeks from ${startOfWeek(selectedWeek, { weekStartsOn: 1 }).toLocaleDateString()}`,
