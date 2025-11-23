@@ -382,7 +382,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           {/* Scrollable Container */}
           <div 
             ref={desktopScrollRef}
-            className="flex flex-nowrap gap-[3px] overflow-x-auto scrollbar-hide"
+            className="flex flex-nowrap gap-[3px] overflow-x-auto scrollbar-hide justify-center"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {cards.map((card) => (
