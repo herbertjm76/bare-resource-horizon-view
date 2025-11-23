@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import { DayInfo } from '../grid/types';
 import { PersonProject, PersonResourceData } from '@/hooks/usePersonResourceData';
 import { useAllocationInput } from '../hooks/useAllocationInput';
@@ -23,6 +23,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
   periodToShow
 }) => {
   const rowBgColor = isEven ? '#f9fafb' : '#ffffff';
+  const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   // Use the allocation input system
   const {
@@ -42,6 +43,38 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
       console.log(`Person ${resourceId} allocation changed for project ${project.projectId} on ${dayKey}: ${hours}h`);
     }
   });
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>, currentDayKey: string, currentIndex: number) => {
+    if (e.key === 'Tab' && !e.shiftKey) {
+      e.preventDefault();
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < days.length) {
+        const nextDayKey = days[nextIndex].date.toISOString().split('T')[0];
+        inputRefs.current[nextDayKey]?.focus();
+      }
+    } else if (e.key === 'Tab' && e.shiftKey) {
+      e.preventDefault();
+      const prevIndex = currentIndex - 1;
+      if (prevIndex >= 0) {
+        const prevDayKey = days[prevIndex].date.toISOString().split('T')[0];
+        inputRefs.current[prevDayKey]?.focus();
+      }
+    } else if (e.key === 'Enter') {
+      e.currentTarget.blur();
+    } else if (e.key === 'ArrowRight') {
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < days.length) {
+        const nextDayKey = days[nextIndex].date.toISOString().split('T')[0];
+        inputRefs.current[nextDayKey]?.focus();
+      }
+    } else if (e.key === 'ArrowLeft') {
+      const prevIndex = currentIndex - 1;
+      if (prevIndex >= 0) {
+        const prevDayKey = days[prevIndex].date.toISOString().split('T')[0];
+        inputRefs.current[prevDayKey]?.focus();
+      }
+    }
+  }, [days]);
 
   return (
     <tr className="workload-resource-row resource-row">
@@ -89,7 +122,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
       </td>
       
       {/* Day allocation cells */}
-      {days.map((day) => {
+      {days.map((day, dayIndex) => {
         const dayKey = day.date.toISOString().split('T')[0];
         const allocation = allocations[dayKey] || 0;
         
@@ -110,6 +143,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
             }}
           >
             <input
+              ref={(el) => inputRefs.current[dayKey] = el}
               type="number"
               min="0"
               max="24"
@@ -117,6 +151,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
               onChange={(e) => handleInputChange(dayKey, e.target.value)}
               onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
               onFocus={(e) => e.target.select()}
+              onKeyDown={(e) => handleKeyDown(e, dayKey, dayIndex)}
               disabled={isLoading || isSaving}
               className={`
                 w-full h-full px-0 py-0 text-center border-0 bg-transparent
