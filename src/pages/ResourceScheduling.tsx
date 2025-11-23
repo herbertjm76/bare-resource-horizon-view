@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
+import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GanttChartSquare, Users, Calendar } from 'lucide-react';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
@@ -110,23 +111,16 @@ const ResourceScheduling = () => {
   };
 
   return (
-    <StandardLayout contentClassName="p-0">
+    <StandardLayout>
       <div className="w-full h-full flex flex-col">
-        {/* Header with gradient background */}
-        <div className="bg-gradient-to-r from-[hsl(var(--gradient-start))] via-[hsl(var(--gradient-mid))] to-[hsl(var(--gradient-end))] px-4 sm:px-8 py-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
-              <GanttChartSquare className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">Resource Scheduling</h1>
-              <p className="text-white/80 text-sm mt-1">Manage resource allocation across projects and team members</p>
-            </div>
-          </div>
-        </div>
+        <StandardizedPageHeader
+          icon={GanttChartSquare}
+          title="Resource Scheduling"
+          description="Manage resource allocation across projects and team members"
+        />
 
         {/* Tabs */}
-        <div className="bg-background border-b px-4 sm:px-8">
+        <div className="bg-background border-b">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full max-w-2xl h-14 bg-muted/50 p-1">
               <TabsTrigger value="by-project" className="flex-1 flex items-center justify-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm">
@@ -144,7 +138,7 @@ const ResourceScheduling = () => {
               </TabsTrigger>
             </TabsList>
 
-          <TabsContent value="by-project" className="mt-0 px-4 sm:px-8 py-6">
+          <TabsContent value="by-project" className="mt-0 py-6">
             <ProjectResourcingContent
               selectedMonth={selectedMonth}
               searchTerm={projectSearchTerm}
@@ -163,7 +157,7 @@ const ResourceScheduling = () => {
             />
           </TabsContent>
 
-          <TabsContent value="by-person" className="mt-0 px-4 sm:px-8 py-6">
+          <TabsContent value="by-person" className="mt-0 py-6">
             <TeamWorkloadContent
               filteredMembers={filteredMembers}
               isLoading={isLoadingTeamMembers}
@@ -186,7 +180,7 @@ const ResourceScheduling = () => {
             />
           </TabsContent>
 
-          <TabsContent value="timeline" className="mt-0 px-4 sm:px-8 py-6">
+          <TabsContent value="timeline" className="mt-0 py-6">
             <div className="flex items-center justify-center h-[500px] border-2 border-dashed border-border rounded-xl bg-muted/20">
               <div className="text-center px-6">
                 <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4">
