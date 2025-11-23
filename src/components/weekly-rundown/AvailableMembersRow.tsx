@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { AvailabilityFilters } from './AvailabilityFilters';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
@@ -42,6 +44,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const [filterBy, setFilterBy] = useState<FilterBy>('all');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
   const [selectedSector, setSelectedSector] = useState<string>('');
+  const membersScrollRef = React.useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
+  const [canScrollRight, setCanScrollRight] = React.useState(false);
 
   const handleClearFilters = () => {
     setFilterBy('all');
@@ -251,28 +256,114 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     });
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
+  // Check scroll position for arrows
+  const checkScrollPosition = React.useCallback(() => {
+    const container = membersScrollRef.current;
+    if (!container) return;
+    
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    setCanScrollLeft(scrollLeft > 0);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+  }, []);
+
+  React.useEffect(() => {
+    const container = membersScrollRef.current;
+    if (!container) return;
+
+    checkScrollPosition();
+    container.addEventListener('scroll', checkScrollPosition);
+    window.addEventListener('resize', checkScrollPosition);
+
+    return () => {
+      container.removeEventListener('scroll', checkScrollPosition);
+      window.removeEventListener('resize', checkScrollPosition);
+    };
+  }, [checkScrollPosition, filteredMembers]);
+
+  const scrollMembers = (direction: 'left' | 'right') => {
+    const container = membersScrollRef.current;
+    if (!container) return;
+    
+    const scrollAmount = 200;
+    const targetScroll = direction === 'left' 
+      ? container.scrollLeft - scrollAmount 
+      : container.scrollLeft + scrollAmount;
+    
+    container.scrollTo({ left: targetScroll, behavior: 'smooth' });
+  };
+
   return (
     <div className="w-full space-y-1">
       <div className="bg-card rounded-lg border shadow-sm p-2 overflow-hidden animate-fade-in relative">
-        {/* Members Avatars - Horizontal Scroll */}
+        {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
         {filteredMembers.length > 0 && (
-          <div className="overflow-x-auto overflow-y-hidden -mx-2 px-2">
-            <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[52px]">
-            {filteredMembers.map((member) => (
-              <MemberAvailabilityCard
-                key={member.id}
-                avatarUrl={member.avatarUrl}
-                firstName={member.firstName}
-                lastName={member.lastName}
-                allocatedHours={member.allocatedHours}
-                projectAllocations={member.projectAllocations}
-                utilization={member.utilization}
-                threshold={threshold}
-              />
-            ))}
+          <div className="hidden sm:block relative">
+            {/* Left Arrow */}
+            {canScrollLeft && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+                onClick={() => scrollMembers('left')}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {/* Right Arrow */}
+            {canScrollRight && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+                onClick={() => scrollMembers('right')}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            )}
+            
+            <div 
+              ref={membersScrollRef}
+              className="overflow-x-auto overflow-y-hidden -mx-2 px-2 scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[52px]">
+                {filteredMembers.map((member) => (
+                  <MemberAvailabilityCard
+                    key={member.id}
+                    avatarUrl={member.avatarUrl}
+                    firstName={member.firstName}
+                    lastName={member.lastName}
+                    allocatedHours={member.allocatedHours}
+                    projectAllocations={member.projectAllocations}
+                    utilization={member.utilization}
+                    threshold={threshold}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Mobile view without arrows */}
+        {filteredMembers.length > 0 && (
+          <div className="block sm:hidden overflow-x-auto overflow-y-hidden -mx-2 px-2">
+            <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[52px]">
+              {filteredMembers.map((member) => (
+                <MemberAvailabilityCard
+                  key={member.id}
+                  avatarUrl={member.avatarUrl}
+                  firstName={member.firstName}
+                  lastName={member.lastName}
+                  allocatedHours={member.allocatedHours}
+                  projectAllocations={member.projectAllocations}
+                  utilization={member.utilization}
+                  threshold={threshold}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Empty state - compact version */}
         {filteredMembers.length === 0 && (
