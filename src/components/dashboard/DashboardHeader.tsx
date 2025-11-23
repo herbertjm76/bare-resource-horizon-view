@@ -22,33 +22,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   return (
     <div className="bg-white border-b border-gray-200">
       <div className="px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
-              >
-                Week
-              </Button>
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="bg-gradient-modern hover:opacity-90 border-transparent"
-              >
-                Month
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
-              >
-                Quarter
-              </Button>
-            </div>
-          </div>
-          
+        <div className="flex items-center justify-end">
           <div className="flex items-center gap-4">
             <TimeRangeSelector
               selectedRange={selectedTimeRange}
