@@ -229,6 +229,7 @@
   }
 }
 
+
 /* Ensure proper z-index stacking */
 .workload-resource-grid-container * {
   position: relative;
@@ -237,4 +238,21 @@
 .workload-resource-header.project-resource-column,
 .workload-resource-cell.project-resource-column {
   position: sticky !important;
+}
+
+/* Optimized input cells for Excel-like feel */
+.workload-resource-cell input[type="number"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+
+.workload-resource-cell input[type="number"]::-webkit-inner-spin-button,
+.workload-resource-cell input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.workload-resource-cell input[type="number"]:focus {
+  background-color: white;
 }
