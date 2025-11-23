@@ -227,26 +227,22 @@ const WeeklyOverview = () => {
           />
           )}
 
-          {/* Summary Cards - Always visible except fullscreen */}
-          {!isFullscreen && (
-            <WeeklySummaryCards
-              selectedWeek={selectedWeek}
-              memberIds={memberIds}
-              cardVisibility={cardVisibility}
-              cardOrder={cardOrder}
-              toggleCard={toggleCard}
-              moveCard={moveCard}
-              reorderCards={reorderCards}
-            />
-          )}
+          {/* Summary Cards */}
+          <WeeklySummaryCards
+            selectedWeek={selectedWeek}
+            memberIds={memberIds}
+            cardVisibility={cardVisibility}
+            cardOrder={cardOrder}
+            toggleCard={toggleCard}
+            moveCard={moveCard}
+            reorderCards={reorderCards}
+          />
 
-          {/* Available Members Row - Always visible except in fullscreen */}
-          {!isFullscreen && (
-            <AvailableMembersRow 
-              weekStartDate={weekStartString}
-              threshold={80}
-            />
-          )}
+          {/* Available Members Row */}
+          <AvailableMembersRow 
+            weekStartDate={weekStartString}
+            threshold={80}
+          />
 
           {/* Unified Controls */}
           <UnifiedWeeklyControls
