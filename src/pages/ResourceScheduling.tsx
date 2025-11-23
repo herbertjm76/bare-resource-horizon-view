@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
-import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GanttChartSquare, Users, Calendar } from 'lucide-react';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
@@ -111,32 +110,41 @@ const ResourceScheduling = () => {
   };
 
   return (
-    <StandardLayout>
-      <div className="max-w-full">
-        <StandardizedPageHeader
-          icon={GanttChartSquare}
-          title="Resource Scheduling"
-          description="Manage resource allocation across projects and team members"
-        />
+    <StandardLayout contentClassName="p-0">
+      <div className="w-full h-full flex flex-col">
+        {/* Header with gradient background */}
+        <div className="bg-gradient-to-r from-[hsl(var(--gradient-start))] via-[hsl(var(--gradient-mid))] to-[hsl(var(--gradient-end))] px-4 sm:px-8 py-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
+              <GanttChartSquare className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">Resource Scheduling</h1>
+              <p className="text-white/80 text-sm mt-1">Manage resource allocation across projects and team members</p>
+            </div>
+          </div>
+        </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="by-project" className="flex items-center gap-2">
-              <GanttChartSquare className="h-4 w-4" />
-              By Project
-            </TabsTrigger>
-            <TabsTrigger value="by-person" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              By Person
-            </TabsTrigger>
-            <TabsTrigger value="timeline" className="flex items-center gap-2" disabled>
-              <Calendar className="h-4 w-4" />
-              Timeline
-              <span className="ml-1 text-xs text-muted-foreground">(Soon)</span>
-            </TabsTrigger>
-          </TabsList>
+        {/* Tabs */}
+        <div className="bg-background border-b px-4 sm:px-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full max-w-2xl h-14 bg-muted/50 p-1">
+              <TabsTrigger value="by-project" className="flex-1 flex items-center justify-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <GanttChartSquare className="h-4 w-4" />
+                <span className="font-medium">By Project</span>
+              </TabsTrigger>
+              <TabsTrigger value="by-person" className="flex-1 flex items-center justify-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <Users className="h-4 w-4" />
+                <span className="font-medium">By Person</span>
+              </TabsTrigger>
+              <TabsTrigger value="timeline" className="flex-1 flex items-center justify-center gap-2 h-full" disabled>
+                <Calendar className="h-4 w-4" />
+                <span className="font-medium">Timeline</span>
+                <span className="ml-1 text-xs opacity-60">(Soon)</span>
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="by-project" className="mt-6">
+          <TabsContent value="by-project" className="mt-0 px-4 sm:px-8 py-6">
             <ProjectResourcingContent
               selectedMonth={selectedMonth}
               searchTerm={projectSearchTerm}
@@ -155,7 +163,7 @@ const ResourceScheduling = () => {
             />
           </TabsContent>
 
-          <TabsContent value="by-person" className="mt-6">
+          <TabsContent value="by-person" className="mt-0 px-4 sm:px-8 py-6">
             <TeamWorkloadContent
               filteredMembers={filteredMembers}
               isLoading={isLoadingTeamMembers}
@@ -178,18 +186,21 @@ const ResourceScheduling = () => {
             />
           </TabsContent>
 
-          <TabsContent value="timeline" className="mt-6">
-            <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-lg">
-              <div className="text-center">
-                <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">Visual Timeline Coming Soon</h3>
+          <TabsContent value="timeline" className="mt-0 px-4 sm:px-8 py-6">
+            <div className="flex items-center justify-center h-[500px] border-2 border-dashed border-border rounded-xl bg-muted/20">
+              <div className="text-center px-6">
+                <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4">
+                  <Calendar className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Visual Timeline Coming Soon</h3>
                 <p className="text-sm text-muted-foreground max-w-md">
                   Interactive Gantt-style timeline for drag-and-drop resource allocation across multiple weeks
                 </p>
               </div>
             </div>
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
       </div>
     </StandardLayout>
   );
