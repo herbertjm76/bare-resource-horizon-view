@@ -14,7 +14,6 @@ interface PersonRowProps {
   isEven: boolean;
   selectedDate?: Date;
   periodToShow?: number;
-  onDataChange?: () => void;
 }
 
 export const PersonRow: React.FC<PersonRowProps> = ({
@@ -24,8 +23,7 @@ export const PersonRow: React.FC<PersonRowProps> = ({
   onToggleExpand,
   isEven,
   selectedDate,
-  periodToShow,
-  onDataChange
+  periodToShow
 }) => {
   const getInitials = () => {
     return `${person.firstName.charAt(0)}${person.lastName.charAt(0)}`.toUpperCase();
@@ -184,7 +182,6 @@ export const PersonRow: React.FC<PersonRowProps> = ({
           projectIndex={projectIndex}
           selectedDate={selectedDate}
           periodToShow={periodToShow}
-          onDataChange={onDataChange}
         />
       ))}
     </>

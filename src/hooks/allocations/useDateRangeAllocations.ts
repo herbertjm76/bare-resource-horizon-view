@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useCompany } from '@/context/CompanyContext';
+import { supabase } from '@/integrations/supabase/client';
 import { fetchResourceAllocations } from './api';
 import { getStandardizedDateRange } from './utils/dateRangeUtils';
+import { ResourceAllocation } from './types';
+import { formatDateKey } from './utils';
 
 interface UseDateRangeAllocationsProps {
   projectId: string;
@@ -53,9 +56,52 @@ export function useDateRangeAllocations({
     }
   }, [projectId, resourceId, resourceType, company?.id, selectedDate, periodToShow, getDateRange]);
 
+  // Setup realtime subscription for instant updates
   useEffect(() => {
+    if (!projectId || !resourceId || !company?.id) return;
+    
+    // Fetch initial data
     fetchAllocations();
-  }, [fetchAllocations]);
+    
+    // Setup realtime subscription for this resource
+    const channel = supabase
+      .channel('date-range-resource-changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'project_resource_allocations',
+        filter: `project_id=eq.${projectId} AND resource_id=eq.${resourceId} AND resource_type=eq.${resourceType}`
+      }, (payload) => {
+        console.log('🔔 Real-time update received:', payload);
+        
+        // Handle different types of changes
+        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+          const newData = payload.new as ResourceAllocation;
+          const weekKey = formatDateKey(newData.week_start_date);
+          
+          setAllocations(prev => ({
+            ...prev,
+            [weekKey]: newData.hours
+          }));
+        } 
+        else if (payload.eventType === 'DELETE') {
+          const oldData = payload.old as ResourceAllocation;
+          const weekKey = formatDateKey(oldData.week_start_date);
+          
+          setAllocations(prev => {
+            const updated = { ...prev };
+            delete updated[weekKey];
+            return updated;
+          });
+        }
+      })
+      .subscribe();
+    
+    // Cleanup subscription
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [projectId, resourceId, resourceType, company?.id, fetchAllocations]);
 
   return {
     allocations,
