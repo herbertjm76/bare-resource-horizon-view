@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { GanttChartSquare } from 'lucide-react';
@@ -8,6 +8,7 @@ import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
 import { TeamWorkloadContent } from '@/components/workload/TeamWorkloadContent';
 import { TeamMember } from '@/components/dashboard/types';
+import { supabase } from '@/integrations/supabase/client';
 
 const TeamWorkload: React.FC = () => {
   const { company } = useCompany();
@@ -20,6 +21,45 @@ const TeamWorkload: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [filterValue, setFilterValue] = useState<string>('all');
+
+  const initializedRef = useRef(false);
+
+  // Initialize default week range to end on the latest week with any allocation
+  useEffect(() => {
+    const initializeWeekRange = async () => {
+      if (!company?.id || initializedRef.current) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('project_resource_allocations')
+          .select('week_start_date')
+          .eq('company_id', company.id)
+          .gt('hours', 0)
+          .order('week_start_date', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error fetching latest allocation week for team workload:', error);
+          initializedRef.current = true;
+          return;
+        }
+
+        if (data?.week_start_date) {
+          const latestWeek = startOfWeek(new Date(data.week_start_date), { weekStartsOn: 1 });
+          const startWeek = subWeeks(latestWeek, Math.max(0, selectedWeeks - 1));
+          setSelectedWeek(startWeek);
+        }
+
+        initializedRef.current = true;
+      } catch (err) {
+        console.error('Unexpected error initializing team workload week range:', err);
+        initializedRef.current = true;
+      }
+    };
+
+    initializeWeekRange();
+  }, [company?.id, selectedWeeks]);
 
   const handlePreviousWeek = () => {
     setSelectedWeek(prev => subWeeks(prev, selectedWeeks));
@@ -36,6 +76,7 @@ const TeamWorkload: React.FC = () => {
   };
 
   // Extract unique departments and locations
+
   const departments = useMemo(() => {
     const depts = new Set(teamMembers.map(m => m.department).filter(Boolean));
     return Array.from(depts) as string[];
