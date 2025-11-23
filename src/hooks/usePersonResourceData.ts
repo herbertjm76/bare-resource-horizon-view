@@ -18,6 +18,7 @@ export interface PersonResourceData {
   location?: string;
   jobTitle?: string;
   weeklyCapacity: number;
+  resourceType: 'active' | 'pre_registered';
   projects: PersonProject[];
 }
 
@@ -61,10 +62,10 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           console.error('Error fetching invites:', invitesError);
         }
 
-        // Combine profiles and invites
+        // Combine profiles and invites, marking their type
         const allMembers = [
-          ...(profiles || []),
-          ...(invites || [])
+          ...(profiles || []).map(p => ({ ...p, resourceType: 'active' as const })),
+          ...(invites || []).map(i => ({ ...i, resourceType: 'pre_registered' as const }))
         ];
 
         if (allMembers.length === 0) {
@@ -117,6 +118,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             location: member.location || undefined,
             jobTitle: member.job_title || undefined,
             weeklyCapacity: member.weekly_capacity || 40,
+            resourceType: member.resourceType,
             projects: []
           });
         });

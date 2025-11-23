@@ -180,6 +180,8 @@ export const PersonRow: React.FC<PersonRowProps> = ({
           days={days}
           isEven={isEven}
           projectIndex={projectIndex}
+          selectedDate={selectedDate}
+          periodToShow={periodToShow}
         />
       ))}
     </>

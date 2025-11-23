@@ -1,6 +1,8 @@
 import React from 'react';
 import { DayInfo } from '../grid/types';
 import { PersonProject, PersonResourceData } from '@/hooks/usePersonResourceData';
+import { Input } from '@/components/ui/input';
+import { useAllocationInput } from '../hooks/useAllocationInput';
 
 interface ProjectAllocationRowProps {
   project: PersonProject;
@@ -8,6 +10,8 @@ interface ProjectAllocationRowProps {
   days: DayInfo[];
   isEven: boolean;
   projectIndex: number;
+  selectedDate?: Date;
+  periodToShow?: number;
 }
 
 export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
@@ -15,9 +19,30 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
   person,
   days,
   isEven,
-  projectIndex
+  projectIndex,
+  selectedDate,
+  periodToShow
 }) => {
   const rowBgColor = isEven ? '#f9fafb' : '#ffffff';
+
+  // Use the allocation input system
+  const {
+    allocations,
+    inputValues,
+    isLoading,
+    isSaving,
+    handleInputChange,
+    handleInputBlur
+  } = useAllocationInput({
+    projectId: project.projectId,
+    resourceId: person.personId,
+    resourceType: person.resourceType,
+    selectedDate,
+    periodToShow,
+    onAllocationChange: (resourceId, dayKey, hours) => {
+      console.log(`Person ${resourceId} allocation changed for project ${project.projectId} on ${dayKey}: ${hours}h`);
+    }
+  });
 
   return (
     <tr className="workload-resource-row resource-row">
@@ -67,7 +92,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
       {/* Day allocation cells */}
       {days.map((day) => {
         const dayKey = day.date.toISOString().split('T')[0];
-        const hours = project.allocations[dayKey] || 0;
+        const allocation = allocations[dayKey] || 0;
         
         return (
           <td 
@@ -85,29 +110,30 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
               verticalAlign: 'middle'
             }}
           >
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: '24px'
-            }}>
-              {hours > 0 ? (
-                <span style={{
-                  fontSize: '11px',
-                  fontWeight: '500',
-                  color: '#374151'
-                }}>
-                  {hours}
-                </span>
-              ) : (
-                <span style={{ 
-                  color: 'rgba(0, 0, 0, 0.2)',
-                  fontSize: '12px'
-                }}>
-                  —
-                </span>
-              )}
-            </div>
+            <Input
+              type="number"
+              min="0"
+              max="24"
+              value={inputValues[dayKey] || ''}
+              onChange={(e) => handleInputChange(dayKey, e.target.value)}
+              onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
+              className={`
+                w-5 h-5 px-0 py-0 text-center border-0 
+                focus:border focus:border-primary focus:ring-1 focus:ring-primary
+                ${allocation > 0 ? 'bg-primary/10 text-primary font-medium' : 'bg-muted/50 text-muted-foreground'}
+                ${isSaving ? 'opacity-50' : ''}
+                ${day.isWeekend ? 'bg-muted/30' : ''}
+              `}
+              placeholder=""
+              disabled={isLoading || isSaving}
+              style={{
+                fontSize: '10px',
+                lineHeight: '1',
+                minHeight: '20px',
+                borderRadius: '2px',
+                textAlign: 'center'
+              }}
+            />
           </td>
         );
       })}
