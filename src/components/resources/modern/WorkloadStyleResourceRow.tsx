@@ -57,56 +57,37 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     }
   });
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>, currentDayKey: string, currentIndex: number) => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (!e.shiftKey) {
-        // Tab forward
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>, currentDayKey: string, currentIndex: number) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
         const nextIndex = currentIndex + 1;
         if (nextIndex < days.length) {
           const nextDayKey = days[nextIndex].date.toISOString().split('T')[0];
           const nextInput = inputRefs.current[nextDayKey];
           if (nextInput) {
-            setTimeout(() => nextInput.focus(), 0);
+            nextInput.focus();
+            nextInput.select();
           }
         }
-      } else {
-        // Shift+Tab backward
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
         const prevIndex = currentIndex - 1;
         if (prevIndex >= 0) {
           const prevDayKey = days[prevIndex].date.toISOString().split('T')[0];
           const prevInput = inputRefs.current[prevDayKey];
           if (prevInput) {
-            setTimeout(() => prevInput.focus(), 0);
+            prevInput.focus();
+            prevInput.select();
           }
         }
+      } else if (e.key === 'Enter') {
+        e.currentTarget.blur();
       }
-    } else if (e.key === 'Enter') {
-      e.currentTarget.blur();
-    } else if (e.key === 'ArrowRight') {
-      e.preventDefault();
-      const nextIndex = currentIndex + 1;
-      if (nextIndex < days.length) {
-        const nextDayKey = days[nextIndex].date.toISOString().split('T')[0];
-        const nextInput = inputRefs.current[nextDayKey];
-        if (nextInput) {
-          setTimeout(() => nextInput.focus(), 0);
-        }
-      }
-    } else if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      const prevIndex = currentIndex - 1;
-      if (prevIndex >= 0) {
-        const prevDayKey = days[prevIndex].date.toISOString().split('T')[0];
-        const prevInput = inputRefs.current[prevDayKey];
-        if (prevInput) {
-          setTimeout(() => prevInput.focus(), 0);
-        }
-      }
-    }
-  }, [days]);
+      // Let Tab behave natively so it follows DOM order
+    },
+    [days]
+  );
 
   return (
     <tr className="workload-resource-row resource-row">
