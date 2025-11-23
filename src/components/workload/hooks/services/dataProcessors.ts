@@ -184,10 +184,31 @@ export const processOtherLeaves = (
 };
 
 export const calculateTotals = (result: UnifiedWorkloadResult) => {
+  console.log('🔍 CALCULATE TOTALS: Starting calculation');
+  let updatedCount = 0;
+  
   Object.keys(result).forEach(memberId => {
     Object.keys(result[memberId]).forEach(weekKey => {
       const breakdown = result[memberId][weekKey];
+      const oldTotal = breakdown.total;
       breakdown.total = breakdown.projectHours + breakdown.annualLeave + breakdown.officeHolidays + breakdown.otherLeave;
+      
+      // Debug for Paul Julius on specific weeks
+      if (memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' && breakdown.total > 0) {
+        console.log('🔍 CALCULATE TOTALS - Paul Julius:', {
+          weekKey,
+          projectHours: breakdown.projectHours,
+          annualLeave: breakdown.annualLeave,
+          oldTotal,
+          newTotal: breakdown.total
+        });
+        updatedCount++;
+      }
     });
+  });
+  
+  console.log('🔍 CALCULATE TOTALS: Complete', { 
+    totalMembers: Object.keys(result).length,
+    paulJuliusWeeksUpdated: updatedCount
   });
 };
