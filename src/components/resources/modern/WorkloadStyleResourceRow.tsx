@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
 import { DayInfo } from '../grid/types';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 
@@ -122,28 +121,29 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               verticalAlign: 'middle'
             }}
           >
-            <Input
+            <input
               type="number"
               min="0"
               max="24"
               value={inputValues[dayKey] || ''}
               onChange={(e) => handleInputChange(dayKey, e.target.value)}
               onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
-              className={`
-                w-5 h-5 px-0 py-0 text-center border-0 
-                focus:border focus:border-primary focus:ring-1 focus:ring-primary
-                ${allocation > 0 ? 'bg-primary/10 text-primary font-medium' : 'bg-muted/50 text-muted-foreground'}
-                ${isSaving ? 'opacity-50' : ''}
-                ${day.isWeekend ? 'bg-muted/30' : ''}
-              `}
-              placeholder=""
+              onFocus={(e) => e.target.select()}
               disabled={isLoading || isSaving}
+              className={`
+                w-full h-full px-0 py-0 text-center border-0 bg-transparent
+                focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white
+                ${allocation > 0 ? 'font-medium text-primary' : 'text-muted-foreground'}
+                ${day.isWeekend ? 'bg-muted/20' : ''}
+              `}
               style={{
                 fontSize: '10px',
-                lineHeight: '1',
-                minHeight: '20px',
-                borderRadius: '2px',
-                textAlign: 'center'
+                lineHeight: '20px',
+                height: '20px',
+                width: '100%',
+                MozAppearance: 'textfield',
+                WebkitAppearance: 'none',
+                margin: 0
               }}
             />
           </td>
