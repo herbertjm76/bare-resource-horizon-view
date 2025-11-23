@@ -302,7 +302,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   };
 
   return (
-    <div className="mb-2 space-y-0.5">
+    <div className="mb-4 space-y-0.5">
       <div className="relative px-1.5 sm:px-2 py-2 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
         {/* Mobile Carousel - Only on small screens */}
         <div className="block sm:hidden relative">
