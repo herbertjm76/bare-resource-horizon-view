@@ -12,6 +12,7 @@ interface PersonResourceGridProps {
   onTogglePersonExpand: (personId: string) => void;
   selectedDate?: Date;
   periodToShow?: number;
+  onDataChange?: () => void;
 }
 
 export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
@@ -20,7 +21,8 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
   expandedPeople,
   onTogglePersonExpand,
   selectedDate,
-  periodToShow
+  periodToShow,
+  onDataChange
 }) => {
   // Calculate if we should center align (for 1-month views)
   const shouldCenterAlign = days.length <= 31;
@@ -53,6 +55,7 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
                     isEven={index % 2 === 0}
                     selectedDate={selectedDate}
                     periodToShow={periodToShow}
+                    onDataChange={onDataChange}
                   />
                 ))}
               </tbody>

@@ -26,7 +26,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   onMonthChange,
   onPeriodChange
 }) => {
-  const { personData, isLoading } = usePersonResourceData(startDate, periodToShow);
+  const { personData, isLoading, refetch } = usePersonResourceData(startDate, periodToShow);
   const days = useGridDays(startDate, periodToShow, displayOptions);
   const [expandedPeople, setExpandedPeople] = useState<string[]>([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -207,6 +207,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
           onTogglePersonExpand={handleTogglePersonExpand}
           selectedDate={startDate}
           periodToShow={periodToShow}
+          onDataChange={refetch}
         />
       </div>
     </div>
