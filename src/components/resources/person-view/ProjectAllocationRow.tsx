@@ -160,7 +160,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
               onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
               onFocus={(e) => e.target.select()}
               onKeyDown={(e) => handleKeyDown(e, dayKey, dayIndex)}
-              disabled={isLoading || isSaving}
+              disabled={isLoading}
               className={`
                 w-full h-full px-0 py-0 text-center border-0 bg-transparent
                 focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white
