@@ -1,5 +1,6 @@
 import React from 'react';
 import { DayInfo } from '../grid/types';
+import { format, isToday } from 'date-fns';
 
 interface PersonGridHeaderProps {
   days: DayInfo[];
@@ -8,11 +9,13 @@ interface PersonGridHeaderProps {
 export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
   return (
     <thead>
-      <tr className="workload-resource-header-row">
+      <tr>
         {/* Person column header - Fixed width, sticky */}
         <th 
           className="workload-resource-header person-resource-column"
-          style={{
+          style={{ 
+            backgroundColor: 'transparent',
+            color: 'white',
             width: '250px',
             minWidth: '250px',
             maxWidth: '250px',
@@ -21,53 +24,117 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
             zIndex: 30,
             textAlign: 'left',
             padding: '12px 16px',
-            backgroundColor: '#f3f4f6',
             borderRight: '2px solid rgba(156, 163, 175, 0.8)',
-            borderBottom: '2px solid rgba(156, 163, 175, 0.8)',
-            fontWeight: '700',
-            fontSize: '13px',
-            color: '#111827'
+            borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+            fontWeight: '600'
           }}
         >
-          TEAM MEMBER
+          Team Member
         </th>
         
-        {/* Day column headers */}
-        {days.map((day) => {
-          const isWeekend = day.isWeekend;
-          const dayKey = day.date.toISOString().split('T')[0];
+        {/* Day columns - Fixed width */}
+        {days.map((day, index) => {
+          const isTodayDay = isToday(day.date);
+          const isFirstOfMonth = day.date.getDate() === 1;
+          const isNewMonth = index === 0 || days[index - 1].date.getMonth() !== day.date.getMonth();
+          
+          let backgroundColor = 'transparent';
           
           return (
             <th 
-              key={dayKey}
-              className={`workload-resource-header day-column ${isWeekend ? 'weekend' : ''}`}
-              style={{
-                width: '30px',
+              key={`${day.date.toISOString()}-${index}`}
+              className="workload-resource-header day-column"
+              style={{ 
+                width: '30px', 
                 minWidth: '30px',
                 maxWidth: '30px',
+                backgroundColor,
+                color: 'white',
                 textAlign: 'center',
                 padding: '4px 2px',
-                backgroundColor: isWeekend ? '#fee' : '#f3f4f6',
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
-                borderBottom: '2px solid rgba(156, 163, 175, 0.8)',
-                fontSize: '10px',
+                borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+                borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined,
+                fontSize: '12px',
                 fontWeight: '600',
-                color: '#374151'
+                height: '80px',
+                position: 'relative',
+                overflow: 'visible'
               }}
-              title={day.date.toLocaleDateString()}
             >
               <div style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
-                alignItems: 'center',
+                alignItems: 'center', 
+                height: '100%',
                 gap: '2px'
               }}>
-                <span style={{ fontSize: '9px', color: '#6b7280' }}>
-                  {day.dayName.slice(0, 3)}
-                </span>
-                <span style={{ fontSize: '11px', fontWeight: '700', color: '#111827' }}>
-                  {day.date.getDate()}
-                </span>
+                {isNewMonth ? (
+                  <>
+                    <span style={{ 
+                      fontSize: '10px', 
+                      fontWeight: '700', 
+                      textTransform: 'uppercase', 
+                      lineHeight: '1',
+                      color: '#fbbf24',
+                      marginBottom: '4px'
+                    }}>
+                      {format(day.date, 'MMM')}
+                    </span>
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      justifyContent: 'flex-end',
+                      gap: '2px',
+                      flex: '1'
+                    }}>
+                      <span style={{ 
+                        fontSize: '10px', 
+                        opacity: '0.9', 
+                        textTransform: 'uppercase', 
+                        lineHeight: '1',
+                        fontWeight: '500'
+                      }}>
+                        {format(day.date, 'EEE').charAt(0)}
+                      </span>
+                      <span style={{ 
+                        fontSize: '14px', 
+                        fontWeight: '700', 
+                        lineHeight: '1'
+                      }}>
+                        {format(day.date, 'd')}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    justifyContent: 'flex-end',
+                    gap: '2px',
+                    height: '100%',
+                    paddingTop: '16px'
+                  }}>
+                    <span style={{ 
+                      fontSize: '10px', 
+                      opacity: '0.9', 
+                      textTransform: 'uppercase', 
+                      lineHeight: '1',
+                      fontWeight: '500'
+                    }}>
+                      {format(day.date, 'EEE').charAt(0)}
+                    </span>
+                    <span style={{ 
+                      fontSize: '14px', 
+                      fontWeight: '700', 
+                      lineHeight: '1'
+                    }}>
+                      {format(day.date, 'd')}
+                    </span>
+                  </div>
+                )}
               </div>
             </th>
           );
