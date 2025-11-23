@@ -108,6 +108,8 @@ const ResourceScheduling = () => {
               startDate={selectedMonth}
               periodToShow={filters.periodToShow}
               displayOptions={displayOptions}
+              onMonthChange={handleMonthChange}
+              onPeriodChange={handlePeriodChange}
             />
           </TabsContent>
 
