@@ -32,7 +32,7 @@ export const WorkloadCalendarTable: React.FC<WorkloadCalendarTableProps> = ({
             minWidth: `${tableWidth}px`,
             borderCollapse: 'separate',
             borderSpacing: '0',
-            background: 'white',
+            background: 'hsl(var(--card))',
             borderRadius: '8px',
             overflow: 'hidden',
             margin: '0',
