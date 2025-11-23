@@ -16,7 +16,7 @@ interface HolidaysCardProps {
 
 export const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays }) => {
   return (
-    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-white sm:min-w-[200px] sm:max-w-[240px]">
+    <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-white sm:min-w-[200px] sm:max-w-[240px]">
       <CardHeader className="pb-2 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Calendar className="h-3.5 w-3.5 text-muted-foreground" />

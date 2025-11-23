@@ -347,7 +347,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
         {/* Card Display */}
         <div className="px-12 py-1">
-          <div className="relative h-[160px] animate-fade-in" key={currentCard?.id}>
+          <div className="relative h-[140px] animate-fade-in" key={currentCard?.id}>
             {currentCard?.component}
           </div>
         </div>
