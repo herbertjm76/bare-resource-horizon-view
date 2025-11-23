@@ -38,6 +38,9 @@ import FinancialControl from "./pages/FinancialControl";
 import { WorkflowPage } from "./pages/WorkflowPage";
 import WeeklyRundown from "./pages/WeeklyRundown";
 import CompanyLanding from "./pages/CompanyLanding";
+import Timeline from "./pages/Timeline";
+import CapacityPlanning from "./pages/CapacityPlanning";
+import Pipeline from "./pages/Pipeline";
 
 const queryClient = new QueryClient();
 
@@ -73,12 +76,15 @@ function App() {
               <Route path="/:companySlug/profile" element={<Profile />} />
               <Route path="/:companySlug/projects" element={<Projects />} />
               <Route path="/:companySlug/projects/onboarding" element={<ProjectsOnboarding />} />
+              <Route path="/:companySlug/pipeline" element={<Pipeline />} />
               <Route path="/:companySlug/team-members" element={<TeamMembers />} />
               <Route path="/:companySlug/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/:companySlug/office-settings" element={<OfficeSettings />} />
               <Route path="/:companySlug/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/:companySlug/weekly-rundown" element={<WeeklyRundown />} />
               <Route path="/:companySlug/resource-scheduling" element={<ResourceScheduling />} />
+              <Route path="/:companySlug/timeline" element={<Timeline />} />
+              <Route path="/:companySlug/capacity-planning" element={<CapacityPlanning />} />
               {/* Legacy routes - redirect to unified scheduling */}
               <Route path="/:companySlug/team-workload" element={<ResourceScheduling />} />
               <Route path="/:companySlug/project-resourcing" element={<ResourceScheduling />} />
@@ -96,12 +102,15 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/onboarding" element={<ProjectsOnboarding />} />
+              <Route path="/pipeline" element={<Pipeline />} />
               <Route path="/team-members" element={<TeamMembers />} />
               <Route path="/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/office-settings" element={<OfficeSettings />} />
               <Route path="/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/weekly-rundown" element={<WeeklyRundown />} />
               <Route path="/resource-scheduling" element={<ResourceScheduling />} />
+              <Route path="/timeline" element={<Timeline />} />
+              <Route path="/capacity-planning" element={<CapacityPlanning />} />
               {/* Legacy routes - redirect to unified scheduling */}
               <Route path="/team-workload" element={<ResourceScheduling />} />
               <Route path="/project-resourcing" element={<ResourceScheduling />} />

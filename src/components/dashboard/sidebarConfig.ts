@@ -5,7 +5,9 @@ import {
   FolderKanban,
   UserSquare2,
   Flag,
-  HelpCircle
+  HelpCircle,
+  TrendingUp,
+  Layers
 } from "lucide-react"
 
 export const getNavigationItems = (companySlug: string | null) => {
@@ -35,6 +37,18 @@ export const getNavigationItems = (companySlug: string | null) => {
           url: `${baseUrl}/resource-scheduling`,
           icon: GanttChartSquare,
         },
+        {
+          title: "Timeline",
+          url: `${baseUrl}/timeline`,
+          icon: GanttChartSquare,
+          comingSoon: true,
+        },
+        {
+          title: "Capacity Planning",
+          url: `${baseUrl}/capacity-planning`,
+          icon: TrendingUp,
+          comingSoon: true,
+        },
       ],
     },
     {
@@ -44,6 +58,12 @@ export const getNavigationItems = (companySlug: string | null) => {
           title: "Projects",
           url: `${baseUrl}/projects`,
           icon: FolderKanban,
+        },
+        {
+          title: "Pipeline",
+          url: `${baseUrl}/pipeline`,
+          icon: Layers,
+          comingSoon: true,
         },
       ],
     },
