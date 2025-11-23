@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronRight, Briefcase } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,8 +25,30 @@ export const PersonRow: React.FC<PersonRowProps> = ({
   selectedDate,
   periodToShow
 }) => {
+  const [projectAllocations, setProjectAllocations] = useState(person.projects);
+
+  useEffect(() => {
+    setProjectAllocations(person.projects);
+  }, [person.projects]);
+
   const getInitials = () => {
     return `${person.firstName.charAt(0)}${person.lastName.charAt(0)}`.toUpperCase();
+  };
+
+  const handleLocalAllocationChange = (projectId: string, dayKey: string, hours: number) => {
+    setProjectAllocations(prev =>
+      prev.map(project =>
+        project.projectId === projectId
+          ? {
+              ...project,
+              allocations: {
+                ...project.allocations,
+                [dayKey]: hours
+              }
+            }
+          : project
+      )
+    );
   };
 
   return (
@@ -126,8 +148,8 @@ export const PersonRow: React.FC<PersonRowProps> = ({
         {days.map((day) => {
           const dayKey = day.date.toISOString().split('T')[0];
           
-          // Calculate day total from all projects for this person
-          const dayTotal = person.projects.reduce((total, project) => {
+          // Calculate day total from all projects for this person (using local state)
+          const dayTotal = projectAllocations.reduce((total, project) => {
             const hours = project.allocations[dayKey] || 0;
             return total + hours;
           }, 0);
@@ -172,7 +194,7 @@ export const PersonRow: React.FC<PersonRowProps> = ({
       </tr>
       
       {/* Project Rows (when expanded) */}
-      {isExpanded && person.projects.map((project, projectIndex) => (
+      {isExpanded && projectAllocations.map((project, projectIndex) => (
         <ProjectAllocationRow
           key={project.projectId}
           project={project}
@@ -182,6 +204,7 @@ export const PersonRow: React.FC<PersonRowProps> = ({
           projectIndex={projectIndex}
           selectedDate={selectedDate}
           periodToShow={periodToShow}
+          onLocalAllocationChange={handleLocalAllocationChange}
         />
       ))}
     </>
