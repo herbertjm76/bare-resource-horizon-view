@@ -2,17 +2,28 @@ import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { GanttChartSquare, Users, Calendar, TrendingUp } from 'lucide-react';
+import { GanttChartSquare, Users, Calendar, TrendingUp, Briefcase } from 'lucide-react';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
 import { PersonResourceView } from '@/components/resources/person-view/PersonResourceView';
+import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
+import { startOfWeek, format } from 'date-fns';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
 const ResourceScheduling = () => {
   const [activeTab, setActiveTab] = useState<string>('by-project');
+  
+  // Weekly view state
+  const [selectedWeek, setSelectedWeek] = useState<Date>(
+    startOfWeek(new Date(), { weekStartsOn: 1 })
+  );
+  const [weekFilters, setWeekFilters] = useState({
+    office: "all",
+    searchTerm: ""
+  });
   
   // Project Resourcing State
   const {
@@ -45,6 +56,19 @@ const ResourceScheduling = () => {
     filters.periodToShow
   );
 
+  const handleWeekChange = (date: Date) => {
+    setSelectedWeek(date);
+  };
+
+  const handleWeekFilterChange = (key: string, value: string) => {
+    setWeekFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const weekLabel = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'MMM d, yyyy');
+
   return (
     <StandardLayout>
       <div className="w-full h-full flex flex-col">
@@ -58,7 +82,7 @@ const ResourceScheduling = () => {
         <div className="bg-background border-b">
           <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="w-full mb-2 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-4 gap-2 flex-nowrap rounded-none bg-transparent p-0">
+              <TabsList className="w-full mb-2 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-5 gap-2 flex-nowrap rounded-none bg-transparent p-0">
                 <TabsTrigger
                   value="by-project"
                   className="flex items-center justify-center gap-2 min-w-max px-4 h-10"
@@ -72,6 +96,13 @@ const ResourceScheduling = () => {
                 >
                   <Users className="h-4 w-4" />
                   <span className="font-medium text-sm">By Person</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="team-workload"
+                  className="flex items-center justify-center gap-2 min-w-max px-4 h-10"
+                >
+                  <Briefcase className="h-4 w-4" />
+                  <span className="font-medium text-sm">Team Workload</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="timeline"
@@ -119,6 +150,18 @@ const ResourceScheduling = () => {
               displayOptions={displayOptions}
               onMonthChange={handleMonthChange}
               onPeriodChange={handlePeriodChange}
+            />
+          </TabsContent>
+
+          <TabsContent value="team-workload" className="mt-0 py-6">
+            <WeekResourceView
+              selectedWeek={selectedWeek}
+              setSelectedWeek={setSelectedWeek}
+              onWeekChange={handleWeekChange}
+              weekLabel={weekLabel}
+              filters={weekFilters}
+              onFilterChange={handleWeekFilterChange}
+              tableOrientation="per-person"
             />
           </TabsContent>
 
