@@ -303,7 +303,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   return (
     <div className="mb-6 space-y-1">
-      <div className="relative px-2 sm:px-4 py-3 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
+      <div className="relative px-1.5 sm:px-2 py-2 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
         {/* Mobile Carousel - Only on small screens */}
         <div className="block sm:hidden relative">
         {/* Card Indicator Dots - Top */}
@@ -346,15 +346,15 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         </Button>
 
         {/* Card Display */}
-        <div className="px-12 py-2">
-          <div className="relative h-[180px] animate-fade-in" key={currentCard?.id}>
+        <div className="px-12 py-1">
+          <div className="relative h-[160px] animate-fade-in" key={currentCard?.id}>
             {currentCard?.component}
           </div>
         </div>
       </div>
 
         {/* Desktop/Tablet Horizontal Row with Arrow Navigation */}
-        <div className="hidden sm:block relative pb-10">
+        <div className="hidden sm:block relative pb-8">
           {/* Left Arrow */}
           {canScrollLeft && (
             <Button
@@ -487,7 +487,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       </div>
 
       {/* Mobile Controls Row - Only on mobile */}
-      <div className="flex sm:hidden justify-end items-center gap-2 px-2 py-1 border rounded-lg bg-card/50">
+      <div className="flex sm:hidden justify-end items-center gap-2 px-1.5 py-0.5 border rounded-lg bg-card/50">
         {/* Jump to Card Menu */}
         {cards.length > 1 && (
           <DropdownMenu>

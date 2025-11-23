@@ -294,7 +294,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
   return (
     <div className="w-full space-y-1">
-      <div className="bg-card rounded-lg border shadow-sm p-2 overflow-hidden animate-fade-in relative">
+      <div className="bg-card rounded-lg border shadow-sm p-1.5 overflow-hidden animate-fade-in relative">
         {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
         {filteredMembers.length > 0 && (
           <div className="hidden sm:block relative">
@@ -327,7 +327,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               className="overflow-x-auto overflow-y-hidden -mx-2 px-2 scrollbar-hide"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[52px]">
+              <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[48px]">
                 {filteredMembers.map((member) => (
                   <MemberAvailabilityCard
                     key={member.id}
@@ -348,7 +348,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         {/* Mobile view without arrows */}
         {filteredMembers.length > 0 && (
           <div className="block sm:hidden overflow-x-auto overflow-y-hidden -mx-2 px-2">
-            <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[52px]">
+            <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[48px]">
               {filteredMembers.map((member) => (
                 <MemberAvailabilityCard
                   key={member.id}
@@ -402,7 +402,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       </div>
 
       {/* Mobile Filters Row - Only on mobile */}
-      <div className="flex sm:hidden justify-end items-center gap-2 px-2 py-1 border rounded-lg bg-card/50">
+      <div className="flex sm:hidden justify-end items-center gap-2 px-1.5 py-0.5 border rounded-lg bg-card/50">
         <AvailabilityFilters
           sortBy={sortBy}
           onSortChange={setSortBy}
