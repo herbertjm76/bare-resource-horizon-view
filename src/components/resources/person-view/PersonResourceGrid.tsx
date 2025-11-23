@@ -30,13 +30,6 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border">
-      <div className="p-4 border-b">
-        <h3 className="text-lg font-semibold text-gray-900">Team Resources</h3>
-        <p className="text-sm text-gray-600 mt-1">
-          Team members with project allocations
-        </p>
-      </div>
-      
       <div className="p-4">
         <div className={`workload-resource-grid-container ${shouldCenterAlign ? 'center-aligned' : ''}`}>
           <div className="workload-resource-table-wrapper">
