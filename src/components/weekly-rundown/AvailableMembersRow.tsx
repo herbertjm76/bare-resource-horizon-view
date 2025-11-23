@@ -252,11 +252,12 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
 
   return (
-    <div className="w-full bg-card rounded-lg border shadow-sm p-2 overflow-hidden animate-fade-in relative">
-      {/* Members Avatars - Horizontal Scroll */}
-      {filteredMembers.length > 0 && (
-        <div className="overflow-x-auto overflow-y-hidden -mx-2 px-2 pr-20 sm:pr-2">
-          <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[52px]">
+    <div className="w-full space-y-1">
+      <div className="bg-card rounded-lg border shadow-sm p-2 overflow-hidden animate-fade-in relative">
+        {/* Members Avatars - Horizontal Scroll */}
+        {filteredMembers.length > 0 && (
+          <div className="overflow-x-auto overflow-y-hidden -mx-2 px-2">
+            <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[52px]">
             {filteredMembers.map((member) => (
               <MemberAvailabilityCard
                 key={member.id}
@@ -273,25 +274,44 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         </div>
       )}
 
-      {/* Empty state - compact version */}
-      {filteredMembers.length === 0 && (
-        <div className="flex-1 flex items-center justify-center py-3 sm:py-0">
-          <p className="text-xs sm:text-sm text-muted-foreground text-center">
-            No available members
-            {activeFilterCount > 0 && (
-              <button 
-                onClick={handleClearFilters}
-                className="ml-1 text-primary hover:underline font-medium"
-              >
-                - clear filters
-              </button>
-            )}
-          </p>
-        </div>
-      )}
+        {/* Empty state - compact version */}
+        {filteredMembers.length === 0 && (
+          <div className="flex-1 flex items-center justify-center py-3 sm:py-0">
+            <p className="text-xs sm:text-sm text-muted-foreground text-center">
+              No available members
+              {activeFilterCount > 0 && (
+                <button 
+                  onClick={handleClearFilters}
+                  className="ml-1 text-primary hover:underline font-medium"
+                >
+                  - clear filters
+                </button>
+              )}
+            </p>
+          </div>
+        )}
 
-      {/* Filters - Bottom Right */}
-      <div className="absolute bottom-2 right-2 z-10">
+        {/* Filters - Bottom Right - Desktop/Tablet only */}
+        <div className="hidden sm:flex absolute bottom-2 right-2 z-10">
+          <AvailabilityFilters
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            filterBy={filterBy}
+            onFilterChange={setFilterBy}
+            selectedDepartment={selectedDepartment}
+            onDepartmentChange={setSelectedDepartment}
+            selectedSector={selectedSector}
+            onSectorChange={setSelectedSector}
+            departments={departments}
+            sectors={sectors}
+            activeFilterCount={activeFilterCount}
+            onClearFilters={handleClearFilters}
+          />
+        </div>
+      </div>
+
+      {/* Mobile Filters Row - Only on mobile */}
+      <div className="flex sm:hidden justify-end items-center gap-2 px-2 py-1 border rounded-lg bg-card/50">
         <AvailabilityFilters
           sortBy={sortBy}
           onSortChange={setSortBy}
