@@ -19,7 +19,7 @@ export const fetchProjectAllocations = async (
     dateRange: `${startDateStr} to ${endDateStr}`
   });
 
-  // Fetch regular allocations
+  // Fetch regular allocations within the requested date range to avoid hitting default row limits
   const result = await supabase
     .from('project_resource_allocations')
     .select(`
@@ -33,6 +33,8 @@ export const fetchProjectAllocations = async (
     .eq('company_id', companyId)
     .in('resource_id', memberIds)
     .gt('hours', 0)
+    .gte('week_start_date', startDateStr)
+    .lte('week_start_date', endDateStr)
     .order('week_start_date', { ascending: true });
 
   const paulJuliusRecords = result.data?.filter(r => r.resource_id === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82') || [];
