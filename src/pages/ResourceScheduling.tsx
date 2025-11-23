@@ -207,6 +207,7 @@ const ResourceScheduling = () => {
           </Tabs>
         </div>
       </div>
+      </div>
     </StandardLayout>
   );
 };
