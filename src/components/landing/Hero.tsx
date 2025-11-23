@@ -89,7 +89,7 @@ const Hero = () => {
             <AnimatedSection animation="fadeInUp" delay={1000}>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <button onClick={() => navigate('/auth')} className="group bg-white text-purple-600 px-5 py-2.5 rounded-2xl font-semibold hover:bg-purple-50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl text-sm sm:text-base">
-                  Start 14-Day Trial
+                  Get Started
                 </button>
                 <button className="group bg-white/15 backdrop-blur-sm text-white px-5 py-2.5 rounded-2xl border border-white/30 hover:bg-white/25 transition-all duration-500 font-semibold flex items-center justify-center gap-3 hover:scale-105 hover:-translate-y-1 hover:shadow-xl text-sm sm:text-base">
                   <PlayCircle className="w-4 h-4 sm:w-5 sm:h-5" />
