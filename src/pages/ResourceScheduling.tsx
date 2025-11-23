@@ -120,33 +120,34 @@ const ResourceScheduling = () => {
         />
 
         {/* Tabs */}
-        <div className="bg-background border-b flex justify-center py-4 px-2">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-4xl">
-            <TabsList className="w-full h-12 bg-secondary/50 p-1 grid grid-cols-3 gap-1">
-              <TabsTrigger 
-                value="by-project" 
-                className="flex items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md transition-all"
-              >
-                <GanttChartSquare className="h-4 w-4 flex-shrink-0" />
-                <span className="font-medium text-xs sm:text-sm truncate">By Project</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="by-person" 
-                className="flex items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md transition-all"
-              >
-                <Users className="h-4 w-4 flex-shrink-0" />
-                <span className="font-medium text-xs sm:text-sm truncate">By Person</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="timeline" 
-                className="flex items-center justify-center gap-1 sm:gap-2 rounded-md" 
-                disabled
-              >
-                <Calendar className="h-4 w-4 flex-shrink-0" />
-                <span className="font-medium text-xs sm:text-sm truncate">Timeline</span>
-                <span className="ml-1 text-xs opacity-60 hidden lg:inline">(Soon)</span>
-              </TabsTrigger>
-            </TabsList>
+        <div className="bg-background border-b">
+          <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="w-full mb-2 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-3 gap-2 flex-nowrap rounded-none bg-transparent p-0">
+                <TabsTrigger
+                  value="by-project"
+                  className="flex items-center justify-center gap-2 min-w-max px-4 h-10"
+                >
+                  <GanttChartSquare className="h-4 w-4" />
+                  <span className="font-medium text-sm">By Project</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="by-person"
+                  className="flex items-center justify-center gap-2 min-w-max px-4 h-10"
+                >
+                  <Users className="h-4 w-4" />
+                  <span className="font-medium text-sm">By Person</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="timeline"
+                  className="flex items-center justify-center gap-2 min-w-max px-4 h-10"
+                  disabled
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span className="font-medium text-sm">Timeline</span>
+                  <span className="ml-1 text-xs opacity-60 hidden md:inline">(Soon)</span>
+                </TabsTrigger>
+              </TabsList>
 
           <TabsContent value="by-project" className="mt-0 py-6">
             <ProjectResourcingContent
