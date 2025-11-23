@@ -293,7 +293,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   };
 
   return (
-    <div className="w-full space-y-0.5 mb-2">
+    <div className="w-full space-y-0.5 mb-4">
       <div className="rounded-lg p-1.5 overflow-hidden animate-fade-in relative">
         {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
         {filteredMembers.length > 0 && (
