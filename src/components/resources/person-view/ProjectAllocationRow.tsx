@@ -141,6 +141,14 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
               borderBottom: '1px solid rgba(229, 231, 235, 0.8)',
               verticalAlign: 'middle'
             }}
+            tabIndex={-1}
+            onClick={() => {
+              const input = inputRefs.current[dayKey];
+              if (input && !input.disabled) {
+                input.focus();
+                input.select();
+              }
+            }}
           >
             <input
               ref={(el) => inputRefs.current[dayKey] = el}

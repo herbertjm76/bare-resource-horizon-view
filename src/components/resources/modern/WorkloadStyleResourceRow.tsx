@@ -153,6 +153,14 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
               verticalAlign: 'middle'
             }}
+            tabIndex={-1}
+            onClick={() => {
+              const input = inputRefs.current[dayKey];
+              if (input && !input.disabled) {
+                input.focus();
+                input.select();
+              }
+            }}
           >
             <input
               ref={(el) => inputRefs.current[dayKey] = el}
