@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 
 interface ProjectTableRowProps {
   project: any;
@@ -41,6 +42,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   saveSignal
 }) => {
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const { project_statuses } = useOfficeSettings();
 
   const {
     handleFieldUpdate,
@@ -118,10 +120,11 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Planning">Planning</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Complete">Complete</SelectItem>
-                <SelectItem value="On Hold">On Hold</SelectItem>
+                {project_statuses.map((status) => (
+                  <SelectItem key={status.id} value={status.name}>
+                    {status.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           ) : (
