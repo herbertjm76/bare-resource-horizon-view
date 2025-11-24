@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import TeamMembersTable from './TeamMembersTable';
 import TeamMembersToolbar from './TeamMembersToolbar';
 import { TeamMember } from './types';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface TeamMemberSectionProps {
   teamMembers: TeamMember[];
@@ -32,6 +34,65 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
   onAdd,
   onRefresh
 }) => {
+  const [pendingChanges, setPendingChanges] = useState<Record<string, Partial<TeamMember>>>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleFieldChange = (memberId: string, field: string, value: string) => {
+    setPendingChanges(prev => ({
+      ...prev,
+      [memberId]: {
+        ...prev[memberId],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleSaveAll = async () => {
+    const changedMemberIds = Object.keys(pendingChanges);
+    if (changedMemberIds.length === 0) {
+      setEditMode(false);
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Save all changes in parallel
+      const savePromises = changedMemberIds.map(memberId => 
+        supabase
+          .from('profiles')
+          .update(pendingChanges[memberId])
+          .eq('id', memberId)
+      );
+
+      const results = await Promise.all(savePromises);
+      const errors = results.filter(r => r.error);
+
+      if (errors.length > 0) {
+        throw new Error(`Failed to update ${errors.length} member(s)`);
+      }
+
+      toast.success(`Successfully updated ${changedMemberIds.length} member(s)`);
+      setPendingChanges({});
+      setEditMode(false);
+      
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      toast.error('Failed to save changes');
+      console.error('Save error:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setPendingChanges({});
+    setEditMode(false);
+  };
+
+  const hasChanges = Object.keys(pendingChanges).length > 0;
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -44,6 +105,10 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
             onBulkDelete={onBulkDelete} 
             onAdd={onAdd}
             onImportComplete={onRefresh}
+            onSaveAll={handleSaveAll}
+            onCancelEdit={handleCancelEdit}
+            hasChanges={hasChanges}
+            isSaving={isSaving}
           />
         )}
       </CardHeader>
@@ -57,6 +122,8 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
           onEditMember={onEditMember} 
           onDeleteMember={onDeleteMember}
           onRefresh={onRefresh}
+          pendingChanges={pendingChanges}
+          onFieldChange={handleFieldChange}
         />
       </CardContent>
     </Card>

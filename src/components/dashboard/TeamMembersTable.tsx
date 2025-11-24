@@ -14,6 +14,8 @@ interface TeamMembersTableProps {
   onEditMember: (member: TeamMember) => void;
   onDeleteMember: (memberId: string) => void;
   onRefresh?: () => void;
+  pendingChanges: Record<string, Partial<TeamMember>>;
+  onFieldChange: (memberId: string, field: string, value: string) => void;
 }
 
 const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
@@ -24,7 +26,9 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   setSelectedMembers,
   onEditMember,
   onDeleteMember,
-  onRefresh
+  onRefresh,
+  pendingChanges,
+  onFieldChange
 }) => {
   const navigate = useNavigate();
 
@@ -79,6 +83,8 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
               onEditMember={onEditMember}
               onDeleteMember={onDeleteMember}
               onRefresh={onRefresh}
+              pendingChanges={pendingChanges[member.id] || {}}
+              onFieldChange={onFieldChange}
             />
           ))}
         </tbody>

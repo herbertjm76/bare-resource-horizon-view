@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, UserPlus, Upload } from "lucide-react";
+import { Edit, Trash2, UserPlus, Upload, Check, X } from "lucide-react";
 import { ExcelImportDialog } from "@/components/projects/ExcelImportDialog";
 
 interface TeamMembersToolbarProps {
@@ -11,6 +11,10 @@ interface TeamMembersToolbarProps {
   onBulkDelete?: () => void;
   onAdd?: () => void;
   onImportComplete?: () => void;
+  onSaveAll?: () => void;
+  onCancelEdit?: () => void;
+  hasChanges?: boolean;
+  isSaving?: boolean;
 }
 
 const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({ 
@@ -19,11 +23,15 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   selectedCount,
   onBulkDelete,
   onAdd,
-  onImportComplete
+  onImportComplete,
+  onSaveAll,
+  onCancelEdit,
+  hasChanges,
+  isSaving
 }) => {
   return (
     <div className="flex items-center gap-2">
-      {onAdd && (
+      {!editMode && onAdd && (
         <Button 
           variant="default"
           size="sm"
@@ -33,31 +41,57 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
           Add Member
         </Button>
       )}
-      <ExcelImportDialog 
-        onImportComplete={onImportComplete}
-        trigger={
+      {!editMode && (
+        <ExcelImportDialog 
+          onImportComplete={onImportComplete}
+          trigger={
+            <Button 
+              variant="outline" 
+              size="sm"
+            >
+              <Upload className="h-4 w-4 mr-1" />
+              Import Excel
+            </Button>
+          }
+        />
+      )}
+      {!editMode ? (
+        <Button 
+          variant="outline"
+          size="sm"
+          onClick={() => setEditMode(true)}
+        >
+          <Edit className="h-4 w-4 mr-1" />
+          Edit
+        </Button>
+      ) : (
+        <>
           <Button 
-            variant="outline" 
+            variant="default"
             size="sm"
+            onClick={onSaveAll}
+            disabled={isSaving}
           >
-            <Upload className="h-4 w-4 mr-1" />
-            Import Excel
+            <Check className="h-4 w-4 mr-1" />
+            {isSaving ? "Saving..." : "Done"}
           </Button>
-        }
-      />
-      <Button 
-        variant={editMode ? "secondary" : "outline"}
-        size="sm"
-        onClick={() => setEditMode(!editMode)}
-      >
-        <Edit className="h-4 w-4 mr-1" />
-        {editMode ? "Done" : "Edit"}
-      </Button>
+          <Button 
+            variant="outline"
+            size="sm"
+            onClick={onCancelEdit}
+            disabled={isSaving}
+          >
+            <X className="h-4 w-4 mr-1" />
+            Cancel
+          </Button>
+        </>
+      )}
       {editMode && selectedCount > 0 && (
         <Button 
           variant="destructive"
           size="sm"
           onClick={onBulkDelete}
+          disabled={isSaving}
         >
           <Trash2 className="h-4 w-4 mr-1" />
           Delete ({selectedCount})
