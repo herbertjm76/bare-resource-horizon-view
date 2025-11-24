@@ -119,6 +119,18 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
       
+      {/* Content-First Main Table */}
+      <div className="w-full max-w-full overflow-hidden">
+        <PersonResourceGrid
+          personData={personData}
+          days={days}
+          expandedPeople={expandedPeople}
+          onTogglePersonExpand={handleTogglePersonExpand}
+          selectedDate={startDate}
+          periodToShow={periodToShow}
+        />
+      </div>
+
       {/* Compact Action Bar */}
       <div className="bg-muted/30 border border-border rounded-lg p-3">
         <div className="flex flex-wrap items-center gap-3">
@@ -223,18 +235,6 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
             </Button>
           </div>
         </div>
-      </div>
-      
-      {/* Content-First Main Table */}
-      <div className="w-full max-w-full overflow-hidden">
-        <PersonResourceGrid
-          personData={personData}
-          days={days}
-          expandedPeople={expandedPeople}
-          onTogglePersonExpand={handleTogglePersonExpand}
-          selectedDate={startDate}
-          periodToShow={periodToShow}
-        />
       </div>
     </div>
   );
