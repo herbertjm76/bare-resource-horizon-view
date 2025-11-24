@@ -4,7 +4,7 @@ import { ExcelProcessor } from '../services/ExcelProcessor';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
-type ImportStep = 'upload' | 'detection' | 'review' | 'progress' | 'complete';
+type ImportStep = 'upload' | 'detection' | 'review' | 'preview' | 'progress' | 'complete';
 
 interface DetectionResult {
   detected: any[];
@@ -94,6 +94,15 @@ export const useExcelImport = (onImportComplete: () => void) => {
     };
   };
 
+  const proceedToPreview = (finalList: any[]) => {
+    setDetectionResult({
+      detected: finalList,
+      confidence: detectionResult?.confidence || 0,
+      location: detectionResult?.location || 'Unknown'
+    });
+    setCurrentStep('preview');
+  };
+
   const confirmAndImport = async (finalList: any[]) => {
     setCurrentStep('progress');
     toast.info('Starting import...');
@@ -146,6 +155,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
     handleFileUpload,
     handleDetection,
     refineDetection,
+    proceedToPreview,
     confirmAndImport,
     downloadTemplate,
     resetDialog,

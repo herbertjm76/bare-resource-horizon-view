@@ -4,6 +4,7 @@ import { ImportUploadStep } from './ImportUploadStep';
 import { ImportCompleteStep } from './ImportCompleteStep';
 import { DetectionTypeStep } from './DetectionTypeStep';
 import { DetectionReviewStep } from './DetectionReviewStep';
+import { DataPreviewStep } from './DataPreviewStep';
 import { useExcelImport } from './useExcelImport';
 
 interface ImportDialogContentProps {
@@ -24,6 +25,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
     handleFileUpload,
     handleDetection,
     refineDetection,
+    proceedToPreview,
     confirmAndImport,
     downloadTemplate,
     setCurrentStep
@@ -53,9 +55,19 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
           detected={detectionResult.detected}
           confidence={detectionResult.confidence}
           location={detectionResult.location}
-          onConfirm={confirmAndImport}
+          onConfirm={proceedToPreview}
           onCancel={() => setCurrentStep('detection')}
           onRefine={refineDetection}
+        />
+      ) : null;
+
+    case 'preview':
+      return detectionResult ? (
+        <DataPreviewStep
+          detectedData={detectionResult.detected}
+          detectionType={detectionType}
+          onConfirm={confirmAndImport}
+          onBack={() => setCurrentStep('review')}
         />
       ) : null;
 
