@@ -15,6 +15,9 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
   getUserInitials,
   handleAvatarUpdate
 }) => {
+  const roleValue = (profile && (profile as any).role) || 'member';
+  const roleLabel = roleValue.charAt(0).toUpperCase() + roleValue.slice(1);
+
   return (
     <Card className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm lg:col-span-2">
       <div className="flex flex-col items-center text-center space-y-4">
@@ -29,9 +32,16 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
         {/* Basic Info with improved hierarchy */}
         <div className="w-full space-y-2">
           {/* Name - Larger and prominent */}
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">
             {profile.first_name} {profile.last_name}
           </h2>
+
+          {/* Role badge */}
+          <div className="flex justify-center mb-2">
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              {roleLabel}
+            </span>
+          </div>
 
           {/* Job Title - Secondary prominence */}
           <div className="flex items-center justify-center gap-2 mb-2">

@@ -23,4 +23,5 @@ export type Profile = {
   department: string | null;
   location: string | null;
   weekly_capacity: number;
+  role?: string | null;
 };

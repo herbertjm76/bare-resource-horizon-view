@@ -41,6 +41,27 @@ export const useProfile = () => {
         .eq("profile_id", session.user.id)
         .maybeSingle();
       
+      // Fetch user roles to determine highest role (owner > admin > member)
+      const { data: userRoles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id);
+
+      if (rolesError) {
+        console.error("Failed to load user roles for profile:", rolesError);
+      }
+
+      let highestRole: string | null = null;
+      if (userRoles && userRoles.length > 0) {
+        if (userRoles.some((r: any) => r.role === "owner")) {
+          highestRole = "owner";
+        } else if (userRoles.some((r: any) => r.role === "admin")) {
+          highestRole = "admin";
+        } else {
+          highestRole = userRoles[0].role as string;
+        }
+      }
+      
       // Combine profile and personal info
       const completeProfile: Profile = {
         id: profileData.id,
@@ -66,6 +87,7 @@ export const useProfile = () => {
         department: profileData.department,
         location: profileData.location,
         weekly_capacity: profileData.weekly_capacity || 40,
+        role: highestRole || "member",
       };
       setProfile(completeProfile);
       setLoading(false);
