@@ -302,6 +302,11 @@
     );
   }
 
+  /* Solid theme color for avatars */
+  .bg-theme-primary {
+    background: hsl(var(--gradient-mid));
+  }
+
   .bg-gradient-mesh {
     background: 
       radial-gradient(at 0% 0%, hsl(var(--gradient-start)) 0px, transparent 50%),
