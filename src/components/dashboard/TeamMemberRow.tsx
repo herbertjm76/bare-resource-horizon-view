@@ -19,6 +19,7 @@ interface TeamMemberRowProps {
   onViewMember: (memberId: string) => void;
   onEditMember: (member: TeamMember) => void;
   onDeleteMember: (memberId: string) => void;
+  onRefresh?: () => void;
 }
 
 export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
@@ -29,7 +30,8 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   onSelectMember,
   onViewMember,
   onEditMember,
-  onDeleteMember
+  onDeleteMember,
+  onRefresh
 }) => {
   const [editedData, setEditedData] = useState({
     first_name: member.first_name || '',
@@ -82,9 +84,9 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
       toast.success('Member updated successfully');
       setHasChanges(false);
       
-      // Trigger a refresh if onEditMember exists
-      if (onEditMember) {
-        onEditMember({ ...member, ...editedData });
+      // Trigger a refresh to update the UI
+      if (onRefresh) {
+        onRefresh();
       }
     } catch (error) {
       toast.error('Failed to update member');

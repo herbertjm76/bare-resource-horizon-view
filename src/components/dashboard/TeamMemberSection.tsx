@@ -55,7 +55,8 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
           selectedMembers={selectedMembers} 
           setSelectedMembers={setSelectedMembers} 
           onEditMember={onEditMember} 
-          onDeleteMember={onDeleteMember} 
+          onDeleteMember={onDeleteMember}
+          onRefresh={onRefresh}
         />
       </CardContent>
     </Card>
