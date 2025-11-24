@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
+import { useWeeklyFilterOptions } from './hooks/useWeeklyFilterOptions';
 import { 
   Search, X, Expand, Minimize2, Calendar, 
   PlayCircle, PauseCircle, Maximize, Minimize,
@@ -27,7 +29,7 @@ interface UnifiedWeeklyControlsProps {
   
   // Filters
   filters: {
-    office: string;
+    sector: string;
     department: string;
     location: string;
     searchTerm: string;
@@ -84,6 +86,9 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   isFullscreen,
   onFullscreenToggle
 }) => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { sectors, departments, locations } = useWeeklyFilterOptions();
+  
   const showPeopleProjectToggle = viewType !== 'table';
   const showSortOptions = viewType !== 'table';
   const showCompactExpanded = viewType === 'table';
@@ -263,32 +268,71 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
 
       {/* Filters Row */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
-        {/* Search */}
-        <div className="relative flex-1 min-w-[250px] max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={
-              tableOrientation === 'per-project' 
-                ? "Search projects..." 
-                : viewType === 'table' 
-                  ? "Search members or projects..."
-                  : rundownMode === 'projects' 
-                    ? "Search projects..."
-                    : "Search members..."
-            }
-            value={filters.searchTerm}
-            onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-            className="pl-10 h-9"
-          />
-        </div>
+        {/* Search Button/Popover */}
+        <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="h-9 gap-2"
+            >
+              <Search className="h-4 w-4" />
+              Search
+              {filters.searchTerm && (
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                  1
+                </Badge>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-4" align="start">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Search</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={
+                    tableOrientation === 'per-project' 
+                      ? "Search projects..." 
+                      : viewType === 'table' 
+                        ? "Search members or projects..."
+                        : rundownMode === 'projects' 
+                          ? "Search projects..."
+                          : "Search members..."
+                  }
+                  value={filters.searchTerm}
+                  onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+                  className="pl-10"
+                  autoFocus
+                />
+                {filters.searchTerm && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
+                    onClick={() => onFilterChange('searchTerm', '')}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
 
-        {/* Office Filter */}
-        <Select value={filters.office} onValueChange={(value) => onFilterChange('office', value)}>
+        {/* Sector Filter */}
+        <Select value={filters.sector} onValueChange={(value) => onFilterChange('sector', value)}>
           <SelectTrigger className="w-36 h-9">
-            <SelectValue placeholder="All Offices" />
+            <SelectValue placeholder="All Sectors" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Offices</SelectItem>
+          <SelectContent className="bg-background z-50">
+            <SelectItem value="all">All Sectors</SelectItem>
+            {sectors.map(sector => (
+              <SelectItem key={sector.id} value={sector.name}>
+                {sector.icon && <span className="mr-2">{sector.icon}</span>}
+                {sector.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
@@ -297,18 +341,30 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
           <SelectTrigger className="w-40 h-9">
             <SelectValue placeholder="All Departments" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background z-50">
             <SelectItem value="all">All Departments</SelectItem>
+            {departments.map(dept => (
+              <SelectItem key={dept.id} value={dept.name}>
+                {dept.icon && <span className="mr-2">{dept.icon}</span>}
+                {dept.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
         {/* Location Filter */}
         <Select value={filters.location} onValueChange={(value) => onFilterChange('location', value)}>
-          <SelectTrigger className="w-36 h-9">
+          <SelectTrigger className="w-40 h-9">
             <SelectValue placeholder="All Locations" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background z-50">
             <SelectItem value="all">All Locations</SelectItem>
+            {locations.map(location => (
+              <SelectItem key={location.id} value={location.code}>
+                {location.emoji && <span className="mr-2">{location.emoji}</span>}
+                {location.code} - {location.city}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
