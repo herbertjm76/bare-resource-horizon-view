@@ -94,7 +94,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+    <div className="space-y-3">
       
       {/* Compact Action Bar */}
       <StreamlinedActionBar
