@@ -5,6 +5,7 @@ import ProjectsTable from './ProjectsTable';
 import { useProjects } from '@/hooks/useProjects';
 import { ProjectFilters } from './ProjectFilters';
 import { FilterPopover } from '@/components/filters/FilterPopover';
+import { QuickStatusManager } from '@/components/projects/QuickStatusManager';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -34,6 +35,7 @@ export const ProjectsList = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [saveSignal, setSaveSignal] = useState(0);
+  const [showStatusManager, setShowStatusManager] = useState(false);
 
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
@@ -174,6 +176,7 @@ export const ProjectsList = () => {
                 setEditMode={handleToggleEditMode}
                 selectedCount={selectedProjects.length}
                 onBulkDelete={handleBulkDelete}
+                onManageStatuses={() => setShowStatusManager(true)}
                 iconOnly={true}
               />
               <FilterPopover
@@ -258,6 +261,7 @@ export const ProjectsList = () => {
               setEditMode={handleToggleEditMode}
               selectedCount={selectedProjects.length}
               onBulkDelete={handleBulkDelete}
+              onManageStatuses={() => setShowStatusManager(true)}
               iconOnly={false}
             />
           </div>
@@ -282,6 +286,11 @@ export const ProjectsList = () => {
             saveSignal={saveSignal}
           />
         </CardContent>
+
+        <QuickStatusManager
+          open={showStatusManager}
+          onOpenChange={setShowStatusManager}
+        />
 
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
           <AlertDialogContent>
