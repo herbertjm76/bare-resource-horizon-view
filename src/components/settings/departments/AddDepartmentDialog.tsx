@@ -15,6 +15,8 @@ interface AddDepartmentDialogProps {
   setNewDepartmentName: (name: string) => void;
   newDepartmentIcon: string;
   setNewDepartmentIcon: (icon: string) => void;
+  newDepartmentSector: string;
+  setNewDepartmentSector: (sector: string) => void;
   onSubmit: () => void;
   editingDepartment: Department | null;
   isSubmitting: boolean;
@@ -28,6 +30,8 @@ export const AddDepartmentDialog: React.FC<AddDepartmentDialogProps> = ({
   setNewDepartmentName,
   newDepartmentIcon,
   setNewDepartmentIcon,
+  newDepartmentSector,
+  setNewDepartmentSector,
   onSubmit,
   editingDepartment,
   isSubmitting,
@@ -63,6 +67,17 @@ export const AddDepartmentDialog: React.FC<AddDepartmentDialogProps> = ({
               autoFocus
             />
           </div>
+          
+          <div>
+            <Label>Sector (Optional)</Label>
+            <Input
+              placeholder="e.g., Public Policy, Design Studio..."
+              value={newDepartmentSector}
+              onChange={(e) => setNewDepartmentSector(e.target.value)}
+              onKeyPress={handleKeyPress}
+            />
+          </div>
+          
           <IconPicker 
             selectedIcon={newDepartmentIcon}
             onIconChange={setNewDepartmentIcon}

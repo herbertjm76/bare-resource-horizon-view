@@ -31,6 +31,7 @@ export type Department = {
   name: string;
   company_id: string;
   icon?: string;
+  sector?: string;
 };
 
 export type ProjectStage = {

@@ -20,6 +20,8 @@ export const DepartmentsTab = () => {
     setNewDepartmentName,
     newDepartmentIcon,
     setNewDepartmentIcon,
+    newDepartmentSector,
+    setNewDepartmentSector,
     editMode,
     selectedDepartments,
     isSubmitting,
@@ -88,6 +90,8 @@ export const DepartmentsTab = () => {
             setNewDepartmentName={setNewDepartmentName}
             newDepartmentIcon={newDepartmentIcon}
             setNewDepartmentIcon={setNewDepartmentIcon}
+            newDepartmentSector={newDepartmentSector}
+            setNewDepartmentSector={setNewDepartmentSector}
             onSubmit={handleSubmit}
             editingDepartment={editingDepartment}
             isSubmitting={isSubmitting}
