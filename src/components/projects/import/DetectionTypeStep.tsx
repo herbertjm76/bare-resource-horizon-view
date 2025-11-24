@@ -4,16 +4,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Users, FolderKanban } from 'lucide-react';
+import { Users, FolderKanban, Loader2 } from 'lucide-react';
 
 interface DetectionTypeStepProps {
   onDetect: (type: 'people' | 'projects', examples: string[], explanation: string) => void;
   onCancel: () => void;
+  isDetecting?: boolean;
 }
 
 export const DetectionTypeStep: React.FC<DetectionTypeStepProps> = ({
   onDetect,
-  onCancel
+  onCancel,
+  isDetecting = false
 }) => {
   const [detectionType, setDetectionType] = useState<'people' | 'projects'>('projects');
   const [examplesInput, setExamplesInput] = useState('');
@@ -84,11 +86,18 @@ export const DetectionTypeStep: React.FC<DetectionTypeStepProps> = ({
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={onCancel} variant="outline" className="flex-1">
+        <Button onClick={onCancel} variant="outline" className="flex-1" disabled={isDetecting}>
           Cancel
         </Button>
-        <Button onClick={handleDetect} className="flex-1">
-          Detect with AI
+        <Button onClick={handleDetect} className="flex-1" disabled={isDetecting}>
+          {isDetecting ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Analyzing...
+            </>
+          ) : (
+            'Detect with AI'
+          )}
         </Button>
       </div>
     </div>

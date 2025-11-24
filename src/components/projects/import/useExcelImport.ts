@@ -21,6 +21,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [importWarnings, setImportWarnings] = useState<string[]>([]);
   const [importSuggestions, setImportSuggestions] = useState<string[]>([]);
+  const [isDetecting, setIsDetecting] = useState(false);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, orientation: 'columns' | 'rows' = 'columns') => {
     const file = event.target.files?.[0];
@@ -42,6 +43,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
 
   const handleDetection = async (type: 'people' | 'projects', examples: string[], explanation: string) => {
     setDetectionType(type);
+    setIsDetecting(true);
     toast.info('AI analyzing data...');
 
     try {
@@ -57,6 +59,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
       if (error || !aiResult) {
         toast.error('AI detection failed. Please try again.');
         console.error('AI detection error:', error);
+        setIsDetecting(false);
         return;
       }
 
@@ -104,6 +107,8 @@ export const useExcelImport = (onImportComplete: () => void) => {
     } catch (error) {
       toast.error('Failed to analyze data');
       console.error('Detection error:', error);
+    } finally {
+      setIsDetecting(false);
     }
   };
 
@@ -236,6 +241,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
     importErrors,
     importWarnings,
     importSuggestions,
+    isDetecting,
     handleFileUpload,
     handleDetection,
     refineDetection,

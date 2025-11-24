@@ -22,6 +22,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
     importErrors,
     importWarnings,
     importSuggestions,
+    isDetecting,
     handleFileUpload,
     handleDetection,
     refineDetection,
@@ -45,6 +46,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
         <DetectionTypeStep
           onDetect={handleDetection}
           onCancel={() => setCurrentStep('upload')}
+          isDetecting={isDetecting}
         />
       );
 
