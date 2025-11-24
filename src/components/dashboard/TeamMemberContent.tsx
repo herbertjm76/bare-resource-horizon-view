@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { TeamMember, Profile } from './types';
 import { TeamManagement } from './TeamManagement';
+import { useTeamMembersPermissions } from '@/hooks/team/useTeamMembersPermissions';
 
 interface TeamMemberContentProps {
   userProfile: any;
@@ -21,7 +22,14 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
   teamMembers,
   onRefresh
 }) => {
-  if (isProfileLoading) {
+  const { checkUserPermissions, hasPermission, isChecking } = useTeamMembersPermissions();
+
+  // Check permissions on mount
+  useEffect(() => {
+    checkUserPermissions();
+  }, [checkUserPermissions]);
+
+  if (isProfileLoading || isChecking) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-violet"></div>
@@ -50,7 +58,7 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
       <TeamManagement
         teamMembers={activeMembers}
         inviteUrl={inviteUrl}
-        userRole={userProfile?.role || 'member'}
+        userRole={hasPermission ? 'admin' : 'member'}
         onRefresh={onRefresh}
       />
     </div>
