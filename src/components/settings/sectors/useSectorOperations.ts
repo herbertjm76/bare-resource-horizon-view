@@ -152,6 +152,37 @@ export const useSectorOperations = (
     }
   };
 
+  const handleConvertToDepartment = async (sector: Sector) => {
+    if (!companyId) return;
+    
+    if (!confirm(`Convert "${sector.name}" to a department?`)) return;
+
+    try {
+      const { error: insertError } = await supabase
+        .from('office_departments')
+        .insert({
+          name: sector.name,
+          icon: sector.icon,
+          company_id: companyId
+        });
+
+      if (insertError) throw insertError;
+
+      const { error: deleteError } = await supabase
+        .from('office_sectors')
+        .delete()
+        .eq('id', sector.id);
+
+      if (deleteError) throw deleteError;
+
+      setSectors(sectors.filter(sect => sect.id !== sector.id));
+      toast.success("Sector converted to department successfully");
+    } catch (error) {
+      console.error('Error converting sector to department:', error);
+      toast.error("Failed to convert sector to department");
+    }
+  };
+
   return {
     editingSector,
     newSectorName,
@@ -169,6 +200,7 @@ export const useSectorOperations = (
     handleSelectSector,
     handleCancel,
     toggleEditMode,
-    handleAddNew
+    handleAddNew,
+    handleConvertToDepartment
   };
 };

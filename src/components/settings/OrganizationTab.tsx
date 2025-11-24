@@ -134,6 +134,7 @@ export const OrganizationTab = () => {
                 onSelectDepartment={departmentOps.handleSelectDepartment}
                 onEdit={departmentOps.handleEdit}
                 onDelete={departmentOps.handleDelete}
+                onConvertToSector={departmentOps.handleConvertToSector}
               />
             </>
           ) : (
@@ -158,6 +159,7 @@ export const OrganizationTab = () => {
                 onSelectSector={sectorOps.handleSelectSector}
                 onEdit={sectorOps.handleEdit}
                 onDelete={sectorOps.handleDelete}
+                onConvertToDepartment={sectorOps.handleConvertToDepartment}
               />
             </>
           )}
