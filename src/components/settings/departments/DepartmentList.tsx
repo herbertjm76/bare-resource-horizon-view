@@ -142,7 +142,12 @@ export const DepartmentList: React.FC<DepartmentListProps> = ({
                   />
                 )}
                 <IconComponent className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="font-medium text-sm truncate">{department.name}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-sm truncate">{department.name}</div>
+                  {department.sector && (
+                    <div className="text-xs text-muted-foreground truncate">{department.sector}</div>
+                  )}
+                </div>
               </div>
               {editMode && (
                 <div className="flex gap-1 flex-shrink-0">
