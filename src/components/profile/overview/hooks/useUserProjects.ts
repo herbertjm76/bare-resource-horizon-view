@@ -54,13 +54,13 @@ export const useUserProjects = (userId: string | undefined) => {
 
       const allProjects = Array.from(projectMap.values());
 
-      // Split into current (active/in progress) and history (completed/on hold)
+      // Split into current (active/in progress) and history (completed only)
       const current = allProjects.filter(p => 
-        p.status === 'In Progress' || p.status === 'Planning'
+        p.status === 'In Progress' || p.status === 'Planning' || p.status === 'On Hold'
       );
       
       const history = allProjects.filter(p => 
-        p.status === 'Complete' || p.status === 'On Hold'
+        p.status === 'Complete'
       );
 
       return { current, history };
