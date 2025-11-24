@@ -38,7 +38,9 @@ export const ProjectHistoryCard: React.FC<ProjectHistoryCardProps> = ({ userId }
                 <div className="min-w-0">
                   <h4 className="text-xs font-medium text-gray-900 truncate">{project.name}</h4>
                   <p className="text-xs text-gray-600">
-                    {project.latest_week ? format(new Date(project.latest_week), 'MMM yyyy') : 'N/A'}
+                    {project.contract_end_date 
+                      ? format(new Date(project.contract_end_date), 'MMM yyyy')
+                      : 'Completed'}
                   </p>
                 </div>
                 <div className="text-right flex-shrink-0">
