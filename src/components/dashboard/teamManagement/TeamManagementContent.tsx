@@ -24,6 +24,7 @@ interface TeamManagementContentProps {
   onInviteMember: () => void;
   onResendInvite: (invite: Invite) => void;
   onDeleteInvite: (inviteId: string) => void;
+  onRefresh?: () => void;
 }
 
 export const TeamManagementContent: React.FC<TeamManagementContentProps> = ({
@@ -45,7 +46,8 @@ export const TeamManagementContent: React.FC<TeamManagementContentProps> = ({
   onCopyInvite,
   onInviteMember,
   onResendInvite,
-  onDeleteInvite
+  onDeleteInvite,
+  onRefresh
 }) => {
   return (
     <div className="space-y-6">
@@ -60,6 +62,7 @@ export const TeamManagementContent: React.FC<TeamManagementContentProps> = ({
         onDeleteMember={onDeleteMember}
         onBulkDelete={onBulkDelete}
         onAdd={onAdd}
+        onRefresh={onRefresh}
       />
 
       <PendingInvitesSection 

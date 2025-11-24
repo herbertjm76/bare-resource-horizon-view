@@ -84,6 +84,7 @@ export const TeamManagement = ({
           onInviteMember={dialogsState.openInviteDialog}
           onResendInvite={inviteActions.resendInvite}
           onDeleteInvite={inviteActions.deleteInvite}
+          onRefresh={handleRefresh}
         />
 
         <TeamManagementDialogs
@@ -128,6 +129,7 @@ export const TeamManagement = ({
         onInviteMember={dialogsState.openInviteDialog}
         onResendInvite={inviteActions.resendInvite}
         onDeleteInvite={inviteActions.deleteInvite}
+        onRefresh={handleRefresh}
       />
 
       <TeamManagementDialogs

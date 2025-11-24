@@ -16,6 +16,7 @@ interface TeamMemberSectionProps {
   onDeleteMember: (memberId: string) => void;
   onBulkDelete: () => void;
   onAdd: () => void;
+  onRefresh?: () => void;
 }
 
 const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
@@ -28,7 +29,8 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
   onEditMember,
   onDeleteMember,
   onBulkDelete,
-  onAdd
+  onAdd,
+  onRefresh
 }) => {
   return (
     <Card>
@@ -40,7 +42,8 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
             setEditMode={setEditMode} 
             selectedCount={selectedMembers.length} 
             onBulkDelete={onBulkDelete} 
-            onAdd={onAdd} 
+            onAdd={onAdd}
+            onImportComplete={onRefresh}
           />
         )}
       </CardHeader>

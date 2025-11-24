@@ -1,7 +1,8 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, UserPlus } from "lucide-react";
+import { Edit, Trash2, UserPlus, Upload } from "lucide-react";
+import { ExcelImportDialog } from "@/components/projects/ExcelImportDialog";
 
 interface TeamMembersToolbarProps {
   editMode: boolean;
@@ -9,6 +10,7 @@ interface TeamMembersToolbarProps {
   selectedCount: number;
   onBulkDelete?: () => void;
   onAdd?: () => void;
+  onImportComplete?: () => void;
 }
 
 const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({ 
@@ -16,7 +18,8 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   setEditMode,
   selectedCount,
   onBulkDelete,
-  onAdd
+  onAdd,
+  onImportComplete
 }) => {
   return (
     <div className="flex items-center gap-2">
@@ -30,6 +33,18 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
           Add Member
         </Button>
       )}
+      <ExcelImportDialog 
+        onImportComplete={onImportComplete}
+        trigger={
+          <Button 
+            variant="outline" 
+            size="sm"
+          >
+            <Upload className="h-4 w-4 mr-1" />
+            Import Excel
+          </Button>
+        }
+      />
       <Button 
         variant={editMode ? "secondary" : "outline"}
         size="sm"
