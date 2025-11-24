@@ -1172,6 +1172,44 @@ export type Database = {
           },
         ]
       }
+      project_statuses: {
+        Row: {
+          color: string | null
+          company_id: string | null
+          created_at: string
+          id: string
+          name: string
+          order_index: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          order_index: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          order_index?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_statuses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_team_composition: {
         Row: {
           company_id: string | null
