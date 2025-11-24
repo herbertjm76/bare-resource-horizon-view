@@ -107,16 +107,67 @@ export const useExcelImport = (onImportComplete: () => void) => {
     setCurrentStep('progress');
     toast.info('Starting import...');
     
-    // TODO: Implement actual import logic based on detection type and final list
-    // For now, simulate progress
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      setImportProgress(i);
+    try {
+      let result;
+      
+      if (detectionType === 'projects') {
+        const processor = new ExcelProcessor();
+        
+        // Convert object data to array format for importer
+        const keys = finalList.length > 0 ? Object.keys(finalList[0]) : [];
+        const arrayData = finalList.map(obj => keys.map(key => obj[key]));
+        
+        // Create column mapping
+        const columnMapping: Record<string, string> = {};
+        keys.forEach((key, index) => {
+          columnMapping[index.toString()] = key;
+        });
+        
+        result = await processor.importProjects(
+          arrayData,
+          columnMapping,
+          (progress) => setImportProgress(progress)
+        );
+      } else {
+        const { TeamExcelProcessor } = await import('@/components/team/services/TeamExcelProcessor');
+        const processor = new TeamExcelProcessor();
+        
+        // Convert object data to array format for importer
+        const keys = finalList.length > 0 ? Object.keys(finalList[0]) : [];
+        const arrayData = finalList.map(obj => keys.map(key => obj[key]));
+        
+        // Create column mapping
+        const columnMapping: Record<string, string> = {};
+        keys.forEach((key, index) => {
+          columnMapping[index.toString()] = key;
+        });
+        
+        result = await processor.importTeamMembers(
+          arrayData,
+          columnMapping,
+          (progress) => setImportProgress(progress)
+        );
+      }
+      
+      // Store the results
+      setImportErrors(result.errors || []);
+      setImportWarnings(result.warnings || []);
+      setImportSuggestions(result.suggestions || []);
+      
+      setCurrentStep('complete');
+      
+      if (result.success && result.imported > 0) {
+        toast.success(`Successfully imported ${result.imported} ${detectionType}`);
+        onImportComplete();
+      } else if (result.errors.length > 0) {
+        toast.error('Import completed with errors');
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      setImportErrors([error instanceof Error ? error.message : 'Unknown error occurred']);
+      toast.error('Import failed');
+      setCurrentStep('complete');
     }
-    
-    setCurrentStep('complete');
-    toast.success(`Successfully imported ${finalList.length} items`);
-    onImportComplete();
   };
 
   const downloadTemplate = () => {
