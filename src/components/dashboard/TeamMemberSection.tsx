@@ -56,18 +56,23 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
 
     setIsSaving(true);
     try {
-      // Save all changes in parallel
-      const savePromises = changedMemberIds.map(memberId => 
-        supabase
-          .from('profiles')
+      // Separate active members from pending members
+      const savePromises = changedMemberIds.map(memberId => {
+        const member = teamMembers.find(m => m.id === memberId);
+        const isPending = member && 'isPending' in member && member.isPending;
+        const tableName = isPending ? 'invites' : 'profiles';
+        
+        return supabase
+          .from(tableName)
           .update(pendingChanges[memberId])
-          .eq('id', memberId)
-      );
+          .eq('id', memberId);
+      });
 
       const results = await Promise.all(savePromises);
       const errors = results.filter(r => r.error);
 
       if (errors.length > 0) {
+        console.error('Errors:', errors);
         throw new Error(`Failed to update ${errors.length} member(s)`);
       }
 
