@@ -125,13 +125,6 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="p-6 space-y-6">
-      {/* Risk Alerts - Top Priority */}
-      <RiskAlertsSection
-        overloadedCount={overloadedCount}
-        atRiskProjects={atRiskProjects}
-        upcomingGaps={upcomingGaps}
-      />
-
       {/* Hero Metrics - 4 Key Numbers */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <SparklineMetricCard
@@ -169,8 +162,15 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         />
       </div>
 
-      {/* Capacity Forecast - Full Width */}
-      <CapacityForecastChart data={capacityForecastData} />
+      {/* Alerts + Forecast Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <RiskAlertsSection
+          overloadedCount={overloadedCount}
+          atRiskProjects={atRiskProjects}
+          upcomingGaps={upcomingGaps}
+        />
+        <CapacityForecastChart data={capacityForecastData} />
+      </div>
 
       {/* Second Row: Top Resources + Project Pipeline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
