@@ -31,10 +31,10 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
         <CapacityCard profile={profile} />
 
         {/* Card 3: Current Projects */}
-        <CurrentProjectsCard />
+        <CurrentProjectsCard userId={profile?.id} />
 
         {/* Card 4: Project History */}
-        <ProjectHistoryCard />
+        <ProjectHistoryCard userId={profile?.id} />
       </div>
     </Card>
   );
