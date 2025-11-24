@@ -60,13 +60,46 @@ export const useExcelImport = (onImportComplete: () => void) => {
         return;
       }
 
+      // Transform detected data into proper format
+      let detectedData = aiResult.detected || [];
+      
+      if (type === 'people' && Array.isArray(detectedData)) {
+        // Convert string names to objects with proper structure
+        detectedData = detectedData.map((item: any) => {
+          // If already an object, use it as is
+          if (typeof item === 'object' && item !== null) {
+            return {
+              first_name: item.first_name || item.firstName || '',
+              last_name: item.last_name || item.lastName || '',
+              email: item.email || '',
+              job_title: item.job_title || item.jobTitle || '',
+              department: item.department || '',
+              location: item.location || ''
+            };
+          }
+          
+          // If it's a string (just a name), split it
+          const nameStr = String(item).trim();
+          const nameParts = nameStr.split(/\s+/);
+          
+          return {
+            first_name: nameParts[0] || nameStr,
+            last_name: nameParts.slice(1).join(' ') || '',
+            email: '',
+            job_title: '',
+            department: '',
+            location: ''
+          };
+        });
+      }
+
       setDetectionResult({
-        detected: aiResult.detected || [],
+        detected: detectedData,
         confidence: aiResult.confidence || 0,
         location: aiResult.location || 'Unknown location'
       });
 
-      toast.success(`Detected ${aiResult.detected?.length || 0} items`);
+      toast.success(`Detected ${detectedData.length || 0} items`);
       setCurrentStep('review');
     } catch (error) {
       toast.error('Failed to analyze data');
