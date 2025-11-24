@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { NewProjectDialog } from "./NewProjectDialog";
 import { ExcelImportDialog } from "./ExcelImportDialog";
-import { Edit, Trash2, Upload, Plus, ListChecks } from "lucide-react";
+import { Edit, Trash2, Upload, Plus, ListChecks, CheckSquare, Square } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ProjectsToolbarProps {
@@ -14,6 +14,8 @@ interface ProjectsToolbarProps {
   onBulkDelete?: () => void;
   iconOnly?: boolean;
   onManageStatuses?: () => void;
+  onSelectAll: () => void;
+  allSelected: boolean;
 }
 
 const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({ 
@@ -23,7 +25,9 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
   selectedCount,
   onBulkDelete,
   iconOnly = false,
-  onManageStatuses
+  onManageStatuses,
+  onSelectAll,
+  allSelected
 }) => {
   const handleImportComplete = () => {
     if (onProjectCreated) {
@@ -50,6 +54,25 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
             <p>{editMode ? "Done editing" : "Edit projects"}</p>
           </TooltipContent>
         </Tooltip>
+
+        {editMode && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="outline"
+                size={iconOnly ? "icon" : "sm"}
+                className="mr-2"
+                onClick={onSelectAll}
+              >
+                {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                {!iconOnly && <span className="ml-1">{allSelected ? "Deselect All" : "Select All"}</span>}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{allSelected ? "Deselect all projects" : "Select all projects"}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
 
         {editMode && selectedCount > 0 && (
           <Tooltip>

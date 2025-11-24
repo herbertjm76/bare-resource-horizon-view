@@ -84,6 +84,24 @@ export const ProjectsList = () => {
     );
   };
 
+  const handleSelectAll = () => {
+    const allFilteredIds = filteredProjects.map(p => p.id);
+    const allSelected = allFilteredIds.every(id => selectedProjects.includes(id));
+    
+    if (allSelected) {
+      // Deselect all filtered projects
+      setSelectedProjects(prev => prev.filter(id => !allFilteredIds.includes(id)));
+    } else {
+      // Select all filtered projects
+      setSelectedProjects(prev => [...new Set([...prev, ...allFilteredIds])]);
+    }
+  };
+
+  const allFilteredSelected = useMemo(() => {
+    const allFilteredIds = filteredProjects.map(p => p.id);
+    return allFilteredIds.length > 0 && allFilteredIds.every(id => selectedProjects.includes(id));
+  }, [filteredProjects, selectedProjects]);
+
   const handleFilterChange = (value: string, filterKey: string) => {
     const newFilters = {
       ...filters,
@@ -177,6 +195,8 @@ export const ProjectsList = () => {
                 selectedCount={selectedProjects.length}
                 onBulkDelete={handleBulkDelete}
                 onManageStatuses={() => setShowStatusManager(true)}
+                onSelectAll={handleSelectAll}
+                allSelected={allFilteredSelected}
                 iconOnly={true}
               />
               <FilterPopover
@@ -262,6 +282,8 @@ export const ProjectsList = () => {
               selectedCount={selectedProjects.length}
               onBulkDelete={handleBulkDelete}
               onManageStatuses={() => setShowStatusManager(true)}
+              onSelectAll={handleSelectAll}
+              allSelected={allFilteredSelected}
               iconOnly={false}
             />
           </div>
