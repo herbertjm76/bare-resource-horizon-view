@@ -34,15 +34,9 @@ export const TeamManagement = ({
     toggleInviteEditMode,
     dialogsState,
     inviteActions,
-    memberHandlers
+    memberHandlers,
+    handleRefresh
   } = useTeamManagementState({ activeMembers, userRole, onRefresh });
-
-  // Custom trigger that combines local and parent refresh
-  const handleRefresh = () => {
-    if (onRefresh) {
-      onRefresh();
-    }
-  };
 
   const handlers = useTeamManagementHandlers({
     companyId,
