@@ -1,7 +1,5 @@
 
-import React, { useEffect, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useEffect } from 'react';
 import { TeamMember, Profile } from './types';
 import { TeamManagement } from './TeamManagement';
 import { useTeamMembersPermissions } from '@/hooks/team/useTeamMembersPermissions';
@@ -28,47 +26,6 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
 
   // Filter out only active members (Profile types) for TeamManagement using type guard
   const activeMembers: Profile[] = teamMembers.filter(isProfile);
-
-  // Ensure current user's row reflects their actual highest role
-  // MUST be called before any early returns (Rules of Hooks)
-  const { data: currentUserRole } = useQuery({
-    queryKey: ['currentUserRole', userProfile?.id],
-    queryFn: async () => {
-      if (!userProfile?.id) return null;
-
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userProfile.id);
-
-      if (error || !data) {
-        console.error('Failed to load current user role:', error);
-        return null;
-      }
-
-      let highestRole: string | null = null;
-      if (data.some((r: any) => r.role === 'owner')) {
-        highestRole = 'owner';
-      } else if (data.some((r: any) => r.role === 'admin')) {
-        highestRole = 'admin';
-      } else if (data.length > 0) {
-        highestRole = data[0].role as string;
-      }
-
-      return highestRole;
-    },
-    enabled: !!userProfile?.id,
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-  });
-
-  const activeMembersWithCurrentRole = useMemo(() => {
-    if (!currentUserRole || !userProfile?.id) return activeMembers;
-
-    return activeMembers.map(member =>
-      member.id === userProfile.id ? { ...member, role: currentUserRole } : member
-    );
-  }, [activeMembers, currentUserRole, userProfile?.id]);
 
   // Check permissions on mount
   useEffect(() => {
@@ -100,7 +57,7 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
   return (
     <div className="space-y-6">
       <TeamManagement
-        teamMembers={activeMembersWithCurrentRole}
+        teamMembers={activeMembers}
         inviteUrl={inviteUrl}
         userRole={hasPermission ? 'admin' : 'member'}
         onRefresh={onRefresh}

@@ -82,36 +82,27 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
 
-        // Fetch roles for these users
-        const userIds = profiles.map(p => p.id);
-        const { data: userRoles, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('user_id, role')
-          .in('user_id', userIds);
-
-        if (rolesError) {
-          console.error('Failed to load user roles:', rolesError);
-        }
-
         if (import.meta.env.DEV) {
           console.log('Fetched profiles:', profiles.length || 0);
-          console.log('Fetched roles:', userRoles?.length || 0);
         }
         
-        // Map profiles to include the highest priority role
+        // Determine current user's role from auth metadata (owner/admin/member)
+        const rawRole = (authData.user.user_metadata as any)?.role as string | undefined;
+        const currentUserRole = rawRole && ['owner', 'admin', 'member'].includes(rawRole)
+          ? rawRole
+          : 'member';
+
+        // Map profiles to include role, ensuring the current user reflects their real role
         const profilesWithRoles = profiles.map(profile => {
-          const roles = (userRoles || []).filter((r: any) => r.user_id === profile.id);
-          let highestRole = 'member';
-          
-          if (roles.some((r: any) => r.role === 'owner')) {
-            highestRole = 'owner';
-          } else if (roles.some((r: any) => r.role === 'admin')) {
-            highestRole = 'admin';
+          let role = 'member';
+
+          if (profile.id === authData.user.id) {
+            role = currentUserRole;
           }
-          
+
           return {
             ...profile,
-            role: highestRole
+            role,
           };
         });
         
