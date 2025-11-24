@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,6 +8,8 @@ import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectR
 import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
 import { PersonResourceView } from '@/components/resources/person-view/PersonResourceView';
+import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
+import { format, startOfWeek } from 'date-fns';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
@@ -44,6 +46,12 @@ const ResourceScheduling = () => {
     setDisplayOptions,
     filters.periodToShow
   );
+
+  // Calculate week start date from selected month for the available members row
+  const weekStartDate = useMemo(() => {
+    const weekStart = startOfWeek(selectedMonth, { weekStartsOn: 1 });
+    return format(weekStart, 'yyyy-MM-dd');
+  }, [selectedMonth]);
 
   return (
     <StandardLayout>
@@ -94,6 +102,14 @@ const ResourceScheduling = () => {
               </TabsList>
 
           <TabsContent value="by-project" className="mt-0 py-6">
+            {/* Available Members Row */}
+            <div className="max-w-7xl mx-auto px-6 mb-4">
+              <AvailableMembersRow 
+                weekStartDate={weekStartDate}
+                threshold={80}
+              />
+            </div>
+            
             <ProjectResourcingContent
               selectedMonth={selectedMonth}
               searchTerm={projectSearchTerm}
@@ -113,6 +129,14 @@ const ResourceScheduling = () => {
           </TabsContent>
 
           <TabsContent value="by-person" className="mt-0 py-6">
+            {/* Available Members Row */}
+            <div className="max-w-7xl mx-auto px-6 mb-4">
+              <AvailableMembersRow 
+                weekStartDate={weekStartDate}
+                threshold={80}
+              />
+            </div>
+            
             <PersonResourceView
               startDate={selectedMonth}
               periodToShow={filters.periodToShow}
