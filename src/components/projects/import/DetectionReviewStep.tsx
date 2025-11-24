@@ -93,7 +93,11 @@ export const DetectionReviewStep: React.FC<DetectionReviewStepProps> = ({
             <div key={idx} className="flex items-center gap-2 p-3 rounded-lg bg-secondary/50 group">
               <div className="flex-1">
                 {detectionType === 'people' ? (
-                  <span className="text-sm font-medium">{item}</span>
+                  <span className="text-sm font-medium">
+                    {typeof item === 'string' 
+                      ? item 
+                      : `${item.first_name || ''} ${item.last_name || ''}`.trim() || 'Unknown Name'}
+                  </span>
                 ) : (
                   <div>
                     <span className="text-sm font-medium">{item.code}</span>
