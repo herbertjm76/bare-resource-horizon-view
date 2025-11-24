@@ -13,6 +13,7 @@ interface TeamMembersTableProps {
   setSelectedMembers: (members: string[]) => void;
   onEditMember: (member: TeamMember) => void;
   onDeleteMember: (memberId: string) => void;
+  onRefresh?: () => void;
 }
 
 const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
@@ -22,7 +23,8 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   selectedMembers,
   setSelectedMembers,
   onEditMember,
-  onDeleteMember
+  onDeleteMember,
+  onRefresh
 }) => {
   const navigate = useNavigate();
 
@@ -76,6 +78,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
               onViewMember={handleViewMember}
               onEditMember={onEditMember}
               onDeleteMember={onDeleteMember}
+              onRefresh={onRefresh}
             />
           ))}
         </tbody>
