@@ -101,16 +101,17 @@ const ResourceScheduling = () => {
                 </TabsTrigger>
               </TabsList>
 
-          <TabsContent value="by-project" className="mt-0 py-6">
+          <TabsContent value="by-project" className="mt-0 py-3">
             {/* Available Members Row */}
-            <div className="max-w-7xl mx-auto px-6 mb-4">
-              <AvailableMembersRow 
+            <div className="px-6 mb-3">
+              <AvailableMembersRow
                 weekStartDate={weekStartDate}
                 threshold={80}
               />
             </div>
             
-            <ProjectResourcingContent
+            <div className="px-6">
+              <ProjectResourcingContent
               selectedMonth={selectedMonth}
               searchTerm={projectSearchTerm}
               filters={filters}
@@ -126,27 +127,30 @@ const ResourceScheduling = () => {
               onDisplayOptionChange={handleDisplayOptionChange}
               onClearFilters={clearProjectFilters}
             />
+          </div>
           </TabsContent>
 
-          <TabsContent value="by-person" className="mt-0 py-6">
+          <TabsContent value="by-person" className="mt-0 py-3">
             {/* Available Members Row */}
-            <div className="max-w-7xl mx-auto px-6 mb-4">
-              <AvailableMembersRow 
+            <div className="px-6 mb-3">
+              <AvailableMembersRow
                 weekStartDate={weekStartDate}
                 threshold={80}
               />
             </div>
             
-            <PersonResourceView
+            <div className="px-6">
+              <PersonResourceView
               startDate={selectedMonth}
               periodToShow={filters.periodToShow}
               displayOptions={displayOptions}
               onMonthChange={handleMonthChange}
               onPeriodChange={handlePeriodChange}
             />
+            </div>
           </TabsContent>
 
-          <TabsContent value="timeline" className="mt-0 py-6">
+          <TabsContent value="timeline" className="mt-0 py-3">
             <div className="flex items-center justify-center h-[500px] border-2 border-dashed border-border rounded-xl bg-muted/20">
               <div className="text-center px-6">
                 <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4">
@@ -160,7 +164,7 @@ const ResourceScheduling = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="capacity" className="mt-0 py-6">
+          <TabsContent value="capacity" className="mt-0 py-3">
             <div className="flex items-center justify-center h-[500px] border-2 border-dashed border-border rounded-xl bg-muted/20">
               <div className="text-center px-6">
                 <div className="inline-flex p-4 rounded-full bg-emerald-500/10 mb-4">
