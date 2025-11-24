@@ -35,94 +35,151 @@ export const ImportUploadStep: React.FC<ImportUploadStepProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractedPeople, setExtractedPeople] = useState<ExtractedPerson[]>([]);
   const [isImporting, setIsImporting] = useState(false);
+  const [processedCount, setProcessedCount] = useState(0);
+  const [totalToProcess, setTotalToProcess] = useState(0);
+  const pasteAreaRef = React.useRef<HTMLDivElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onFileUpload(event, orientation);
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const processImage = async (file: File): Promise<ExtractedPerson[]> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64 = reader.result as string;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
+          const { data, error } = await supabase.functions.invoke('extract-team-from-image', {
+            body: { imageData: base64 }
+          });
+
+          if (error) throw error;
+
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          resolve(data.people || []);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+    
+    if (imageFiles.length === 0) {
+      toast.error('Please upload image files');
       return;
     }
 
     setIsProcessing(true);
     setExtractedPeople([]);
+    setProcessedCount(0);
+    setTotalToProcess(imageFiles.length);
 
     try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result as string;
+      let allPeople: ExtractedPerson[] = [];
 
-        const { data, error } = await supabase.functions.invoke('extract-team-from-image', {
-          body: { imageData: base64 }
-        });
+      for (let i = 0; i < imageFiles.length; i++) {
+        const people = await processImage(imageFiles[i]);
+        allPeople = [...allPeople, ...people];
+        setProcessedCount(i + 1);
+      }
 
-        if (error) throw error;
-
-        if (data.error) {
-          toast.error(data.error);
-          return;
+      // Remove duplicates based on name
+      const uniquePeople = allPeople.reduce((acc, person) => {
+        const key = `${person.first_name}-${person.last_name}`.toLowerCase();
+        if (!acc.some(p => `${p.first_name}-${p.last_name}`.toLowerCase() === key)) {
+          acc.push(person);
         }
+        return acc;
+      }, [] as ExtractedPerson[]);
 
-        setExtractedPeople(data.people || []);
-        toast.success(`Extracted ${data.total} people (${data.new} new, ${data.existing} existing)`);
-      };
-      reader.readAsDataURL(file);
+      setExtractedPeople(uniquePeople);
+      const newCount = uniquePeople.filter(p => p.status === 'new').length;
+      const existingCount = uniquePeople.filter(p => p.status === 'exists').length;
+      toast.success(`Extracted ${uniquePeople.length} people from ${imageFiles.length} screenshot(s) (${newCount} new, ${existingCount} existing)`);
+    } catch (error: any) {
+      console.error('Error extracting from images:', error);
+      toast.error('Failed to extract names from images');
+    } finally {
+      setIsProcessing(false);
+      setProcessedCount(0);
+      setTotalToProcess(0);
+    }
+  };
+
+  const handlePaste = async (event: React.ClipboardEvent | ClipboardEvent) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    const imageFiles: File[] = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const blob = items[i].getAsFile();
+        if (blob) imageFiles.push(blob);
+      }
+    }
+
+    if (imageFiles.length === 0) return;
+
+    event.preventDefault();
+    setIsProcessing(true);
+    setExtractedPeople([]);
+    setProcessedCount(0);
+    setTotalToProcess(imageFiles.length);
+
+    try {
+      let allPeople: ExtractedPerson[] = [];
+
+      for (let i = 0; i < imageFiles.length; i++) {
+        const people = await processImage(imageFiles[i]);
+        allPeople = [...allPeople, ...people];
+        setProcessedCount(i + 1);
+      }
+
+      // Remove duplicates
+      const uniquePeople = allPeople.reduce((acc, person) => {
+        const key = `${person.first_name}-${person.last_name}`.toLowerCase();
+        if (!acc.some(p => `${p.first_name}-${p.last_name}`.toLowerCase() === key)) {
+          acc.push(person);
+        }
+        return acc;
+      }, [] as ExtractedPerson[]);
+
+      setExtractedPeople(uniquePeople);
+      const newCount = uniquePeople.filter(p => p.status === 'new').length;
+      const existingCount = uniquePeople.filter(p => p.status === 'exists').length;
+      toast.success(`Extracted ${uniquePeople.length} people from ${imageFiles.length} pasted screenshot(s) (${newCount} new, ${existingCount} existing)`);
     } catch (error: any) {
       console.error('Error extracting from image:', error);
       toast.error('Failed to extract names from image');
     } finally {
       setIsProcessing(false);
+      setProcessedCount(0);
+      setTotalToProcess(0);
     }
   };
 
-  const handlePaste = async (event: React.ClipboardEvent) => {
-    const items = event.clipboardData?.items;
-    if (!items) return;
-
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf('image') !== -1) {
-        event.preventDefault();
-        const blob = items[i].getAsFile();
-        if (!blob) continue;
-
-        setIsProcessing(true);
-        setExtractedPeople([]);
-
-        try {
-          const reader = new FileReader();
-          reader.onload = async () => {
-            const base64 = reader.result as string;
-
-            const { data, error } = await supabase.functions.invoke('extract-team-from-image', {
-              body: { imageData: base64 }
-            });
-
-            if (error) throw error;
-
-            if (data.error) {
-              toast.error(data.error);
-              return;
-            }
-
-            setExtractedPeople(data.people || []);
-            toast.success(`Extracted ${data.total} people (${data.new} new, ${data.existing} existing)`);
-          };
-          reader.readAsDataURL(blob);
-        } catch (error: any) {
-          console.error('Error extracting from image:', error);
-          toast.error('Failed to extract names from image');
-        } finally {
-          setIsProcessing(false);
-        }
-        break;
+  React.useEffect(() => {
+    const handleGlobalPaste = (e: ClipboardEvent) => {
+      if (pasteAreaRef.current && document.activeElement === pasteAreaRef.current) {
+        handlePaste(e);
       }
-    }
-  };
+    };
+
+    document.addEventListener('paste', handleGlobalPaste);
+    return () => document.removeEventListener('paste', handleGlobalPaste);
+  }, []);
 
   const handleImportTeam = async () => {
     if (!company?.id) return;
@@ -229,6 +286,7 @@ export const ImportUploadStep: React.FC<ImportUploadStepProps> = ({
                 onChange={handleFileChange}
                 className="hidden"
                 id="excel-upload"
+                multiple
               />
               <label htmlFor="excel-upload">
                 <Button variant="outline" className="cursor-pointer" asChild>
@@ -248,8 +306,10 @@ export const ImportUploadStep: React.FC<ImportUploadStepProps> = ({
           </div>
 
           <div 
-            className="border-2 border-dashed rounded-lg p-8 text-center"
+            ref={pasteAreaRef}
+            className="border-2 border-dashed rounded-lg p-8 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer"
             onPaste={handlePaste}
+            onClick={() => pasteAreaRef.current?.focus()}
             tabIndex={0}
           >
             <input
@@ -259,18 +319,22 @@ export const ImportUploadStep: React.FC<ImportUploadStepProps> = ({
               className="hidden"
               id="screenshot-upload"
               disabled={isProcessing}
+              multiple
             />
             <label htmlFor="screenshot-upload" className="cursor-pointer">
               {isProcessing ? (
                 <div className="flex flex-col items-center gap-2">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="text-sm text-muted-foreground">Extracting names from image...</p>
+                  <p className="text-sm text-muted-foreground">
+                    Extracting names from {totalToProcess > 1 ? `${processedCount}/${totalToProcess} screenshots` : 'screenshot'}...
+                  </p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2">
                   <Image className="h-8 w-8 text-muted-foreground" />
-                  <p className="text-sm font-medium">Click to upload or paste screenshot</p>
-                  <p className="text-xs text-muted-foreground">PNG, JPG up to 10MB • Ctrl+V to paste</p>
+                  <p className="text-sm font-medium">Click to upload or paste screenshots</p>
+                  <p className="text-xs text-muted-foreground">Multiple files supported • PNG, JPG up to 10MB each</p>
+                  <p className="text-xs text-primary font-medium">Click here then press Ctrl+V to paste</p>
                 </div>
               )}
             </label>
