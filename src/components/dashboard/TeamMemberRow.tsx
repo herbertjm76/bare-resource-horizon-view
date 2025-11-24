@@ -99,9 +99,23 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         </div>
       </td>
       <td className="px-4 py-3">
-        <Badge className="bg-gray-100 text-gray-800 border-gray-200 border">
-          Member
-        </Badge>
+        {'isPending' in member ? (
+          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 border">
+            Pending
+          </Badge>
+        ) : (
+          <Badge 
+            className={
+              (member as any).role === 'owner' 
+                ? "bg-purple-100 text-purple-800 border-purple-200 border" 
+                : (member as any).role === 'admin'
+                ? "bg-blue-100 text-blue-800 border-blue-200 border"
+                : "bg-gray-100 text-gray-800 border-gray-200 border"
+            }
+          >
+            {((member as any).role || 'member').charAt(0).toUpperCase() + ((member as any).role || 'member').slice(1)}
+          </Badge>
+        )}
       </td>
       <td className="px-4 py-3">
         {editMode && ['owner', 'admin'].includes(userRole) ? (
