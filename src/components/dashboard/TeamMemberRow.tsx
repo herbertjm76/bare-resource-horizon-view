@@ -31,7 +31,6 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   onEditMember,
   onDeleteMember
 }) => {
-  const [isInlineEditing, setIsInlineEditing] = useState(false);
   const [editedData, setEditedData] = useState({
     first_name: member.first_name || '',
     last_name: member.last_name || '',
@@ -41,8 +40,29 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
     job_title: member.job_title || ''
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  // Reset edited data when member changes or edit mode is toggled
+  React.useEffect(() => {
+    setEditedData({
+      first_name: member.first_name || '',
+      last_name: member.last_name || '',
+      email: member.email || '',
+      department: member.department || '',
+      location: member.location || '',
+      job_title: member.job_title || ''
+    });
+    setHasChanges(false);
+  }, [member, editMode]);
+
+  const handleChange = (field: string, value: string) => {
+    setEditedData({ ...editedData, [field]: value });
+    setHasChanges(true);
+  };
 
   const handleSave = async () => {
+    if (!hasChanges) return;
+    
     setIsSaving(true);
     try {
       const { error } = await supabase
@@ -60,7 +80,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
       if (error) throw error;
 
       toast.success('Member updated successfully');
-      setIsInlineEditing(false);
+      setHasChanges(false);
       
       // Trigger a refresh if onEditMember exists
       if (onEditMember) {
@@ -83,7 +103,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
       location: member.location || '',
       job_title: member.job_title || ''
     });
-    setIsInlineEditing(false);
+    setHasChanges(false);
   };
 
   const getRoleBadgeColor = (role: string) => {
@@ -113,25 +133,25 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         <div className="flex items-center gap-3">
           <TeamMemberAvatar member={member} />
           <div className="flex-1">
-            {isInlineEditing && editMode ? (
+            {editMode && ['owner', 'admin'].includes(userRole) ? (
               <div className="space-y-1">
                 <div className="flex gap-1">
                   <Input
                     value={editedData.first_name}
-                    onChange={(e) => setEditedData({ ...editedData, first_name: e.target.value })}
+                    onChange={(e) => handleChange('first_name', e.target.value)}
                     placeholder="First name"
                     className="h-7 text-sm"
                   />
                   <Input
                     value={editedData.last_name}
-                    onChange={(e) => setEditedData({ ...editedData, last_name: e.target.value })}
+                    onChange={(e) => handleChange('last_name', e.target.value)}
                     placeholder="Last name"
                     className="h-7 text-sm"
                   />
                 </div>
                 <Input
                   value={editedData.email}
-                  onChange={(e) => setEditedData({ ...editedData, email: e.target.value })}
+                  onChange={(e) => handleChange('email', e.target.value)}
                   placeholder="Email"
                   className="h-7 text-sm"
                   type="email"
@@ -157,10 +177,10 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         </Badge>
       </td>
       <td className="px-4 py-3">
-        {isInlineEditing && editMode ? (
+        {editMode && ['owner', 'admin'].includes(userRole) ? (
           <Input
             value={editedData.department}
-            onChange={(e) => setEditedData({ ...editedData, department: e.target.value })}
+            onChange={(e) => handleChange('department', e.target.value)}
             placeholder="Department"
             className="h-8 text-sm"
           />
@@ -171,10 +191,10 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         )}
       </td>
       <td className="px-4 py-3">
-        {isInlineEditing && editMode ? (
+        {editMode && ['owner', 'admin'].includes(userRole) ? (
           <Input
             value={editedData.location}
-            onChange={(e) => setEditedData({ ...editedData, location: e.target.value })}
+            onChange={(e) => handleChange('location', e.target.value)}
             placeholder="Location"
             className="h-8 text-sm"
           />
@@ -186,14 +206,14 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
-          {isInlineEditing ? (
+          {editMode && ['owner', 'admin'].includes(userRole) ? (
             <>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleSave}
-                disabled={isSaving}
-                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                disabled={isSaving || !hasChanges}
+                className="text-green-600 hover:text-green-700 hover:bg-green-50 disabled:opacity-50"
               >
                 <Check className="h-4 w-4" />
               </Button>
@@ -201,44 +221,30 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleCancel}
-                disabled={isSaving}
-                className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                disabled={isSaving || !hasChanges}
+                className="text-gray-600 hover:text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
                 <X className="h-4 w-4" />
               </Button>
-            </>
-          ) : (
-            <>
-              {/* Everyone can view insights now - this is the MVP feature */}
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onViewMember(member.id)}
-                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                onClick={() => onDeleteMember(member.id)}
+                disabled={isSaving}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                <Eye className="h-4 w-4" />
+                <Trash2 className="h-4 w-4" />
               </Button>
-              {editMode && ['owner', 'admin'].includes(userRole) && (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsInlineEditing(true)}
-                    className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDeleteMember(member.id)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </>
-              )}
             </>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onViewMember(member.id)}
+              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
           )}
         </div>
       </td>
