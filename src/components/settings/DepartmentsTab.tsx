@@ -31,7 +31,8 @@ export const DepartmentsTab = () => {
     handleSelectDepartment,
     handleCancel,
     toggleEditMode,
-    handleAddNew
+    handleAddNew,
+    handleConvertToSector
   } = useDepartmentOperations(departments, setDepartments, company?.id);
 
   if (loading) {
@@ -101,6 +102,7 @@ export const DepartmentsTab = () => {
             onSelectDepartment={handleSelectDepartment}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onConvertToSector={handleConvertToSector}
           />
         </div>
       </CardContent>

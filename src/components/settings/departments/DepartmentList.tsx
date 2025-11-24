@@ -3,7 +3,7 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
-  Edit, Trash2, Circle, Square, Triangle, Hexagon, Diamond, Star, Pentagon, Octagon,
+  Edit, Trash2, ArrowRightLeft, Circle, Square, Triangle, Hexagon, Diamond, Star, Pentagon, Octagon,
   Flag, Bookmark, Tag, Pin, MapPin, Hash, AtSign, Percent,
   Dot, Disc, Box, Package, Boxes, Layers, Grid, Layout,
   Shapes, Sparkles, Zap, Flame, Sun, Moon, Cloud, Droplet,
@@ -106,6 +106,7 @@ interface DepartmentListProps {
   onSelectDepartment: (deptId: string) => void;
   onEdit: (department: Department) => void;
   onDelete: (department: Department) => void;
+  onConvertToSector: (department: Department) => void;
 }
 
 export const DepartmentList: React.FC<DepartmentListProps> = ({
@@ -114,7 +115,8 @@ export const DepartmentList: React.FC<DepartmentListProps> = ({
   selectedDepartments,
   onSelectDepartment,
   onEdit,
-  onDelete
+  onDelete,
+  onConvertToSector
 }) => {
   if (departments.length === 0) {
     return (
@@ -153,6 +155,7 @@ export const DepartmentList: React.FC<DepartmentListProps> = ({
                     size="icon"
                     className="h-8 w-8"
                     onClick={() => onEdit(department)}
+                    title="Edit"
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -160,7 +163,17 @@ export const DepartmentList: React.FC<DepartmentListProps> = ({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
+                    onClick={() => onConvertToSector(department)}
+                    title="Convert to Sector"
+                  >
+                    <ArrowRightLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
                     onClick={() => onDelete(department)}
+                    title="Delete"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
