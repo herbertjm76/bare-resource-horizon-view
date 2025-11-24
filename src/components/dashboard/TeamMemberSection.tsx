@@ -54,30 +54,43 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
       return;
     }
 
-    // Only update active (registered) members for now
-    const profileIdsToUpdate = changedMemberIds.filter((memberId) => {
+    // Separate active and pending members
+    const activeIds: string[] = [];
+    const pendingIds: string[] = [];
+    
+    changedMemberIds.forEach((memberId) => {
       const member = teamMembers.find((m) => m.id === memberId);
       const isPending = member && 'isPending' in member && (member as any).isPending;
-      return !isPending;
+      if (isPending) {
+        pendingIds.push(memberId);
+      } else {
+        activeIds.push(memberId);
+      }
     });
-
-    if (profileIdsToUpdate.length === 0) {
-      toast.error('Bulk editing is currently only supported for registered members.');
-      setPendingChanges({});
-      setEditMode(false);
-      return;
-    }
-
-    const skippedCount = changedMemberIds.length - profileIdsToUpdate.length;
 
     setIsSaving(true);
     try {
-      const savePromises = profileIdsToUpdate.map((memberId) =>
-        supabase
-          .from('profiles')
-          .update(pendingChanges[memberId])
-          .eq('id', memberId)
-      );
+      const savePromises = [];
+      
+      // Update active members in profiles table
+      activeIds.forEach((memberId) => {
+        savePromises.push(
+          supabase
+            .from('profiles')
+            .update(pendingChanges[memberId])
+            .eq('id', memberId)
+        );
+      });
+      
+      // Update pending members in invites table
+      pendingIds.forEach((memberId) => {
+        savePromises.push(
+          supabase
+            .from('invites')
+            .update(pendingChanges[memberId])
+            .eq('id', memberId)
+        );
+      });
 
       const results = await Promise.all(savePromises);
       const errors = results.filter((r) => r.error);
@@ -87,13 +100,8 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
         throw new Error(`Failed to update ${errors.length} member(s)`);
       }
 
-      const updatedCount = profileIdsToUpdate.length;
-      const message =
-        skippedCount > 0
-          ? `Updated ${updatedCount} member(s). Pending invites were not updated.`
-          : `Successfully updated ${updatedCount} member(s)`;
-
-      toast.success(message);
+      const totalUpdated = activeIds.length + pendingIds.length;
+      toast.success(`Successfully updated ${totalUpdated} member(s)`);
       setPendingChanges({});
       setEditMode(false);
 
@@ -118,7 +126,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg font-medium">Registered Members</CardTitle>
+        <CardTitle className="text-lg font-medium">Team Members</CardTitle>
         {['owner', 'admin'].includes(userRole) && (
           <TeamMembersToolbar 
             editMode={editMode} 
