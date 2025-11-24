@@ -26,36 +26,11 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
 }) => {
   const { checkUserPermissions, hasPermission, isChecking } = useTeamMembersPermissions();
 
-  // Check permissions on mount
-  useEffect(() => {
-    checkUserPermissions();
-  }, [checkUserPermissions]);
-
-  if (isProfileLoading || isChecking) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-violet"></div>
-      </div>
-    );
-  }
-
-  if (!userProfile) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">Unable to load your profile information.</p>
-      </div>
-    );
-  }
-
-  // Generate invite URL
-  const inviteUrl = userProfile?.company_id 
-    ? `${window.location.origin}/join?company=${userProfile.company_id}`
-    : `${window.location.origin}/join`;
- 
   // Filter out only active members (Profile types) for TeamManagement using type guard
   const activeMembers: Profile[] = teamMembers.filter(isProfile);
 
   // Ensure current user's row reflects their actual highest role
+  // MUST be called before any early returns (Rules of Hooks)
   const { data: currentUserRole } = useQuery({
     queryKey: ['currentUserRole', userProfile?.id],
     queryFn: async () => {
@@ -94,6 +69,33 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
       member.id === userProfile.id ? { ...member, role: currentUserRole } : member
     );
   }, [activeMembers, currentUserRole, userProfile?.id]);
+
+  // Check permissions on mount
+  useEffect(() => {
+    checkUserPermissions();
+  }, [checkUserPermissions]);
+
+  // Early returns AFTER all hooks
+  if (isProfileLoading || isChecking) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-violet"></div>
+      </div>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">Unable to load your profile information.</p>
+      </div>
+    );
+  }
+
+  // Generate invite URL
+  const inviteUrl = userProfile.company_id 
+    ? `${window.location.origin}/join?company=${userProfile.company_id}`
+    : `${window.location.origin}/join`;
  
   return (
     <div className="space-y-6">
