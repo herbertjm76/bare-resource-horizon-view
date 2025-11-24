@@ -7,7 +7,8 @@ type BaseProfile = Database['public']['Tables']['profiles']['Row'];
 
 // Extended Profile type with additional fields that might not be in the database
 export interface Profile extends BaseProfile {
-  // These properties are now correctly optional to match the database schema
+  // Role is fetched from user_roles table and merged in
+  role?: string;
 }
 
 export type Invite = Database['public']['Tables']['invites']['Row'];

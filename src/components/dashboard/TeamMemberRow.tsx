@@ -106,14 +106,14 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         ) : (
           <Badge 
             className={
-              (member as any).role === 'owner' 
+              member.role === 'owner' 
                 ? "bg-purple-100 text-purple-800 border-purple-200 border" 
-                : (member as any).role === 'admin'
+                : member.role === 'admin'
                 ? "bg-blue-100 text-blue-800 border-blue-200 border"
                 : "bg-gray-100 text-gray-800 border-gray-200 border"
             }
           >
-            {((member as any).role || 'member').charAt(0).toUpperCase() + ((member as any).role || 'member').slice(1)}
+            {(member.role || 'member').charAt(0).toUpperCase() + (member.role || 'member').slice(1)}
           </Badge>
         )}
       </td>
