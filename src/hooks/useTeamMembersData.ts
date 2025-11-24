@@ -65,21 +65,16 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Use direct query to get company members with their roles
-        const { data: profiles, error } = await supabase
+        // Fetch profiles
+        const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
-          .select(`
-            *,
-            user_roles!user_roles_user_id_fkey (
-              role
-            )
-          `)
+          .select('*')
           .eq('company_id', companyId);
 
-        if (error) {
-          console.error('Failed to load team members:', error);
+        if (profilesError) {
+          console.error('Failed to load team members:', profilesError);
           toast.error('Failed to load team members');
-          throw error;
+          throw profilesError;
         }
 
         if (!profiles) {
@@ -87,13 +82,25 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
 
+        // Fetch roles for these users
+        const userIds = profiles.map(p => p.id);
+        const { data: userRoles, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('user_id, role')
+          .in('user_id', userIds);
+
+        if (rolesError) {
+          console.error('Failed to load user roles:', rolesError);
+        }
+
         if (import.meta.env.DEV) {
           console.log('Fetched profiles:', profiles.length || 0);
+          console.log('Fetched roles:', userRoles?.length || 0);
         }
         
         // Map profiles to include the highest priority role
         const profilesWithRoles = profiles.map(profile => {
-          const roles = (profile as any).user_roles || [];
+          const roles = (userRoles || []).filter((r: any) => r.user_id === profile.id);
           let highestRole = 'member';
           
           if (roles.some((r: any) => r.role === 'owner')) {
