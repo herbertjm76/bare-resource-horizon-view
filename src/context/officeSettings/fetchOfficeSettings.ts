@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Role, Location, Rate, Department, Sector, ProjectStage } from './types';
+import { Role, Location, Rate, Department, Sector, ProjectStage, ProjectStatus } from './types';
 import { toast } from 'sonner';
 
 type OfficeSettings = {
@@ -9,6 +9,7 @@ type OfficeSettings = {
   departments: Department[];
   sectors: Sector[];
   office_stages: ProjectStage[];
+  project_statuses: ProjectStatus[];
 };
 
 export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSettings> => {
@@ -85,12 +86,22 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       
     if (stagesError) throw stagesError;
 
+    // Fetch project statuses data with colors
+    const { data: statusesData, error: statusesError } = await supabase
+      .from('project_statuses')
+      .select('id, name, order_index, company_id, color')
+      .eq('company_id', companyId)
+      .order('order_index', { ascending: true });
+      
+    if (statusesError) throw statusesError;
+
     console.log("Roles data:", rolesData);
     console.log("Locations data:", locationsData);
     console.log("Departments data:", departmentsData);
     console.log("Sectors data:", sectorsData);
     console.log("Rates data:", ratesData);
     console.log("Stages data:", stagesData);
+    console.log("Statuses data:", statusesData);
 
     // Process data
     const processedRoles = Array.isArray(rolesData) 
@@ -144,6 +155,16 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
         }))
       : [];
 
+    const processedStatuses = Array.isArray(statusesData)
+      ? statusesData.map((status) => ({
+          id: status.id,
+          name: status.name,
+          order_index: status.order_index,
+          company_id: (status.company_id ?? companyId).toString(),
+          color: status.color || "#6366f1" // Default color if none is set
+        }))
+      : [];
+
     // Fix the TypeScript error by properly casting the type property
     const processedRates = Array.isArray(ratesData)
       ? ratesData.map(r => {
@@ -171,7 +192,8 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       rates: processedRates,
       departments: processedDepartments,
       sectors: processedSectors,
-      office_stages: processedStages
+      office_stages: processedStages,
+      project_statuses: processedStatuses
     };
   } catch (error: any) {
     console.error('Error fetching office settings:', error);
@@ -184,7 +206,8 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       rates: [],
       departments: [],
       sectors: [],
-      office_stages: []
+      office_stages: [],
+      project_statuses: []
     };
   }
 };
