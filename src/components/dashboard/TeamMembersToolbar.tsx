@@ -1,8 +1,9 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, UserPlus, Upload, Check, X } from "lucide-react";
+import { Edit, Trash2, UserPlus, Upload, Check, X, Image } from "lucide-react";
 import { ExcelImportDialog } from "@/components/projects/ExcelImportDialog";
+import { ImportFromScreenshotDialog } from "../team/ImportFromScreenshotDialog";
 
 interface TeamMembersToolbarProps {
   editMode: boolean;
@@ -29,8 +30,11 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   hasChanges,
   isSaving
 }) => {
+  const [showScreenshotDialog, setShowScreenshotDialog] = useState(false);
+  
   return (
-    <div className="flex items-center gap-2">
+    <>
+      <div className="flex items-center gap-2">
       {!editMode && onAdd && (
         <Button 
           variant="default"
@@ -42,18 +46,28 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
         </Button>
       )}
       {!editMode && (
-        <ExcelImportDialog 
-          onImportComplete={onImportComplete}
-          trigger={
-            <Button 
-              variant="outline" 
-              size="sm"
-            >
-              <Upload className="h-4 w-4 mr-1" />
-              Import Excel
-            </Button>
-          }
-        />
+        <>
+          <ExcelImportDialog 
+            onImportComplete={onImportComplete}
+            trigger={
+              <Button 
+                variant="outline" 
+                size="sm"
+              >
+                <Upload className="h-4 w-4 mr-1" />
+                Import Excel
+              </Button>
+            }
+          />
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowScreenshotDialog(true)}
+          >
+            <Image className="h-4 w-4 mr-1" />
+            Import Screenshot
+          </Button>
+        </>
       )}
       {!editMode ? (
         <Button 
@@ -98,6 +112,16 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
         </Button>
       )}
     </div>
+    
+    <ImportFromScreenshotDialog
+      isOpen={showScreenshotDialog}
+      onClose={() => setShowScreenshotDialog(false)}
+      onImportComplete={() => {
+        setShowScreenshotDialog(false);
+        onImportComplete?.();
+      }}
+    />
+  </>
   );
 };
 
