@@ -3,7 +3,23 @@ import * as XLSX from 'xlsx';
 import type { ExcelParseResult } from './types';
 
 export class ExcelParser {
-  static async parseExcelFile(file: File): Promise<ExcelParseResult> {
+  static transposeData(data: any[][]): any[][] {
+    if (!data || data.length === 0) return data;
+    const maxCols = Math.max(...data.map(row => row?.length || 0));
+    const transposed: any[][] = [];
+    
+    for (let col = 0; col < maxCols; col++) {
+      const newRow: any[] = [];
+      for (let row = 0; row < data.length; row++) {
+        newRow.push(data[row]?.[col] ?? '');
+      }
+      transposed.push(newRow);
+    }
+    
+    return transposed;
+  }
+
+  static async parseExcelFile(file: File, options?: { orientation?: 'columns' | 'rows' }): Promise<ExcelParseResult> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
@@ -19,11 +35,16 @@ export class ExcelParser {
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
           
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+          let jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
           
           if (jsonData.length === 0) {
             reject(new Error('Excel file is empty'));
             return;
+          }
+
+          // Transpose data if orientation is set to 'rows'
+          if (options?.orientation === 'rows') {
+            jsonData = ExcelParser.transposeData(jsonData);
           }
           
           // Detect matrix format: look for project codes in first column

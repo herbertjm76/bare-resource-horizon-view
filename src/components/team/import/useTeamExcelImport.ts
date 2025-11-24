@@ -17,12 +17,12 @@ export const useTeamExcelImport = (onComplete?: () => void) => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const processor = new TeamExcelProcessor();
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, orientation: 'columns' | 'rows' = 'columns') => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
-      const result = await processor.parseExcelFile(file);
+      const result = await processor.parseExcelFile(file, { orientation });
       setExcelData(result.data);
       setHeaders(result.headers);
       
