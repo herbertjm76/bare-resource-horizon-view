@@ -14,7 +14,9 @@ interface WeekResourceViewProps {
   onWeekChange?: (date: Date) => void;
   weekLabel: string;
   filters: {
-    office: string;
+    sector: string;
+    department: string;
+    location: string;
     searchTerm: string;
   };
   onFilterChange: (key: string, value: string) => void;
@@ -35,9 +37,11 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   
   // Stabilize filters to prevent unnecessary re-renders
   const stableFilters = useMemo(() => ({
-    office: filters.office,
+    sector: filters.sector === 'all' ? '' : filters.sector,
+    department: filters.department === 'all' ? '' : filters.department,
+    location: filters.location === 'all' ? '' : filters.location,
     searchTerm: filters.searchTerm
-  }), [filters.office, filters.searchTerm]);
+  }), [filters.sector, filters.department, filters.location, filters.searchTerm]);
 
   const { 
     allMembers, 
@@ -84,14 +88,18 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   }, [setSelectedWeek, onWeekChange]);
 
   const clearFilters = useCallback(() => {
-    onFilterChange('office', 'all');
+    onFilterChange('sector', 'all');
+    onFilterChange('department', 'all');
+    onFilterChange('location', 'all');
     onFilterChange('searchTerm', '');
   }, [onFilterChange]);
 
   const activeFiltersCount = useMemo(() => [
-    filters.office !== 'all' ? 'office' : '',
+    filters.sector !== 'all' ? 'sector' : '',
+    filters.department !== 'all' ? 'department' : '',
+    filters.location !== 'all' ? 'location' : '',
     filters.searchTerm ? 'search' : ''
-  ].filter(Boolean).length, [filters.office, filters.searchTerm]);
+  ].filter(Boolean).length, [filters.sector, filters.department, filters.location, filters.searchTerm]);
 
   // Weekly metrics calculation using the utility functions
   const metrics = useMemo(() => {
