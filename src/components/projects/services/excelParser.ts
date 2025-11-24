@@ -47,24 +47,27 @@ export class ExcelParser {
             jsonData = ExcelParser.transposeData(jsonData);
           }
           
-          // Detect matrix format: look for project codes in first column
+          // After transposition, always treat first row as headers for row-oriented data
+          // Only use matrix format detection if NOT transposed
           let startRowIndex = 0;
           let isMatrixFormat = false;
           
-          // Check if first column contains project codes (pattern: numbers.numbers)
-          for (let i = 0; i < Math.min(10, jsonData.length); i++) {
-            const firstCell = String(jsonData[i]?.[0] || '').trim();
-            if (/^\d+\.\d+/.test(firstCell)) {
-              isMatrixFormat = true;
-              startRowIndex = i;
-              break;
+          if (options?.orientation !== 'rows') {
+            // Check if first column contains project codes (pattern: numbers.numbers)
+            for (let i = 0; i < Math.min(10, jsonData.length); i++) {
+              const firstCell = String(jsonData[i]?.[0] || '').trim();
+              if (/^\d+\.\d+/.test(firstCell)) {
+                isMatrixFormat = true;
+                startRowIndex = i;
+                break;
+              }
             }
           }
           
           let headers: string[];
           let rows: any[][];
           
-          if (isMatrixFormat) {
+          if (isMatrixFormat && options?.orientation !== 'rows') {
             // For matrix format, use column indices as headers
             const maxColumns = Math.max(...jsonData.map(row => row?.length || 0));
             headers = Array.from({ length: maxColumns }, (_, i) => `Column ${i}`);
@@ -81,8 +84,8 @@ export class ExcelParser {
                      firstCell !== 'CATEGORY';
             }) as any[][];
           } else {
-            // Standard format: first row is headers
-            headers = jsonData[0] as string[];
+            // Standard format: first row is headers (or transposed data)
+            headers = (jsonData[0] || []).map((h: any) => String(h || '').trim()).filter(h => h !== '');
             rows = jsonData.slice(1).filter(row => 
               Array.isArray(row) && row.some(cell => cell !== null && cell !== undefined && cell !== '')
             ) as any[][];
