@@ -5,41 +5,41 @@ import { Button } from "@/components/ui/button";
 import { Edit, Plus } from "lucide-react";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
-import { AddDepartmentDialog } from './departments/AddDepartmentDialog';
-import { BulkOperations } from './departments/BulkOperations';
-import { DepartmentList } from './departments/DepartmentList';
-import { useDepartmentOperations } from './departments/useDepartmentOperations';
+import { AddSectorDialog } from './sectors/AddSectorDialog';
+import { BulkOperations } from './sectors/BulkOperations';
+import { SectorList } from './sectors/SectorList';
+import { useSectorOperations } from './sectors/useSectorOperations';
 
-export const DepartmentsTab = () => {
-  const { departments, setDepartments, loading } = useOfficeSettings();
+export const SectorsTab = () => {
+  const { sectors, setSectors, loading } = useOfficeSettings();
   const { company } = useCompany();
 
   const {
-    editingDepartment,
-    newDepartmentName,
-    setNewDepartmentName,
-    newDepartmentIcon,
-    setNewDepartmentIcon,
+    editingSector,
+    newSectorName,
+    setNewSectorName,
+    newSectorIcon,
+    setNewSectorIcon,
     editMode,
-    selectedDepartments,
+    selectedSectors,
     isSubmitting,
     showAddForm,
     handleSubmit,
     handleEdit,
     handleDelete,
     handleBulkDelete,
-    handleSelectDepartment,
+    handleSelectSector,
     handleCancel,
     toggleEditMode,
     handleAddNew
-  } = useDepartmentOperations(departments, setDepartments, company?.id);
+  } = useSectorOperations(sectors, setSectors, company?.id);
 
   if (loading) {
     return (
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-center">
-            <div className="text-muted-foreground">Loading departments...</div>
+            <div className="text-muted-foreground">Loading sectors...</div>
           </div>
         </CardContent>
       </Card>
@@ -49,7 +49,7 @@ export const DepartmentsTab = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle style={{ color: 'hsl(var(--theme-primary))' }}>Departments</CardTitle>
+        <CardTitle style={{ color: 'hsl(var(--theme-primary))' }}>Sectors</CardTitle>
         <div className="flex gap-2">
           <Button 
             size="sm" 
@@ -64,41 +64,41 @@ export const DepartmentsTab = () => {
             onClick={handleAddNew}
           >
             <Plus className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:inline">Add Department</span>
+            <span className="hidden md:inline">Add Sector</span>
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
-            Define organizational departments to categorize team members and projects.
+            Define organizational sectors to categorize at a higher level than departments.
           </div>
           
           {editMode && (
             <BulkOperations
-              selectedDepartments={selectedDepartments}
+              selectedSectors={selectedSectors}
               onBulkDelete={handleBulkDelete}
             />
           )}
 
-          <AddDepartmentDialog
+          <AddSectorDialog
             open={showAddForm}
             onOpenChange={(open) => !open && handleCancel()}
-            newDepartmentName={newDepartmentName}
-            setNewDepartmentName={setNewDepartmentName}
-            newDepartmentIcon={newDepartmentIcon}
-            setNewDepartmentIcon={setNewDepartmentIcon}
+            newSectorName={newSectorName}
+            setNewSectorName={setNewSectorName}
+            newSectorIcon={newSectorIcon}
+            setNewSectorIcon={setNewSectorIcon}
             onSubmit={handleSubmit}
-            editingDepartment={editingDepartment}
+            editingSector={editingSector}
             isSubmitting={isSubmitting}
             onCancel={handleCancel}
           />
 
-          <DepartmentList
-            departments={departments}
+          <SectorList
+            sectors={sectors}
             editMode={editMode}
-            selectedDepartments={selectedDepartments}
-            onSelectDepartment={handleSelectDepartment}
+            selectedSectors={selectedSectors}
+            onSelectSector={handleSelectSector}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
@@ -108,4 +108,4 @@ export const DepartmentsTab = () => {
   );
 };
 
-export default DepartmentsTab;
+export default SectorsTab;
