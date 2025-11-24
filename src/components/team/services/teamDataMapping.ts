@@ -54,9 +54,7 @@ export class TeamDataMapping {
     if (!member.first_name) {
       member.first_name = 'Unknown';
     }
-    if (!member.last_name) {
-      member.last_name = 'Member';
-    }
+    // Don't set default for last_name - allow it to be empty
     if (!member.weekly_capacity) {
       member.weekly_capacity = 40;
     }
