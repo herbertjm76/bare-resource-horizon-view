@@ -1,11 +1,11 @@
-
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { 
   Role, 
   Location, 
   Rate, 
-  Department, 
+  Department,
+  Sector, 
   ProjectStage, 
   OfficeSettingsContextType 
 } from './types';
@@ -18,6 +18,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
   const [locations, setLocations] = useState<Location[]>([]);
   const [rates, setRates] = useState<Rate[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [sectors, setSectors] = useState<Sector[]>([]);
   const [office_stages, setOfficeStages] = useState<ProjectStage[]>([]);
   const [loading, setLoading] = useState(true);
   const { company } = useCompany();
@@ -29,6 +30,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
       setLocations([]);
       setRates([]);
       setDepartments([]);
+      setSectors([]);
       setOfficeStages([]);
       return;
     }
@@ -43,6 +45,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         setLocations(settings.locations);
         setRates(settings.rates);
         setDepartments(settings.departments);
+        setSectors(settings.sectors);
         setOfficeStages(settings.office_stages);
       } finally {
         setLoading(false);
@@ -63,6 +66,8 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         setRates,
         departments,
         setDepartments,
+        sectors,
+        setSectors,
         office_stages,
         setOfficeStages,
         loading

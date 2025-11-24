@@ -5,31 +5,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { Department } from "@/context/officeSettings/types";
-import { IconPicker } from "./IconPicker";
+import { Sector } from "@/context/officeSettings/types";
+import { IconPicker } from "../departments/IconPicker";
 
-interface AddDepartmentDialogProps {
+interface AddSectorDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  newDepartmentName: string;
-  setNewDepartmentName: (name: string) => void;
-  newDepartmentIcon: string;
-  setNewDepartmentIcon: (icon: string) => void;
+  newSectorName: string;
+  setNewSectorName: (name: string) => void;
+  newSectorIcon: string;
+  setNewSectorIcon: (icon: string) => void;
   onSubmit: () => void;
-  editingDepartment: Department | null;
+  editingSector: Sector | null;
   isSubmitting: boolean;
   onCancel: () => void;
 }
 
-export const AddDepartmentDialog: React.FC<AddDepartmentDialogProps> = ({
+export const AddSectorDialog: React.FC<AddSectorDialogProps> = ({
   open,
   onOpenChange,
-  newDepartmentName,
-  setNewDepartmentName,
-  newDepartmentIcon,
-  setNewDepartmentIcon,
+  newSectorName,
+  setNewSectorName,
+  newSectorIcon,
+  setNewSectorIcon,
   onSubmit,
-  editingDepartment,
+  editingSector,
   isSubmitting,
   onCancel
 }) => {
@@ -49,23 +49,23 @@ export const AddDepartmentDialog: React.FC<AddDepartmentDialogProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {editingDepartment ? 'Edit Department' : 'Add New Department'}
+            {editingSector ? 'Edit Sector' : 'Add New Sector'}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label>Department Name</Label>
+            <Label>Sector Name</Label>
             <Input
-              placeholder="Enter department name..."
-              value={newDepartmentName}
-              onChange={(e) => setNewDepartmentName(e.target.value)}
+              placeholder="Enter sector name..."
+              value={newSectorName}
+              onChange={(e) => setNewSectorName(e.target.value)}
               onKeyPress={handleKeyPress}
               autoFocus
             />
           </div>
           <IconPicker 
-            selectedIcon={newDepartmentIcon}
-            onIconChange={setNewDepartmentIcon}
+            selectedIcon={newSectorIcon}
+            onIconChange={setNewSectorIcon}
           />
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={handleCancel}>
@@ -73,10 +73,10 @@ export const AddDepartmentDialog: React.FC<AddDepartmentDialogProps> = ({
             </Button>
             <Button 
               onClick={onSubmit} 
-              disabled={isSubmitting || !newDepartmentName.trim()}
+              disabled={isSubmitting || !newSectorName.trim()}
             >
               <Plus className="h-4 w-4 mr-2" />
-              {editingDepartment ? 'Update' : 'Add'} Department
+              {editingSector ? 'Update' : 'Add'} Sector
             </Button>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Role, Location, Rate, Department, ProjectStage } from './types';
+import { Role, Location, Rate, Department, Sector, ProjectStage } from './types';
 import { toast } from 'sonner';
 
 type OfficeSettings = {
@@ -7,6 +7,7 @@ type OfficeSettings = {
   locations: Location[];
   rates: Rate[];
   departments: Department[];
+  sectors: Sector[];
   office_stages: ProjectStage[];
 };
 
@@ -40,17 +41,31 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
     // Fetch departments data
     let departmentsData = [];
     try {
-      // Using 'any' type to bypass TypeScript checking since the table was just created
-      const { data, error } = await (supabase
-        .from('office_departments' as any)
+      const { data, error } = await supabase
+        .from('office_departments')
         .select('id, name, company_id, icon')
-        .eq('company_id', companyId) as any);
+        .eq('company_id', companyId);
       
       if (error) throw error;
       departmentsData = data || [];
     } catch (deptError) {
       console.error('Error fetching departments:', deptError);
       departmentsData = [];
+    }
+
+    // Fetch sectors data
+    let sectorsData = [];
+    try {
+      const { data, error } = await supabase
+        .from('office_sectors')
+        .select('id, name, company_id, icon')
+        .eq('company_id', companyId);
+      
+      if (error) throw error;
+      sectorsData = data || [];
+    } catch (sectorError) {
+      console.error('Error fetching sectors:', sectorError);
+      sectorsData = [];
     }
 
     // Fetch rates data
@@ -73,6 +88,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
     console.log("Roles data:", rolesData);
     console.log("Locations data:", locationsData);
     console.log("Departments data:", departmentsData);
+    console.log("Sectors data:", sectorsData);
     console.log("Rates data:", ratesData);
     console.log("Stages data:", stagesData);
 
@@ -106,6 +122,15 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
           name: dept.name,
           company_id: (dept.company_id ?? companyId).toString(),
           icon: dept.icon || undefined
+        }))
+      : [];
+
+    const processedSectors = Array.isArray(sectorsData)
+      ? sectorsData.map((sector: any) => ({
+          id: sector.id,
+          name: sector.name,
+          company_id: (sector.company_id ?? companyId).toString(),
+          icon: sector.icon || undefined
         }))
       : [];
       
@@ -145,6 +170,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       locations: processedLocations,
       rates: processedRates,
       departments: processedDepartments,
+      sectors: processedSectors,
       office_stages: processedStages
     };
   } catch (error: any) {
@@ -157,6 +183,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       locations: [],
       rates: [],
       departments: [],
+      sectors: [],
       office_stages: []
     };
   }
