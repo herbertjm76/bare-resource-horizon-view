@@ -41,25 +41,19 @@ export const useProfile = () => {
         .eq("profile_id", session.user.id)
         .maybeSingle();
       
-      // Fetch user roles to determine highest role (owner > admin > member)
-      const { data: userRoles, error: rolesError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", session.user.id);
-
-      if (rolesError) {
-        console.error("Failed to load user roles for profile:", rolesError);
-      }
-
+      // Fetch user role using secure RPC to avoid RLS recursion
       let highestRole: string | null = null;
-      if (userRoles && userRoles.length > 0) {
-        if (userRoles.some((r: any) => r.role === "owner")) {
-          highestRole = "owner";
-        } else if (userRoles.some((r: any) => r.role === "admin")) {
-          highestRole = "admin";
-        } else {
-          highestRole = userRoles[0].role as string;
+      try {
+        const { data: roleData, error: roleError } = await supabase
+          .rpc('get_user_role_safe');
+
+        if (roleError) {
+          console.error("Failed to load user role for profile:", roleError);
+        } else if (roleData) {
+          highestRole = roleData as string;
         }
+      } catch (roleException) {
+        console.error("Unexpected error while loading user role:", roleException);
       }
       
       // Combine profile and personal info
