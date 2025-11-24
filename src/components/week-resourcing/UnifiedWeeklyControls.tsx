@@ -88,14 +88,14 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   onFullscreenToggle
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeFilterType, setActiveFilterType] = useState<'sector' | 'department' | 'location'>('sector');
+  const [activeSortType, setActiveSortType] = useState<'sector' | 'department' | 'location'>('sector');
   const [focusedBadgeIndex, setFocusedBadgeIndex] = useState(0);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
   const { sectors, departments, locations } = useWeeklyFilterOptions();
 
-  // Get current filter options based on active filter type
+  // Get current sort options based on active sort type
   const getCurrentOptions = () => {
-    switch (activeFilterType) {
+    switch (activeSortType) {
       case 'sector':
         return sectors.map(s => ({ value: s.name, label: s.name, icon: s.icon }));
       case 'department':
@@ -108,7 +108,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   };
 
   const currentOptions = getCurrentOptions();
-  const currentValue = filters[activeFilterType];
+  const currentValue = filters[activeSortType];
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -123,13 +123,13 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
         setFocusedBadgeIndex(prev => (prev < currentOptions.length - 1 ? prev + 1 : 0));
       } else if (e.key === 'Enter' && focusedBadgeIndex >= 0) {
         e.preventDefault();
-        onFilterChange(activeFilterType, currentOptions[focusedBadgeIndex].value);
+        onFilterChange(activeSortType, currentOptions[focusedBadgeIndex].value);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentOptions, focusedBadgeIndex, activeFilterType, onFilterChange]);
+  }, [currentOptions, focusedBadgeIndex, activeSortType, onFilterChange]);
 
   // Scroll focused badge into view
   useEffect(() => {
@@ -142,10 +142,10 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
     }
   }, [focusedBadgeIndex]);
 
-  // Reset focused index when filter type changes
+  // Reset focused index when sort type changes
   useEffect(() => {
     setFocusedBadgeIndex(0);
-  }, [activeFilterType]);
+  }, [activeSortType]);
   
   const showPeopleProjectToggle = viewType !== 'table';
   const showSortOptions = viewType !== 'table';
@@ -324,18 +324,18 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
         </div>
       </div>
 
-      {/* Filters Row */}
+      {/* Sort and Search Row */}
       <div className="flex flex-col gap-3">
         <div className="flex gap-3 items-center flex-wrap">
-          {/* Filter Type Selector */}
-          <Select value={activeFilterType} onValueChange={(value: any) => setActiveFilterType(value)}>
-            <SelectTrigger className="w-40 h-9">
-              <SelectValue placeholder="Filter by..." />
+          {/* Sort Type Selector */}
+          <Select value={activeSortType} onValueChange={(value: any) => setActiveSortType(value)}>
+            <SelectTrigger className="w-44 h-9">
+              <SelectValue placeholder="Sort by..." />
             </SelectTrigger>
             <SelectContent className="bg-background z-50">
-              <SelectItem value="sector">Filter by Sector</SelectItem>
-              <SelectItem value="department">Filter by Department</SelectItem>
-              <SelectItem value="location">Filter by Location</SelectItem>
+              <SelectItem value="sector">Sort by Sector</SelectItem>
+              <SelectItem value="department">Sort by Department</SelectItem>
+              <SelectItem value="location">Sort by Location</SelectItem>
             </SelectContent>
           </Select>
 
@@ -361,7 +361,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
             </Button>
           </div>
 
-          {/* Clear Filters */}
+          {/* Clear Sort */}
           {activeFiltersCount > 0 && (
             <Button
               variant="ghost"
@@ -430,7 +430,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
           </Popover>
         </div>
 
-        {/* Horizontal Badge Carousel */}
+        {/* Horizontal Badge Carousel - Sort Options */}
         <div 
           ref={badgeContainerRef}
           className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
@@ -442,9 +442,9 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
             className={`cursor-pointer whitespace-nowrap transition-all ${
               currentValue === 'all' ? 'bg-gradient-modern text-white' : ''
             } ${focusedBadgeIndex === -1 ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-            onClick={() => onFilterChange(activeFilterType, 'all')}
+            onClick={() => onFilterChange(activeSortType, 'all')}
           >
-            All {activeFilterType === 'sector' ? 'Sectors' : activeFilterType === 'department' ? 'Departments' : 'Locations'}
+            All {activeSortType === 'sector' ? 'Sectors' : activeSortType === 'department' ? 'Departments' : 'Locations'}
           </Badge>
 
           {currentOptions.map((option, index) => (
@@ -455,7 +455,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
               className={`cursor-pointer whitespace-nowrap transition-all ${
                 currentValue === option.value ? 'bg-gradient-modern text-white' : ''
               } ${focusedBadgeIndex === index ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-              onClick={() => onFilterChange(activeFilterType, option.value)}
+              onClick={() => onFilterChange(activeSortType, option.value)}
             >
               {option.icon && <span className="mr-1.5">{option.icon}</span>}
               {option.label}
