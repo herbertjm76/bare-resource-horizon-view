@@ -93,6 +93,17 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   const badgeContainerRef = useRef<HTMLDivElement>(null);
   const { sectors, departments, locations } = useWeeklyFilterOptions();
 
+  // Debug logging
+  console.log('Filter Options Debug:', {
+    activeSortType,
+    sectors,
+    departments,
+    locations,
+    sectorsCount: sectors?.length,
+    departmentsCount: departments?.length,
+    locationsCount: locations?.length
+  });
+
   // Get current sort options based on active sort type
   const getCurrentOptions = () => {
     switch (activeSortType) {
@@ -109,6 +120,13 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
 
   const currentOptions = getCurrentOptions();
   const currentValue = filters[activeSortType];
+
+  console.log('Current Options Debug:', {
+    activeSortType,
+    currentOptionsCount: currentOptions?.length,
+    currentOptions,
+    currentValue
+  });
 
   // Handle keyboard navigation
   useEffect(() => {
