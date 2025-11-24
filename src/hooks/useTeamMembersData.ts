@@ -65,10 +65,15 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Use direct query to get company members
+        // Use direct query to get company members with their roles
         const { data: profiles, error } = await supabase
           .from('profiles')
-          .select('*')
+          .select(`
+            *,
+            user_roles!user_roles_user_id_fkey (
+              role
+            )
+          `)
           .eq('company_id', companyId);
 
         if (error) {
@@ -85,7 +90,25 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         if (import.meta.env.DEV) {
           console.log('Fetched profiles:', profiles.length || 0);
         }
-        return profiles as Profile[];
+        
+        // Map profiles to include the highest priority role
+        const profilesWithRoles = profiles.map(profile => {
+          const roles = (profile as any).user_roles || [];
+          let highestRole = 'member';
+          
+          if (roles.some((r: any) => r.role === 'owner')) {
+            highestRole = 'owner';
+          } else if (roles.some((r: any) => r.role === 'admin')) {
+            highestRole = 'admin';
+          }
+          
+          return {
+            ...profile,
+            role: highestRole
+          };
+        });
+        
+        return profilesWithRoles as Profile[];
       } catch (fetchError) {
         console.error('Error in team members fetch function:', fetchError);
         toast.error('Error loading team members');
