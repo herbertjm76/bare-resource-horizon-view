@@ -6,15 +6,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Folder, Layers, Building, Briefcase, Currency, Calendar, Palette, Building2, Shapes } from 'lucide-react';
+import { MapPin, Folder, Layers, Building, Briefcase, Currency, Calendar, Palette, Building2 } from 'lucide-react';
 import { CountriesTab } from '@/components/settings/CountriesTab';
 import { StagesTab } from '@/components/settings/StagesTab';
 import { LocationsTab } from '@/components/settings/LocationsTab';
 import { RolesTab } from '@/components/settings/roles/RolesTab';
 import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
-import { DepartmentsTab } from '@/components/settings/DepartmentsTab';
-import { SectorsTab } from '@/components/settings/SectorsTab';
+import { OrganizationTab } from '@/components/settings/OrganizationTab';
 import { ThemeTab } from '@/components/settings/ThemeTab';
 import { CompanyTab } from '@/components/settings/CompanyTab';
 
@@ -26,8 +25,7 @@ export const OfficeSettingsTabs: React.FC = () => {
     { value: 'locations', label: 'Office Locations', icon: MapPin },
     { value: 'areas', label: 'Project Areas', icon: Folder },
     { value: 'stages', label: 'Stages', icon: Layers },
-    { value: 'sectors', label: 'Sectors', icon: Shapes },
-    { value: 'departments', label: 'Departments', icon: Building },
+    { value: 'organization', label: 'Organization', icon: Building },
     { value: 'roles', label: 'Roles', icon: Briefcase },
     { value: 'rates', label: 'Rates', icon: Currency },
     { value: 'holidays', label: 'Holidays', icon: Calendar },
@@ -57,8 +55,7 @@ export const OfficeSettingsTabs: React.FC = () => {
         {selectedTab === 'locations' && <LocationsTab />}
         {selectedTab === 'areas' && <CountriesTab />}
         {selectedTab === 'stages' && <StagesTab />}
-        {selectedTab === 'sectors' && <SectorsTab />}
-        {selectedTab === 'departments' && <DepartmentsTab />}
+        {selectedTab === 'organization' && <OrganizationTab />}
         {selectedTab === 'roles' && <RolesTab />}
         {selectedTab === 'rates' && <RatesTab />}
         {selectedTab === 'holidays' && <HolidaysTab />}
