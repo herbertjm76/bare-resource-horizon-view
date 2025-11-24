@@ -5,8 +5,8 @@ import { TemplateGenerator } from './templateGenerator';
 import type { ExcelParseResult, ImportResult } from './types';
 
 export class ExcelProcessor {
-  async parseExcelFile(file: File): Promise<ExcelParseResult> {
-    return ExcelParser.parseExcelFile(file);
+  async parseExcelFile(file: File, options?: { orientation?: 'columns' | 'rows' }): Promise<ExcelParseResult> {
+    return ExcelParser.parseExcelFile(file, options);
   }
 
   async importProjects(

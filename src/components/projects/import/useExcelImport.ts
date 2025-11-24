@@ -22,14 +22,14 @@ export const useExcelImport = (onImportComplete: () => void) => {
   const [importWarnings, setImportWarnings] = useState<string[]>([]);
   const [importSuggestions, setImportSuggestions] = useState<string[]>([]);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, orientation: 'columns' | 'rows' = 'columns') => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
       toast.info('Parsing Excel file...');
       const processor = new ExcelProcessor();
-      const result = await processor.parseExcelFile(file);
+      const result = await processor.parseExcelFile(file, { orientation });
       
       setExcelData(result.data);
       setCurrentStep('detection');

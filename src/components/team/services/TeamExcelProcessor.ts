@@ -4,8 +4,8 @@ import { TeamImporter } from './teamImporter';
 import type { ExcelParseResult, ImportResult } from './types';
 
 export class TeamExcelProcessor {
-  async parseExcelFile(file: File): Promise<ExcelParseResult> {
-    return ExcelParser.parseExcelFile(file);
+  async parseExcelFile(file: File, options?: { orientation?: 'columns' | 'rows' }): Promise<ExcelParseResult> {
+    return ExcelParser.parseExcelFile(file, options);
   }
 
   async importTeamMembers(
