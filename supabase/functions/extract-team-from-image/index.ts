@@ -78,23 +78,32 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a team member extraction assistant. Extract all person names and any available details (email, job title, department, location) from the provided image. 
-            
-Return a JSON array of objects with this structure:
+            content: `You are a team member extraction assistant. Extract all person names and available details from the provided image.
+
+IMPORTANT: Look for these fields specifically:
+- Name (split into first_name and last_name)
+- Role/Job Title (map to "job_title")
+- Type (if visible, could be employment type like "Full-time", "Contractor", "Part-time")
+- Sector/Department (map to "department")
+- Location (office location, city, or country)
+- Email (if visible)
+
+Return a JSON array with this EXACT structure:
 {
   "people": [
     {
       "first_name": "string",
-      "last_name": "string",
-      "email": "string or null",
+      "last_name": "string", 
       "job_title": "string or null",
-      "department": "string or null",
-      "location": "string or null"
+      "department": "string or null (use sector if that's what's shown)",
+      "location": "string or null",
+      "email": "string or null",
+      "employment_type": "string or null (Full-time, Part-time, Contractor, etc)"
     }
   ]
 }
 
-Be thorough - extract all visible names. If only full names are visible, split them intelligently into first_name and last_name.`
+Be thorough - extract ALL visible people and their details. If only full names are visible, split intelligently into first_name and last_name.`
           },
           {
             role: 'user',

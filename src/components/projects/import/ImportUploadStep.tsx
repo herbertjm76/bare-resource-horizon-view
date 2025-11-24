@@ -16,6 +16,7 @@ interface ExtractedPerson {
   job_title?: string | null;
   department?: string | null;
   location?: string | null;
+  employment_type?: string | null;
   status: 'new' | 'exists';
   existingEmail?: string;
 }
@@ -312,8 +313,9 @@ export const ImportUploadStep: React.FC<ImportUploadStepProps> = ({
                       </div>
                       <div className="text-xs text-muted-foreground space-y-0.5 mt-1">
                         {person.email && <p>Email: {person.email}</p>}
-                        {person.job_title && <p>Title: {person.job_title}</p>}
-                        {person.department && <p>Department: {person.department}</p>}
+                        {person.job_title && <p>Role: {person.job_title}</p>}
+                        {person.employment_type && <p>Type: {person.employment_type}</p>}
+                        {person.department && <p>Sector: {person.department}</p>}
                         {person.location && <p>Location: {person.location}</p>}
                       </div>
                     </div>
