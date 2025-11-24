@@ -54,32 +54,49 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
       return;
     }
 
+    // Only update active (registered) members for now
+    const profileIdsToUpdate = changedMemberIds.filter((memberId) => {
+      const member = teamMembers.find((m) => m.id === memberId);
+      const isPending = member && 'isPending' in member && (member as any).isPending;
+      return !isPending;
+    });
+
+    if (profileIdsToUpdate.length === 0) {
+      toast.error('Bulk editing is currently only supported for registered members.');
+      setPendingChanges({});
+      setEditMode(false);
+      return;
+    }
+
+    const skippedCount = changedMemberIds.length - profileIdsToUpdate.length;
+
     setIsSaving(true);
     try {
-      // Separate active members from pending members
-      const savePromises = changedMemberIds.map(memberId => {
-        const member = teamMembers.find(m => m.id === memberId);
-        const isPending = member && 'isPending' in member && member.isPending;
-        const tableName = isPending ? 'invites' : 'profiles';
-        
-        return supabase
-          .from(tableName)
+      const savePromises = profileIdsToUpdate.map((memberId) =>
+        supabase
+          .from('profiles')
           .update(pendingChanges[memberId])
-          .eq('id', memberId);
-      });
+          .eq('id', memberId)
+      );
 
       const results = await Promise.all(savePromises);
-      const errors = results.filter(r => r.error);
+      const errors = results.filter((r) => r.error);
 
       if (errors.length > 0) {
         console.error('Errors:', errors);
         throw new Error(`Failed to update ${errors.length} member(s)`);
       }
 
-      toast.success(`Successfully updated ${changedMemberIds.length} member(s)`);
+      const updatedCount = profileIdsToUpdate.length;
+      const message =
+        skippedCount > 0
+          ? `Updated ${updatedCount} member(s). Pending invites were not updated.`
+          : `Successfully updated ${updatedCount} member(s)`;
+
+      toast.success(message);
       setPendingChanges({});
       setEditMode(false);
-      
+
       if (onRefresh) {
         onRefresh();
       }
