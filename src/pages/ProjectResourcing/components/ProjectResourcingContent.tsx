@@ -96,21 +96,6 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
       
-      {/* Content-First Main Table */}
-      <div className="w-full max-w-full overflow-hidden">
-        <ModernResourceGrid
-          startDate={selectedMonth}
-          periodToShow={filters.periodToShow}
-          filters={combinedFilters}
-          displayOptions={displayOptions}
-          onExpandAll={expandAll}
-          onCollapseAll={collapseAll}
-          expandedProjects={expandedProjects}
-          totalProjects={totalProjects}
-          onToggleProjectExpand={handleToggleProjectExpand}
-        />
-      </div>
-
       {/* Compact Action Bar */}
       <StreamlinedActionBar
         selectedDate={selectedMonth}
@@ -133,6 +118,21 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         expandedProjects={expandedProjects}
         totalProjects={totalProjects}
       />
+      
+      {/* Content-First Main Table */}
+      <div className="w-full max-w-full overflow-hidden">
+        <ModernResourceGrid
+          startDate={selectedMonth}
+          periodToShow={filters.periodToShow}
+          filters={combinedFilters}
+          displayOptions={displayOptions}
+          onExpandAll={expandAll}
+          onCollapseAll={collapseAll}
+          expandedProjects={expandedProjects}
+          totalProjects={totalProjects}
+          onToggleProjectExpand={handleToggleProjectExpand}
+        />
+      </div>
     </div>
   );
 };
