@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, X, ChevronLeft, ChevronRight, Users, Calendar } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -110,38 +110,84 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
 
   return (
     <div className="space-y-3 mb-4">
-      <div className="flex gap-3 items-center flex-wrap">
-        {/* Filter Type Selector */}
+      {/* Streamlined Single Row Filter */}
+      <div className="flex gap-2 items-center">
+        {/* Filter Type Icon Dropdown */}
         <Select value={activeFilterType} onValueChange={(value: any) => setActiveFilterType(value)}>
-          <SelectTrigger className="w-44 h-9">
-            <SelectValue placeholder="Filter by..." />
+          <SelectTrigger className="w-9 h-9 p-0 border-input">
+            <div className="flex items-center justify-center w-full">
+              {activeFilterType === 'department' ? (
+                <Users className="h-4 w-4" />
+              ) : (
+                <Calendar className="h-4 w-4" />
+              )}
+            </div>
           </SelectTrigger>
           <SelectContent className="bg-background z-50">
-            <SelectItem value="department">Filter by Department</SelectItem>
-            <SelectItem value="location">Filter by Location</SelectItem>
+            <SelectItem value="department">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span>Department</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="location">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <span>Location</span>
+              </div>
+            </SelectItem>
           </SelectContent>
         </Select>
 
         {/* Navigation Arrows */}
-        <div className="flex gap-1">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 w-9 p-0"
-            onClick={() => setFocusedBadgeIndex(prev => (prev > 0 ? prev - 1 : currentOptions.length - 1))}
-            disabled={currentOptions.length === 0}
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 w-9 p-0"
+          onClick={() => setFocusedBadgeIndex(prev => (prev > 0 ? prev - 1 : currentOptions.length - 1))}
+          disabled={currentOptions.length === 0}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 w-9 p-0"
+          onClick={() => setFocusedBadgeIndex(prev => (prev < currentOptions.length - 1 ? prev + 1 : 0))}
+          disabled={currentOptions.length === 0}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+
+        {/* Badges Container */}
+        <div 
+          ref={badgeContainerRef}
+          className="flex gap-2 overflow-x-auto flex-1 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+        >
+          <Badge
+            data-badge-index="-1"
+            variant={currentValue === 'all' ? 'default' : 'outline'}
+            className={`cursor-pointer whitespace-nowrap transition-all ${
+              focusedBadgeIndex === -1 ? 'ring-2 ring-primary' : ''
+            } ${currentValue === 'all' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+            onClick={() => onFilterChange(activeFilterType, 'all')}
           >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 w-9 p-0"
-            onClick={() => setFocusedBadgeIndex(prev => (prev < currentOptions.length - 1 ? prev + 1 : 0))}
-            disabled={currentOptions.length === 0}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+            All
+          </Badge>
+
+          {currentOptions.map((option, index) => (
+            <Badge
+              key={option.value}
+              data-badge-index={index}
+              variant={currentValue === option.value ? 'default' : 'outline'}
+              className={`cursor-pointer whitespace-nowrap transition-all ${
+                focusedBadgeIndex === index ? 'ring-2 ring-primary' : ''
+              } ${currentValue === option.value ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+              onClick={() => onFilterChange(activeFilterType, option.value)}
+            >
+              {option.label}
+            </Badge>
+          ))}
         </div>
 
         {/* Clear Filters */}
@@ -150,30 +196,25 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
             variant="ghost"
             size="sm"
             onClick={clearFilters}
-            className="h-9"
+            className="h-9 w-9 p-0 shrink-0"
+            title="Clear filters"
           >
-            <X className="h-4 w-4 mr-2" />
-            Clear
-            <Badge variant="secondary" className="ml-2">
-              {activeFiltersCount}
-            </Badge>
+            <X className="h-4 w-4" />
           </Button>
         )}
 
-        {/* Search Button/Popover */}
+        {/* Search Icon Button */}
         <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
           <PopoverTrigger asChild>
             <Button 
               variant="outline" 
               size="sm"
-              className="h-9 gap-2 ml-auto"
+              className={`h-9 w-9 p-0 shrink-0 relative ${filters.searchTerm ? 'ring-2 ring-primary' : ''}`}
+              title="Search"
             >
               <Search className="h-4 w-4" />
-              Search
               {filters.searchTerm && (
-                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
-                  1
-                </Badge>
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full" />
               )}
             </Button>
           </PopoverTrigger>
@@ -203,39 +244,6 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
             </div>
           </PopoverContent>
         </Popover>
-      </div>
-
-      {/* Horizontal Badge Carousel - Filter Options */}
-      <div 
-        ref={badgeContainerRef}
-        className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
-      >
-        {/* All option */}
-        <Badge
-          data-badge-index="-1"
-          variant={currentValue === 'all' ? 'default' : 'outline'}
-          className={`cursor-pointer whitespace-nowrap transition-all ${
-            focusedBadgeIndex === -1 ? 'ring-2 ring-primary' : ''
-          } ${currentValue === 'all' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-          onClick={() => onFilterChange(activeFilterType, 'all')}
-        >
-          All
-        </Badge>
-
-        {/* Dynamic filter options */}
-        {currentOptions.map((option, index) => (
-          <Badge
-            key={option.value}
-            data-badge-index={index}
-            variant={currentValue === option.value ? 'default' : 'outline'}
-            className={`cursor-pointer whitespace-nowrap transition-all ${
-              focusedBadgeIndex === index ? 'ring-2 ring-primary' : ''
-            } ${currentValue === option.value ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-            onClick={() => onFilterChange(activeFilterType, option.value)}
-          >
-            {option.label}
-          </Badge>
-        ))}
       </div>
     </div>
   );
