@@ -32,6 +32,8 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
     const fetchInviteDetails = async () => {
       if (!inviteCode) return;
 
+      console.log('Fetching invite details for code:', inviteCode);
+
       const { data: invite, error } = await supabase
         .from('invites')
         .select('*')
@@ -39,8 +41,16 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
         .eq('status', 'pending')
         .maybeSingle();
 
+      console.log('Invite data:', invite);
+      console.log('Invite error:', error);
+
       if (!error && invite) {
-        if (invite.email && invite.invitation_type === 'email_invite') {
+        console.log('Invite type:', invite.invitation_type);
+        console.log('Invite email:', invite.email);
+        
+        // Pre-fill email if invite has an email address
+        if (invite.email) {
+          console.log('Setting email to:', invite.email);
           setEmail(invite.email);
           setIsEmailLocked(true);
         }
@@ -114,7 +124,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
           }
 
           // Validate email match for email_invite type
-          if (invite.invitation_type === 'email_invite' && invite.email !== validatedData.email) {
+          if (invite.email && invite.email !== validatedData.email) {
             toast.error('This invite is for a different email address');
             setLoading(false);
             return;
