@@ -346,7 +346,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
       </div>
 
       {/* Streamlined Single Row Filter */}
-      <div className="flex gap-2 items-center rounded-none border border-y-0 bg-card p-3">
+      <div className="flex gap-2 items-center rounded-none border border-y-0 bg-card p-3 shadow-[inset_0_2px_4px_-2px_hsl(var(--border))]">
         {/* Sort Type Icon Dropdown */}
         <Select value={activeSortType} onValueChange={(value: any) => setActiveSortType(value)}>
           <SelectTrigger className="w-9 h-9 p-0 border-input">

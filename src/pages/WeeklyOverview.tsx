@@ -274,7 +274,7 @@ const WeeklyOverview = () => {
             />
 
             {/* View Content */}
-            <div className="rounded-b-lg border border-t-0 bg-card overflow-hidden">
+            <div className="rounded-b-lg border border-t-0 bg-card overflow-hidden shadow-[0_4px_8px_-2px_hsl(var(--border)/0.5)]">
               {viewType === 'table' && (
                 <WeekResourceView
                   selectedWeek={selectedWeek}
