@@ -27,7 +27,7 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
   clearFilters
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeFilterType, setActiveFilterType] = useState<'practiceArea' | 'department' | 'location'>('practiceArea');
+  const [activeFilterType, setActiveFilterType] = useState<'practiceArea' | 'department' | 'location'>('department');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
@@ -146,16 +146,16 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
             </div>
           </SelectTrigger>
           <SelectContent className="bg-background z-50">
-            <SelectItem value="practiceArea">
-              <div className="flex items-center gap-2">
-                <FolderOpen className="h-4 w-4" />
-                <span>Practice Area</span>
-              </div>
-            </SelectItem>
             <SelectItem value="department">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 <span>Department</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="practiceArea">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4" />
+                <span>Practice Area</span>
               </div>
             </SelectItem>
             <SelectItem value="location">
