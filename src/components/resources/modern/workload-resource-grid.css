@@ -209,12 +209,62 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  /* Enable horizontal scrolling on mobile */
+  .workload-resource-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+  
+  /* Make table scrollable with minimum width */
+  .workload-resource-table {
+    min-width: 800px !important;
+  }
+  
+  /* Make sticky project/person column narrower */
   .workload-resource-header.project-resource-column,
   .workload-resource-cell.project-resource-column {
-    width: 200px !important;
-    min-width: 200px !important;
-    max-width: 200px !important;
-    padding-left: 12px;
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+    font-size: 11px !important;
+    padding: 6px 4px !important;
+  }
+  
+  /* Make day columns narrower for more visible columns */
+  .workload-resource-header.day-column,
+  .workload-resource-cell.day-column {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    font-size: 10px !important;
+    padding: 4px 2px !important;
+  }
+  
+  .workload-resource-header.day-column {
+    height: 75px;
+  }
+  
+  /* Reduce indentation on resource rows */
+  .workload-resource-row.resource-row .workload-resource-cell.project-resource-column {
+    padding-left: 16px !important;
+  }
+  
+  .workload-resource-row.add-resource-row .workload-resource-cell.project-resource-column {
+    padding-left: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Even narrower on small screens */
+  .workload-resource-header.project-resource-column,
+  .workload-resource-cell.project-resource-column {
+    width: 90px !important;
+    min-width: 90px !important;
+    max-width: 90px !important;
+    font-size: 10px !important;
+    padding: 4px 2px !important;
   }
   
   .workload-resource-header.day-column,
@@ -222,10 +272,8 @@
     width: 28px !important;
     min-width: 28px !important;
     max-width: 28px !important;
-  }
-  
-  .workload-resource-header.day-column {
-    height: 75px;
+    font-size: 9px !important;
+    padding: 2px 1px !important;
   }
 }
 

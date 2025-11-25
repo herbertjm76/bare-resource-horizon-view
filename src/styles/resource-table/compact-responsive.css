@@ -1,57 +1,110 @@
 
 /* Compact View - Mobile Responsiveness */
 
-@media (max-width: 640px) {
-  .resource-table-compact-container {
+@media (max-width: 768px) {
+  /* Enable horizontal scrolling */
+  .resource-table-compact-container,
+  .resource-table-expanded-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     margin: 0 -1rem;
+    padding: 0 1rem;
     border-radius: 0;
   }
   
-  .resource-table-compact {
+  /* Minimum table width to enable scrolling */
+  .resource-table-compact,
+  .resource-table-expanded {
     min-width: 900px;
   }
   
-  .resource-table-compact th,
-  .resource-table-compact td {
-    padding: 4px 3px;
-    font-size: 12px;
+  /* Make sticky name column super narrow */
+  .resource-table-compact thead th:first-child,
+  .resource-table-expanded thead th:first-child,
+  .resource-table-compact tbody td:first-child,
+  .resource-table-expanded tbody td:first-child {
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+    font-size: 10px !important;
+    padding: 4px 2px !important;
   }
   
+  /* Narrow down other fixed columns */
+  .resource-table-compact thead th:nth-child(2),
+  .resource-table-expanded thead th:nth-child(2) {
+    width: 120px !important;
+    min-width: 120px !important;
+    font-size: 10px !important;
+    padding: 4px 2px !important;
+  }
+  
+  .resource-table-compact thead th:nth-child(3),
+  .resource-table-expanded thead th:nth-child(3) {
+    width: 80px !important;
+    min-width: 80px !important;
+    font-size: 10px !important;
+    padding: 4px 2px !important;
+  }
+  
+  .resource-table-compact thead th:nth-child(4),
+  .resource-table-expanded thead th:nth-child(4) {
+    width: 30px !important;
+    min-width: 30px !important;
+    font-size: 10px !important;
+    padding: 2px !important;
+  }
+  
+  /* Make project columns narrower for more visible columns */
+  .resource-table-compact thead th:nth-child(n+5),
+  .resource-table-expanded thead th:nth-child(n+5),
+  .resource-table-compact tbody td:nth-child(n+5),
+  .resource-table-expanded tbody td:nth-child(n+5) {
+    width: 32px !important;
+    min-width: 32px !important;
+    font-size: 11px !important;
+    padding: 2px 1px !important;
+  }
+  
+  /* Reduce padding on all cells */
+  .resource-table-compact th,
+  .resource-table-compact td,
+  .resource-table-expanded th,
+  .resource-table-expanded td {
+    padding: 4px 2px;
+  }
+  
+  /* Smaller pills on mobile */
   .resource-table-compact .utilization-pill,
   .resource-table-compact .utilization-pill-elongated {
-    padding: 6px 12px;
-    font-size: 11px;
-    min-width: 60px;
-    height: 28px;
+    padding: 4px 8px;
+    font-size: 10px;
+    min-width: 50px;
+    height: 24px;
   }
+}
 
-  .resource-table-row-compact td {
-    font-size: 10px !important;
-    min-width: 12px !important;
-    padding-left: 1px !important;
-    padding-right: 1px !important;
+@media (max-width: 480px) {
+  /* Even narrower on very small screens */
+  .resource-table-compact thead th:first-child,
+  .resource-table-expanded thead th:first-child,
+  .resource-table-compact tbody td:first-child,
+  .resource-table-expanded tbody td:first-child {
+    width: 60px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+    font-size: 9px !important;
   }
   
-  .resource-table-row-compact .utilization-column {
-    min-width: 36px !important;
-    max-width: 44px !important;
+  .resource-table-compact thead th:nth-child(2),
+  .resource-table-expanded thead th:nth-child(2) {
+    width: 100px !important;
+    min-width: 100px !important;
   }
   
-  .resource-table-row-compact .leave-column,
-  .resource-table-row-compact .project-column {
-    min-width: 20px !important;
-    max-width: 30px !important;
-  }
-  
-  .resource-table-row-compact .name-column {
-    width: 50px !important;
-    min-width: 50px !important;
-    max-width: 50px !important;
-  }
-  
-  .resource-table-row-compact .count-column {
-    width: 12px !important;
-    min-width: 12px !important;
-    max-width: 12px !important;
+  .resource-table-compact thead th:nth-child(3),
+  .resource-table-expanded thead th:nth-child(3) {
+    width: 70px !important;
+    min-width: 70px !important;
   }
 }
