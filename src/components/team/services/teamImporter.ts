@@ -32,13 +32,25 @@ export class TeamImporter {
       if (!profile?.company_id) throw new Error('Company not found');
 
       const companyId = profile.company_id;
+      
+      // Fetch practice areas for matching
+      const { data: practiceAreas } = await supabase
+        .from('office_practice_areas')
+        .select('id, name')
+        .eq('company_id', companyId);
+      
       const totalRows = data.length;
       
       // Process each row
       for (let i = 0; i < totalRows; i++) {
         try {
           const row = data[i];
-          const memberData = TeamDataMapping.mapRowToTeamMember(row, columnMapping, companyId);
+          const memberData = TeamDataMapping.mapRowToTeamMember(
+            row, 
+            columnMapping, 
+            companyId,
+            practiceAreas || undefined
+          );
 
           // Check if email already exists (if provided)
           if (memberData.email) {

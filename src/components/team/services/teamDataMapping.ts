@@ -5,7 +5,8 @@ export class TeamDataMapping {
   static mapRowToTeamMember(
     row: any[], 
     columnMapping: Record<string, string>,
-    companyId: string
+    companyId: string,
+    practiceAreas?: any[]
   ): MappedTeamMember {
     const member: Partial<MappedTeamMember> = {
       company_id: companyId,
@@ -46,6 +47,21 @@ export class TeamDataMapping {
           break;
         case 'role':
           member.role = String(value).trim();
+          break;
+        case 'practice_area':
+          // Handle practice area with fuzzy matching
+          if (practiceAreas && practiceAreas.length > 0) {
+            const areaName = String(value).toLowerCase().trim();
+            const matchedArea = practiceAreas.find(pa => {
+              const name = pa.name.toLowerCase();
+              return name === areaName ||
+                     name.includes(areaName) ||
+                     areaName.includes(name);
+            });
+            if (matchedArea) {
+              member.practice_area = matchedArea.name;
+            }
+          }
           break;
       }
     });
