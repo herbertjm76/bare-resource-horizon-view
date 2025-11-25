@@ -15,8 +15,11 @@ interface ResourceSelectOptionProps {
 
 export const ResourceSelectOption: React.FC<ResourceSelectOptionProps> = ({ member }) => {
   return (
-    <div className="flex items-center justify-between w-full">
-      <span>{member.name}</span>
+    <div className="flex flex-col gap-0.5 w-full">
+      <span className="font-medium text-sm">{member.name}</span>
+      {member.role && (
+        <span className="text-xs text-muted-foreground">{member.role}</span>
+      )}
     </div>
   );
 };
