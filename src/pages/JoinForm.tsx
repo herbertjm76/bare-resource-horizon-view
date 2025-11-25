@@ -64,11 +64,11 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
             .from('invites')
             .select('*')
             .eq('code', effectiveInviteCode)
-            .eq('company_id', company?.id)
             .eq('status', 'pending')
             .maybeSingle();
 
           if (inviteError) {
+            console.error('Error validating invite:', inviteError);
             toast.error('Error validating invite code');
             setLoading(false);
             return;
@@ -76,6 +76,13 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
 
           if (!invite) {
             toast.error('Invalid or expired invite code');
+            setLoading(false);
+            return;
+          }
+
+          // Verify the invite belongs to the company from URL
+          if (company?.id && invite.company_id !== company.id) {
+            toast.error('This invite is for a different company');
             setLoading(false);
             return;
           }
