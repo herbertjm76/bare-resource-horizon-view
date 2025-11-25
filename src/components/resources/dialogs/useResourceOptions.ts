@@ -14,6 +14,8 @@ export type ResourceOption = {
   email: string;
   type: 'active' | 'pre-registered';
   role?: string;
+  department?: string;
+  location?: string;
 };
 
 export const useResourceOptions = () => {
@@ -54,7 +56,9 @@ export const useResourceOptions = () => {
             name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || member.email,
             email: member.email,
             type: 'active' as const,
-            role: member.job_title
+            role: member.job_title,
+            department: member.department,
+            location: member.location
           })),
           
           // Pre-registered members
@@ -63,7 +67,9 @@ export const useResourceOptions = () => {
             name: `${invite.first_name || ''} ${invite.last_name || ''}`.trim() || invite.email,
             email: invite.email || '',
             type: 'pre-registered' as const,
-            role: invite.job_title
+            role: invite.job_title,
+            department: invite.department,
+            location: invite.location
           }))
         ];
         
