@@ -3,6 +3,7 @@ import React from 'react';
 import JoinHeader from './JoinHeader';
 import JoinForm from './JoinForm';
 import JoinContainer from './JoinContainer';
+import JoinCompanyBadge from './JoinCompanyBadge';
 
 interface JoinMainSectionProps {
   companyName: string;
@@ -20,6 +21,10 @@ const JoinMainSection: React.FC<JoinMainSectionProps> = ({
   return (
     <JoinContainer>
       <JoinHeader companyName={companyName} isSignup={isSignup} />
+      <JoinCompanyBadge 
+        companyName={companyName}
+        logoUrl={company?.logo_url}
+      />
       <JoinForm
         companyName={companyName}
         company={company}
