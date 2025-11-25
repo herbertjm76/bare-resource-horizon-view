@@ -23,6 +23,7 @@ Available target fields:
 - email: Email (optional) - email address
 - job_title: Job Title (optional) - role or position
 - department: Department (optional) - department name
+- practice_area: Practice Area (optional) - practice area or specialty
 - location: Office Location (optional) - office location
 - weekly_capacity: Weekly Capacity (optional) - hours per week (numeric, default 40)
 - role: Role (optional) - staff role/title
@@ -51,6 +52,7 @@ Provide intelligent mappings based on column names and data patterns. Consider v
 - "Email", "Email Address", "Contact" → email
 - "Title", "Position", "Job" → job_title
 - "Dept", "Department", "Division" → department
+- "Practice Area", "Practice", "Area", "Specialty" → practice_area
 - "Location", "Office", "Site" → location
 - "Capacity", "Hours", "Weekly Hours" → weekly_capacity
 - "Role", "Staff Role", "Position" → role
