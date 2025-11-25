@@ -8,6 +8,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Eye, Trash2, Mail, AlertTriangle, Send } from 'lucide-react';
 import { TeamMember } from './types';
 import { TeamMemberAvatar } from './TeamMemberAvatar';
+import { useOfficeSettings } from '@/context/officeSettings';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 
 interface TeamMemberRowProps {
   member: TeamMember;
@@ -38,6 +46,8 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   pendingChanges,
   onFieldChange
 }) => {
+  const { locations, departments, loading } = useOfficeSettings();
+  
   const getValue = (field: keyof TeamMember): string => {
     if (pendingChanges[field] !== undefined) {
       return String(pendingChanges[field]);
@@ -152,12 +162,23 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
       </td>
       <td className="px-4 py-3">
         {editMode && ['owner', 'admin'].includes(userRole) ? (
-          <Input
+          <Select
+            disabled={loading}
             value={getValue('department')}
-            onChange={(e) => handleChange('department', e.target.value)}
-            placeholder="Department"
-            className="h-8 text-sm"
-          />
+            onValueChange={(value) => handleChange('department', value)}
+          >
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue placeholder="Select department" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="not_assigned">Not Assigned</SelectItem>
+              {departments.map((department) => (
+                <SelectItem key={department.id} value={department.name}>
+                  {department.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         ) : (
           <span className="text-sm text-gray-900">
             {member.department || '-'}
@@ -166,12 +187,23 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
       </td>
       <td className="px-4 py-3">
         {editMode && ['owner', 'admin'].includes(userRole) ? (
-          <Input
+          <Select
+            disabled={loading}
             value={getValue('location')}
-            onChange={(e) => handleChange('location', e.target.value)}
-            placeholder="Location"
-            className="h-8 text-sm"
-          />
+            onValueChange={(value) => handleChange('location', value)}
+          >
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue placeholder="Select location" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Unassigned">Unassigned</SelectItem>
+              {locations.map((location) => (
+                <SelectItem key={location.id} value={location.code}>
+                  {location.emoji} {location.city}, {location.country}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         ) : (
           <span className="text-sm text-gray-900">
             {member.location || '-'}
