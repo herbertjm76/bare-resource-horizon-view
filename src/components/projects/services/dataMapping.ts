@@ -1,6 +1,12 @@
 import type { MappedProject } from './types';
 
 export class DataMapping {
+  private static importCounter = 0;
+
+  static resetImportCounter() {
+    this.importCounter = 0;
+  }
+
   static mapRowToProject(
     row: any[], 
     columnMapping: Record<string, string>, 
@@ -115,7 +121,8 @@ export class DataMapping {
 
       // Set smart defaults for required fields only if not provided
       if (!project.code) {
-        project.code = `PROJ-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
+        this.importCounter++;
+        project.code = `XXXX-${String(this.importCounter).padStart(3, '0')}`;
       }
       
       if (!project.name) {

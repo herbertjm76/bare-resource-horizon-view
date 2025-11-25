@@ -43,6 +43,9 @@ export class ProjectImporter {
 
       console.log(`Starting import of ${total} rows for company ${companyId} with default office ${defaultOfficeId}`);
 
+      // Reset the counter for this import batch
+      DataMapping.resetImportCounter();
+
       for (let i = 0; i < data.length; i++) {
         const row = data[i];
         onProgress?.((i / total) * 100);
