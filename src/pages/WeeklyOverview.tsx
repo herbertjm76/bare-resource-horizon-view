@@ -238,12 +238,6 @@ const WeeklyOverview = () => {
             reorderCards={reorderCards}
           />
 
-          {/* Available Members Row */}
-          <AvailableMembersRow 
-            weekStartDate={weekStartString}
-            threshold={80}
-          />
-
           {/* Unified Controls */}
           <UnifiedWeeklyControls
             selectedWeek={selectedWeek}
@@ -269,6 +263,12 @@ const WeeklyOverview = () => {
             totalItems={rundownItems.length}
             isFullscreen={isFullscreen}
             onFullscreenToggle={handleFullscreenToggle}
+          />
+
+          {/* Available Members Row */}
+          <AvailableMembersRow 
+            weekStartDate={weekStartString}
+            threshold={80}
           />
 
           {/* View Content */}
