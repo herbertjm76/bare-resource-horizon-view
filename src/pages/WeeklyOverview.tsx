@@ -238,73 +238,78 @@ const WeeklyOverview = () => {
             reorderCards={reorderCards}
           />
 
-          {/* Unified Controls */}
-          <UnifiedWeeklyControls
-            selectedWeek={selectedWeek}
-            onWeekChange={handleWeekChange}
-            weekLabel={weekLabel}
-            viewType={viewType}
-            onViewTypeChange={handleViewTypeChange}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            activeFiltersCount={activeFiltersCount}
-            clearFilters={clearFilters}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            tableOrientation={tableOrientation}
-            onTableOrientationChange={setTableOrientation}
-            rundownMode={rundownMode}
-            onModeChange={handleModeChange}
-            sortOption={sortOption}
-            onSortChange={handleSortChange}
-            isAutoAdvance={isAutoAdvance}
-            onAutoAdvanceToggle={handleAutoAdvanceToggle}
-            currentIndex={currentIndex}
-            totalItems={rundownItems.length}
-            isFullscreen={isFullscreen}
-            onFullscreenToggle={handleFullscreenToggle}
-          />
-
-          {/* Available Members Row */}
-          <AvailableMembersRow 
-            weekStartDate={weekStartString}
-            threshold={80}
-          />
-
-          {/* View Content */}
-          {viewType === 'table' && (
-            <WeekResourceView
+          {/* Connected Filter and Content Section */}
+          <div className="space-y-0">
+            {/* Unified Controls */}
+            <UnifiedWeeklyControls
               selectedWeek={selectedWeek}
-              setSelectedWeek={setSelectedWeek}
               onWeekChange={handleWeekChange}
               weekLabel={weekLabel}
+              viewType={viewType}
+              onViewTypeChange={handleViewTypeChange}
               filters={filters}
               onFilterChange={handleFilterChange}
+              activeFiltersCount={activeFiltersCount}
+              clearFilters={clearFilters}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
               tableOrientation={tableOrientation}
-            />
-          )}
-
-          {viewType === 'grid' && (
-            <RundownGridView
-              items={rundownItems}
+              onTableOrientationChange={setTableOrientation}
               rundownMode={rundownMode}
-              isFullscreen={isFullscreen}
-              selectedWeek={selectedWeek}
-            />
-          )}
-
-          {viewType === 'carousel' && (
-            <RundownCarousel
-              items={rundownItems}
+              onModeChange={handleModeChange}
+              sortOption={sortOption}
+              onSortChange={handleSortChange}
+              isAutoAdvance={isAutoAdvance}
+              onAutoAdvanceToggle={handleAutoAdvanceToggle}
               currentIndex={currentIndex}
-              rundownMode={rundownMode}
-              onNext={nextItem}
-              onPrev={prevItem}
-              onGoTo={goToItem}
+              totalItems={rundownItems.length}
               isFullscreen={isFullscreen}
-              selectedWeek={selectedWeek}
+              onFullscreenToggle={handleFullscreenToggle}
             />
-          )}
+
+            {/* Available Members Row */}
+            <AvailableMembersRow 
+              weekStartDate={weekStartString}
+              threshold={80}
+            />
+
+            {/* View Content */}
+            <div className="rounded-b-lg border border-t-0 bg-card overflow-hidden">
+              {viewType === 'table' && (
+                <WeekResourceView
+                  selectedWeek={selectedWeek}
+                  setSelectedWeek={setSelectedWeek}
+                  onWeekChange={handleWeekChange}
+                  weekLabel={weekLabel}
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  tableOrientation={tableOrientation}
+                />
+              )}
+
+              {viewType === 'grid' && (
+                <RundownGridView
+                  items={rundownItems}
+                  rundownMode={rundownMode}
+                  isFullscreen={isFullscreen}
+                  selectedWeek={selectedWeek}
+                />
+              )}
+
+              {viewType === 'carousel' && (
+                <RundownCarousel
+                  items={rundownItems}
+                  currentIndex={currentIndex}
+                  rundownMode={rundownMode}
+                  onNext={nextItem}
+                  onPrev={prevItem}
+                  onGoTo={goToItem}
+                  isFullscreen={isFullscreen}
+                  selectedWeek={selectedWeek}
+                />
+              )}
+            </div>
+          </div>
           </div>
         </PullToRefresh>
       </OfficeSettingsProvider>
