@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { MapPin, Folder, Layers, Building, Briefcase, Currency, Calendar, Palette, Building2, ListChecks, FolderOpen } from 'lucide-react';
+import { Building2, FolderKanban, Users, MapPin } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CountriesTab } from '@/components/settings/CountriesTab';
 import { StagesTab } from '@/components/settings/StagesTab';
 import { LocationsTab } from '@/components/settings/LocationsTab';
@@ -20,53 +14,97 @@ import { StatusesTab } from '@/components/settings/StatusesTab';
 import { ProjectTypesTab } from '@/components/settings/ProjectTypesTab';
 
 export const OfficeSettingsTabs: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState('company');
-
-  const tabs = [
-    { value: 'company', label: 'Company', icon: Building2 },
-    { value: 'locations', label: 'Office Locations', icon: MapPin },
-    { value: 'areas', label: 'Project Areas', icon: Folder },
-    { value: 'stages', label: 'Stages', icon: Layers },
-    { value: 'statuses', label: 'Statuses', icon: ListChecks },
-    { value: 'projectTypes', label: 'Project Types', icon: FolderOpen },
-    { value: 'organization', label: 'Organization', icon: Building },
-    { value: 'roles', label: 'Roles', icon: Briefcase },
-    { value: 'rates', label: 'Rates', icon: Currency },
-    { value: 'holidays', label: 'Holidays', icon: Calendar },
-    { value: 'theme', label: 'Theme', icon: Palette },
-  ];
+  const [mainTab, setMainTab] = useState('company');
+  const [projectSubTab, setProjectSubTab] = useState('areas');
+  const [teamSubTab, setTeamSubTab] = useState('organization');
+  const [officeSubTab, setOfficeSubTab] = useState('locations');
 
   return (
     <div className="w-full space-y-6">
-      <Select value={selectedTab} onValueChange={setSelectedTab}>
-        <SelectTrigger className="w-full sm:w-[280px]">
-          <SelectValue placeholder="Select settings category" />
-        </SelectTrigger>
-        <SelectContent>
-          {tabs.map((tab) => (
-            <SelectItem key={tab.value} value={tab.value}>
-              <div className="flex items-center gap-2">
-                <tab.icon className="h-4 w-4" />
-                <span>{tab.label}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      
-      <div>
-        {selectedTab === 'company' && <CompanyTab />}
-        {selectedTab === 'locations' && <LocationsTab />}
-        {selectedTab === 'areas' && <CountriesTab />}
-        {selectedTab === 'stages' && <StagesTab />}
-        {selectedTab === 'statuses' && <StatusesTab />}
-        {selectedTab === 'projectTypes' && <ProjectTypesTab />}
-        {selectedTab === 'organization' && <OrganizationTab />}
-        {selectedTab === 'roles' && <RolesTab />}
-        {selectedTab === 'rates' && <RatesTab />}
-        {selectedTab === 'holidays' && <HolidaysTab />}
-        {selectedTab === 'theme' && <ThemeTab />}
-      </div>
+      <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4 h-auto">
+          <TabsTrigger value="company" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Company</span>
+          </TabsTrigger>
+          <TabsTrigger value="projects" className="flex items-center gap-2">
+            <FolderKanban className="h-4 w-4" />
+            <span className="hidden sm:inline">Projects</span>
+          </TabsTrigger>
+          <TabsTrigger value="team" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Team</span>
+          </TabsTrigger>
+          <TabsTrigger value="office" className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            <span className="hidden sm:inline">Office</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="company" className="space-y-6 mt-6">
+          <CompanyTab />
+          <div className="border-t pt-6">
+            <ThemeTab />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="projects" className="space-y-6 mt-6">
+          <Tabs value={projectSubTab} onValueChange={setProjectSubTab}>
+            <TabsList>
+              <TabsTrigger value="areas">Areas</TabsTrigger>
+              <TabsTrigger value="types">Types</TabsTrigger>
+              <TabsTrigger value="stages">Stages</TabsTrigger>
+              <TabsTrigger value="statuses">Statuses</TabsTrigger>
+            </TabsList>
+            <TabsContent value="areas" className="mt-6">
+              <CountriesTab />
+            </TabsContent>
+            <TabsContent value="types" className="mt-6">
+              <ProjectTypesTab />
+            </TabsContent>
+            <TabsContent value="stages" className="mt-6">
+              <StagesTab />
+            </TabsContent>
+            <TabsContent value="statuses" className="mt-6">
+              <StatusesTab />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        <TabsContent value="team" className="space-y-6 mt-6">
+          <Tabs value={teamSubTab} onValueChange={setTeamSubTab}>
+            <TabsList>
+              <TabsTrigger value="organization">Organization</TabsTrigger>
+              <TabsTrigger value="roles">Roles</TabsTrigger>
+              <TabsTrigger value="rates">Rates</TabsTrigger>
+            </TabsList>
+            <TabsContent value="organization" className="mt-6">
+              <OrganizationTab />
+            </TabsContent>
+            <TabsContent value="roles" className="mt-6">
+              <RolesTab />
+            </TabsContent>
+            <TabsContent value="rates" className="mt-6">
+              <RatesTab />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        <TabsContent value="office" className="space-y-6 mt-6">
+          <Tabs value={officeSubTab} onValueChange={setOfficeSubTab}>
+            <TabsList>
+              <TabsTrigger value="locations">Locations</TabsTrigger>
+              <TabsTrigger value="holidays">Holidays</TabsTrigger>
+            </TabsList>
+            <TabsContent value="locations" className="mt-6">
+              <LocationsTab />
+            </TabsContent>
+            <TabsContent value="holidays" className="mt-6">
+              <HolidaysTab />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
