@@ -33,7 +33,7 @@ const WeeklyOverview = () => {
   );
   
   const [filters, setFilters] = useState({
-    sector: "all",
+    practiceArea: "all",
     department: "all",
     location: "all",
     searchTerm: ""
@@ -54,11 +54,11 @@ const WeeklyOverview = () => {
 
   // Stable filters for data fetching
   const stableFilters = useMemo(() => ({ 
-    sector: filters.sector === 'all' ? '' : filters.sector,
+    practiceArea: filters.practiceArea === 'all' ? '' : filters.practiceArea,
     department: filters.department === 'all' ? '' : filters.department,
     location: filters.location === 'all' ? '' : filters.location,
     searchTerm: filters.searchTerm 
-  }), [filters.sector, filters.department, filters.location, filters.searchTerm]);
+  }), [filters.practiceArea, filters.department, filters.location, filters.searchTerm]);
 
   // Get raw data
   const { 
@@ -121,7 +121,7 @@ const WeeklyOverview = () => {
 
   const clearFilters = useCallback(() => {
     setFilters({
-      sector: 'all',
+      practiceArea: 'all',
       department: 'all',
       location: 'all',
       searchTerm: ''
@@ -129,11 +129,11 @@ const WeeklyOverview = () => {
   }, []);
 
   const activeFiltersCount = useMemo(() => [
-    filters.sector !== 'all' ? 'sector' : '',
+    filters.practiceArea !== 'all' ? 'practiceArea' : '',
     filters.department !== 'all' ? 'department' : '',
     filters.location !== 'all' ? 'location' : '',
     filters.searchTerm ? 'search' : ''
-  ].filter(Boolean).length, [filters.sector, filters.department, filters.location, filters.searchTerm]);
+  ].filter(Boolean).length, [filters.practiceArea, filters.department, filters.location, filters.searchTerm]);
 
   const handleViewTypeChange = useCallback((view: ViewType) => {
     setViewType(view);

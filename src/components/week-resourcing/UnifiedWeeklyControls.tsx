@@ -30,7 +30,7 @@ interface UnifiedWeeklyControlsProps {
   
   // Filters
   filters: {
-    sector: string;
+    practiceArea: string;
     department: string;
     location: string;
     searchTerm: string;
@@ -88,7 +88,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   onFullscreenToggle
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeSortType, setActiveSortType] = useState<'practiceArea' | 'department' | 'location'>('practiceArea');
+  const [activeSortType, setActiveSortType] = useState<'practiceArea' | 'department' | 'location'>('department');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
@@ -361,16 +361,16 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
             </div>
           </SelectTrigger>
           <SelectContent className="bg-background z-50">
-            <SelectItem value="sector">
-              <div className="flex items-center gap-2">
-                <FolderOpen className="h-4 w-4" />
-                <span>Sector</span>
-              </div>
-            </SelectItem>
             <SelectItem value="department">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 <span>Department</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="practiceArea">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4" />
+                <span>Practice Area</span>
               </div>
             </SelectItem>
             <SelectItem value="location">
