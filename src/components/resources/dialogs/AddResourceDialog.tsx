@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { useResourceOptions } from './useResourceOptions';
 import { useAddResource } from './useAddResource';
 import { ResourceSelectOption } from './ResourceSelectOption';
+import { useOfficeSettings } from '@/context/officeSettings';
 
 interface AddResourceDialogProps {
   projectId: string;
@@ -43,6 +44,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   onAdd
 }) => {
   const { resourceOptions, loading: optionsLoading } = useResourceOptions();
+  const { departments: officeDepartments } = useOfficeSettings();
   const { 
     selectedResource, 
     loading: addLoading, 
@@ -53,12 +55,13 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   const [filterBy, setFilterBy] = useState<'all' | 'department' | 'role'>('all');
   const [filterValue, setFilterValue] = useState<string>('all');
 
-  // Get unique departments and roles for filter options
+  // Get departments from office settings
   const departments = useMemo(() => 
-    ['all', ...new Set(resourceOptions.map(r => r.department).filter(Boolean))],
-    [resourceOptions]
+    ['all', ...officeDepartments.map(d => d.name)],
+    [officeDepartments]
   );
   
+  // Get unique roles from resource options
   const roles = useMemo(() => 
     ['all', ...new Set(resourceOptions.map(r => r.role).filter(Boolean))],
     [resourceOptions]
