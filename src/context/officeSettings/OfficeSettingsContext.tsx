@@ -8,6 +8,7 @@ import {
   PracticeArea, 
   ProjectStage,
   ProjectStatus,
+  ProjectType,
   OfficeSettingsContextType 
 } from './types';
 import { fetchOfficeSettings } from './fetchOfficeSettings';
@@ -22,6 +23,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
   const [practice_areas, setPracticeAreas] = useState<PracticeArea[]>([]);
   const [office_stages, setOfficeStages] = useState<ProjectStage[]>([]);
   const [project_statuses, setProjectStatuses] = useState<ProjectStatus[]>([]);
+  const [project_types, setProjectTypes] = useState<ProjectType[]>([]);
   const [loading, setLoading] = useState(true);
   const { company } = useCompany();
 
@@ -35,6 +37,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
       setPracticeAreas([]);
       setOfficeStages([]);
       setProjectStatuses([]);
+      setProjectTypes([]);
       return;
     }
 
@@ -51,6 +54,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         setPracticeAreas(settings.practice_areas);
         setOfficeStages(settings.office_stages);
         setProjectStatuses(settings.project_statuses);
+        setProjectTypes(settings.project_types);
       } finally {
         setLoading(false);
       }
@@ -76,6 +80,8 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         setOfficeStages,
         project_statuses,
         setProjectStatuses,
+        project_types,
+        setProjectTypes,
         loading
       }}
     >

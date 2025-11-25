@@ -56,6 +56,15 @@ export type ProjectStatus = {
   color?: string;
 };
 
+export type ProjectType = {
+  id: string;
+  name: string;
+  order_index: number;
+  company_id: string;
+  icon?: string;
+  color?: string;
+};
+
 export type OfficeSettingsContextType = {
   roles: Role[];
   locations: Location[];
@@ -64,6 +73,7 @@ export type OfficeSettingsContextType = {
   practice_areas: PracticeArea[];
   office_stages: ProjectStage[];
   project_statuses: ProjectStatus[];
+  project_types: ProjectType[];
   setRoles: React.Dispatch<React.SetStateAction<Role[]>>;
   setLocations: React.Dispatch<React.SetStateAction<Location[]>>;
   setRates: React.Dispatch<React.SetStateAction<Rate[]>>;
@@ -71,5 +81,6 @@ export type OfficeSettingsContextType = {
   setPracticeAreas: React.Dispatch<React.SetStateAction<PracticeArea[]>>;
   setOfficeStages: React.Dispatch<React.SetStateAction<ProjectStage[]>>;
   setProjectStatuses: React.Dispatch<React.SetStateAction<ProjectStatus[]>>;
+  setProjectTypes: React.Dispatch<React.SetStateAction<ProjectType[]>>;
   loading: boolean;
 };

@@ -331,6 +331,47 @@ export type Database = {
           },
         ]
       }
+      office_project_types: {
+        Row: {
+          color: string | null
+          company_id: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          name: string
+          order_index: number
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          company_id?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          order_index?: number
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          company_id?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          order_index?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "office_project_types_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       office_rates: {
         Row: {
           company_id: string | null
