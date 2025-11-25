@@ -1,0 +1,177 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { Resend } from "npm:resend@2.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+interface BulkInviteRequest {
+  inviteIds: string[];
+}
+
+const handler = async (req: Request): Promise<Response> => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      throw new Error("No authorization header");
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const { inviteIds }: BulkInviteRequest = await req.json();
+
+    if (!inviteIds || inviteIds.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "No invite IDs provided" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log(`Processing ${inviteIds.length} invites`);
+
+    // Fetch invite details
+    const { data: invites, error: invitesError } = await supabase
+      .from("invites")
+      .select("id, email, first_name, last_name, code, invitation_type, companies(name, subdomain)")
+      .in("id", inviteIds)
+      .eq("invitation_type", "pre_registered")
+      .eq("status", "pending");
+
+    if (invitesError) {
+      console.error("Error fetching invites:", invitesError);
+      throw invitesError;
+    }
+
+    if (!invites || invites.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "No valid pre-registered invites found" }),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log(`Found ${invites.length} valid invites to send`);
+
+    const results = {
+      successful: 0,
+      failed: 0,
+      errors: [] as string[],
+    };
+
+    // Send emails
+    for (const invite of invites) {
+      if (!invite.email) {
+        console.warn(`Skipping invite ${invite.id} - no email address`);
+        results.failed++;
+        results.errors.push(`Invite ${invite.id} has no email address`);
+        continue;
+      }
+
+      try {
+        const companyName = invite.companies?.name || "the team";
+        const companySubdomain = invite.companies?.subdomain || "";
+        const firstName = invite.first_name || "";
+        const inviteUrl = `${req.headers.get("origin") || "https://app.example.com"}/join/${companySubdomain}/${invite.code}`;
+
+        console.log(`Sending invite to ${invite.email}`);
+
+        const emailResponse = await resend.emails.send({
+          from: "Team Invitation <onboarding@resend.dev>",
+          to: [invite.email],
+          subject: `Join ${companyName}`,
+          html: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              </head>
+              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center; border-radius: 10px 10px 0 0;">
+                  <h1 style="color: white; margin: 0; font-size: 28px;">You're Invited!</h1>
+                </div>
+                
+                <div style="background: white; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                  <p style="font-size: 16px; margin-bottom: 20px;">Hi${firstName ? ` ${firstName}` : ''},</p>
+                  
+                  <p style="font-size: 16px; margin-bottom: 20px;">
+                    You've been pre-registered to join <strong>${companyName}</strong>. Click the button below to complete your registration and join the team.
+                  </p>
+                  
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="${inviteUrl}" 
+                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; font-size: 16px;">
+                      Accept Invitation
+                    </a>
+                  </div>
+                  
+                  <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
+                    Or copy and paste this link into your browser:<br>
+                    <a href="${inviteUrl}" style="color: #667eea; word-break: break-all;">${inviteUrl}</a>
+                  </p>
+                  
+                  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+                  
+                  <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                    If you didn't expect this invitation, you can safely ignore this email.
+                  </p>
+                </div>
+              </body>
+            </html>
+          `,
+        });
+
+        console.log(`Email sent successfully to ${invite.email}:`, emailResponse);
+        results.successful++;
+      } catch (emailError: any) {
+        console.error(`Failed to send email to ${invite.email}:`, emailError);
+        results.failed++;
+        results.errors.push(`Failed to send to ${invite.email}: ${emailError.message}`);
+      }
+    }
+
+    console.log("Bulk invite results:", results);
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        results,
+        message: `Successfully sent ${results.successful} invite(s). ${results.failed} failed.`,
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      }
+    );
+  } catch (error: any) {
+    console.error("Error in send-bulk-invites function:", error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+};
+
+serve(handler);
