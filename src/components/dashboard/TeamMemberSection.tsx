@@ -40,6 +40,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
   
   // Filter state
   const [filters, setFilters] = useState({
+    sector: 'all',
     department: 'all',
     location: 'all',
     searchTerm: ''
@@ -51,6 +52,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
 
   const clearFilters = () => {
     setFilters({
+      sector: 'all',
       department: 'all',
       location: 'all',
       searchTerm: ''
@@ -60,6 +62,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
   // Calculate active filters count
   const activeFiltersCount = useMemo(() => {
     let count = 0;
+    if (filters.sector !== 'all') count++;
     if (filters.department !== 'all') count++;
     if (filters.location !== 'all') count++;
     if (filters.searchTerm) count++;
@@ -69,6 +72,16 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
   // Filter team members based on active filters
   const filteredTeamMembers = useMemo(() => {
     return teamMembers.filter(member => {
+      // Sector filter - Note: Currently sectors are associated with projects,
+      // not directly with team members. To implement this properly, you would need
+      // to fetch project allocations and filter based on project sectors.
+      // For now, this filter won't have an effect unless you add sector data to profiles.
+      if (filters.sector !== 'all') {
+        // Placeholder for sector filtering
+        // You may want to add a sector field to the profiles table
+        // or filter based on project allocations
+      }
+      
       // Department filter
       if (filters.department !== 'all' && member.department !== filters.department) {
         return false;

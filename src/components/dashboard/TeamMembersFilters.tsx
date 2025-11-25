@@ -4,12 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Search, X, ChevronLeft, ChevronRight, Users, Calendar } from 'lucide-react';
+import { Search, X, ChevronLeft, ChevronRight, Users, Calendar, FolderOpen } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TeamMembersFiltersProps {
   filters: {
+    sector: string;
     department: string;
     location: string;
     searchTerm: string;
@@ -26,7 +27,7 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
   clearFilters
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeFilterType, setActiveFilterType] = useState<'department' | 'location'>('department');
+  const [activeFilterType, setActiveFilterType] = useState<'sector' | 'department' | 'location'>('sector');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
@@ -50,6 +51,19 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
       });
     }
   }, []);
+
+  // Fetch sectors
+  const { data: sectors = [] } = useQuery({
+    queryKey: ['office-sectors'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('office_sectors')
+        .select('*')
+        .order('name');
+      if (error) throw error;
+      return data || [];
+    }
+  });
 
   // Fetch departments
   const { data: departments = [] } = useQuery({
@@ -80,6 +94,8 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
   // Get current filter options based on active filter type
   const getCurrentOptions = () => {
     switch (activeFilterType) {
+      case 'sector':
+        return sectors.map(s => ({ value: s.name, label: s.name, icon: s.icon }));
       case 'department':
         return departments.map(d => ({ value: d.name, label: d.name, icon: d.icon }));
       case 'location':
@@ -120,7 +136,9 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
         <Select value={activeFilterType} onValueChange={(value: any) => setActiveFilterType(value)}>
           <SelectTrigger className="w-9 h-9 p-0 border-input">
             <div className="flex items-center justify-center w-full">
-              {activeFilterType === 'department' ? (
+              {activeFilterType === 'sector' ? (
+                <FolderOpen className="h-4 w-4" />
+              ) : activeFilterType === 'department' ? (
                 <Users className="h-4 w-4" />
               ) : (
                 <Calendar className="h-4 w-4" />
@@ -128,6 +146,12 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
             </div>
           </SelectTrigger>
           <SelectContent className="bg-background z-50">
+            <SelectItem value="sector">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4" />
+                <span>Sector</span>
+              </div>
+            </SelectItem>
             <SelectItem value="department">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
@@ -154,7 +178,11 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
             className={`cursor-pointer whitespace-nowrap transition-all ${
               currentValue === 'all' ? 'bg-gradient-modern text-white hover:opacity-90' : ''
             }`}
-            onClick={() => onFilterChange(activeFilterType, 'all')}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onFilterChange(activeFilterType, 'all');
+            }}
           >
             All
           </Badge>
@@ -166,7 +194,11 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
               className={`cursor-pointer whitespace-nowrap transition-all ${
                 currentValue === option.value ? 'bg-gradient-modern text-white hover:opacity-90' : ''
               }`}
-              onClick={() => onFilterChange(activeFilterType, option.value)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onFilterChange(activeFilterType, option.value);
+              }}
             >
               {option.label}
             </Badge>
