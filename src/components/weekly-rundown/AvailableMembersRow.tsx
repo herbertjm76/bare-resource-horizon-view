@@ -10,7 +10,7 @@ interface AvailableMembersRowProps {
   weekStartDate: string;
   threshold?: number;
   filters?: {
-    sector: string;
+    practiceArea: string;
     department: string;
     location: string;
     searchTerm: string;
@@ -18,7 +18,7 @@ interface AvailableMembersRowProps {
 }
 
 type SortBy = 'hours' | 'name';
-type FilterBy = 'all' | 'department' | 'sector';
+type FilterBy = 'all' | 'department' | 'practiceArea';
 
 interface ProjectAllocation {
   projectId: string;
@@ -211,9 +211,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         // Apply filters
         if (!filters) return true;
 
-        // Sector filter (from project allocations)
-        if (filters.sector && filters.sector !== 'all') {
-          if (!member.sectors.includes(filters.sector)) return false;
+        // Practice Area filter (from project allocations)
+        if (filters.practiceArea && filters.practiceArea !== 'all') {
+          if (!member.sectors.includes(filters.practiceArea)) return false;
         }
 
         // Department filter
