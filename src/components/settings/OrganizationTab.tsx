@@ -12,6 +12,7 @@ import { AddPracticeAreaDialog } from './practiceAreas/AddPracticeAreaDialog';
 import { BulkOperations as PracticeAreaBulkOperations } from './practiceAreas/BulkOperations';
 import { PracticeAreaList } from './practiceAreas/PracticeAreaList';
 import { usePracticeAreaOperations } from './practiceAreas/usePracticeAreaOperations';
+import { AddPracticeAreasButton } from './AddPracticeAreasButton';
 import { AddProjectTypeDialog } from './projectTypes/AddProjectTypeDialog';
 import { BulkOperations as ProjectTypeBulkOperations } from './projectTypes/BulkOperations';
 import { ProjectTypeList } from './projectTypes/ProjectTypeList';
@@ -186,6 +187,10 @@ export const OrganizationTab = () => {
                 isSubmitting={practiceAreaOps.isSubmitting}
                 onCancel={practiceAreaOps.handleCancel}
               />
+
+              <div className="mb-4">
+                <AddPracticeAreasButton />
+              </div>
 
               <PracticeAreaList
                 practiceAreas={practice_areas}
