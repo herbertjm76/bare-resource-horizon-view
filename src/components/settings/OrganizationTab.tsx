@@ -12,6 +12,10 @@ import { AddPracticeAreaDialog } from './practiceAreas/AddPracticeAreaDialog';
 import { BulkOperations as PracticeAreaBulkOperations } from './practiceAreas/BulkOperations';
 import { PracticeAreaList } from './practiceAreas/PracticeAreaList';
 import { usePracticeAreaOperations } from './practiceAreas/usePracticeAreaOperations';
+import { AddProjectTypeDialog } from './projectTypes/AddProjectTypeDialog';
+import { BulkOperations as ProjectTypeBulkOperations } from './projectTypes/BulkOperations';
+import { ProjectTypeList } from './projectTypes/ProjectTypeList';
+import { useProjectTypeOperations } from './projectTypes/useProjectTypeOperations';
 import {
   Select,
   SelectContent,
@@ -20,15 +24,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type ViewType = 'departments' | 'practiceAreas';
+type ViewType = 'departments' | 'practiceAreas' | 'projectTypes';
 
 export const OrganizationTab = () => {
-  const { departments, setDepartments, practice_areas, setPracticeAreas, loading } = useOfficeSettings();
+  const { departments, setDepartments, practice_areas, setPracticeAreas, project_types, setProjectTypes, loading } = useOfficeSettings();
   const { company } = useCompany();
   const [viewType, setViewType] = useState<ViewType>('departments');
 
   const departmentOps = useDepartmentOperations(departments, setDepartments, company?.id);
   const practiceAreaOps = usePracticeAreaOperations(practice_areas, setPracticeAreas, company?.id);
+  const projectTypeOps = useProjectTypeOperations(project_types, setProjectTypes, company?.id);
 
   if (loading) {
     return (
@@ -43,7 +48,20 @@ export const OrganizationTab = () => {
   }
 
   const isDepartmentView = viewType === 'departments';
-  const currentOps = isDepartmentView ? departmentOps : practiceAreaOps;
+  const isPracticeAreaView = viewType === 'practiceAreas';
+  const isProjectTypeView = viewType === 'projectTypes';
+  
+  const currentOps = isDepartmentView 
+    ? departmentOps 
+    : isPracticeAreaView 
+    ? practiceAreaOps 
+    : projectTypeOps;
+
+  const getViewLabel = () => {
+    if (isDepartmentView) return 'Department';
+    if (isPracticeAreaView) return 'Practice Area';
+    return 'Project Type';
+  };
 
   return (
     <Card>
@@ -65,7 +83,7 @@ export const OrganizationTab = () => {
             onClick={currentOps.handleAddNew}
           >
             <Plus className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:inline">Add {isDepartmentView ? 'Department' : 'Practice Area'}</span>
+            <span className="hidden md:inline">Add {getViewLabel()}</span>
           </Button>
         </div>
       </CardHeader>
@@ -89,27 +107,44 @@ export const OrganizationTab = () => {
                     <span>Practice Areas</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="projectTypes">
+                  <div className="flex items-center gap-2">
+                    <Building className="h-4 w-4" />
+                    <span>Project Types</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
             <div className="text-sm text-muted-foreground">
               {isDepartmentView 
-                ? 'Functional teams (Architecture, Landscape, Operations, etc.)'
-                : 'Industry/project types (Healthcare, Finance, Enterprise, etc.)'}
+                ? 'Industry categories (Enterprise, Healthcare, etc.)'
+                : isPracticeAreaView
+                ? 'Functional teams (Architecture, BIM, Operations, etc.)'
+                : 'Project status types (Active Projects, Active Pursuits, etc.)'}
             </div>
           </div>
           
           {currentOps.editMode && (
-            isDepartmentView ? (
-              <DepartmentBulkOperations
-                selectedDepartments={departmentOps.selectedDepartments}
-                onBulkDelete={departmentOps.handleBulkDelete}
-              />
-            ) : (
-              <PracticeAreaBulkOperations
-                selectedPracticeAreas={practiceAreaOps.selectedPracticeAreas}
-                onBulkDelete={practiceAreaOps.handleBulkDelete}
-              />
-            )
+            <>
+              {isDepartmentView && (
+                <DepartmentBulkOperations
+                  selectedDepartments={departmentOps.selectedDepartments}
+                  onBulkDelete={departmentOps.handleBulkDelete}
+                />
+              )}
+              {isPracticeAreaView && (
+                <PracticeAreaBulkOperations
+                  selectedPracticeAreas={practiceAreaOps.selectedPracticeAreas}
+                  onBulkDelete={practiceAreaOps.handleBulkDelete}
+                />
+              )}
+              {isProjectTypeView && (
+                <ProjectTypeBulkOperations
+                  selectedProjectTypes={projectTypeOps.selectedProjectTypes}
+                  onBulkDelete={projectTypeOps.handleBulkDelete}
+                />
+              )}
+            </>
           )}
 
           {isDepartmentView ? (
@@ -137,7 +172,7 @@ export const OrganizationTab = () => {
                 onConvertToPracticeArea={departmentOps.handleConvertToPracticeArea}
               />
             </>
-          ) : (
+          ) : isPracticeAreaView ? (
             <>
               <AddPracticeAreaDialog
                 open={practiceAreaOps.showAddForm}
@@ -160,6 +195,32 @@ export const OrganizationTab = () => {
                 onEdit={practiceAreaOps.handleEdit}
                 onDelete={practiceAreaOps.handleDelete}
                 onConvertToDepartment={practiceAreaOps.handleConvertToDepartment}
+              />
+            </>
+          ) : (
+            <>
+              <AddProjectTypeDialog
+                open={projectTypeOps.showAddForm}
+                onOpenChange={(open) => !open && projectTypeOps.handleCancel()}
+                newProjectTypeName={projectTypeOps.newProjectTypeName}
+                setNewProjectTypeName={projectTypeOps.setNewProjectTypeName}
+                newProjectTypeIcon={projectTypeOps.newProjectTypeIcon}
+                setNewProjectTypeIcon={projectTypeOps.setNewProjectTypeIcon}
+                newProjectTypeColor={projectTypeOps.newProjectTypeColor}
+                setNewProjectTypeColor={projectTypeOps.setNewProjectTypeColor}
+                onSubmit={projectTypeOps.handleSubmit}
+                editingProjectType={projectTypeOps.editingProjectType}
+                isSubmitting={projectTypeOps.isSubmitting}
+                onCancel={projectTypeOps.handleCancel}
+              />
+
+              <ProjectTypeList
+                projectTypes={project_types}
+                editMode={projectTypeOps.editMode}
+                selectedProjectTypes={projectTypeOps.selectedProjectTypes}
+                onSelectProjectType={projectTypeOps.handleSelectProjectType}
+                onEdit={projectTypeOps.handleEdit}
+                onDelete={projectTypeOps.handleDelete}
               />
             </>
           )}
