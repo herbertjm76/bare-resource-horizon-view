@@ -138,21 +138,18 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                     {optionsLoading ? 'Loading...' : 'No team members found'}
                   </CommandEmpty>
                   <CommandGroup>
-                    <div className="grid grid-cols-2 gap-2 p-2">
+                    <div className="grid grid-cols-5 gap-3 p-3">
                       {filteredResources.map(member => (
                         <div
                           key={member.id}
                           onClick={() => setSelectedResource(member.id)}
                           className={cn(
-                            "relative flex flex-col gap-1 p-3 rounded-md border cursor-pointer transition-colors",
-                            "hover:bg-accent hover:text-accent-foreground",
-                            selectedResource === member.id && "bg-accent border-primary"
+                            "flex flex-col items-center gap-2 p-2 rounded-lg cursor-pointer transition-all",
+                            "hover:bg-accent",
+                            selectedResource === member.id && "bg-accent ring-2 ring-primary"
                           )}
                         >
-                          {selectedResource === member.id && (
-                            <Check className="absolute top-2 right-2 h-4 w-4" />
-                          )}
-                          <ResourceSelectOption member={member} />
+                          <ResourceSelectOption member={member} isSelected={selectedResource === member.id} />
                         </div>
                       ))}
                     </div>
