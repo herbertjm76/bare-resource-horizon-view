@@ -26,7 +26,7 @@ export const useTeamInvites = (companyId: string | undefined) => {
 
       const code = Math.random().toString(36).substring(2, 10).toUpperCase();
       
-      const { error } = await supabase
+      const { data: inviteData, error } = await supabase
         .from('invites')
         .insert({
           code,
@@ -34,12 +34,27 @@ export const useTeamInvites = (companyId: string | undefined) => {
           email: inviteEmail,
           created_by: session.user.id,
           first_name: firstName || null,
-          last_name: lastName || null
-        });
+          last_name: lastName || null,
+          invitation_type: 'pre_registered',
+          status: 'pending'
+        })
+        .select()
+        .single();
 
       if (error) throw error;
       
-      toast.success('Invite sent!');
+      // Send the email via edge function
+      const { error: emailError } = await supabase.functions.invoke('send-bulk-invites', {
+        body: { inviteIds: [inviteData.id] }
+      });
+
+      if (emailError) {
+        console.error('Error sending invite email:', emailError);
+        toast.error('Invite created but email failed to send');
+        return false;
+      }
+      
+      toast.success('Invite email sent!');
       setInviteEmail('');
       return true;
     } catch (e: any) {
