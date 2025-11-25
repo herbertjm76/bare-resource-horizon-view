@@ -189,8 +189,8 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         {editMode && ['owner', 'admin'].includes(userRole) ? (
           <Select
             disabled={loading}
-            value={getValue('job_title')}
-            onValueChange={(value) => handleChange('job_title', value)}
+            value={getValue('practice_area')}
+            onValueChange={(value) => handleChange('practice_area', value)}
           >
             <SelectTrigger className="h-8 text-sm">
               <SelectValue placeholder="Select practice area" />
@@ -206,7 +206,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
           </Select>
         ) : (
           <span className="text-sm text-gray-900">
-            {member.job_title || '-'}
+            {member.practice_area || '-'}
           </span>
         )}
       </td>

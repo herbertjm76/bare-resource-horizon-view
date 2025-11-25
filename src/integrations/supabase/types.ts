@@ -112,6 +112,7 @@ export type Database = {
           job_title: string | null
           last_name: string | null
           location: string | null
+          practice_area: string | null
           role: string | null
           status: string
           updated_at: string | null
@@ -133,6 +134,7 @@ export type Database = {
           job_title?: string | null
           last_name?: string | null
           location?: string | null
+          practice_area?: string | null
           role?: string | null
           status?: string
           updated_at?: string | null
@@ -154,6 +156,7 @@ export type Database = {
           job_title?: string | null
           last_name?: string | null
           location?: string | null
+          practice_area?: string | null
           role?: string | null
           status?: string
           updated_at?: string | null
@@ -677,6 +680,7 @@ export type Database = {
           last_name: string | null
           location: string | null
           manager_id: string | null
+          practice_area: string | null
           start_date: string | null
           updated_at: string
           weekly_capacity: number
@@ -694,6 +698,7 @@ export type Database = {
           last_name?: string | null
           location?: string | null
           manager_id?: string | null
+          practice_area?: string | null
           start_date?: string | null
           updated_at?: string
           weekly_capacity?: number
@@ -711,6 +716,7 @@ export type Database = {
           last_name?: string | null
           location?: string | null
           manager_id?: string | null
+          practice_area?: string | null
           start_date?: string | null
           updated_at?: string
           weekly_capacity?: number
