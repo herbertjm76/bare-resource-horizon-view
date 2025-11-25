@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
-import { AvailabilityFilters } from './AvailabilityFilters';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -40,24 +39,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80
 }) => {
-  const [sortBy, setSortBy] = useState<SortBy>('hours');
-  const [filterBy, setFilterBy] = useState<FilterBy>('all');
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
-  const [selectedSector, setSelectedSector] = useState<string>('');
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
-
-  const handleClearFilters = () => {
-    setFilterBy('all');
-    setSelectedDepartment('');
-    setSelectedSector('');
-  };
-
-  const activeFilterCount = [
-    selectedDepartment !== '',
-    selectedSector !== '',
-  ].filter(Boolean).length;
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['available-members-profiles'],
@@ -216,45 +200,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           projectAllocations
         };
       })
-      .sort((a, b) => {
-        if (sortBy === 'hours') {
-          return b.availableHours - a.availableHours;
-        } else {
-          return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
-        }
-      });
+      .sort((a, b) => b.availableHours - a.availableHours);
 
     return available;
-  }, [profiles, invites, allocations, threshold, sortBy]);
-
-  // Get unique departments and sectors for filters
-  const { departments, sectors } = React.useMemo(() => {
-    const depts = new Set<string>();
-    const sects = new Set<string>();
-    
-    availableMembers.forEach(member => {
-      if (member.department) depts.add(member.department);
-      member.sectors.forEach(sector => sects.add(sector));
-    });
-    
-    return {
-      departments: Array.from(depts).sort(),
-      sectors: Array.from(sects).sort()
-    };
-  }, [availableMembers]);
-
-  // Apply filters
-  const filteredMembers = React.useMemo(() => {
-    return availableMembers.filter(member => {
-      if (filterBy === 'department' && selectedDepartment !== '') {
-        return member.department === selectedDepartment;
-      }
-      if (filterBy === 'sector' && selectedSector !== '') {
-        return member.sectors.includes(selectedSector);
-      }
-      return true;
-    });
-  }, [availableMembers, filterBy, selectedDepartment, selectedSector]);
+  }, [profiles, invites, allocations, threshold]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
@@ -278,7 +227,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       container.removeEventListener('scroll', checkScrollPosition);
       window.removeEventListener('resize', checkScrollPosition);
     };
-  }, [checkScrollPosition, filteredMembers]);
+  }, [checkScrollPosition, availableMembers]);
 
   const scrollMembers = (direction: 'left' | 'right') => {
     const container = membersScrollRef.current;
@@ -293,10 +242,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   };
 
   return (
-    <div className="w-full space-y-0.5 mb-3">
-      <div className="rounded-lg p-1.5 overflow-hidden animate-fade-in relative">
+    <div className="w-full">
+      <div className="rounded-t-lg border border-b-0 bg-card p-2 overflow-hidden animate-fade-in relative">
         {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
-        {filteredMembers.length > 0 && (
+        {availableMembers.length > 0 && (
           <div className="hidden sm:block relative">
             {/* Left Arrow */}
             {canScrollLeft && (
@@ -328,7 +277,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[48px]">
-                {filteredMembers.map((member) => (
+                {availableMembers.map((member) => (
                   <MemberAvailabilityCard
                     key={member.id}
                     avatarUrl={member.avatarUrl}
@@ -346,10 +295,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         )}
 
         {/* Mobile view without arrows */}
-        {filteredMembers.length > 0 && (
+        {availableMembers.length > 0 && (
           <div className="block sm:hidden overflow-x-auto overflow-y-hidden -mx-2 px-2">
             <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[48px]">
-              {filteredMembers.map((member) => (
+              {availableMembers.map((member) => (
                 <MemberAvailabilityCard
                   key={member.id}
                   avatarUrl={member.avatarUrl}
@@ -366,57 +315,13 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         )}
 
         {/* Empty state - compact version */}
-        {filteredMembers.length === 0 && (
+        {availableMembers.length === 0 && (
           <div className="flex-1 flex items-center justify-center py-3 sm:py-0">
             <p className="text-xs sm:text-sm text-muted-foreground text-center">
               No available members
-              {activeFilterCount > 0 && (
-                <button 
-                  onClick={handleClearFilters}
-                  className="ml-1 text-primary hover:underline font-medium"
-                >
-                  - clear filters
-                </button>
-              )}
             </p>
           </div>
         )}
-
-        {/* Filters - Bottom Right - Desktop/Tablet only */}
-        <div className="hidden sm:flex absolute bottom-2 right-2 z-10">
-          <AvailabilityFilters
-            sortBy={sortBy}
-            onSortChange={setSortBy}
-            filterBy={filterBy}
-            onFilterChange={setFilterBy}
-            selectedDepartment={selectedDepartment}
-            onDepartmentChange={setSelectedDepartment}
-            selectedSector={selectedSector}
-            onSectorChange={setSelectedSector}
-            departments={departments}
-            sectors={sectors}
-            activeFilterCount={activeFilterCount}
-            onClearFilters={handleClearFilters}
-          />
-        </div>
-      </div>
-
-      {/* Mobile Filters Row - Only on mobile */}
-      <div className="flex sm:hidden justify-end items-center gap-2 px-1.5 py-0.5 rounded-lg">
-        <AvailabilityFilters
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          filterBy={filterBy}
-          onFilterChange={setFilterBy}
-          selectedDepartment={selectedDepartment}
-          onDepartmentChange={setSelectedDepartment}
-          selectedSector={selectedSector}
-          onSectorChange={setSelectedSector}
-          departments={departments}
-          sectors={sectors}
-          activeFilterCount={activeFilterCount}
-          onClearFilters={handleClearFilters}
-        />
       </div>
     </div>
   );
