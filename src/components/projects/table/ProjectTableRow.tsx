@@ -123,14 +123,14 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         <TableCell>
           {editMode ? (
             <Select 
-              value={editableFields[project.id]?.project_manager_id || project.project_manager_id || ''} 
-              onValueChange={(value) => updateEditableField(project.id, 'project_manager_id', value)}
+              value={editableFields[project.id]?.project_manager_id || project.project_manager_id || 'not_assigned'} 
+              onValueChange={(value) => updateEditableField(project.id, 'project_manager_id', value === 'not_assigned' ? null : value)}
             >
               <SelectTrigger className="h-8 w-32">
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Not Assigned</SelectItem>
+                <SelectItem value="not_assigned">Not Assigned</SelectItem>
                 {managers.map((manager) => (
                   <SelectItem key={manager.id} value={manager.id}>
                     {manager.name}
