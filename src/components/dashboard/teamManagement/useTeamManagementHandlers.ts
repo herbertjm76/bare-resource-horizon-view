@@ -2,6 +2,8 @@
 import { useTeamDialogsState } from '@/hooks/useTeamDialogsState';
 import { useTeamMemberHandlers } from '../handlers/TeamMemberHandlers';
 import { TeamMember, Profile, PendingMember } from '../types';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface UseTeamManagementHandlersProps {
   companyId: string;
@@ -12,6 +14,7 @@ interface UseTeamManagementHandlersProps {
   handleRefresh: () => void;
   dialogsState: ReturnType<typeof useTeamDialogsState>;
   memberHandlers: ReturnType<typeof useTeamMemberHandlers>;
+  inviteUrl: string;
 }
 
 export const useTeamManagementHandlers = ({
@@ -22,13 +25,15 @@ export const useTeamManagementHandlers = ({
   setEditMode,
   handleRefresh,
   dialogsState,
-  memberHandlers
+  memberHandlers,
+  inviteUrl
 }: UseTeamManagementHandlersProps) => {
   const {
     memberToDelete,
     isPendingMemberToDelete,
     currentMember,
     openDeleteDialog,
+    openEditDialog,
     closeDeleteDialog,
     closeAddEditDialog
   } = dialogsState;
@@ -36,13 +41,56 @@ export const useTeamManagementHandlers = ({
   const {
     handleSaveMemberWrapper,
     handleConfirmDelete,
-    handleBulkDelete
+    handleBulkDelete: bulkDelete
   } = memberHandlers;
 
   // Handlers
-  const handleDeleteMemberClick = (memberId: string) => {
+  const handleEditMember = (member: TeamMember) => {
+    openEditDialog(member);
+  };
+
+  const handleDeleteMember = (memberId: string) => {
     const isPending = preRegisteredMembers.some(m => m.id === memberId);
     openDeleteDialog(memberId, isPending);
+  };
+
+  const handleDeleteMemberClick = handleDeleteMember;
+
+  const handleSendPreRegisteredInvite = async (member: TeamMember) => {
+    if (!('isPending' in member) || !member.isPending) {
+      toast.error('This action is only available for pre-registered members');
+      return;
+    }
+
+    const email = member.email;
+    if (!email || !email.trim()) {
+      toast.error('Email address is required to send an invite');
+      return;
+    }
+
+    try {
+      // Send the email via edge function
+      const { error: emailError } = await supabase.functions.invoke('send-bulk-invites', {
+        body: { inviteIds: [member.id] }
+      });
+
+      if (emailError) {
+        console.error('Error sending invite email:', emailError);
+        toast.error('Failed to send invite email');
+        return;
+      }
+      
+      toast.success(`Invite sent to ${email}`);
+      handleRefresh();
+    } catch (e: any) {
+      console.error('Error sending invite:', e);
+      toast.error(e.message || 'Error sending invite');
+    }
+  };
+
+  const handleCopyInvite = () => {
+    navigator.clipboard.writeText(inviteUrl);
+    toast.success('Invite link copied to clipboard!');
   };
 
   const handleConfirmDeleteWrapper = async () => {
@@ -61,16 +109,20 @@ export const useTeamManagementHandlers = ({
     return false;
   };
 
-  const handleBulkDeleteWrapper = () => {
-    handleBulkDelete(selectedMembers, preRegisteredMembers);
+  const handleBulkDelete = () => {
+    bulkDelete(selectedMembers, preRegisteredMembers);
     setSelectedMembers([]);
     setEditMode(false);
   };
 
   return {
+    handleEditMember,
+    handleDeleteMember,
     handleDeleteMemberClick,
+    handleSendPreRegisteredInvite,
+    handleCopyInvite,
+    handleBulkDelete,
     handleConfirmDeleteWrapper,
-    handleSaveMemberDialogSubmit,
-    handleBulkDeleteWrapper
+    handleSaveMemberDialogSubmit
   };
 };

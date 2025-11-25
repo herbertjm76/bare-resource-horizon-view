@@ -17,6 +17,7 @@ interface TeamMemberSectionProps {
   setSelectedMembers: (members: string[]) => void;
   onEditMember: (member: TeamMember) => void;
   onDeleteMember: (memberId: string) => void;
+  onSendInvite?: (member: TeamMember) => void;
   onBulkDelete: () => void;
   onAdd: () => void;
   onRefresh?: () => void;
@@ -31,6 +32,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
   setSelectedMembers,
   onEditMember,
   onDeleteMember,
+  onSendInvite,
   onBulkDelete,
   onAdd,
   onRefresh
@@ -233,6 +235,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
           setSelectedMembers={setSelectedMembers} 
           onEditMember={onEditMember} 
           onDeleteMember={onDeleteMember}
+          onSendInvite={onSendInvite}
           onRefresh={onRefresh}
           pendingChanges={pendingChanges}
           onFieldChange={handleFieldChange}

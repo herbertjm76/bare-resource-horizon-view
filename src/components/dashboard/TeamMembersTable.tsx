@@ -13,6 +13,7 @@ interface TeamMembersTableProps {
   setSelectedMembers: (members: string[]) => void;
   onEditMember: (member: TeamMember) => void;
   onDeleteMember: (memberId: string) => void;
+  onSendInvite?: (member: TeamMember) => void;
   onRefresh?: () => void;
   pendingChanges: Record<string, Partial<TeamMember>>;
   onFieldChange: (memberId: string, field: string, value: string) => void;
@@ -26,6 +27,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   setSelectedMembers,
   onEditMember,
   onDeleteMember,
+  onSendInvite,
   onRefresh,
   pendingChanges,
   onFieldChange
@@ -82,6 +84,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
               onViewMember={handleViewMember}
               onEditMember={onEditMember}
               onDeleteMember={onDeleteMember}
+              onSendInvite={onSendInvite}
               onRefresh={onRefresh}
               pendingChanges={pendingChanges[member.id] || {}}
               onFieldChange={onFieldChange}

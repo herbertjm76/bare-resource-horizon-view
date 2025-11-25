@@ -16,6 +16,7 @@ interface TeamManagementContentProps {
   inviteEditMode: boolean;
   onEditMember: (member: TeamMember) => void;
   onDeleteMember: (memberId: string) => void;
+  onSendInvite?: (member: TeamMember) => void;
   onBulkDelete: () => void;
   onAdd: () => void;
   onToggleInviteEditMode: () => void;
@@ -39,6 +40,7 @@ export const TeamManagementContent: React.FC<TeamManagementContentProps> = ({
   inviteEditMode,
   onEditMember,
   onDeleteMember,
+  onSendInvite,
   onBulkDelete,
   onAdd,
   onToggleInviteEditMode,
@@ -60,6 +62,7 @@ export const TeamManagementContent: React.FC<TeamManagementContentProps> = ({
         setSelectedMembers={setSelectedMembers}
         onEditMember={onEditMember}
         onDeleteMember={onDeleteMember}
+        onSendInvite={onSendInvite}
         onBulkDelete={onBulkDelete}
         onAdd={onAdd}
         onRefresh={onRefresh}
