@@ -475,7 +475,6 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
               } ${focusedBadgeIndex === index ? 'ring-2 ring-primary ring-offset-2' : ''}`}
               onClick={() => onFilterChange(activeSortType, option.value)}
             >
-              {option.icon && <span className="mr-1.5">{option.icon}</span>}
               {option.label}
             </Badge>
           ))}
