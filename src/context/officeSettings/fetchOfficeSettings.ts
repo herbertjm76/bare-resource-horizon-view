@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Role, Location, Rate, Department, Sector, ProjectStage, ProjectStatus } from './types';
+import { Role, Location, Rate, Department, PracticeArea, ProjectStage, ProjectStatus } from './types';
 import { toast } from 'sonner';
 
 type OfficeSettings = {
@@ -7,7 +7,7 @@ type OfficeSettings = {
   locations: Location[];
   rates: Rate[];
   departments: Department[];
-  sectors: Sector[];
+  practice_areas: PracticeArea[];
   office_stages: ProjectStage[];
   project_statuses: ProjectStatus[];
 };
@@ -54,19 +54,19 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       departmentsData = [];
     }
 
-    // Fetch sectors data
-    let sectorsData = [];
+    // Fetch practice areas data
+    let practiceAreasData = [];
     try {
       const { data, error } = await supabase
-        .from('office_sectors')
+        .from('office_practice_areas')
         .select('id, name, company_id, icon')
         .eq('company_id', companyId);
       
       if (error) throw error;
-      sectorsData = data || [];
-    } catch (sectorError) {
-      console.error('Error fetching sectors:', sectorError);
-      sectorsData = [];
+      practiceAreasData = data || [];
+    } catch (practiceAreaError) {
+      console.error('Error fetching practice areas:', practiceAreaError);
+      practiceAreasData = [];
     }
 
     // Fetch rates data
@@ -98,7 +98,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
     console.log("Roles data:", rolesData);
     console.log("Locations data:", locationsData);
     console.log("Departments data:", departmentsData);
-    console.log("Sectors data:", sectorsData);
+    console.log("Practice Areas data:", practiceAreasData);
     console.log("Rates data:", ratesData);
     console.log("Stages data:", stagesData);
     console.log("Statuses data:", statusesData);
@@ -136,12 +136,12 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
         }))
       : [];
 
-    const processedSectors = Array.isArray(sectorsData)
-      ? sectorsData.map((sector: any) => ({
-          id: sector.id,
-          name: sector.name,
-          company_id: (sector.company_id ?? companyId).toString(),
-          icon: sector.icon || undefined
+    const processedPracticeAreas = Array.isArray(practiceAreasData)
+      ? practiceAreasData.map((practiceArea: any) => ({
+          id: practiceArea.id,
+          name: practiceArea.name,
+          company_id: (practiceArea.company_id ?? companyId).toString(),
+          icon: practiceArea.icon || undefined
         }))
       : [];
       
@@ -191,7 +191,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       locations: processedLocations,
       rates: processedRates,
       departments: processedDepartments,
-      sectors: processedSectors,
+      practice_areas: processedPracticeAreas,
       office_stages: processedStages,
       project_statuses: processedStatuses
     };
@@ -205,7 +205,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       locations: [],
       rates: [],
       departments: [],
-      sectors: [],
+      practice_areas: [],
       office_stages: [],
       project_statuses: []
     };

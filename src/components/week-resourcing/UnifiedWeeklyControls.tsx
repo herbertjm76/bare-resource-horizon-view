@@ -88,11 +88,11 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   onFullscreenToggle
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeSortType, setActiveSortType] = useState<'sector' | 'department' | 'location'>('sector');
+  const [activeSortType, setActiveSortType] = useState<'practiceArea' | 'department' | 'location'>('practiceArea');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
-  const { sectors, departments, locations } = useWeeklyFilterOptions();
+  const { practiceAreas, departments, locations } = useWeeklyFilterOptions();
 
   // Check scroll position
   const checkScroll = useCallback(() => {
@@ -117,10 +117,10 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   // Debug logging
   console.log('Filter Options Debug:', {
     activeSortType,
-    sectors,
+    practiceAreas,
     departments,
     locations,
-    sectorsCount: sectors?.length,
+    practiceAreasCount: practiceAreas?.length,
     departmentsCount: departments?.length,
     locationsCount: locations?.length
   });
@@ -128,8 +128,8 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   // Get current sort options based on active sort type
   const getCurrentOptions = () => {
     switch (activeSortType) {
-      case 'sector':
-        return sectors.map(s => ({ value: s.name, label: s.name, icon: s.icon }));
+      case 'practiceArea':
+        return practiceAreas.map(pa => ({ value: pa.name, label: pa.name, icon: pa.icon }));
       case 'department':
         return departments.map(d => ({ value: d.name, label: d.name, icon: d.icon }));
       case 'location':
@@ -351,7 +351,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
         <Select value={activeSortType} onValueChange={(value: any) => setActiveSortType(value)}>
           <SelectTrigger className="w-9 h-9 p-0 border-input">
             <div className="flex items-center justify-center w-full">
-              {activeSortType === 'sector' ? (
+              {activeSortType === 'practiceArea' ? (
                 <FolderOpen className="h-4 w-4" />
               ) : activeSortType === 'department' ? (
                 <Users className="h-4 w-4" />

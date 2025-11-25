@@ -33,7 +33,7 @@ export type Department = {
   icon?: string;
 };
 
-export type Sector = {
+export type PracticeArea = {
   id: string;
   name: string;
   company_id: string;
@@ -61,14 +61,14 @@ export type OfficeSettingsContextType = {
   locations: Location[];
   rates: Rate[];
   departments: Department[];
-  sectors: Sector[];
+  practice_areas: PracticeArea[];
   office_stages: ProjectStage[];
   project_statuses: ProjectStatus[];
   setRoles: React.Dispatch<React.SetStateAction<Role[]>>;
   setLocations: React.Dispatch<React.SetStateAction<Location[]>>;
   setRates: React.Dispatch<React.SetStateAction<Rate[]>>;
   setDepartments: React.Dispatch<React.SetStateAction<Department[]>>;
-  setSectors: React.Dispatch<React.SetStateAction<Sector[]>>;
+  setPracticeAreas: React.Dispatch<React.SetStateAction<PracticeArea[]>>;
   setOfficeStages: React.Dispatch<React.SetStateAction<ProjectStage[]>>;
   setProjectStatuses: React.Dispatch<React.SetStateAction<ProjectStatus[]>>;
   loading: boolean;

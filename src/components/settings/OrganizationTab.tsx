@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Plus, Building, Shapes } from "lucide-react";
+import { Edit, Plus, Building, Target } from "lucide-react";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
 import { AddDepartmentDialog } from './departments/AddDepartmentDialog';
 import { BulkOperations as DepartmentBulkOperations } from './departments/BulkOperations';
 import { DepartmentList } from './departments/DepartmentList';
 import { useDepartmentOperations } from './departments/useDepartmentOperations';
-import { AddSectorDialog } from './sectors/AddSectorDialog';
-import { BulkOperations as SectorBulkOperations } from './sectors/BulkOperations';
-import { SectorList } from './sectors/SectorList';
-import { useSectorOperations } from './sectors/useSectorOperations';
+import { AddPracticeAreaDialog } from './practiceAreas/AddPracticeAreaDialog';
+import { BulkOperations as PracticeAreaBulkOperations } from './practiceAreas/BulkOperations';
+import { PracticeAreaList } from './practiceAreas/PracticeAreaList';
+import { usePracticeAreaOperations } from './practiceAreas/usePracticeAreaOperations';
 import {
   Select,
   SelectContent,
@@ -20,15 +20,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type ViewType = 'departments' | 'sectors';
+type ViewType = 'departments' | 'practiceAreas';
 
 export const OrganizationTab = () => {
-  const { departments, setDepartments, sectors, setSectors, loading } = useOfficeSettings();
+  const { departments, setDepartments, practice_areas, setPracticeAreas, loading } = useOfficeSettings();
   const { company } = useCompany();
   const [viewType, setViewType] = useState<ViewType>('departments');
 
   const departmentOps = useDepartmentOperations(departments, setDepartments, company?.id);
-  const sectorOps = useSectorOperations(sectors, setSectors, company?.id);
+  const practiceAreaOps = usePracticeAreaOperations(practice_areas, setPracticeAreas, company?.id);
 
   if (loading) {
     return (
@@ -43,7 +43,7 @@ export const OrganizationTab = () => {
   }
 
   const isDepartmentView = viewType === 'departments';
-  const currentOps = isDepartmentView ? departmentOps : sectorOps;
+  const currentOps = isDepartmentView ? departmentOps : practiceAreaOps;
 
   return (
     <Card>
@@ -65,7 +65,7 @@ export const OrganizationTab = () => {
             onClick={currentOps.handleAddNew}
           >
             <Plus className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:inline">Add {isDepartmentView ? 'Department' : 'Sector'}</span>
+            <span className="hidden md:inline">Add {isDepartmentView ? 'Department' : 'Practice Area'}</span>
           </Button>
         </div>
       </CardHeader>
@@ -83,18 +83,18 @@ export const OrganizationTab = () => {
                     <span>Departments</span>
                   </div>
                 </SelectItem>
-                <SelectItem value="sectors">
+                <SelectItem value="practiceAreas">
                   <div className="flex items-center gap-2">
-                    <Shapes className="h-4 w-4" />
-                    <span>Sectors</span>
+                    <Target className="h-4 w-4" />
+                    <span>Practice Areas</span>
                   </div>
                 </SelectItem>
               </SelectContent>
             </Select>
             <div className="text-sm text-muted-foreground">
               {isDepartmentView 
-                ? 'Define organizational departments to categorize team members and projects.'
-                : 'Define organizational sectors to categorize at a higher level than departments.'}
+                ? 'Functional teams (Architecture, Landscape, Operations, etc.)'
+                : 'Industry/project types (Healthcare, Finance, Enterprise, etc.)'}
             </div>
           </div>
           
@@ -105,9 +105,9 @@ export const OrganizationTab = () => {
                 onBulkDelete={departmentOps.handleBulkDelete}
               />
             ) : (
-              <SectorBulkOperations
-                selectedSectors={sectorOps.selectedSectors}
-                onBulkDelete={sectorOps.handleBulkDelete}
+              <PracticeAreaBulkOperations
+                selectedPracticeAreas={practiceAreaOps.selectedPracticeAreas}
+                onBulkDelete={practiceAreaOps.handleBulkDelete}
               />
             )
           )}
@@ -134,32 +134,32 @@ export const OrganizationTab = () => {
                 onSelectDepartment={departmentOps.handleSelectDepartment}
                 onEdit={departmentOps.handleEdit}
                 onDelete={departmentOps.handleDelete}
-                onConvertToSector={departmentOps.handleConvertToSector}
+                onConvertToPracticeArea={departmentOps.handleConvertToPracticeArea}
               />
             </>
           ) : (
             <>
-              <AddSectorDialog
-                open={sectorOps.showAddForm}
-                onOpenChange={(open) => !open && sectorOps.handleCancel()}
-                newSectorName={sectorOps.newSectorName}
-                setNewSectorName={sectorOps.setNewSectorName}
-                newSectorIcon={sectorOps.newSectorIcon}
-                setNewSectorIcon={sectorOps.setNewSectorIcon}
-                onSubmit={sectorOps.handleSubmit}
-                editingSector={sectorOps.editingSector}
-                isSubmitting={sectorOps.isSubmitting}
-                onCancel={sectorOps.handleCancel}
+              <AddPracticeAreaDialog
+                open={practiceAreaOps.showAddForm}
+                onOpenChange={(open) => !open && practiceAreaOps.handleCancel()}
+                newPracticeAreaName={practiceAreaOps.newPracticeAreaName}
+                setNewPracticeAreaName={practiceAreaOps.setNewPracticeAreaName}
+                newPracticeAreaIcon={practiceAreaOps.newPracticeAreaIcon}
+                setNewPracticeAreaIcon={practiceAreaOps.setNewPracticeAreaIcon}
+                onSubmit={practiceAreaOps.handleSubmit}
+                editingPracticeArea={practiceAreaOps.editingPracticeArea}
+                isSubmitting={practiceAreaOps.isSubmitting}
+                onCancel={practiceAreaOps.handleCancel}
               />
 
-              <SectorList
-                sectors={sectors}
-                editMode={sectorOps.editMode}
-                selectedSectors={sectorOps.selectedSectors}
-                onSelectSector={sectorOps.handleSelectSector}
-                onEdit={sectorOps.handleEdit}
-                onDelete={sectorOps.handleDelete}
-                onConvertToDepartment={sectorOps.handleConvertToDepartment}
+              <PracticeAreaList
+                practiceAreas={practice_areas}
+                editMode={practiceAreaOps.editMode}
+                selectedPracticeAreas={practiceAreaOps.selectedPracticeAreas}
+                onSelectPracticeArea={practiceAreaOps.handleSelectPracticeArea}
+                onEdit={practiceAreaOps.handleEdit}
+                onDelete={practiceAreaOps.handleDelete}
+                onConvertToDepartment={practiceAreaOps.handleConvertToDepartment}
               />
             </>
           )}
