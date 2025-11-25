@@ -96,40 +96,42 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           </TableCell>
         )}
         
-        <TableCell className="font-semibold">
+        <TableCell className="font-semibold p-0">
           {editMode ? (
             <Input
               value={editableFields[project.id]?.code || project.code}
               onChange={(e) => updateEditableField(project.id, 'code', e.target.value)}
-              className="h-8 text-xs font-semibold"
+              className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs font-semibold px-4 py-3"
             />
           ) : (
-            project.code
+            <div className="px-4 py-3">{project.code}</div>
           )}
         </TableCell>
         
-        <TableCell>
+        <TableCell className="p-0">
           {editMode ? (
             <Input
               value={editableFields[project.id]?.name || project.name}
               onChange={(e) => updateEditableField(project.id, 'name', e.target.value)}
-              className="h-8 text-xs"
+              className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3"
             />
           ) : (
-            <span className="font-bold">{project.name}</span>
+            <div className="px-4 py-3">
+              <span className="font-bold">{project.name}</span>
+            </div>
           )}
         </TableCell>
         
-        <TableCell>
+        <TableCell className="p-0">
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.project_manager_id || project.project_manager_id || 'not_assigned'} 
               onValueChange={(value) => updateEditableField(project.id, 'project_manager_id', value === 'not_assigned' ? null : value)}
             >
-              <SelectTrigger className="h-8 w-32">
+              <SelectTrigger className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3">
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border">
                 <SelectItem value="not_assigned">Not Assigned</SelectItem>
                 {managers.map((manager) => (
                   <SelectItem key={manager.id} value={manager.id}>
@@ -139,20 +141,20 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               </SelectContent>
             </Select>
           ) : (
-            project.project_manager?.first_name || '-'
+            <div className="px-4 py-3">{project.project_manager?.first_name || '-'}</div>
           )}
         </TableCell>
         
-        <TableCell>
+        <TableCell className="p-0">
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.status || project.status} 
               onValueChange={(value) => updateEditableField(project.id, 'status', value)}
             >
-              <SelectTrigger className="h-8 w-32">
+              <SelectTrigger className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border">
                 {project_statuses.map((status) => (
                   <SelectItem key={status.id} value={status.name}>
                     {status.name}
@@ -161,28 +163,30 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               </SelectContent>
             </Select>
           ) : (
-            <span 
-              className="inline-block px-2 py-0.5 rounded text-xs"
-              style={{
-                background: getStatusColor(project.status).bg,
-                color: getStatusColor(project.status).text
-              }}
-            >
-              {project.status}
-            </span>
+            <div className="px-4 py-3">
+              <span 
+                className="inline-block px-2 py-0.5 rounded text-xs"
+                style={{
+                  background: getStatusColor(project.status).bg,
+                  color: getStatusColor(project.status).text
+                }}
+              >
+                {project.status}
+              </span>
+            </div>
           )}
         </TableCell>
         
-        <TableCell>
+        <TableCell className="p-0">
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.country || project.country || ''} 
               onValueChange={(value) => updateEditableField(project.id, 'country', value)}
             >
-              <SelectTrigger className="h-8 w-32">
+              <SelectTrigger className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3">
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border">
                 {projectAreas.map((area) => (
                   <SelectItem key={area.id} value={area.name}>
                     <span
@@ -199,28 +203,30 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               </SelectContent>
             </Select>
           ) : (
-            <span
-              className="inline-block px-2 py-1 rounded"
-              style={{
-                background: projectArea?.color || "#E5DEFF",
-                color: "#212172"
-              }}
-            >
-              {projectArea?.code?.toUpperCase() || project.country}
-            </span>
+            <div className="px-4 py-3">
+              <span
+                className="inline-block px-2 py-1 rounded"
+                style={{
+                  background: projectArea?.color || "#E5DEFF",
+                  color: "#212172"
+                }}
+              >
+                {projectArea?.code?.toUpperCase() || project.country}
+              </span>
+            </div>
           )}
         </TableCell>
         
-        <TableCell>
+        <TableCell className="p-0">
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.department || project.department || ''} 
               onValueChange={(value) => updateEditableField(project.id, 'department', value)}
             >
-              <SelectTrigger className="h-8 w-32">
+              <SelectTrigger className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3">
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border">
                 {departments.map((dept) => (
                   <SelectItem key={dept.id} value={dept.name}>
                     {dept.name}
@@ -229,7 +235,9 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               </SelectContent>
             </Select>
           ) : (
-            <span className="text-xs">{project.department || '-'}</span>
+            <div className="px-4 py-3">
+              <span className="text-xs">{project.department || '-'}</span>
+            </div>
           )}
         </TableCell>
         
@@ -237,16 +245,16 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           {project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"}
         </TableCell> */}
         
-        <TableCell>
+        <TableCell className="p-0">
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.current_stage || project.current_stage || ''} 
               onValueChange={(value) => updateEditableField(project.id, 'current_stage', value)}
             >
-              <SelectTrigger className="h-8 w-32">
+              <SelectTrigger className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3">
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border">
                 {office_stages.map((stage) => (
                   <SelectItem key={stage.id} value={stage.id}>
                     {stage.name}
@@ -255,15 +263,17 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               </SelectContent>
             </Select>
           ) : (
-            <span
-              className="inline-block px-2 py-1 rounded text-xs"
-              style={{
-                backgroundColor: getCurrentStageColor(),
-                color: "#212172"
-              }}
-            >
-              {getCurrentStageName()}
-            </span>
+            <div className="px-4 py-3">
+              <span
+                className="inline-block px-2 py-1 rounded text-xs"
+                style={{
+                  backgroundColor: getCurrentStageColor(),
+                  color: "#212172"
+                }}
+              >
+                {getCurrentStageName()}
+              </span>
+            </div>
           )}
         </TableCell>
         
