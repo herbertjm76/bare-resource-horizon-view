@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 import { useResourceOptions } from './useResourceOptions';
 import { useAddResource } from './useAddResource';
@@ -40,34 +50,110 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
     handleAdd 
   } = useAddResource({ projectId, onAdd, onClose });
   
+  const [filterType, setFilterType] = useState<'all' | 'active' | 'pre-registered'>('all');
+  const [sortBy, setSortBy] = useState<'name' | 'role'>('name');
+
+  // Filter and sort resources
+  const filteredAndSortedResources = useMemo(() => {
+    let filtered = resourceOptions;
+    
+    // Apply type filter
+    if (filterType !== 'all') {
+      filtered = filtered.filter(r => r.type === filterType);
+    }
+    
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name);
+      } else {
+        const roleA = a.role || '';
+        const roleB = b.role || '';
+        return roleA.localeCompare(roleB);
+      }
+    });
+    
+    return sorted;
+  }, [resourceOptions, filterType, sortBy]);
+
+  const selectedResourceData = resourceOptions.find(r => r.id === selectedResource);
+  
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add Resource to Project</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
+          {/* Filter and Sort Controls */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Filter by Type</Label>
+              <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Members</SelectItem>
+                  <SelectItem value="active">Active Only</SelectItem>
+                  <SelectItem value="pre-registered">Pending Only</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Sort by</Label>
+              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name">Name</SelectItem>
+                  <SelectItem value="role">Role</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Searchable Resource List */}
           <div className="space-y-2">
-            <Label htmlFor="resource">Team Member</Label>
-            <Select value={selectedResource} onValueChange={setSelectedResource}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select team member" />
-              </SelectTrigger>
-              <SelectContent>
-                {resourceOptions.length === 0 && (
-                  <div className="text-center py-2 text-sm text-muted-foreground">
+            <Label>Team Member</Label>
+            <div className="border rounded-md">
+              <Command>
+                <CommandInput placeholder="Search team members..." />
+                <CommandList>
+                  <CommandEmpty>
                     {optionsLoading ? 'Loading...' : 'No team members found'}
-                  </div>
-                )}
-                
-                {resourceOptions.map(member => (
-                  <SelectItem key={member.id} value={member.id}>
-                    <ResourceSelectOption member={member} />
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  </CommandEmpty>
+                  <CommandGroup>
+                    {filteredAndSortedResources.map(member => (
+                      <CommandItem
+                        key={member.id}
+                        value={`${member.name} ${member.role || ''}`}
+                        onSelect={() => setSelectedResource(member.id)}
+                        className="cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <Check
+                            className={cn(
+                              "h-4 w-4 shrink-0",
+                              selectedResource === member.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <ResourceSelectOption member={member} />
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </div>
+            {selectedResourceData && (
+              <div className="text-sm text-muted-foreground mt-2">
+                Selected: <span className="font-medium text-foreground">{selectedResourceData.name}</span>
+              </div>
+            )}
           </div>
         </div>
         
