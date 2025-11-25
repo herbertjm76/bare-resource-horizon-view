@@ -18,6 +18,7 @@ export const TEAM_MEMBER_FIELDS: TeamMemberField[] = [
   { value: 'email', label: 'Email', required: false },
   { value: 'job_title', label: 'Job Title', required: false },
   { value: 'department', label: 'Department', required: false },
+  { value: 'practice_area', label: 'Practice Area', required: false },
   { value: 'location', label: 'Office Location', required: false },
   { value: 'weekly_capacity', label: 'Weekly Capacity (hours)', required: false },
   { value: 'role', label: 'Role', required: false }

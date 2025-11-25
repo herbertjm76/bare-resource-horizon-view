@@ -20,6 +20,7 @@ export interface MappedTeamMember {
   email?: string;
   job_title?: string;
   department?: string;
+  practice_area?: string;
   location?: string;
   weekly_capacity?: number;
   role?: string;
