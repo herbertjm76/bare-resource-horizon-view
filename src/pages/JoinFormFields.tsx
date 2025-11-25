@@ -12,6 +12,7 @@ interface JoinFormFieldsProps {
   setFirstName: (v: string) => void;
   lastName: string;
   setLastName: (v: string) => void;
+  isEmailLocked?: boolean;
 }
 
 const JoinFormFields: React.FC<JoinFormFieldsProps> = ({
@@ -24,6 +25,7 @@ const JoinFormFields: React.FC<JoinFormFieldsProps> = ({
   setFirstName,
   lastName,
   setLastName,
+  isEmailLocked = false,
 }) => (
   <>
     {isSignup && (
@@ -59,9 +61,13 @@ const JoinFormFields: React.FC<JoinFormFieldsProps> = ({
         id="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+        className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50 disabled:opacity-70 disabled:cursor-not-allowed"
         required
+        disabled={isEmailLocked}
       />
+      {isEmailLocked && (
+        <p className="text-xs text-white/60 mt-1">Email is locked to match your invite</p>
+      )}
     </div>
     <div>
       <label htmlFor="password" className="block text-white/80 mb-2">Password</label>

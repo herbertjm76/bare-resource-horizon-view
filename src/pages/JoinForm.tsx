@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -24,7 +24,33 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignup, setIsSignup] = useState(true);
+  const [isEmailLocked, setIsEmailLocked] = useState(false);
   const navigate = useNavigate();
+
+  // Pre-fill email from invite code if available
+  useEffect(() => {
+    const fetchInviteDetails = async () => {
+      if (!inviteCode) return;
+
+      const { data: invite, error } = await supabase
+        .from('invites')
+        .select('*')
+        .eq('code', inviteCode)
+        .eq('status', 'pending')
+        .maybeSingle();
+
+      if (!error && invite) {
+        if (invite.email && invite.invitation_type === 'email_invite') {
+          setEmail(invite.email);
+          setIsEmailLocked(true);
+        }
+        if (invite.first_name) setFirstName(invite.first_name);
+        if (invite.last_name) setLastName(invite.last_name);
+      }
+    };
+
+    fetchInviteDetails();
+  }, [inviteCode]);
 
   const handleAuthModeChange = (newIsSignup: boolean) => {
     setIsSignup(newIsSignup);
@@ -227,6 +253,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
         setFirstName={setFirstName}
         lastName={lastName}
         setLastName={setLastName}
+        isEmailLocked={isEmailLocked}
       />
       <Button
         type="submit"
