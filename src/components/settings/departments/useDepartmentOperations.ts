@@ -152,14 +152,14 @@ export const useDepartmentOperations = (
     }
   };
 
-  const handleConvertToSector = async (department: Department) => {
+  const handleConvertToPracticeArea = async (department: Department) => {
     if (!companyId) return;
     
-    if (!confirm(`Convert "${department.name}" to a sector?`)) return;
+    if (!confirm(`Convert "${department.name}" to a practice area?`)) return;
 
     try {
       const { error: insertError } = await supabase
-        .from('office_sectors')
+        .from('office_practice_areas')
         .insert({
           name: department.name,
           icon: department.icon,
@@ -176,10 +176,10 @@ export const useDepartmentOperations = (
       if (deleteError) throw deleteError;
 
       setDepartments(departments.filter(dept => dept.id !== department.id));
-      toast.success("Department converted to sector successfully");
+      toast.success("Department converted to practice area successfully");
     } catch (error) {
-      console.error('Error converting department to sector:', error);
-      toast.error("Failed to convert department to sector");
+      console.error('Error converting department to practice area:', error);
+      toast.error("Failed to convert department to practice area");
     }
   };
 
@@ -201,6 +201,6 @@ export const useDepartmentOperations = (
     handleCancel,
     toggleEditMode,
     handleAddNew,
-    handleConvertToSector
+    handleConvertToPracticeArea
   };
 };

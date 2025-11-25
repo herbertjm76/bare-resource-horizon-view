@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface TeamMembersFiltersProps {
   filters: {
-    sector: string;
+    practiceArea: string;
     department: string;
     location: string;
     searchTerm: string;
@@ -27,7 +27,7 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
   clearFilters
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeFilterType, setActiveFilterType] = useState<'sector' | 'department' | 'location'>('sector');
+  const [activeFilterType, setActiveFilterType] = useState<'practiceArea' | 'department' | 'location'>('practiceArea');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
@@ -52,12 +52,12 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
     }
   }, []);
 
-  // Fetch sectors
-  const { data: sectors = [] } = useQuery({
-    queryKey: ['office-sectors'],
+  // Fetch practice areas
+  const { data: practiceAreas = [] } = useQuery({
+    queryKey: ['office-practice-areas'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('office_sectors')
+        .from('office_practice_areas')
         .select('*')
         .order('name');
       if (error) throw error;
@@ -94,8 +94,8 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
   // Get current filter options based on active filter type
   const getCurrentOptions = () => {
     switch (activeFilterType) {
-      case 'sector':
-        return sectors.map(s => ({ value: s.name, label: s.name, icon: s.icon }));
+      case 'practiceArea':
+        return practiceAreas.map(pa => ({ value: pa.name, label: pa.name, icon: pa.icon }));
       case 'department':
         return departments.map(d => ({ value: d.name, label: d.name, icon: d.icon }));
       case 'location':
@@ -136,7 +136,7 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
         <Select value={activeFilterType} onValueChange={(value: any) => setActiveFilterType(value)}>
           <SelectTrigger className="w-9 h-9 p-0 border-input">
             <div className="flex items-center justify-center w-full">
-              {activeFilterType === 'sector' ? (
+              {activeFilterType === 'practiceArea' ? (
                 <FolderOpen className="h-4 w-4" />
               ) : activeFilterType === 'department' ? (
                 <Users className="h-4 w-4" />
@@ -146,10 +146,10 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
             </div>
           </SelectTrigger>
           <SelectContent className="bg-background z-50">
-            <SelectItem value="sector">
+            <SelectItem value="practiceArea">
               <div className="flex items-center gap-2">
                 <FolderOpen className="h-4 w-4" />
-                <span>Sector</span>
+                <span>Practice Area</span>
               </div>
             </SelectItem>
             <SelectItem value="department">

@@ -5,14 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 export const useWeeklyFilterOptions = () => {
   const { company } = useCompany();
 
-  // Fetch sectors
-  const { data: sectors = [] } = useQuery({
-    queryKey: ['office-sectors', company?.id],
+  // Fetch practice areas
+  const { data: practiceAreas = [] } = useQuery({
+    queryKey: ['office-practice-areas', company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
       
       const { data, error } = await supabase
-        .from('office_sectors')
+        .from('office_practice_areas')
         .select('id, name, icon')
         .eq('company_id', company.id)
         .order('name');
@@ -60,7 +60,7 @@ export const useWeeklyFilterOptions = () => {
   });
 
   return {
-    sectors,
+    practiceAreas,
     departments,
     locations
   };

@@ -14,7 +14,7 @@ import {
   BarChart, PieChart, LineChart, TrendingDown, GitBranch, GitCommit, GitMerge, Share2,
   Plus, Minus, Equal, Divide, Asterisk, Check, X, ChevronRight
 } from "lucide-react";
-import { Sector } from "@/context/officeSettings/types";
+import { PracticeArea } from "@/context/officeSettings/types";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   'circle': Circle,
@@ -99,52 +99,52 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   'chevron': ChevronRight,
 };
 
-interface SectorListProps {
-  sectors: Sector[];
+interface PracticeAreaListProps {
+  practiceAreas: PracticeArea[];
   editMode: boolean;
-  selectedSectors: string[];
-  onSelectSector: (sectorId: string) => void;
-  onEdit: (sector: Sector) => void;
-  onDelete: (sector: Sector) => void;
-  onConvertToDepartment: (sector: Sector) => void;
+  selectedPracticeAreas: string[];
+  onSelectPracticeArea: (practiceAreaId: string) => void;
+  onEdit: (practiceArea: PracticeArea) => void;
+  onDelete: (practiceArea: PracticeArea) => void;
+  onConvertToDepartment: (practiceArea: PracticeArea) => void;
 }
 
-export const SectorList: React.FC<SectorListProps> = ({
-  sectors,
+export const PracticeAreaList: React.FC<PracticeAreaListProps> = ({
+  practiceAreas,
   editMode,
-  selectedSectors,
-  onSelectSector,
+  selectedPracticeAreas,
+  onSelectPracticeArea,
   onEdit,
   onDelete,
   onConvertToDepartment
 }) => {
-  if (sectors.length === 0) {
+  if (practiceAreas.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        No sectors defined yet. Add your first sector above.
+        No practice areas defined yet. Add your first practice area to categorize projects by industry or type.
       </div>
     );
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-      {sectors.map((sector) => {
-        const IconComponent = ICON_MAP[sector.icon || 'circle'] || Circle;
+      {practiceAreas.map((practiceArea) => {
+        const IconComponent = ICON_MAP[practiceArea.icon || 'target'] || Target;
         
         return (
-          <Card key={sector.id} className="p-3 hover:shadow-md transition-shadow group">
+          <Card key={practiceArea.id} className="p-3 hover:shadow-md transition-shadow group">
             <div className="flex items-center justify-between gap-2 min-w-0">
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 {editMode && (
                   <input
                     type="checkbox"
-                    checked={selectedSectors.includes(sector.id)}
-                    onChange={() => onSelectSector(sector.id)}
+                    checked={selectedPracticeAreas.includes(practiceArea.id)}
+                    onChange={() => onSelectPracticeArea(practiceArea.id)}
                     className="rounded flex-shrink-0"
                   />
                 )}
                 <IconComponent className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="font-medium text-sm truncate">{sector.name}</span>
+                <span className="font-medium text-sm truncate">{practiceArea.name}</span>
               </div>
               {editMode && (
                 <div className="flex gap-1 flex-shrink-0">
@@ -152,7 +152,7 @@ export const SectorList: React.FC<SectorListProps> = ({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => onEdit(sector)}
+                    onClick={() => onEdit(practiceArea)}
                     title="Edit"
                   >
                     <Edit className="h-4 w-4" />
@@ -161,7 +161,7 @@ export const SectorList: React.FC<SectorListProps> = ({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => onConvertToDepartment(sector)}
+                    onClick={() => onConvertToDepartment(practiceArea)}
                     title="Convert to Department"
                   >
                     <ArrowRightLeft className="h-4 w-4" />
@@ -170,7 +170,7 @@ export const SectorList: React.FC<SectorListProps> = ({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => onDelete(sector)}
+                    onClick={() => onDelete(practiceArea)}
                     title="Delete"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />

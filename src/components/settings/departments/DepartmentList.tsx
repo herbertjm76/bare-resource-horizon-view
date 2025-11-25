@@ -106,7 +106,7 @@ interface DepartmentListProps {
   onSelectDepartment: (deptId: string) => void;
   onEdit: (department: Department) => void;
   onDelete: (department: Department) => void;
-  onConvertToSector: (department: Department) => void;
+  onConvertToPracticeArea: (department: Department) => void;
 }
 
 export const DepartmentList: React.FC<DepartmentListProps> = ({
@@ -116,7 +116,7 @@ export const DepartmentList: React.FC<DepartmentListProps> = ({
   onSelectDepartment,
   onEdit,
   onDelete,
-  onConvertToSector
+  onConvertToPracticeArea
 }) => {
   if (departments.length === 0) {
     return (
@@ -163,8 +163,8 @@ export const DepartmentList: React.FC<DepartmentListProps> = ({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => onConvertToSector(department)}
-                    title="Convert to Sector"
+                    onClick={() => onConvertToPracticeArea(department)}
+                    title="Convert to Practice Area"
                   >
                     <ArrowRightLeft className="h-4 w-4" />
                   </Button>

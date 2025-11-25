@@ -5,7 +5,7 @@ import {
   Location, 
   Rate, 
   Department,
-  Sector, 
+  PracticeArea, 
   ProjectStage,
   ProjectStatus,
   OfficeSettingsContextType 
@@ -19,7 +19,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
   const [locations, setLocations] = useState<Location[]>([]);
   const [rates, setRates] = useState<Rate[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [practice_areas, setPracticeAreas] = useState<PracticeArea[]>([]);
   const [office_stages, setOfficeStages] = useState<ProjectStage[]>([]);
   const [project_statuses, setProjectStatuses] = useState<ProjectStatus[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
       setLocations([]);
       setRates([]);
       setDepartments([]);
-      setSectors([]);
+      setPracticeAreas([]);
       setOfficeStages([]);
       setProjectStatuses([]);
       return;
@@ -48,7 +48,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         setLocations(settings.locations);
         setRates(settings.rates);
         setDepartments(settings.departments);
-        setSectors(settings.sectors);
+        setPracticeAreas(settings.practice_areas);
         setOfficeStages(settings.office_stages);
         setProjectStatuses(settings.project_statuses);
       } finally {
@@ -70,8 +70,8 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         setRates,
         departments,
         setDepartments,
-        sectors,
-        setSectors,
+        practice_areas,
+        setPracticeAreas,
         office_stages,
         setOfficeStages,
         project_statuses,
