@@ -9,7 +9,7 @@ export const useBulkInvites = () => {
   const sendBulkInvites = async (inviteIds: string[]) => {
     if (!inviteIds || inviteIds.length === 0) {
       toast({
-        title: "No invites selected",
+        title: "No members selected",
         description: "Please select at least one pre-registered member to send invites to.",
         variant: "destructive",
       });
@@ -48,9 +48,14 @@ export const useBulkInvites = () => {
           });
         } else if (failed > 0) {
           console.error("Failed invites:", errors);
+          const errorMessage = errors?.[0] || `${failed} invite(s) could not be sent.`;
+          const needsEmail = errorMessage.includes("no email address");
+          
           toast({
             title: "Failed to send invites",
-            description: errors?.[0] || `${failed} invite(s) could not be sent.`,
+            description: needsEmail 
+              ? "The selected member(s) need an email address. Click 'Edit', add their email, then click 'Done' to save before sending invites."
+              : errorMessage,
             variant: "destructive",
           });
         }
