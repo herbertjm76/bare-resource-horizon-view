@@ -38,22 +38,32 @@ export const ProjectTypeList: React.FC<ProjectTypeListProps> = ({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {projectTypes.map((projectType) => (
         <div
           key={projectType.id}
-          className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+          className="relative flex flex-col gap-3 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+          style={{ borderLeftColor: projectType.color || 'transparent', borderLeftWidth: '4px' }}
         >
           {editMode && (
-            <Checkbox
-              checked={selectedProjectTypes.includes(projectType.id)}
-              onCheckedChange={() => onSelectProjectType(projectType.id)}
-            />
+            <div className="absolute top-2 right-2">
+              <Checkbox
+                checked={selectedProjectTypes.includes(projectType.id)}
+                onCheckedChange={() => onSelectProjectType(projectType.id)}
+              />
+            </div>
           )}
           
-          <div className="flex items-center gap-2 flex-1">
-            {projectType.icon && getIcon(projectType.icon)}
-            <span className="font-medium">{projectType.name}</span>
+          <div className="flex items-center gap-3 pr-8">
+            {projectType.icon && (
+              <div 
+                className="flex items-center justify-center w-10 h-10 rounded-md"
+                style={{ backgroundColor: projectType.color || 'hsl(var(--muted))', color: 'white' }}
+              >
+                {getIcon(projectType.icon)}
+              </div>
+            )}
+            <span className="font-medium flex-1">{projectType.name}</span>
           </div>
 
           {editMode && (
@@ -62,8 +72,10 @@ export const ProjectTypeList: React.FC<ProjectTypeListProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => onEdit(projectType)}
+                className="flex-1"
               >
-                <Edit className="h-4 w-4" />
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
               </Button>
               <Button
                 variant="ghost"

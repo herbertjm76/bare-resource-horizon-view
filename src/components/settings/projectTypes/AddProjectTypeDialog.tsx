@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ProjectType } from '@/context/officeSettings/types';
+import { IconPicker } from './IconPicker';
+import { ThemedColorPicker } from './ThemedColorPicker';
 
 interface AddProjectTypeDialogProps {
   open: boolean;
@@ -60,34 +62,18 @@ export const AddProjectTypeDialog: React.FC<AddProjectTypeDialogProps> = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="projectTypeIcon">Icon (optional)</Label>
-            <Input
-              id="projectTypeIcon"
-              value={newProjectTypeIcon}
-              onChange={(e) => setNewProjectTypeIcon(e.target.value)}
-              placeholder="e.g., circle, star, check"
+            <Label>Icon (optional)</Label>
+            <IconPicker
+              selectedIcon={newProjectTypeIcon}
+              onIconChange={setNewProjectTypeIcon}
             />
-            <p className="text-xs text-muted-foreground">
-              Use Lucide icon names (e.g., circle, star, check, folder, briefcase)
-            </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="projectTypeColor">Color (optional)</Label>
-            <div className="flex gap-2">
-              <Input
-                id="projectTypeColor"
-                type="color"
-                value={newProjectTypeColor}
-                onChange={(e) => setNewProjectTypeColor(e.target.value)}
-                className="w-20 h-10 cursor-pointer"
-              />
-              <Input
-                value={newProjectTypeColor}
-                onChange={(e) => setNewProjectTypeColor(e.target.value)}
-                placeholder="#6366f1"
-                className="flex-1"
-              />
-            </div>
+            <Label>Color (optional)</Label>
+            <ThemedColorPicker
+              selectedColor={newProjectTypeColor}
+              onColorChange={setNewProjectTypeColor}
+            />
           </div>
         </div>
         <DialogFooter>
