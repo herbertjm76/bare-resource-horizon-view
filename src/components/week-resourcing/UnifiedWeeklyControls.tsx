@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -90,8 +90,30 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeSortType, setActiveSortType] = useState<'sector' | 'department' | 'location'>('sector');
   const [focusedBadgeIndex, setFocusedBadgeIndex] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
   const { sectors, departments, locations } = useWeeklyFilterOptions();
+
+  // Check scroll position
+  const checkScroll = useCallback(() => {
+    if (badgeContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = badgeContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  }, []);
+
+  // Scroll badges
+  const scrollBadges = useCallback((direction: 'left' | 'right') => {
+    if (badgeContainerRef.current) {
+      const scrollAmount = 200;
+      badgeContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  }, []);
 
   // Debug logging
   console.log('Filter Options Debug:', {
@@ -127,6 +149,25 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
     currentOptions,
     currentValue
   });
+
+  // Setup scroll listeners
+  useEffect(() => {
+    checkScroll();
+    const container = badgeContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScroll);
+      window.addEventListener('resize', checkScroll);
+      return () => {
+        container.removeEventListener('scroll', checkScroll);
+        window.removeEventListener('resize', checkScroll);
+      };
+    }
+  }, [checkScroll]);
+
+  // Check scroll when options change
+  useEffect(() => {
+    checkScroll();
+  }, [currentOptions.length, checkScroll]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -402,7 +443,8 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
         {/* Badges Container */}
         <div 
           ref={badgeContainerRef}
-          className="flex gap-2 overflow-x-auto flex-1 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+          className="flex gap-2 overflow-x-auto flex-1 scrollbar-none"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <Badge
             data-badge-index="-1"
@@ -429,6 +471,30 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
             </Badge>
           ))}
         </div>
+
+        {/* Badge Scroll Arrows */}
+        {canScrollLeft && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 w-9 p-0 shrink-0"
+            onClick={() => scrollBadges('left')}
+            title="Scroll left"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        )}
+        {canScrollRight && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 w-9 p-0 shrink-0"
+            onClick={() => scrollBadges('right')}
+            title="Scroll right"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
 
         {/* Clear Filters */}
         {activeFiltersCount > 0 && (
