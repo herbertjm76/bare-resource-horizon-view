@@ -393,7 +393,11 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
             className={`cursor-pointer whitespace-nowrap transition-all ${
               currentValue === 'all' ? 'bg-gradient-modern text-white hover:opacity-90' : ''
             }`}
-            onClick={() => onFilterChange(activeSortType, 'all')}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onFilterChange(activeSortType, 'all');
+            }}
           >
             All
           </Badge>
@@ -405,7 +409,11 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
               className={`cursor-pointer whitespace-nowrap transition-all ${
                 currentValue === option.value ? 'bg-gradient-modern text-white hover:opacity-90' : ''
               }`}
-              onClick={() => onFilterChange(activeSortType, option.value)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onFilterChange(activeSortType, option.value);
+              }}
             >
               {option.label}
             </Badge>
