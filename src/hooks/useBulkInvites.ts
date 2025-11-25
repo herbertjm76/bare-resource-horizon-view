@@ -35,18 +35,22 @@ export const useBulkInvites = () => {
       if (data?.results) {
         const { successful, failed, errors } = data.results;
         
-        if (successful > 0) {
+        if (successful > 0 && failed === 0) {
           toast({
             title: "Invites sent successfully",
-            description: `${successful} invite email(s) sent. ${failed > 0 ? `${failed} failed.` : ''}`,
+            description: `${successful} invite email(s) sent successfully.`,
           });
-        }
-
-        if (failed > 0 && errors?.length > 0) {
+        } else if (successful > 0 && failed > 0) {
+          toast({
+            title: "Invites partially sent",
+            description: `${successful} sent successfully, ${failed} failed. ${errors?.[0] || ''}`,
+            variant: "destructive",
+          });
+        } else if (failed > 0) {
           console.error("Failed invites:", errors);
           toast({
-            title: "Some invites failed",
-            description: `${failed} invite(s) could not be sent. Check console for details.`,
+            title: "Failed to send invites",
+            description: errors?.[0] || `${failed} invite(s) could not be sent.`,
             variant: "destructive",
           });
         }
