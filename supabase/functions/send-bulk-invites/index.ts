@@ -102,33 +102,28 @@ const handler = async (req: Request): Promise<Response> => {
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
               </head>
-              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center; border-radius: 10px 10px 0 0;">
                   <h1 style="color: white; margin: 0; font-size: 28px;">You're Invited!</h1>
                 </div>
                 
                 <div style="background: white; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
-                  <p style="font-size: 16px; margin-bottom: 20px;">Hi${firstName ? ` ${firstName}` : ''},</p>
+                  <p style="font-size: 16px; margin-bottom: 20px; color: #111827;">Hi${firstName ? ` ${firstName}` : ''},</p>
                   
-                  <p style="font-size: 16px; margin-bottom: 20px;">
+                  <p style="font-size: 16px; margin-bottom: 30px; color: #374151; line-height: 1.6;">
                     You've been pre-registered to join <strong>${companyName}</strong>. Click the button below to complete your registration and join the team.
                   </p>
                   
-                  <div style="text-align: center; margin: 30px 0;">
+                  <div style="text-align: center; margin: 35px 0;">
                     <a href="${inviteUrl}" 
-                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; font-size: 16px;">
+                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);">
                       Accept Invitation
                     </a>
                   </div>
                   
-                  <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
-                    Or copy and paste this link into your browser:<br>
-                    <a href="${inviteUrl}" style="color: #667eea; word-break: break-all;">${inviteUrl}</a>
-                  </p>
-                  
                   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
                   
-                  <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                  <p style="font-size: 12px; color: #9ca3af; margin: 0; text-align: center;">
                     If you didn't expect this invitation, you can safely ignore this email.
                   </p>
                 </div>
