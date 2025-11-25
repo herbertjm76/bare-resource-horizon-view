@@ -46,7 +46,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   pendingChanges,
   onFieldChange
 }) => {
-  const { locations, departments, loading } = useOfficeSettings();
+  const { locations, departments, practice_areas, loading } = useOfficeSettings();
   
   const getValue = (field: keyof TeamMember): string => {
     if (pendingChanges[field] !== undefined) {
@@ -182,6 +182,31 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         ) : (
           <span className="text-sm text-gray-900">
             {member.department || '-'}
+          </span>
+        )}
+      </td>
+      <td className="px-4 py-3">
+        {editMode && ['owner', 'admin'].includes(userRole) ? (
+          <Select
+            disabled={loading}
+            value={getValue('job_title')}
+            onValueChange={(value) => handleChange('job_title', value)}
+          >
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue placeholder="Select practice area" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="not_assigned">Not Assigned</SelectItem>
+              {practice_areas.map((pa) => (
+                <SelectItem key={pa.id} value={pa.name}>
+                  {pa.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <span className="text-sm text-gray-900">
+            {member.job_title || '-'}
           </span>
         )}
       </td>
