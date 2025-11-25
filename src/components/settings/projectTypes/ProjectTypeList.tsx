@@ -54,21 +54,6 @@ export const ProjectTypeList: React.FC<ProjectTypeListProps> = ({
           <div className="flex items-center gap-2 flex-1">
             {projectType.icon && getIcon(projectType.icon)}
             <span className="font-medium">{projectType.name}</span>
-            {projectType.color && (
-              <Badge 
-                className="ml-2" 
-                style={{ 
-                  backgroundColor: projectType.color,
-                  color: '#fff'
-                }}
-              >
-                <div 
-                  className="w-3 h-3 rounded-full mr-1" 
-                  style={{ backgroundColor: projectType.color }}
-                />
-                {projectType.color}
-              </Badge>
-            )}
           </div>
 
           {editMode && (
