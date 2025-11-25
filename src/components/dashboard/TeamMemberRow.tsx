@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Eye, Trash2, Mail } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Eye, Trash2, Mail, AlertTriangle } from 'lucide-react';
 import { TeamMember } from './types';
 import { TeamMemberAvatar } from './TeamMemberAvatar';
 
@@ -46,6 +47,10 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
     onFieldChange(member.id, field, value);
   };
 
+  const isPending = 'isPending' in member && member.isPending;
+  const missingEmail = !getValue('email') || getValue('email').trim() === '';
+  const showWarning = isPending && missingEmail;
+
   return (
     <tr key={member.id} className="hover:bg-gray-50">
       {editMode && ['owner', 'admin'].includes(userRole) && (
@@ -76,22 +81,48 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
                     className="h-7 text-sm"
                   />
                 </div>
-                <Input
-                  value={getValue('email')}
-                  onChange={(e) => handleChange('email', e.target.value)}
-                  placeholder="Email"
-                  className="h-7 text-sm"
-                  type="email"
-                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={getValue('email')}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    placeholder="Email"
+                    className={`h-7 text-sm ${showWarning ? 'border-amber-500 focus-visible:ring-amber-500' : ''}`}
+                    type="email"
+                  />
+                  {showWarning && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Email required to send invite</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
               </div>
             ) : (
               <>
-                <div className="font-medium text-gray-900">
+                <div className="font-medium text-gray-900 flex items-center gap-2">
                   {`${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed'}
+                  {showWarning && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <AlertTriangle className="h-4 w-4 text-amber-500" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Email required to send invite</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </div>
                 <div className="text-sm text-gray-500 flex items-center gap-1">
                   <Mail className="h-3 w-3" />
-                  {member.email}
+                  {member.email || <span className="text-amber-600">No email</span>}
                 </div>
               </>
             )}
