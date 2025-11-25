@@ -52,7 +52,9 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     getAreaByCountry,
     departments,
     updateEditableField,
-    flushPendingUpdates
+    flushPendingUpdates,
+    managers,
+    projectAreas
   } = useProjectTableRow(project, refetch);
 
   const projectArea = getAreaByCountry(project.country);
@@ -94,7 +96,17 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           </TableCell>
         )}
         
-        <TableCell className="font-semibold">{project.code}</TableCell>
+        <TableCell className="font-semibold">
+          {editMode ? (
+            <Input
+              value={editableFields[project.id]?.code || project.code}
+              onChange={(e) => updateEditableField(project.id, 'code', e.target.value)}
+              className="h-8 text-xs font-semibold"
+            />
+          ) : (
+            project.code
+          )}
+        </TableCell>
         
         <TableCell>
           {editMode ? (
@@ -108,7 +120,28 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           )}
         </TableCell>
         
-        <TableCell>{project.project_manager?.first_name || '-'}</TableCell>
+        <TableCell>
+          {editMode ? (
+            <Select 
+              value={editableFields[project.id]?.project_manager_id || project.project_manager_id || ''} 
+              onValueChange={(value) => updateEditableField(project.id, 'project_manager_id', value)}
+            >
+              <SelectTrigger className="h-8 w-32">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Not Assigned</SelectItem>
+                {managers.map((manager) => (
+                  <SelectItem key={manager.id} value={manager.id}>
+                    {manager.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            project.project_manager?.first_name || '-'
+          )}
+        </TableCell>
         
         <TableCell>
           {editMode ? (
@@ -141,15 +174,41 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         </TableCell>
         
         <TableCell>
-          <span
-            className="inline-block px-2 py-1 rounded"
-            style={{
-              background: projectArea?.color || "#E5DEFF",
-              color: "#212172"
-            }}
-          >
-            {projectArea?.code?.toUpperCase() || project.country}
-          </span>
+          {editMode ? (
+            <Select 
+              value={editableFields[project.id]?.country || project.country || ''} 
+              onValueChange={(value) => updateEditableField(project.id, 'country', value)}
+            >
+              <SelectTrigger className="h-8 w-32">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                {projectAreas.map((area) => (
+                  <SelectItem key={area.id} value={area.name}>
+                    <span
+                      className="inline-block px-2 py-0.5 rounded"
+                      style={{
+                        background: area.color || "#E5DEFF",
+                        color: "#212172"
+                      }}
+                    >
+                      {area.code?.toUpperCase() || area.name}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <span
+              className="inline-block px-2 py-1 rounded"
+              style={{
+                background: projectArea?.color || "#E5DEFF",
+                color: "#212172"
+              }}
+            >
+              {projectArea?.code?.toUpperCase() || project.country}
+            </span>
+          )}
         </TableCell>
         
         <TableCell>
