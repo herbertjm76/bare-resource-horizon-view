@@ -5,8 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
 import { ProjectAreaFormValues, ProjectArea } from "./projectAreaTypes";
-import { ColorPicker, colorPalette } from './ColorPicker';
-import { getDefaultColor } from './utils/colorUtils';
 
 interface ProjectAreaFormProps {
   open: boolean;
@@ -25,14 +23,6 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
   onSubmit,
   onOpenChange,
 }) => {
-  React.useEffect(() => {
-    if (!form.getValues('color') && !editing?.color) {
-      form.setValue('color', colorPalette[0]);
-    } else if (editing?.color) {
-      form.setValue('color', getDefaultColor(editing.color));
-    }
-  }, [form, editing]);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -90,23 +80,6 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
                   <FormLabel>City (Optional)</FormLabel>
                   <FormControl>
                     <Input placeholder="New York" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel>Color</FormLabel>
-                  <FormControl>
-                    <ColorPicker
-                      selectedColor={field.value || colorPalette[0]}
-                      onColorChange={(color) => field.onChange(color)}
-                      className="mt-2"
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
