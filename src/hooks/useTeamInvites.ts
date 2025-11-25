@@ -35,7 +35,7 @@ export const useTeamInvites = (companyId: string | undefined) => {
           created_by: session.user.id,
           first_name: firstName || null,
           last_name: lastName || null,
-          invitation_type: 'pre_registered',
+          invitation_type: 'email_invite',
           status: 'pending'
         })
         .select()
