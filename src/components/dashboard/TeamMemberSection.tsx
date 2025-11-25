@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import TeamMembersTable from './TeamMembersTable';
 import TeamMembersToolbar from './TeamMembersToolbar';
+import { TeamMembersFilters } from './TeamMembersFilters';
 import { TeamMember } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -36,6 +37,65 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
 }) => {
   const [pendingChanges, setPendingChanges] = useState<Record<string, Partial<TeamMember>>>({});
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Filter state
+  const [filters, setFilters] = useState({
+    department: 'all',
+    location: 'all',
+    searchTerm: ''
+  });
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      department: 'all',
+      location: 'all',
+      searchTerm: ''
+    });
+  };
+
+  // Calculate active filters count
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filters.department !== 'all') count++;
+    if (filters.location !== 'all') count++;
+    if (filters.searchTerm) count++;
+    return count;
+  }, [filters]);
+
+  // Filter team members based on active filters
+  const filteredTeamMembers = useMemo(() => {
+    return teamMembers.filter(member => {
+      // Department filter
+      if (filters.department !== 'all' && member.department !== filters.department) {
+        return false;
+      }
+      
+      // Location filter
+      if (filters.location !== 'all' && member.location !== filters.location) {
+        return false;
+      }
+      
+      // Search filter
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        const fullName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
+        const email = (member.email || '').toLowerCase();
+        const jobTitle = (member.job_title || '').toLowerCase();
+        
+        if (!fullName.includes(searchLower) && 
+            !email.includes(searchLower) && 
+            !jobTitle.includes(searchLower)) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  }, [teamMembers, filters]);
 
   const handleFieldChange = (memberId: string, field: string, value: string) => {
     setPendingChanges(prev => ({
@@ -144,8 +204,16 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
         )}
       </CardHeader>
       <CardContent>
+        {['owner', 'admin'].includes(userRole) && (
+          <TeamMembersFilters
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            activeFiltersCount={activeFiltersCount}
+            clearFilters={clearFilters}
+          />
+        )}
         <TeamMembersTable 
-          teamMembers={teamMembers} 
+          teamMembers={filteredTeamMembers} 
           userRole={userRole} 
           editMode={editMode} 
           selectedMembers={selectedMembers} 
