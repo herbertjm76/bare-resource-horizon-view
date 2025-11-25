@@ -6,7 +6,6 @@ import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView'
 import { RundownGridView } from '@/components/weekly-rundown/RundownGridView';
 import { RundownCarousel } from '@/components/weekly-rundown/RundownCarousel';
 import { UnifiedWeeklyControls, ViewType, RundownMode, SortOption, TableOrientation } from '@/components/week-resourcing/UnifiedWeeklyControls';
-import { WeeklyFilterRow } from '@/components/week-resourcing/WeeklyFilterRow';
 import { WeeklySummaryCards } from '@/components/weekly-rundown/WeeklySummaryCards';
 import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
@@ -274,16 +273,8 @@ const WeeklyOverview = () => {
               threshold={80}
             />
 
-            {/* Filter Row */}
-            <WeeklyFilterRow
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              activeFiltersCount={activeFiltersCount}
-              clearFilters={clearFilters}
-            />
-
             {/* View Content */}
-            <div className="rounded-b-lg border bg-card overflow-hidden">
+            <div className="rounded-b-lg border border-t-0 bg-card overflow-hidden">
               {viewType === 'table' && (
                 <WeekResourceView
                   selectedWeek={selectedWeek}
