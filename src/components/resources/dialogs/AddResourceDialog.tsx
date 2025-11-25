@@ -44,7 +44,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   onAdd
 }) => {
   const { resourceOptions, loading: optionsLoading } = useResourceOptions();
-  const { departments: officeDepartments } = useOfficeSettings();
+  const { departments: officeDepartments, practice_areas: officePracticeAreas } = useOfficeSettings();
   const { 
     selectedResource, 
     loading: addLoading, 
@@ -52,7 +52,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
     handleAdd 
   } = useAddResource({ projectId, onAdd, onClose });
   
-  const [filterBy, setFilterBy] = useState<'all' | 'department' | 'role'>('all');
+  const [filterBy, setFilterBy] = useState<'all' | 'department' | 'practice_area'>('all');
   const [filterValue, setFilterValue] = useState<string>('all');
 
   // Get departments from office settings
@@ -61,10 +61,10 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
     [officeDepartments]
   );
   
-  // Get unique roles from resource options
-  const roles = useMemo(() => 
-    ['all', ...new Set(resourceOptions.map(r => r.role).filter(Boolean))],
-    [resourceOptions]
+  // Get practice areas from office settings
+  const practiceAreas = useMemo(() => 
+    ['all', ...officePracticeAreas.map(p => p.name)],
+    [officePracticeAreas]
   );
 
   // Filter resources
@@ -73,7 +73,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
     
     return resourceOptions.filter(r => {
       if (filterBy === 'department') return r.department === filterValue;
-      if (filterBy === 'role') return r.role === filterValue;
+      if (filterBy === 'practice_area') return r.role === filterValue;
       return true;
     });
   }, [resourceOptions, filterBy, filterValue]);
@@ -102,13 +102,13 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="department">Department</SelectItem>
-                  <SelectItem value="role">Role</SelectItem>
+                  <SelectItem value="practice_area">Practice Area</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div className="space-y-2">
-              <Label>{filterBy === 'department' ? 'Department' : filterBy === 'role' ? 'Role' : 'Value'}</Label>
+              <Label>{filterBy === 'department' ? 'Department' : filterBy === 'practice_area' ? 'Practice Area' : 'Value'}</Label>
               <Select 
                 value={filterValue} 
                 onValueChange={setFilterValue}
@@ -121,8 +121,8 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                   {filterBy === 'department' && departments.map(dept => (
                     <SelectItem key={dept} value={dept}>{dept === 'all' ? 'All' : dept}</SelectItem>
                   ))}
-                  {filterBy === 'role' && roles.map(role => (
-                    <SelectItem key={role} value={role}>{role === 'all' ? 'All' : role}</SelectItem>
+                  {filterBy === 'practice_area' && practiceAreas.map(area => (
+                    <SelectItem key={area} value={area}>{area === 'all' ? 'All' : area}</SelectItem>
                   ))}
                   {filterBy === 'all' && <SelectItem value="all">All</SelectItem>}
                 </SelectContent>
