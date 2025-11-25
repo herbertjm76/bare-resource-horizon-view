@@ -89,7 +89,6 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeSortType, setActiveSortType] = useState<'sector' | 'department' | 'location'>('sector');
-  const [focusedBadgeIndex, setFocusedBadgeIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
@@ -168,43 +167,6 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   useEffect(() => {
     checkScroll();
   }, [currentOptions.length, checkScroll]);
-
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (currentOptions.length === 0) return;
-
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        setFocusedBadgeIndex(prev => (prev > 0 ? prev - 1 : currentOptions.length - 1));
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        setFocusedBadgeIndex(prev => (prev < currentOptions.length - 1 ? prev + 1 : 0));
-      } else if (e.key === 'Enter' && focusedBadgeIndex >= 0) {
-        e.preventDefault();
-        onFilterChange(activeSortType, currentOptions[focusedBadgeIndex].value);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentOptions, focusedBadgeIndex, activeSortType, onFilterChange]);
-
-  // Scroll focused badge into view
-  useEffect(() => {
-    if (badgeContainerRef.current) {
-      const badges = badgeContainerRef.current.querySelectorAll('[data-badge-index]');
-      const focusedBadge = badges[focusedBadgeIndex] as HTMLElement;
-      if (focusedBadge) {
-        focusedBadge.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
-    }
-  }, [focusedBadgeIndex]);
-
-  // Reset focused index when sort type changes
-  useEffect(() => {
-    setFocusedBadgeIndex(0);
-  }, [activeSortType]);
   
   const showPeopleProjectToggle = viewType !== 'table';
   const showSortOptions = viewType !== 'table';
@@ -420,26 +382,6 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
           </SelectContent>
         </Select>
 
-        {/* Navigation Arrows */}
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9 w-9 p-0"
-          onClick={() => setFocusedBadgeIndex(prev => (prev > 0 ? prev - 1 : currentOptions.length - 1))}
-          disabled={currentOptions.length === 0}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9 w-9 p-0"
-          onClick={() => setFocusedBadgeIndex(prev => (prev < currentOptions.length - 1 ? prev + 1 : 0))}
-          disabled={currentOptions.length === 0}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-
         {/* Badges Container */}
         <div 
           ref={badgeContainerRef}
@@ -447,24 +389,22 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <Badge
-            data-badge-index="-1"
             variant={currentValue === 'all' ? 'default' : 'outline'}
             className={`cursor-pointer whitespace-nowrap transition-all ${
-              currentValue === 'all' ? 'bg-gradient-modern text-white' : ''
-            } ${focusedBadgeIndex === -1 ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+              currentValue === 'all' ? 'bg-gradient-modern text-white hover:opacity-90' : ''
+            }`}
             onClick={() => onFilterChange(activeSortType, 'all')}
           >
             All
           </Badge>
 
-          {currentOptions.map((option, index) => (
+          {currentOptions.map((option) => (
             <Badge
               key={option.value}
-              data-badge-index={index}
               variant={currentValue === option.value ? 'default' : 'outline'}
               className={`cursor-pointer whitespace-nowrap transition-all ${
-                currentValue === option.value ? 'bg-gradient-modern text-white' : ''
-              } ${focusedBadgeIndex === index ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+                currentValue === option.value ? 'bg-gradient-modern text-white hover:opacity-90' : ''
+              }`}
               onClick={() => onFilterChange(activeSortType, option.value)}
             >
               {option.label}
