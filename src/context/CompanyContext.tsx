@@ -81,9 +81,13 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setLoading(true);
       setError(null);
 
-      // If user is not authenticated, skip querying companies to avoid RLS errors
+      // For unauthenticated users, still fetch company data for public pages like /join
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
+      
+      // Check if we're on a public join page
+      const isJoinPage = window.location.pathname.startsWith('/join/');
+      
+      if (!session?.user && !isJoinPage) {
         setCompany(null);
         // Do NOT toast here; unauthenticated users may just be visiting a public slug
         setLoading(false);
