@@ -131,7 +131,8 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
           <TeamMembersToolbar 
             editMode={editMode} 
             setEditMode={setEditMode} 
-            selectedCount={selectedMembers.length} 
+            selectedCount={selectedMembers.length}
+            selectedMemberIds={selectedMembers}
             onBulkDelete={onBulkDelete} 
             onAdd={onAdd}
             onImportComplete={onRefresh}

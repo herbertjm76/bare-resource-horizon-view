@@ -1,13 +1,15 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, UserPlus, Upload, Check, X } from "lucide-react";
+import { Edit, Trash2, UserPlus, Upload, Check, X, Mail } from "lucide-react";
 import { ExcelImportDialog } from "@/components/projects/ExcelImportDialog";
+import { useBulkInvites } from "@/hooks/useBulkInvites";
 
 interface TeamMembersToolbarProps {
   editMode: boolean;
   setEditMode: (mode: boolean) => void;
   selectedCount: number;
+  selectedMemberIds?: string[];
   onBulkDelete?: () => void;
   onAdd?: () => void;
   onImportComplete?: () => void;
@@ -21,6 +23,7 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   editMode,
   setEditMode,
   selectedCount,
+  selectedMemberIds = [],
   onBulkDelete,
   onAdd,
   onImportComplete,
@@ -29,6 +32,11 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   hasChanges,
   isSaving
 }) => {
+  const { sendBulkInvites, isSending } = useBulkInvites();
+
+  const handleSendInvites = async () => {
+    await sendBulkInvites(selectedMemberIds);
+  };
   return (
     <div className="flex items-center gap-2">
       {!editMode && onAdd && (
@@ -87,15 +95,26 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
         </>
       )}
       {editMode && selectedCount > 0 && (
-        <Button 
-          variant="destructive"
-          size="sm"
-          onClick={onBulkDelete}
-          disabled={isSaving}
-        >
-          <Trash2 className="h-4 w-4 mr-1" />
-          Delete ({selectedCount})
-        </Button>
+        <>
+          <Button 
+            variant="outline"
+            size="sm"
+            onClick={handleSendInvites}
+            disabled={isSaving || isSending}
+          >
+            <Mail className="h-4 w-4 mr-1" />
+            {isSending ? "Sending..." : `Send Invites (${selectedCount})`}
+          </Button>
+          <Button 
+            variant="destructive"
+            size="sm"
+            onClick={onBulkDelete}
+            disabled={isSaving}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete ({selectedCount})
+          </Button>
+        </>
       )}
     </div>
   );

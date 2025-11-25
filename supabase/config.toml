@@ -47,6 +47,9 @@ verify_jwt = true
 [functions.extract-team-from-image]
 verify_jwt = true
 
+[functions.send-bulk-invites]
+verify_jwt = true
+
 [db]
 port = 54322
 shadow_port = 54320
