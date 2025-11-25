@@ -9,6 +9,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 interface AvailableMembersRowProps {
   weekStartDate: string;
   threshold?: number;
+  filters?: {
+    sector: string;
+    department: string;
+    location: string;
+    searchTerm: string;
+  };
 }
 
 type SortBy = 'hours' | 'name';
@@ -37,7 +43,8 @@ interface AvailableMember {
 
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
-  threshold = 80
+  threshold = 80,
+  filters
 }) => {
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
@@ -200,10 +207,34 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           projectAllocations
         };
       })
+      .filter(member => {
+        // Apply filters
+        if (!filters) return true;
+
+        // Sector filter (from project allocations)
+        if (filters.sector && filters.sector !== 'all') {
+          if (!member.sectors.includes(filters.sector)) return false;
+        }
+
+        // Department filter
+        if (filters.department && filters.department !== 'all') {
+          if (member.department !== filters.department) return false;
+        }
+
+        // Location filter - we don't have location in this data, so skip
+        // Search term filter
+        if (filters.searchTerm) {
+          const searchLower = filters.searchTerm.toLowerCase();
+          const fullName = `${member.firstName} ${member.lastName}`.toLowerCase();
+          if (!fullName.includes(searchLower)) return false;
+        }
+
+        return true;
+      })
       .sort((a, b) => b.availableHours - a.availableHours);
 
     return available;
-  }, [profiles, invites, allocations, threshold]);
+  }, [profiles, invites, allocations, threshold, filters]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
