@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Eye, Trash2, Mail, AlertTriangle } from 'lucide-react';
+import { Eye, Trash2, Mail, AlertTriangle, Send } from 'lucide-react';
 import { TeamMember } from './types';
 import { TeamMemberAvatar } from './TeamMemberAvatar';
 
@@ -18,6 +18,7 @@ interface TeamMemberRowProps {
   onViewMember: (memberId: string) => void;
   onEditMember: (member: TeamMember) => void;
   onDeleteMember: (memberId: string) => void;
+  onSendInvite?: (member: TeamMember) => void;
   onRefresh?: () => void;
   pendingChanges: Partial<TeamMember>;
   onFieldChange: (memberId: string, field: string, value: string) => void;
@@ -32,6 +33,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   onViewMember,
   onEditMember,
   onDeleteMember,
+  onSendInvite,
   onRefresh,
   pendingChanges,
   onFieldChange
@@ -179,14 +181,36 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
           {editMode && ['owner', 'admin'].includes(userRole) ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDeleteMember(member.id)}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <>
+              {isPending && onSendInvite && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onSendInvite(member)}
+                        disabled={missingEmail}
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{missingEmail ? 'Email required' : 'Send invitation'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDeleteMember(member.id)}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
           ) : (
             <Button
               variant="ghost"

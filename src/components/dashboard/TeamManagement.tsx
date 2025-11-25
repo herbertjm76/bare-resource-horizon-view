@@ -46,7 +46,8 @@ export const TeamManagement = ({
     setEditMode,
     handleRefresh,
     dialogsState,
-    memberHandlers
+    memberHandlers,
+    inviteUrl
   });
 
   // Combine active members (filtered) with pre-registered members for display
@@ -70,7 +71,7 @@ export const TeamManagement = ({
           inviteEditMode={inviteEditMode}
           onEditMember={dialogsState.openEditDialog}
           onDeleteMember={handlers.handleDeleteMemberClick}
-          onBulkDelete={handlers.handleBulkDeleteWrapper}
+          onBulkDelete={handlers.handleBulkDelete}
           onAdd={dialogsState.openAddDialog}
           onToggleInviteEditMode={toggleInviteEditMode}
           copyInviteCode={inviteActions.copyInviteCode}
@@ -113,13 +114,14 @@ export const TeamManagement = ({
         emailInvites={emailInvites}
         isAdminOrOwner={isAdminOrOwner}
         inviteEditMode={inviteEditMode}
-        onEditMember={dialogsState.openEditDialog}
-        onDeleteMember={handlers.handleDeleteMemberClick}
-        onBulkDelete={handlers.handleBulkDeleteWrapper}
+        onEditMember={handlers.handleEditMember}
+        onDeleteMember={handlers.handleDeleteMember}
+        onSendInvite={handlers.handleSendPreRegisteredInvite}
+        onBulkDelete={handlers.handleBulkDelete}
         onAdd={dialogsState.openAddDialog}
         onToggleInviteEditMode={toggleInviteEditMode}
         copyInviteCode={inviteActions.copyInviteCode}
-        onCopyInvite={() => inviteActions.copyInviteUrl(inviteUrl)}
+        onCopyInvite={handlers.handleCopyInvite}
         onInviteMember={dialogsState.openInviteDialog}
         onResendInvite={inviteActions.resendInvite}
         onDeleteInvite={inviteActions.deleteInvite}
