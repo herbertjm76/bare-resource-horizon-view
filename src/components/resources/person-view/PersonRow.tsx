@@ -127,18 +127,6 @@ export const PersonRow: React.FC<PersonRowProps> = ({
                   <Briefcase style={{ width: '12px', height: '12px', color: 'black' }} />
                   {person.projects.length} projects
                 </span>
-                {person.location && (
-                  <span style={{ 
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                    color: 'black',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    fontSize: '11px',
-                    fontWeight: '500'
-                  }}>
-                    {person.location}
-                  </span>
-                )}
               </div>
             </div>
           </div>
