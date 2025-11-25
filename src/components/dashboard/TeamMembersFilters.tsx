@@ -233,7 +233,6 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
             } ${currentValue === option.value ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
             onClick={() => onFilterChange(activeFilterType, option.value)}
           >
-            {option.icon && <span className="mr-1">{option.icon}</span>}
             {option.label}
           </Badge>
         ))}
