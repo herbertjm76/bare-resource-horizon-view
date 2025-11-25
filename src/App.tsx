@@ -68,7 +68,8 @@ function App() {
               {/* Auth routes */}
               <Route path="/auth" element={<Auth />} />
               
-              {/* Company-scoped join route: /join/:companySlug */}
+              {/* Company-scoped join route: /join/:companySlug/:inviteCode? */}
+              <Route path="/join/:companySlug/:inviteCode?" element={<Join />} />
               <Route path="/join/:companySlug" element={<Join />} />
               
               {/* Company-scoped app routes: /:companySlug/* */}
