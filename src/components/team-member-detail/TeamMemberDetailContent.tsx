@@ -41,7 +41,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
 
       try {
         const { data, error } = await supabase
-          .rpc('get_user_role_secure')
+          .rpc('get_user_role_secure', { _user_id: userId })
           .abortSignal(controller.signal);
           
         clearTimeout(timeoutId);
@@ -50,6 +50,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
           return null;
         }
         
+        console.log('User role fetched:', data);
         return { role: data };
       } catch (error) {
         clearTimeout(timeoutId);
