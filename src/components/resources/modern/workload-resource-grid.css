@@ -20,6 +20,7 @@
 /* Table Wrapper with Horizontal Scrolling */
 .workload-resource-table-wrapper {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
@@ -213,8 +214,6 @@
   .workload-resource-table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    margin: 0 -1rem;
-    padding: 0 1rem;
   }
   
   /* Make table scrollable with minimum width */
