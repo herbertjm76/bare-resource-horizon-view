@@ -84,7 +84,7 @@ export const LocationsTab = () => {
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
-            Define office locations where your team members are based. Select a country first, then choose from suggested cities.
+            Define locations where your team members work, including HQ offices and outsourcing partners. Select a country first, then choose from suggested cities.
           </div>
 
           {editMode && (
