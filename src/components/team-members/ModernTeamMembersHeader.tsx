@@ -3,6 +3,7 @@ import React from 'react';
 import { Users, BarChart3, Building2, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
+import { PopulateDepartmentsButton } from '@/components/team/PopulateDepartmentsButton';
 
 interface ModernTeamMembersHeaderProps {
   totalMembers?: number;
@@ -19,11 +20,14 @@ export const ModernTeamMembersHeader: React.FC<ModernTeamMembersHeaderProps> = (
 }) => {
   return (
     <div className="mb-4">
-      <StandardizedPageHeader
-        title="Team Members"
-        description="Manage your team and track member information"
-        icon={Users}
-      />
+      <div className="flex items-center justify-between mb-3">
+        <StandardizedPageHeader
+          title="Team Members"
+          description="Manage your team and track member information"
+          icon={Users}
+        />
+        <PopulateDepartmentsButton />
+      </div>
       
       <div className="grid grid-cols-4 gap-4 mt-4">
         <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
