@@ -59,8 +59,8 @@ export const useUnifiedWorkloadData = (
       });
     },
     enabled: !!company?.id && members.length > 0,
-    staleTime: 0, // DISABLE CACHING TO FORCE FRESH FETCH
-    gcTime: 0, // DISABLE CACHING TO FORCE FRESH FETCH
+    staleTime: 2 * 60 * 1000, // 2 minutes - data stays fresh
+    gcTime: 5 * 60 * 1000, // 5 minutes - keep in cache
   });
 
   // Generate week start dates for the calendar
