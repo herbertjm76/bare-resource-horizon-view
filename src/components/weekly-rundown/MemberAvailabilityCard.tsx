@@ -33,7 +33,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   
   
   // Calculate progress for the ring based on utilization percentage
-  const radius = 16;
+  const radius = 20;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (Math.min(utilization, 100) / 100) * circumference;
   
@@ -50,22 +50,22 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
         <TooltipTrigger asChild>
           <div className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer">
             {/* Avatar with utilization ring */}
-            <div className="relative w-10 h-10 flex items-center justify-center">
+            <div className="relative w-[50px] h-[50px] flex items-center justify-center">
               {/* Full light grey background circle */}
-              <svg className="absolute inset-0 -rotate-90" width="40" height="40">
+              <svg className="absolute inset-0 -rotate-90" width="50" height="50">
                 <circle
-                  cx="20"
-                  cy="20"
-                  r={16}
+                  cx="25"
+                  cy="25"
+                  r={20}
                   fill="none"
                   stroke="hsl(var(--border))"
                   strokeWidth="5"
                 />
                 {/* Color-coded utilization ring */}
                 <circle
-                  cx="20"
-                  cy="20"
-                  r={16}
+                  cx="25"
+                  cy="25"
+                  r={20}
                   fill="none"
                   stroke={getUtilizationColor()}
                   strokeWidth="5"
@@ -75,14 +75,14 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
                   className="transition-all duration-300"
                 />
               </svg>
-              <Avatar className="h-6 w-6">
+              <Avatar className="h-[38px] w-[38px]">
                 <AvatarImage src={avatarUrl || ''} alt={fullName} />
-                <AvatarFallback className="text-[9px] font-medium">{initials}</AvatarFallback>
+                <AvatarFallback className="text-xs font-medium">{initials}</AvatarFallback>
               </Avatar>
             </div>
             
             {/* First name */}
-            <span className="text-[10px] font-medium text-foreground truncate max-w-[45px] -mt-1.5">
+            <span className="text-[11px] font-medium text-foreground truncate max-w-[55px] -mt-1">
               {firstName}
             </span>
           </div>
