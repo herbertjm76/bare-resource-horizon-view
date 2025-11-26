@@ -68,7 +68,9 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    enabled: !!company?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Fetch office holidays for the selected week from office_holidays (office settings)
@@ -87,7 +89,9 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    enabled: !!company?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Fetch weekly other leave
@@ -106,7 +110,9 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id && memberIds.length > 0
+    enabled: !!company?.id && memberIds.length > 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Fetch weekly notes
@@ -125,7 +131,9 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    enabled: !!company?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Fetch custom card types
