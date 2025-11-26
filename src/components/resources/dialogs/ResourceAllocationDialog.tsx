@@ -208,11 +208,11 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                 </p>
               </div>
             ) : (
-              <div className="space-y-2 pr-3">
+              <div className="grid grid-cols-2 gap-2 pr-3">
                 {filteredProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="flex items-center gap-2 p-2 border rounded-md hover:bg-accent/30 transition-colors"
+                    className="flex items-center gap-2 p-3 border rounded-md hover:bg-accent/30 transition-colors w-full"
                   >
                     <div className="flex-[3] min-w-0 font-medium text-xs truncate" title={project.name}>
                       {project.name}
