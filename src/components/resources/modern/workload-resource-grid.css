@@ -285,14 +285,19 @@
 }
 
 
-/* Ensure proper z-index stacking */
-.workload-resource-grid-container * {
-  position: relative;
-}
-
+/* Ensure proper z-index stacking - only for sticky elements */
 .workload-resource-header.project-resource-column,
 .workload-resource-cell.project-resource-column {
   position: sticky !important;
+  z-index: 20 !important;
+}
+
+/* Ensure buttons are clickable */
+.workload-resource-cell button {
+  position: relative;
+  z-index: 25;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 /* Optimized input cells for Excel-like feel */
