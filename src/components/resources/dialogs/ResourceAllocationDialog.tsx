@@ -162,71 +162,63 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={compact ? 'max-w-md' : 'max-w-2xl'}>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            <Avatar className="h-10 w-10">
+      <DialogContent className={compact ? 'max-w-md' : 'max-w-lg'}>
+        <DialogHeader className="pb-3">
+          <DialogTitle className="flex items-center gap-2.5 text-base">
+            <Avatar className="h-8 w-8">
               <AvatarImage src={member.avatarUrl || ''} alt={fullName} />
-              <AvatarFallback className="text-sm">{initials}</AvatarFallback>
+              <AvatarFallback className="text-xs">{initials}</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col items-start">
-              <span>{fullName}</span>
-              <span className="text-xs text-muted-foreground font-normal flex items-center gap-1">
+            <div className="flex flex-col items-start gap-0.5">
+              <span className="font-semibold">{fullName}</span>
+              <span className="text-[11px] text-muted-foreground font-normal flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                Week of {format(new Date(weekStartDate), 'MMM d, yyyy')}
+                {format(new Date(weekStartDate), 'MMM d, yyyy')}
               </span>
             </div>
+            <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 bg-muted rounded-md">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-sm font-semibold">{totalHours}h</span>
+            </div>
           </DialogTitle>
-          <DialogDescription>
-            Allocate hours to projects for this week
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
               placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
+              className="h-8 pl-8 text-sm"
             />
           </div>
 
-          {/* Total hours indicator */}
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <span className="text-sm font-medium flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Total Hours
-            </span>
-            <span className="text-lg font-bold">{totalHours}h</span>
-          </div>
-
           {/* Projects list */}
-          <ScrollArea className={compact ? 'h-[300px]' : 'h-[400px]'}>
+          <ScrollArea className={compact ? 'h-[280px]' : 'h-[360px]'}>
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <p className="text-sm text-muted-foreground">Loading projects...</p>
+                <p className="text-xs text-muted-foreground">Loading...</p>
               </div>
             ) : filteredProjects.length === 0 ? (
               <div className="flex items-center justify-center py-8">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {searchTerm ? 'No projects found' : 'No active projects'}
                 </p>
               </div>
             ) : (
-              <div className="space-y-2 pr-4">
+              <div className="space-y-1.5 pr-3">
                 {filteredProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                    className="flex items-center gap-2 px-2.5 py-2 border rounded-md hover:bg-accent/50 transition-colors"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">{project.name}</div>
-                      <div className="text-xs text-muted-foreground">{project.code}</div>
+                      <div className="font-medium text-xs truncate">{project.name}</div>
+                      <div className="text-[10px] text-muted-foreground">{project.code}</div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <Input
                         type="number"
                         min="0"
@@ -234,9 +226,9 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                         placeholder="0"
                         value={allocations[project.id] || ''}
                         onChange={(e) => handleHoursChange(project.id, e.target.value)}
-                        className="w-20 text-right"
+                        className="w-16 h-7 text-xs text-right px-2"
                       />
-                      <span className="text-xs text-muted-foreground">hrs</span>
+                      <span className="text-[10px] text-muted-foreground w-6">hrs</span>
                     </div>
                   </div>
                 ))}
@@ -246,11 +238,11 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
 
           {/* Actions */}
           <div className="flex justify-end gap-2 pt-2 border-t">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Save Allocations'}
+            <Button size="sm" onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </div>
