@@ -219,7 +219,9 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                         className="block w-full font-semibold text-[11px] leading-tight truncate text-foreground"
                         title={project.name}
                       >
-                        {project.name}
+                        {project.name && project.name.length > 15
+                          ? `${project.name.slice(0, 15)}…`
+                          : project.name}
                       </span>
                     </div>
                     <div className="flex-1 flex-shrink-0 min-w-[44px]">
