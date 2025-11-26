@@ -4,6 +4,7 @@ import { Users, BarChart3, Building2, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { PopulateDepartmentsButton } from '@/components/team/PopulateDepartmentsButton';
+import { PopulatePracticeAreasButton } from '@/components/team/PopulatePracticeAreasButton';
 
 interface ModernTeamMembersHeaderProps {
   totalMembers?: number;
@@ -26,7 +27,10 @@ export const ModernTeamMembersHeader: React.FC<ModernTeamMembersHeaderProps> = (
           description="Manage your team and track member information"
           icon={Users}
         />
-        <PopulateDepartmentsButton />
+        <div className="flex items-center gap-2">
+          <PopulateDepartmentsButton />
+          <PopulatePracticeAreasButton />
+        </div>
       </div>
       
       <div className="grid grid-cols-4 gap-4 mt-4">
