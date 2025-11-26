@@ -123,20 +123,10 @@ export const updatePracticeAreasFromMapping = async () => {
       const firstName = nameParts[0];
       const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : null;
       
-      // Build query to find matching profiles
-      let query = supabase
+      // Build query to find matching profiles - use broader matching
+      const { data: profiles, error: selectError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, practice_area');
-      
-      if (lastName) {
-        // Try exact match first
-        query = query.or(`and(first_name.ilike.${firstName},last_name.ilike.${lastName}),and(first_name.ilike.${firstName}%,last_name.ilike.${lastName}%)`);
-      } else {
-        // Only first name
-        query = query.or(`first_name.ilike.${firstName},first_name.ilike.${firstName}%`);
-      }
-      
-      const { data: profiles, error: selectError } = await query;
       
       if (selectError) {
         console.error(`Error finding ${name}:`, selectError);
@@ -144,19 +134,37 @@ export const updatePracticeAreasFromMapping = async () => {
         continue;
       }
       
-      if (!profiles || profiles.length === 0) {
+      // Filter profiles to find matching ones
+      const matchingProfiles = profiles.filter(p => {
+        const pFirstName = p.first_name?.toLowerCase().trim() || '';
+        const pLastName = p.last_name?.toLowerCase().trim() || '';
+        const searchFirst = firstName.toLowerCase().trim();
+        const searchLast = lastName?.toLowerCase().trim();
+        
+        // Try different matching strategies
+        if (searchLast) {
+          // If we have both first and last name to search
+          return (pFirstName === searchFirst && pLastName === searchLast) ||
+                 (pFirstName.startsWith(searchFirst) && pLastName.startsWith(searchLast)) ||
+                 (pFirstName === searchFirst && pLastName.includes(searchLast));
+        } else {
+          // Only first name - be more flexible
+          return pFirstName === searchFirst || pFirstName.startsWith(searchFirst);
+        }
+      });
+      
+      if (matchingProfiles.length === 0) {
         console.log(`No profile found for ${name}`);
         results.notFound.push(name);
         continue;
       }
       
-      // If multiple matches, try to find the best match
-      let profileToUpdate = profiles[0];
-      if (profiles.length > 1) {
-        // Try to find exact match
-        const exactMatch = profiles.find(p => 
+      // Use the best match (prefer exact matches)
+      let profileToUpdate = matchingProfiles[0];
+      if (matchingProfiles.length > 1) {
+        const exactMatch = matchingProfiles.find(p => 
           p.first_name?.toLowerCase() === firstName.toLowerCase() &&
-          (lastName ? p.last_name?.toLowerCase() === lastName.toLowerCase() : true)
+          (!lastName || p.last_name?.toLowerCase() === lastName.toLowerCase())
         );
         if (exactMatch) {
           profileToUpdate = exactMatch;
