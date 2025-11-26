@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ResourceAllocationDialog } from '@/components/resources/dialogs/ResourceAllocationDialog';
 
 interface ProjectAllocation {
   projectId: string;
@@ -17,6 +18,9 @@ interface MemberAvailabilityCardProps {
   projectAllocations: ProjectAllocation[];
   utilization: number;
   threshold?: number;
+  memberId: string;
+  memberType: 'active' | 'pre_registered';
+  weekStartDate: string;
 }
 
 export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
@@ -27,7 +31,11 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   projectAllocations,
   utilization,
   threshold = 80,
+  memberId,
+  memberType,
+  weekStartDate,
 }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
   
@@ -45,10 +53,27 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
     return 'hsl(221, 83%, 53%)'; // Blue - highly available
   };
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer">
+    <>
+      <ResourceAllocationDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        member={{
+          id: memberId,
+          firstName,
+          lastName,
+          avatarUrl,
+          type: memberType,
+        }}
+        weekStartDate={weekStartDate}
+        compact
+      />
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div 
+              className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer"
+              onClick={() => setDialogOpen(true)}
+            >
             {/* Avatar with utilization ring */}
             <div className="relative w-[50px] h-[50px] flex items-center justify-center">
               {/* Full light grey background circle */}
@@ -86,8 +111,8 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
               {firstName}
             </span>
           </div>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-[280px]">
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-[280px]">
           <div className="space-y-3">
             {/* Full name */}
             <div>
@@ -122,8 +147,9 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
               <p className="text-xs text-muted-foreground italic">No project allocations</p>
             )}
           </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </>
   );
 };

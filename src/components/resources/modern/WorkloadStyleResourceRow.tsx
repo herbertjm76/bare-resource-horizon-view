@@ -1,8 +1,9 @@
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { DayInfo } from '../grid/types';
 import { useAllocationInput } from '../hooks/useAllocationInput';
+import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
 
 interface WorkloadStyleResourceRowProps {
   resource: any;
@@ -25,13 +26,17 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   selectedDate,
   periodToShow
 }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const displayName = resource.first_name && resource.last_name 
     ? `${resource.first_name} ${resource.last_name}`
     : resource.name;
-
+  
   const initials = resource.first_name && resource.last_name
     ? `${resource.first_name.charAt(0)}${resource.last_name.charAt(0)}`
     : resource.name.split(' ').map((n: string) => n.charAt(0)).join('').slice(0, 2);
+
+  // Get week start date from the first day in days array
+  const weekStartDate = days.length > 0 ? days[0].date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
 
   const rowBgColor = '#fcfcfc';
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
@@ -90,10 +95,24 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   );
 
   return (
-    <tr className="workload-resource-row resource-row">
+    <>
+      <ResourceAllocationDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        member={{
+          id: resource.id,
+          firstName: resource.first_name,
+          lastName: resource.last_name,
+          avatarUrl: resource.avatar_url,
+          type: resource.isPending ? 'pre_registered' : 'active',
+        }}
+        weekStartDate={weekStartDate}
+        compact={false}
+      />
+      <tr className="workload-resource-row resource-row">
       {/* Resource info column - Fixed width, sticky */}
       <td 
-        className="workload-resource-cell project-resource-column"
+        className="workload-resource-cell project-resource-column cursor-pointer hover:bg-muted/50"
         style={{
           width: '250px',
           minWidth: '250px',
@@ -108,6 +127,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
           verticalAlign: 'middle',
           height: '32px'
         }}
+        onClick={() => setDialogOpen(true)}
       >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgb(111, 75, 246)' }}>
@@ -193,5 +213,6 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         );
       })}
     </tr>
+    </>
   );
 };
