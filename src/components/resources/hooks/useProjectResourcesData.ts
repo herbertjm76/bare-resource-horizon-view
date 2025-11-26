@@ -5,6 +5,7 @@ import { Resource } from './types/resourceTypes';
 
 export const useProjectResourcesData = (
   projectId: string,
+  companyId: string | undefined,
   resources: Resource[],
   setResources: (resources: Resource[]) => void
 ) => {
@@ -17,7 +18,7 @@ export const useProjectResourcesData = (
     checkResourceInOtherProjects,
     getAllocationKey,
     isLoadingAllocations
-  } = useResourceManagement(projectId, resources, setResources);
+  } = useResourceManagement(projectId, companyId, resources, setResources);
 
   return {
     projectAllocations,
