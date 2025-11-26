@@ -61,6 +61,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   const [resourceOptions, setResourceOptions] = useState<ResourceOption[]>([]);
   const [filterType, setFilterType] = useState<'all' | 'active' | 'pre-registered'>('all');
   const [sortBy, setSortBy] = useState<'name' | 'role'>('name');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const { company } = useCompany();
   
   // Fetch team members and pre-registered invites when dialog opens
@@ -135,6 +136,18 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
       filtered = filtered.filter(r => r.type === filterType);
     }
     
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(r => 
+        r.name.toLowerCase().includes(searchLower) ||
+        r.email.toLowerCase().includes(searchLower) ||
+        (r.role && r.role.toLowerCase().includes(searchLower)) ||
+        (r.department && r.department.toLowerCase().includes(searchLower)) ||
+        (r.location && r.location.toLowerCase().includes(searchLower))
+      );
+    }
+    
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
       if (sortBy === 'name') {
@@ -148,7 +161,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
     });
     
     return sorted;
-  }, [resourceOptions, filterType, sortBy]);
+  }, [resourceOptions, filterType, sortBy, searchTerm]);
   
   const handleAdd = async () => {
     if (!selectedResource || !company?.id || !projectId) {
@@ -269,8 +282,12 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
           <div className="space-y-2">
             <Label>Team Member</Label>
             <div className="border rounded-md">
-              <Command>
-                <CommandInput placeholder="Search team members..." />
+              <Command shouldFilter={false}>
+                <CommandInput 
+                  placeholder="Search team members..." 
+                  value={searchTerm}
+                  onValueChange={setSearchTerm}
+                />
                 <CommandList>
                   <CommandEmpty>
                     {loading ? 'Loading...' : 'No team members found'}
@@ -279,7 +296,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                     {filteredAndSortedResources.map(member => (
                       <CommandItem
                         key={member.id}
-                        value={`${member.name} ${member.email} ${member.role || ''}`}
+                        value={member.id}
                         onSelect={() => setSelectedResource(member.id)}
                         className="cursor-pointer"
                       >
