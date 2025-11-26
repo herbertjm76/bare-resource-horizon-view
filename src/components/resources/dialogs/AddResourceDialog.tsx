@@ -110,18 +110,21 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
     setLoading(true);
     
     try {
-      // Add all selected resources
+      // Add all selected resources one by one with a small delay to ensure state updates properly
       for (const resourceId of selectedResources) {
         const resource = resourceOptions.find(r => r.id === resourceId);
         if (!resource) continue;
         
         // Call the onAdd callback for each resource
-        onAdd({ 
+        await Promise.resolve(onAdd({ 
           staffId: resource.id, 
           name: resource.name,
           role: resource.role,
           isPending: resource.type === 'pre-registered'
-        });
+        }));
+        
+        // Small delay to ensure state updates are processed
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
       
       onClose();
