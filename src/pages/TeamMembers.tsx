@@ -32,16 +32,15 @@ const TeamMembersPageContent = () => {
   const { company } = useCompany();
   const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
   const { projects } = useProjects();
-  const { locations } = useOfficeSettings();
+  const { locations, departments } = useOfficeSettings();
   
   // Calculate statistics for header
   const allMembers = [...teamMembers, ...preRegisteredMembers];
   const totalMembers = allMembers.length;
   const totalActiveMembers = teamMembers.length;
   
-  // Calculate unique departments
-  const departments = new Set(teamMembers.map(member => member.department).filter(Boolean));
-  const totalDepartments = departments.size;
+  // Count departments from office settings (not from team members)
+  const totalDepartments = departments.length;
   
   const totalLocations = locations.length;
   
