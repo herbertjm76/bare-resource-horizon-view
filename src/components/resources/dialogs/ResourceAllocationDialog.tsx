@@ -195,7 +195,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
             />
           </div>
 
-          {/* Projects list */}
+          {/* Projects grid */}
           <ScrollArea className={compact ? 'h-[280px]' : 'h-[360px]'}>
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -208,28 +208,24 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                 </p>
               </div>
             ) : (
-              <div className="space-y-1.5 pr-3">
+              <div className="grid grid-cols-2 gap-2 pr-3">
                 {filteredProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="flex items-center gap-2 px-2.5 py-2 border rounded-md hover:bg-accent/50 transition-colors"
+                    className="flex flex-col gap-1.5 p-2 border rounded-md hover:bg-accent/30 transition-colors"
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-xs truncate">{project.name}</div>
-                      <div className="text-[10px] text-muted-foreground">{project.code}</div>
+                    <div className="font-medium text-xs truncate" title={project.name}>
+                      {project.name}
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.5"
-                        placeholder="0"
-                        value={allocations[project.id] || ''}
-                        onChange={(e) => handleHoursChange(project.id, e.target.value)}
-                        className="w-16 h-7 text-xs text-right px-2"
-                      />
-                      <span className="text-[10px] text-muted-foreground w-6">hrs</span>
-                    </div>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      placeholder="0"
+                      value={allocations[project.id] || ''}
+                      onChange={(e) => handleHoursChange(project.id, e.target.value)}
+                      className="h-7 text-xs text-center"
+                    />
                   </div>
                 ))}
               </div>
