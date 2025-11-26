@@ -215,9 +215,12 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                     className="flex items-center gap-2 p-3 border rounded-md hover:bg-accent/30 transition-colors w-full overflow-hidden"
                   >
                     <div className="flex-[3] min-w-0 overflow-hidden">
-                      <div className="font-medium text-xs truncate" title={project.name}>
+                      <span
+                        className="block w-full font-medium text-xs truncate"
+                        title={project.name}
+                      >
                         {project.name}
-                      </div>
+                      </span>
                     </div>
                     <div className="flex-1 flex-shrink-0">
                       <Input
