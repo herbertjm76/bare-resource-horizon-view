@@ -214,7 +214,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                     key={project.id}
                     className="flex items-center gap-1.5 p-2 border border-border/60 rounded-lg hover:bg-accent/50 hover:border-border transition-all max-w-full overflow-hidden"
                   >
-                    <div className="flex-[3] min-w-0 max-w-0 overflow-hidden">
+                    <div className="flex-[3] min-w-0 overflow-hidden">
                       <span
                         className="block w-full font-semibold text-[11px] leading-tight truncate text-foreground"
                         title={project.name}
