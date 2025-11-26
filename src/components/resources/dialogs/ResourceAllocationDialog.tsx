@@ -208,7 +208,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2 pr-3">
+              <div className="space-y-2 pr-3">
                 {filteredProjects.map((project) => (
                   <div
                     key={project.id}
@@ -217,15 +217,17 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                     <div className="flex-[3] min-w-0 font-medium text-xs truncate" title={project.name}>
                       {project.name}
                     </div>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.5"
-                      placeholder="0"
-                      value={allocations[project.id] || ''}
-                      onChange={(e) => handleHoursChange(project.id, e.target.value)}
-                      className="flex-1 h-8 text-sm text-center"
-                    />
+                    <div className="flex-1 flex-shrink-0">
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        placeholder="0"
+                        value={allocations[project.id] || ''}
+                        onChange={(e) => handleHoursChange(project.id, e.target.value)}
+                        className="w-full h-8 text-sm text-center"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
