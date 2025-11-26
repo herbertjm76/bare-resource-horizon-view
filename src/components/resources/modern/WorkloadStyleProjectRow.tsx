@@ -18,7 +18,7 @@ interface WorkloadStyleProjectRowProps {
   periodToShow?: number;
 }
 
-export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = ({
+export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = React.memo(({
   project,
   days,
   isExpanded,
@@ -72,15 +72,22 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                 padding: '0',
                 border: '1px solid rgba(0, 0, 0, 0.2)',
                 backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                color: 'black'
+                color: 'black',
+                cursor: 'pointer',
+                position: 'relative',
+                zIndex: 30,
+                pointerEvents: 'auto'
               }}
-              onClick={onToggleExpand}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleExpand();
+              }}
               disabled={isLoading}
             >
               {isExpanded ? (
-                <ChevronDown style={{ width: '12px', height: '12px', color: 'black' }} />
+                <ChevronDown style={{ width: '12px', height: '12px', color: 'black', pointerEvents: 'none' }} />
               ) : (
-                <ChevronRight style={{ width: '12px', height: '12px', color: 'black' }} />
+                <ChevronRight style={{ width: '12px', height: '12px', color: 'black', pointerEvents: 'none' }} />
               )}
             </Button>
             
@@ -221,4 +228,11 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
       )}
     </>
   );
-};
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.project.id === nextProps.project.id &&
+    prevProps.isExpanded === nextProps.isExpanded &&
+    prevProps.isEven === nextProps.isEven &&
+    prevProps.days.length === nextProps.days.length
+  );
+});
