@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { HolidaysCard } from './cards/HolidaysCard';
 import { AnnualLeaveCard } from './cards/AnnualLeaveCard';
 import { OtherLeaveCard } from './cards/OtherLeaveCard';
@@ -43,6 +43,10 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('weekly-summary-collapsed');
+    return saved === 'true';
+  });
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekStartString = format(weekStart, 'yyyy-MM-dd');
@@ -301,9 +305,28 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     return cardId;
   };
 
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem('weekly-summary-collapsed', String(newState));
+  };
+
   return (
     <div className="mb-0 space-y-0">
-      <div className="relative px-1.5 sm:px-2 py-1.5 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
+      <div className="relative px-1.5 sm:px-2 py-1.5 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container transition-all duration-300">
+        {/* Collapse Toggle Button - Top Right */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleCollapse}
+          className="absolute top-1 right-1 z-30 h-7 w-7 p-0 hover:bg-background/80 backdrop-blur-sm"
+          title={isCollapsed ? 'Show summary cards' : 'Hide summary cards'}
+        >
+          {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+        </Button>
+
+        {!isCollapsed && (
+          <>
         {/* Mobile Carousel - Only on small screens */}
         <div className="block sm:hidden relative">
         {/* Card Indicator Dots - Top */}
@@ -484,6 +507,15 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           {/* Add Card Button - Icon only */}
           <ManageCustomCardsDialog iconOnly />
         </div>
+        </>
+        )}
+
+        {/* Collapsed State - Show minimal info */}
+        {isCollapsed && (
+          <div className="flex items-center justify-center py-2">
+            <span className="text-xs text-muted-foreground">Summary cards hidden</span>
+          </div>
+        )}
       </div>
 
       {/* Mobile Controls Row - Only on mobile */}
