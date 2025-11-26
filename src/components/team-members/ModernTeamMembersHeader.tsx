@@ -3,7 +3,6 @@ import React from 'react';
 import { Users, BarChart3, Building2, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
-import { UpdatePracticeAreasButton } from '@/components/team/UpdatePracticeAreasButton';
 
 interface ModernTeamMembersHeaderProps {
   totalMembers?: number;
@@ -66,9 +65,6 @@ export const ModernTeamMembersHeader: React.FC<ModernTeamMembersHeaderProps> = (
             </div>
           </Card>
         </StandardizedPageHeader>
-        <div className="mt-2">
-          <UpdatePracticeAreasButton />
-        </div>
       </div>
     </>
   );
