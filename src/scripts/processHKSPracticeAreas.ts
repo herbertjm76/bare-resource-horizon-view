@@ -137,21 +137,17 @@ export const updatePracticeAreasFromMapping = async () => {
       // Filter profiles to find matching ones - use very flexible matching
       const matchingProfiles = profiles.filter(p => {
         const pFirstName = p.first_name?.toLowerCase().trim() || '';
-        const pLastName = p.last_name?.toLowerCase().trim() || '';
         const searchFirst = firstName.toLowerCase().trim();
-        const searchLast = lastName?.toLowerCase().trim();
-        
-        // Try different matching strategies
-        if (searchLast) {
-          // If we have both first and last name to search (e.g., "David M", "Jo Wee")
-          return (pFirstName === searchFirst && pLastName === searchLast) ||
-                 (pFirstName === searchFirst && pLastName.startsWith(searchLast)) ||
-                 (pFirstName.startsWith(searchFirst) && pLastName.startsWith(searchLast));
-        } else {
-          // Only first name from Excel - allow full names stored in first_name
-          // e.g. Excel: "Catherine", profile.first_name: "Catherine Smith"
-          return pFirstName === searchFirst || pFirstName.startsWith(`${searchFirst} `);
-        }
+
+        if (!pFirstName || !searchFirst) return false;
+
+        // Fuzzy first-name matching to handle minor spelling differences
+        // e.g. "catherin" (Excel) vs "catherine" (profile)
+        return (
+          pFirstName === searchFirst ||
+          pFirstName.startsWith(searchFirst) ||
+          searchFirst.startsWith(pFirstName)
+        );
       });
       
       if (matchingProfiles.length === 0) {
@@ -163,21 +159,19 @@ export const updatePracticeAreasFromMapping = async () => {
         if (inviteSelectError) {
           console.error(`Error finding invite for ${name}:`, inviteSelectError);
         } else if (invites && invites.length > 0) {
-          const matchingInvites = invites.filter(i => {
-            const iFirstName = i.first_name?.toLowerCase().trim() || '';
-            const iLastName = i.last_name?.toLowerCase().trim() || '';
-            const searchFirst = firstName.toLowerCase().trim();
-            const searchLast = lastName?.toLowerCase().trim();
+           const matchingInvites = invites.filter(i => {
+             const iFirstName = i.first_name?.toLowerCase().trim() || '';
+             const searchFirst = firstName.toLowerCase().trim();
 
-            if (searchLast) {
-              return (iFirstName === searchFirst && iLastName === searchLast) ||
-                     (iFirstName === searchFirst && iLastName.startsWith(searchLast)) ||
-                     (iFirstName.startsWith(searchFirst) && iLastName.startsWith(searchLast));
-            } else {
-              // Only first name from Excel - allow full names stored in first_name
-              return iFirstName === searchFirst || iFirstName.startsWith(`${searchFirst} `);
-            }
-          });
+             if (!iFirstName || !searchFirst) return false;
+
+             // Fuzzy first-name matching to handle minor spelling differences
+             return (
+               iFirstName === searchFirst ||
+               iFirstName.startsWith(searchFirst) ||
+               searchFirst.startsWith(iFirstName)
+             );
+           });
 
           if (matchingInvites.length > 0) {
             let inviteToUpdate = matchingInvites[0];
