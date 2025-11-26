@@ -134,7 +134,7 @@ export const updatePracticeAreasFromMapping = async () => {
         continue;
       }
       
-      // Filter profiles to find matching ones
+      // Filter profiles to find matching ones - use very flexible matching
       const matchingProfiles = profiles.filter(p => {
         const pFirstName = p.first_name?.toLowerCase().trim() || '';
         const pLastName = p.last_name?.toLowerCase().trim() || '';
@@ -143,13 +143,14 @@ export const updatePracticeAreasFromMapping = async () => {
         
         // Try different matching strategies
         if (searchLast) {
-          // If we have both first and last name to search
+          // If we have both first and last name to search (e.g., "David M", "Jo Wee")
           return (pFirstName === searchFirst && pLastName === searchLast) ||
-                 (pFirstName.startsWith(searchFirst) && pLastName.startsWith(searchLast)) ||
-                 (pFirstName === searchFirst && pLastName.includes(searchLast));
+                 (pFirstName === searchFirst && pLastName.startsWith(searchLast)) ||
+                 (pFirstName.startsWith(searchFirst) && pLastName.startsWith(searchLast));
         } else {
-          // Only first name - be more flexible
-          return pFirstName === searchFirst || pFirstName.startsWith(searchFirst);
+          // Only first name - match if profile's first name matches exactly
+          // This handles cases like "Catherine" matching "Catherine Smith"
+          return pFirstName === searchFirst;
         }
       });
       
