@@ -155,7 +155,59 @@ export const updatePracticeAreasFromMapping = async () => {
       });
       
       if (matchingProfiles.length === 0) {
-        console.log(`No profile found for ${name}`);
+        // Try matching against invites (pre-registered team members)
+        const { data: invites, error: inviteSelectError } = await supabase
+          .from('invites')
+          .select('id, first_name, last_name, practice_area');
+
+        if (inviteSelectError) {
+          console.error(`Error finding invite for ${name}:`, inviteSelectError);
+        } else if (invites && invites.length > 0) {
+          const matchingInvites = invites.filter(i => {
+            const iFirstName = i.first_name?.toLowerCase().trim() || '';
+            const iLastName = i.last_name?.toLowerCase().trim() || '';
+            const searchFirst = firstName.toLowerCase().trim();
+            const searchLast = lastName?.toLowerCase().trim();
+
+            if (searchLast) {
+              return (iFirstName === searchFirst && iLastName === searchLast) ||
+                     (iFirstName === searchFirst && iLastName.startsWith(searchLast)) ||
+                     (iFirstName.startsWith(searchFirst) && iLastName.startsWith(searchLast));
+            } else {
+              // Only first name from Excel - allow full names stored in first_name
+              return iFirstName === searchFirst || iFirstName.startsWith(`${searchFirst} `);
+            }
+          });
+
+          if (matchingInvites.length > 0) {
+            let inviteToUpdate = matchingInvites[0];
+            if (matchingInvites.length > 1) {
+              const exactInviteMatch = matchingInvites.find(i =>
+                i.first_name?.toLowerCase().trim() === firstName.toLowerCase().trim() &&
+                (!lastName || i.last_name?.toLowerCase().trim() === lastName.toLowerCase().trim())
+              );
+              if (exactInviteMatch) {
+                inviteToUpdate = exactInviteMatch;
+              }
+            }
+
+            const { error: updateInviteError } = await supabase
+              .from('invites')
+              .update({ practice_area: practiceArea })
+              .eq('id', inviteToUpdate.id);
+
+            if (updateInviteError) {
+              console.error(`Error updating invite for ${name}:`, updateInviteError);
+              results.errors.push(`${name} (invite): ${updateInviteError.message}`);
+            } else {
+              console.log(`✓ Updated invite ${inviteToUpdate.first_name} ${inviteToUpdate.last_name} → ${practiceArea}`);
+              results.updated++;
+              continue; // Go to next name mapping
+            }
+          }
+        }
+
+        console.log(`No profile or invite found for ${name}`);
         results.notFound.push(name);
         continue;
       }
