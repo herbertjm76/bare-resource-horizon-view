@@ -6,6 +6,7 @@ import { Resource } from './types/resourceTypes';
 
 export const useResourceManagement = (
   projectId: string,
+  companyId: string | undefined,
   resources: Resource[],
   setResources: (resources: Resource[]) => void
 ) => {
@@ -27,7 +28,7 @@ export const useResourceManagement = (
   // Resource addition
   const {
     handleAddResource
-  } = useResourceAddition(resources, setResources);
+  } = useResourceAddition(projectId, companyId, resources, setResources);
 
   return {
     projectAllocations,

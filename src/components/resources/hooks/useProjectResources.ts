@@ -2,10 +2,13 @@
 import { useFetchResources } from './useFetchResources';
 import { useProjectResourcesState } from './useProjectResourcesState';
 import { useProjectResourcesData } from './useProjectResourcesData';
+import { useCompany } from '@/context/CompanyContext';
 
 export type { Resource } from './types/resourceTypes';
 
 export const useProjectResources = (projectId: string) => {
+  const { company } = useCompany();
+  
   // Get UI state
   const { showAddResource, setShowAddResource } = useProjectResourcesState();
   
@@ -21,7 +24,7 @@ export const useProjectResources = (projectId: string) => {
     checkResourceInOtherProjects,
     getAllocationKey,
     isLoadingAllocations
-  } = useProjectResourcesData(projectId, resources, setResources);
+  } = useProjectResourcesData(projectId, company?.id, resources, setResources);
 
   return {
     resources,
