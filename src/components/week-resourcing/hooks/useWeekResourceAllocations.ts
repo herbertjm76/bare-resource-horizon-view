@@ -31,6 +31,8 @@ export const useWeekResourceAllocations = ({ weekStartDate }: UseWeekResourceAll
 
       return data || [];
     },
-    enabled: !!company?.id && !!weekStartDate
+    enabled: !!company?.id && !!weekStartDate,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 };
