@@ -302,8 +302,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   };
 
   return (
-    <div className="mb-3 space-y-0.5">
-      <div className="relative px-1.5 sm:px-2 py-2 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
+    <div className="mb-0 space-y-0">
+      <div className="relative px-1.5 sm:px-2 py-1.5 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container">
         {/* Mobile Carousel - Only on small screens */}
         <div className="block sm:hidden relative">
         {/* Card Indicator Dots - Top */}
@@ -346,15 +346,15 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         </Button>
 
         {/* Card Display */}
-        <div className="px-12 py-1">
-          <div className="relative h-[140px] animate-fade-in" key={currentCard?.id}>
+        <div className="px-12 py-0.5">
+          <div className="relative h-[120px] animate-fade-in" key={currentCard?.id}>
             {currentCard?.component}
           </div>
         </div>
       </div>
 
         {/* Desktop/Tablet Horizontal Row with Arrow Navigation */}
-        <div className="hidden sm:block relative pb-8">
+        <div className="hidden sm:block relative pb-4">
           {/* Left Arrow */}
           {canScrollLeft && (
             <Button
