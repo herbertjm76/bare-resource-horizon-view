@@ -29,6 +29,7 @@ interface ProjectAllocation {
 
 interface AvailableMember {
   id: string;
+  type: 'active' | 'pre_registered';
   firstName: string;
   lastName: string;
   avatarUrl?: string;
@@ -195,6 +196,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
         return {
           id: member.id,
+          type: member.type,
           firstName: member.firstName,
           lastName: member.lastName,
           avatarUrl: member.avatarUrl,
@@ -311,6 +313,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                 {availableMembers.map((member) => (
                   <MemberAvailabilityCard
                     key={member.id}
+                    memberId={member.id}
+                    memberType={member.type}
                     avatarUrl={member.avatarUrl}
                     firstName={member.firstName}
                     lastName={member.lastName}
@@ -318,6 +322,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                     projectAllocations={member.projectAllocations}
                     utilization={member.utilization}
                     threshold={threshold}
+                    weekStartDate={weekStartDate}
                   />
                 ))}
               </div>
@@ -332,6 +337,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               {availableMembers.map((member) => (
                 <MemberAvailabilityCard
                   key={member.id}
+                  memberId={member.id}
+                  memberType={member.type}
                   avatarUrl={member.avatarUrl}
                   firstName={member.firstName}
                   lastName={member.lastName}
@@ -339,6 +346,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                   projectAllocations={member.projectAllocations}
                   utilization={member.utilization}
                   threshold={threshold}
+                  weekStartDate={weekStartDate}
                 />
               ))}
             </div>

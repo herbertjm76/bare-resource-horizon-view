@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProjectAllocationRow } from './ProjectAllocationRow';
 import { DayInfo } from '../grid/types';
 import { PersonResourceData } from '@/hooks/usePersonResourceData';
+import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
 
 interface PersonRowProps {
   person: PersonResourceData;
@@ -26,6 +27,10 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
   periodToShow
 }) => {
   const [projectAllocations, setProjectAllocations] = useState(person.projects);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Get week start date from the first day in days array
+  const weekStartDate = days.length > 0 ? days[0].date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     setProjectAllocations(person.projects);
@@ -53,11 +58,24 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
 
   return (
     <>
+      <ResourceAllocationDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        member={{
+          id: person.personId,
+          firstName: person.firstName,
+          lastName: person.lastName,
+          avatarUrl: person.avatarUrl,
+          type: person.resourceType,
+        }}
+        weekStartDate={weekStartDate}
+        compact={false}
+      />
       {/* Person Header Row */}
       <tr className="workload-resource-row project-header-row">
         {/* Person info column - Fixed width, sticky */}
         <td 
-          className="workload-resource-cell project-resource-column"
+          className="workload-resource-cell project-resource-column cursor-pointer hover:bg-muted/50"
           style={{
             width: '250px',
             minWidth: '250px',
@@ -71,6 +89,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
             borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
             verticalAlign: 'middle'
           }}
+          onClick={() => setDialogOpen(true)}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Button
