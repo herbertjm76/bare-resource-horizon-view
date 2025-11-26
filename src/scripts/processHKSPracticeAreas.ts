@@ -148,9 +148,9 @@ export const updatePracticeAreasFromMapping = async () => {
                  (pFirstName === searchFirst && pLastName.startsWith(searchLast)) ||
                  (pFirstName.startsWith(searchFirst) && pLastName.startsWith(searchLast));
         } else {
-          // Only first name - match if profile's first name matches exactly
-          // This handles cases like "Catherine" matching "Catherine Smith"
-          return pFirstName === searchFirst;
+          // Only first name from Excel - allow full names stored in first_name
+          // e.g. Excel: "Catherine", profile.first_name: "Catherine Smith"
+          return pFirstName === searchFirst || pFirstName.startsWith(`${searchFirst} `);
         }
       });
       
