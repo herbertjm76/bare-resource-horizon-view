@@ -19,7 +19,7 @@ export const LocationsHeader: React.FC<LocationsHeaderProps> = ({
 }) => {
   return (
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle style={{ color: 'hsl(var(--theme-primary))' }}>Office Locations</CardTitle>
+      <CardTitle style={{ color: 'hsl(var(--theme-primary))' }}>Team Locations</CardTitle>
       <div className="flex gap-2">
         <Button 
           size="sm" 
