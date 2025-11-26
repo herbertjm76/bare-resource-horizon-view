@@ -54,6 +54,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   
   const [filterBy, setFilterBy] = useState<'all' | 'department' | 'practice_area'>('all');
   const [filterValue, setFilterValue] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Get departments from office settings
   const departments = useMemo(() => 
@@ -69,14 +70,31 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
 
   // Filter resources
   const filteredResources = useMemo(() => {
-    if (filterBy === 'all' || filterValue === 'all') return resourceOptions;
+    let filtered = resourceOptions;
     
-    return resourceOptions.filter(r => {
-      if (filterBy === 'department') return r.department === filterValue;
-      if (filterBy === 'practice_area') return r.role === filterValue;
-      return true;
-    });
-  }, [resourceOptions, filterBy, filterValue]);
+    // Apply filter by department or practice area
+    if (filterBy !== 'all' && filterValue !== 'all') {
+      filtered = filtered.filter(r => {
+        if (filterBy === 'department') return r.department === filterValue;
+        if (filterBy === 'practice_area') return r.role === filterValue;
+        return true;
+      });
+    }
+    
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(r => 
+        r.name.toLowerCase().includes(searchLower) ||
+        r.email.toLowerCase().includes(searchLower) ||
+        (r.role && r.role.toLowerCase().includes(searchLower)) ||
+        (r.department && r.department.toLowerCase().includes(searchLower)) ||
+        (r.location && r.location.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    return filtered;
+  }, [resourceOptions, filterBy, filterValue, searchTerm]);
 
   const selectedResourceData = resourceOptions.find(r => r.id === selectedResource);
   
@@ -134,8 +152,12 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
           <div className="space-y-2">
             <Label>Team Member</Label>
             <div className="border rounded-md">
-              <Command>
-                <CommandInput placeholder="Search team members..." />
+              <Command shouldFilter={false}>
+                <CommandInput 
+                  placeholder="Search team members..." 
+                  value={searchTerm}
+                  onValueChange={setSearchTerm}
+                />
                 <CommandList className="max-h-[300px]">
                   <CommandEmpty>
                     {optionsLoading ? 'Loading...' : 'No team members found'}
