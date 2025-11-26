@@ -210,7 +210,6 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
             selectedMemberIds={selectedMembers}
             onBulkDelete={onBulkDelete} 
             onAdd={onAdd}
-            onImportComplete={onRefresh}
             onSaveAll={handleSaveAll}
             onCancelEdit={handleCancelEdit}
             hasChanges={hasChanges}
