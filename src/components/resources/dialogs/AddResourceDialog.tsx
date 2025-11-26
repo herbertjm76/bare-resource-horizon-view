@@ -45,12 +45,8 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
 }) => {
   const { resourceOptions, loading: optionsLoading } = useResourceOptions();
   const { departments: officeDepartments, practice_areas: officePracticeAreas } = useOfficeSettings();
-  const { 
-    selectedResource, 
-    loading: addLoading, 
-    setSelectedResource, 
-    handleAdd 
-  } = useAddResource({ projectId, onAdd, onClose });
+  const [selectedResources, setSelectedResources] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   
   const [filterBy, setFilterBy] = useState<'all' | 'department' | 'practice_area'>('all');
   const [filterValue, setFilterValue] = useState<string>('all');
@@ -96,7 +92,45 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
     return filtered;
   }, [resourceOptions, filterBy, filterValue, searchTerm]);
 
-  const selectedResourceData = resourceOptions.find(r => r.id === selectedResource);
+  const selectedResourcesData = resourceOptions.filter(r => selectedResources.includes(r.id));
+  
+  const toggleResourceSelection = (resourceId: string) => {
+    setSelectedResources(prev => 
+      prev.includes(resourceId) 
+        ? prev.filter(id => id !== resourceId)
+        : [...prev, resourceId]
+    );
+  };
+  
+  const handleAddMultiple = async () => {
+    if (selectedResources.length === 0) {
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      // Add all selected resources
+      for (const resourceId of selectedResources) {
+        const resource = resourceOptions.find(r => r.id === resourceId);
+        if (!resource) continue;
+        
+        // Call the onAdd callback for each resource
+        onAdd({ 
+          staffId: resource.id, 
+          name: resource.name,
+          role: resource.role,
+          isPending: resource.type === 'pre-registered'
+        });
+      }
+      
+      onClose();
+    } catch (err: any) {
+      console.error('Error adding resources:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   return (
     <Dialog open onOpenChange={onClose}>
@@ -167,14 +201,19 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                       {filteredResources.map(member => (
                         <div
                           key={member.id}
-                          onClick={() => setSelectedResource(member.id)}
+                          onClick={() => toggleResourceSelection(member.id)}
                           className={cn(
-                            "flex flex-col items-center gap-2 p-2 rounded-lg cursor-pointer transition-all",
+                            "flex flex-col items-center gap-2 p-2 rounded-lg cursor-pointer transition-all relative",
                             "hover:bg-accent",
-                            selectedResource === member.id && "bg-accent ring-2 ring-primary"
+                            selectedResources.includes(member.id) && "bg-accent ring-2 ring-primary"
                           )}
                         >
-                          <ResourceSelectOption member={member} isSelected={selectedResource === member.id} />
+                          {selectedResources.includes(member.id) && (
+                            <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                              <Check className="h-3 w-3" />
+                            </div>
+                          )}
+                          <ResourceSelectOption member={member} isSelected={selectedResources.includes(member.id)} />
                         </div>
                       ))}
                     </div>
@@ -182,9 +221,11 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                 </CommandList>
               </Command>
             </div>
-            {selectedResourceData && (
+            {selectedResourcesData.length > 0 && (
               <div className="text-sm text-muted-foreground mt-2">
-                Selected: <span className="font-medium text-foreground">{selectedResourceData.name}</span>
+                Selected ({selectedResourcesData.length}): <span className="font-medium text-foreground">
+                  {selectedResourcesData.map(r => r.name).join(', ')}
+                </span>
               </div>
             )}
           </div>
@@ -193,11 +234,11 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button 
-            isLoading={addLoading} 
-            onClick={handleAdd} 
-            disabled={!selectedResource || addLoading || optionsLoading}
+            isLoading={loading} 
+            onClick={handleAddMultiple} 
+            disabled={selectedResources.length === 0 || loading || optionsLoading}
           >
-            Add Resource
+            Add {selectedResources.length > 0 ? `${selectedResources.length} ` : ''}Resource{selectedResources.length !== 1 ? 's' : ''}
           </Button>
         </DialogFooter>
       </DialogContent>
