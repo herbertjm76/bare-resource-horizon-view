@@ -1,8 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, UserPlus, Upload, Check, X, Mail } from "lucide-react";
-import { ExcelImportDialog } from "@/components/projects/ExcelImportDialog";
+import { Edit, Trash2, UserPlus, Check, X, Mail } from "lucide-react";
 import { useBulkInvites } from "@/hooks/useBulkInvites";
 
 interface TeamMembersToolbarProps {
@@ -12,7 +11,6 @@ interface TeamMembersToolbarProps {
   selectedMemberIds?: string[];
   onBulkDelete?: () => void;
   onAdd?: () => void;
-  onImportComplete?: () => void;
   onSaveAll?: () => void;
   onCancelEdit?: () => void;
   hasChanges?: boolean;
@@ -26,7 +24,6 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   selectedMemberIds = [],
   onBulkDelete,
   onAdd,
-  onImportComplete,
   onSaveAll,
   onCancelEdit,
   hasChanges,
@@ -48,20 +45,6 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
           <UserPlus className="h-4 w-4 mr-1" />
           Add Member
         </Button>
-      )}
-      {!editMode && (
-        <ExcelImportDialog 
-          onImportComplete={onImportComplete}
-          trigger={
-            <Button 
-              variant="outline" 
-              size="sm"
-            >
-              <Upload className="h-4 w-4 mr-1" />
-              Import
-            </Button>
-          }
-        />
       )}
       {!editMode ? (
         <Button 
