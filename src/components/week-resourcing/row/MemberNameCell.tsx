@@ -38,9 +38,9 @@ export const MemberNameCell: React.FC<MemberNameCellProps> = ({ member }) => {
   return (
     <TableCell className="sticky-column sticky-left-0 border-r font-medium py-1 text-center w-[150px]">
       <div className="flex items-center gap-2 justify-center">
-        <Avatar className="h-8 w-8">
+        <Avatar className="h-[45px] w-[45px]">
           <AvatarImage src={getAvatarUrl()} alt={getMemberName()} />
-          <AvatarFallback className="bg-gradient-modern text-white text-xs">
+          <AvatarFallback className="bg-gradient-modern text-white text-sm">
             {getUserInitials()}
           </AvatarFallback>
         </Avatar>
