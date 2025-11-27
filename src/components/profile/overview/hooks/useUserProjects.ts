@@ -23,7 +23,7 @@ export const useUserProjects = (userId: string | undefined) => {
           )
         `)
         .eq('resource_id', userId)
-        .eq('resource_type', 'active')
+        .in('resource_type', ['active', 'pre_registered'])
         .order('week_start_date', { ascending: false });
 
       if (error) throw error;
