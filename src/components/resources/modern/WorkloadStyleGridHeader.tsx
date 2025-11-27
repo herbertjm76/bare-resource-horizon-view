@@ -61,7 +61,10 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                 fontWeight: '600',
                 height: '80px',
                 position: 'relative',
-                overflow: 'visible'
+                overflow: 'visible',
+                ...(day.isPreviousWeek && {
+                  opacity: 0.4
+                })
               }}
             >
               <div style={{ 
