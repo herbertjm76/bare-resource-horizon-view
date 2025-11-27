@@ -1,8 +1,35 @@
 
 import React, { useEffect } from 'react';
 
-const mobileStyles = `
+const responsiveStyles = `
 <style>
+  /* Tablet optimizations - 768px to 1024px */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .mobile-resource-table tbody tr {
+      height: 32px !important;
+    }
+    
+    .mobile-resource-table th,
+    .mobile-resource-table td {
+      font-size: 11px !important;
+      padding: 2px 4px !important;
+    }
+    
+    /* Hide project codes in headers on tablet */
+    .mobile-resource-table th[data-project-code] small,
+    .mobile-resource-table td[data-project-code] small {
+      display: none !important;
+    }
+    
+    /* Compact badges on tablet */
+    .mobile-resource-table [class*="badge"],
+    .mobile-resource-table [class*="Badge"] {
+      padding: 2px 6px !important;
+      font-size: 10px !important;
+      height: 18px !important;
+    }
+  }
+  
   /* Simple sticky positioning for mobile */
   @media (max-width: 768px) {
     .mobile-resource-table th:first-child,
@@ -56,7 +83,7 @@ export const CellStyles: React.FC = () => {
   useEffect(() => {
     if (typeof document !== 'undefined') {
       const styleElement = document.createElement('style');
-      styleElement.innerHTML = mobileStyles;
+      styleElement.innerHTML = responsiveStyles;
       document.head.appendChild(styleElement);
 
       return () => {

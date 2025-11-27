@@ -1,0 +1,114 @@
+
+/* Tablet Optimizations for Resource Tables */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* Compact Row View Tablet Optimizations */
+  .resource-table-row-compact {
+    height: 32px !important;
+    min-height: 32px !important;
+  }
+  
+  /* Smaller member names */
+  .resource-table-row-compact .name-column span[data-testid="compact-full-name"] {
+    font-size: 13px !important;
+  }
+  
+  /* More compact avatar */
+  .resource-table-row-compact .name-column .h-6.w-6 {
+    height: 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+  }
+  
+  /* Compact leave badges */
+  .compact-leave-badge {
+    padding: 2px 4px !important;
+    font-size: 9px !important;
+    height: 16px !important;
+    min-height: 16px !important;
+    line-height: 1 !important;
+  }
+  
+  /* Compact FTE badges - target StandardizedBadge */
+  .resource-table-row-compact [class*="badge"]:not(.compact-leave-badge) {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+    height: 18px !important;
+    min-height: 18px !important;
+  }
+  
+  /* Compact LongCapacityBar */
+  .resource-table-row-compact .w-full.relative {
+    min-width: 70px !important;
+    height: 18px !important;
+  }
+  
+  .resource-table-row-compact .w-full.relative > div {
+    height: 18px !important;
+  }
+  
+  .resource-table-row-compact .w-full.relative span {
+    font-size: 10px !important;
+  }
+  
+  /* Compact project count badge */
+  .resource-table-row-compact .count-column span {
+    width: 24px !important;
+    height: 22px !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+  }
+  
+  /* Compact project allocation cells */
+  .resource-table-row-compact .project-column span {
+    width: 24px !important;
+    height: 22px !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+  }
+  
+  /* Reduce cell padding */
+  .resource-table-row-compact > td {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+  }
+  
+  /* Hide project codes in tooltips on tablet */
+  .resource-table-compact [data-project-code] {
+    display: none !important;
+  }
+  
+  /* Make utilization column more compact */
+  .resource-table-row-compact .utilization-column {
+    width: 160px !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+  }
+  
+  /* Make leave column more compact */
+  .resource-table-row-compact .leave-column {
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+  }
+}
+
+/* Expanded Row View Tablet Optimizations */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .resource-table-expanded tbody tr {
+    height: 64px !important;
+  }
+  
+  .resource-table-expanded .name-column {
+    font-size: 13px !important;
+  }
+  
+  /* Compact badges in expanded view */
+  .resource-table-expanded [class*="badge"] {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+    height: 18px !important;
+  }
+}
+
