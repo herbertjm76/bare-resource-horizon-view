@@ -104,12 +104,40 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
     }
   };
 
-  const handleDeleteAllocation = (projectId: string) => {
-    setAllocations((prev) => {
-      const updated = { ...prev };
-      delete updated[projectId];
-      return updated;
-    });
+  const handleDeleteAllocation = async (projectId: string) => {
+    if (!company?.id) return;
+
+    try {
+      // Delete from database immediately
+      const { error } = await supabase
+        .from('project_resource_allocations')
+        .delete()
+        .eq('resource_id', member.id)
+        .eq('project_id', projectId)
+        .eq('week_start_date', weekStartDate)
+        .eq('resource_type', member.type);
+
+      if (error) throw error;
+
+      // Update local state
+      setAllocations((prev) => {
+        const updated = { ...prev };
+        delete updated[projectId];
+        return updated;
+      });
+
+      toast({
+        title: 'Deleted',
+        description: 'Allocation removed successfully',
+      });
+    } catch (error) {
+      console.error('Error deleting allocation:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete allocation',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleSave = async () => {
