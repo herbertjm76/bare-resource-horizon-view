@@ -1,0 +1,28 @@
+
+/* Tablet Optimizations for Weekly Rundown */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* Hide project codes in project lists */
+  .project-list-item .project-code[data-project-code] {
+    display: none !important;
+  }
+  
+  /* Make project names smaller and more compact */
+  .project-list-item .project-name {
+    font-size: 10px !important;
+    max-width: 120px !important;
+  }
+  
+  /* Make hour badges more compact */
+  .project-list-item .project-hours-badge {
+    padding: 1px 4px !important;
+    font-size: 8px !important;
+    height: 14px !important;
+    min-height: 14px !important;
+  }
+  
+  /* Reduce spacing in project list */
+  .project-list-item {
+    gap: 4px !important;
+  }
+}
