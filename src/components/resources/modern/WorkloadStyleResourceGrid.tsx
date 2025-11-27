@@ -4,6 +4,7 @@ import { WorkloadStyleGridHeader } from './WorkloadStyleGridHeader';
 import { WorkloadStyleProjectRow } from './WorkloadStyleProjectRow';
 import { DayInfo } from '../grid/types';
 import './workload-resource-grid.css';
+import './tablet-optimizations.css';
 
 interface WorkloadStyleResourceGridProps {
   projects: any[];
