@@ -30,7 +30,7 @@ export const useProjects = () => {
       console.log('Fetching projects data for company:', company.id);
       
       try {
-        // Select projects with deterministic ordering
+        // Select projects with deterministic, alphabetical ordering by name, then code
         const { data, error } = await supabase
           .from('projects')
           .select(`
@@ -48,7 +48,9 @@ export const useProjects = () => {
             office:offices(id, name, country)
           `)
           .eq('company_id', company.id)
-          .order('created_at', { ascending: true });   // <--- Added order here
+          .order('name', { ascending: true })
+          .order('code', { ascending: true })
+          .order('id', { ascending: true });
 
         if (error) {
           console.error('Error fetching projects:', error);
