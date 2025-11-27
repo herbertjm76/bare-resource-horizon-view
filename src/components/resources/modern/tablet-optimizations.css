@@ -8,13 +8,15 @@
     max-width: 140px !important;
   }
   
-  /* Hide project codes completely */
-  .workload-resource-row.project-header-row .project-code-badge {
+  /* Hide project codes completely (all locations) */
+  .workload-resource-row.project-header-row .project-code-badge,
+  .project-code-badge {
     display: none !important;
   }
   
-  /* Make FTE badge more compact */
-  .workload-resource-row.project-header-row .fte-badge {
+  /* Make FTE badge more compact (all locations) */
+  .workload-resource-row.project-header-row .fte-badge,
+  .fte-badge {
     padding: 1px 6px !important;
     font-size: 9px !important;
     height: 16px !important;
@@ -23,9 +25,20 @@
   }
   
   /* Make FTE badge icon smaller */
-  .workload-resource-row.project-header-row .fte-badge svg {
+  .workload-resource-row.project-header-row .fte-badge svg,
+  .fte-badge svg {
     width: 10px !important;
     height: 10px !important;
+  }
+}
+
+/* Extra-small screens: allow project names to wrap and shrink further */
+@media (max-width: 640px) {
+  .workload-resource-row.project-header-row h3 {
+    font-size: 10px !important;
+    max-width: 110px !important;
+    white-space: normal !important;
+    line-height: 1.2 !important;
   }
 }
 
