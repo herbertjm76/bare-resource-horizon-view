@@ -272,7 +272,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
 
       {/* Mobile layout: 2 rows as requested */}
       <div className="flex sm:hidden flex-col gap-2">
-        {/* Row 1: Month navigation + Period */}
+        {/* Row 1: Month navigation ONLY */}
         <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
@@ -314,13 +314,16 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
+        </div>
 
+        {/* Row 2: Period + Expand + Filter + Export */}
+        <div className="flex items-center gap-2">
           {/* Period selector */}
           <Select 
             value={periodToShow.toString()}
             onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
           >
-            <SelectTrigger className="w-[110px] h-9 shrink-0">
+            <SelectTrigger className="h-9 flex-1">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -331,10 +334,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
               ))}
             </SelectContent>
           </Select>
-        </div>
 
-        {/* Row 2: Expand + Filter + Export */}
-        <div className="flex items-center gap-2">
           {/* Expand/Collapse */}
           <Button
             variant="outline"
