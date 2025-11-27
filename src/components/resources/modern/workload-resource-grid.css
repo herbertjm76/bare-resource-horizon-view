@@ -32,6 +32,9 @@
 .center-aligned .workload-resource-table-wrapper {
   display: inline-block;
   min-width: min-content;
+  width: auto;
+  max-width: 100%;
+  overflow-x: visible;
 }
 
 /* Main Table */
