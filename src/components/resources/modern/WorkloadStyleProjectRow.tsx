@@ -83,11 +83,11 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
             verticalAlign: 'middle'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
-              className="w-6 h-6 p-0 border border-border bg-muted hover:bg-muted/80 text-foreground cursor-pointer relative z-30 pointer-events-auto"
+              className="w-6 h-6 p-0 border border-border bg-muted hover:bg-muted/80 text-foreground cursor-pointer relative z-30"
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleExpand();
@@ -95,31 +95,26 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
               disabled={isLoading}
             >
               {isExpanded ? (
-                <ChevronDown className="w-3 h-3 pointer-events-none" />
+                <ChevronDown className="w-3 h-3" />
               ) : (
-                <ChevronRight className="w-3 h-3 pointer-events-none" />
+                <ChevronRight className="w-3 h-3" />
               )}
             </Button>
             
-            <div style={{ flex: '1', minWidth: '0' }}>
+            <div className="flex-1 min-w-0">
               <h3 className="text-[15px] font-semibold text-foreground m-0 leading-tight overflow-hidden text-ellipsis whitespace-nowrap">
                 {project.name}
               </h3>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px', 
-                marginTop: '4px'
-              }}>
+              <div className="flex items-center gap-2 mt-1">
                 <Badge 
                   variant="default"
-                  className="gap-1 font-medium bg-primary text-primary-foreground"
+                  className="gap-1 font-medium bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   <Users className="w-3 h-3" />
                   {totalFTE.toFixed(1)} FTE
                 </Badge>
                 {project.code && (
-                  <span className="bg-muted text-foreground px-1.5 py-0.5 rounded text-[11px] font-medium">
+                  <span className="bg-muted text-muted-foreground px-1.5 py-0.5 rounded text-[11px] font-medium">
                     {project.code}
                   </span>
                 )}
