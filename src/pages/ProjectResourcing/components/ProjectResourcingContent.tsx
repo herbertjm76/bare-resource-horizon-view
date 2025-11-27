@@ -12,6 +12,7 @@ interface ProjectResourcingContentProps {
   selectedMonth: Date;
   searchTerm: string;
   sortBy: 'name' | 'code' | 'status' | 'created';
+  sortDirection: 'asc' | 'desc';
   filters: {
     office: string;
     country: string;
@@ -32,6 +33,7 @@ interface ProjectResourcingContentProps {
   onFilterChange: (key: string, value: string) => void;
   onPeriodChange: (period: number) => void;
   onSortChange: (value: 'name' | 'code' | 'status' | 'created') => void;
+  onSortDirectionToggle: () => void;
   onDisplayOptionChange: (option: string, value: boolean | string[]) => void;
   onClearFilters: () => void;
 }
@@ -41,6 +43,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   selectedMonth,
   searchTerm,
   sortBy,
+  sortDirection,
   filters,
   displayOptions,
   officeOptions,
@@ -52,11 +55,12 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onFilterChange,
   onPeriodChange,
   onSortChange,
+  onSortDirectionToggle,
   onDisplayOptionChange,
   onClearFilters
 }) => {
   // Fetch projects only for expand all functionality and total count
-  const { projects } = useProjects(sortBy);
+  const { projects } = useProjects(sortBy, sortDirection);
   const [expandedProjects, setExpandedProjects] = React.useState<string[]>([]);
   
   // Expand all projects
@@ -98,7 +102,9 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         periodToShow={filters.periodToShow}
         onPeriodChange={onPeriodChange}
         sortBy={sortBy}
+        sortDirection={sortDirection}
         onSortChange={onSortChange}
+        onSortDirectionToggle={onSortDirectionToggle}
         filters={filters}
         searchTerm={searchTerm}
         onFilterChange={onFilterChange}
@@ -122,12 +128,13 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
           startDate={selectedMonth}
           periodToShow={filters.periodToShow}
           sortBy={sortBy}
+          sortDirection={sortDirection}
           filters={combinedFilters}
           displayOptions={displayOptions}
           onExpandAll={expandAll}
           onCollapseAll={collapseAll}
           expandedProjects={expandedProjects}
-          totalProjects={totalProjects}
+          totalProjects={0}
           onToggleProjectExpand={handleToggleProjectExpand}
         />
       </div>

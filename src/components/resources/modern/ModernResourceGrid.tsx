@@ -11,6 +11,7 @@ interface ModernResourceGridProps {
   startDate: Date;
   periodToShow: number;
   sortBy?: 'name' | 'code' | 'status' | 'created';
+  sortDirection?: 'asc' | 'desc';
   filters: any;
   displayOptions: any;
   onExpandAll?: () => void;
@@ -24,6 +25,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   startDate,
   periodToShow,
   sortBy = 'created',
+  sortDirection = 'asc',
   filters,
   displayOptions,
   onExpandAll,
@@ -32,7 +34,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   totalProjects,
   onToggleProjectExpand
 }) => {
-  const { projects, isLoading: isLoadingProjects } = useProjects(sortBy);
+  const { projects, isLoading: isLoadingProjects } = useProjects(sortBy, sortDirection);
   const filteredProjects = useFilteredProjects(projects, filters);
   const days = useGridDays(startDate, periodToShow, displayOptions);
 

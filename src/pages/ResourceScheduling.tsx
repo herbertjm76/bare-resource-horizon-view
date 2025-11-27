@@ -23,12 +23,14 @@ const ResourceScheduling = () => {
     filters,
     displayOptions,
     sortBy,
+    sortDirection,
     handleFilterChange,
     handlePeriodChange,
     handleDisplayOptionChange,
     handleSearchChange: handleProjectSearchChange,
     handleMonthChange,
     handleSortChange,
+    handleSortDirectionToggle,
     setFilters,
     setSearchTerm: setProjectSearchTerm,
     setDisplayOptions
@@ -119,6 +121,7 @@ const ResourceScheduling = () => {
                   selectedMonth={selectedMonth}
                   searchTerm={projectSearchTerm}
                   sortBy={sortBy}
+                  sortDirection={sortDirection}
                   filters={filters}
                   displayOptions={displayOptions}
                   officeOptions={officeOptions}
@@ -130,6 +133,7 @@ const ResourceScheduling = () => {
                   onFilterChange={handleFilterChange}
                   onPeriodChange={handlePeriodChange}
                   onSortChange={handleSortChange}
+                  onSortDirectionToggle={handleSortDirectionToggle}
                   onDisplayOptionChange={handleDisplayOptionChange}
                   onClearFilters={clearProjectFilters}
                 />
