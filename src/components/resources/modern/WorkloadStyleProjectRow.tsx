@@ -35,6 +35,8 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
     getAllocationKey, 
     handleAllocationChange,
     handleAddResource,
+    handleDeleteResource,
+    checkResourceInOtherProjects,
     refreshResources 
   } = useProjectResources(project.id);
   
@@ -187,6 +189,11 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
           selectedDate={selectedDate}
           periodToShow={periodToShow}
           onAllocationChange={handleAllocationChange}
+          onDeleteResource={async (resourceId, globalDelete) => {
+            await handleDeleteResource(resourceId, globalDelete);
+            await refreshResources();
+          }}
+          onCheckOtherProjects={checkResourceInOtherProjects}
         />
       ))}
 
