@@ -176,7 +176,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   }
 
   return (
-    <div className="table-responsive-wrapper">
+    <div className="table-responsive-wrapper max-w-[1600px] mx-auto">
       {/* Resource Table - Header, filters, and metrics shown in parent */}
       {tableOrientation === 'per-person' ? (
         <NewResourceTable 
