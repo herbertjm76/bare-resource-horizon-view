@@ -110,8 +110,8 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                   variant="default"
                   className="gap-1 font-medium"
                   style={{
-                    backgroundColor: 'hsl(var(--primary))',
-                    color: 'hsl(var(--primary-foreground))'
+                    backgroundColor: 'hsl(var(--theme-primary))',
+                    color: 'hsl(0 0% 100%)'
                   }}
                 >
                   <Users className="w-3 h-3" />
