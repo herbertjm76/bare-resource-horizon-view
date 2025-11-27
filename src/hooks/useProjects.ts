@@ -10,7 +10,7 @@ type Project = Database['public']['Tables']['projects']['Row'];
 
 export type ProjectSortBy = 'name' | 'code' | 'status' | 'created';
 
-export const useProjects = (sortBy: ProjectSortBy = 'name') => {
+export const useProjects = (sortBy: ProjectSortBy = 'created') => {
   const { company, loading: companyLoading } = useCompany();
 
   useEffect(() => {

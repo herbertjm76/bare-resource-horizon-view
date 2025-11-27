@@ -23,7 +23,7 @@ interface ModernResourceGridProps {
 export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   startDate,
   periodToShow,
-  sortBy = 'name',
+  sortBy = 'created',
   filters,
   displayOptions,
   onExpandAll,

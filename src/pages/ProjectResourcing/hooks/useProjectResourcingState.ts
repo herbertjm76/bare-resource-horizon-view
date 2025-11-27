@@ -19,7 +19,7 @@ export const useProjectResourcingState = () => {
     periodToShow: 4, // Default is 1 month (4 weeks)
   });
 
-  const [sortBy, setSortBy] = useState<'name' | 'code' | 'status' | 'created'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'code' | 'status' | 'created'>('created');
   
   const [displayOptions, setDisplayOptions] = useState({
     showWeekends: false, // Default to not showing weekends
