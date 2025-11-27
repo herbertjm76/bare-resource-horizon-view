@@ -87,18 +87,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
             <Button
               variant="ghost"
               size="sm"
-              style={{ 
-                width: '24px', 
-                height: '24px', 
-                padding: '0',
-                border: '1px solid rgba(0, 0, 0, 0.2)',
-                backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                color: 'black',
-                cursor: 'pointer',
-                position: 'relative',
-                zIndex: 30,
-                pointerEvents: 'auto'
-              }}
+              className="w-6 h-6 p-0 border border-border bg-muted hover:bg-muted/80 text-foreground cursor-pointer relative z-30 pointer-events-auto"
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleExpand();
@@ -106,23 +95,14 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
               disabled={isLoading}
             >
               {isExpanded ? (
-                <ChevronDown style={{ width: '12px', height: '12px', color: 'black', pointerEvents: 'none' }} />
+                <ChevronDown className="w-3 h-3 pointer-events-none" />
               ) : (
-                <ChevronRight style={{ width: '12px', height: '12px', color: 'black', pointerEvents: 'none' }} />
+                <ChevronRight className="w-3 h-3 pointer-events-none" />
               )}
             </Button>
             
             <div style={{ flex: '1', minWidth: '0' }}>
-              <h3 style={{ 
-                fontSize: '15px', 
-                fontWeight: '600', 
-                color: 'black',
-                margin: '0',
-                lineHeight: '1.2',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }}>
+              <h3 className="text-[15px] font-semibold text-foreground m-0 leading-tight overflow-hidden text-ellipsis whitespace-nowrap">
                 {project.name}
               </h3>
               <div style={{ 
@@ -139,14 +119,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                   {totalFTE.toFixed(1)} FTE
                 </Badge>
                 {project.code && (
-                  <span style={{ 
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                    color: 'black',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    fontSize: '11px',
-                    fontWeight: '500'
-                  }}>
+                  <span className="bg-muted text-foreground px-1.5 py-0.5 rounded text-[11px] font-medium">
                     {project.code}
                   </span>
                 )}
