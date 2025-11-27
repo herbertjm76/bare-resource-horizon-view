@@ -60,7 +60,7 @@ export const useProjects = (sortBy: ProjectSortBy = 'created') => {
             query = query.order('status', { ascending: true }).order('name', { ascending: true });
             break;
           case 'created':
-            query = query.order('created_at', { ascending: false });
+            query = query.order('created_at', { ascending: true });
             break;
           case 'name':
           default:
