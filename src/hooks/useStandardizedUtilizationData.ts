@@ -79,35 +79,67 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers, time
             .in('member_id', teamMembers.map(m => m.id))
         ]);
 
+        // Calculate number of weeks in the time range
+        const millisecondsInWeek = 7 * 24 * 60 * 60 * 1000;
+        const startTime = timeRange ? timeRange.startDate.getTime() : new Date(queryStartDate).getTime();
+        const endTime = timeRange ? timeRange.endDate.getTime() : new Date(queryEndDate).getTime();
+        const numberOfWeeks = Math.max(1, Math.ceil((endTime - startTime) / millisecondsInWeek));
+        
+        console.log('📊 UTILIZATION CALCULATION:', {
+          queryStartDate,
+          queryEndDate,
+          numberOfWeeks,
+          timeRangeProvided: !!timeRange
+        });
+
         // Process the data safely
         const memberUtilizationData: MemberUtilizationData[] = teamMembers.map(member => {
-          // Calculate project hours
-          const projectHours = projectAllocationsData.status === 'fulfilled' && projectAllocationsData.value.data
+          // Calculate total project hours across all weeks
+          const totalProjectHours = projectAllocationsData.status === 'fulfilled' && projectAllocationsData.value.data
             ? projectAllocationsData.value.data
                 .filter(allocation => allocation.resource_id === member.id)
                 .reduce((sum, allocation) => sum + (allocation.hours || 0), 0)
             : 0;
 
-          // Calculate annual leave hours
-          const annualLeaveHours = annualLeaveData.status === 'fulfilled' && annualLeaveData.value.data
+          // Calculate average project hours per week
+          const projectHours = totalProjectHours / numberOfWeeks;
+
+          // Calculate total annual leave hours
+          const totalAnnualLeaveHours = annualLeaveData.status === 'fulfilled' && annualLeaveData.value.data
             ? annualLeaveData.value.data
                 .filter(leave => leave.member_id === member.id)
                 .reduce((sum, leave) => sum + (leave.hours || 0), 0)
             : 0;
+          
+          // Calculate average annual leave hours per week
+          const annualLeaveHours = totalAnnualLeaveHours / numberOfWeeks;
 
           // Calculate office holiday hours (8 hours per day for holidays affecting member's location)
-          const officeHolidayHours = holidaysData.status === 'fulfilled' && holidaysData.value.data
+          const totalOfficeHolidayHours = holidaysData.status === 'fulfilled' && holidaysData.value.data
             ? holidaysData.value.data
                 .filter(holiday => !holiday.location_id || holiday.location_id === member.location)
                 .length * 8
             : 0;
+          
+          // Calculate average office holiday hours per week
+          const officeHolidayHours = totalOfficeHolidayHours / numberOfWeeks;
 
-          // Calculate other leave hours
-          const otherLeaveHours = otherLeaveData.status === 'fulfilled' && otherLeaveData.value.data
+          // Calculate total other leave hours
+          const totalOtherLeaveHours = otherLeaveData.status === 'fulfilled' && otherLeaveData.value.data
             ? otherLeaveData.value.data
                 .filter(leave => leave.member_id === member.id)
                 .reduce((sum, leave) => sum + (leave.hours || 0), 0)
             : 0;
+          
+          // Calculate average other leave hours per week
+          const otherLeaveHours = totalOtherLeaveHours / numberOfWeeks;
+          
+          console.log(`📊 ${member.first_name} ${member.last_name}:`, {
+            totalProjectHours,
+            numberOfWeeks,
+            averageProjectHours: projectHours,
+            utilizationCalculatedFrom: 'average per week'
+          });
 
           return UtilizationCalculationService.calculateMemberUtilization(
             member,
