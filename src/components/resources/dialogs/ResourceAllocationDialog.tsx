@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { Search, Calendar, Clock } from 'lucide-react';
+import { Search, Calendar, Clock, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
@@ -102,6 +102,14 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
     if (!isNaN(value) && value >= 0) {
       setAllocations((prev) => ({ ...prev, [projectId]: value }));
     }
+  };
+
+  const handleDeleteAllocation = (projectId: string) => {
+    setAllocations((prev) => {
+      const updated = { ...prev };
+      delete updated[projectId];
+      return updated;
+    });
   };
 
   const handleSave = async () => {
@@ -212,7 +220,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                 {filteredProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="flex items-center gap-1.5 p-2 border border-border/60 rounded-lg hover:bg-accent/50 hover:border-border transition-all max-w-full overflow-hidden"
+                    className="flex items-center gap-1.5 p-2 border border-border/60 rounded-lg hover:bg-accent/50 hover:border-border transition-all max-w-full overflow-hidden group"
                   >
                     <div className="flex-[3] min-w-0 overflow-hidden">
                       <span
@@ -235,6 +243,16 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
                         className="w-full h-7 text-xs text-center font-semibold px-1"
                       />
                     </div>
+                    {allocations[project.id] > 0 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteAllocation(project.id)}
+                        className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-3 w-3 text-destructive" />
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
