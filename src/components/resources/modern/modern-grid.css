@@ -1,6 +1,8 @@
 
 /* Modern Resource Grid Styles - Clean Implementation with Sticky Columns */
 
+@import './tablet-optimizations.css';
+
 .resource-grid-container {
   width: 100%;
   max-width: 100%;

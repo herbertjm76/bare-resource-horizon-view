@@ -1,0 +1,28 @@
+/* Tablet Optimizations for Modern Resource Grid */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* Make project names smaller */
+  .workload-resource-row.project-header-row h3 {
+    font-size: 11px !important;
+  }
+  
+  /* Hide project codes */
+  .workload-resource-row.project-header-row .bg-muted.text-muted-foreground {
+    display: none !important;
+  }
+  
+  /* Make FTE badge more compact */
+  .workload-resource-row.project-header-row .gap-1.font-medium {
+    padding: 2px 6px !important;
+    font-size: 9px !important;
+    height: 18px !important;
+    min-height: 18px !important;
+    gap: 2px !important;
+  }
+  
+  /* Make FTE badge icon smaller */
+  .workload-resource-row.project-header-row .gap-1.font-medium svg {
+    width: 10px !important;
+    height: 10px !important;
+  }
+}
