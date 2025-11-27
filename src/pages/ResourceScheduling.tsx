@@ -67,41 +67,41 @@ const ResourceScheduling = () => {
         />
 
         {/* Tabs */}
-        <div className="bg-background border-b">
-          <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2">
+        <div className="bg-background border-b overflow-hidden">
+          <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 overflow-x-auto scrollbar-hide">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="w-full mb-2 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-4 gap-2 flex-nowrap rounded-none bg-transparent p-0">
+              <TabsList className="w-full mb-2 sm:grid sm:grid-cols-4 gap-1 sm:gap-2 flex flex-nowrap rounded-none bg-transparent p-0 min-w-max sm:min-w-0">
                 <TabsTrigger
                   value="by-project"
-                  className="flex items-center justify-center gap-2 min-w-max px-4 h-10"
+                  className="flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap px-3 sm:px-4 h-9 sm:h-10 text-xs sm:text-sm"
                 >
-                  <GanttChartSquare className="h-4 w-4" />
-                  <span className="font-medium text-sm">By Project</span>
+                  <GanttChartSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="font-medium">By Project</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="by-person"
-                  className="flex items-center justify-center gap-2 min-w-max px-4 h-10"
+                  className="flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap px-3 sm:px-4 h-9 sm:h-10 text-xs sm:text-sm"
                 >
-                  <Users className="h-4 w-4" />
-                  <span className="font-medium text-sm">By Person</span>
+                  <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="font-medium">By Person</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="timeline"
-                  className="flex items-center justify-center gap-2 min-w-max px-4 h-10"
+                  className="flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap px-3 sm:px-4 h-9 sm:h-10 text-xs sm:text-sm"
                   disabled
                 >
-                  <Calendar className="h-4 w-4" />
-                  <span className="font-medium text-sm">Timeline</span>
-                  <span className="ml-1 text-xs opacity-60 hidden md:inline">(Soon)</span>
+                  <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="font-medium">Timeline</span>
+                  <span className="ml-1 text-[10px] sm:text-xs opacity-60 hidden md:inline">(Soon)</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="capacity"
-                  className="flex items-center justify-center gap-2 min-w-max px-4 h-10"
+                  className="flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap px-3 sm:px-4 h-9 sm:h-10 text-xs sm:text-sm"
                   disabled
                 >
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="font-medium text-sm">Capacity</span>
-                  <span className="ml-1 text-xs opacity-60 hidden md:inline">(Soon)</span>
+                  <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="font-medium">Capacity</span>
+                  <span className="ml-1 text-[10px] sm:text-xs opacity-60 hidden md:inline">(Soon)</span>
                 </TabsTrigger>
               </TabsList>
 
