@@ -54,12 +54,8 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
       return total + resourceHours;
     }, 0);
     
-    // Calculate number of weeks in the period
-    const numberOfWeeks = days.length / 7;
-    // Calculate average hours per week
-    const averageWeeklyHours = numberOfWeeks > 0 ? totalHours / numberOfWeeks : 0;
-    // Convert to FTE (40 hours = 1 FTE)
-    return averageWeeklyHours / 40;
+    // Convert to FTE (40 hours = 1 FTE per week)
+    return totalHours / 40;
   }, [resources, days, projectAllocations, getAllocationKey]);
   
   return (
