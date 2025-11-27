@@ -1,6 +1,7 @@
 import React from 'react';
 import { DayInfo } from '../grid/types';
 import { format, isToday } from 'date-fns';
+import { ArrowDown } from 'lucide-react';
 
 interface PersonGridHeaderProps {
   days: DayInfo[];
@@ -72,6 +73,17 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                 height: '100%',
                 gap: '2px'
               }}>
+                {isTodayDay && (
+                  <ArrowDown 
+                    className="animate-bounce" 
+                    style={{ 
+                      width: '14px', 
+                      height: '14px', 
+                      color: '#10b981',
+                      marginBottom: '2px'
+                    }} 
+                  />
+                )}
                 {isNewMonth ? (
                   <>
                     <span style={{ 
@@ -79,7 +91,7 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                       fontWeight: '700', 
                       textTransform: 'uppercase', 
                       lineHeight: '1',
-                      color: '#fbbf24',
+                      color: isTodayDay ? '#10b981' : '#fbbf24',
                       marginBottom: '4px'
                     }}>
                       {format(day.date, 'MMM')}
@@ -97,14 +109,16 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                         opacity: '0.9', 
                         textTransform: 'uppercase', 
                         lineHeight: '1',
-                        fontWeight: '500'
+                        fontWeight: '500',
+                        color: isTodayDay ? '#10b981' : 'white'
                       }}>
                         {format(day.date, 'EEE').charAt(0)}
                       </span>
                       <span style={{ 
                         fontSize: '14px', 
                         fontWeight: '700', 
-                        lineHeight: '1'
+                        lineHeight: '1',
+                        color: isTodayDay ? '#10b981' : 'white'
                       }}>
                         {format(day.date, 'd')}
                       </span>
@@ -118,21 +132,23 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                     justifyContent: 'flex-end',
                     gap: '2px',
                     height: '100%',
-                    paddingTop: '16px'
+                    paddingTop: isTodayDay ? '0px' : '16px'
                   }}>
                     <span style={{ 
                       fontSize: '10px', 
                       opacity: '0.9', 
                       textTransform: 'uppercase', 
                       lineHeight: '1',
-                      fontWeight: '500'
+                      fontWeight: '500',
+                      color: isTodayDay ? '#10b981' : 'white'
                     }}>
                       {format(day.date, 'EEE').charAt(0)}
                     </span>
                     <span style={{ 
                       fontSize: '14px', 
                       fontWeight: '700', 
-                      lineHeight: '1'
+                      lineHeight: '1',
+                      color: isTodayDay ? '#10b981' : 'white'
                     }}>
                       {format(day.date, 'd')}
                     </span>
