@@ -20,6 +20,8 @@ export const useProjectResourcingState = () => {
   });
 
   const [sortBy, setSortBy] = useState<'name' | 'code' | 'status' | 'created'>('created');
+
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   
   const [displayOptions, setDisplayOptions] = useState({
     showWeekends: false, // Default to not showing weekends
@@ -132,6 +134,10 @@ export const useProjectResourcingState = () => {
     setSortBy(value);
   };
 
+  const handleSortDirectionToggle = () => {
+    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+  };
+
   return {
     selectedMonth,
     gridStartDate, // Add this new property for the grid
@@ -139,6 +145,7 @@ export const useProjectResourcingState = () => {
     filters,
     displayOptions,
     sortBy,
+    sortDirection,
     monthLabel,
     handleFilterChange,
     handlePeriodChange,
@@ -146,6 +153,7 @@ export const useProjectResourcingState = () => {
     handleSearchChange,
     handleMonthChange,
     handleSortChange,
+    handleSortDirectionToggle,
     setFilters,
     setSearchTerm,
     setDisplayOptions

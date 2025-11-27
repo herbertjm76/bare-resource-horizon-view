@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Calendar, ChevronLeft, ChevronRight, Filter, Expand, Shrink, Download } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Filter, Expand, Shrink, Download, ArrowUpDown } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -14,7 +14,9 @@ interface StreamlinedActionBarProps {
   periodToShow: number;
   onPeriodChange: (period: number) => void;
   sortBy: 'name' | 'code' | 'status' | 'created';
+  sortDirection: 'asc' | 'desc';
   onSortChange: (value: 'name' | 'code' | 'status' | 'created') => void;
+  onSortDirectionToggle: () => void;
   filters: {
     office: string;
     country: string;
@@ -47,7 +49,9 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
   periodToShow,
   onPeriodChange,
   sortBy,
+  sortDirection,
   onSortChange,
+  onSortDirectionToggle,
   filters,
   searchTerm,
   onFilterChange,
@@ -183,6 +187,17 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
             ))}
           </SelectContent>
         </Select>
+
+        {/* Sort direction toggle */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onSortDirectionToggle}
+          className="h-8 w-8 p-0"
+          title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
+        >
+          <ArrowUpDown className={`h-3.5 w-3.5 transition-transform ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
+        </Button>
 
         {/* Divider */}
         <div className="h-6 w-px bg-border" />

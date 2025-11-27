@@ -10,7 +10,7 @@ type Project = Database['public']['Tables']['projects']['Row'];
 
 export type ProjectSortBy = 'name' | 'code' | 'status' | 'created';
 
-export const useProjects = (sortBy: ProjectSortBy = 'created') => {
+export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'asc' | 'desc' = 'asc') => {
   const { company, loading: companyLoading } = useCompany();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export const useProjects = (sortBy: ProjectSortBy = 'created') => {
   }, [company, companyLoading]);
   
   const { data: projects, isLoading, error, refetch } = useQuery({
-    queryKey: ['projects', company?.id, sortBy],
+    queryKey: ['projects', company?.id, sortBy, sortDirection],
     queryFn: async () => {
       if (!company) {
         console.log('No company available, cannot fetch projects');
@@ -52,19 +52,21 @@ export const useProjects = (sortBy: ProjectSortBy = 'created') => {
           .eq('company_id', company.id);
 
         // Apply sorting based on sortBy parameter
+        const ascending = sortDirection === 'asc';
+        
         switch (sortBy) {
           case 'code':
-            query = query.order('code', { ascending: true }).order('name', { ascending: true });
+            query = query.order('code', { ascending }).order('name', { ascending });
             break;
           case 'status':
-            query = query.order('status', { ascending: true }).order('name', { ascending: true });
+            query = query.order('status', { ascending }).order('name', { ascending });
             break;
           case 'created':
-            query = query.order('created_at', { ascending: true });
+            query = query.order('created_at', { ascending });
             break;
           case 'name':
           default:
-            query = query.order('name', { ascending: true }).order('code', { ascending: true });
+            query = query.order('name', { ascending }).order('code', { ascending });
             break;
         }
         
