@@ -13,11 +13,13 @@ const ProjectResourcing = () => {
     searchTerm,
     filters,
     displayOptions,
+    sortBy,
     handleFilterChange,
     handlePeriodChange,
     handleDisplayOptionChange,
     handleSearchChange,
     handleMonthChange,
+    handleSortChange,
     setFilters,
     setSearchTerm,
     setDisplayOptions
@@ -46,6 +48,7 @@ const ProjectResourcing = () => {
         <ProjectResourcingContent
           selectedMonth={selectedMonth}
           searchTerm={searchTerm}
+          sortBy={sortBy}
           filters={filters}
           displayOptions={displayOptions}
           officeOptions={officeOptions}
@@ -56,6 +59,7 @@ const ProjectResourcing = () => {
           onSearchChange={handleSearchChange}
           onFilterChange={handleFilterChange}
           onPeriodChange={handlePeriodChange}
+          onSortChange={handleSortChange}
           onDisplayOptionChange={handleDisplayOptionChange}
           onClearFilters={clearFilters}
         />

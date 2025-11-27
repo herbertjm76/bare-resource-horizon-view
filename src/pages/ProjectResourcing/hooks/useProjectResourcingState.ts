@@ -18,6 +18,8 @@ export const useProjectResourcingState = () => {
     manager: "all",
     periodToShow: 4, // Default is 1 month (4 weeks)
   });
+
+  const [sortBy, setSortBy] = useState<'name' | 'code' | 'status' | 'created'>('name');
   
   const [displayOptions, setDisplayOptions] = useState({
     showWeekends: false, // Default to not showing weekends
@@ -126,18 +128,24 @@ export const useProjectResourcingState = () => {
     return format(selectedMonth, 'MMMM yyyy');
   }, [selectedMonth]);
 
+  const handleSortChange = (value: 'name' | 'code' | 'status' | 'created') => {
+    setSortBy(value);
+  };
+
   return {
     selectedMonth,
     gridStartDate, // Add this new property for the grid
     searchTerm,
     filters,
     displayOptions,
+    sortBy,
     monthLabel,
     handleFilterChange,
     handlePeriodChange,
     handleDisplayOptionChange,
     handleSearchChange,
     handleMonthChange,
+    handleSortChange,
     setFilters,
     setSearchTerm,
     setDisplayOptions
