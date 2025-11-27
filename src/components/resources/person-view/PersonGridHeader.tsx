@@ -78,7 +78,7 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                     height: '0', 
                     borderLeft: '6px solid transparent',
                     borderRight: '6px solid transparent',
-                    borderTop: '8px solid #ef4444',
+                    borderTop: '8px solid #000000',
                     marginBottom: '4px'
                   }} />
                 )}
@@ -89,7 +89,7 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                       fontWeight: '700', 
                       textTransform: 'uppercase', 
                       lineHeight: '1',
-                      color: isTodayDay ? '#ef4444' : '#fbbf24',
+                      color: isTodayDay ? '#000000' : '#fbbf24',
                       marginBottom: '4px'
                     }}>
                       {format(day.date, 'MMM')}
@@ -108,7 +108,7 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                         textTransform: 'uppercase', 
                         lineHeight: '1',
                         fontWeight: '500',
-                        color: isTodayDay ? '#ef4444' : 'white'
+                        color: isTodayDay ? '#000000' : 'white'
                       }}>
                         {format(day.date, 'EEE').charAt(0)}
                       </span>
@@ -116,7 +116,7 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                         fontSize: '14px', 
                         fontWeight: '700', 
                         lineHeight: '1',
-                        color: isTodayDay ? '#ef4444' : 'white'
+                        color: isTodayDay ? '#000000' : 'white'
                       }}>
                         {format(day.date, 'd')}
                       </span>
@@ -138,7 +138,7 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                       textTransform: 'uppercase', 
                       lineHeight: '1',
                       fontWeight: '500',
-                      color: isTodayDay ? '#ef4444' : 'white'
+                      color: isTodayDay ? '#000000' : 'white'
                     }}>
                       {format(day.date, 'EEE').charAt(0)}
                     </span>
@@ -146,7 +146,7 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ days }) => {
                       fontSize: '14px', 
                       fontWeight: '700', 
                       lineHeight: '1',
-                      color: isTodayDay ? '#ef4444' : 'white'
+                      color: isTodayDay ? '#000000' : 'white'
                     }}>
                       {format(day.date, 'd')}
                     </span>
