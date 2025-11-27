@@ -102,54 +102,58 @@ const ResourceScheduling = () => {
               </TabsList>
 
           <TabsContent value="by-project" className="mt-0 py-3">
-            {/* Available Members Row */}
-            <div className="px-3 sm:px-6 mb-3">
-              <AvailableMembersRow
-                weekStartDate={weekStartDate}
-                threshold={80}
-              />
-            </div>
-            
-            <div className="overflow-x-auto">
-              <div className="px-3 sm:px-6">
-                <ProjectResourcingContent
-                selectedMonth={selectedMonth}
-                searchTerm={projectSearchTerm}
-                filters={filters}
-                displayOptions={displayOptions}
-                officeOptions={officeOptions}
-                countryOptions={countryOptions}
-                managers={managers}
-                activeFiltersCount={activeFiltersCount}
-                onMonthChange={handleMonthChange}
-                onSearchChange={handleProjectSearchChange}
-                onFilterChange={handleFilterChange}
-                onPeriodChange={handlePeriodChange}
-                onDisplayOptionChange={handleDisplayOptionChange}
-                onClearFilters={clearProjectFilters}
-              />
+            <div className="max-w-[1600px] mx-auto">
+              {/* Available Members Row */}
+              <div className="px-3 sm:px-6 mb-3">
+                <AvailableMembersRow
+                  weekStartDate={weekStartDate}
+                  threshold={80}
+                />
+              </div>
+              
+              <div className="overflow-x-auto">
+                <div className="px-3 sm:px-6">
+                  <ProjectResourcingContent
+                  selectedMonth={selectedMonth}
+                  searchTerm={projectSearchTerm}
+                  filters={filters}
+                  displayOptions={displayOptions}
+                  officeOptions={officeOptions}
+                  countryOptions={countryOptions}
+                  managers={managers}
+                  activeFiltersCount={activeFiltersCount}
+                  onMonthChange={handleMonthChange}
+                  onSearchChange={handleProjectSearchChange}
+                  onFilterChange={handleFilterChange}
+                  onPeriodChange={handlePeriodChange}
+                  onDisplayOptionChange={handleDisplayOptionChange}
+                  onClearFilters={clearProjectFilters}
+                />
+                </div>
               </div>
             </div>
           </TabsContent>
 
           <TabsContent value="by-person" className="mt-0 py-3">
-            {/* Available Members Row */}
-            <div className="px-3 sm:px-6 mb-3">
-              <AvailableMembersRow
-                weekStartDate={weekStartDate}
-                threshold={80}
-              />
-            </div>
-            
-            <div className="overflow-x-auto">
-              <div className="px-3 sm:px-6">
-                <PersonResourceView
-                startDate={selectedMonth}
-                periodToShow={filters.periodToShow}
-                displayOptions={displayOptions}
-                onMonthChange={handleMonthChange}
-                onPeriodChange={handlePeriodChange}
-              />
+            <div className="max-w-[1600px] mx-auto">
+              {/* Available Members Row */}
+              <div className="px-3 sm:px-6 mb-3">
+                <AvailableMembersRow
+                  weekStartDate={weekStartDate}
+                  threshold={80}
+                />
+              </div>
+              
+              <div className="overflow-x-auto">
+                <div className="px-3 sm:px-6">
+                  <PersonResourceView
+                  startDate={selectedMonth}
+                  periodToShow={filters.periodToShow}
+                  displayOptions={displayOptions}
+                  onMonthChange={handleMonthChange}
+                  onPeriodChange={handlePeriodChange}
+                />
+                </div>
               </div>
             </div>
           </TabsContent>
