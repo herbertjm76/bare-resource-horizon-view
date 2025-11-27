@@ -4,6 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { DayInfo } from '../grid/types';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
+import { ResourceActions } from '../components/ResourceActions';
 
 interface WorkloadStyleResourceRowProps {
   resource: any;
@@ -12,6 +13,8 @@ interface WorkloadStyleResourceRowProps {
   isEven: boolean;
   resourceIndex: number;
   onAllocationChange?: (resourceId: string, dayKey: string, hours: number) => void;
+  onDeleteResource?: (resourceId: string, globalDelete?: boolean) => void;
+  onCheckOtherProjects?: (resourceId: string, resourceType: 'active' | 'pre_registered') => Promise<{ hasOtherAllocations: boolean; projectCount: number; }>;
   selectedDate?: Date;
   periodToShow?: number;
 }
@@ -23,6 +26,8 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   isEven,
   resourceIndex,
   onAllocationChange,
+  onDeleteResource,
+  onCheckOtherProjects,
   selectedDate,
   periodToShow
 }) => {
@@ -94,6 +99,9 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     [days]
   );
 
+  // Calculate total allocated hours for this resource
+  const totalAllocatedHours = Object.values(allocations).reduce((sum, hours) => sum + hours, 0);
+
   return (
     <>
       <ResourceAllocationDialog
@@ -109,7 +117,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         weekStartDate={weekStartDate}
         compact={false}
       />
-      <tr className="workload-resource-row resource-row">
+      <tr className="workload-resource-row resource-row group">
       {/* Resource info column - Fixed width, sticky */}
       <td 
         className="workload-resource-cell project-resource-column cursor-pointer hover:bg-muted/50"
@@ -129,25 +137,39 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         }}
         onClick={() => setDialogOpen(true)}
       >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgb(111, 75, 246)' }}>
-              <AvatarImage src={resource.avatar_url} alt={displayName} />
-              <AvatarFallback className="bg-gradient-modern text-white">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div style={{ flex: '1', minWidth: '0' }}>
-              <span style={{ 
-                fontSize: '13px',
-                fontWeight: '400',
-                color: 'hsl(var(--muted-foreground))',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }}>
-                {displayName}
-              </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
+              <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgb(111, 75, 246)' }}>
+                <AvatarImage src={resource.avatar_url} alt={displayName} />
+                <AvatarFallback className="bg-gradient-modern text-white">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div style={{ flex: '1', minWidth: '0' }}>
+                <span style={{ 
+                  fontSize: '13px',
+                  fontWeight: '400',
+                  color: 'hsl(var(--muted-foreground))',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {displayName}
+                </span>
+              </div>
             </div>
+            {onDeleteResource && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <ResourceActions
+                  resourceId={resource.id}
+                  resourceName={displayName}
+                  resourceType={resource.isPending ? 'pre_registered' : 'active'}
+                  totalAllocatedHours={totalAllocatedHours}
+                  onDeleteResource={onDeleteResource}
+                  onCheckOtherProjects={onCheckOtherProjects}
+                />
+              </div>
+            )}
           </div>
       </td>
       
