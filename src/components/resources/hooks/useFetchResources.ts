@@ -29,7 +29,7 @@ export const useFetchResources = (projectId: string) => {
           id, 
           hours,
           staff_id,
-          staff:profiles(id, first_name, last_name, job_title, avatar_url)
+          profiles!project_resources_staff_id_fkey(id, first_name, last_name, job_title, avatar_url)
         `)
         .eq('project_id', projectId)
         .eq('company_id', company.id);
@@ -49,7 +49,7 @@ export const useFetchResources = (projectId: string) => {
           id,
           hours,
           invite_id,
-          invite:invites(id, first_name, last_name, job_title)
+          invites!pending_resources_invite_id_fkey(id, first_name, last_name, job_title)
         `)
         .eq('project_id', projectId)
         .eq('company_id', company.id);
@@ -63,24 +63,30 @@ export const useFetchResources = (projectId: string) => {
       console.log('DEBUG useFetchResources - Pre-registered members count:', preRegisteredMembers?.length || 0);
       
       // Format the results to match our Resource interface
-      const activeResources: Resource[] = (activeMembers || []).map(member => ({
-        id: member.staff_id,
-        name: `${member.staff?.first_name || ''} ${member.staff?.last_name || ''}`.trim() || 'Unnamed',
-        role: member.staff?.job_title || 'Team Member',
-        isPending: false,
-        avatar_url: member.staff?.avatar_url,
-        first_name: member.staff?.first_name,
-        last_name: member.staff?.last_name,
-      }));
+      const activeResources: Resource[] = (activeMembers || []).map(member => {
+        const profile = member.profiles as any;
+        return {
+          id: member.staff_id,
+          name: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Unnamed',
+          role: profile?.job_title || 'Team Member',
+          isPending: false,
+          avatar_url: profile?.avatar_url,
+          first_name: profile?.first_name,
+          last_name: profile?.last_name,
+        };
+      });
       
-      const pendingResources: Resource[] = (preRegisteredMembers || []).map(member => ({
-        id: member.invite_id,
-        name: `${member.invite?.first_name || ''} ${member.invite?.last_name || ''}`.trim() || 'Unnamed',
-        role: member.invite?.job_title || 'Team Member',
-        isPending: true,
-        first_name: member.invite?.first_name,
-        last_name: member.invite?.last_name,
-      }));
+      const pendingResources: Resource[] = (preRegisteredMembers || []).map(member => {
+        const invite = member.invites as any;
+        return {
+          id: member.invite_id,
+          name: `${invite?.first_name || ''} ${invite?.last_name || ''}`.trim() || 'Unnamed',
+          role: invite?.job_title || 'Team Member',
+          isPending: true,
+          first_name: invite?.first_name,
+          last_name: invite?.last_name,
+        };
+      });
       
       // Check for allocations that exist without corresponding resource entries
       const { data: orphanedAllocations, error: allocError } = await supabase
