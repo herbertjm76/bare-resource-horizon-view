@@ -139,8 +139,9 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
       const projectDetails = projects?.find(p => p.id === project.project_id);
       return {
         projectId: project.project_id,
-        projectName: projectDetails?.name || 'Unknown Project',
-        projectCode: projectDetails?.code || 'UNK',
+        // Prefer full project record, fall back to allocation's own name/code, then generic label
+        projectName: projectDetails?.name || project.project_name || 'Unknown Project',
+        projectCode: projectDetails?.code || project.project_code || 'UNK',
         hours: project.total_hours
       };
     }) || [];
