@@ -316,7 +316,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
           </Button>
         </div>
 
-        {/* Row 2: Period + Expand + Filter + Export */}
+        {/* Row 2: Period + Expand + Filter */}
         <div className="flex items-center gap-2">
           {/* Period selector */}
           <Select 
@@ -353,7 +353,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
           {/* Filters */}
           <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 w-9 p-0 shrink-0">
+              <Button variant="outline" size="sm" className="h-9 w-9 p-0 shrink-0 relative">
                 <Filter className="h-4 w-4" />
                 {activeFiltersCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-white text-[10px] flex items-center justify-center font-bold">
@@ -389,14 +389,6 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
               Clear
             </Button>
           )}
-
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          {/* Export */}
-          <Button variant="outline" size="sm" className="h-9 w-9 p-0 shrink-0">
-            <Download className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     </div>
