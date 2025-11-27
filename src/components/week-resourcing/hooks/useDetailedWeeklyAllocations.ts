@@ -51,6 +51,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
           project_id,
           hours,
           week_start_date,
+          resource_type,
           projects!inner(
             id,
             name,
@@ -59,6 +60,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
         `)
         .eq('company_id', company.id)
         .in('resource_id', memberIds)
+        .in('resource_type', ['active', 'pre_registered'])
         .gte('week_start_date', weekStartDate)  // From Monday
         .lte('week_start_date', weekEndDate)    // To Sunday
         .gt('hours', 0);
