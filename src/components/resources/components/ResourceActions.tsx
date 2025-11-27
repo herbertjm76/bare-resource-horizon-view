@@ -8,6 +8,7 @@ interface ResourceActionsProps {
   resourceId: string;
   resourceName: string;
   resourceType: 'active' | 'pre_registered';
+  totalAllocatedHours: number;
   onDeleteResource: (resourceId: string, globalDelete?: boolean) => void;
   onCheckOtherProjects?: (resourceId: string, resourceType: 'active' | 'pre_registered') => Promise<{ hasOtherAllocations: boolean; projectCount: number; }>;
 }
@@ -16,6 +17,7 @@ export const ResourceActions: React.FC<ResourceActionsProps> = ({
   resourceId,
   resourceName,
   resourceType,
+  totalAllocatedHours,
   onDeleteResource,
   onCheckOtherProjects
 }) => {
@@ -23,6 +25,7 @@ export const ResourceActions: React.FC<ResourceActionsProps> = ({
   const [deleteDialogData, setDeleteDialogData] = useState({
     hasOtherAllocations: false,
     projectCount: 0,
+    totalHours: 0,
     isLoading: false
   });
 
@@ -35,6 +38,7 @@ export const ResourceActions: React.FC<ResourceActionsProps> = ({
         setDeleteDialogData({
           hasOtherAllocations: result.hasOtherAllocations,
           projectCount: result.projectCount,
+          totalHours: totalAllocatedHours,
           isLoading: false
         });
         setShowDeleteDialog(true);
@@ -45,8 +49,14 @@ export const ResourceActions: React.FC<ResourceActionsProps> = ({
         onDeleteResource(resourceId, false);
       }
     } else {
-      // Fallback if check function not provided
-      onDeleteResource(resourceId, false);
+      // Show dialog with hours info even without other project check
+      setDeleteDialogData({
+        hasOtherAllocations: false,
+        projectCount: 0,
+        totalHours: totalAllocatedHours,
+        isLoading: false
+      });
+      setShowDeleteDialog(true);
     }
   };
 
@@ -75,6 +85,7 @@ export const ResourceActions: React.FC<ResourceActionsProps> = ({
         resourceName={resourceName}
         hasOtherAllocations={deleteDialogData.hasOtherAllocations}
         projectCount={deleteDialogData.projectCount}
+        totalHours={deleteDialogData.totalHours}
         isLoading={deleteDialogData.isLoading}
       />
     </>
