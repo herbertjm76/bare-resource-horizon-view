@@ -18,9 +18,11 @@ export const ModernGridHeader: React.FC<ModernGridHeaderProps> = ({
 }) => {
   const getPeriodLabel = (period: number) => {
     switch (period) {
+      case 1: return '1 Week';
       case 4: return '1 Month';
       case 8: return '2 Months';
       case 12: return '3 Months';
+      case 16: return '4 Months';
       default: return `${period} Weeks`;
     }
   };
