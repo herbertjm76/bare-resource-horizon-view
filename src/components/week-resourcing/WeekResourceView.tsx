@@ -176,31 +176,33 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   }
 
   return (
-    <div className="table-responsive-wrapper max-w-[1600px] mx-auto">
-      {/* Resource Table - Header, filters, and metrics shown in parent */}
-      {tableOrientation === 'per-person' ? (
-        <NewResourceTable 
-          members={filteredMembers}
-          projects={projects}
-          allocationMap={allocationMap}
-          annualLeaveData={annualLeaveData}
-          holidaysData={holidaysData}
-          otherLeaveData={otherLeaveData}
-          getMemberTotal={getMemberTotal}
-          getProjectCount={getProjectCount}
-          getWeeklyLeave={getWeeklyLeave}
-          updateOtherLeave={updateOtherLeave}
-          viewMode={viewMode}
-          selectedWeek={selectedWeek}
-        />
-      ) : (
-        <ProjectRowTable
-          projects={projects}
-          members={filteredMembers}
-          allocationMap={allocationMap}
-          weekStartDate={format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd')}
-        />
-      )}
+    <div className="max-w-[1600px] mx-auto">
+      <div className="table-responsive-wrapper">
+        {/* Resource Table - Header, filters, and metrics shown in parent */}
+        {tableOrientation === 'per-person' ? (
+          <NewResourceTable 
+            members={filteredMembers}
+            projects={projects}
+            allocationMap={allocationMap}
+            annualLeaveData={annualLeaveData}
+            holidaysData={holidaysData}
+            otherLeaveData={otherLeaveData}
+            getMemberTotal={getMemberTotal}
+            getProjectCount={getProjectCount}
+            getWeeklyLeave={getWeeklyLeave}
+            updateOtherLeave={updateOtherLeave}
+            viewMode={viewMode}
+            selectedWeek={selectedWeek}
+          />
+        ) : (
+          <ProjectRowTable
+            projects={projects}
+            members={filteredMembers}
+            allocationMap={allocationMap}
+            weekStartDate={format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd')}
+          />
+        )}
+      </div>
     </div>
   );
 };
