@@ -1,5 +1,7 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { format, startOfWeek } from 'date-fns';
+
+const SORT_PREFERENCES_KEY = 'project-sort-preferences';
 
 export const useProjectResourcingState = () => {
   // Calculate the start of the current week (Monday)
@@ -7,6 +9,21 @@ export const useProjectResourcingState = () => {
     const today = new Date();
     return startOfWeek(today, { weekStartsOn: 1 }); // Start on Monday
   };
+
+  // Load sort preferences from localStorage
+  const loadSortPreferences = () => {
+    try {
+      const stored = localStorage.getItem(SORT_PREFERENCES_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.error('Error loading sort preferences:', error);
+    }
+    return { sortBy: 'created', sortDirection: 'asc' };
+  };
+
+  const initialPreferences = loadSortPreferences();
 
   // Use current week as the default view
   const [selectedMonth, setSelectedMonth] = useState<Date>(getCurrentWeekStart());
@@ -19,15 +36,25 @@ export const useProjectResourcingState = () => {
     periodToShow: 4, // Default is 1 month (4 weeks)
   });
 
-  const [sortBy, setSortBy] = useState<'name' | 'code' | 'status' | 'created'>('created');
+  const [sortBy, setSortBy] = useState<'name' | 'code' | 'status' | 'created'>(initialPreferences.sortBy);
 
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(initialPreferences.sortDirection);
   
   const [displayOptions, setDisplayOptions] = useState({
     showWeekends: false, // Default to not showing weekends
     selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'], // Default to weekdays only (Monday start)
     weekStartsOnSunday: false // Default: week starts on Monday
   });
+
+  // Save sort preferences to localStorage whenever they change
+  useEffect(() => {
+    try {
+      const preferences = { sortBy, sortDirection };
+      localStorage.setItem(SORT_PREFERENCES_KEY, JSON.stringify(preferences));
+    } catch (error) {
+      console.error('Error saving sort preferences:', error);
+    }
+  }, [sortBy, sortDirection]);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({
