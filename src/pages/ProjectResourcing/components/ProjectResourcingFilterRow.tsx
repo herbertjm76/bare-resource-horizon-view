@@ -74,8 +74,9 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
 
   const monthLabel = format(selectedDate, 'MMMM yyyy');
 
-  // Updated period options to 1, 2, and 3 months
+  // Updated period options to include 1 week, 1, 2, and 3 months
   const periodOptions = [
+    { value: '1', label: '1 Week' },
     { value: '4', label: '1 Month' },
     { value: '8', label: '2 Months' },
     { value: '12', label: '3 Months' }

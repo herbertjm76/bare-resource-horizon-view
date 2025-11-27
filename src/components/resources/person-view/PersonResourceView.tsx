@@ -87,6 +87,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   const monthLabel = format(startDate, 'MMM yyyy');
 
   const periodOptions = [
+    { value: '1', label: '1 Week' },
     { value: '4', label: '1 Month' },
     { value: '8', label: '2 Months' },
     { value: '12', label: '3 Months' },

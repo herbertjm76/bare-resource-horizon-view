@@ -20,9 +20,11 @@ export const StreamlinedProjectResourcingHeader: React.FC<StreamlinedProjectReso
   multiProjectResources
 }) => {
   const getPeriodLabel = (weeks: number): string => {
+    if (weeks === 1) return '1 Week';
     if (weeks === 4) return '1 Month';
     if (weeks === 8) return '2 Months';
     if (weeks === 12) return '3 Months';
+    if (weeks === 16) return '4 Months';
     return `${weeks} Weeks`;
   };
 
