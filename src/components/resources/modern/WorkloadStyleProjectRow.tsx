@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronRight, Users } from 'lucide-react';
 import { WorkloadStyleResourceRow } from './WorkloadStyleResourceRow';
 import { AddResourceRow } from '../components/AddResourceRow';
@@ -130,16 +131,13 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                 gap: '8px', 
                 marginTop: '4px'
               }}>
-                <span style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '4px',
-                  fontSize: '12px',
-                  color: 'black'
-                }}>
-                  <Users style={{ width: '12px', height: '12px', color: 'black' }} />
+                <Badge 
+                  variant="secondary"
+                  className="gap-1 font-medium"
+                >
+                  <Users className="w-3 h-3" />
                   {totalFTE.toFixed(1)} FTE
-                </span>
+                </Badge>
                 {project.code && (
                   <span style={{ 
                     backgroundColor: 'rgba(0, 0, 0, 0.1)',
