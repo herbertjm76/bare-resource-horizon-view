@@ -13,6 +13,8 @@ interface StreamlinedActionBarProps {
   onDateChange: (date: Date) => void;
   periodToShow: number;
   onPeriodChange: (period: number) => void;
+  sortBy: 'name' | 'code' | 'status' | 'created';
+  onSortChange: (value: 'name' | 'code' | 'status' | 'created') => void;
   filters: {
     office: string;
     country: string;
@@ -44,6 +46,8 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
   onDateChange,
   periodToShow,
   onPeriodChange,
+  sortBy,
+  onSortChange,
   filters,
   searchTerm,
   onFilterChange,
@@ -79,6 +83,13 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
     { value: '8', label: '2 Months' },
     { value: '12', label: '3 Months' },
     { value: '16', label: '4 Months' }
+  ];
+
+  const sortOptions = [
+    { value: 'name', label: 'Name' },
+    { value: 'code', label: 'Code' },
+    { value: 'status', label: 'Status' },
+    { value: 'created', label: 'Created Date' }
   ];
 
   const allExpanded = expandedProjects.length === totalProjects && totalProjects > 0;
@@ -151,6 +162,23 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
             {periodOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Sort selector */}
+        <Select 
+          value={sortBy}
+          onValueChange={onSortChange}
+        >
+          <SelectTrigger className="w-[140px] h-8">
+            <SelectValue placeholder="Sort by..." />
+          </SelectTrigger>
+          <SelectContent>
+            {sortOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                Sort: {option.label}
               </SelectItem>
             ))}
           </SelectContent>

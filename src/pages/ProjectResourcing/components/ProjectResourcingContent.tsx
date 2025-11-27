@@ -11,6 +11,7 @@ import { useProjectResourcingSummary } from '../hooks/useProjectResourcingSummar
 interface ProjectResourcingContentProps {
   selectedMonth: Date;
   searchTerm: string;
+  sortBy: 'name' | 'code' | 'status' | 'created';
   filters: {
     office: string;
     country: string;
@@ -30,6 +31,7 @@ interface ProjectResourcingContentProps {
   onSearchChange: (value: string) => void;
   onFilterChange: (key: string, value: string) => void;
   onPeriodChange: (period: number) => void;
+  onSortChange: (value: 'name' | 'code' | 'status' | 'created') => void;
   onDisplayOptionChange: (option: string, value: boolean | string[]) => void;
   onClearFilters: () => void;
 }
@@ -38,6 +40,7 @@ interface ProjectResourcingContentProps {
 const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   selectedMonth,
   searchTerm,
+  sortBy,
   filters,
   displayOptions,
   officeOptions,
@@ -48,10 +51,11 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onSearchChange,
   onFilterChange,
   onPeriodChange,
+  onSortChange,
   onDisplayOptionChange,
   onClearFilters
 }) => {
-  const { projects, isLoading } = useProjects();
+  const { projects, isLoading } = useProjects(sortBy);
   const { 
     availableThisMonth,
     multiProjectLoad, 
@@ -102,6 +106,8 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         onDateChange={onMonthChange}
         periodToShow={filters.periodToShow}
         onPeriodChange={onPeriodChange}
+        sortBy={sortBy}
+        onSortChange={onSortChange}
         filters={filters}
         searchTerm={searchTerm}
         onFilterChange={onFilterChange}

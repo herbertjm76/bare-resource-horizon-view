@@ -8,7 +8,9 @@ import type { Database } from '@/integrations/supabase/types';
 
 type Project = Database['public']['Tables']['projects']['Row'];
 
-export const useProjects = () => {
+export type ProjectSortBy = 'name' | 'code' | 'status' | 'created';
+
+export const useProjects = (sortBy: ProjectSortBy = 'name') => {
   const { company, loading: companyLoading } = useCompany();
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export const useProjects = () => {
   }, [company, companyLoading]);
   
   const { data: projects, isLoading, error, refetch } = useQuery({
-    queryKey: ['projects', company?.id],
+    queryKey: ['projects', company?.id, sortBy],
     queryFn: async () => {
       if (!company) {
         console.log('No company available, cannot fetch projects');
@@ -30,8 +32,8 @@ export const useProjects = () => {
       console.log('Fetching projects data for company:', company.id);
       
       try {
-        // Select projects with deterministic, alphabetical ordering by name, then code
-        const { data, error } = await supabase
+        // Select projects with deterministic ordering based on sortBy parameter
+        let query = supabase
           .from('projects')
           .select(`
             id,
@@ -47,10 +49,29 @@ export const useProjects = () => {
             project_manager:profiles(id, first_name, last_name, avatar_url),
             office:offices(id, name, country)
           `)
-          .eq('company_id', company.id)
-          .order('name', { ascending: true })
-          .order('code', { ascending: true })
-          .order('id', { ascending: true });
+          .eq('company_id', company.id);
+
+        // Apply sorting based on sortBy parameter
+        switch (sortBy) {
+          case 'code':
+            query = query.order('code', { ascending: true }).order('name', { ascending: true });
+            break;
+          case 'status':
+            query = query.order('status', { ascending: true }).order('name', { ascending: true });
+            break;
+          case 'created':
+            query = query.order('created_at', { ascending: false });
+            break;
+          case 'name':
+          default:
+            query = query.order('name', { ascending: true }).order('code', { ascending: true });
+            break;
+        }
+        
+        // Always add ID as final tie-breaker for stability
+        query = query.order('id', { ascending: true });
+
+        const { data, error } = await query;
 
         if (error) {
           console.error('Error fetching projects:', error);
