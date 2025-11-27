@@ -180,7 +180,11 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
                 padding: '2px',
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
                 borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
-                verticalAlign: 'middle'
+                verticalAlign: 'middle',
+                ...(day.isPreviousWeek && {
+                  backgroundColor: 'rgba(0, 0, 0, 0.03)',
+                  opacity: 0.5
+                })
               }}
             >
               <div style={{ 

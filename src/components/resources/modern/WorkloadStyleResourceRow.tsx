@@ -193,7 +193,11 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               padding: '2px',
               borderRight: '1px solid rgba(156, 163, 175, 0.6)',
               borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
-              verticalAlign: 'middle'
+              verticalAlign: 'middle',
+              ...(day.isPreviousWeek && {
+                backgroundColor: 'rgba(0, 0, 0, 0.03)',
+                opacity: 0.5
+              })
             }}
             tabIndex={-1}
             onClick={() => {
@@ -214,12 +218,13 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
               onFocus={(e) => e.target.select()}
               onKeyDown={(e) => handleKeyDown(e, dayKey, dayIndex)}
-              disabled={isLoading}
+              disabled={isLoading || day.isPreviousWeek}
               className={`
                 w-full h-full px-0 py-0 text-center border-0 bg-transparent
                 focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white
                 ${allocation > 0 ? 'font-medium text-primary' : 'text-muted-foreground'}
                 ${day.isWeekend ? 'bg-muted/20' : ''}
+                ${day.isPreviousWeek ? 'cursor-not-allowed' : ''}
               `}
               style={{
                 fontSize: '10px',

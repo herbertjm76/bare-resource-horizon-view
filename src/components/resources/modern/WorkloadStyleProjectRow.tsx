@@ -44,15 +44,17 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   
   const rowBgColor = isEven ? '#ffffff' : '#f9fafb';
   
-  // Calculate total FTE across all resources for visible days
+  // Calculate total FTE across all resources for visible days (excluding previous week)
   const totalFTE = React.useMemo(() => {
     const totalHours = resources.reduce((total, resource) => {
-      const resourceHours = days.reduce((sum, day) => {
-        const dayKey = day.date.toISOString().split('T')[0];
-        const allocationKey = getAllocationKey(resource.id, dayKey);
-        const hours = projectAllocations[allocationKey] || 0;
-        return sum + hours;
-      }, 0);
+      const resourceHours = days
+        .filter(day => !day.isPreviousWeek) // Exclude previous week from calculation
+        .reduce((sum, day) => {
+          const dayKey = day.date.toISOString().split('T')[0];
+          const allocationKey = getAllocationKey(resource.id, dayKey);
+          const hours = projectAllocations[allocationKey] || 0;
+          return sum + hours;
+        }, 0);
       return total + resourceHours;
     }, 0);
     
@@ -150,7 +152,11 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                 padding: '2px',
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
                 borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
-                verticalAlign: 'middle'
+                verticalAlign: 'middle',
+                ...(day.isPreviousWeek && {
+                  backgroundColor: 'rgba(0, 0, 0, 0.03)',
+                  opacity: 0.5
+                })
               }}
             >
               <div style={{ 

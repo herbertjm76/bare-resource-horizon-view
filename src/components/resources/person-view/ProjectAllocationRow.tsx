@@ -143,7 +143,10 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
               padding: '2px',
               borderRight: '1px solid rgba(229, 231, 235, 0.8)',
               borderBottom: '1px solid rgba(229, 231, 235, 0.8)',
-              verticalAlign: 'middle'
+              verticalAlign: 'middle',
+              ...(day.isPreviousWeek && {
+                opacity: 0.5
+              })
             }}
             tabIndex={-1}
             onClick={() => {
@@ -164,12 +167,13 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
               onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
               onFocus={(e) => e.target.select()}
               onKeyDown={(e) => handleKeyDown(e, dayKey, dayIndex)}
-              disabled={isLoading}
+              disabled={isLoading || day.isPreviousWeek}
               className={`
                 w-full h-full px-0 py-0 text-center border-0 bg-transparent
                 focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white
                 ${allocation > 0 ? 'font-medium text-primary' : 'text-muted-foreground'}
                 ${day.isWeekend ? 'bg-muted/20' : ''}
+                ${day.isPreviousWeek ? 'cursor-not-allowed' : ''}
               `}
               style={{
                 fontSize: '10px',

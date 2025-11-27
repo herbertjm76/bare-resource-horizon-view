@@ -68,12 +68,15 @@ export const useGridDays = (
       adjustedStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
     }
     
+    // Include previous week by starting 7 days earlier
+    const previousWeekStartDate = addDays(adjustedStartDate, -7);
+    
     // Convert periodToShow from weeks to days for eachDayOfInterval
     const daysToAdd = periodToShow * 7;
     const endDate = addDays(adjustedStartDate, daysToAdd - 1);
     
     let allDays = eachDayOfInterval({
-      start: adjustedStartDate,
+      start: previousWeekStartDate,
       end: endDate
     });
     
@@ -119,6 +122,9 @@ export const useGridDays = (
       const isEndOfWeek = isLastDayOfWeek || index === days.length - 1 || 
         (index < days.length - 1 && getDayOfWeek(days[index + 1], displayOptions.weekStartsOnSunday) === 0);
       
+      // Check if day is in the previous week
+      const isPreviousWeek = day < adjustedStartDate;
+      
       return {
         date: day,
         label: format(day, 'd'), // Day of month
@@ -127,7 +133,8 @@ export const useGridDays = (
         isWeekend: isWeekendDay(day, displayOptions.weekStartsOnSunday),
         isSunday: isSunday(day),
         isFirstOfMonth: day.getDate() === 1,
-        isEndOfWeek: isEndOfWeek
+        isEndOfWeek: isEndOfWeek,
+        isPreviousWeek: isPreviousWeek
       };
     });
   }, [
