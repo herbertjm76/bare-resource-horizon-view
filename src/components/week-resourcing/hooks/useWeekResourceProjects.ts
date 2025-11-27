@@ -31,7 +31,9 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
         query = query.eq('department', filters.department);
       }
       
-      const { data, error } = await query.order('code');
+      const { data, error } = await query
+        .order('code', { ascending: true })
+        .order('id', { ascending: true });
 
       if (error) {
         console.error('Error fetching projects:', error);
