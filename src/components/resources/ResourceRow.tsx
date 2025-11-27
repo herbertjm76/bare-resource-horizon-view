@@ -88,6 +88,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
       <ResourceInfo
         resource={resource}
         utilizationPercentage={utilizationPercentage}
+        totalAllocatedHours={totalAllocatedHours}
         rowBgClass={rowBgClass}
         onDeleteResource={onDeleteResource}
         onCheckOtherProjects={onCheckOtherProjects}

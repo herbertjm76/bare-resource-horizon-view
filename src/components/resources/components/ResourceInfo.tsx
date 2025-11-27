@@ -15,6 +15,7 @@ interface ResourceInfoProps {
     last_name?: string;
   };
   utilizationPercentage: number;
+  totalAllocatedHours: number;
   rowBgClass: string;
   onDeleteResource: (resourceId: string, globalDelete?: boolean) => void;
   onCheckOtherProjects?: (resourceId: string, resourceType: 'active' | 'pre_registered') => Promise<{ hasOtherAllocations: boolean; projectCount: number; }>;
@@ -23,6 +24,7 @@ interface ResourceInfoProps {
 export const ResourceInfo: React.FC<ResourceInfoProps> = ({
   resource,
   utilizationPercentage,
+  totalAllocatedHours,
   rowBgClass,
   onDeleteResource,
   onCheckOtherProjects
@@ -63,6 +65,7 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
             resourceId={resource.id}
             resourceName={displayName}
             resourceType={resource.isPending ? 'pre_registered' : 'active'}
+            totalAllocatedHours={totalAllocatedHours}
             onDeleteResource={onDeleteResource}
             onCheckOtherProjects={onCheckOtherProjects}
           />

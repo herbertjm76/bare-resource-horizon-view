@@ -19,6 +19,7 @@ interface ResourceDeleteDialogProps {
   resourceName: string;
   hasOtherAllocations: boolean;
   projectCount: number;
+  totalHours: number;
   isLoading?: boolean;
 }
 
@@ -29,6 +30,7 @@ export const ResourceDeleteDialog: React.FC<ResourceDeleteDialogProps> = ({
   resourceName,
   hasOtherAllocations,
   projectCount,
+  totalHours,
   isLoading = false
 }) => {
   const [deleteOption, setDeleteOption] = useState<'project' | 'global'>('project');
@@ -59,6 +61,22 @@ export const ResourceDeleteDialog: React.FC<ResourceDeleteDialogProps> = ({
           <p className="text-sm text-muted-foreground">
             You are about to remove <strong>{resourceName}</strong> from this project.
           </p>
+          
+          {totalHours > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="text-amber-800 font-medium">
+                    This resource has {totalHours} hours logged in this project
+                  </p>
+                  <p className="text-amber-700 mt-1">
+                    Removing this resource will also delete all logged hours.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           
           {hasOtherAllocations && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
