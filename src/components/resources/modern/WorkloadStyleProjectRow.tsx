@@ -132,8 +132,8 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                 marginTop: '4px'
               }}>
                 <Badge 
-                  variant="secondary"
-                  className="gap-1 font-medium"
+                  variant="default"
+                  className="gap-1 font-medium bg-primary text-primary-foreground"
                 >
                   <Users className="w-3 h-3" />
                   {totalFTE.toFixed(1)} FTE
