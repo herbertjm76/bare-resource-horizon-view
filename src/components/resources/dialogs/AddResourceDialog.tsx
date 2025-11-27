@@ -24,7 +24,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { useResourceOptions } from './useResourceOptions';
@@ -225,10 +225,23 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
               </Command>
             </div>
             {selectedResourcesData.length > 0 && (
-              <div className="text-sm text-muted-foreground mt-2">
-                Selected ({selectedResourcesData.length}): <span className="font-medium text-foreground">
-                  {selectedResourcesData.map(r => r.name).join(', ')}
-                </span>
+              <div className="mt-2 space-y-1">
+                <div className="text-sm text-muted-foreground">
+                  Selected ({selectedResourcesData.length}):
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedResourcesData.map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => toggleResourceSelection(r.id)}
+                      className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-background px-2.5 py-0.5 text-xs text-foreground hover:bg-accent hover:text-foreground transition-colors"
+                    >
+                      <span className="max-w-[140px] truncate" title={r.name}>{r.name}</span>
+                      <X className="h-3 w-3 text-muted-foreground" />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
