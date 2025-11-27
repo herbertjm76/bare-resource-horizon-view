@@ -2,7 +2,6 @@
 import React from 'react';
 import { DayInfo } from '../grid/types';
 import { format, isToday } from 'date-fns';
-import { ArrowDown } from 'lucide-react';
 
 interface WorkloadStyleGridHeaderProps {
   days: DayInfo[];
@@ -76,15 +75,14 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                 gap: '2px'
               }}>
                 {isTodayDay && (
-                  <ArrowDown 
-                    className="animate-bounce" 
-                    style={{ 
-                      width: '14px', 
-                      height: '14px', 
-                      color: '#10b981',
-                      marginBottom: '2px'
-                    }} 
-                  />
+                  <div style={{ 
+                    width: '0', 
+                    height: '0', 
+                    borderLeft: '6px solid transparent',
+                    borderRight: '6px solid transparent',
+                    borderTop: '8px solid #ef4444',
+                    marginBottom: '4px'
+                  }} />
                 )}
                 {isNewMonth ? (
                   <>
@@ -93,7 +91,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                       fontWeight: '700', 
                       textTransform: 'uppercase', 
                       lineHeight: '1',
-                      color: isTodayDay ? '#10b981' : '#fbbf24',
+                      color: isTodayDay ? '#ef4444' : '#fbbf24',
                       marginBottom: '4px'
                     }}>
                       {format(day.date, 'MMM')}
@@ -112,7 +110,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                         textTransform: 'uppercase', 
                         lineHeight: '1',
                         fontWeight: '500',
-                        color: isTodayDay ? '#10b981' : 'white'
+                        color: isTodayDay ? '#ef4444' : 'white'
                       }}>
                         {format(day.date, 'EEE').charAt(0)}
                       </span>
@@ -120,7 +118,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                         fontSize: '14px', 
                         fontWeight: '700', 
                         lineHeight: '1',
-                        color: isTodayDay ? '#10b981' : 'white'
+                        color: isTodayDay ? '#ef4444' : 'white'
                       }}>
                         {format(day.date, 'd')}
                       </span>
@@ -142,7 +140,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                       textTransform: 'uppercase', 
                       lineHeight: '1',
                       fontWeight: '500',
-                      color: isTodayDay ? '#10b981' : 'white'
+                      color: isTodayDay ? '#ef4444' : 'white'
                     }}>
                       {format(day.date, 'EEE').charAt(0)}
                     </span>
@@ -150,7 +148,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                       fontSize: '14px', 
                       fontWeight: '700', 
                       lineHeight: '1',
-                      color: isTodayDay ? '#10b981' : 'white'
+                      color: isTodayDay ? '#ef4444' : 'white'
                     }}>
                       {format(day.date, 'd')}
                     </span>
