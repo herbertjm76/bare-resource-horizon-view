@@ -41,6 +41,26 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   
   const rowBgColor = isEven ? '#ffffff' : '#f9fafb';
   
+  // Calculate total FTE across all resources for visible days
+  const totalFTE = React.useMemo(() => {
+    const totalHours = resources.reduce((total, resource) => {
+      const resourceHours = days.reduce((sum, day) => {
+        const dayKey = day.date.toISOString().split('T')[0];
+        const allocationKey = getAllocationKey(resource.id, dayKey);
+        const hours = projectAllocations[allocationKey] || 0;
+        return sum + hours;
+      }, 0);
+      return total + resourceHours;
+    }, 0);
+    
+    // Calculate number of weeks in the period
+    const numberOfWeeks = days.length / 7;
+    // Calculate average hours per week
+    const averageWeeklyHours = numberOfWeeks > 0 ? totalHours / numberOfWeeks : 0;
+    // Convert to FTE (40 hours = 1 FTE)
+    return averageWeeklyHours / 40;
+  }, [resources, days, projectAllocations, getAllocationKey]);
+  
   return (
     <>
       {/* Project Header Row */}
@@ -118,7 +138,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                   color: 'black'
                 }}>
                   <Users style={{ width: '12px', height: '12px', color: 'black' }} />
-                  {resources.length} resources
+                  {totalFTE.toFixed(1)} FTE
                 </span>
                 {project.code && (
                   <span style={{ 
