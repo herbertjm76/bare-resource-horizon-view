@@ -108,7 +108,11 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
               <div className="flex items-center gap-2 mt-1">
                 <Badge 
                   variant="default"
-                  className="gap-1 font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="gap-1 font-medium"
+                  style={{
+                    backgroundColor: 'hsl(var(--primary))',
+                    color: 'hsl(var(--primary-foreground))'
+                  }}
                 >
                   <Users className="w-3 h-3" />
                   {totalFTE.toFixed(1)} FTE
