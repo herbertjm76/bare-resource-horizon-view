@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Calendar, ChevronLeft, ChevronRight, Filter, Expand, Shrink, Download, Settings } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Filter, Expand, Shrink, Download } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -249,20 +249,14 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
           </Button>
         )}
 
-        {/* Spacer to push secondary actions to the right */}
+        {/* Spacer to push export to the right */}
         <div className="flex-1" />
 
-        {/* Secondary actions */}
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-8">
-            <Download className="h-3 w-3 mr-2" />
-            Export
-          </Button>
-          <Button variant="outline" size="sm" className="h-8">
-            <Settings className="h-3 w-3 mr-2" />
-            Settings
-          </Button>
-        </div>
+        {/* Export action */}
+        <Button variant="outline" size="sm" className="h-8">
+          <Download className="h-3 w-3 mr-2" />
+          Export
+        </Button>
       </div>
     </div>
   );

@@ -55,13 +55,8 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onDisplayOptionChange,
   onClearFilters
 }) => {
-  const { projects, isLoading } = useProjects(sortBy);
-  const { 
-    availableThisMonth,
-    multiProjectLoad, 
-    overloadedResources,
-    isLoading: isSummaryLoading 
-  } = useProjectResourcingSummary(selectedMonth, filters.periodToShow);
+  // Fetch projects only for expand all functionality and total count
+  const { projects } = useProjects(sortBy);
   const [expandedProjects, setExpandedProjects] = React.useState<string[]>([]);
   
   // Expand all projects
@@ -92,10 +87,6 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
     ...filters,
     searchTerm
   };
-
-  if (isLoading) {
-    return <GridLoadingState />;
-  }
 
   return (
     <div className="space-y-3">
@@ -130,6 +121,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         <ModernResourceGrid
           startDate={selectedMonth}
           periodToShow={filters.periodToShow}
+          sortBy={sortBy}
           filters={combinedFilters}
           displayOptions={displayOptions}
           onExpandAll={expandAll}

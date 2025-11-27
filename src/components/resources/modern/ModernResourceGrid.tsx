@@ -10,6 +10,7 @@ import { GridEmptyState } from '../grid/GridEmptyState';
 interface ModernResourceGridProps {
   startDate: Date;
   periodToShow: number;
+  sortBy?: 'name' | 'code' | 'status' | 'created';
   filters: any;
   displayOptions: any;
   onExpandAll?: () => void;
@@ -22,6 +23,7 @@ interface ModernResourceGridProps {
 export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   startDate,
   periodToShow,
+  sortBy = 'name',
   filters,
   displayOptions,
   onExpandAll,
@@ -30,7 +32,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   totalProjects,
   onToggleProjectExpand
 }) => {
-  const { projects, isLoading: isLoadingProjects } = useProjects();
+  const { projects, isLoading: isLoadingProjects } = useProjects(sortBy);
   const filteredProjects = useFilteredProjects(projects, filters);
   const days = useGridDays(startDate, periodToShow, displayOptions);
 
