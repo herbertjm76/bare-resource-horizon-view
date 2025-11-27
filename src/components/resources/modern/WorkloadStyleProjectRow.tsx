@@ -108,7 +108,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
               <div className="flex items-center gap-2 mt-1">
                 <Badge 
                   variant="default"
-                  className="gap-1 font-medium"
+                  className="gap-1 font-medium fte-badge"
                   style={{
                     backgroundColor: 'hsl(var(--theme-primary))',
                     color: 'hsl(0 0% 100%)'
@@ -118,7 +118,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                   {totalFTE.toFixed(1)} FTE
                 </Badge>
                 {project.code && (
-                  <span className="bg-muted text-muted-foreground px-1.5 py-0.5 rounded text-[11px] font-medium">
+                  <span className="bg-muted text-muted-foreground px-1.5 py-0.5 rounded text-[11px] font-medium project-code-badge">
                     {project.code}
                   </span>
                 )}
