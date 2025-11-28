@@ -38,12 +38,13 @@ export const fetchResourceAllocations = async (
     
     console.log(`🔍 ALLOCATION API: Retrieved ${data?.length || 0} allocation records`);
     
-    // Transform data into a week key -> hours mapping
+    // Transform data into a week key -> hours mapping, aggregating daily hours into weekly totals
     const allocationMap: Record<string, number> = {};
     data?.forEach(item => {
       const weekKey = formatDateKey(item.week_start_date);
-      allocationMap[weekKey] = item.hours;
-      console.log(`🔍 ALLOCATION API: Mapped ${item.week_start_date} -> ${weekKey}: ${item.hours}h`);
+      // Aggregate hours by week (sum up multiple allocations for the same week)
+      allocationMap[weekKey] = (allocationMap[weekKey] || 0) + item.hours;
+      console.log(`🔍 ALLOCATION API: Aggregating ${item.week_start_date} -> ${weekKey}: +${item.hours}h (total: ${allocationMap[weekKey]}h)`);
     });
     
     return allocationMap;
