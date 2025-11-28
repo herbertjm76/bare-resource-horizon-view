@@ -8,8 +8,9 @@ import { useProjects } from '@/hooks/useProjects';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
 import { useProjectResourcingSummary } from '../hooks/useProjectResourcingSummary';
 import { toast } from 'sonner';
-import { utils, writeFile } from 'xlsx';
 import { format } from 'date-fns';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 interface ProjectResourcingContentProps {
   selectedMonth: Date;
@@ -88,34 +89,108 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
     );
   };
 
-  // Export to Excel
+  // Export to PDF
   const handleExport = () => {
     setIsExporting(true);
     
     setTimeout(() => {
       try {
         // Get the table element from the grid
-        const table = document.querySelector('.workload-resource-table');
+        const table = document.querySelector('.workload-resource-table') as HTMLTableElement;
         
         if (!table) {
           toast.error('Could not find table data');
           setIsExporting(false);
           return;
         }
+
+        // Create new PDF document in A3 landscape orientation
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a3'
+        });
+
+        // Get company name or use default
+        const companyName = document.querySelector('.company-name')?.textContent || 'Team';
         
-        // Create worksheet from table
-        const ws = utils.table_to_sheet(table);
+        // Add header
+        pdf.setFontSize(16);
+        pdf.text(`${companyName} - Project Resourcing`, 14, 15);
         
-        // Create workbook and add worksheet
-        const wb = utils.book_new();
-        utils.book_append_sheet(wb, ws, 'Project Resourcing');
+        pdf.setFontSize(12);
+        const monthLabel = format(selectedMonth, 'MMMM yyyy');
+        pdf.text(monthLabel, 14, 22);
         
+        // Add timestamp
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`Generated on ${format(new Date(), 'MMMM d, yyyy h:mm a')}`, 14, 27);
+        pdf.setTextColor(0, 0, 0);
+
+        // Get table headers
+        const headerRow = table.querySelector('thead tr') as HTMLTableRowElement;
+        const headers: string[] = [];
+        if (headerRow) {
+          Array.from(headerRow.cells).forEach(cell => {
+            headers.push(cell.textContent?.trim() || '');
+          });
+        }
+
+        // Get table data
+        const tableBody = table.querySelector('tbody') as HTMLTableSectionElement;
+        const data: any[][] = [];
+        if (tableBody) {
+          Array.from(tableBody.rows).forEach(row => {
+            const rowData: any[] = [];
+            Array.from(row.cells).forEach(cell => {
+              const input = cell.querySelector('input');
+              if (input) {
+                rowData.push(input.value);
+              } else {
+                rowData.push(cell.textContent?.trim() || '');
+              }
+            });
+            data.push(rowData);
+          });
+        }
+
+        // Prepare the table configuration
+        (pdf as any).autoTable({
+          startY: 32,
+          head: [headers],
+          body: data,
+          theme: 'grid',
+          styles: {
+            fontSize: 7,
+            cellPadding: 2,
+          },
+          headStyles: {
+            fillColor: [110, 89, 165],
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            halign: 'center'
+          },
+          alternateRowStyles: {
+            fillColor: [245, 245, 250]
+          },
+          margin: { top: 30 },
+          didDrawPage: (data: any) => {
+            const pageCount = (pdf as any).internal.pages.length - 1;
+            pdf.setFontSize(8);
+            pdf.text(
+              `Page ${data.pageNumber} of ${pageCount}`,
+              (pdf as any).internal.pageSize.width - 20,
+              (pdf as any).internal.pageSize.height - 10
+            );
+          }
+        });
+
         // Generate file name
-        const monthLabel = format(selectedMonth, 'MMM_yyyy');
-        const fileName = `Project_Resourcing_${monthLabel}.xlsx`;
+        const fileName = `Project_Resourcing_${format(selectedMonth, 'MMM_yyyy')}.pdf`;
         
-        // Write file and trigger download
-        writeFile(wb, fileName);
+        // Save PDF
+        pdf.save(fileName);
         
         // Show success message
         toast.success('Export successful', { 
