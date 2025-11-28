@@ -13,7 +13,7 @@ export const useUserProjects = (userId: string | undefined) => {
         .select(`
           project_id,
           hours,
-          week_start_date,
+          allocation_date,
           projects (
             id,
             name,
@@ -24,7 +24,7 @@ export const useUserProjects = (userId: string | undefined) => {
         `)
         .eq('resource_id', userId)
         .in('resource_type', ['active', 'pre_registered'])
-        .order('week_start_date', { ascending: false });
+        .order('allocation_date', { ascending: false });
 
       if (error) throw error;
 
@@ -44,7 +44,7 @@ export const useUserProjects = (userId: string | undefined) => {
             contract_end_date: project.contract_end_date,
             current_stage: project.current_stage,
             total_hours: 0,
-            latest_week: allocation.week_start_date
+            latest_week: allocation.allocation_date
           });
         }
         

@@ -61,7 +61,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
         })
         .eq('resource_id', member.id)
         .eq('project_id', projectId)
-        .eq('week_start_date', weekStartDate)
+        .eq('allocation_date', weekStartDate)
         .select()
         .single();
 
@@ -87,7 +87,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
         .delete()
         .eq('resource_id', member.id)
         .eq('project_id', projectId)
-        .eq('week_start_date', weekStartDate);
+        .eq('allocation_date', weekStartDate);
 
       if (error) throw error;
     },

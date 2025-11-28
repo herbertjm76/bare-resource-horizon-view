@@ -14,7 +14,7 @@ export const calculatePlanningMetrics = (
 ) => {
   // Calculate planning metrics with null checks
   const futureWeeksData: FutureWeeksData = futureAllocations?.reduce((acc: FutureWeeksData, allocation) => {
-    const weekKey = allocation.week_start_date;
+    const weekKey = allocation.allocation_date;
     if (!acc[weekKey]) {
       acc[weekKey] = { total: 0, projects: [] };
     }

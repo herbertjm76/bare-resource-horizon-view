@@ -45,7 +45,7 @@ export const useBurnRateTracking = (projectId: string, stageId?: string) => {
       // Fetch resource allocations with amount calculations
       let allocationQuery = supabase
         .from('project_resource_allocations')
-        .select('hours, allocation_amount, week_start_date')
+        .select('hours, allocation_amount, allocation_date')
         .eq('project_id', projectId);
 
       if (stageId) {
@@ -62,7 +62,7 @@ export const useBurnRateTracking = (projectId: string, stageId?: string) => {
       const totalSpent = allocations?.reduce((sum, alloc) => sum + (alloc.allocation_amount || 0), 0) || 0;
 
       // Calculate burn rate (weekly average)
-      const weeksWithActivity = new Set(allocations?.map(a => a.week_start_date)).size || 1;
+      const weeksWithActivity = new Set(allocations?.map(a => a.allocation_date)).size || 1;
       const burnRate = totalSpent / weeksWithActivity;
 
       // Calculate budget runway

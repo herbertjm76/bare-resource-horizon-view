@@ -62,7 +62,7 @@ export const EditableTeamMemberAllocation: React.FC<EditableTeamMemberAllocation
         })
         .eq('resource_id', member.id)
         .eq('project_id', projectId)
-        .eq('week_start_date', weekStartDate)
+        .eq('allocation_date', weekStartDate)
         .select()
         .single();
 
@@ -88,7 +88,7 @@ export const EditableTeamMemberAllocation: React.FC<EditableTeamMemberAllocation
         .delete()
         .eq('resource_id', member.id)
         .eq('project_id', projectId)
-        .eq('week_start_date', weekStartDate);
+        .eq('allocation_date', weekStartDate);
 
       if (error) throw error;
     },

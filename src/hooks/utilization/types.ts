@@ -14,7 +14,7 @@ export interface UtilizationPeriod {
 export interface MemberAllocation {
   resource_id: string;
   hours: number;
-  week_start_date: string;
+  allocation_date: string;
   project_id: string;
   resource_type: string;
 }

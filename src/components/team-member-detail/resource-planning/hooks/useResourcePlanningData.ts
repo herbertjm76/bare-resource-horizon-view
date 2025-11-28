@@ -99,23 +99,23 @@ export const useResourcePlanningData = (memberId: string) => {
         const [futureResponse, historicalResponse] = await Promise.all([
           supabase
             .from('project_resource_allocations')
-            .select('hours, week_start_date, project:projects!inner(id, name)')
+            .select('hours, allocation_date, project:projects!inner(id, name)')
             .eq('resource_id', memberId)
             .eq('resource_type', 'active')
             .eq('company_id', company.id)
-            .gte('week_start_date', startDateFuture)
-            .lte('week_start_date', endDateFuture)
+            .gte('allocation_date', startDateFuture)
+            .lte('allocation_date', endDateFuture)
             .abortSignal(controller.signal)
             .limit(20),
             
           supabase
             .from('project_resource_allocations')
-            .select('hours, week_start_date')
+            .select('hours, allocation_date')
             .eq('resource_id', memberId)
             .eq('resource_type', 'active')
             .eq('company_id', company.id)
-            .gte('week_start_date', startDateHistory)
-            .lt('week_start_date', endDateHistory)
+            .gte('allocation_date', startDateHistory)
+            .lt('allocation_date', endDateHistory)
             .abortSignal(controller.signal)
             .limit(10),
         ]);

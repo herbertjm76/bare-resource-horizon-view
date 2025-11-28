@@ -27,10 +27,10 @@ export async function fetchPreciseDateAllocations(
         id,
         resource_id,
         hours,
-        week_start_date,
+        allocation_date,
         project:projects(id, name, code)
       `)
-      .or(`week_start_date.eq.${mondayKey},week_start_date.eq.${sundayKey}`)
+      .or(`allocation_date.eq.${mondayKey},allocation_date.eq.${sundayKey}`)
       .eq('company_id', companyId)
       .in('resource_id', memberIds);
     
@@ -69,11 +69,11 @@ export async function fetchDateRangeAllocations(
         id,
         resource_id,
         hours,
-        week_start_date,
+        allocation_date,
         project:projects(id, name, code)
       `)
-      .gte('week_start_date', startDateString)
-      .lte('week_start_date', endDateString)
+      .gte('allocation_date', startDateString)
+      .lte('allocation_date', endDateString)
       .eq('company_id', companyId)
       .in('resource_id', memberIds);
       
@@ -103,9 +103,9 @@ export async function fetchRecentAllocations(
     // First fetch recent dates
     const { data: dateData } = await supabase
       .from('project_resource_allocations')
-      .select('week_start_date')
+      .select('allocation_date')
       .eq('company_id', companyId)
-      .order('week_start_date', { ascending: false })
+      .order('allocation_date', { ascending: false })
       .limit(10);
       
     if (!dateData || dateData.length === 0) {
@@ -113,7 +113,7 @@ export async function fetchRecentAllocations(
     }
     
     // Get unique dates for debugging
-    const uniqueDates = [...new Set(dateData.map(item => item.week_start_date))];
+    const uniqueDates = [...new Set(dateData.map(item => item.allocation_date))];
     console.log('Recent allocation dates in DB:', uniqueDates);
     
     // Try fetching with the most recent date
@@ -126,10 +126,10 @@ export async function fetchRecentAllocations(
         id,
         resource_id,
         hours,
-        week_start_date,
+        allocation_date,
         project:projects(id, name, code)
       `)
-      .eq('week_start_date', latestDate)
+      .eq('allocation_date', latestDate)
       .eq('company_id', companyId)
       .in('resource_id', memberIds);
       

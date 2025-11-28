@@ -23,12 +23,12 @@ export const calculatePreRegisteredUtilizations = async (
   
   const { data: preRegAllocations, error: preRegError } = await supabase
     .from('project_resource_allocations')
-    .select('resource_id, hours, week_start_date, project_id, resource_type')
+    .select('resource_id, hours, allocation_date, project_id, resource_type')
     .eq('company_id', companyId)
     .eq('resource_type', 'pre_registered')
     .in('resource_id', preRegisteredIds)
-    .gte('week_start_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
-    .lte('week_start_date', format(currentWeekStart, 'yyyy-MM-dd'));
+    .gte('allocation_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
+    .lte('allocation_date', format(currentWeekStart, 'yyyy-MM-dd'));
 
   if (preRegError) throw preRegError;
 

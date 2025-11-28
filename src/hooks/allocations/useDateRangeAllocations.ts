@@ -77,7 +77,7 @@ export function useDateRangeAllocations({
         // Handle different types of changes
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newData = payload.new as ResourceAllocation;
-          const weekKey = formatDateKey(newData.week_start_date);
+          const weekKey = formatDateKey(newData.allocation_date);
           
           setAllocations(prev => ({
             ...prev,
@@ -86,7 +86,7 @@ export function useDateRangeAllocations({
         } 
         else if (payload.eventType === 'DELETE') {
           const oldData = payload.old as ResourceAllocation;
-          const weekKey = formatDateKey(oldData.week_start_date);
+          const weekKey = formatDateKey(oldData.allocation_date);
           
           setAllocations(prev => {
             const updated = { ...prev };

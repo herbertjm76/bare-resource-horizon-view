@@ -32,10 +32,10 @@ const TeamWorkload: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('project_resource_allocations')
-          .select('week_start_date')
+          .select('allocation_date')
           .eq('company_id', company.id)
           .gt('hours', 0)
-          .order('week_start_date', { ascending: false })
+          .order('allocation_date', { ascending: false })
           .limit(1)
           .maybeSingle();
 
@@ -45,8 +45,8 @@ const TeamWorkload: React.FC = () => {
           return;
         }
 
-        if (data?.week_start_date) {
-          const latestWeek = startOfWeek(new Date(data.week_start_date), { weekStartsOn: 1 });
+        if (data?.allocation_date) {
+          const latestWeek = startOfWeek(new Date(data.allocation_date), { weekStartsOn: 1 });
           const startWeek = subWeeks(latestWeek, Math.max(0, selectedWeeks - 1));
           setSelectedWeek(startWeek);
         }
