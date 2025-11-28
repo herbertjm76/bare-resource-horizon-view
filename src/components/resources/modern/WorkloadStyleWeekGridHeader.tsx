@@ -53,12 +53,15 @@ export const WorkloadStyleWeekGridHeader: React.FC<WorkloadStyleWeekGridHeaderPr
                 width: '80px', 
                 minWidth: '80px',
                 maxWidth: '80px',
-                backgroundColor: 'transparent',
+                backgroundColor: isCurrentWeek 
+                  ? 'linear-gradient(180deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%)'
+                  : 'transparent',
                 color: 'white',
                 textAlign: 'center',
                 padding: '6px 4px',
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
                 borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+                borderTop: isCurrentWeek ? '3px solid #10b981' : 'none',
                 fontSize: '11px',
                 fontWeight: '600',
                 height: '60px',
@@ -66,6 +69,9 @@ export const WorkloadStyleWeekGridHeader: React.FC<WorkloadStyleWeekGridHeaderPr
                 overflow: 'visible',
                 ...(week.isPreviousWeek && {
                   opacity: 0.4
+                }),
+                ...(isCurrentWeek && {
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                 })
               }}
             >
@@ -77,20 +83,35 @@ export const WorkloadStyleWeekGridHeader: React.FC<WorkloadStyleWeekGridHeaderPr
                 height: '100%',
                 gap: '2px'
               }}>
-                {isNewMonth && (
+                {isCurrentWeek && (
+                  <span style={{ 
+                    fontSize: '7px', 
+                    fontWeight: '800', 
+                    textTransform: 'uppercase', 
+                    color: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    padding: '2px 6px',
+                    borderRadius: '8px',
+                    marginBottom: '2px',
+                    letterSpacing: '0.5px'
+                  }}>
+                    THIS WEEK
+                  </span>
+                )}
+                {isNewMonth && !isCurrentWeek && (
                   <span style={{ 
                     fontSize: '9px', 
                     fontWeight: '700', 
                     textTransform: 'uppercase', 
                     lineHeight: '1',
-                    color: isCurrentWeek ? '#10b981' : '#fbbf24',
+                    color: '#fbbf24',
                     marginBottom: '2px'
                   }}>
                     {week.monthLabel}
                   </span>
                 )}
                 <div style={{ 
-                  fontSize: isCurrentWeek ? '12px' : '11px', 
+                  fontSize: isCurrentWeek ? '13px' : '11px', 
                   fontWeight: isCurrentWeek ? '700' : '500', 
                   lineHeight: '1.2',
                   color: isCurrentWeek ? '#10b981' : 'white',
