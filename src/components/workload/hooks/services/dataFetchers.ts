@@ -26,19 +26,19 @@ export const fetchProjectAllocations = async (
       resource_id,
       project_id,
       hours,
-      week_start_date,
+      allocation_date,
       resource_type,
       projects!inner(id, name, code)
     `)
     .eq('company_id', companyId)
     .in('resource_id', memberIds)
     .gt('hours', 0)
-    .gte('week_start_date', startDateStr)
-    .lte('week_start_date', endDateStr)
-    .order('week_start_date', { ascending: true });
+    .gte('allocation_date', startDateStr)
+    .lte('allocation_date', endDateStr)
+    .order('allocation_date', { ascending: true });
 
   const paulJuliusRecords = result.data?.filter(r => r.resource_id === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82') || [];
-  const paulOct13Records = paulJuliusRecords.filter(r => r.week_start_date >= '2025-10-13' && r.week_start_date <= '2025-10-19');
+  const paulOct13Records = paulJuliusRecords.filter(r => r.allocation_date >= '2025-10-13' && r.allocation_date <= '2025-10-19');
   
   console.log('🔍 PROJECT ALLOCATIONS RESULT (ALL RECORDS):', {
     totalRecords: result.data?.length || 0,
@@ -46,12 +46,12 @@ export const fetchProjectAllocations = async (
     paulJuliusRecords: paulJuliusRecords.length,
     paulJuliusOct13Week: paulOct13Records.length,
     paulJuliusOct13Details: paulOct13Records.map(r => ({
-      date: r.week_start_date,
+      date: r.allocation_date,
       hours: r.hours,
       project: r.projects?.name
     })),
     robNightRecords: result.data?.filter(r => r.resource_id === 'fc351fa0-b6df-447a-bc27-b6675db2622e').length || 0,
-    dateRange: result.data ? `${result.data[0]?.week_start_date} to ${result.data[result.data.length - 1]?.week_start_date}` : 'none'
+    dateRange: result.data ? `${result.data[0]?.allocation_date} to ${result.data[result.data.length - 1]?.allocation_date}` : 'none'
   });
 
   // Also fetch pending resource allocations for pre-registered members
@@ -78,7 +78,7 @@ export const fetchProjectAllocations = async (
       resource_id: pr.invite_id,
       project_id: pr.project_id,
       hours: pr.hours,
-      week_start_date: startDateStr, // Use start date as placeholder for pending resources
+      allocation_date: startDateStr, // Use start date as placeholder for pending resources
       resource_type: 'pending',
       projects: pr.projects
     }))]

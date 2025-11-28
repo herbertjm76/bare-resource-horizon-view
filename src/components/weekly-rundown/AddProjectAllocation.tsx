@@ -65,7 +65,7 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
         .insert({
           resource_id: memberId,
           project_id: projectId,
-          week_start_date: weekStartDate,
+          allocation_date: weekStartDate,
           hours: allocationHours,
           company_id: company?.id,
           resource_type: 'active'

@@ -99,7 +99,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           resource_id, 
           resource_type, 
           hours,
-          week_start_date,
+          allocation_date,
           projects:project_id (
             id,
             name,
@@ -107,8 +107,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
             department
           )
         `)
-        .gte('week_start_date', weekStartDate)
-        .lte('week_start_date', weekEndDate);
+        .gte('allocation_date', weekStartDate)
+        .lte('allocation_date', weekEndDate);
       if (error) throw error;
       return data || [];
     },

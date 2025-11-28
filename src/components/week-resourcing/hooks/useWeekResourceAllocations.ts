@@ -22,7 +22,7 @@ export const useWeekResourceAllocations = ({ weekStartDate }: UseWeekResourceAll
         .from('project_resource_allocations')
         .select('*')
         .eq('company_id', company.id)
-        .eq('week_start_date', weekStartDate);
+        .eq('allocation_date', weekStartDate);
 
       if (error) {
         console.error('Error fetching week resource allocations:', error);

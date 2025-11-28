@@ -70,7 +70,7 @@ export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = (
           project_id: projectId,
           resource_id: selectedMember.id,
           resource_type: 'team_member',
-          week_start_date: weekStartDate,
+          allocation_date: weekStartDate,
           hours: allocationHours,
           company_id: company.id
         })

@@ -15,7 +15,7 @@ export const initializeAllocations = async (
     // Fetch all resource allocations for this project from database
     const { data, error } = await supabase
       .from('project_resource_allocations')
-      .select('resource_id, week_start_date, hours')
+      .select('resource_id, allocation_date, hours')
       .eq('project_id', projectId)
       .eq('company_id', companyId);
       
@@ -32,7 +32,7 @@ export const initializeAllocations = async (
     const initialAllocations: ProjectAllocations = {};
     
     data?.forEach(allocation => {
-      const weekKey = allocation.week_start_date;
+      const weekKey = allocation.allocation_date;
       const resourceId = allocation.resource_id;
       const allocationKey = getAllocationKey(resourceId, weekKey);
       const hours = allocation.hours;

@@ -71,7 +71,7 @@ export const useStaffAllocations = (memberId: string | null, timeRange?: TimeRan
           .from('project_resource_allocations')
           .select(`
             hours,
-            week_start_date,
+            allocation_date,
             project_id,
             resource_type,
             projects!inner (
@@ -82,8 +82,8 @@ export const useStaffAllocations = (memberId: string | null, timeRange?: TimeRan
           `)
           .eq('resource_id', memberId)
           .eq('company_id', company.id)
-          .gte('week_start_date', rangeStartStr)
-          .lte('week_start_date', rangeEndStr)
+          .gte('allocation_date', rangeStartStr)
+          .lte('allocation_date', rangeEndStr)
           .gt('hours', 0);
 
         if (error) {
@@ -95,7 +95,7 @@ export const useStaffAllocations = (memberId: string | null, timeRange?: TimeRan
             projectName: allocation.projects.name,
             projectCode: allocation.projects.code,
             hours: Number(allocation.hours),
-            weekStartDate: allocation.week_start_date
+            weekStartDate: allocation.allocation_date
           }));
 
           console.log(`Found ${formattedAllocations.length} allocations for member ${memberId}:`, formattedAllocations);
