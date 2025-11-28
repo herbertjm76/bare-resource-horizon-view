@@ -12,6 +12,7 @@ interface ProjectAllocationRowProps {
   selectedDate?: Date;
   periodToShow?: number;
   onLocalAllocationChange?: (projectId: string, weekKey: string, hours: number) => void;
+  initialAllocations?: Record<string, number>; // Pre-loaded allocations from parent
 }
 
 export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
@@ -22,14 +23,16 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
   projectIndex,
   selectedDate,
   periodToShow,
-  onLocalAllocationChange
+  onLocalAllocationChange,
+  initialAllocations
 }) => {
   const rowBgColor = isEven ? '#f9fafb' : '#ffffff';
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
-  // Use the allocation input system
+  // Use pre-loaded allocations from parent as the base
+  // The fetchedAllocations from useAllocationInput will be used for real-time updates after saves
   const {
-    allocations,
+    allocations: fetchedAllocations,
     inputValues,
     isLoading,
     isSaving,
@@ -47,6 +50,9 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
       onLocalAllocationChange?.(project.projectId, weekKey, hours);
     }
   });
+
+  // Merge initial allocations with fetched ones (fetched takes priority for real-time updates)
+  const allocations = { ...project.allocations, ...fetchedAllocations };
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>, currentWeekKey: string, currentIndex: number) => {
