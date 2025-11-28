@@ -43,8 +43,6 @@ export const WorkloadStyleWeekGridHeader: React.FC<WorkloadStyleWeekGridHeaderPr
             end: endOfDay(week.weekEndDate)
           });
           
-          const isFirstOfMonth = week.weekStartDate.getDate() <= 7 && 
-                                (index === 0 || weeks[index - 1].monthLabel !== week.monthLabel);
           const isNewMonth = index === 0 || weeks[index - 1].monthLabel !== week.monthLabel;
           
           return (
@@ -58,13 +56,12 @@ export const WorkloadStyleWeekGridHeader: React.FC<WorkloadStyleWeekGridHeaderPr
                 backgroundColor: 'transparent',
                 color: 'white',
                 textAlign: 'center',
-                padding: '8px 4px',
+                padding: '6px 4px',
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
                 borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
-                borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined,
                 fontSize: '11px',
                 fontWeight: '600',
-                height: '80px',
+                height: '60px',
                 position: 'relative',
                 overflow: 'visible',
                 ...(week.isPreviousWeek && {
@@ -78,52 +75,28 @@ export const WorkloadStyleWeekGridHeader: React.FC<WorkloadStyleWeekGridHeaderPr
                 alignItems: 'center', 
                 justifyContent: 'center',
                 height: '100%',
-                gap: '4px'
+                gap: '2px'
               }}>
-                {isCurrentWeek && (
-                  <div style={{ 
-                    width: '0', 
-                    height: '0', 
-                    borderLeft: '6px solid transparent',
-                    borderRight: '6px solid transparent',
-                    borderTop: '8px solid #000000',
-                    marginBottom: '2px'
-                  }} />
-                )}
                 {isNewMonth && (
                   <span style={{ 
-                    fontSize: '10px', 
+                    fontSize: '9px', 
                     fontWeight: '700', 
                     textTransform: 'uppercase', 
                     lineHeight: '1',
-                    color: isCurrentWeek ? '#000000' : '#fbbf24',
+                    color: isCurrentWeek ? '#10b981' : '#fbbf24',
                     marginBottom: '2px'
                   }}>
                     {week.monthLabel}
                   </span>
                 )}
                 <div style={{ 
-                  fontSize: '11px', 
-                  fontWeight: '500', 
+                  fontSize: isCurrentWeek ? '12px' : '11px', 
+                  fontWeight: isCurrentWeek ? '700' : '500', 
                   lineHeight: '1.2',
-                  color: isCurrentWeek ? '#000000' : 'white',
+                  color: isCurrentWeek ? '#10b981' : 'white',
                   textAlign: 'center'
                 }}>
-                  <div>{format(week.weekStartDate, 'MMM d')}</div>
-                  <div style={{ 
-                    fontSize: '9px',
-                    opacity: 0.7,
-                    marginTop: '2px'
-                  }}>to</div>
-                  <div>{format(week.weekEndDate, 'MMM d')}</div>
-                </div>
-                <div style={{ 
-                  fontSize: '9px', 
-                  opacity: '0.6', 
-                  fontWeight: '400',
-                  color: isCurrentWeek ? '#000000' : 'white'
-                }}>
-                  W{week.weekNumber}
+                  <div>{format(week.weekStartDate, 'd')}-{format(week.weekEndDate, 'd')}</div>
                 </div>
               </div>
             </th>
