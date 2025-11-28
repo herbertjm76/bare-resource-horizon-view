@@ -1,16 +1,23 @@
 import { useEffect } from 'react';
+import { useCompany } from '@/context/CompanyContext';
 
 export const useTheme = () => {
+  const { company } = useCompany();
+  
   useEffect(() => {
-    // Load and apply saved theme on mount, or default to "default" theme
-    const savedTheme = localStorage.getItem('app-theme') || 'default';
-    applyThemeById(savedTheme);
+    // Apply theme from company database, or fallback to localStorage, then default
+    const companyTheme = company?.theme;
+    const localTheme = localStorage.getItem('app-theme');
+    const themeToApply = companyTheme || localTheme || 'default';
     
-    // Save the default theme if none was saved before
-    if (!localStorage.getItem('app-theme')) {
-      localStorage.setItem('app-theme', 'default');
+    console.log('useTheme: Applying theme:', { companyTheme, localTheme, themeToApply });
+    applyThemeById(themeToApply);
+    
+    // Keep localStorage in sync for offline use
+    if (companyTheme && companyTheme !== localTheme) {
+      localStorage.setItem('app-theme', companyTheme);
     }
-  }, []);
+  }, [company]);
 };
 
 export const applyThemeById = (themeId: string) => {

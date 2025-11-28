@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check } from 'lucide-react';
+import { useCompany } from '@/context/CompanyContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 type Theme = {
   id: string;
@@ -77,15 +80,16 @@ const themes: Theme[] = [
 ];
 
 export const ThemeTab: React.FC = () => {
+  const { company, refreshCompany } = useCompany();
   const [selectedTheme, setSelectedTheme] = useState<string>('default');
   const [previewKey, setPreviewKey] = useState(0);
 
   useEffect(() => {
-    // Load saved theme from localStorage
-    const savedTheme = localStorage.getItem('app-theme') || 'default';
-    setSelectedTheme(savedTheme);
-    applyTheme(savedTheme);
-  }, []);
+    // Load theme from company database, fallback to localStorage
+    const themeToUse = company?.theme || localStorage.getItem('app-theme') || 'default';
+    setSelectedTheme(themeToUse);
+    applyTheme(themeToUse);
+  }, [company]);
 
   const applyTheme = (themeId: string) => {
     const theme = themes.find(t => t.id === themeId);
@@ -109,11 +113,27 @@ export const ThemeTab: React.FC = () => {
     });
   };
 
-  const handleThemeChange = (themeId: string) => {
+  const handleThemeChange = async (themeId: string) => {
     setSelectedTheme(themeId);
     applyTheme(themeId);
     localStorage.setItem('app-theme', themeId);
-    setPreviewKey(prev => prev + 1); // Force preview to update
+    setPreviewKey(prev => prev + 1);
+    
+    // Save theme to database
+    if (company?.id) {
+      const { error } = await supabase
+        .from('companies')
+        .update({ theme: themeId })
+        .eq('id', company.id);
+      
+      if (error) {
+        console.error('Failed to save theme:', error);
+        toast.error('Failed to save theme to your company profile');
+      } else {
+        toast.success('Theme saved to your company profile');
+        await refreshCompany(); // Refresh to ensure company context has latest theme
+      }
+    }
   };
 
   return (
