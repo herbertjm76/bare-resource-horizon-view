@@ -16,23 +16,18 @@ interface PersonResourceGridProps {
 
 export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
   personData,
-  days,
+  weeks,
   expandedPeople,
   onTogglePersonExpand,
   selectedDate,
   periodToShow
 }) => {
-  // Calculate if we should center align (for 1-month or shorter views)
-  const shouldCenterAlign = days.length <= 31;
-  const containerClassName = `workload-resource-grid-container${shouldCenterAlign ? ' center-aligned' : ''}`;
-  
-  // Calculate total table width: person column (250px) + day columns (30px each)
-  const tableWidth = 250 + (days.length * 30);
+  const tableWidth = 250 + (weeks.length * 80);
  
   return (
     <div className="bg-white rounded-lg shadow-sm border">
       <div className="p-4">
-        <div className={containerClassName}>
+        <div className="workload-resource-grid-container">
           <div className="workload-resource-table-wrapper">
             <table 
               className="workload-resource-table"

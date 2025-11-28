@@ -29,8 +29,8 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
   const [projectAllocations, setProjectAllocations] = useState(person.projects);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Get week start date from the first day in days array
-  const weekStartDate = days.length > 0 ? days[0].date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+  // Get week start date from the first week in weeks array
+  const weekStartDate = weeks.length > 0 ? weeks[0].weekStartDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     setProjectAllocations(person.projects);
@@ -40,7 +40,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
     return `${person.firstName.charAt(0)}${person.lastName.charAt(0)}`.toUpperCase();
   };
 
-  const handleLocalAllocationChange = (projectId: string, dayKey: string, hours: number) => {
+  const handleLocalAllocationChange = (projectId: string, weekKey: string, hours: number) => {
     setProjectAllocations(prev =>
       prev.map(project =>
         project.projectId === projectId
@@ -48,7 +48,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
               ...project,
               allocations: {
                 ...project.allocations,
-                [dayKey]: hours
+                [weekKey]: hours
               }
             }
           : project
@@ -158,30 +158,30 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
           </div>
         </td>
         
-        {/* Day allocation cells - show total hours for person across all projects */}
-        {days.map((day) => {
-          const dayKey = day.date.toISOString().split('T')[0];
+        {/* Week allocation cells - show total hours for person across all projects */}
+        {weeks.map((week) => {
+          const weekKey = week.weekStartDate.toISOString().split('T')[0];
           
-          // Calculate day total from all projects for this person (using local state)
-          const dayTotal = projectAllocations.reduce((total, project) => {
-            const hours = project.allocations[dayKey] || 0;
+          // Calculate week total from all projects for this person (using local state)
+          const weekTotal = projectAllocations.reduce((total, project) => {
+            const hours = project.allocations[weekKey] || 0;
             return total + hours;
           }, 0);
           
           return (
             <td 
-              key={dayKey} 
-              className="workload-resource-cell day-column"
+              key={weekKey} 
+              className="workload-resource-cell week-column"
               style={{ 
-                width: '30px', 
-                minWidth: '30px',
-                maxWidth: '30px',
+                width: '80px', 
+                minWidth: '80px',
+                maxWidth: '80px',
                 textAlign: 'center',
-                padding: '2px',
+                padding: '4px',
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
                 borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
                 verticalAlign: 'middle',
-                ...(day.isPreviousWeek && {
+                ...(week.isPreviousWeek && {
                   backgroundColor: 'rgba(0, 0, 0, 0.03)',
                   opacity: 0.5
                 })
@@ -193,14 +193,14 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
                 justifyContent: 'center',
                 minHeight: '24px'
               }}>
-                {dayTotal > 0 ? (
-                  <span className="project-total-hours">
-                    {dayTotal}
+                {weekTotal > 0 ? (
+                  <span className="project-total-hours" style={{ fontSize: '13px' }}>
+                    {weekTotal}h
                   </span>
                 ) : (
                   <span style={{ 
                     color: 'rgba(0, 0, 0, 0.4)',
-                    fontSize: '12px'
+                    fontSize: '13px'
                   }}>
                     —
                   </span>
@@ -217,7 +217,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
           key={project.projectId}
           project={project}
           person={person}
-          days={days}
+          weeks={weeks}
           isEven={isEven}
           projectIndex={projectIndex}
           selectedDate={selectedDate}
@@ -232,6 +232,6 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
     prevProps.person.personId === nextProps.person.personId &&
     prevProps.isExpanded === nextProps.isExpanded &&
     prevProps.isEven === nextProps.isEven &&
-    prevProps.days.length === nextProps.days.length
+    prevProps.weeks.length === nextProps.weeks.length
   );
 });
