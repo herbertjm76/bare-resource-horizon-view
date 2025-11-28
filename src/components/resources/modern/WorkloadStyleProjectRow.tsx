@@ -199,6 +199,8 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
             await refreshResources();
           }}
           onCheckOtherProjects={checkResourceInOtherProjects}
+          projectAllocations={projectAllocations}
+          getAllocationKey={getAllocationKey}
         />
       ))}
 
