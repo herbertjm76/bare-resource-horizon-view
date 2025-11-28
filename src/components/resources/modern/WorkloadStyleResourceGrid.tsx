@@ -1,14 +1,14 @@
 
 import React from 'react';
-import { WorkloadStyleGridHeader } from './WorkloadStyleGridHeader';
+import { WorkloadStyleWeekGridHeader } from './WorkloadStyleWeekGridHeader';
 import { WorkloadStyleProjectRow } from './WorkloadStyleProjectRow';
-import { DayInfo } from '../grid/types';
+import { WeekInfo } from '../hooks/useGridWeeks';
 import './workload-resource-grid.css';
 import './tablet-optimizations.css';
 
 interface WorkloadStyleResourceGridProps {
   projects: any[];
-  days: DayInfo[];
+  weeks: WeekInfo[];
   expandedProjects: string[];
   onToggleProjectExpand: (projectId: string) => void;
   selectedDate?: Date;
@@ -17,17 +17,14 @@ interface WorkloadStyleResourceGridProps {
 
 export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps> = ({
   projects,
-  days,
+  weeks,
   expandedProjects,
   onToggleProjectExpand,
   selectedDate,
   periodToShow
 }) => {
-  // Calculate if we should center align (for 1-month views)
-  const shouldCenterAlign = days.length <= 31;
-  
-  // Calculate total table width: project column (250px) + day columns (30px each)
-  const tableWidth = 250 + (days.length * 30);
+  // Calculate total table width: project column (250px) + week columns (80px each)
+  const tableWidth = 250 + (weeks.length * 80);
 
   return (
     <div className="workload-resource-grid-container">
@@ -39,14 +36,14 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
             minWidth: `${tableWidth}px`
           }}
         >
-          <WorkloadStyleGridHeader days={days} />
+          <WorkloadStyleWeekGridHeader weeks={weeks} />
           
           <tbody>
             {projects.map((project, index) => (
               <WorkloadStyleProjectRow
                 key={project.id}
                 project={project}
-                days={days}
+                weeks={weeks}
                 isExpanded={expandedProjects.includes(project.id)}
                 onToggleExpand={() => onToggleProjectExpand(project.id)}
                 isEven={index % 2 === 0}

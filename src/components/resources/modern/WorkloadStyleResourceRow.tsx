@@ -1,7 +1,7 @@
 
 import React, { useRef, useCallback, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { DayInfo } from '../grid/types';
+import { WeekInfo } from '../hooks/useGridWeeks';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
 import { ResourceActions } from '../components/ResourceActions';
@@ -9,10 +9,10 @@ import { ResourceActions } from '../components/ResourceActions';
 interface WorkloadStyleResourceRowProps {
   resource: any;
   project: any;
-  days: DayInfo[];
+  weeks: WeekInfo[];
   isEven: boolean;
   resourceIndex: number;
-  onAllocationChange?: (resourceId: string, dayKey: string, hours: number) => void;
+  onAllocationChange?: (resourceId: string, weekKey: string, hours: number) => void;
   onDeleteResource?: (resourceId: string, globalDelete?: boolean) => void;
   onCheckOtherProjects?: (resourceId: string, resourceType: 'active' | 'pre_registered') => Promise<{ hasOtherAllocations: boolean; projectCount: number; }>;
   selectedDate?: Date;
@@ -22,7 +22,7 @@ interface WorkloadStyleResourceRowProps {
 export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> = ({
   resource,
   project,
-  days,
+  weeks,
   isEven,
   resourceIndex,
   onAllocationChange,
@@ -40,8 +40,8 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     ? `${resource.first_name.charAt(0)}${resource.last_name.charAt(0)}`
     : resource.name.split(' ').map((n: string) => n.charAt(0)).join('').slice(0, 2);
 
-  // Get week start date from the first day in days array
-  const weekStartDate = days.length > 0 ? days[0].date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+  // Get week start date from the first week in weeks array
+  const weekStartDate = weeks.length > 0 ? weeks[0].weekStartDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
 
   const rowBgColor = '#fcfcfc';
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
@@ -60,21 +60,21 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     resourceType: resource.isPending ? 'pre_registered' : 'active',
     selectedDate,
     periodToShow,
-    onAllocationChange: (resourceId, dayKey, hours) => {
+    onAllocationChange: (resourceId, weekKey, hours) => {
       // Update the parent project's allocation state immediately
-      onAllocationChange?.(resourceId, dayKey, hours);
-      console.log(`Resource ${resourceId} allocation changed for ${dayKey}: ${hours}h`);
+      onAllocationChange?.(resourceId, weekKey, hours);
+      console.log(`Resource ${resourceId} allocation changed for week ${weekKey}: ${hours}h`);
     }
   });
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>, currentDayKey: string, currentIndex: number) => {
+    (e: React.KeyboardEvent<HTMLInputElement>, currentWeekKey: string, currentIndex: number) => {
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         const nextIndex = currentIndex + 1;
-        if (nextIndex < days.length) {
-          const nextDayKey = days[nextIndex].date.toISOString().split('T')[0];
-          const nextInput = inputRefs.current[nextDayKey];
+        if (nextIndex < weeks.length) {
+          const nextWeekKey = weeks[nextIndex].weekStartDate.toISOString().split('T')[0];
+          const nextInput = inputRefs.current[nextWeekKey];
           if (nextInput) {
             nextInput.focus();
             nextInput.select();
@@ -84,8 +84,8 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         e.preventDefault();
         const prevIndex = currentIndex - 1;
         if (prevIndex >= 0) {
-          const prevDayKey = days[prevIndex].date.toISOString().split('T')[0];
-          const prevInput = inputRefs.current[prevDayKey];
+          const prevWeekKey = weeks[prevIndex].weekStartDate.toISOString().split('T')[0];
+          const prevInput = inputRefs.current[prevWeekKey];
           if (prevInput) {
             prevInput.focus();
             prevInput.select();
@@ -96,7 +96,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
       }
       // Let Tab behave natively so it follows DOM order
     },
-    [days]
+    [weeks]
   );
 
   // Calculate total allocated hours for this resource
@@ -173,35 +173,33 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
           </div>
       </td>
       
-      {/* Day allocation cells */}
-      {days.map((day, dayIndex) => {
-        const dayKey = day.date.toISOString().split('T')[0];
+      {/* Week allocation cells */}
+      {weeks.map((week, weekIndex) => {
+        const weekKey = week.weekStartDate.toISOString().split('T')[0];
         // Get allocation from the proper allocation system
-        const allocation = allocations[dayKey] || 0;
-        
-        let cellBgColor = 'transparent'; // Let CSS handle the background
+        const allocation = allocations[weekKey] || 0;
         
         return (
           <td 
-            key={dayKey} 
-            className="workload-resource-cell day-column"
+            key={weekKey} 
+            className="workload-resource-cell week-column"
             style={{ 
-              width: '30px', 
-              minWidth: '30px',
-              maxWidth: '30px',
+              width: '80px', 
+              minWidth: '80px',
+              maxWidth: '80px',
               textAlign: 'center',
-              padding: '2px',
+              padding: '4px',
               borderRight: '1px solid rgba(156, 163, 175, 0.6)',
               borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
               verticalAlign: 'middle',
-              ...(day.isPreviousWeek && {
+              ...(week.isPreviousWeek && {
                 backgroundColor: 'rgba(0, 0, 0, 0.03)',
                 opacity: 0.5
               })
             }}
             tabIndex={-1}
             onClick={() => {
-              const input = inputRefs.current[dayKey];
+              const input = inputRefs.current[weekKey];
               if (input && !input.disabled) {
                 input.focus();
                 input.select();
@@ -209,32 +207,32 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
             }}
           >
             <input
-              ref={(el) => inputRefs.current[dayKey] = el}
+              ref={(el) => inputRefs.current[weekKey] = el}
               type="number"
               min="0"
-              max="24"
-              value={inputValues[dayKey] || ''}
-              onChange={(e) => handleInputChange(dayKey, e.target.value)}
-              onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
+              max="200"
+              value={inputValues[weekKey] || ''}
+              onChange={(e) => handleInputChange(weekKey, e.target.value)}
+              onBlur={(e) => handleInputBlur(weekKey, e.target.value)}
               onFocus={(e) => e.target.select()}
-              onKeyDown={(e) => handleKeyDown(e, dayKey, dayIndex)}
-              disabled={isLoading || day.isPreviousWeek}
+              onKeyDown={(e) => handleKeyDown(e, weekKey, weekIndex)}
+              disabled={isLoading || week.isPreviousWeek}
               className={`
-                w-full h-full px-0 py-0 text-center border-0 bg-transparent
-                focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white
-                ${allocation > 0 ? 'font-medium text-primary' : 'text-muted-foreground'}
-                ${day.isWeekend ? 'bg-muted/20' : ''}
-                ${day.isPreviousWeek ? 'cursor-not-allowed' : ''}
+                w-full h-full px-1 py-1 text-center border-0 bg-transparent
+                focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white
+                ${allocation > 0 ? 'font-semibold text-primary' : 'text-muted-foreground'}
+                ${week.isPreviousWeek ? 'cursor-not-allowed' : ''}
               `}
               style={{
-                fontSize: '10px',
-                lineHeight: '20px',
-                height: '20px',
+                fontSize: '13px',
+                lineHeight: '24px',
+                height: '28px',
                 width: '100%',
                 MozAppearance: 'textfield',
                 WebkitAppearance: 'none',
                 margin: 0
               }}
+              placeholder="0"
             />
           </td>
         );

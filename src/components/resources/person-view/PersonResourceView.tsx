@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PersonResourceGrid } from './PersonResourceGrid';
 import { usePersonResourceData } from '@/hooks/usePersonResourceData';
-import { useGridDays } from '../hooks/useGridDays';
+import { useGridWeeks } from '../hooks/useGridWeeks';
 import { GridLoadingState } from '../grid/GridLoadingState';
 import { Button } from '@/components/ui/button';
 import { Calendar, ChevronLeft, ChevronRight, Filter, Expand, Shrink, Download, Settings } from 'lucide-react';
@@ -29,7 +29,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   onPeriodChange
 }) => {
   const { personData, isLoading, refetch } = usePersonResourceData(startDate, periodToShow);
-  const days = useGridDays(startDate, periodToShow, displayOptions);
+  const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
   const [expandedPeople, setExpandedPeople] = useState<string[]>([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const { company } = useCompany();
@@ -124,7 +124,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
       <div className="w-full max-w-full overflow-hidden">
         <PersonResourceGrid
           personData={personData}
-          days={days}
+          weeks={weeks}
           expandedPeople={expandedPeople}
           onTogglePersonExpand={handleTogglePersonExpand}
           selectedDate={startDate}

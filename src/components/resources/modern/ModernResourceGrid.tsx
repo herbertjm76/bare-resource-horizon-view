@@ -3,7 +3,7 @@ import React from 'react';
 import { WorkloadStyleResourceGrid } from './WorkloadStyleResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
 import { useFilteredProjects } from '../hooks/useFilteredProjects';
-import { useGridDays } from '../hooks/useGridDays';
+import { useGridWeeks } from '../hooks/useGridWeeks';
 import { GridLoadingState } from '../grid/GridLoadingState';
 import { GridEmptyState } from '../grid/GridEmptyState';
 
@@ -36,7 +36,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
 }) => {
   const { projects, isLoading: isLoadingProjects } = useProjects(sortBy, sortDirection);
   const filteredProjects = useFilteredProjects(projects, filters);
-  const days = useGridDays(startDate, periodToShow, displayOptions);
+  const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
 
   if (isLoadingProjects) {
     return <GridLoadingState />;
@@ -49,7 +49,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   return (
     <WorkloadStyleResourceGrid
       projects={filteredProjects}
-      days={days}
+      weeks={weeks}
       expandedProjects={expandedProjects}
       onToggleProjectExpand={onToggleProjectExpand}
       selectedDate={startDate}
