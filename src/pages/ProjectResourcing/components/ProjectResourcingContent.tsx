@@ -12,6 +12,13 @@ import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
+// Extend the jsPDF types
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+  }
+}
+
 interface ProjectResourcingContentProps {
   selectedMonth: Date;
   searchTerm: string;
@@ -156,7 +163,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         }
 
         // Prepare the table configuration
-        (pdf as any).autoTable({
+        pdf.autoTable({
           startY: 32,
           head: [headers],
           body: data,
@@ -176,12 +183,12 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
           },
           margin: { top: 30 },
           didDrawPage: (data: any) => {
-            const pageCount = (pdf as any).internal.pages.length - 1;
+            const pageCount = pdf.internal.pages.length - 1;
             pdf.setFontSize(8);
             pdf.text(
               `Page ${data.pageNumber} of ${pageCount}`,
-              (pdf as any).internal.pageSize.width - 20,
-              (pdf as any).internal.pageSize.height - 10
+              pdf.internal.pageSize.width - 20,
+              pdf.internal.pageSize.height - 10
             );
           }
         });
