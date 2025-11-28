@@ -123,7 +123,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           });
         });
 
-        // Group allocations by person and project
+        // Group allocations by person and project, aggregating daily hours into weekly totals
         allocations?.forEach((allocation: any) => {
           const personData = personMap.get(allocation.resource_id);
           if (!personData) return;
@@ -141,9 +141,16 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             personData.projects.push(projectEntry);
           }
 
-          // Add allocation hours for this week
-          const dayKey = allocation.week_start_date;
-          projectEntry.allocations[dayKey] = allocation.hours;
+          // Convert the date to the week start (Monday)
+          const allocationDate = new Date(allocation.week_start_date + 'T00:00:00');
+          const dayOfWeek = allocationDate.getDay();
+          const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+          const monday = new Date(allocationDate);
+          monday.setDate(allocationDate.getDate() + daysToMonday);
+          const weekKey = monday.toISOString().split('T')[0];
+          
+          // Aggregate hours by week (sum up daily hours into weekly total)
+          projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });
 
         const result = Array.from(personMap.values());
