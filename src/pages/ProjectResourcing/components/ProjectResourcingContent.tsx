@@ -10,7 +10,7 @@ import { useProjectResourcingSummary } from '../hooks/useProjectResourcingSummar
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 // Extend the jsPDF types
 declare module 'jspdf' {
@@ -163,7 +163,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         }
 
         // Prepare the table configuration
-        pdf.autoTable({
+        autoTable(pdf, {
           startY: 32,
           head: [headers],
           body: data,
