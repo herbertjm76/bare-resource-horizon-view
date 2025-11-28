@@ -58,6 +58,7 @@ export type Database = {
           phone: string | null
           size: string | null
           subdomain: string
+          theme: string | null
           updated_at: string
           website: string | null
         }
@@ -74,6 +75,7 @@ export type Database = {
           phone?: string | null
           size?: string | null
           subdomain: string
+          theme?: string | null
           updated_at?: string
           website?: string | null
         }
@@ -90,6 +92,7 @@ export type Database = {
           phone?: string | null
           size?: string | null
           subdomain?: string
+          theme?: string | null
           updated_at?: string
           website?: string | null
         }
