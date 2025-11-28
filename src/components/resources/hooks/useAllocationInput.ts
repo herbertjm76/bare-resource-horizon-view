@@ -67,7 +67,17 @@ export const useAllocationInput = ({
     
     console.log(`Saving allocation for resource ${resourceId}, day ${dayKey}: ${hours} hours`);
     
-    saveAllocation(dayKey, hours);
+    // Convert daily date to week start date (Monday) before saving
+    const date = new Date(dayKey);
+    const dayOfWeek = date.getDay();
+    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // If Sunday (0), go back 6 days, otherwise go back to Monday
+    const monday = new Date(date);
+    monday.setDate(date.getDate() + diff);
+    const weekStartKey = monday.toISOString().split('T')[0];
+    
+    console.log(`Converting day ${dayKey} to week start ${weekStartKey}`);
+    
+    saveAllocation(weekStartKey, hours);
     onAllocationChange(resourceId, dayKey, hours);
   };
 
