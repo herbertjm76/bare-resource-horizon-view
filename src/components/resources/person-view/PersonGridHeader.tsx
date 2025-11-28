@@ -34,21 +34,21 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ weeks }) => 
               style={{ 
                 width: '80px', minWidth: '80px', maxWidth: '80px',
                 backgroundColor: isCurrentWeek 
-                  ? 'linear-gradient(180deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%)'
+                  ? '#14b8a6'
                   : 'transparent',
                 color: 'white', 
                 textAlign: 'center',
                 padding: '6px 4px', 
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
                 borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
-                borderTop: isCurrentWeek ? '3px solid #10b981' : 'none',
+                borderTop: isCurrentWeek ? '3px solid #0d9488' : 'none',
                 fontSize: '11px',
                 fontWeight: '600', 
                 height: '60px',
                 position: 'relative',
                 ...(week.isPreviousWeek && { opacity: 0.4 }),
                 ...(isCurrentWeek && {
-                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                  boxShadow: '0 4px 12px rgba(20, 184, 166, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
                 })
               }}>
               <div style={{ 
@@ -65,8 +65,8 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ weeks }) => 
                     fontSize: '7px', 
                     fontWeight: '800', 
                     textTransform: 'uppercase', 
-                    color: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    color: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     padding: '2px 6px',
                     borderRadius: '8px',
                     marginBottom: '2px',
@@ -91,7 +91,7 @@ export const PersonGridHeader: React.FC<PersonGridHeaderProps> = ({ weeks }) => 
                   fontSize: isCurrentWeek ? '13px' : '11px', 
                   fontWeight: isCurrentWeek ? '700' : '500', 
                   lineHeight: '1.2',
-                  color: isCurrentWeek ? '#10b981' : 'white', 
+                  color: 'white', 
                   textAlign: 'center' 
                 }}>
                   <div>{format(week.weekStartDate, 'd')}-{format(week.weekEndDate, 'd')}</div>
