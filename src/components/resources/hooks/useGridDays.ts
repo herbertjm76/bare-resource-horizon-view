@@ -58,6 +58,9 @@ export const useGridDays = (
   displayOptions: DisplayOptions
 ): DayInfo[] => {
   return useMemo(() => {
+    // Check if mobile/tablet viewport (up to 1024px)
+    const isMobileOrTablet = typeof window !== 'undefined' && window.innerWidth <= 1024;
+    
     // Adjust start date based on week start preference
     let adjustedStartDate: Date;
     if (displayOptions.weekStartsOnSunday) {
@@ -68,8 +71,10 @@ export const useGridDays = (
       adjustedStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
     }
     
-    // Include previous week by starting 7 days earlier
-    const previousWeekStartDate = addDays(adjustedStartDate, -7);
+    // Only include previous week on desktop, not on mobile/tablet
+    const previousWeekStartDate = isMobileOrTablet 
+      ? adjustedStartDate 
+      : addDays(adjustedStartDate, -7);
     
     // Convert periodToShow from weeks to days for eachDayOfInterval
     const daysToAdd = periodToShow * 7;
