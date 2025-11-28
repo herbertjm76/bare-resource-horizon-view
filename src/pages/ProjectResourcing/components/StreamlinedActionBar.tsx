@@ -41,6 +41,7 @@ interface StreamlinedActionBarProps {
   onCollapseAll: () => void;
   expandedProjects: string[];
   totalProjects: number;
+  onExport?: () => void;
 }
 
 export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
@@ -66,7 +67,8 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
   onExpandAll,
   onCollapseAll,
   expandedProjects,
-  totalProjects
+  totalProjects,
+  onExport
 }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -264,7 +266,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
         <div className="flex-1" />
 
         {/* Export */}
-        <Button variant="outline" size="sm" className="h-8">
+        <Button variant="outline" size="sm" className="h-8" onClick={onExport}>
           <Download className="h-3 w-3 mr-2" />
           Export
         </Button>
