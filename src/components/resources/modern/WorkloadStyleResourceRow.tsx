@@ -17,6 +17,8 @@ interface WorkloadStyleResourceRowProps {
   onCheckOtherProjects?: (resourceId: string, resourceType: 'active' | 'pre_registered') => Promise<{ hasOtherAllocations: boolean; projectCount: number; }>;
   selectedDate?: Date;
   periodToShow?: number;
+  projectAllocations: Record<string, number>;
+  getAllocationKey: (resourceId: string, weekKey: string) => string;
 }
 
 export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> = ({
@@ -29,7 +31,9 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   onDeleteResource,
   onCheckOtherProjects,
   selectedDate,
-  periodToShow
+  periodToShow,
+  projectAllocations,
+  getAllocationKey
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const displayName = resource.first_name && resource.last_name 
@@ -99,8 +103,13 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     [weeks]
   );
 
-  // Calculate total allocated hours for this resource
-  const totalAllocatedHours = Object.values(allocations).reduce((sum, hours) => sum + hours, 0);
+  // Calculate total allocated hours for this resource from project-level allocations
+  const totalAllocatedHours = weeks.reduce((sum, week) => {
+    const weekKey = week.weekStartDate.toISOString().split('T')[0];
+    const allocationKey = getAllocationKey(resource.id, weekKey);
+    const hours = projectAllocations[allocationKey] || 0;
+    return sum + hours;
+  }, 0);
 
   return (
     <>
@@ -176,8 +185,9 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
       {/* Week allocation cells */}
       {weeks.map((week, weekIndex) => {
         const weekKey = week.weekStartDate.toISOString().split('T')[0];
-        // Get allocation from the proper allocation system
-        const allocation = allocations[weekKey] || 0;
+        // Get allocation from the project-level allocation map
+        const allocationKey = getAllocationKey(resource.id, weekKey);
+        const allocation = projectAllocations[allocationKey] || 0;
         
         return (
           <td 
@@ -211,7 +221,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               type="number"
               min="0"
               max="200"
-              value={inputValues[weekKey] || ''}
+              value={inputValues[weekKey] ?? (allocation > 0 ? String(allocation) : '')}
               onChange={(e) => handleInputChange(weekKey, e.target.value)}
               onBlur={(e) => handleInputBlur(weekKey, e.target.value)}
               onFocus={(e) => e.target.select()}
