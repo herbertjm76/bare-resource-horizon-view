@@ -43,19 +43,19 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
           .from('project_resource_allocations')
           .select(`
             hours,
-            week_start_date,
+            allocation_date,
             project:projects(id, name, code, status)
           `)
           .eq('company_id', company.id)
           .eq('resource_id', memberId)
           .eq('resource_type', 'active')
-          .order('week_start_date', { ascending: true });
+          .order('allocation_date', { ascending: true });
 
         if (error) throw error;
 
         // Filter to current + next 8 weeks in frontend for consistency
         const filteredAllocations = allocations?.filter(allocation => {
-          const allocationDate = new Date(allocation.week_start_date);
+          const allocationDate = new Date(allocation.allocation_date);
           return allocationDate >= currentWeek && allocationDate <= endWeek;
         }) || [];
 
@@ -83,7 +83,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
           const projectAllocation = projectMap.get(projectId)!;
           projectAllocation.totalHours += allocation.hours;
           projectAllocation.weeklyBreakdown.push({
-            weekStart: allocation.week_start_date,
+            weekStart: allocation.allocation_date,
             hours: allocation.hours
           });
         });

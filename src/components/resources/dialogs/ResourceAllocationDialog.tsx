@@ -76,7 +76,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
         .from('project_resource_allocations')
         .select('project_id, hours')
         .eq('resource_id', member.id)
-        .eq('week_start_date', weekStartDate)
+        .eq('allocation_date', weekStartDate)
         .eq('resource_type', member.type);
 
       if (error) throw error;
@@ -114,7 +114,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
         .delete()
         .eq('resource_id', member.id)
         .eq('project_id', projectId)
-        .eq('week_start_date', weekStartDate)
+        .eq('allocation_date', weekStartDate)
         .eq('resource_type', member.type);
 
       if (error) throw error;
@@ -155,7 +155,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
         .from('project_resource_allocations')
         .delete()
         .eq('resource_id', member.id)
-        .eq('week_start_date', weekStartDate)
+        .eq('allocation_date', weekStartDate)
         .eq('resource_type', member.type);
 
       // Insert new allocations
@@ -164,7 +164,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
           project_id: projectId,
           resource_id: member.id,
           resource_type: member.type,
-          week_start_date: weekStartDate,
+          allocation_date: weekStartDate,
           hours: allocations[projectId],
           company_id: company.id,
         }));

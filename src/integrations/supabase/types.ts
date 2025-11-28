@@ -950,6 +950,7 @@ export type Database = {
       project_resource_allocations: {
         Row: {
           allocation_amount: number | null
+          allocation_date: string
           company_id: string | null
           created_at: string
           hours: number
@@ -960,10 +961,10 @@ export type Database = {
           resource_type: string
           stage_id: string | null
           updated_at: string
-          week_start_date: string
         }
         Insert: {
           allocation_amount?: number | null
+          allocation_date: string
           company_id?: string | null
           created_at?: string
           hours?: number
@@ -974,10 +975,10 @@ export type Database = {
           resource_type: string
           stage_id?: string | null
           updated_at?: string
-          week_start_date: string
         }
         Update: {
           allocation_amount?: number | null
+          allocation_date?: string
           company_id?: string | null
           created_at?: string
           hours?: number
@@ -988,7 +989,6 @@ export type Database = {
           resource_type?: string
           stage_id?: string | null
           updated_at?: string
-          week_start_date?: string
         }
         Relationships: [
           {
@@ -1693,7 +1693,44 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      weekly_resource_allocations: {
+        Row: {
+          allocation_amount: number | null
+          company_id: string | null
+          created_at: string | null
+          hours: number | null
+          project_id: string | null
+          rate_snapshot: number | null
+          resource_id: string | null
+          resource_type: string | null
+          stage_id: string | null
+          updated_at: string | null
+          week_start_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_resource_allocations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_resource_allocations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_resource_allocations_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "office_stages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       calculate_project_financial_metrics: {

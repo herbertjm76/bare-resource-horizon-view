@@ -18,7 +18,7 @@ export const fetchResourceAllocations = async (
     
     let query = supabase
       .from('project_resource_allocations')
-      .select('id, week_start_date, hours')
+      .select('id, allocation_date, hours')
       .eq('project_id', projectId)
       .eq('resource_id', resourceId)
       .eq('resource_type', resourceType)
@@ -28,8 +28,8 @@ export const fetchResourceAllocations = async (
     if (dateRange) {
       console.log(`🔍 ALLOCATION API: Applying date range filter: ${dateRange.startDate} to ${dateRange.endDate}`);
       query = query
-        .gte('week_start_date', dateRange.startDate)
-        .lte('week_start_date', dateRange.endDate);
+        .gte('allocation_date', dateRange.startDate)
+        .lte('allocation_date', dateRange.endDate);
     }
     
     const { data, error } = await query;
@@ -41,10 +41,10 @@ export const fetchResourceAllocations = async (
     // Transform data into a week key -> hours mapping, aggregating daily hours into weekly totals
     const allocationMap: Record<string, number> = {};
     data?.forEach(item => {
-      const weekKey = formatDateKey(item.week_start_date);
+      const weekKey = formatDateKey(item.allocation_date);
       // Aggregate hours by week (sum up multiple allocations for the same week)
       allocationMap[weekKey] = (allocationMap[weekKey] || 0) + item.hours;
-      console.log(`🔍 ALLOCATION API: Aggregating ${item.week_start_date} -> ${weekKey}: +${item.hours}h (total: ${allocationMap[weekKey]}h)`);
+      console.log(`🔍 ALLOCATION API: Aggregating ${item.allocation_date} -> ${weekKey}: +${item.hours}h (total: ${allocationMap[weekKey]}h)`);
     });
     
     return allocationMap;
@@ -84,7 +84,7 @@ export const saveResourceAllocation = async (
       .eq('project_id', projectId)
       .eq('resource_id', resourceId)
       .eq('resource_type', resourceType)
-      .eq('week_start_date', formattedWeekKey)
+      .eq('allocation_date', formattedWeekKey)
       .eq('company_id', companyId)
       .maybeSingle();
     
@@ -105,7 +105,7 @@ export const saveResourceAllocation = async (
           project_id: projectId,
           resource_id: resourceId,
           resource_type: resourceType,
-          week_start_date: formattedWeekKey,
+          allocation_date: formattedWeekKey,
           hours,
           company_id: companyId
         })
@@ -145,7 +145,7 @@ export const deleteResourceAllocation = async (
       .eq('project_id', projectId)
       .eq('resource_id', resourceId)
       .eq('resource_type', resourceType)
-      .eq('week_start_date', formattedWeekKey)
+      .eq('allocation_date', formattedWeekKey)
       .eq('company_id', companyId);
     
     if (error) throw error;

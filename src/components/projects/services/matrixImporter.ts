@@ -153,7 +153,7 @@ export class MatrixImporter {
               .select('id')
               .eq('project_id', projectId)
               .eq('resource_id', resourceId)
-              .eq('week_start_date', weekStartDate)
+              .eq('allocation_date', weekStartDate)
               .maybeSingle();
 
             if (existingAllocation) {
@@ -172,7 +172,7 @@ export class MatrixImporter {
                   resource_id: resourceId,
                   resource_type: 'team_member',
                   hours,
-                  week_start_date: weekStartDate
+                  allocation_date: weekStartDate
                 });
             }
             allocationsCreated++;
