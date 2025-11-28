@@ -24,12 +24,12 @@ export const calculateActiveUtilizations = async (
   // Fetch allocations for active members
   const { data: activeAllocations, error: activeError } = await supabase
     .from('project_resource_allocations')
-    .select('resource_id, hours, week_start_date, project_id, resource_type')
+    .select('resource_id, hours, allocation_date, project_id, resource_type')
     .eq('company_id', companyId)
     .eq('resource_type', 'active')
     .in('resource_id', activeMemberIds)
-    .gte('week_start_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
-    .lte('week_start_date', format(currentWeekStart, 'yyyy-MM-dd'));
+    .gte('allocation_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
+    .lte('allocation_date', format(currentWeekStart, 'yyyy-MM-dd'));
 
   if (activeError) throw activeError;
 

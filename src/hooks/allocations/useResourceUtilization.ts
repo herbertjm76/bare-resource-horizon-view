@@ -49,14 +49,14 @@ export function useResourceUtilization(
         .from('project_resource_allocations')
         .select(`
           resource_id,
-          week_start_date,
+          allocation_date,
           hours,
           project:projects(id, name)
         `)
         .eq('resource_type', resourceType)
         .eq('company_id', company.id)
         .in('resource_id', resourceIds)
-        .in('week_start_date', formattedWeekKeys);
+        .in('allocation_date', formattedWeekKeys);
       
       if (error) throw error;
       
@@ -82,13 +82,13 @@ export function useResourceUtilization(
       
       // Process allocations
       (allocations || []).forEach(allocation => {
-        const { resource_id, week_start_date, hours } = allocation;
+        const { resource_id, allocation_date, hours } = allocation;
         const resourceUtil = utilizationMap[resource_id];
         
         if (resourceUtil) {
           // Update weekly hours
-          resourceUtil.weeklyHours[week_start_date] = 
-            (resourceUtil.weeklyHours[week_start_date] || 0) + Number(hours);
+          resourceUtil.weeklyHours[allocation_date] = 
+            (resourceUtil.weeklyHours[allocation_date] || 0) + Number(hours);
           
           // Update total hours
           resourceUtil.totalHours += Number(hours);

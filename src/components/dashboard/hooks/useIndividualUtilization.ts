@@ -117,8 +117,8 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
               .eq('resource_id', member.id)
               .eq('resource_type', 'pre_registered')
               .eq('company_id', company.id)
-              .gte('week_start_date', startDate)
-              .lte('week_start_date', endDate);
+              .gte('allocation_date', startDate)
+              .lte('allocation_date', endDate);
 
             if (error) {
               console.error(`Error fetching allocations for pending member ${memberName}:`, error);
@@ -137,8 +137,8 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
               .eq('resource_id', member.id)
               .eq('resource_type', 'active')
               .eq('company_id', company.id)
-              .gte('week_start_date', startDate)
-              .lte('week_start_date', endDate);
+              .gte('allocation_date', startDate)
+              .lte('allocation_date', endDate);
 
             if (error) {
               console.error(`Error fetching allocations for active member ${memberName}:`, error);

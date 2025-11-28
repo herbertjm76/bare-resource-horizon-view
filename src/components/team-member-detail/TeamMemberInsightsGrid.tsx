@@ -13,7 +13,7 @@ export const TeamMemberInsightsGrid: React.FC<TeamMemberInsightsGridProps> = ({ 
   
   const weeklyCapacity = memberProfile?.weekly_capacity || 40;
   
-  // Calculate quick metrics
+  // Calculate quick metrics - historicalData now uses allocation_date
   const currentWeekUtilization = historicalData[0]?.hours 
     ? (historicalData[0].hours / weeklyCapacity) * 100 
     : 0;

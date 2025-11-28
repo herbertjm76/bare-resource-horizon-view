@@ -47,12 +47,12 @@ export const useTeamUtilization = (teamMembers: any[]) => {
         // which stores weekly allocations, not daily ones
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
-          .select('resource_id, hours, week_start_date, project_id')
+          .select('resource_id, hours, allocation_date, project_id')
           .eq('company_id', company.id)
           .eq('resource_type', 'active')
           .in('resource_id', memberIds)
-          .gte('week_start_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
-          .lte('week_start_date', format(currentWeekStart, 'yyyy-MM-dd'));
+          .gte('allocation_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
+          .lte('allocation_date', format(currentWeekStart, 'yyyy-MM-dd'));
 
         if (error) throw error;
 
@@ -85,7 +85,7 @@ export const useTeamUtilization = (teamMembers: any[]) => {
           weeks.forEach(weekStart => {
             const weekKey = format(weekStart, 'yyyy-MM-dd');
             const weekAllocations = allocations?.filter(allocation => 
-              allocation.week_start_date === weekKey
+              allocation.allocation_date === weekKey
             ) || [];
             
             const weekHours = weekAllocations.reduce((sum, allocation) => {

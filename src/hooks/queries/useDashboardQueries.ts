@@ -188,10 +188,10 @@ export const useDashboardMetrics = (companyId?: string, timeRange: TimeRange = '
           .lte('created_at', dateRange.endDate),
         supabase
           .from('project_resource_allocations')
-          .select('hours, week_start_date, resource_id, project_id')
+          .select('hours, allocation_date, resource_id, project_id')
           .eq('company_id', companyId)
-          .gte('week_start_date', dateRange.startDate)
-          .lte('week_start_date', dateRange.endDate)
+          .gte('allocation_date', dateRange.startDate)
+          .lte('allocation_date', dateRange.endDate)
       ]);
       
       const projects = projectsRes.data || [];

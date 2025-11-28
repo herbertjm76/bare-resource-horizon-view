@@ -46,10 +46,10 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers, time
           // Project allocations - now respects time range
           supabase
             .from('project_resource_allocations')
-            .select('resource_id, hours, week_start_date')
+            .select('resource_id, hours, allocation_date')
             .eq('company_id', company.id)
-            .gte('week_start_date', queryStartDate)
-            .lt('week_start_date', queryEndDate)
+            .gte('allocation_date', queryStartDate)
+            .lt('allocation_date', queryEndDate)
             .in('resource_id', teamMembers.map(m => m.id)),
           
           // Annual leave - now respects time range

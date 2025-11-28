@@ -97,14 +97,14 @@ export const useProjectResourcingSummary = (
         .from('project_resource_allocations')
         .select(`
           resource_id,
-          week_start_date,
+          allocation_date,
           hours,
           project_id,
           resource_type,
           projects(id, name)
         `)
         .eq('company_id', company.id)
-        .in('week_start_date', uniqueWeekKeys);
+        .in('allocation_date', uniqueWeekKeys);
 
       if (error) throw error;
 
@@ -119,7 +119,7 @@ export const useProjectResourcingSummary = (
       
       (allocations || []).forEach(allocation => {
         const resourceId = allocation.resource_id;
-        const weekStart = new Date(allocation.week_start_date);
+        const weekStart = new Date(allocation.allocation_date);
         const hoursPerDay = allocation.hours / 7; // Distribute weekly hours across 7 days
 
         // Initialize maps if not exists

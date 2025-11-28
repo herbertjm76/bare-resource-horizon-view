@@ -84,7 +84,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             resource_id,
             resource_type,
             project_id,
-            week_start_date,
+            allocation_date,
             hours,
             projects (
               id,
@@ -94,8 +94,8 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           `)
           .eq('company_id', company.id)
           .in('resource_type', ['active', 'pre_registered'])
-          .gte('week_start_date', startDate.toISOString().split('T')[0])
-          .lte('week_start_date', endDate.toISOString().split('T')[0]);
+          .gte('allocation_date', startDate.toISOString().split('T')[0])
+          .lte('allocation_date', endDate.toISOString().split('T')[0]);
 
         if (allocationsError) {
           console.error('Error fetching allocations:', allocationsError);
@@ -142,7 +142,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           }
 
           // Convert the date to the week start (Monday)
-          const allocationDate = new Date(allocation.week_start_date + 'T00:00:00');
+          const allocationDate = new Date(allocation.allocation_date + 'T00:00:00');
           const dayOfWeek = allocationDate.getDay();
           const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
           const monday = new Date(allocationDate);

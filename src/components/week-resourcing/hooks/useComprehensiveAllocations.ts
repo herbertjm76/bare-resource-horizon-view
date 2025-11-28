@@ -35,7 +35,7 @@ export const useComprehensiveAllocations = ({
         .from('project_resource_allocations')
         .select('*')
         .eq('company_id', company.id)
-        .eq('week_start_date', weekStartDate)
+        .eq('allocation_date', weekStartDate)
         .in('resource_id', memberIds);
 
       if (error) {

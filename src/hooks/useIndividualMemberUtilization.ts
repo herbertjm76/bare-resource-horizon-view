@@ -40,11 +40,11 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity:
         // Fetch allocations for the past 90 days in one query
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
-          .select('hours, week_start_date')
+          .select('hours, allocation_date')
           .eq('resource_id', memberId)
           .eq('company_id', company.id)
-          .gte('week_start_date', format(twelveWeeksAgo, 'yyyy-MM-dd'))
-          .lte('week_start_date', format(currentWeekStart, 'yyyy-MM-dd'));
+          .gte('allocation_date', format(twelveWeeksAgo, 'yyyy-MM-dd'))
+          .lte('allocation_date', format(currentWeekStart, 'yyyy-MM-dd'));
 
         if (error) {
           console.error('Error fetching allocations:', error);
@@ -57,7 +57,7 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity:
         const calculatePeriodUtilization = (weeksBack: number) => {
           const periodStart = subWeeks(currentWeekStart, weeksBack);
           const periodAllocations = allocations?.filter(allocation => 
-            allocation.week_start_date >= format(periodStart, 'yyyy-MM-dd')
+            allocation.allocation_date >= format(periodStart, 'yyyy-MM-dd')
           ) || [];
           
           const totalHours = periodAllocations.reduce((sum, allocation) => 

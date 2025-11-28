@@ -78,11 +78,11 @@ export const useProjectStageProgress = (projectId: string, currentStage: string)
         if (stageStartDate && stageEndDate) {
           const { data: allocations, error: allocError } = await supabase
             .from('project_resource_allocations')
-            .select('hours, week_start_date')
+            .select('hours, allocation_date')
             .eq('project_id', projectId)
             .eq('company_id', company.id)
-            .gte('week_start_date', stageStartDate.toISOString().split('T')[0])
-            .lte('week_start_date', stageEndDate.toISOString().split('T')[0]);
+            .gte('allocation_date', stageStartDate.toISOString().split('T')[0])
+            .lte('allocation_date', stageEndDate.toISOString().split('T')[0]);
 
           if (!allocError && allocations) {
             allocatedHours = allocations.reduce((sum, alloc) => sum + (alloc.hours || 0), 0);

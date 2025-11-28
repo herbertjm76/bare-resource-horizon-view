@@ -5,7 +5,7 @@ interface ProjectAllocation {
   id: string;
   resource_id: string;
   hours: number;
-  week_start_date: string;
+  allocation_date: string;
   project: {
     id: string;
     name: string;

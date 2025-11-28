@@ -31,7 +31,7 @@ export const calculatePeriodUtilization = (
   weeks.forEach(weekStart => {
     const weekKey = format(weekStart, 'yyyy-MM-dd');
     const weekAllocations = memberAllocations.filter(allocation => 
-      allocation.week_start_date === weekKey
+      allocation.allocation_date === weekKey
     );
     
     const weekHours = weekAllocations.reduce((sum, allocation) => {

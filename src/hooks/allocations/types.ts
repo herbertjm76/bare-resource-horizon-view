@@ -6,7 +6,7 @@ export interface ResourceAllocation {
   project_id: string;
   resource_id: string;
   resource_type: 'active' | 'pre_registered';
-  week_start_date: string;
+  allocation_date: string;
   hours: number;
   company_id?: string;
 }
