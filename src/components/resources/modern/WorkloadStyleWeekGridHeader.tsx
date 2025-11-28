@@ -54,14 +54,14 @@ export const WorkloadStyleWeekGridHeader: React.FC<WorkloadStyleWeekGridHeaderPr
                 minWidth: '80px',
                 maxWidth: '80px',
                 backgroundColor: isCurrentWeek 
-                  ? '#14b8a6'
+                  ? 'hsl(var(--theme-primary))'
                   : 'transparent',
                 color: 'white',
                 textAlign: 'center',
                 padding: '6px 4px',
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
                 borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
-                borderTop: isCurrentWeek ? '3px solid #0d9488' : 'none',
+                borderTop: isCurrentWeek ? '3px solid hsl(var(--theme-border))' : 'none',
                 fontSize: '11px',
                 fontWeight: '600',
                 height: '60px',
@@ -71,7 +71,7 @@ export const WorkloadStyleWeekGridHeader: React.FC<WorkloadStyleWeekGridHeaderPr
                   opacity: 0.4
                 }),
                 ...(isCurrentWeek && {
-                  boxShadow: '0 4px 12px rgba(20, 184, 166, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                  boxShadow: '0 4px 12px hsl(var(--theme-primary) / 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
                 })
               }}
             >
