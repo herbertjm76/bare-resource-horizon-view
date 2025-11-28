@@ -7,6 +7,9 @@ import { ModernResourceGrid } from '@/components/resources/modern/ModernResource
 import { useProjects } from '@/hooks/useProjects';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
 import { useProjectResourcingSummary } from '../hooks/useProjectResourcingSummary';
+import { toast } from 'sonner';
+import { utils, writeFile } from 'xlsx';
+import { format } from 'date-fns';
 
 interface ProjectResourcingContentProps {
   selectedMonth: Date;
@@ -62,6 +65,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   // Fetch projects only for expand all functionality and total count
   const { projects } = useProjects(sortBy, sortDirection);
   const [expandedProjects, setExpandedProjects] = React.useState<string[]>([]);
+  const [isExporting, setIsExporting] = React.useState(false);
   
   // Expand all projects
   const expandAll = () => {
@@ -82,6 +86,50 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         ? prev.filter(id => id !== projectId)
         : [...prev, projectId]
     );
+  };
+
+  // Export to Excel
+  const handleExport = () => {
+    setIsExporting(true);
+    
+    setTimeout(() => {
+      try {
+        // Get the table element from the grid
+        const table = document.querySelector('.workload-resource-table');
+        
+        if (!table) {
+          toast.error('Could not find table data');
+          setIsExporting(false);
+          return;
+        }
+        
+        // Create worksheet from table
+        const ws = utils.table_to_sheet(table);
+        
+        // Create workbook and add worksheet
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, 'Project Resourcing');
+        
+        // Generate file name
+        const monthLabel = format(selectedMonth, 'MMM_yyyy');
+        const fileName = `Project_Resourcing_${monthLabel}.xlsx`;
+        
+        // Write file and trigger download
+        writeFile(wb, fileName);
+        
+        // Show success message
+        toast.success('Export successful', { 
+          description: `Exported to ${fileName}` 
+        });
+      } catch (error) {
+        console.error('Export failed:', error);
+        toast.error('Export failed', { 
+          description: 'An error occurred while exporting the data.'
+        });
+      } finally {
+        setIsExporting(false);
+      }
+    }, 100);
   };
 
   const totalProjects = projects?.length || 0;
@@ -120,6 +168,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         onCollapseAll={collapseAll}
         expandedProjects={expandedProjects}
         totalProjects={totalProjects}
+        onExport={handleExport}
       />
       
       {/* Content-First Main Table */}
