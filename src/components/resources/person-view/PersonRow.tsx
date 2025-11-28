@@ -3,13 +3,13 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronRight, Briefcase } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProjectAllocationRow } from './ProjectAllocationRow';
-import { DayInfo } from '../grid/types';
+import { WeekInfo } from '../hooks/useGridWeeks';
 import { PersonResourceData } from '@/hooks/usePersonResourceData';
 import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
 
 interface PersonRowProps {
   person: PersonResourceData;
-  days: DayInfo[];
+  weeks: WeekInfo[];
   isExpanded: boolean;
   onToggleExpand: () => void;
   isEven: boolean;
@@ -19,7 +19,7 @@ interface PersonRowProps {
 
 export const PersonRow: React.FC<PersonRowProps> = React.memo(({
   person,
-  days,
+  weeks,
   isExpanded,
   onToggleExpand,
   isEven,

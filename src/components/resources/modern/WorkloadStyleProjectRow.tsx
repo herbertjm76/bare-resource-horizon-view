@@ -7,11 +7,11 @@ import { WorkloadStyleResourceRow } from './WorkloadStyleResourceRow';
 import { AddResourceRow } from '../components/AddResourceRow';
 import { AddResourceDialog } from '../dialogs/AddResourceDialog';
 import { useProjectResources } from '../hooks/useProjectResources';
-import { DayInfo } from '../grid/types';
+import { WeekInfo } from '../hooks/useGridWeeks';
 
 interface WorkloadStyleProjectRowProps {
   project: any;
-  days: DayInfo[];
+  weeks: WeekInfo[];
   isExpanded: boolean;
   onToggleExpand: () => void;
   isEven: boolean;
@@ -21,7 +21,7 @@ interface WorkloadStyleProjectRowProps {
 
 export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = React.memo(({
   project,
-  days,
+  weeks,
   isExpanded,
   onToggleExpand,
   isEven,
@@ -44,23 +44,24 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   
   const rowBgColor = isEven ? '#ffffff' : '#f9fafb';
   
-  // Calculate total FTE across all resources for visible days (excluding previous week)
-  const totalFTE = React.useMemo(() => {
-    const totalHours = resources.reduce((total, resource) => {
-      const resourceHours = days
-        .filter(day => !day.isPreviousWeek) // Exclude previous week from calculation
-        .reduce((sum, day) => {
-          const dayKey = day.date.toISOString().split('T')[0];
-          const allocationKey = getAllocationKey(resource.id, dayKey);
+  // Calculate total hours across all resources for visible weeks (excluding previous week)
+  const totalHours = React.useMemo(() => {
+    return resources.reduce((total, resource) => {
+      const resourceHours = weeks
+        .filter(week => !week.isPreviousWeek) // Exclude previous week from calculation
+        .reduce((sum, week) => {
+          const weekKey = week.weekStartDate.toISOString().split('T')[0];
+          const allocationKey = getAllocationKey(resource.id, weekKey);
           const hours = projectAllocations[allocationKey] || 0;
           return sum + hours;
         }, 0);
       return total + resourceHours;
     }, 0);
-    
-    // Convert to FTE (40 hours = 1 FTE per week)
-    return totalHours / 40;
-  }, [resources, days, projectAllocations, getAllocationKey]);
+  }, [resources, weeks, projectAllocations, getAllocationKey]);
+  
+  // Calculate FTE (40 hours = 1 FTE per week)
+  const visibleWeeksCount = weeks.filter(w => !w.isPreviousWeek).length;
+  const totalFTE = visibleWeeksCount > 0 ? totalHours / (40 * visibleWeeksCount) : 0;
   
   return (
     <>
@@ -127,33 +128,31 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
           </div>
         </td>
         
-        {/* Day allocation cells */}
-        {days.map((day) => {
-          const dayKey = day.date.toISOString().split('T')[0];
+        {/* Week allocation cells */}
+        {weeks.map((week) => {
+          const weekKey = week.weekStartDate.toISOString().split('T')[0];
           
-          // Calculate day total from all resources for this project
-          const dayTotal = resources.reduce((total, resource) => {
-            const allocationKey = getAllocationKey(resource.id, dayKey);
+          // Calculate week total from all resources for this project
+          const weekTotal = resources.reduce((total, resource) => {
+            const allocationKey = getAllocationKey(resource.id, weekKey);
             const hours = projectAllocations[allocationKey] || 0;
             return total + hours;
           }, 0);
           
-          let cellBgColor = 'transparent'; // Let CSS gradient show through
-          
           return (
             <td 
-              key={dayKey} 
-              className="workload-resource-cell day-column"
+              key={weekKey} 
+              className="workload-resource-cell week-column"
               style={{ 
-                width: '30px', 
-                minWidth: '30px',
-                maxWidth: '30px',
+                width: '80px', 
+                minWidth: '80px',
+                maxWidth: '80px',
                 textAlign: 'center',
-                padding: '2px',
+                padding: '4px',
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
                 borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
                 verticalAlign: 'middle',
-                ...(day.isPreviousWeek && {
+                ...(week.isPreviousWeek && {
                   backgroundColor: 'rgba(0, 0, 0, 0.03)',
                   opacity: 0.5
                 })
@@ -165,14 +164,14 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                 justifyContent: 'center',
                 minHeight: '24px'
               }}>
-                {dayTotal > 0 ? (
-                  <span className="project-total-hours">
-                    {dayTotal}
+                {weekTotal > 0 ? (
+                  <span className="project-total-hours" style={{ fontSize: '13px' }}>
+                    {weekTotal}h
                   </span>
                 ) : (
                   <span style={{ 
                     color: 'rgba(0, 0, 0, 0.4)',
-                    fontSize: '12px'
+                    fontSize: '13px'
                   }}>
                     —
                   </span>
@@ -189,7 +188,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
           key={resource.id}
           resource={resource}
           project={project}
-          days={days}
+          weeks={weeks}
           isEven={isEven}
           resourceIndex={resourceIndex}
           selectedDate={selectedDate}
@@ -208,7 +207,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
         <AddResourceRow
           isExpanded={true}
           rowBgClass="add-resource-row"
-          daysCount={days.length}
+          daysCount={weeks.length}
           onAddResource={() => setShowAddResourceDialog(true)}
         />
       )}
@@ -232,6 +231,6 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
     prevProps.project.id === nextProps.project.id &&
     prevProps.isExpanded === nextProps.isExpanded &&
     prevProps.isEven === nextProps.isEven &&
-    prevProps.days.length === nextProps.days.length
+    prevProps.weeks.length === nextProps.weeks.length
   );
 });

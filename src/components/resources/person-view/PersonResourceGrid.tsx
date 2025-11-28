@@ -1,13 +1,13 @@
 import React from 'react';
 import { PersonGridHeader } from './PersonGridHeader';
 import { PersonRow } from './PersonRow';
-import { DayInfo } from '../grid/types';
+import { WeekInfo } from '../hooks/useGridWeeks';
 import '../modern/workload-resource-grid.css';
 import { PersonResourceData } from '@/hooks/usePersonResourceData';
 
 interface PersonResourceGridProps {
   personData: PersonResourceData[];
-  days: DayInfo[];
+  weeks: WeekInfo[];
   expandedPeople: string[];
   onTogglePersonExpand: (personId: string) => void;
   selectedDate?: Date;
@@ -41,20 +41,20 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
                 minWidth: `${tableWidth}px`
               }}
             >
-              <PersonGridHeader days={days} />
+              <PersonGridHeader weeks={weeks} />
               
               <tbody>
                 {personData.map((person, index) => (
-                  <PersonRow
-                    key={person.personId}
-                    person={person}
-                    days={days}
-                    isExpanded={expandedPeople.includes(person.personId)}
-                    onToggleExpand={() => onTogglePersonExpand(person.personId)}
-                    isEven={index % 2 === 0}
-                    selectedDate={selectedDate}
-                    periodToShow={periodToShow}
-                  />
+              <PersonRow
+                key={person.personId}
+                person={person}
+                weeks={weeks}
+                isExpanded={expandedPeople.includes(person.personId)}
+                onToggleExpand={() => onTogglePersonExpand(person.personId)}
+                isEven={index % 2 === 0}
+                selectedDate={selectedDate}
+                periodToShow={periodToShow}
+              />
                 ))}
               </tbody>
             </table>
