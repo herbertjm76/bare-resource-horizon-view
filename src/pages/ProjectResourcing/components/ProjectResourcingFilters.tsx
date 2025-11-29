@@ -7,6 +7,7 @@ interface ProjectResourcingFiltersProps {
     office: string;
     country: string;
     manager: string;
+    status: string;
     periodToShow: number;
   };
   searchTerm: string;

@@ -10,6 +10,7 @@ interface ModernResourceGridContainerProps {
     office: string;
     country: string;
     manager: string;
+    status: string;
     searchTerm?: string;
   };
   displayOptions: {

@@ -33,6 +33,7 @@ export const useProjectResourcingState = () => {
     office: "all",
     country: "all",
     manager: "all",
+    status: "Active", // Default to Active projects only
     periodToShow: 4, // Default is 1 month (4 weeks)
   });
 
