@@ -1,12 +1,10 @@
 
 import React from 'react';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
-import { StreamlinedProjectResourcingHeader } from './StreamlinedProjectResourcingHeader';
 import { StreamlinedActionBar } from './StreamlinedActionBar';
 import { ModernResourceGrid } from '@/components/resources/modern/ModernResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
-import { useProjectResourcingSummary } from '../hooks/useProjectResourcingSummary';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import jsPDF from 'jspdf';
@@ -214,9 +212,6 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
 
   const totalProjects = projects?.length || 0;
 
-  // Resource summary metrics for header
-  const summary = useProjectResourcingSummary(selectedMonth, filters.periodToShow);
-
   // Combine filters with search term for filtering
   const combinedFilters = {
     ...filters,
@@ -229,15 +224,6 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
 
   return (
     <div className="space-y-3">
-      {/* Header with metrics */}
-      <StreamlinedProjectResourcingHeader
-        projectCount={totalProjects}
-        periodToShow={filters.periodToShow}
-        availableResources={summary.availableThisMonth?.count ?? 0}
-        overloadedResources={summary.overloadedResources?.count ?? 0}
-        multiProjectResources={summary.multiProjectLoad?.count ?? 0}
-      />
-
       {/* Compact Action Bar */}
       <StreamlinedActionBar
         selectedDate={selectedMonth}
