@@ -207,7 +207,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="vacation" className="space-y-4">
+            <TabsContent value="vacation" className="mt-3 space-y-4">
               <div className="space-y-2">
                 <Label className="text-sm">Start Date</Label>
                 <Popover>
@@ -285,7 +285,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </Button>
             </TabsContent>
             
-            <TabsContent value="project" className="space-y-4">
+            <TabsContent value="project" className="mt-3 space-y-4">
               <div className="space-y-2">
                 <Label className="text-sm">Project</Label>
                 <Select value={selectedProject} onValueChange={setSelectedProject}>
