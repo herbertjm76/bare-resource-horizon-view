@@ -50,20 +50,32 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     return <div className="text-center p-8 border rounded-md border-dashed">No projects found. Click "New Project" to create your first project.</div>;
   }
 
-  const columnWidths: Record<ColumnKey, { default: string; expanded: string }> = {
-    code: { default: '80px', expanded: '140px' },
-    name: { default: 'auto', expanded: 'auto' },
-    pm: { default: '120px', expanded: '200px' },
-    status: { default: '140px', expanded: '220px' },
-    country: { default: '120px', expanded: '200px' },
-    department: { default: '140px', expanded: '240px' },
-    stage: { default: '160px', expanded: '260px' }
+  const baseWidths: Record<ColumnKey, number> = {
+    code: 80,
+    name: 200,
+    pm: 120,
+    status: 140,
+    country: 120,
+    department: 140,
+    stage: 160
   };
 
-  const getColumnWidth = (key: ColumnKey) => {
-    return expandedColumn === key 
-      ? columnWidths[key].expanded 
-      : columnWidths[key].default;
+  const expandAmount = 120; // Extra pixels for expanded column
+
+  const getColumnWidth = (key: ColumnKey): number => {
+    if (!expandedColumn) return baseWidths[key];
+    
+    if (expandedColumn === key) {
+      return baseWidths[key] + expandAmount;
+    }
+    
+    // Contract other columns proportionally
+    const totalBase = Object.values(baseWidths).reduce((sum, w) => sum + w, 0);
+    const thisColumnBase = baseWidths[key];
+    const contractionRatio = thisColumnBase / (totalBase - baseWidths[expandedColumn]);
+    const totalContraction = expandAmount;
+    
+    return Math.max(60, thisColumnBase - (totalContraction * contractionRatio));
   };
 
   return (
@@ -71,13 +83,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       <Table>
         <colgroup>
           {editMode && <col style={{ width: '40px' }} />}
-          <col style={{ width: getColumnWidth('code'), transition: 'width 0.2s ease' }} />
-          <col style={{ width: getColumnWidth('name'), transition: 'width 0.2s ease' }} />
-          <col style={{ width: getColumnWidth('pm'), transition: 'width 0.2s ease' }} />
-          <col style={{ width: getColumnWidth('status'), transition: 'width 0.2s ease' }} />
-          <col style={{ width: getColumnWidth('country'), transition: 'width 0.2s ease' }} />
-          <col style={{ width: getColumnWidth('department'), transition: 'width 0.2s ease' }} />
-          <col style={{ width: getColumnWidth('stage'), transition: 'width 0.2s ease' }} />
+          <col style={{ width: `${getColumnWidth('code')}px`, transition: 'width 0.3s ease' }} />
+          <col style={{ width: `${getColumnWidth('name')}px`, transition: 'width 0.3s ease' }} />
+          <col style={{ width: `${getColumnWidth('pm')}px`, transition: 'width 0.3s ease' }} />
+          <col style={{ width: `${getColumnWidth('status')}px`, transition: 'width 0.3s ease' }} />
+          <col style={{ width: `${getColumnWidth('country')}px`, transition: 'width 0.3s ease' }} />
+          <col style={{ width: `${getColumnWidth('department')}px`, transition: 'width 0.3s ease' }} />
+          <col style={{ width: `${getColumnWidth('stage')}px`, transition: 'width 0.3s ease' }} />
           {editMode && <col style={{ width: '96px' }} />}
         </colgroup>
         <ProjectTableHeader 
