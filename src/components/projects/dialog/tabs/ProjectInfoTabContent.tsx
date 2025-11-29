@@ -38,7 +38,7 @@ export const ProjectInfoTabContent: React.FC<ProjectInfoTabContentProps> = ({
         updateStageApplicability={updateStageApplicability}
         statusOptions={[
           { label: "Not started", value: "Planning" },
-          { label: "On-going", value: "In Progress" },
+          { label: "Active", value: "In Progress" },
           { label: "Completed", value: "Complete" },
           { label: "On hold", value: "On Hold" }
         ]}
