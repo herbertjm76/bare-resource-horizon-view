@@ -10,25 +10,34 @@ export type ProjectStage = string;
 
 export const mapStatusToDb = (status: string): DbProjectStatus => {
   switch(status) {
-    case 'In Progress': return 'In Progress';
+    case 'Active':
+    case 'In Progress':
+      return 'In Progress';
     case 'Completed': 
-    case 'Complete': return 'Complete';
-    case 'On Hold': return 'On Hold';
-    case 'Not Started': 
+    case 'Complete':
+      return 'Complete';
+    case 'On Hold':
+      return 'On Hold';
     case 'Planning':
-    default:
       return 'Planning';
+    default:
+      // Fallback to a non-planning state so we never accidentally set everything to "Planning"
+      return 'In Progress';
   }
 };
 
 export const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
   switch(dbStatus) {
-    case 'In Progress': return 'In Progress';
-    case 'Complete': return 'Complete';
-    case 'On Hold': return 'On Hold';
+    case 'In Progress':
+      return 'In Progress';
+    case 'Complete':
+      return 'Complete';
+    case 'On Hold':
+      return 'On Hold';
     case 'Planning': 
     default:
-      return 'Planning';
+      // Treat unknown statuses as in progress instead of "Planning"
+      return 'In Progress';
   }
 };
 
