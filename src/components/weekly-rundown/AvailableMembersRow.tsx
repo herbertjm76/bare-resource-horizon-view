@@ -318,19 +318,21 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                     memberName={`${member.firstName} ${member.lastName}`}
                     weekStartDate={weekStartDate}
                   >
-                    <MemberAvailabilityCard
-                      memberId={member.id}
-                      memberType={member.type}
-                      avatarUrl={member.avatarUrl}
-                      firstName={member.firstName}
-                      lastName={member.lastName}
-                      allocatedHours={member.allocatedHours}
-                      projectAllocations={member.projectAllocations}
-                      utilization={member.utilization}
-                      threshold={threshold}
-                      weekStartDate={weekStartDate}
-                      disableDialog={true}
-                    />
+                    <div className="cursor-pointer">
+                      <MemberAvailabilityCard
+                        memberId={member.id}
+                        memberType={member.type}
+                        avatarUrl={member.avatarUrl}
+                        firstName={member.firstName}
+                        lastName={member.lastName}
+                        allocatedHours={member.allocatedHours}
+                        projectAllocations={member.projectAllocations}
+                        utilization={member.utilization}
+                        threshold={threshold}
+                        weekStartDate={weekStartDate}
+                        disableDialog={true}
+                      />
+                    </div>
                   </MemberVacationPopover>
                 ))}
               </div>
@@ -349,19 +351,21 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                   memberName={`${member.firstName} ${member.lastName}`}
                   weekStartDate={weekStartDate}
                 >
-                  <MemberAvailabilityCard
-                    memberId={member.id}
-                    memberType={member.type}
-                    avatarUrl={member.avatarUrl}
-                    firstName={member.firstName}
-                    lastName={member.lastName}
-                    allocatedHours={member.allocatedHours}
-                    projectAllocations={member.projectAllocations}
-                    utilization={member.utilization}
-                    threshold={threshold}
-                    weekStartDate={weekStartDate}
-                    disableDialog={true}
-                  />
+                  <div className="cursor-pointer">
+                    <MemberAvailabilityCard
+                      memberId={member.id}
+                      memberType={member.type}
+                      avatarUrl={member.avatarUrl}
+                      firstName={member.firstName}
+                      lastName={member.lastName}
+                      allocatedHours={member.allocatedHours}
+                      projectAllocations={member.projectAllocations}
+                      utilization={member.utilization}
+                      threshold={threshold}
+                      weekStartDate={weekStartDate}
+                      disableDialog={true}
+                    />
+                  </div>
                 </MemberVacationPopover>
               ))}
             </div>
