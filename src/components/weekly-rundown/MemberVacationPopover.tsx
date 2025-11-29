@@ -189,34 +189,34 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-96" align="start" side="top" sideOffset={12}>
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 pb-2 border-b">
-            <h4 className="font-medium text-sm">{memberName}</h4>
+      <PopoverContent className="w-96 border-border-primary shadow-elevation-2" align="start" side="top" sideOffset={12}>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 pb-3 border-b border-border-primary">
+            <h4 className="font-semibold text-base text-text-primary">{memberName}</h4>
           </div>
           
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'vacation' | 'project')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="vacation" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-bg-tertiary">
+              <TabsTrigger value="vacation" className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm">
                 <CalendarIcon className="h-4 w-4" />
                 Vacation
               </TabsTrigger>
-              <TabsTrigger value="project" className="flex items-center gap-2">
+              <TabsTrigger value="project" className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm">
                 <Briefcase className="h-4 w-4" />
                 Project
               </TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="vacation" className="mt-3 space-y-4">
+
+            <TabsContent value="vacation" className="mt-4 space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm">Start Date</Label>
+                <Label className="text-sm font-medium text-text-primary">Start Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !vacationDate && "text-muted-foreground"
+                        "w-full justify-start text-left font-normal h-10 border-border-primary hover:bg-bg-secondary",
+                        !vacationDate && "text-text-tertiary"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -236,14 +236,14 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm">End Date (Optional)</Label>
+                <Label className="text-sm font-medium text-text-primary">End Date (Optional)</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !vacationEndDate && "text-muted-foreground"
+                        "w-full justify-start text-left font-normal h-10 border-border-primary hover:bg-bg-secondary",
+                        !vacationEndDate && "text-text-tertiary"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -264,7 +264,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm">Hours per Day</Label>
+                <Label className="text-sm font-medium text-text-primary">Hours per Day</Label>
                 <Input
                   type="number"
                   min="0"
@@ -273,23 +273,24 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                   value={vacationHours}
                   onChange={(e) => setVacationHours(e.target.value)}
                   placeholder="8"
+                  className="h-10 border-border-primary"
                 />
               </div>
 
               <Button 
                 onClick={handleSaveVacation}
                 disabled={!vacationDate || isSavingVacation}
-                className="w-full"
+                className="w-full h-10 bg-brand-primary hover:bg-brand-primary/90 text-white font-medium"
               >
                 {isSavingVacation ? 'Saving...' : 'Save Vacation'}
               </Button>
             </TabsContent>
             
-            <TabsContent value="project" className="mt-3 space-y-4">
+            <TabsContent value="project" className="mt-4 space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm">Project</Label>
+                <Label className="text-sm font-medium text-text-primary">Project</Label>
                 <Select value={selectedProject} onValueChange={setSelectedProject}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-10 border-border-primary">
                     <SelectValue placeholder="Select project" />
                   </SelectTrigger>
                   <SelectContent>
@@ -303,8 +304,8 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm">Hours per Week</Label>
-                <div className="max-h-[300px] overflow-y-auto space-y-2">
+                <Label className="text-sm font-medium text-text-primary">Hours per Week</Label>
+                <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
                   {weeks.map((weekKey) => {
                     const weekDate = new Date(weekKey);
                     const weekEnd = new Date(weekDate);
@@ -312,7 +313,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                     
                     return (
                       <div key={weekKey} className="flex items-center gap-2">
-                        <Label className="text-xs text-muted-foreground w-32 flex-shrink-0">
+                        <Label className="text-xs text-text-secondary w-32 flex-shrink-0">
                           {format(weekDate, 'MMM d')} - {format(weekEnd, 'MMM d')}
                         </Label>
                         <Input
@@ -323,7 +324,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                           value={projectWeeks[weekKey] || ''}
                           onChange={(e) => handleWeekHoursChange(weekKey, e.target.value)}
                           placeholder="0"
-                          className="flex-1"
+                          className="flex-1 h-9 border-border-primary"
                         />
                       </div>
                     );
@@ -334,7 +335,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               <Button 
                 onClick={handleSaveProject}
                 disabled={!selectedProject || isSavingProject}
-                className="w-full"
+                className="w-full h-10 bg-brand-primary hover:bg-brand-primary/90 text-white font-medium"
               >
                 {isSavingProject ? 'Saving...' : 'Save Project Allocation'}
               </Button>
