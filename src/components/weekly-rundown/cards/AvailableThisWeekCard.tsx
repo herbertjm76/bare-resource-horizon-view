@@ -70,7 +70,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
         .from('project_resource_allocations')
         .select('resource_id, resource_type, hours')
         .eq('company_id', company.id)
-        .eq('week_start_date', weekStartDate);
+        .eq('allocation_date', weekStartDate);
       if (error) throw error;
       return data || [];
     },

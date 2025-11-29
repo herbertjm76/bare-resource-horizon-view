@@ -2,27 +2,75 @@
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+type ColumnKey = 'code' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
+
 interface ProjectTableHeaderProps {
   editMode: boolean;
   office_stages: Array<{ id: string; name: string; color?: string }>;
+  expandedColumn: ColumnKey | null;
+  onColumnClick: (column: ColumnKey) => void;
 }
 
 export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({ 
   editMode, 
-  office_stages 
+  office_stages,
+  expandedColumn,
+  onColumnClick
 }) => {
   return (
     <TableHeader>
       <TableRow style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
         {editMode && <TableHead className="w-10" style={{ background: 'transparent', color: 'white' }}><span className="sr-only">Select</span></TableHead>}
-        <TableHead className="w-20" style={{ background: 'transparent', color: 'white' }}>Code</TableHead>
-        <TableHead style={{ background: 'transparent', color: 'white' }}>Project Name</TableHead>
-        <TableHead style={{ background: 'transparent', color: 'white' }}>PM</TableHead>
-        <TableHead style={{ background: 'transparent', color: 'white' }}>Status</TableHead>
-        <TableHead style={{ background: 'transparent', color: 'white' }}>Country</TableHead>
-        <TableHead style={{ background: 'transparent', color: 'white' }}>Department</TableHead>
+        <TableHead 
+          className="cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ background: 'transparent', color: 'white' }}
+          onClick={() => onColumnClick('code')}
+        >
+          Code
+        </TableHead>
+        <TableHead 
+          className="cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ background: 'transparent', color: 'white' }}
+          onClick={() => onColumnClick('name')}
+        >
+          Project Name
+        </TableHead>
+        <TableHead 
+          className="cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ background: 'transparent', color: 'white' }}
+          onClick={() => onColumnClick('pm')}
+        >
+          PM
+        </TableHead>
+        <TableHead 
+          className="cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ background: 'transparent', color: 'white' }}
+          onClick={() => onColumnClick('status')}
+        >
+          Status
+        </TableHead>
+        <TableHead 
+          className="cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ background: 'transparent', color: 'white' }}
+          onClick={() => onColumnClick('country')}
+        >
+          Country
+        </TableHead>
+        <TableHead 
+          className="cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ background: 'transparent', color: 'white' }}
+          onClick={() => onColumnClick('department')}
+        >
+          Department
+        </TableHead>
         {/* <TableHead style={{ background: 'transparent', color: 'white' }}>%Profit</TableHead> */}
-        <TableHead style={{ background: 'transparent', color: 'white' }}>Current Stage</TableHead>
+        <TableHead 
+          className="cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ background: 'transparent', color: 'white' }}
+          onClick={() => onColumnClick('stage')}
+        >
+          Current Stage
+        </TableHead>
         {/* Stage fee columns hidden for MVP */}
         {/* {office_stages.map((stage) => (
           <TableHead 

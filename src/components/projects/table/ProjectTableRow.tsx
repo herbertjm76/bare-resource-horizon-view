@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/select";
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 
+type ColumnKey = 'code' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
+
 interface ProjectTableRowProps {
   project: any;
   editMode: boolean;
@@ -27,6 +29,8 @@ interface ProjectTableRowProps {
   getProjectStageFee: (projectId: string, officeStageId: string) => number | null;
   refetch: () => void;
   saveSignal?: number;
+  expandedColumn: ColumnKey | null;
+  onColumnClick: (column: ColumnKey) => void;
 }
 
 export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
@@ -39,7 +43,9 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   office_stages,
   getProjectStageFee,
   refetch,
-  saveSignal
+  saveSignal,
+  expandedColumn,
+  onColumnClick
 }) => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { project_statuses } = useOfficeSettings();
@@ -96,7 +102,10 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           </TableCell>
         )}
         
-        <TableCell className="font-semibold p-0">
+        <TableCell 
+          className="font-semibold p-0 cursor-pointer hover:bg-muted/10 transition-colors"
+          onClick={() => onColumnClick('code')}
+        >
           {editMode ? (
             <Input
               value={editableFields[project.id]?.code || project.code}
@@ -108,7 +117,10 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           )}
         </TableCell>
         
-        <TableCell className="p-0">
+        <TableCell 
+          className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
+          onClick={() => onColumnClick('name')}
+        >
           {editMode ? (
             <Input
               value={editableFields[project.id]?.name || project.name}
@@ -122,7 +134,10 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           )}
         </TableCell>
         
-        <TableCell className="p-0">
+        <TableCell 
+          className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
+          onClick={() => onColumnClick('pm')}
+        >
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.project_manager_id || project.project_manager_id || 'not_assigned'} 
@@ -145,7 +160,10 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           )}
         </TableCell>
         
-        <TableCell className="p-0">
+        <TableCell 
+          className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
+          onClick={() => onColumnClick('status')}
+        >
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.status || project.status} 
@@ -177,7 +195,10 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           )}
         </TableCell>
         
-        <TableCell className="p-0">
+        <TableCell 
+          className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
+          onClick={() => onColumnClick('country')}
+        >
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.country || project.country || ''} 
@@ -217,7 +238,10 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           )}
         </TableCell>
         
-        <TableCell className="p-0">
+        <TableCell 
+          className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
+          onClick={() => onColumnClick('department')}
+        >
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.department || project.department || ''} 
@@ -245,7 +269,10 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           {project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"}
         </TableCell> */}
         
-        <TableCell className="p-0">
+        <TableCell 
+          className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
+          onClick={() => onColumnClick('stage')}
+        >
           {editMode ? (
             <Select 
               value={editableFields[project.id]?.current_stage || project.current_stage || ''} 
