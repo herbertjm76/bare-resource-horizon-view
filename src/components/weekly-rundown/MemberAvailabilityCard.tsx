@@ -21,6 +21,8 @@ interface MemberAvailabilityCardProps {
   memberId: string;
   memberType: 'active' | 'pre_registered';
   weekStartDate: string;
+  disableDialog?: boolean;
+  onAvatarClick?: () => void;
 }
 
 export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
@@ -34,10 +36,20 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   memberId,
   memberType,
   weekStartDate,
+  disableDialog = false,
+  onAvatarClick,
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
+  
+  const handleClick = () => {
+    if (onAvatarClick) {
+      onAvatarClick();
+    } else if (!disableDialog) {
+      setDialogOpen(true);
+    }
+  };
   
   
   // Calculate progress for the ring based on utilization percentage
@@ -54,25 +66,27 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   };
   return (
     <>
-      <ResourceAllocationDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        member={{
-          id: memberId,
-          firstName,
-          lastName,
-          avatarUrl,
-          type: memberType,
-        }}
-        weekStartDate={weekStartDate}
-        compact
-      />
+      {!disableDialog && (
+        <ResourceAllocationDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          member={{
+            id: memberId,
+            firstName,
+            lastName,
+            avatarUrl,
+            type: memberType,
+          }}
+          weekStartDate={weekStartDate}
+          compact
+        />
+      )}
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <div 
               className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer"
-              onClick={() => setDialogOpen(true)}
+              onClick={handleClick}
             >
             {/* Avatar with utilization ring */}
             <div className="relative w-[50px] h-[50px] flex items-center justify-center">
