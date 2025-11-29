@@ -19,6 +19,7 @@ interface ProjectFilters {
   office: string;
   country: string;
   manager: string;
+  status: string;
   searchTerm?: string;
 }
 
@@ -33,6 +34,7 @@ export const useFilteredProjects = (
       if (filters.office !== "all" && project.office?.name !== filters.office) return false;
       if (filters.country !== "all" && project.country !== filters.country) return false;
       if (filters.manager !== "all" && project.project_manager?.id !== filters.manager) return false;
+      if (filters.status !== "all" && project.status !== filters.status) return false;
 
       // Filter by search term if present
       if (filters.searchTerm && filters.searchTerm.trim() !== '') {

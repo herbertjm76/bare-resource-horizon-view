@@ -4,12 +4,14 @@ import { PeriodSelector } from './PeriodSelector';
 import { FilterBadges } from './FilterBadges';
 import { DisplayOptions } from './DisplayOptions';
 import { Separator } from "@/components/ui/separator";
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 
 interface ProjectResourceFiltersProps {
   filters: {
     office: string;
     country: string;
     manager: string;
+    status: string;
     periodToShow: number;
   };
   searchTerm: string;
@@ -41,6 +43,8 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
   displayOptions,
   onDisplayOptionChange
 }) => {
+  const { project_statuses } = useOfficeSettings();
+  
   return (
     <div className="space-y-4 p-4">
       <div className="grid grid-cols-1 gap-4">
@@ -61,6 +65,21 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
         />
         
         <Separator className="my-2" />
+        
+        {/* Status filter */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Status</label>
+          <select
+            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            value={filters.status}
+            onChange={(e) => onFilterChange('status', e.target.value)}
+          >
+            <option value="all">All Statuses</option>
+            {project_statuses.map(status => (
+              <option key={status.id} value={status.name}>{status.name}</option>
+            ))}
+          </select>
+        </div>
         
         {/* Office filter */}
         <div className="space-y-2">

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { StreamlinedActionBar } from './StreamlinedActionBar';
 import { ModernResourceGrid } from '@/components/resources/modern/ModernResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
@@ -26,6 +27,7 @@ interface ProjectResourcingContentProps {
     office: string;
     country: string;
     manager: string;
+    status: string;
     periodToShow: number;
   };
   displayOptions: {
