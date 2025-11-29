@@ -226,7 +226,24 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
 
   return (
     <div className="space-y-3">
-      {/* Compact Action Bar */}
+      {/* Centered main grid */}
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-[1400px] overflow-hidden">
+          <ModernResourceGrid
+            startDate={selectedMonth}
+            periodToShow={filters.periodToShow}
+            filters={combinedFilters}
+            displayOptions={displayOptions}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            expandedProjects={expandedProjects}
+            totalProjects={totalProjects}
+            onToggleProjectExpand={handleToggleProjectExpand}
+          />
+        </div>
+      </div>
+
+      {/* Compact Action Bar - moved below grid */}
       <StreamlinedActionBar
         selectedDate={selectedMonth}
         onDateChange={onMonthChange}
@@ -253,23 +270,6 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         totalProjects={totalProjects}
         onExport={handleExport}
       />
-
-      {/* Centered main grid */}
-      <div className="w-full flex justify-center">
-        <div className="w-full max-w-[1400px] overflow-hidden">
-          <ModernResourceGrid
-            startDate={selectedMonth}
-            periodToShow={filters.periodToShow}
-            filters={combinedFilters}
-            displayOptions={displayOptions}
-            sortBy={sortBy}
-            sortDirection={sortDirection}
-            expandedProjects={expandedProjects}
-            totalProjects={totalProjects}
-            onToggleProjectExpand={handleToggleProjectExpand}
-          />
-        </div>
-      </div>
     </div>
   );
 };
