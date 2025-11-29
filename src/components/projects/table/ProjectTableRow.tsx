@@ -47,6 +47,9 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   expandedColumn,
   onColumnClick
 }) => {
+  const handleColumnClick = (column: ColumnKey) => {
+    onColumnClick(expandedColumn === column ? null : column);
+  };
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { project_statuses } = useOfficeSettings();
 
@@ -104,7 +107,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         
         <TableCell 
           className="font-semibold p-0 cursor-pointer hover:bg-muted/10 transition-colors"
-          onClick={() => onColumnClick('code')}
+          onClick={() => handleColumnClick('code')}
         >
           {editMode ? (
             <Input
@@ -119,7 +122,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         
         <TableCell 
           className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
-          onClick={() => onColumnClick('name')}
+          onClick={() => handleColumnClick('name')}
         >
           {editMode ? (
             <Input
@@ -136,7 +139,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         
         <TableCell 
           className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
-          onClick={() => onColumnClick('pm')}
+          onClick={() => handleColumnClick('pm')}
         >
           {editMode ? (
             <Select 
@@ -162,7 +165,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         
         <TableCell 
           className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
-          onClick={() => onColumnClick('status')}
+          onClick={() => handleColumnClick('status')}
         >
           {editMode ? (
             <Select 
@@ -197,7 +200,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         
         <TableCell 
           className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
-          onClick={() => onColumnClick('country')}
+          onClick={() => handleColumnClick('country')}
         >
           {editMode ? (
             <Select 
@@ -240,7 +243,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         
         <TableCell 
           className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
-          onClick={() => onColumnClick('department')}
+          onClick={() => handleColumnClick('department')}
         >
           {editMode ? (
             <Select 
@@ -271,7 +274,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         
         <TableCell 
           className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
-          onClick={() => onColumnClick('stage')}
+          onClick={() => handleColumnClick('stage')}
         >
           {editMode ? (
             <Select 

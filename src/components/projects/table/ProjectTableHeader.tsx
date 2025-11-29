@@ -17,6 +17,10 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
   expandedColumn,
   onColumnClick
 }) => {
+  const handleColumnClick = (column: ColumnKey) => {
+    onColumnClick(expandedColumn === column ? null : column);
+  };
+
   return (
     <TableHeader>
       <TableRow style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
@@ -24,42 +28,42 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
         <TableHead 
           className="cursor-pointer hover:opacity-80 transition-opacity" 
           style={{ background: 'transparent', color: 'white' }}
-          onClick={() => onColumnClick('code')}
+          onClick={() => handleColumnClick('code')}
         >
           Code
         </TableHead>
         <TableHead 
           className="cursor-pointer hover:opacity-80 transition-opacity" 
           style={{ background: 'transparent', color: 'white' }}
-          onClick={() => onColumnClick('name')}
+          onClick={() => handleColumnClick('name')}
         >
           Project Name
         </TableHead>
         <TableHead 
           className="cursor-pointer hover:opacity-80 transition-opacity" 
           style={{ background: 'transparent', color: 'white' }}
-          onClick={() => onColumnClick('pm')}
+          onClick={() => handleColumnClick('pm')}
         >
           PM
         </TableHead>
         <TableHead 
           className="cursor-pointer hover:opacity-80 transition-opacity" 
           style={{ background: 'transparent', color: 'white' }}
-          onClick={() => onColumnClick('status')}
+          onClick={() => handleColumnClick('status')}
         >
           Status
         </TableHead>
         <TableHead 
           className="cursor-pointer hover:opacity-80 transition-opacity" 
           style={{ background: 'transparent', color: 'white' }}
-          onClick={() => onColumnClick('country')}
+          onClick={() => handleColumnClick('country')}
         >
           Country
         </TableHead>
         <TableHead 
           className="cursor-pointer hover:opacity-80 transition-opacity" 
           style={{ background: 'transparent', color: 'white' }}
-          onClick={() => onColumnClick('department')}
+          onClick={() => handleColumnClick('department')}
         >
           Department
         </TableHead>
@@ -67,7 +71,7 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
         <TableHead 
           className="cursor-pointer hover:opacity-80 transition-opacity" 
           style={{ background: 'transparent', color: 'white' }}
-          onClick={() => onColumnClick('stage')}
+          onClick={() => handleColumnClick('stage')}
         >
           Current Stage
         </TableHead>
