@@ -393,14 +393,23 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         )}
       </div>
 
-      {/* Expanded vacation hours input */}
-      {expandedMember && (
+      {/* Expanded vacation hours row - one input per member */}
+      {expandedMemberId && (
         <div className="border border-t-0 rounded-b-lg bg-card p-3 animate-in slide-in-from-top-2 duration-200">
-          <MemberVacationInput
-            memberId={expandedMember.id}
-            memberName={`${expandedMember.firstName} ${expandedMember.lastName}`}
-            weekStartDate={weekStartDate}
-          />
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-sm font-medium text-foreground w-32">Vacation Hours</span>
+          </div>
+          <div className="flex gap-1.5 sm:gap-2 items-start">
+            {availableMembers.map((member) => (
+              <div key={member.id} className="flex flex-col items-center" style={{ minWidth: '80px', maxWidth: '80px' }}>
+                <MemberVacationInput
+                  memberId={member.id}
+                  memberName={`${member.firstName} ${member.lastName}`}
+                  weekStartDate={weekStartDate}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
