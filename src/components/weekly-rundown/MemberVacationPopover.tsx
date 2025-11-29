@@ -189,7 +189,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-96" align="start" side="bottom">
+      <PopoverContent className="w-96" align="start" side="top" sideOffset={12}>
         <div className="space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b">
             <h4 className="font-medium text-sm">{memberName}</h4>
