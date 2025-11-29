@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { mapStatusToDb } from '../../utils/projectMappings';
 
 export const useProjectFields = (project: any, refetch: () => void) => {
   const [editableFields, setEditableFields] = useState<Record<string, any>>({});
@@ -104,7 +103,7 @@ export const useProjectFields = (project: any, refetch: () => void) => {
     mapField('country');
     mapField('department');
     mapField('current_stage', 'current_stage', (v) => v || null);
-    mapField('status', 'status', (v) => mapStatusToDb(v));
+    mapField('status');
 
     return updateData;
   };

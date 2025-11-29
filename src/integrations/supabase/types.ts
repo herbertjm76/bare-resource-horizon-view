@@ -1329,7 +1329,7 @@ export type Database = {
           project_manager_id: string | null
           rate_basis_strategy: string | null
           stages: string[] | null
-          status: Database["public"]["Enums"]["project_status"]
+          status: string
           target_profit_percentage: number
           temp_office_location_id: string | null
           updated_at: string | null
@@ -1357,7 +1357,7 @@ export type Database = {
           project_manager_id?: string | null
           rate_basis_strategy?: string | null
           stages?: string[] | null
-          status?: Database["public"]["Enums"]["project_status"]
+          status?: string
           target_profit_percentage: number
           temp_office_location_id?: string | null
           updated_at?: string | null
@@ -1385,7 +1385,7 @@ export type Database = {
           project_manager_id?: string | null
           rate_basis_strategy?: string | null
           stages?: string[] | null
-          status?: Database["public"]["Enums"]["project_status"]
+          status?: string
           target_profit_percentage?: number
           temp_office_location_id?: string | null
           updated_at?: string | null
@@ -1803,7 +1803,6 @@ export type Database = {
       app_role: "owner" | "admin" | "member"
       data_sensitivity: "public" | "internal" | "confidential" | "restricted"
       member_type: "active" | "pre_registered"
-      project_status: "In Progress" | "On Hold" | "Complete" | "Planning"
       user_role: "owner" | "admin" | "member"
     }
     CompositeTypes: {
@@ -1935,7 +1934,6 @@ export const Constants = {
       app_role: ["owner", "admin", "member"],
       data_sensitivity: ["public", "internal", "confidential", "restricted"],
       member_type: ["active", "pre_registered"],
-      project_status: ["In Progress", "On Hold", "Complete", "Planning"],
       user_role: ["owner", "admin", "member"],
     },
   },

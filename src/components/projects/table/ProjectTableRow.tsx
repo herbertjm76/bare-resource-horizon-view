@@ -71,11 +71,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   // Get the current stage name from office stages
   const getCurrentStageName = () => {
     if (!project.current_stage) return 'None';
-    // Treat any "Planning" value as "Concept" in the UI
-    if (project.current_stage === 'Planning') return 'Concept';
     const stage = office_stages.find(s => s.id === project.current_stage);
-    const rawName = stage ? stage.name : project.current_stage;
-    return rawName === 'Planning' ? 'Concept' : rawName;
+    return stage ? stage.name : project.current_stage;
   };
 
   // Get the current stage color
@@ -181,7 +178,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               <SelectContent className="bg-background border-border">
                 {project_statuses.map((status) => (
                   <SelectItem key={status.id} value={status.name}>
-                    {status.name === 'In Progress' || status.name === 'Planning' ? 'Active' : status.name}
+                    {status.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -195,7 +192,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                   color: getStatusColor(project.status).text
                 }}
               >
-                {project.status === 'In Progress' || project.status === 'Planning' ? 'Active' : project.status}
+                {project.status}
               </span>
             </div>
           )}
