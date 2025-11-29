@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { Calendar } from 'lucide-react';
 
 interface MemberVacationInputProps {
   memberId: string;
@@ -20,105 +18,114 @@ export const MemberVacationInput: React.FC<MemberVacationInputProps> = ({
 }) => {
   const { company } = useCompany();
   const queryClient = useQueryClient();
-  const [hours, setHours] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  const [dailyHours, setDailyHours] = useState<Record<string, string>>({});
 
-  const handleSave = async () => {
+  // Calculate the 5 weekdays (Mon-Fri)
+  const weekDays = React.useMemo(() => {
+    const weekStart = new Date(weekStartDate);
+    const days = [];
+    for (let i = 0; i < 5; i++) {
+      const day = new Date(weekStart);
+      day.setDate(day.getDate() + i);
+      days.push({
+        dateKey: day.toISOString().split('T')[0],
+        dayName: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'][i]
+      });
+    }
+    return days;
+  }, [weekStartDate]);
+
+  // Load existing vacation hours
+  useEffect(() => {
+    const loadVacationHours = async () => {
+      if (!company?.id) return;
+
+      const dates = weekDays.map(d => d.dateKey);
+
+      const { data } = await supabase
+        .from('annual_leaves')
+        .select('date, hours')
+        .eq('member_id', memberId)
+        .eq('company_id', company.id)
+        .in('date', dates);
+
+      if (data) {
+        const hoursMap: Record<string, string> = {};
+        data.forEach(leave => {
+          hoursMap[leave.date] = leave.hours.toString();
+        });
+        setDailyHours(hoursMap);
+      }
+    };
+
+    loadVacationHours();
+  }, [memberId, weekStartDate, company?.id, weekDays]);
+
+  const handleHoursChange = async (dateKey: string, value: string) => {
+    setDailyHours(prev => ({ ...prev, [dateKey]: value }));
+
     if (!company?.id) return;
 
-    const totalHours = parseInt(hours) || 0;
-    setIsSaving(true);
-
+    const hours = parseFloat(value) || 0;
+    
     try {
-      // Parse week start date
-      const weekStart = new Date(weekStartDate);
-      
-      // Calculate days in the week (Monday to Sunday)
-      const daysInWeek = [];
-      for (let i = 0; i < 7; i++) {
-        const day = new Date(weekStart);
-        day.setDate(day.getDate() + i);
-        daysInWeek.push(day.toISOString().split('T')[0]);
-      }
-
-      // Distribute hours across weekdays (Monday to Friday)
-      const hoursPerDay = Math.floor(totalHours / 5);
-      const remainderHours = totalHours % 5;
-
-      // Delete existing leave records for this week
+      // Delete existing entry for this date
       await supabase
         .from('annual_leaves')
         .delete()
-        .eq('company_id', company.id)
         .eq('member_id', memberId)
-        .in('date', daysInWeek);
+        .eq('company_id', company.id)
+        .eq('date', dateKey);
 
-      if (totalHours > 0) {
-        // Insert new leave records
-        const leaveRecords = [];
-        for (let i = 0; i < 5; i++) { // Monday to Friday
-          const dayHours = hoursPerDay + (i < remainderHours ? 1 : 0);
-          if (dayHours > 0) {
-            leaveRecords.push({
-              company_id: company.id,
-              member_id: memberId,
-              date: daysInWeek[i],
-              hours: dayHours
-            });
-          }
-        }
-
-        if (leaveRecords.length > 0) {
-          const { error } = await supabase
-            .from('annual_leaves')
-            .insert(leaveRecords);
-
-          if (error) throw error;
-        }
+      // Insert new entry if hours > 0
+      if (hours > 0) {
+        await supabase
+          .from('annual_leaves')
+          .insert({
+            member_id: memberId,
+            company_id: company.id,
+            date: dateKey,
+            hours: hours
+          });
       }
 
-      // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['weekly-leave-details'] });
       queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['member-workload'] });
-      
-      toast.success(`Vacation hours saved for ${memberName}`);
-      setHours(''); // Clear input after save
+      queryClient.invalidateQueries({ queryKey: ['available-members-profiles'] });
     } catch (error) {
       console.error('Error saving vacation hours:', error);
       toast.error('Failed to save vacation hours');
-    } finally {
-      setIsSaving(false);
     }
   };
 
   return (
-    <div className="p-3 bg-muted/50 rounded-lg space-y-2 animate-in slide-in-from-top-2 duration-200">
-      <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-        <Calendar className="h-4 w-4" />
-        <span>Vacation Hours for {memberName}</span>
+    <div className="space-y-2">
+      <div className="text-sm font-medium text-foreground">
+        Vacation Hours - {memberName}
       </div>
       <div className="flex gap-2">
-        <Input
-          type="number"
-          min="0"
-          max="40"
-          value={hours}
-          onChange={(e) => setHours(e.target.value)}
-          placeholder="Enter hours (0-40)"
-          className="flex-1"
-          disabled={isSaving}
-        />
-        <Button 
-          onClick={handleSave}
-          disabled={isSaving || !hours}
-          size="sm"
-        >
-          {isSaving ? 'Saving...' : 'Save'}
-        </Button>
+        {weekDays.map(day => (
+          <div key={day.dateKey} className="flex-1 space-y-1">
+            <div className="text-xs text-center text-muted-foreground font-medium">
+              {day.dayName}
+            </div>
+            <Input
+              type="number"
+              min="0"
+              max="24"
+              step="0.5"
+              value={dailyHours[day.dateKey] || ''}
+              onChange={(e) => setDailyHours(prev => ({ ...prev, [day.dateKey]: e.target.value }))}
+              onBlur={(e) => handleHoursChange(day.dateKey, e.target.value)}
+              placeholder="0"
+              className="w-full h-9 text-center text-sm"
+            />
+          </div>
+        ))}
       </div>
       <p className="text-xs text-muted-foreground">
-        Hours will be distributed across weekdays (Mon-Fri)
+        Enter vacation hours for each day (auto-saves on blur)
       </p>
     </div>
   );
