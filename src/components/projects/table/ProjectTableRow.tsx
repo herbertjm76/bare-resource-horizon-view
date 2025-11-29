@@ -192,7 +192,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                   color: getStatusColor(project.status).text
                 }}
               >
-                {project.status}
+                {project.status === 'In Progress' ? 'Active' : project.status}
               </span>
             </div>
           )}
