@@ -97,9 +97,9 @@ export const ProjectBasicInfoStep: React.FC<ProjectBasicInfoStepProps> = ({ data
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Planning">Planning</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="In Progress">Active</SelectItem>
                 <SelectItem value="On Hold">On Hold</SelectItem>
-                <SelectItem value="Completed">Completed</SelectItem>
+                <SelectItem value="Complete">Completed</SelectItem>
               </SelectContent>
             </Select>
           </div>

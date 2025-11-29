@@ -178,7 +178,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               <SelectContent className="bg-background border-border">
                 {project_statuses.map((status) => (
                   <SelectItem key={status.id} value={status.name}>
-                    {status.name}
+                    {status.name === 'In Progress' ? 'Active' : status.name}
                   </SelectItem>
                 ))}
               </SelectContent>
