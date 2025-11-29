@@ -236,7 +236,11 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80" align="end">
+          <PopoverContent 
+            className="w-80 pointer-events-auto z-50" 
+            align="end"
+            onClick={(e) => e.stopPropagation()}
+          >
             <ProjectResourcingFilters
               filters={filters}
               searchTerm={searchTerm}
@@ -365,7 +369,11 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80" align="end">
+            <PopoverContent 
+              className="w-80 pointer-events-auto z-50" 
+              align="end"
+              onClick={(e) => e.stopPropagation()}
+            >
               <ProjectResourcingFilters
                 filters={filters}
                 searchTerm={searchTerm}
