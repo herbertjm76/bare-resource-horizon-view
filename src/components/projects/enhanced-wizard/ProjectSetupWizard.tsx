@@ -68,7 +68,7 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
     managerId: '',
     country: '',
     officeId: '',
-    status: 'In Progress',
+    status: 'In Progress', // Database value
     totalFee: 0,
     currency: 'USD',
     rateBasisStrategy: 'role_based',

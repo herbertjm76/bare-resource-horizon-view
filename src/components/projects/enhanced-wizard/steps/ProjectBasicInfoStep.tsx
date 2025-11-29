@@ -91,13 +91,20 @@ export const ProjectBasicInfoStep: React.FC<ProjectBasicInfoStepProps> = ({ data
           
           <div>
             <Label htmlFor="status">Status</Label>
-            <Select value={data.status} onValueChange={(value) => onUpdate({ status: value })}>
+            <Select 
+              value={data.status === 'In Progress' ? 'Active' : data.status} 
+              onValueChange={(value) => {
+                // Map "Active" display value to "In Progress" database value
+                const dbValue = value === 'Active' ? 'In Progress' : value;
+                onUpdate({ status: dbValue });
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Planning">Planning</SelectItem>
-                <SelectItem value="In Progress">Active</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
                 <SelectItem value="On Hold">On Hold</SelectItem>
                 <SelectItem value="Complete">Completed</SelectItem>
               </SelectContent>
