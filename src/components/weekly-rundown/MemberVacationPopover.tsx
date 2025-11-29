@@ -109,7 +109,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
         {children}
       </PopoverTrigger>
       <PopoverContent className="w-80" align="start" side="bottom">

@@ -86,7 +86,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
           <TooltipTrigger asChild>
             <div 
               className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer"
-              onClick={handleClick}
+              onClick={!disableDialog ? handleClick : undefined}
             >
             {/* Avatar with utilization ring */}
             <div className="relative w-[50px] h-[50px] flex items-center justify-center">
