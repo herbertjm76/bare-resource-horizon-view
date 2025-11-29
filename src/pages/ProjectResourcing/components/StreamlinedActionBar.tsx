@@ -72,7 +72,6 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
   onExport
 }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
   
   const handlePreviousMonth = () => {
     onDateChange(subMonths(selectedDate, 1));
@@ -224,7 +223,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
         </Button>
 
         {/* Filters */}
-        <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-8">
               <Filter className="h-3 w-3 mr-2" />
@@ -358,7 +357,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
           </Button>
 
           {/* Filters */}
-          <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
+          <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm" className="h-9 w-9 p-0 shrink-0 relative">
                 <Filter className="h-4 w-4" />
