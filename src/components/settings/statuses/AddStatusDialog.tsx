@@ -52,6 +52,8 @@ export const AddStatusDialog: React.FC<AddStatusDialogProps> = ({
               value={newStatusName}
               onChange={(e) => setNewStatusName(e.target.value)}
               placeholder="Enter status name"
+              autoComplete="off"
+              autoFocus
             />
           </div>
           <div className="space-y-2">
