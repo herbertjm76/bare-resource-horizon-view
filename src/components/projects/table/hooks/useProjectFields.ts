@@ -113,14 +113,18 @@ export const useProjectFields = (project: any, refetch: () => void) => {
       const updateData = getPendingUpdates(projectId);
       if (Object.keys(updateData).length === 0) return false;
 
+      console.log(`Saving project ${projectId} with updates:`, updateData);
+
       const { error } = await supabase
         .from('projects')
         .update(updateData)
         .eq('id', projectId);
 
       if (error) {
-        console.error('Error saving changes:', error);
-        toast.error('Failed to save changes', { description: error.message });
+        console.error(`Error saving project ${projectId}:`, error);
+        toast.error('Failed to save changes', { 
+          description: `${error.message} (Project: ${projectId.slice(0, 8)}...)` 
+        });
         return false;
       }
 
@@ -130,10 +134,13 @@ export const useProjectFields = (project: any, refetch: () => void) => {
         [projectId]: { ...editableFields[projectId] }
       }));
 
+      console.log(`Successfully saved project ${projectId}`);
       return true;
     } catch (err: any) {
-      console.error('Error flushing updates:', err);
-      toast.error('An error occurred while saving changes');
+      console.error(`Error flushing updates for project ${projectId}:`, err);
+      toast.error('An error occurred while saving changes', {
+        description: `Project: ${projectId.slice(0, 8)}...`
+      });
       return false;
     }
   };
