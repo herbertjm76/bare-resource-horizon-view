@@ -37,7 +37,7 @@ interface ProjectResourcingContentProps {
   };
   officeOptions: string[];
   countryOptions: string[];
-  managers: Array<{id: string, name: string}>;
+  managers: Array<{ id: string; name: string }>;
   activeFiltersCount: number;
   onMonthChange: (date: Date) => void;
   onSearchChange: (value: string) => void;
@@ -71,14 +71,14 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onClearFilters
 }) => {
   // Fetch projects only for expand all functionality and total count
-  const { projects } = useProjects(sortBy, sortDirection);
+  const { projects, isLoading } = useProjects(sortBy, sortDirection);
   const [expandedProjects, setExpandedProjects] = React.useState<string[]>([]);
   const [isExporting, setIsExporting] = React.useState(false);
-  
+
   // Expand all projects
   const expandAll = () => {
     if (projects) {
-      setExpandedProjects(projects.map(p => p.id));
+      setExpandedProjects(projects.map((p) => p.id));
     }
   };
 
@@ -89,22 +89,20 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
 
   // Toggle individual project
   const handleToggleProjectExpand = (projectId: string) => {
-    setExpandedProjects(prev => 
-      prev.includes(projectId) 
-        ? prev.filter(id => id !== projectId)
-        : [...prev, projectId]
+    setExpandedProjects((prev) =>
+      prev.includes(projectId) ? prev.filter((id) => id !== projectId) : [...prev, projectId]
     );
   };
 
   // Export to PDF
   const handleExport = () => {
     setIsExporting(true);
-    
+
     setTimeout(() => {
       try {
         // Get the table element from the grid
         const table = document.querySelector('.workload-resource-table') as HTMLTableElement;
-        
+
         if (!table) {
           toast.error('Could not find table data');
           setIsExporting(false);
@@ -120,15 +118,15 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
 
         // Get company name or use default
         const companyName = document.querySelector('.company-name')?.textContent || 'Team';
-        
+
         // Add header
         pdf.setFontSize(16);
         pdf.text(`${companyName} - Project Resourcing`, 14, 15);
-        
+
         pdf.setFontSize(12);
         const monthLabel = format(selectedMonth, 'MMMM yyyy');
         pdf.text(monthLabel, 14, 22);
-        
+
         // Add timestamp
         pdf.setFontSize(9);
         pdf.setTextColor(100, 100, 100);
@@ -139,7 +137,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         const headerRow = table.querySelector('thead tr') as HTMLTableRowElement;
         const headers: string[] = [];
         if (headerRow) {
-          Array.from(headerRow.cells).forEach(cell => {
+          Array.from(headerRow.cells).forEach((cell) => {
             headers.push(cell.textContent?.trim() || '');
           });
         }
@@ -148,9 +146,9 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         const tableBody = table.querySelector('tbody') as HTMLTableSectionElement;
         const data: any[][] = [];
         if (tableBody) {
-          Array.from(tableBody.rows).forEach(row => {
+          Array.from(tableBody.rows).forEach((row) => {
             const rowData: any[] = [];
-            Array.from(row.cells).forEach(cell => {
+            Array.from(row.cells).forEach((cell) => {
               const input = cell.querySelector('input');
               if (input) {
                 rowData.push(input.value);
@@ -170,7 +168,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
           theme: 'grid',
           styles: {
             fontSize: 7,
-            cellPadding: 2,
+            cellPadding: 2
           },
           headStyles: {
             fillColor: [110, 89, 165],
@@ -195,17 +193,17 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
 
         // Generate file name
         const fileName = `Project_Resourcing_${format(selectedMonth, 'MMM_yyyy')}.pdf`;
-        
+
         // Save PDF
         pdf.save(fileName);
-        
+
         // Show success message
-        toast.success('Export successful', { 
-          description: `Exported to ${fileName}` 
+        toast.success('Export successful', {
+          description: `Exported to ${fileName}`
         });
       } catch (error) {
         console.error('Export failed:', error);
-        toast.error('Export failed', { 
+        toast.error('Export failed', {
           description: 'An error occurred while exporting the data.'
         });
       } finally {
@@ -216,15 +214,30 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
 
   const totalProjects = projects?.length || 0;
 
+  // Resource summary metrics for header
+  const summary = useProjectResourcingSummary(selectedMonth, filters.periodToShow);
+
   // Combine filters with search term for filtering
   const combinedFilters = {
     ...filters,
     searchTerm
   };
 
+  if (isLoading) {
+    return <GridLoadingState />;
+  }
+
   return (
     <div className="space-y-3">
-      
+      {/* Header with metrics */}
+      <StreamlinedProjectResourcingHeader
+        projectCount={totalProjects}
+        periodToShow={filters.periodToShow}
+        availableResources={summary.availableThisMonth?.count ?? 0}
+        overloadedResources={summary.overloadedResources?.count ?? 0}
+        multiProjectResources={summary.multiProjectLoad?.count ?? 0}
+      />
+
       {/* Compact Action Bar */}
       <StreamlinedActionBar
         selectedDate={selectedMonth}
@@ -252,22 +265,22 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         totalProjects={totalProjects}
         onExport={handleExport}
       />
-      
-      {/* Content-First Main Table */}
-      <div className="w-full max-w-full overflow-hidden">
-        <ModernResourceGrid
-          startDate={selectedMonth}
-          periodToShow={filters.periodToShow}
-          sortBy={sortBy}
-          sortDirection={sortDirection}
-          filters={combinedFilters}
-          displayOptions={displayOptions}
-          onExpandAll={expandAll}
-          onCollapseAll={collapseAll}
-          expandedProjects={expandedProjects}
-          totalProjects={0}
-          onToggleProjectExpand={handleToggleProjectExpand}
-        />
+
+      {/* Centered main grid */}
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-[1400px] overflow-hidden">
+          <ModernResourceGrid
+            startDate={selectedMonth}
+            periodToShow={filters.periodToShow}
+            filters={combinedFilters}
+            displayOptions={displayOptions}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            expandedProjects={expandedProjects}
+            totalProjects={totalProjects}
+            onToggleProjectExpand={handleToggleProjectExpand}
+          />
+        </div>
       </div>
     </div>
   );

@@ -120,18 +120,20 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   return (
     <div className="space-y-3">
       
-      {/* Content-First Main Table */}
-      <div className="w-full max-w-full overflow-hidden">
-        <PersonResourceGrid
-          personData={personData}
-          weeks={weeks}
-          expandedPeople={expandedPeople}
-          onTogglePersonExpand={handleTogglePersonExpand}
-          selectedDate={startDate}
-          periodToShow={periodToShow}
-        />
+      {/* Centered main grid */}
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-[1400px] overflow-hidden">
+          <PersonResourceGrid
+            personData={personData}
+            weeks={weeks}
+            expandedPeople={expandedPeople}
+            onTogglePersonExpand={handleTogglePersonExpand}
+            selectedDate={startDate}
+            periodToShow={periodToShow}
+          />
+        </div>
       </div>
-
+      
       {/* Compact Action Bar */}
       <div className="bg-muted/30 border border-border rounded-lg p-3">
         <div className="flex flex-wrap items-center gap-3">
