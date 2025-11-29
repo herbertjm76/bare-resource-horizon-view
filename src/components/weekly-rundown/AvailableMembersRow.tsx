@@ -307,7 +307,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
             
             <div 
               ref={membersScrollRef}
-              className="overflow-x-auto overflow-y-hidden -mx-2 px-2 scrollbar-hide"
+              className="overflow-x-auto overflow-y-hidden px-2 scrollbar-hide"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[40px]">
@@ -342,7 +342,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
         {/* Mobile view without arrows */}
         {availableMembers.length > 0 && (
-          <div className="block sm:hidden overflow-x-auto overflow-y-hidden -mx-2 px-2">
+          <div className="block sm:hidden overflow-x-auto overflow-y-hidden px-2">
             <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[40px]">
               {availableMembers.map((member) => (
                 <MemberVacationPopover
