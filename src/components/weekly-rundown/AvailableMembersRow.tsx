@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
+import { MemberVacationInput } from './MemberVacationInput';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
@@ -50,6 +51,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
+  const [expandedMemberId, setExpandedMemberId] = useState<string | null>(null);
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['available-members-profiles'],
@@ -274,9 +276,35 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     container.scrollTo({ left: targetScroll, behavior: 'smooth' });
   };
 
+  const handleMemberClick = (memberId: string) => {
+    setExpandedMemberId(expandedMemberId === memberId ? null : memberId);
+  };
+
+  const expandedMember = expandedMemberId 
+    ? availableMembers.find(m => m.id === expandedMemberId)
+    : null;
+
   return (
     <div className="w-full">
       <div className="rounded-t-lg border border-b-0 bg-card p-1.5 overflow-hidden animate-fade-in relative shadow-[0_4px_8px_-2px_hsl(var(--border))]">
+        {/* Expand/Collapse button */}
+        {availableMembers.length > 0 && (
+          <div className="absolute top-2 right-2 z-30">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={() => setExpandedMemberId(expandedMemberId ? null : availableMembers[0]?.id || null)}
+            >
+              {expandedMemberId ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        )}
+
         {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
         {availableMembers.length > 0 && (
           <div className="hidden sm:block relative">
@@ -311,19 +339,20 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
             >
               <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[40px]">
                 {availableMembers.map((member) => (
-                  <MemberAvailabilityCard
-                    key={member.id}
-                    memberId={member.id}
-                    memberType={member.type}
-                    avatarUrl={member.avatarUrl}
-                    firstName={member.firstName}
-                    lastName={member.lastName}
-                    allocatedHours={member.allocatedHours}
-                    projectAllocations={member.projectAllocations}
-                    utilization={member.utilization}
-                    threshold={threshold}
-                    weekStartDate={weekStartDate}
-                  />
+                  <div key={member.id} onClick={() => handleMemberClick(member.id)}>
+                    <MemberAvailabilityCard
+                      memberId={member.id}
+                      memberType={member.type}
+                      avatarUrl={member.avatarUrl}
+                      firstName={member.firstName}
+                      lastName={member.lastName}
+                      allocatedHours={member.allocatedHours}
+                      projectAllocations={member.projectAllocations}
+                      utilization={member.utilization}
+                      threshold={threshold}
+                      weekStartDate={weekStartDate}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
@@ -335,19 +364,20 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           <div className="block sm:hidden overflow-x-auto overflow-y-hidden -mx-2 px-2">
             <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[40px]">
               {availableMembers.map((member) => (
-                <MemberAvailabilityCard
-                  key={member.id}
-                  memberId={member.id}
-                  memberType={member.type}
-                  avatarUrl={member.avatarUrl}
-                  firstName={member.firstName}
-                  lastName={member.lastName}
-                  allocatedHours={member.allocatedHours}
-                  projectAllocations={member.projectAllocations}
-                  utilization={member.utilization}
-                  threshold={threshold}
-                  weekStartDate={weekStartDate}
-                />
+                <div key={member.id} onClick={() => handleMemberClick(member.id)}>
+                  <MemberAvailabilityCard
+                    memberId={member.id}
+                    memberType={member.type}
+                    avatarUrl={member.avatarUrl}
+                    firstName={member.firstName}
+                    lastName={member.lastName}
+                    allocatedHours={member.allocatedHours}
+                    projectAllocations={member.projectAllocations}
+                    utilization={member.utilization}
+                    threshold={threshold}
+                    weekStartDate={weekStartDate}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -362,6 +392,17 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           </div>
         )}
       </div>
+
+      {/* Expanded vacation hours input */}
+      {expandedMember && (
+        <div className="border border-t-0 rounded-b-lg bg-card p-3 animate-in slide-in-from-top-2 duration-200">
+          <MemberVacationInput
+            memberId={expandedMember.id}
+            memberName={`${expandedMember.firstName} ${expandedMember.lastName}`}
+            weekStartDate={weekStartDate}
+          />
+        </div>
+      )}
     </div>
   );
 };
