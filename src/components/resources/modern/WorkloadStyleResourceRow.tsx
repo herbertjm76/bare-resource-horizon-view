@@ -133,7 +133,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
       <tr className="workload-resource-row resource-row group">
       {/* Resource info column - Fixed width, sticky */}
       <td 
-        className="workload-resource-cell project-resource-column hover:bg-muted/50"
+        className="workload-resource-cell project-resource-column hover:bg-muted/50 cursor-pointer"
         style={{
           width: '250px',
           minWidth: '250px',
@@ -148,6 +148,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
           verticalAlign: 'middle',
           height: '32px'
         }}
+        onClick={() => setIsExpanded(!isExpanded)}
       >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
@@ -168,7 +169,10 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               </Button>
               <Avatar 
                 style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgb(111, 75, 246)', cursor: 'pointer' }}
-                onClick={() => setDialogOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDialogOpen(true);
+                }}
               >
                 <AvatarImage src={resource.avatar_url} alt={displayName} />
                 <AvatarFallback className="bg-gradient-modern text-white">
@@ -177,7 +181,10 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               </Avatar>
               <div 
                 style={{ flex: '1', minWidth: '0', cursor: 'pointer' }}
-                onClick={() => setDialogOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDialogOpen(true);
+                }}
               >
                 <span style={{ 
                   fontSize: '13px',
