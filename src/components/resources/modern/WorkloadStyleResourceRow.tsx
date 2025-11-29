@@ -1,13 +1,10 @@
 
 import React, { useRef, useCallback, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronRight } from 'lucide-react';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
 import { ResourceActions } from '../components/ResourceActions';
-import { VacationHoursRow } from './VacationHoursRow';
 
 interface WorkloadStyleResourceRowProps {
   resource: any;
@@ -39,7 +36,6 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   getAllocationKey
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const displayName = resource.first_name && resource.last_name 
     ? `${resource.first_name} ${resource.last_name}`
     : resource.name;
@@ -133,7 +129,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
       <tr className="workload-resource-row resource-row group">
       {/* Resource info column - Fixed width, sticky */}
       <td 
-        className="workload-resource-cell project-resource-column hover:bg-muted/50 cursor-pointer"
+        className="workload-resource-cell project-resource-column cursor-pointer hover:bg-muted/50"
         style={{
           width: '250px',
           minWidth: '250px',
@@ -148,44 +144,17 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
           verticalAlign: 'middle',
           height: '32px'
         }}
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => setDialogOpen(true)}
       >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-4 h-4 p-0 border-0 bg-transparent hover:bg-muted/80 text-foreground cursor-pointer shrink-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsExpanded(!isExpanded);
-                }}
-              >
-                {isExpanded ? (
-                  <ChevronDown className="w-3 h-3" />
-                ) : (
-                  <ChevronRight className="w-3 h-3" />
-                )}
-              </Button>
-              <Avatar 
-                style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgb(111, 75, 246)', cursor: 'pointer' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDialogOpen(true);
-                }}
-              >
+              <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgb(111, 75, 246)' }}>
                 <AvatarImage src={resource.avatar_url} alt={displayName} />
                 <AvatarFallback className="bg-gradient-modern text-white">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div 
-                style={{ flex: '1', minWidth: '0', cursor: 'pointer' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDialogOpen(true);
-                }}
-              >
+              <div style={{ flex: '1', minWidth: '0' }}>
                 <span style={{ 
                   fontSize: '13px',
                   fontWeight: '400',
@@ -279,15 +248,6 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         );
       })}
     </tr>
-      
-      {/* Vacation Hours Row (when expanded) */}
-      {isExpanded && (
-        <VacationHoursRow
-          memberId={resource.id}
-          weeks={weeks}
-          isEven={isEven}
-        />
-      )}
     </>
   );
 };
