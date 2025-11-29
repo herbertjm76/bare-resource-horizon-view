@@ -174,9 +174,9 @@ export class DataMapping {
 
   private static mapStatus(value: any): string {
     const statusMap: Record<string, string> = {
-      'planning': 'Planning',
-      'plan': 'Planning',
-      'planned': 'Planning',
+      'planning': 'In Progress',
+      'plan': 'In Progress',
+      'planned': 'In Progress',
       'in progress': 'In Progress',
       'in-progress': 'In Progress',
       'inprogress': 'In Progress',
