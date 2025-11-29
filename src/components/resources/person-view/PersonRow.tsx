@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronRight, Briefcase } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProjectAllocationRow } from './ProjectAllocationRow';
+import { AddProjectRow } from './AddProjectRow';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { PersonResourceData } from '@/hooks/usePersonResourceData';
 import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
@@ -15,6 +16,7 @@ interface PersonRowProps {
   isEven: boolean;
   selectedDate?: Date;
   periodToShow?: number;
+  onRefresh: () => void;
 }
 
 export const PersonRow: React.FC<PersonRowProps> = React.memo(({
@@ -24,7 +26,8 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
   onToggleExpand,
   isEven,
   selectedDate,
-  periodToShow
+  periodToShow,
+  onRefresh
 }) => {
   const [projectAllocations, setProjectAllocations] = useState(person.projects);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -226,6 +229,16 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
           initialAllocations={project.allocations}
         />
       ))}
+      
+      {/* Add Project Row */}
+      {isExpanded && (
+        <AddProjectRow
+          personId={person.personId}
+          existingProjectIds={projectAllocations.map(p => p.projectId)}
+          weeks={weeks}
+          onProjectAdded={onRefresh}
+        />
+      )}
     </>
   );
 }, (prevProps, nextProps) => {

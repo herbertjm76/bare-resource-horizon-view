@@ -1,0 +1,171 @@
+import React, { useState } from 'react';
+import { Plus, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useCompany } from '@/context/CompanyContext';
+
+interface AddProjectRowProps {
+  personId: string;
+  existingProjectIds: string[];
+  weeks: any[];
+  onProjectAdded: () => void;
+}
+
+export const AddProjectRow: React.FC<AddProjectRowProps> = ({
+  personId,
+  existingProjectIds,
+  weeks,
+  onProjectAdded
+}) => {
+  const { company } = useCompany();
+  const [isAdding, setIsAdding] = useState(false);
+  const [selectedProject, setSelectedProject] = useState('');
+
+  // Fetch available projects
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects', company?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, name, code')
+        .eq('company_id', company?.id)
+        .order('name');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!company?.id && isAdding,
+  });
+
+  // Filter out projects already assigned to this person
+  const availableProjects = projects.filter(p => !existingProjectIds.includes(p.id));
+
+  const handleAddProject = async () => {
+    if (!selectedProject || !company?.id) return;
+
+    try {
+      // Create an initial allocation with 0 hours for the first week
+      const firstWeekKey = weeks[0]?.weekStartDate.toISOString().split('T')[0];
+      
+      if (firstWeekKey) {
+        const { error } = await supabase
+          .from('project_resource_allocations')
+          .insert({
+            project_id: selectedProject,
+            resource_id: personId,
+            resource_type: 'active',
+            allocation_date: firstWeekKey,
+            hours: 0,
+            company_id: company.id
+          });
+
+        if (error) throw error;
+      }
+
+      onProjectAdded();
+      setIsAdding(false);
+      setSelectedProject('');
+    } catch (error) {
+      console.error('Error adding project:', error);
+    }
+  };
+
+  if (!isAdding) {
+    return (
+      <tr className="workload-resource-row">
+        <td
+          className="workload-resource-cell project-resource-column"
+          colSpan={weeks.length + 1}
+          style={{
+            position: 'sticky',
+            left: '0',
+            zIndex: 10,
+            padding: '8px 16px',
+            borderRight: '2px solid rgba(156, 163, 175, 0.8)',
+            borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
+          }}
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsAdding(true)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Project
+          </Button>
+        </td>
+      </tr>
+    );
+  }
+
+  return (
+    <tr className="workload-resource-row">
+      <td
+        className="workload-resource-cell project-resource-column"
+        style={{
+          width: '250px',
+          minWidth: '250px',
+          maxWidth: '250px',
+          position: 'sticky',
+          left: '0',
+          zIndex: 10,
+          padding: '8px 16px',
+          borderRight: '2px solid rgba(156, 163, 175, 0.8)',
+          borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <Select value={selectedProject} onValueChange={setSelectedProject}>
+            <SelectTrigger className="h-8 flex-1">
+              <SelectValue placeholder="Select project" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableProjects.map((project) => (
+                <SelectItem key={project.id} value={project.id}>
+                  {project.code || project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            size="sm"
+            onClick={handleAddProject}
+            disabled={!selectedProject}
+            className="h-8 px-3"
+          >
+            Add
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setIsAdding(false);
+              setSelectedProject('');
+            }}
+            className="h-8 w-8 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </td>
+      {weeks.map((week) => {
+        const weekKey = week.weekStartDate.toISOString().split('T')[0];
+        return (
+          <td
+            key={weekKey}
+            className="workload-resource-cell week-column"
+            style={{
+              width: '80px',
+              minWidth: '80px',
+              maxWidth: '80px',
+              borderRight: '1px solid rgba(156, 163, 175, 0.6)',
+              borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
+            }}
+          />
+        );
+      })}
+    </tr>
+  );
+};
