@@ -40,10 +40,27 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   
   // Project state
   const [selectedProject, setSelectedProject] = useState('');
-  const [projectDate, setProjectDate] = useState<Date>();
-  const [projectEndDate, setProjectEndDate] = useState<Date>();
-  const [projectHours, setProjectHours] = useState('');
+  const [projectWeeks, setProjectWeeks] = useState<Record<string, string>>({});
   const [isSavingProject, setIsSavingProject] = useState(false);
+
+  // Generate next 8 weeks starting from current week
+  const generateWeeks = () => {
+    const weeks = [];
+    const today = new Date();
+    const currentDay = today.getDay();
+    const diff = currentDay === 0 ? -6 : 1 - currentDay;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+    
+    for (let i = 0; i < 8; i++) {
+      const weekStart = new Date(monday);
+      weekStart.setDate(monday.getDate() + (i * 7));
+      weeks.push(format(weekStart, 'yyyy-MM-dd'));
+    }
+    return weeks;
+  };
+
+  const weeks = generateWeeks();
 
   // Fetch projects
   const { data: projects = [] } = useQuery({
@@ -118,40 +135,30 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   };
 
   const handleSaveProject = async () => {
-    if (!selectedProject || !projectDate || !company?.id) return;
+    if (!selectedProject || !company?.id) return;
 
     setIsSavingProject(true);
     try {
-      const hours = parseFloat(projectHours) || 0;
-      if (hours <= 0) {
-        toast.error('Please enter valid hours');
+      // Get all weeks with hours entered
+      const weekEntries = Object.entries(projectWeeks)
+        .filter(([_, hours]) => hours && parseFloat(hours) > 0)
+        .map(([weekKey, hours]) => ({
+          project_id: selectedProject,
+          resource_id: memberId,
+          resource_type: 'active' as const,
+          allocation_date: weekKey,
+          hours: parseFloat(hours),
+          company_id: company.id
+        }));
+
+      if (weekEntries.length === 0) {
+        toast.error('Please enter hours for at least one week');
         return;
       }
 
-      const startDate = projectDate;
-      const endDate = projectEndDate || projectDate;
-      
-      // Generate all dates in range
-      const dates = [];
-      const currentDate = new Date(startDate);
-      while (currentDate <= endDate) {
-        dates.push(format(currentDate, 'yyyy-MM-dd'));
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-
-      // Insert allocation records
-      const allocationRecords = dates.map(date => ({
-        project_id: selectedProject,
-        resource_id: memberId,
-        resource_type: 'active',
-        allocation_date: date,
-        hours: hours,
-        company_id: company.id
-      }));
-
       const { error } = await supabase
         .from('project_resource_allocations')
-        .insert(allocationRecords);
+        .insert(weekEntries);
 
       if (error) throw error;
 
@@ -160,9 +167,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       
       toast.success('Project allocation saved');
       setSelectedProject('');
-      setProjectDate(undefined);
-      setProjectEndDate(undefined);
-      setProjectHours('');
+      setProjectWeeks({});
       setOpen(false);
     } catch (error) {
       console.error('Error saving project allocation:', error);
@@ -170,6 +175,13 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     } finally {
       setIsSavingProject(false);
     }
+  };
+
+  const handleWeekHoursChange = (weekKey: string, value: string) => {
+    setProjectWeeks(prev => ({
+      ...prev,
+      [weekKey]: value
+    }));
   };
 
   return (
@@ -291,79 +303,40 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm">Start Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !projectDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {projectDate ? format(projectDate, "PPP") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={projectDate}
-                      onSelect={setProjectDate}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm">End Date (Optional)</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !projectEndDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {projectEndDate ? format(projectEndDate, "PPP") : "Same as start date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={projectEndDate}
-                      onSelect={setProjectEndDate}
-                      disabled={(date) => projectDate ? date < projectDate : false}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm">Hours per Day</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="24"
-                  step="0.5"
-                  value={projectHours}
-                  onChange={(e) => setProjectHours(e.target.value)}
-                  placeholder="0"
-                />
+                <Label className="text-sm">Hours per Week</Label>
+                <div className="max-h-[300px] overflow-y-auto space-y-2">
+                  {weeks.map((weekKey) => {
+                    const weekDate = new Date(weekKey);
+                    const weekEnd = new Date(weekDate);
+                    weekEnd.setDate(weekDate.getDate() + 6);
+                    
+                    return (
+                      <div key={weekKey} className="flex items-center gap-2">
+                        <Label className="text-xs text-muted-foreground w-32 flex-shrink-0">
+                          {format(weekDate, 'MMM d')} - {format(weekEnd, 'MMM d')}
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="168"
+                          step="0.5"
+                          value={projectWeeks[weekKey] || ''}
+                          onChange={(e) => handleWeekHoursChange(weekKey, e.target.value)}
+                          placeholder="0"
+                          className="flex-1"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               <Button 
                 onClick={handleSaveProject}
-                disabled={!selectedProject || !projectDate || !projectHours || isSavingProject}
+                disabled={!selectedProject || isSavingProject}
                 className="w-full"
               >
-                {isSavingProject ? 'Saving...' : 'Save Project'}
+                {isSavingProject ? 'Saving...' : 'Save Project Allocation'}
               </Button>
             </TabsContent>
           </Tabs>
