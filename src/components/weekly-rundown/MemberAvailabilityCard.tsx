@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ResourceAllocationDialog } from '@/components/resources/dialogs/ResourceAllocationDialog';
 
 interface ProjectAllocation {
   projectId: string;
@@ -22,7 +20,6 @@ interface MemberAvailabilityCardProps {
   memberType: 'active' | 'pre_registered';
   weekStartDate: string;
   disableDialog?: boolean;
-  onAvatarClick?: () => void;
 }
 
 export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
@@ -37,19 +34,9 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   memberType,
   weekStartDate,
   disableDialog = false,
-  onAvatarClick,
 }) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
-  
-  const handleClick = () => {
-    if (onAvatarClick) {
-      onAvatarClick();
-    } else if (!disableDialog) {
-      setDialogOpen(true);
-    }
-  };
   
   
   // Calculate progress for the ring based on utilization percentage
@@ -65,105 +52,45 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
     return 'hsl(221, 83%, 53%)'; // Blue - highly available
   };
   return (
-    <>
-      {!disableDialog && (
-        <ResourceAllocationDialog
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          member={{
-            id: memberId,
-            firstName,
-            lastName,
-            avatarUrl,
-            type: memberType,
-          }}
-          weekStartDate={weekStartDate}
-          compact
-        />
-      )}
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div 
-              className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer"
-              onClick={!disableDialog ? handleClick : undefined}
-            >
-            {/* Avatar with utilization ring */}
-            <div className="relative w-[50px] h-[50px] flex items-center justify-center">
-              {/* Full light grey background circle */}
-              <svg className="absolute inset-0 -rotate-90" width="50" height="50">
-                <circle
-                  cx="25"
-                  cy="25"
-                  r={20}
-                  fill="none"
-                  stroke="hsl(var(--border))"
-                  strokeWidth="5"
-                />
-                {/* Color-coded utilization ring */}
-                <circle
-                  cx="25"
-                  cy="25"
-                  r={20}
-                  fill="none"
-                  stroke={getUtilizationColor()}
-                  strokeWidth="5"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={strokeDashoffset}
-                  strokeLinecap="round"
-                  className="transition-all duration-300"
-                />
-              </svg>
-              <Avatar className="h-[38px] w-[38px]">
-                <AvatarImage src={avatarUrl || ''} alt={fullName} />
-                <AvatarFallback className="text-xs font-medium">{initials}</AvatarFallback>
-              </Avatar>
-            </div>
-            
-            {/* First name */}
-            <span className="text-[11px] font-medium text-foreground truncate max-w-[55px] -mt-1">
-              {firstName}
-            </span>
-          </div>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-[280px]">
-          <div className="space-y-3">
-            {/* Full name */}
-            <div>
-              <p className="font-semibold text-base">{fullName}</p>
-            </div>
-            
-            {/* Total hours */}
-            <div className="flex justify-between items-center pb-2 border-b">
-              <span className="text-sm text-muted-foreground">Total Hours:</span>
-              <span className="font-semibold text-sm">{allocatedHours}h</span>
-            </div>
-            
-            {/* Project allocations */}
-            {projectAllocations.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground font-medium">Projects:</p>
-                <div className="space-y-1.5">
-                  {projectAllocations.map((project) => (
-                    <div key={project.projectId} className="flex justify-between items-center text-xs">
-                      <span className="font-medium truncate flex-1 mr-2">
-                        {project.projectCode}
-                      </span>
-                      <span className="text-muted-foreground shrink-0">{project.hours}h</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Empty state */}
-            {projectAllocations.length === 0 && (
-              <p className="text-xs text-muted-foreground italic">No project allocations</p>
-            )}
-          </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </>
+    <div 
+      className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer"
+    >
+      {/* Avatar with utilization ring */}
+      <div className="relative w-[50px] h-[50px] flex items-center justify-center">
+        {/* Full light grey background circle */}
+        <svg className="absolute inset-0 -rotate-90" width="50" height="50">
+          <circle
+            cx="25"
+            cy="25"
+            r={20}
+            fill="none"
+            stroke="hsl(var(--border))"
+            strokeWidth="5"
+          />
+          {/* Color-coded utilization ring */}
+          <circle
+            cx="25"
+            cy="25"
+            r={20}
+            fill="none"
+            stroke={getUtilizationColor()}
+            strokeWidth="5"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            className="transition-all duration-300"
+          />
+        </svg>
+        <Avatar className="h-[38px] w-[38px]">
+          <AvatarImage src={avatarUrl || ''} alt={fullName} />
+          <AvatarFallback className="text-xs font-medium">{initials}</AvatarFallback>
+        </Avatar>
+      </div>
+      
+      {/* First name */}
+      <span className="text-[11px] font-medium text-foreground truncate max-w-[55px] -mt-1">
+        {firstName}
+      </span>
+    </div>
   );
 };
