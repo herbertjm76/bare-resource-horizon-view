@@ -131,11 +131,12 @@ export class DataMapping {
 
       // Set safe defaults for other required database fields
       if (!project.status) {
-        project.status = 'Planning';
+        project.status = 'In Progress';
       }
       
       if (!project.current_stage) {
-        project.current_stage = 'Planning';
+        // Use an empty current_stage so the UI shows "None" instead of a fake "Planning" stage
+        project.current_stage = '';
       }
       
       // Only set default profit percentage if not provided
@@ -199,6 +200,6 @@ export class DataMapping {
     };
 
     const normalized = String(value).toLowerCase().trim();
-    return statusMap[normalized] || 'Planning';
+    return statusMap[normalized] || 'In Progress';
   }
 }
