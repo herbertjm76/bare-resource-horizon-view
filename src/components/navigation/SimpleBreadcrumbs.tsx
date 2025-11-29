@@ -11,9 +11,7 @@ export const SimpleBreadcrumbs: React.FC = () => {
   const location = useLocation();
   
   const getBreadcrumbs = (pathname: string): BreadcrumbItem[] => {
-    const breadcrumbs: BreadcrumbItem[] = [
-      { label: 'Dashboard', href: '/dashboard' }
-    ];
+    const breadcrumbs: BreadcrumbItem[] = [];
 
     switch (pathname) {
       case '/projects':
