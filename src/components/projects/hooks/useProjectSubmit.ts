@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
 import { useProjectUpdate } from './submit/useProjectUpdate';
 import { useStageSubmit } from './submit/useStageSubmit';
-import { mapStatusToDb } from "../utils/projectMappings"; // Fixed import path
 import type { ProjectSubmitData } from './submit/types';
 
 // Add an optional onAfterSubmit callback and call it at the end
@@ -32,7 +31,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         name: form.name,
         project_manager_id: form.manager && form.manager !== 'not_assigned' ? form.manager : null,
         office_id: form.office || null,
-        status: mapStatusToDb(form.status), // Using the mapper function
+        status: form.status,
         country: form.country,
         current_stage: form.current_stage,
         target_profit_percentage: form.profit ? Number(form.profit) : null,
@@ -43,10 +42,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       console.log('Project update data:', projectUpdate);
 
       // Update the main project record and get existing stages
-      const { existingStages } = await updateProject(projectId, {
-        ...projectUpdate,
-        status: form.status // Pass string status which will be handled by updateProject
-      });
+      const { existingStages } = await updateProject(projectId, projectUpdate);
 
       // Check if company ID is available
       if (!company?.id) {

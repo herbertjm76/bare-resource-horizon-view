@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import type { FormState } from '../hooks/types/projectTypes';
 import { checkProjectCodeUnique, isProjectInfoValid } from './NewProjectValidation';
 import { toast } from 'sonner';
-import { mapStatusToDb } from '../utils/projectMappings';
 
 export const submitNewProject = async (
   form: FormState,
@@ -26,7 +25,7 @@ export const submitNewProject = async (
   }
 
   try {
-    const projectStatus = form.status === 'none' ? "Planning" : (form.status || "Planning");
+    const projectStatus = form.status === 'none' ? "Active" : (form.status || "Active");
     const manager = form.manager === 'none' ? null : (form.manager === "not_assigned" ? null : (form.manager || null));
     const country = form.country === 'none' ? null : form.country;
     const officeLocationId = form.office === 'none' ? null : form.office;
@@ -53,9 +52,6 @@ export const submitNewProject = async (
       const stage = officeStages.find(os => os.id === stageId);
       return stage ? stage.name : '';
     }).filter(Boolean);
-
-    // Map the status to the correct database enum value
-    const mappedStatus = mapStatusToDb(projectStatus);
 
     // We need to find or create a default office in the offices table
     // First, let's try to get an existing office or create a default one
@@ -99,7 +95,7 @@ export const submitNewProject = async (
       project_manager_id: manager,
       office_id: defaultOfficeId,
       temp_office_location_id: officeLocationId,
-      status: mappedStatus,
+      status: projectStatus,
       country: country,
       current_stage: currentStage,
       target_profit_percentage: form.profit ? Number(form.profit) : null,
@@ -114,7 +110,7 @@ export const submitNewProject = async (
       project_manager_id: manager,
       office_id: defaultOfficeId,
       temp_office_location_id: officeLocationId,
-      status: mappedStatus,
+      status: projectStatus,
       country: country,
       current_stage: currentStage,
       target_profit_percentage: form.profit ? Number(form.profit) : null,

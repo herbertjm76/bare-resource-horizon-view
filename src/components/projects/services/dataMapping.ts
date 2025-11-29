@@ -173,24 +173,29 @@ export class DataMapping {
   }
 
   private static mapStatus(value: any): string {
+    // Map common status variations to standard custom status names
     const statusMap: Record<string, string> = {
-      'planning': 'In Progress',
-      'plan': 'In Progress',
-      'planned': 'In Progress',
-      'in progress': 'In Progress',
-      'in-progress': 'In Progress',
-      'inprogress': 'In Progress',
-      'active': 'In Progress',
-      'ongoing': 'In Progress',
-      'current': 'In Progress',
-      'complete': 'Complete',
-      'completed': 'Complete',
-      'finished': 'Complete',
-      'done': 'Complete',
-      'closed': 'Complete',
+      'planning': 'Planning',
+      'plan': 'Planning',
+      'planned': 'Planning',
+      'in progress': 'Active',
+      'in-progress': 'Active',
+      'inprogress': 'Active',
+      'active': 'Active',
+      'wip': 'Active',
+      'working': 'Active',
+      'ongoing': 'Active',
+      'started': 'Active',
+      'current': 'Active',
+      'complete': 'Completed',
+      'completed': 'Completed',
+      'done': 'Completed',
+      'finished': 'Completed',
+      'closed': 'Completed',
       'on hold': 'On Hold',
-      'on-hold': 'On Hold',
       'onhold': 'On Hold',
+      'on-hold': 'On Hold',
+      'hold': 'On Hold',
       'paused': 'On Hold',
       'suspended': 'On Hold',
       'cancelled': 'Cancelled',
@@ -199,7 +204,7 @@ export class DataMapping {
       'stopped': 'Cancelled'
     };
 
-    const normalized = String(value).toLowerCase().trim();
-    return statusMap[normalized] || 'In Progress';
+    const normalized = String(value || '').toLowerCase().trim();
+    return statusMap[normalized] || 'Active';
   }
 }

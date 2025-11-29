@@ -1,16 +1,13 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { mapStatusToDb, type ProjectStatus } from '../../utils/projectMappings';
 
 export const useProjectStatus = (refetch: () => void) => {
-  const handleStatusChange = async (projectId: string, uiStatus: ProjectStatus) => {
+  const handleStatusChange = async (projectId: string, statusName: string) => {
     try {
-      const dbStatus = mapStatusToDb(uiStatus);
-      
       const { error } = await supabase
         .from('projects')
-        .update({ status: dbStatus })
+        .update({ status: statusName })
         .eq('id', projectId);
         
       if (error) {

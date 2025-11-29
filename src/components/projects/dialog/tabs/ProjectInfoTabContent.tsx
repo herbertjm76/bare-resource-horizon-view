@@ -2,6 +2,7 @@
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { ProjectInfoTab } from "../../ProjectTabs/ProjectInfoTab";
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 
 interface ProjectInfoTabContentProps {
   form: any;
@@ -26,6 +27,14 @@ export const ProjectInfoTabContent: React.FC<ProjectInfoTabContentProps> = ({
   handleChange,
   projectId,
 }) => {
+  const { project_statuses } = useOfficeSettings();
+
+  // Convert custom statuses to options format
+  const statusOptions = project_statuses.map(status => ({
+    label: status.name,
+    value: status.name
+  }));
+
   return (
     <TabsContent value="info" className="mt-0 space-y-6">
       <ProjectInfoTab 
@@ -36,12 +45,7 @@ export const ProjectInfoTabContent: React.FC<ProjectInfoTabContentProps> = ({
         officeStages={officeStages}
         departments={departments}
         updateStageApplicability={updateStageApplicability}
-        statusOptions={[
-          { label: "Not started", value: "Planning" },
-          { label: "Active", value: "In Progress" },
-          { label: "Completed", value: "Complete" },
-          { label: "On hold", value: "On Hold" }
-        ]}
+        statusOptions={statusOptions}
         onChange={handleChange}
         projectId={projectId}
       />
