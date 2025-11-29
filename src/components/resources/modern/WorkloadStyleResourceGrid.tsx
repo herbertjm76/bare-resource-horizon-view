@@ -27,7 +27,7 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
   const tableWidth = 250 + (weeks.length * 80);
 
   return (
-    <div className="workload-resource-grid-container">
+    <div className="workload-resource-grid-container center-aligned">
       <div className="workload-resource-table-wrapper">
         <table 
           className="workload-resource-table"
