@@ -60,15 +60,16 @@ const ResourceScheduling = () => {
   return (
     <StandardLayout>
       <div className="w-full h-full flex flex-col">
-        <StandardizedPageHeader
-          icon={GanttChartSquare}
-          title="Resource Scheduling"
-          description="Manage resource allocation across projects and team members"
-        />
+        <div className="max-w-[1600px] mx-auto w-full">
+          <StandardizedPageHeader
+            icon={GanttChartSquare}
+            title="Resource Scheduling"
+            description="Manage resource allocation across projects and team members"
+          />
 
-        {/* Tabs */}
-        <div className="bg-background border-b overflow-hidden">
-          <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 overflow-x-auto scrollbar-hide">
+          {/* Tabs */}
+          <div className="bg-background border-b overflow-hidden">
+            <div className="px-3 sm:px-4 py-2 overflow-x-auto scrollbar-hide">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="w-full mb-2 sm:grid sm:grid-cols-4 gap-1 sm:gap-2 flex flex-nowrap rounded-none bg-transparent p-0 min-w-max sm:min-w-0">
                 <TabsTrigger
@@ -106,7 +107,7 @@ const ResourceScheduling = () => {
               </TabsList>
 
           <TabsContent value="by-project" className="mt-0 py-3">
-            <div className="max-w-[1600px] mx-auto">
+            <div>
               {/* Available Members Row */}
               <div className="px-3 sm:px-6 mb-3">
                 <AvailableMembersRow
@@ -143,7 +144,7 @@ const ResourceScheduling = () => {
           </TabsContent>
 
           <TabsContent value="by-person" className="mt-0 py-3">
-            <div className="max-w-[1600px] mx-auto">
+            <div>
               {/* Available Members Row */}
               <div className="px-3 sm:px-6 mb-3">
                 <AvailableMembersRow
@@ -194,8 +195,9 @@ const ResourceScheduling = () => {
             </div>
           </TabsContent>
           </Tabs>
+            </div>
+          </div>
         </div>
-      </div>
       </div>
     </StandardLayout>
   );
