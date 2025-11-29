@@ -12,6 +12,7 @@ interface PersonResourceGridProps {
   onTogglePersonExpand: (personId: string) => void;
   selectedDate?: Date;
   periodToShow?: number;
+  onRefresh: () => void;
 }
 
 export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
@@ -20,7 +21,8 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
   expandedPeople,
   onTogglePersonExpand,
   selectedDate,
-  periodToShow
+  periodToShow,
+  onRefresh
 }) => {
   const tableWidth = 250 + (weeks.length * 80);
  
@@ -49,6 +51,7 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
                 isEven={index % 2 === 0}
                 selectedDate={selectedDate}
                 periodToShow={periodToShow}
+                onRefresh={onRefresh}
               />
                 ))}
               </tbody>

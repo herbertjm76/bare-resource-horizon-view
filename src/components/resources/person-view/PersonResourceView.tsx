@@ -130,6 +130,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
             onTogglePersonExpand={handleTogglePersonExpand}
             selectedDate={startDate}
             periodToShow={periodToShow}
+            onRefresh={refetch}
           />
         </div>
       </div>
