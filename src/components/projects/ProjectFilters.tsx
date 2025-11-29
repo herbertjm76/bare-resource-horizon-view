@@ -46,7 +46,7 @@ export const ProjectFilters = ({
           <SelectItem value="all">All Statuses</SelectItem>
           {statuses.map((status) => (
             <SelectItem key={status} value={status}>
-              {status === 'In Progress' ? 'Active' : status}
+              {status === 'In Progress' || status === 'Planning' ? 'Active' : status}
             </SelectItem>
           ))}
         </SelectContent>
