@@ -8,24 +8,10 @@ import { useProjects } from '@/hooks/useProjects';
 import { ProjectSetupWizard } from '@/components/projects/enhanced-wizard/ProjectSetupWizard';
 import { SimpleBreadcrumbs } from '@/components/navigation/SimpleBreadcrumbs';
 import { ProjectsHeader } from '@/components/projects/ProjectsHeader';
-import { ProjectExecutiveSummary } from '@/pages/Projects/components/ProjectExecutiveSummary';
 
 const Projects = () => {
-  const { projects, refetch } = useProjects();
+  const { refetch } = useProjects();
   const [showWizard, setShowWizard] = useState(false);
-
-  // Calculate statistics
-  const totalProjects = projects.length;
-  const activeProjects = projects.filter(project => 
-    project.status === 'In Progress'
-  ).length;
-  const completedProjects = projects.filter(project => 
-    project.status === 'Complete'
-  ).length;
-  const totalOffices = new Set(projects.map(project => project.office?.name).filter(Boolean)).size;
-
-  // Calculate completion rate
-  const completionRate = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0;
 
   const handleWizardSubmit = async (data: any) => {
     console.log('Project wizard data:', data);
@@ -40,13 +26,6 @@ const Projects = () => {
         <SimpleBreadcrumbs />
         
         <ProjectsHeader onNewProject={() => setShowWizard(true)} />
-
-        <ProjectExecutiveSummary
-          totalProjects={totalProjects}
-          activeProjects={activeProjects}
-          completionRate={completionRate}
-          totalOffices={totalOffices}
-        />
         
         <OfficeSettingsProvider>
           <ProjectsList />
