@@ -2,26 +2,7 @@ import React, { useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
-
-interface ProjectAllocation {
-  projectId: string;
-  projectName: string;
-  projectCode: string;
-  hours: number;
-}
-
-interface AvailableMember {
-  id: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  avatarUrl?: string | null;
-  allocatedHours: number;
-  availableHours: number;
-  utilization: number;
-  capacity: number;
-  projectAllocations: ProjectAllocation[];
-  memberType: 'active' | 'pre_registered';
-}
+import { AvailableMember } from '@/types/weekly-overview';
 
 interface VirtualizedMemberListProps {
   members: AvailableMember[];
