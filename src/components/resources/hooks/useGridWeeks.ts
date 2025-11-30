@@ -30,10 +30,32 @@ export const useGridWeeks = (
     // Adjust start date to beginning of week
     const adjustedStartDate = startOfWeek(startDate, { weekStartsOn });
     
-    // Only include previous week on desktop, not on mobile/tablet
-    const previousWeekStartDate = isMobileOrTablet 
-      ? adjustedStartDate 
-      : addWeeks(adjustedStartDate, -1);
+    // On mobile/tablet, only show current week
+    if (isMobileOrTablet) {
+      const today = new Date();
+      const currentWeekStart = startOfWeek(today, { weekStartsOn });
+      const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn });
+      
+      return [{
+        weekStartDate: currentWeekStart,
+        weekEndDate: currentWeekEnd,
+        weekLabel: (() => {
+          const startDay = format(currentWeekStart, 'd');
+          const endDay = format(currentWeekEnd, 'd');
+          const startMonth = format(currentWeekStart, 'MMM');
+          const endMonth = format(currentWeekEnd, 'MMM');
+          return startMonth === endMonth 
+            ? `${startMonth} ${startDay}-${endDay}`
+            : `${startMonth} ${startDay}-${endMonth} ${endDay}`;
+        })(),
+        monthLabel: format(currentWeekStart, 'MMM'),
+        weekNumber: parseInt(format(currentWeekStart, 'w'), 10),
+        isPreviousWeek: false
+      }];
+    }
+    
+    // Desktop: include previous week and all selected weeks
+    const previousWeekStartDate = addWeeks(adjustedStartDate, -1);
     
     // Calculate end date based on periodToShow
     const endDate = addWeeks(adjustedStartDate, periodToShow - 1);
