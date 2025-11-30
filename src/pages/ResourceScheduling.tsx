@@ -142,7 +142,7 @@ const ResourceScheduling = () => {
             <div>
               {/* Member Filter and Available Members */}
               <div className="px-3 sm:px-6">
-                <div className="bg-card rounded-lg border p-1 space-y-1">
+                <div className="bg-card rounded-lg p-1 space-y-1">
                   <MemberFilterRow
                     filters={memberFilters}
                     onFilterChange={handleMemberFilterChange}
@@ -188,7 +188,7 @@ const ResourceScheduling = () => {
             <div>
               {/* Member Filter and Available Members */}
               <div className="px-3 sm:px-6">
-                <div className="bg-card rounded-lg border p-1 space-y-1">
+                <div className="bg-card rounded-lg p-1 space-y-1">
                   <MemberFilterRow
                     filters={memberFilters}
                     onFilterChange={handleMemberFilterChange}
