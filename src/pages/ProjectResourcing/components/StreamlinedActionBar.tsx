@@ -109,227 +109,63 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
   };
 
   return (
-    <div className="bg-muted/30 border border-border rounded-lg p-2 sm:p-3">
+    <div className="bg-card rounded-lg border p-3">
       {/* Desktop layout */}
-      <div className="hidden sm:flex flex-wrap items-center gap-3">
-        {/* Time navigation */}
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handlePreviousMonth}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        
-        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 min-w-[90px]">
-              <Calendar className="h-3 w-3 mr-2" />
-              {monthLabel}
+      <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
+        {/* Left section - Date Navigation */}
+        <div className="flex gap-3 items-center">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground hidden sm:block" />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handlePreviousMonth}
+              className="h-7 w-7 p-0"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => {
-                if (date) {
-                  const startOfSelectedMonth = startOfMonth(date);
-                  onDateChange(startOfSelectedMonth);
-                  setCalendarOpen(false);
-                }
-              }}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleNextMonth}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-
-        {/* Period selector */}
-        <Select 
-          value={periodToShow.toString()}
-          onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
-        >
-          <SelectTrigger className="w-[120px] h-8">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {periodOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Sort selector */}
-        <Select 
-          value={sortBy}
-          onValueChange={onSortChange}
-        >
-          <SelectTrigger className="w-[140px] h-8">
-            <SelectValue placeholder="Sort by..." />
-          </SelectTrigger>
-          <SelectContent>
-            {sortOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                Sort: {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Sort direction toggle */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onSortDirectionToggle}
-          className="h-8 w-8 p-0"
-          title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
-        >
-          <ArrowUpDown className={`h-3.5 w-3.5 transition-transform ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
-        </Button>
-
-        <div className="h-6 w-px bg-border" />
-
-        {/* Expand/Collapse */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleToggleExpand}
-          className="h-8"
-          disabled={totalProjects === 0}
-        >
-          {allExpanded ? (
-            <>
-              <Shrink className="h-3 w-3 mr-2" />
-              Collapse
-            </>
-          ) : (
-            <>
-              <Expand className="h-3 w-3 mr-2" />
-              Expand
-            </>
-          )}
-        </Button>
-
-        {/* Filters */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8">
-              <Filter className="h-3 w-3 mr-2" />
-              Filters
-              {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="ml-2 h-4 px-1 text-xs">
-                  {activeFiltersCount}
-                </Badge>
-              )}
+            
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-7 min-w-[90px]">
+                  {monthLabel}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      const startOfSelectedMonth = startOfMonth(date);
+                      onDateChange(startOfSelectedMonth);
+                      setCalendarOpen(false);
+                    }
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleNextMonth}
+              className="h-7 w-7 p-0"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent 
-            className="w-80 pointer-events-auto z-50" 
-            align="end"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ProjectResourcingFilters
-              filters={filters}
-              searchTerm={searchTerm}
-              onFilterChange={onFilterChange}
-              onPeriodChange={onPeriodChange}
-              onSearchChange={onSearchChange}
-              officeOptions={officeOptions}
-              countryOptions={countryOptions}
-              managers={managers}
-              activeFiltersCount={activeFiltersCount}
-              displayOptions={displayOptions}
-              onDisplayOptionChange={onDisplayOptionChange}
-            />
-          </PopoverContent>
-        </Popover>
-        
-        {activeFiltersCount > 0 && (
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={onClearFilters}
-            className="h-8 text-muted-foreground"
-          >
-            Clear
-          </Button>
-        )}
-
-        <div className="flex-1" />
-
-        {/* Export */}
-        <Button variant="outline" size="sm" className="h-8" onClick={onExport}>
-          <Download className="h-3 w-3 mr-2" />
-          Export
-        </Button>
-      </div>
-
-      {/* Mobile layout: 2 rows as requested */}
-      <div className="flex sm:hidden flex-col gap-2">
-        {/* Row 1: Month navigation ONLY */}
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handlePreviousMonth}
-            className="h-9 w-9 p-0 shrink-0"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          
-          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 flex-1">
-                <Calendar className="h-4 w-4 mr-2" />
-                {monthLabel}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="center">
-              <CalendarComponent
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => {
-                  if (date) {
-                    const startOfSelectedMonth = startOfMonth(date);
-                    onDateChange(startOfSelectedMonth);
-                    setCalendarOpen(false);
-                  }
-                }}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleNextMonth}
-            className="h-9 w-9 p-0 shrink-0"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          </div>
         </div>
 
-        {/* Row 2: Period + Expand + Filter */}
-        <div className="flex items-center gap-2">
+        {/* Right section - Controls */}
+        <div className="flex gap-2 items-center ml-auto overflow-x-auto">
           {/* Period selector */}
           <Select 
             value={periodToShow.toString()}
             onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
           >
-            <SelectTrigger className="h-9 flex-1">
+            <SelectTrigger className="w-28 h-7 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -341,30 +177,58 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
             </SelectContent>
           </Select>
 
+          {/* Sort selector */}
+          <Select 
+            value={sortBy}
+            onValueChange={onSortChange}
+          >
+            <SelectTrigger className="w-32 h-7 text-xs">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              {sortOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Sort direction toggle */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onSortDirectionToggle}
+            className="h-7 px-2"
+            title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
+          >
+            <ArrowUpDown className={`h-3.5 w-3.5 transition-transform ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
+          </Button>
+
           {/* Expand/Collapse */}
           <Button
             variant="outline"
             size="sm"
             onClick={handleToggleExpand}
-            className="h-9 w-9 p-0 shrink-0"
+            className="h-7 px-2"
             disabled={totalProjects === 0}
           >
             {allExpanded ? (
-              <Shrink className="h-4 w-4" />
+              <Shrink className="h-3.5 w-3.5" />
             ) : (
-              <Expand className="h-4 w-4" />
+              <Expand className="h-3.5 w-3.5" />
             )}
           </Button>
 
           {/* Filters */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 w-9 p-0 shrink-0 relative">
-                <Filter className="h-4 w-4" />
+              <Button variant="outline" size="sm" className="h-7 px-2">
+                <Filter className="h-3.5 w-3.5 mr-1.5" />
                 {activeFiltersCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-white text-[10px] flex items-center justify-center font-bold">
+                  <Badge variant="secondary" className="ml-1 h-4 px-1 text-[10px]">
                     {activeFiltersCount}
-                  </span>
+                  </Badge>
                 )}
               </Button>
             </PopoverTrigger>
@@ -394,11 +258,16 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
               variant="ghost" 
               size="sm"
               onClick={onClearFilters}
-              className="h-9 text-xs text-muted-foreground shrink-0"
+              className="h-7 px-2 text-xs text-muted-foreground"
             >
               Clear
             </Button>
           )}
+
+          {/* Export */}
+          <Button variant="outline" size="sm" className="h-7 px-2" onClick={onExport}>
+            <Download className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </div>
     </div>
