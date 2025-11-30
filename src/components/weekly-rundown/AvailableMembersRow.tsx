@@ -5,6 +5,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
 import { MemberFilterTabs } from './MemberFilterTabs';
+import { MemberSearchSort, SortOption } from './MemberSearchSort';
 import { VirtualizedMemberList } from './VirtualizedMemberList';
 import { UtilizationZone, ZoneCounts, AvailableMember as SharedAvailableMember, ProjectAllocation } from '@/types/weekly-overview';
 import { Button } from '@/components/ui/button';
@@ -21,9 +22,6 @@ interface AvailableMembersRowProps {
   };
 }
 
-type SortBy = 'hours' | 'name';
-type FilterBy = 'all' | 'department' | 'practiceArea';
-
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
@@ -33,6 +31,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
   const [activeZone, setActiveZone] = React.useState<UtilizationZone>('needs-attention');
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [sortBy, setSortBy] = React.useState<SortOption>('available-hours');
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['available-members-profiles'],
@@ -221,28 +221,59 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         }
 
         return true;
-      })
-      .sort((a, b) => b.availableHours - a.availableHours);
+      });
 
     return available;
   }, [profiles, invites, allocations, threshold, filters]);
 
+  // Apply local search and sort
+  const searchedAndSortedMembers = React.useMemo(() => {
+    let result = [...availableMembers];
+
+    // Apply search
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      result = result.filter(member => {
+        const fullName = `${member.firstName} ${member.lastName}`.toLowerCase();
+        return fullName.includes(searchLower);
+      });
+    }
+
+    // Apply sort
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+          const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+          return nameA.localeCompare(nameB);
+        case 'utilization':
+          return b.utilization - a.utilization;
+        case 'available-hours':
+          return b.availableHours - a.availableHours;
+        default:
+          return 0;
+      }
+    });
+
+    return result;
+  }, [availableMembers, searchTerm, sortBy]);
+
   // Calculate zone counts
   const zoneCounts: ZoneCounts = React.useMemo(() => {
     return {
-      'needs-attention': availableMembers.filter(m => m.utilization > 100 || m.utilization < 60).length,
-      'available': availableMembers.filter(m => m.utilization < threshold).length,
-      'at-capacity': availableMembers.filter(m => m.utilization >= threshold && m.utilization <= 100).length,
-      'over-allocated': availableMembers.filter(m => m.utilization > 100).length,
-      'all': availableMembers.length,
+      'needs-attention': searchedAndSortedMembers.filter(m => m.utilization > 100 || m.utilization < 60).length,
+      'available': searchedAndSortedMembers.filter(m => m.utilization < threshold).length,
+      'at-capacity': searchedAndSortedMembers.filter(m => m.utilization >= threshold && m.utilization <= 100).length,
+      'over-allocated': searchedAndSortedMembers.filter(m => m.utilization > 100).length,
+      'all': searchedAndSortedMembers.length,
     };
-  }, [availableMembers, threshold]);
+  }, [searchedAndSortedMembers, threshold]);
 
   // Apply zone filtering
   const filteredMembers = React.useMemo(() => {
-    if (activeZone === 'all') return availableMembers;
+    if (activeZone === 'all') return searchedAndSortedMembers;
     
-    return availableMembers.filter(m => {
+    return searchedAndSortedMembers.filter(m => {
       const util = m.utilization;
       switch (activeZone) {
         case 'needs-attention':
@@ -257,7 +288,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           return true;
       }
     });
-  }, [availableMembers, activeZone, threshold]);
+  }, [searchedAndSortedMembers, activeZone, threshold]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
@@ -281,7 +312,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       container.removeEventListener('scroll', checkScrollPosition);
       window.removeEventListener('resize', checkScrollPosition);
     };
-  }, [checkScrollPosition, availableMembers]);
+  }, [checkScrollPosition, filteredMembers]);
 
   const scrollMembers = (direction: 'left' | 'right') => {
     const container = membersScrollRef.current;
@@ -297,6 +328,14 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
   return (
     <div className="w-full space-y-4">
+      {/* Search and Sort */}
+      <MemberSearchSort
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+      />
+
       {/* Filter Tabs */}
       <MemberFilterTabs
         activeZone={activeZone}
@@ -359,10 +398,18 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         )}
 
         {/* Empty state */}
-        {filteredMembers.length === 0 && availableMembers.length > 0 && (
+        {filteredMembers.length === 0 && searchedAndSortedMembers.length > 0 && (
           <div className="flex-1 flex items-center justify-center py-6">
             <p className="text-sm text-muted-foreground text-center">
               No members in this category
+            </p>
+          </div>
+        )}
+        
+        {searchedAndSortedMembers.length === 0 && availableMembers.length > 0 && (
+          <div className="flex-1 flex items-center justify-center py-6">
+            <p className="text-sm text-muted-foreground text-center">
+              No members match your search
             </p>
           </div>
         )}
