@@ -112,47 +112,28 @@ export const MobileResourceControls: React.FC<MobileResourceControlsProps> = ({
 
   return (
     <div className="lg:hidden">
-      {/* Month Navigation - Swipeable */}
-      <div {...swipeHandlers} className="bg-card rounded-lg border p-3 mb-3 touch-pan-y">
-        <div className="flex items-center justify-between">
+      {/* Compact Header with Month & Period */}
+      <div {...swipeHandlers} className="bg-card rounded-lg border p-2 mb-2 touch-pan-y">
+        <div className="flex items-center justify-between gap-2">
           <Button 
             variant="outline" 
-            size="lg"
+            size="sm"
             onClick={handlePreviousMonth}
-            className="h-11 w-11 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
+            className="h-9 w-9 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
           
           <div className="flex items-center gap-2 flex-1 justify-center">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium text-base">{monthLabel}</span>
+            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="font-medium text-sm">{monthLabel}</span>
           </div>
-          
-          <Button 
-            variant="outline" 
-            size="lg"
-            onClick={handleNextMonth}
-            className="h-11 w-11 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        <div className="text-xs text-center text-muted-foreground mt-2">
-          Swipe left or right to change month
-        </div>
-      </div>
 
-      {/* Quick Controls */}
-      <div className="bg-card rounded-lg border p-3 mb-3">
-        <div className="grid grid-cols-2 gap-2">
-          {/* Period Selector */}
           <Select 
             value={periodToShow.toString()}
             onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
           >
-            <SelectTrigger className="h-11 text-sm bg-muted border">
+            <SelectTrigger className="h-9 w-20 text-xs bg-muted border">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -163,13 +144,27 @@ export const MobileResourceControls: React.FC<MobileResourceControlsProps> = ({
               ))}
             </SelectContent>
           </Select>
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleNextMonth}
+            className="h-9 w-9 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
 
-          {/* Sort Selector */}
+      {/* Compact Actions Row */}
+      <div className="bg-card rounded-lg border p-2 mb-2">
+        <div className="flex items-center gap-2">
+          {/* Sort Controls */}
           <Select 
             value={sortBy}
             onValueChange={onSortChange}
           >
-            <SelectTrigger className="h-11 text-sm bg-muted border">
+            <SelectTrigger className="h-8 flex-1 text-xs bg-muted border">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -180,57 +175,37 @@ export const MobileResourceControls: React.FC<MobileResourceControlsProps> = ({
               ))}
             </SelectContent>
           </Select>
-        </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="bg-card rounded-lg border p-3 mb-3">
-        <div className="grid grid-cols-4 gap-2">
-          {/* Sort Direction */}
           <Button
             variant="outline"
-            size="lg"
+            size="sm"
             onClick={onSortDirectionToggle}
-            className="h-12 flex flex-col items-center justify-center gap-1 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
+            className="h-8 w-8 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
             title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
           >
-            <ArrowUpDown className={`h-4 w-4 transition-transform ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
-            <span className="text-[10px]">Sort</span>
+            <ArrowUpDown className={`h-3.5 w-3.5 transition-transform ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
           </Button>
 
-          {/* Expand/Collapse */}
           <Button
             variant="outline"
-            size="lg"
+            size="sm"
             onClick={allExpanded ? onCollapseAll : onExpandAll}
-            className="h-12 flex flex-col items-center justify-center gap-1 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
+            className="h-8 w-8 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
             disabled={totalProjects === 0}
           >
-            {allExpanded ? (
-              <>
-                <Shrink className="h-4 w-4" />
-                <span className="text-[10px]">Collapse</span>
-              </>
-            ) : (
-              <>
-                <Expand className="h-4 w-4" />
-                <span className="text-[10px]">Expand</span>
-              </>
-            )}
+            {allExpanded ? <Shrink className="h-3.5 w-3.5" /> : <Expand className="h-3.5 w-3.5" />}
           </Button>
 
-          {/* Filters */}
           <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="outline"
-                size="lg"
-                className="h-12 flex flex-col items-center justify-center gap-1 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95 relative"
+                size="sm"
+                className="h-8 w-8 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95 relative"
               >
-                <Filter className="h-4 w-4" />
-                <span className="text-[10px]">Filters</span>
+                <Filter className="h-3.5 w-3.5" />
                 {activeFiltersCount > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px]">
+                  <Badge className="absolute -top-1 -right-1 h-4 w-4 rounded-full p-0 flex items-center justify-center text-[9px]">
                     {activeFiltersCount}
                   </Badge>
                 )}
@@ -270,15 +245,13 @@ export const MobileResourceControls: React.FC<MobileResourceControlsProps> = ({
             </SheetContent>
           </Sheet>
 
-          {/* Export */}
           <Button
             variant="outline"
-            size="lg"
+            size="sm"
             onClick={onExport}
-            className="h-12 flex flex-col items-center justify-center gap-1 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
+            className="h-8 w-8 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
           >
-            <Download className="h-4 w-4" />
-            <span className="text-[10px]">Export</span>
+            <Download className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
