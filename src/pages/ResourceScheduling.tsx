@@ -3,7 +3,7 @@ import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GanttChartSquare, Users, Calendar, TrendingUp } from 'lucide-react';
-import { WeeklyResourceFilters } from '@/components/weekly-overview/WeeklyResourceFilters';
+import { MemberFilterRow } from '@/components/resources/MemberFilterRow';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectResourcingData';
@@ -60,7 +60,6 @@ const ResourceScheduling = () => {
 
   // Member filters state
   const [memberFilters, setMemberFilters] = useState({
-    office: "all",
     practiceArea: "all",
     department: "all",
     location: "all",
@@ -76,7 +75,6 @@ const ResourceScheduling = () => {
 
   const clearMemberFilters = useCallback(() => {
     setMemberFilters({
-      office: 'all',
       practiceArea: 'all',
       department: 'all',
       location: 'all',
@@ -85,12 +83,11 @@ const ResourceScheduling = () => {
   }, []);
 
   const activeMemberFiltersCount = useMemo(() => [
-    memberFilters.office !== 'all' ? 'office' : '',
     memberFilters.practiceArea !== 'all' ? 'practiceArea' : '',
     memberFilters.department !== 'all' ? 'department' : '',
     memberFilters.location !== 'all' ? 'location' : '',
     memberFilters.searchTerm ? 'search' : ''
-  ].filter(Boolean).length, [memberFilters.office, memberFilters.practiceArea, memberFilters.department, memberFilters.location, memberFilters.searchTerm]);
+  ].filter(Boolean).length, [memberFilters.practiceArea, memberFilters.department, memberFilters.location, memberFilters.searchTerm]);
 
   return (
     <StandardLayout>
@@ -143,11 +140,13 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-project" className="mt-0 py-3">
             <div className="space-y-3">
-              {/* Member Filters */}
+              {/* Member Filter Row */}
               <div className="px-3 sm:px-6">
-                <WeeklyResourceFilters
-                  filters={{ office: memberFilters.office }}
+                <MemberFilterRow
+                  filters={memberFilters}
                   onFilterChange={handleMemberFilterChange}
+                  activeFiltersCount={activeMemberFiltersCount}
+                  clearFilters={clearMemberFilters}
                 />
               </div>
 
@@ -189,11 +188,13 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-person" className="mt-0 py-3">
             <div className="space-y-3">
-              {/* Member Filters */}
+              {/* Member Filter Row */}
               <div className="px-3 sm:px-6">
-                <WeeklyResourceFilters
-                  filters={{ office: memberFilters.office }}
+                <MemberFilterRow
+                  filters={memberFilters}
                   onFilterChange={handleMemberFilterChange}
+                  activeFiltersCount={activeMemberFiltersCount}
+                  clearFilters={clearMemberFilters}
                 />
               </div>
 
