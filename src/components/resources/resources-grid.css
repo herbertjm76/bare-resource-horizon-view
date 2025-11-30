@@ -37,10 +37,10 @@
 @media (max-width: 640px) {
   .grid-table-card-scroll {
     /* Ensure full width on mobile with proper scrolling */
-    width: 100vw;
-    max-width: 100vw;
-    margin-left: calc(-1rem); /* Offset container padding */
-    padding-left: 1rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding-left: 0;
     padding-right: 1rem;
   }
   
