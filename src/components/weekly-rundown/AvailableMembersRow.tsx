@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
+import { MemberFilterTabs, UtilizationZone } from './MemberFilterTabs';
+import { VirtualizedMemberList } from './VirtualizedMemberList';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -30,7 +32,7 @@ interface ProjectAllocation {
 
 interface AvailableMember {
   id: string;
-  type: 'active' | 'pre_registered';
+  memberType: 'active' | 'pre_registered';
   firstName: string;
   lastName: string;
   avatarUrl?: string;
@@ -39,6 +41,8 @@ interface AvailableMember {
   utilization: number;
   capacity: number;
   department?: string;
+  practiceArea?: string;
+  location?: string;
   sectors: string[];
   projectAllocations: ProjectAllocation[];
 }
@@ -51,6 +55,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
+  const [activeZone, setActiveZone] = React.useState<UtilizationZone>('needs-attention');
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['available-members-profiles'],
@@ -59,7 +64,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (!session?.user) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department');
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location');
       if (error) throw error;
       return data || [];
     },
@@ -73,7 +78,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (!session?.user) return [];
       const { data, error } = await supabase
         .from('invites')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department')
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location')
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
       if (error) throw error;
@@ -125,7 +130,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         avatarUrl: p.avatar_url,
         capacity: p.weekly_capacity || 40,
         department: p.department || undefined,
-        type: 'active' as const
+        practiceArea: p.practice_area || undefined,
+        location: p.location || undefined,
+        memberType: 'active' as const
       })),
       ...invites.map(i => ({
         id: i.id,
@@ -134,7 +141,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         avatarUrl: i.avatar_url,
         capacity: i.weekly_capacity || 40,
         department: i.department || undefined,
-        type: 'pre_registered' as const
+        practiceArea: i.practice_area || undefined,
+        location: i.location || undefined,
+        memberType: 'pre_registered' as const
       }))
     ];
 
@@ -197,7 +206,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
         return {
           id: member.id,
-          type: member.type,
+          memberType: member.memberType,
           firstName: member.firstName,
           lastName: member.lastName,
           avatarUrl: member.avatarUrl,
@@ -206,6 +215,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           utilization,
           capacity: member.capacity,
           department: member.department,
+          practiceArea: member.practiceArea,
+          location: member.location,
           sectors,
           projectAllocations
         };
@@ -238,6 +249,38 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
     return available;
   }, [profiles, invites, allocations, threshold, filters]);
+
+  // Calculate zone counts
+  const zoneCounts = React.useMemo(() => {
+    return {
+      needsAttention: availableMembers.filter(m => m.utilization > 100 || m.utilization < 60).length,
+      available: availableMembers.filter(m => m.utilization < threshold).length,
+      atCapacity: availableMembers.filter(m => m.utilization >= threshold && m.utilization <= 100).length,
+      overAllocated: availableMembers.filter(m => m.utilization > 100).length,
+      all: availableMembers.length,
+    };
+  }, [availableMembers, threshold]);
+
+  // Apply zone filtering
+  const filteredMembers = React.useMemo(() => {
+    if (activeZone === 'all') return availableMembers;
+    
+    return availableMembers.filter(m => {
+      const util = m.utilization;
+      switch (activeZone) {
+        case 'needs-attention':
+          return util > 100 || util < 60;
+        case 'available':
+          return util < threshold;
+        case 'at-capacity':
+          return util >= threshold && util <= 100;
+        case 'over-allocated':
+          return util > 100;
+        default:
+          return true;
+      }
+    });
+  }, [availableMembers, activeZone, threshold]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
@@ -276,10 +319,18 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   };
 
   return (
-    <div className="w-full">
-      <div className="rounded-lg border bg-card p-1.5 animate-fade-in relative shadow-[0_4px_8px_-2px_hsl(var(--border))]">
-        {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
-        {availableMembers.length > 0 && (
+    <div className="w-full space-y-4">
+      {/* Filter Tabs */}
+      <MemberFilterTabs
+        activeZone={activeZone}
+        onZoneChange={setActiveZone}
+        counts={zoneCounts}
+      />
+
+      {/* Member List Container */}
+      <div className="rounded-lg border bg-card p-4 animate-fade-in relative shadow-[0_4px_8px_-2px_hsl(var(--border))]">
+        {/* Members Avatars - Virtualized with Arrow Navigation */}
+        {filteredMembers.length > 0 && (
           <div className="hidden sm:block relative">
             {/* Left Arrow */}
             {canScrollLeft && (
@@ -307,75 +358,41 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
             
             <div 
               ref={membersScrollRef}
-              className="overflow-x-auto overflow-y-hidden pl-14 pr-2 scrollbar-hide"
+              className="overflow-x-auto overflow-y-hidden pl-14 pr-2 scrollbar-hide h-24"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[40px]">
-                {availableMembers.map((member) => (
-                  <MemberVacationPopover
-                    key={member.id}
-                    memberId={member.id}
-                    memberName={`${member.firstName} ${member.lastName}`}
-                    weekStartDate={weekStartDate}
-                  >
-                    <div className="cursor-pointer">
-                      <MemberAvailabilityCard
-                        memberId={member.id}
-                        memberType={member.type}
-                        avatarUrl={member.avatarUrl}
-                        firstName={member.firstName}
-                        lastName={member.lastName}
-                        allocatedHours={member.allocatedHours}
-                        projectAllocations={member.projectAllocations}
-                        utilization={member.utilization}
-                        threshold={threshold}
-                        weekStartDate={weekStartDate}
-                        disableDialog={true}
-                      />
-                    </div>
-                  </MemberVacationPopover>
-                ))}
-              </div>
+              <VirtualizedMemberList
+                members={filteredMembers}
+                weekStartDate={weekStartDate}
+                threshold={threshold}
+              />
             </div>
           </div>
         )}
 
         {/* Mobile view without arrows */}
-        {availableMembers.length > 0 && (
-          <div className="block sm:hidden overflow-x-auto overflow-y-hidden px-2">
-            <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[40px]">
-              {availableMembers.map((member) => (
-                <MemberVacationPopover
-                  key={member.id}
-                  memberId={member.id}
-                  memberName={`${member.firstName} ${member.lastName}`}
-                  weekStartDate={weekStartDate}
-                >
-                  <div className="cursor-pointer">
-                    <MemberAvailabilityCard
-                      memberId={member.id}
-                      memberType={member.type}
-                      avatarUrl={member.avatarUrl}
-                      firstName={member.firstName}
-                      lastName={member.lastName}
-                      allocatedHours={member.allocatedHours}
-                      projectAllocations={member.projectAllocations}
-                      utilization={member.utilization}
-                      threshold={threshold}
-                      weekStartDate={weekStartDate}
-                      disableDialog={true}
-                    />
-                  </div>
-                </MemberVacationPopover>
-              ))}
-            </div>
+        {filteredMembers.length > 0 && (
+          <div className="block sm:hidden overflow-x-auto overflow-y-hidden px-2 h-24">
+            <VirtualizedMemberList
+              members={filteredMembers}
+              weekStartDate={weekStartDate}
+              threshold={threshold}
+            />
           </div>
         )}
 
-        {/* Empty state - compact version */}
+        {/* Empty state */}
+        {filteredMembers.length === 0 && availableMembers.length > 0 && (
+          <div className="flex-1 flex items-center justify-center py-6">
+            <p className="text-sm text-muted-foreground text-center">
+              No members in this category
+            </p>
+          </div>
+        )}
+        
         {availableMembers.length === 0 && (
-          <div className="flex-1 flex items-center justify-center py-3 sm:py-0">
-            <p className="text-xs sm:text-sm text-muted-foreground text-center">
+          <div className="flex-1 flex items-center justify-center py-6">
+            <p className="text-sm text-muted-foreground text-center">
               No available members
             </p>
           </div>
