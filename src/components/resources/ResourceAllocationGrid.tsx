@@ -45,14 +45,23 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   // Generate array of days for the selected period
   const days = useGridDays(startDate, periodToShow, displayOptions);
 
+  // Determine which days to display based on viewport
+  const isMobileOrTablet = typeof window !== 'undefined' && window.innerWidth <= 1024;
+  const displayedDays = isMobileOrTablet
+    ? (() => {
+        const currentWeekDays = days.filter((day) => day.isCurrentWeek);
+        return currentWeekDays.length > 0 ? currentWeekDays : days;
+      })()
+    : days;
+
   // Filter and enhance projects
   const filteredProjects = useFilteredProjects(projects, filters, office_stages);
 
-  // Calculate the table width
-  const tableWidth = useGridTableWidth(days.length);
+  // Calculate the table width based on visible days
+  const tableWidth = useGridTableWidth(displayedDays.length);
   
   // Auto-scroll to current week on mount
-  useScrollToCurrentWeek(days, scrollContainerRef);
+  useScrollToCurrentWeek(displayedDays, scrollContainerRef);
   
   // Toggle project expansion
   const toggleProjectExpanded = (projectId: string) => {
@@ -82,14 +91,14 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               }}
             >
               <thead>
-                <GridDaysHeader days={days} />
+                <GridDaysHeader days={displayedDays} />
               </thead>
               <tbody>
                 {filteredProjects.map((project, index) => (
                   <ProjectRow 
                     key={project.id} 
                     project={project} 
-                    days={days} 
+                    days={displayedDays} 
                     isExpanded={expandedProjects.includes(project.id)} 
                     onToggleExpand={() => toggleProjectExpanded(project.id)} 
                     isEven={index % 2 === 0} 
