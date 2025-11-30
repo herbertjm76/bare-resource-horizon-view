@@ -143,16 +143,16 @@ const ResourceScheduling = () => {
               {/* Member Filter and Available Members */}
               <div className="px-3 sm:px-6">
                 <div className="bg-card rounded-lg p-1 space-y-1">
-                  <AvailableMembersRow
-                    weekStartDate={weekStartDate}
-                    threshold={80}
-                    filters={memberFilters}
-                  />
                   <MemberFilterRow
                     filters={memberFilters}
                     onFilterChange={handleMemberFilterChange}
                     activeFiltersCount={activeMemberFiltersCount}
                     clearFilters={clearMemberFilters}
+                  />
+                  <AvailableMembersRow
+                    weekStartDate={weekStartDate}
+                    threshold={80}
+                    filters={memberFilters}
                   />
                 </div>
               </div>
@@ -189,16 +189,16 @@ const ResourceScheduling = () => {
               {/* Member Filter and Available Members */}
               <div className="px-3 sm:px-6">
                 <div className="bg-card rounded-lg p-1 space-y-1">
-                  <AvailableMembersRow
-                    weekStartDate={weekStartDate}
-                    threshold={80}
-                    filters={memberFilters}
-                  />
                   <MemberFilterRow
                     filters={memberFilters}
                     onFilterChange={handleMemberFilterChange}
                     activeFiltersCount={activeMemberFiltersCount}
                     clearFilters={clearMemberFilters}
+                  />
+                  <AvailableMembersRow
+                    weekStartDate={weekStartDate}
+                    threshold={80}
+                    filters={memberFilters}
                   />
                 </div>
               </div>
