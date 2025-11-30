@@ -44,4 +44,18 @@
     padding: 6px 4px;
     font-size: 11px;
   }
+  
+  /* Ensure first column stays sticky on mobile */
+  .enhanced-resource-table thead th:first-child,
+  .enhanced-resource-table tbody td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 20 !important;
+    background: white !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
+  }
+  
+  .enhanced-resource-table thead th:first-child {
+    z-index: 25 !important;
+  }
 }
