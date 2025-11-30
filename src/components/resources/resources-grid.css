@@ -55,6 +55,19 @@
   position: sticky;
   left: 0;
   z-index: 20;
+  background: hsl(var(--background));
+}
+
+/* Sticky columns on mobile/tablet - higher z-index and shadow */
+@media (max-width: 1024px) {
+  .sticky-left-0 {
+    z-index: 30 !important;
+    box-shadow: 3px 0 6px rgba(0, 0, 0, 0.12);
+  }
+  
+  .resource-allocation-table thead th.sticky-left-0 {
+    z-index: 35 !important;
+  }
 }
 
 .sticky-left-12 {
@@ -82,14 +95,29 @@
 .resource-allocation-table td.current-week,
 .resource-allocation-table th.current-week {
   background-color: rgba(59, 130, 246, 0.08) !important;
+  position: relative;
+}
+
+.resource-allocation-table td.current-week::before,
+.resource-allocation-table th.current-week::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-left: 2px solid #3b82f6;
+  border-right: 2px solid #3b82f6;
+  pointer-events: none;
 }
 
 /* Today highlighting - stronger */
 .resource-allocation-table td.today,
 .resource-allocation-table th.today {
-  background-color: rgba(59, 130, 246, 0.15) !important;
-  border-left: 2px solid #3b82f6 !important;
-  border-right: 2px solid #3b82f6 !important;
+  background-color: rgba(59, 130, 246, 0.2) !important;
+  border-left: 3px solid #3b82f6 !important;
+  border-right: 3px solid #3b82f6 !important;
+  font-weight: 600;
 }
 
 /* Sunday border - thicker separation */

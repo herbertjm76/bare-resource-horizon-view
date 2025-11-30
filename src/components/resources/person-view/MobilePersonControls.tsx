@@ -53,7 +53,7 @@ export const MobilePersonControls: React.FC<MobilePersonControlsProps> = ({
 
   return (
     <div className="lg:hidden">
-      {/* Compact Header with Month & Period */}
+      {/* Compact Header with Month Navigation - No Period Selector */}
       <div {...swipeHandlers} className="bg-card rounded-lg border p-2 mb-2 touch-pan-y">
         <div className="flex items-center justify-between gap-2">
           <Button 
@@ -69,22 +69,6 @@ export const MobilePersonControls: React.FC<MobilePersonControlsProps> = ({
             <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="font-medium text-sm">{monthLabel}</span>
           </div>
-
-          <Select 
-            value={periodToShow.toString()}
-            onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
-          >
-            <SelectTrigger className="h-9 w-20 text-xs bg-muted border">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {periodOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           
           <Button 
             variant="outline" 
@@ -93,47 +77,6 @@ export const MobilePersonControls: React.FC<MobilePersonControlsProps> = ({
             className="h-9 w-9 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
           >
             <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Compact Actions Row */}
-      <div className="bg-card rounded-lg border p-2 mb-2">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onToggleExpand}
-            className="h-8 flex-1 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95 text-xs"
-            disabled={totalPeople === 0}
-          >
-            {allExpanded ? (
-              <>
-                <Shrink className="h-3.5 w-3.5 mr-1.5" />
-                <span>Collapse</span>
-              </>
-            ) : (
-              <>
-                <Expand className="h-3.5 w-3.5 mr-1.5" />
-                <span>Expand</span>
-              </>
-            )}
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 w-8 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
-          >
-            <Download className="h-3.5 w-3.5" />
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 w-8 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
-          >
-            <Settings className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>

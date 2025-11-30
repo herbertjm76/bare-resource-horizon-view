@@ -26,29 +26,31 @@
 }
 
 /* Sticky counter column */
-.project-resourcing-table .counter-column {
+.project-resourcing-table .counter-column,
+.resource-allocation-table .counter-column {
   width: 48px !important;
   min-width: 48px !important;
   max-width: 48px !important;
   position: sticky !important;
   left: 0 !important;
-  z-index: 20 !important;
-  background: white !important;
+  z-index: 30 !important;
+  background: hsl(var(--background)) !important;
   border-right: 2px solid #e5e7eb !important;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 3px 0 6px rgba(0, 0, 0, 0.12) !important;
 }
 
 /* Sticky project name column */
-.project-resourcing-table .project-name-column {
+.project-resourcing-table .project-name-column,
+.resource-allocation-table .project-name-column {
   width: 200px !important;
   min-width: 200px !important;
   max-width: 200px !important;
   position: sticky !important;
   left: 48px !important;
-  z-index: 20 !important;
-  background: white !important;
+  z-index: 30 !important;
+  background: hsl(var(--background)) !important;
   border-right: 2px solid #e5e7eb !important;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 3px 0 6px rgba(0, 0, 0, 0.12) !important;
 }
 
 /* Day columns */
@@ -76,8 +78,10 @@
 
 /* Ensure header sticky columns have higher z-index */
 .project-resourcing-table thead th.counter-column,
-.project-resourcing-table thead th.project-name-column {
-  z-index: 30 !important;
+.project-resourcing-table thead th.project-name-column,
+.resource-allocation-table thead th.counter-column,
+.resource-allocation-table thead th.project-name-column {
+  z-index: 35 !important;
   background: transparent !important;
   color: white !important;
 }
@@ -90,23 +94,29 @@
 
 /* Sticky body cells - ensure proper background and text colors */
 .project-resourcing-table tbody td.counter-column,
-.project-resourcing-table tbody td.project-name-column {
-  background: white !important;
-  color: #1f2937 !important;
+.project-resourcing-table tbody td.project-name-column,
+.resource-allocation-table tbody td.counter-column,
+.resource-allocation-table tbody td.project-name-column {
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 /* Project header rows - special styling for sticky columns */
 .project-resourcing-table tbody tr.project-header-row td.counter-column,
-.project-resourcing-table tbody tr.project-header-row td.project-name-column {
+.project-resourcing-table tbody tr.project-header-row td.project-name-column,
+.resource-allocation-table tbody tr.project-header-row td.counter-column,
+.resource-allocation-table tbody tr.project-header-row td.project-name-column {
   background: hsl(var(--gradient-start)) !important;
   color: white !important;
 }
 
 /* Resource rows - ensure text is visible */
 .project-resourcing-table tbody tr.resource-row td.counter-column,
-.project-resourcing-table tbody tr.resource-row td.project-name-column {
-  background: white !important;
-  color: #374151 !important;
+.project-resourcing-table tbody tr.resource-row td.project-name-column,
+.resource-allocation-table tbody tr.resource-row td.counter-column,
+.resource-allocation-table tbody tr.resource-row td.project-name-column {
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 /* Text truncation for project names */
