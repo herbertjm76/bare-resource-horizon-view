@@ -18,7 +18,15 @@ export const useRundownData = ({
   getMemberTotal,
   getProjectCount
 }: UseRundownDataProps) => {
+  // Memoize the rundown items to prevent flickering
   const rundownItems = useMemo(() => {
+    console.log('useRundownData - Computing rundown items', { rundownMode, memberCount: allMembers?.length });
+    
+    // Early return if no data
+    if (!allMembers || allMembers.length === 0) {
+      return [];
+    }
+    
     if (rundownMode === 'people') {
       // Process people data
       let processedPeople = allMembers.map(member => {
