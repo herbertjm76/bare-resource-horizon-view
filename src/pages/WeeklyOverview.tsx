@@ -8,6 +8,7 @@ import { RundownCarousel } from '@/components/weekly-rundown/RundownCarousel';
 import { UnifiedWeeklyControls, ViewType, RundownMode, SortOption, TableOrientation } from '@/components/week-resourcing/UnifiedWeeklyControls';
 import { WeeklySummaryCards } from '@/components/weekly-rundown/WeeklySummaryCards';
 import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
+import { MemberFilterRow } from '@/components/resources/MemberFilterRow';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
 import { useRundownData } from '@/components/weekly-rundown/hooks/useRundownData';
 import { useCarouselNavigation } from '@/components/weekly-rundown/hooks/useCarouselNavigation';
@@ -269,7 +270,13 @@ const WeeklyOverview = () => {
 
             {/* Combined Filter and Available Members Card */}
             <div className="px-3 sm:px-6">
-              <div className="bg-card rounded-lg p-1">
+              <div className="bg-card rounded-lg p-1 space-y-1">
+                <MemberFilterRow
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  activeFiltersCount={activeFiltersCount}
+                  clearFilters={clearFilters}
+                />
                 <AvailableMembersRow 
                   weekStartDate={weekStartString}
                   threshold={80}
