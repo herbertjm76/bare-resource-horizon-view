@@ -39,7 +39,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   const filteredProjects = useFilteredProjects(projects, filters);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
 
-  // On tablet and mobile, only show the current week column
+  // On tablet and mobile, only show a single week column (prefer THIS WEEK)
   const displayedWeeks = React.useMemo(() => {
     if (!weeks || weeks.length === 0) return weeks;
 
@@ -56,7 +56,12 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
       })
     );
 
-    return currentWeek ? [currentWeek] : weeks;
+    if (currentWeek) {
+      return [currentWeek];
+    }
+
+    // Fallback: still show only the first available week to keep grid compact
+    return weeks.length > 0 ? [weeks[0]] : weeks;
   }, [weeks]);
 
   if (isLoadingProjects) {
