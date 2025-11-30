@@ -26,6 +26,12 @@ interface WeeklySummaryCardsProps {
   toggleCard: (key: string, isVisible: boolean) => void;
   moveCard: (cardId: string, direction: 'up' | 'down') => void;
   reorderCards: (newOrder: CardOrder) => void;
+  // Optional pre-fetched data to avoid duplicate queries
+  annualLeaves?: any[];
+  holidays?: any[];
+  otherLeaves?: any[];
+  weeklyNotes?: any[];
+  customCardTypes?: any[];
 }
 
 export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
@@ -35,7 +41,12 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   cardOrder,
   toggleCard,
   moveCard,
-  reorderCards
+  reorderCards,
+  annualLeaves: prefetchedAnnualLeaves,
+  holidays: prefetchedHolidays,
+  otherLeaves: prefetchedOtherLeaves,
+  weeklyNotes: prefetchedWeeklyNotes,
+  customCardTypes: prefetchedCustomCardTypes
 }) => {
   const { company } = useCompany();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -52,8 +63,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   const weekStartString = format(weekStart, 'yyyy-MM-dd');
   const weekEndString = format(weekEnd, 'yyyy-MM-dd');
 
-  // Fetch annual leaves
-  const { data: annualLeaves = [] } = useQuery({
+  // Fetch annual leaves if not provided
+  const { data: fetchedAnnualLeaves = [] } = useQuery({
     queryKey: ['weekly-summary-leaves', weekStartString, weekEndString, company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
@@ -68,13 +79,13 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!company?.id && !prefetchedAnnualLeaves,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 
-  // Fetch office holidays for the selected week from office_holidays (office settings)
-  const { data: holidays = [] } = useQuery({
+  // Fetch holidays if not provided
+  const { data: fetchedHolidays = [] } = useQuery({
     queryKey: ['weekly-summary-holidays', weekStartString, weekEndString, company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
@@ -89,13 +100,13 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!company?.id && !prefetchedHolidays,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 
-  // Fetch weekly other leave
-  const { data: otherLeaves = [] } = useQuery({
+  // Fetch other leaves if not provided
+  const { data: fetchedOtherLeaves = [] } = useQuery({
     queryKey: ['weekly-summary-other-leaves', weekStartString, memberIds, company?.id],
     queryFn: async () => {
       if (!company?.id || memberIds.length === 0) return [];
@@ -110,13 +121,13 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id && memberIds.length > 0,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!company?.id && memberIds.length > 0 && !prefetchedOtherLeaves,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 
-  // Fetch weekly notes
-  const { data: weeklyNotes = [] } = useQuery({
+  // Fetch weekly notes if not provided
+  const { data: fetchedWeeklyNotes = [] } = useQuery({
     queryKey: ['weekly-notes', weekStartString, company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
@@ -131,13 +142,19 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!company?.id && !prefetchedWeeklyNotes,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 
-  // Fetch custom card types
-  const { data: customCardTypes = [] } = useCustomCardTypes();
+  // Fetch custom card types if not provided
+  const { data: fetchedCustomCardTypes = [] } = useCustomCardTypes();
+
+  const annualLeaves = prefetchedAnnualLeaves || fetchedAnnualLeaves;
+  const holidays = prefetchedHolidays || fetchedHolidays;
+  const otherLeaves = prefetchedOtherLeaves || fetchedOtherLeaves;
+  const weeklyNotes = prefetchedWeeklyNotes || fetchedWeeklyNotes;
+  const customCardTypes = prefetchedCustomCardTypes || fetchedCustomCardTypes;
 
   // Build card registry based on visibility
   const cards = useMemo(() => {
