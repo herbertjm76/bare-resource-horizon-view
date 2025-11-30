@@ -124,106 +124,97 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   // Render only controls if requested
   if (showOnlyControls) {
     return (
-      <div className="bg-muted/30 border border-border rounded-lg p-3">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="bg-card rounded-lg border p-3">
+        <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
           
-          {/* Time navigation group */}
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handlePreviousMonth}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 min-w-[90px]">
-                  <Calendar className="h-3 w-3 mr-2" />
-                  {monthLabel}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={startDate}
-                  onSelect={(date) => {
-                    if (date) {
-                      const startOfSelectedMonth = startOfMonth(date);
-                      onMonthChange(startOfSelectedMonth);
-                      setCalendarOpen(false);
-                    }
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleNextMonth}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          {/* Left section - Date Navigation */}
+          <div className="flex gap-3 items-center">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground hidden sm:block" />
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handlePreviousMonth}
+                className="h-7 w-7 p-0"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </Button>
+              
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-7 min-w-[90px]">
+                    {monthLabel}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={startDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        const startOfSelectedMonth = startOfMonth(date);
+                        onMonthChange(startOfSelectedMonth);
+                        setCalendarOpen(false);
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleNextMonth}
+                className="h-7 w-7 p-0"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
 
-          {/* Period selector */}
-          <Select 
-            value={periodToShow.toString()}
-            onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
-          >
-            <SelectTrigger className="w-[120px] h-8">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {periodOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Right section - Controls */}
+          <div className="flex gap-2 items-center ml-auto overflow-x-auto">
+            {/* Period selector */}
+            <Select 
+              value={periodToShow.toString()}
+              onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
+            >
+              <SelectTrigger className="w-28 h-7 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {periodOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {/* Divider */}
-          <div className="h-6 w-px bg-border" />
-
-          {/* View controls group */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleToggleExpand}
-            className="h-8"
-            disabled={totalPeople === 0}
-          >
-            {allExpanded ? (
-              <>
-                <Shrink className="h-3 w-3 mr-2" />
-                Collapse
-              </>
-            ) : (
-              <>
-                <Expand className="h-3 w-3 mr-2" />
-                Expand
-              </>
-            )}
-          </Button>
-
-          {/* Spacer to push secondary actions to the right */}
-          <div className="flex-1" />
-
-          {/* Secondary actions */}
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-8">
-              <Download className="h-3 w-3 mr-2" />
-              Export
+            {/* Expand/Collapse */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleToggleExpand}
+              className="h-7 px-2"
+              disabled={totalPeople === 0}
+            >
+              {allExpanded ? (
+                <Shrink className="h-3.5 w-3.5" />
+              ) : (
+                <Expand className="h-3.5 w-3.5" />
+              )}
             </Button>
-            <Button variant="outline" size="sm" className="h-8">
-              <Settings className="h-3 w-3 mr-2" />
-              Settings
+
+            {/* Export */}
+            <Button variant="outline" size="sm" className="h-7 px-2">
+              <Download className="h-3.5 w-3.5" />
+            </Button>
+            
+            {/* Settings */}
+            <Button variant="outline" size="sm" className="h-7 px-2">
+              <Settings className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
@@ -270,106 +261,97 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
       </div>
       
       {/* Compact Action Bar */}
-      <div className="bg-muted/30 border border-border rounded-lg p-3">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="bg-card rounded-lg border p-3">
+        <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
           
-          {/* Time navigation group */}
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handlePreviousMonth}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 min-w-[90px]">
-                  <Calendar className="h-3 w-3 mr-2" />
-                  {monthLabel}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={startDate}
-                  onSelect={(date) => {
-                    if (date) {
-                      const startOfSelectedMonth = startOfMonth(date);
-                      onMonthChange(startOfSelectedMonth);
-                      setCalendarOpen(false);
-                    }
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleNextMonth}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          {/* Left section - Date Navigation */}
+          <div className="flex gap-3 items-center">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground hidden sm:block" />
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handlePreviousMonth}
+                className="h-7 w-7 p-0"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </Button>
+              
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-7 min-w-[90px]">
+                    {monthLabel}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={startDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        const startOfSelectedMonth = startOfMonth(date);
+                        onMonthChange(startOfSelectedMonth);
+                        setCalendarOpen(false);
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleNextMonth}
+                className="h-7 w-7 p-0"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
 
-          {/* Period selector */}
-          <Select 
-            value={periodToShow.toString()}
-            onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
-          >
-            <SelectTrigger className="w-[120px] h-8">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {periodOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Right section - Controls */}
+          <div className="flex gap-2 items-center ml-auto overflow-x-auto">
+            {/* Period selector */}
+            <Select 
+              value={periodToShow.toString()}
+              onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
+            >
+              <SelectTrigger className="w-28 h-7 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {periodOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {/* Divider */}
-          <div className="h-6 w-px bg-border" />
-
-          {/* View controls group */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleToggleExpand}
-            className="h-8"
-            disabled={totalPeople === 0}
-          >
-            {allExpanded ? (
-              <>
-                <Shrink className="h-3 w-3 mr-2" />
-                Collapse
-              </>
-            ) : (
-              <>
-                <Expand className="h-3 w-3 mr-2" />
-                Expand
-              </>
-            )}
-          </Button>
-
-          {/* Spacer to push secondary actions to the right */}
-          <div className="flex-1" />
-
-          {/* Secondary actions */}
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-8">
-              <Download className="h-3 w-3 mr-2" />
-              Export
+            {/* Expand/Collapse */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleToggleExpand}
+              className="h-7 px-2"
+              disabled={totalPeople === 0}
+            >
+              {allExpanded ? (
+                <Shrink className="h-3.5 w-3.5" />
+              ) : (
+                <Expand className="h-3.5 w-3.5" />
+              )}
             </Button>
-            <Button variant="outline" size="sm" className="h-8">
-              <Settings className="h-3 w-3 mr-2" />
-              Settings
+
+            {/* Export */}
+            <Button variant="outline" size="sm" className="h-7 px-2">
+              <Download className="h-3.5 w-3.5" />
+            </Button>
+            
+            {/* Settings */}
+            <Button variant="outline" size="sm" className="h-7 px-2">
+              <Settings className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
