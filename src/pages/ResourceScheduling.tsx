@@ -9,12 +9,23 @@ import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectRe
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
 import { PersonResourceView } from '@/components/resources/person-view/PersonResourceView';
 import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
+import { AvailabilityFilters } from '@/components/weekly-rundown/AvailabilityFilters';
+import { useWeeklyFilterOptions } from '@/components/week-resourcing/hooks/useWeeklyFilterOptions';
 import { format, startOfWeek } from 'date-fns';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
 const ResourceScheduling = () => {
   const [activeTab, setActiveTab] = useState<string>('by-project');
+  
+  // Available Members Filter State
+  const [memberSortBy, setMemberSortBy] = useState<'hours' | 'name'>('hours');
+  const [memberFilterBy, setMemberFilterBy] = useState<'all' | 'department' | 'sector'>('all');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+  const [selectedSector, setSelectedSector] = useState<string>('');
+  
+  // Fetch filter options
+  const { practiceAreas, departments } = useWeeklyFilterOptions();
   
   // Project Resourcing State
   const {
@@ -56,6 +67,38 @@ const ResourceScheduling = () => {
     const weekStart = startOfWeek(selectedMonth, { weekStartsOn: 1 });
     return format(weekStart, 'yyyy-MM-dd');
   }, [selectedMonth]);
+
+  // Build filters object for AvailableMembersRow
+  const memberFilters = useMemo(() => ({
+    practiceArea: memberFilterBy === 'sector' ? selectedSector : 'all',
+    department: memberFilterBy === 'department' ? selectedDepartment : 'all',
+    location: 'all',
+    searchTerm: ''
+  }), [memberFilterBy, selectedDepartment, selectedSector]);
+
+  // Calculate active filter count
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (selectedDepartment) count++;
+    if (selectedSector) count++;
+    return count;
+  }, [selectedDepartment, selectedSector]);
+
+  // Get unique departments and sectors
+  const uniqueDepartments = useMemo(() => {
+    return departments.map(d => d.name);
+  }, [departments]);
+
+  const uniqueSectors = useMemo(() => {
+    return practiceAreas.map(pa => pa.name);
+  }, [practiceAreas]);
+
+  // Clear member filters
+  const clearMemberFilters = () => {
+    setMemberFilterBy('all');
+    setSelectedDepartment('');
+    setSelectedSector('');
+  };
 
   return (
     <StandardLayout>
@@ -108,11 +151,29 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-project" className="mt-0 py-3">
             <div>
-              {/* Available Members Row */}
+              {/* Available Members Row with Filters */}
               <div className="px-3 sm:px-6 mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-medium text-muted-foreground">Available Members</span>
+                  <AvailabilityFilters
+                    sortBy={memberSortBy}
+                    onSortChange={setMemberSortBy}
+                    filterBy={memberFilterBy}
+                    onFilterChange={setMemberFilterBy}
+                    selectedDepartment={selectedDepartment}
+                    onDepartmentChange={setSelectedDepartment}
+                    selectedSector={selectedSector}
+                    onSectorChange={setSelectedSector}
+                    departments={uniqueDepartments}
+                    sectors={uniqueSectors}
+                    activeFilterCount={activeFilterCount}
+                    onClearFilters={clearMemberFilters}
+                  />
+                </div>
                 <AvailableMembersRow
                   weekStartDate={weekStartDate}
                   threshold={80}
+                  filters={memberFilters}
                 />
               </div>
               
@@ -145,11 +206,29 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-person" className="mt-0 py-3">
             <div>
-              {/* Available Members Row */}
+              {/* Available Members Row with Filters */}
               <div className="px-3 sm:px-6 mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-medium text-muted-foreground">Available Members</span>
+                  <AvailabilityFilters
+                    sortBy={memberSortBy}
+                    onSortChange={setMemberSortBy}
+                    filterBy={memberFilterBy}
+                    onFilterChange={setMemberFilterBy}
+                    selectedDepartment={selectedDepartment}
+                    onDepartmentChange={setSelectedDepartment}
+                    selectedSector={selectedSector}
+                    onSectorChange={setSelectedSector}
+                    departments={uniqueDepartments}
+                    sectors={uniqueSectors}
+                    activeFilterCount={activeFilterCount}
+                    onClearFilters={clearMemberFilters}
+                  />
+                </div>
                 <AvailableMembersRow
                   weekStartDate={weekStartDate}
                   threshold={80}
+                  filters={memberFilters}
                 />
               </div>
               
