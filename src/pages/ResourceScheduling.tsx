@@ -139,9 +139,9 @@ const ResourceScheduling = () => {
               </TabsList>
 
           <TabsContent value="by-project" className="mt-0 py-3">
-            <div className="space-y-3">
+            <div>
               {/* Member Filter and Available Members */}
-              <div className="px-3 sm:px-6">
+              <div className="px-3 sm:px-6 mb-2">
                 <div className="bg-card rounded-lg border p-2 space-y-2">
                   <MemberFilterRow
                     filters={memberFilters}
@@ -185,9 +185,9 @@ const ResourceScheduling = () => {
           </TabsContent>
 
           <TabsContent value="by-person" className="mt-0 py-3">
-            <div className="space-y-3">
+            <div>
               {/* Member Filter and Available Members */}
-              <div className="px-3 sm:px-6">
+              <div className="px-3 sm:px-6 mb-2">
                 <div className="bg-card rounded-lg border p-2 space-y-2">
                   <MemberFilterRow
                     filters={memberFilters}
