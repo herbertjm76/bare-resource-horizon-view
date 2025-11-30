@@ -140,23 +140,21 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-project" className="mt-0 py-3">
             <div className="space-y-3">
-              {/* Member Filter Row */}
+              {/* Member Filter and Available Members */}
               <div className="px-3 sm:px-6">
-                <MemberFilterRow
-                  filters={memberFilters}
-                  onFilterChange={handleMemberFilterChange}
-                  activeFiltersCount={activeMemberFiltersCount}
-                  clearFilters={clearMemberFilters}
-                />
-              </div>
-
-              {/* Available Members Row */}
-              <div className="px-3 sm:px-6">
-                <AvailableMembersRow
-                  weekStartDate={weekStartDate}
-                  threshold={80}
-                  filters={memberFilters}
-                />
+                <div className="bg-card rounded-lg border p-4 space-y-4">
+                  <MemberFilterRow
+                    filters={memberFilters}
+                    onFilterChange={handleMemberFilterChange}
+                    activeFiltersCount={activeMemberFiltersCount}
+                    clearFilters={clearMemberFilters}
+                  />
+                  <AvailableMembersRow
+                    weekStartDate={weekStartDate}
+                    threshold={80}
+                    filters={memberFilters}
+                  />
+                </div>
               </div>
               
               <div className="overflow-x-auto">
@@ -188,23 +186,21 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-person" className="mt-0 py-3">
             <div className="space-y-3">
-              {/* Member Filter Row */}
+              {/* Member Filter and Available Members */}
               <div className="px-3 sm:px-6">
-                <MemberFilterRow
-                  filters={memberFilters}
-                  onFilterChange={handleMemberFilterChange}
-                  activeFiltersCount={activeMemberFiltersCount}
-                  clearFilters={clearMemberFilters}
-                />
-              </div>
-
-              {/* Available Members Row */}
-              <div className="px-3 sm:px-6">
-                <AvailableMembersRow
-                  weekStartDate={weekStartDate}
-                  threshold={80}
-                  filters={memberFilters}
-                />
+                <div className="bg-card rounded-lg border p-4 space-y-4">
+                  <MemberFilterRow
+                    filters={memberFilters}
+                    onFilterChange={handleMemberFilterChange}
+                    activeFiltersCount={activeMemberFiltersCount}
+                    clearFilters={clearMemberFilters}
+                  />
+                  <AvailableMembersRow
+                    weekStartDate={weekStartDate}
+                    threshold={80}
+                    filters={memberFilters}
+                  />
+                </div>
               </div>
               
               <div className="overflow-x-auto">
