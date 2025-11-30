@@ -239,7 +239,7 @@ const WeeklyOverview = () => {
           />
 
           {/* Connected Filter and Content Section */}
-          <div className="space-y-0">
+          <div>
             {/* Unified Controls */}
             <UnifiedWeeklyControls
               selectedWeek={selectedWeek}
@@ -268,11 +268,15 @@ const WeeklyOverview = () => {
             />
 
             {/* Available Members Row */}
-            <AvailableMembersRow 
-              weekStartDate={weekStartString}
-              threshold={80}
-              filters={filters}
-            />
+            <div className="px-3 sm:px-6">
+              <div className="bg-card rounded-lg p-1">
+                <AvailableMembersRow 
+                  weekStartDate={weekStartString}
+                  threshold={80}
+                  filters={filters}
+                />
+              </div>
+            </div>
 
             {/* View Content */}
             <div className="rounded-b-lg border border-t-0 bg-card overflow-hidden shadow-[0_4px_8px_-2px_hsl(var(--border)/0.5)]">
