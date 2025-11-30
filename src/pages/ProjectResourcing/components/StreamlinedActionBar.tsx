@@ -7,6 +7,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ProjectResourcingFilters } from './ProjectResourcingFilters';
+import { MobileResourceControls } from './MobileResourceControls';
 
 interface StreamlinedActionBarProps {
   selectedDate: Date;
@@ -109,9 +110,38 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-lg border p-3">
+    <>
+      {/* Mobile Controls */}
+      <MobileResourceControls
+        selectedDate={selectedDate}
+        onDateChange={onDateChange}
+        periodToShow={periodToShow}
+        onPeriodChange={onPeriodChange}
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+        onSortChange={onSortChange}
+        onSortDirectionToggle={onSortDirectionToggle}
+        filters={filters}
+        searchTerm={searchTerm}
+        onFilterChange={onFilterChange}
+        onSearchChange={onSearchChange}
+        officeOptions={officeOptions}
+        countryOptions={countryOptions}
+        managers={managers}
+        activeFiltersCount={activeFiltersCount}
+        displayOptions={displayOptions}
+        onDisplayOptionChange={onDisplayOptionChange}
+        onClearFilters={onClearFilters}
+        onExpandAll={onExpandAll}
+        onCollapseAll={onCollapseAll}
+        expandedProjects={expandedProjects}
+        totalProjects={totalProjects}
+        onExport={onExport}
+      />
+      
       {/* Desktop layout */}
-      <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
+      <div className="hidden lg:block bg-card rounded-lg border p-3">
+        <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
         {/* Left section - Date Navigation */}
         <div className="flex gap-3 items-center">
           <div className="flex items-center gap-2">
@@ -271,5 +301,6 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
         </div>
       </div>
     </div>
+    </>
   );
 };

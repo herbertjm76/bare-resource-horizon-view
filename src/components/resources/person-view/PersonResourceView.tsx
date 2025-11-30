@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { MobilePersonControls } from './MobilePersonControls';
 
 interface PersonResourceViewProps {
   startDate: Date;
@@ -124,101 +125,115 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   // Render only controls if requested
   if (showOnlyControls) {
     return (
-      <div className="bg-card rounded-lg border p-3">
-        <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
-          
-          {/* Left section - Date Navigation */}
-          <div className="flex gap-3 items-center">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground hidden sm:block" />
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handlePreviousMonth}
-                className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
+      <>
+        {/* Mobile Controls */}
+        <MobilePersonControls
+          startDate={startDate}
+          onMonthChange={onMonthChange}
+          periodToShow={periodToShow}
+          onPeriodChange={onPeriodChange}
+          allExpanded={allExpanded}
+          onToggleExpand={handleToggleExpand}
+          totalPeople={totalPeople}
+        />
+        
+        {/* Desktop Controls */}
+        <div className="hidden lg:block bg-card rounded-lg border p-3">
+          <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
+            
+            {/* Left section - Date Navigation */}
+            <div className="flex gap-3 items-center">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground hidden sm:block" />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handlePreviousMonth}
+                  className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </Button>
+                
+                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-7 min-w-[90px] bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
+                      {monthLabel}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={startDate}
+                      onSelect={(date) => {
+                        if (date) {
+                          const startOfSelectedMonth = startOfMonth(date);
+                          onMonthChange(startOfSelectedMonth);
+                          setCalendarOpen(false);
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleNextMonth}
+                  className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Right section - Controls */}
+            <div className="flex gap-2 items-center ml-auto overflow-x-auto">
+              {/* Period selector */}
+              <Select 
+                value={periodToShow.toString()}
+                onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
               >
-                <ChevronLeft className="h-3.5 w-3.5" />
+                <SelectTrigger className="w-28 h-7 text-xs bg-muted border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {periodOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Expand/Collapse */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleToggleExpand}
+                className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
+                disabled={totalPeople === 0}
+              >
+                {allExpanded ? (
+                  <Shrink className="h-3.5 w-3.5" />
+                ) : (
+                  <Expand className="h-3.5 w-3.5" />
+                )}
+              </Button>
+
+              {/* Export */}
+              <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
+                <Download className="h-3.5 w-3.5" />
               </Button>
               
-              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-7 min-w-[90px] bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
-                    {monthLabel}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={startDate}
-                    onSelect={(date) => {
-                      if (date) {
-                        const startOfSelectedMonth = startOfMonth(date);
-                        onMonthChange(startOfSelectedMonth);
-                        setCalendarOpen(false);
-                      }
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleNextMonth}
-                className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
-              >
-                <ChevronRight className="h-3.5 w-3.5" />
+              {/* Settings */}
+              <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
+                <Settings className="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>
-
-          {/* Right section - Controls */}
-          <div className="flex gap-2 items-center ml-auto overflow-x-auto">
-            {/* Period selector */}
-            <Select 
-              value={periodToShow.toString()}
-              onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
-            >
-              <SelectTrigger className="w-28 h-7 text-xs bg-muted border">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {periodOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Expand/Collapse */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleToggleExpand}
-              className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
-              disabled={totalPeople === 0}
-            >
-              {allExpanded ? (
-                <Shrink className="h-3.5 w-3.5" />
-              ) : (
-                <Expand className="h-3.5 w-3.5" />
-              )}
-            </Button>
-
-            {/* Export */}
-            <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
-              <Download className="h-3.5 w-3.5" />
-            </Button>
-            
-            {/* Settings */}
-            <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
-              <Settings className="h-3.5 w-3.5" />
-            </Button>
-          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -244,6 +259,16 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   // Default: render both
   return (
     <div className="space-y-3">
+      {/* Mobile Controls */}
+      <MobilePersonControls
+        startDate={startDate}
+        onMonthChange={onMonthChange}
+        periodToShow={periodToShow}
+        onPeriodChange={onPeriodChange}
+        allExpanded={allExpanded}
+        onToggleExpand={handleToggleExpand}
+        totalPeople={totalPeople}
+      />
       
       {/* Centered main grid */}
       <div className="w-full flex justify-center">
@@ -260,8 +285,8 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
         </div>
       </div>
       
-      {/* Compact Action Bar */}
-      <div className="bg-card rounded-lg border p-3">
+      {/* Desktop Compact Action Bar */}
+      <div className="hidden lg:block bg-card rounded-lg border p-3">
         <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
           
           {/* Left section - Date Navigation */}
