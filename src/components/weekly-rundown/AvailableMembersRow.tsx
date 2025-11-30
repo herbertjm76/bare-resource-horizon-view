@@ -34,14 +34,18 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortBy, setSortBy] = React.useState<SortOption>('available-hours');
 
+  const { company } = useCompany();
+  const companyId = company?.id;
+
   const { data: profiles = [] } = useQuery({
-    queryKey: ['available-members-profiles'],
+    queryKey: ['available-members-profiles', companyId],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
+      if (!session?.user || !companyId) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location');
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location')
+        .eq('company_id', companyId);
       if (error) throw error;
       return data || [];
     },
@@ -49,13 +53,14 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   });
 
   const { data: invites = [] } = useQuery({
-    queryKey: ['available-members-invites'],
+    queryKey: ['available-members-invites', companyId],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
+      if (!session?.user || !companyId) return [];
       const { data, error } = await supabase
         .from('invites')
         .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location')
+        .eq('company_id', companyId)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
       if (error) throw error;
