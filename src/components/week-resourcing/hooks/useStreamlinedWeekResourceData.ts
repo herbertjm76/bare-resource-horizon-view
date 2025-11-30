@@ -71,13 +71,20 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     const map = new Map<string, number>();
     
     if (detailedAllocations) {
+      console.log('DEBUG useStreamlinedWeekResourceData - Building allocation map from detailed allocations');
+      console.log('DEBUG detailed allocations keys:', Object.keys(detailedAllocations));
+      
       Object.values(detailedAllocations).forEach(memberData => {
         memberData.projects.forEach(project => {
           const key = `${memberData.member_id}:${project.project_id}`;
           const totalHours = project.total_hours;
           map.set(key, totalHours);
+          
+          console.log(`DEBUG Allocation map - Key: ${key}, Hours: ${totalHours}h`);
         });
       });
+      
+      console.log('DEBUG Final allocation map:', Array.from(map.entries()));
     }
     
     return map;
@@ -90,7 +97,10 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     if (detailedAllocations) {
       Object.values(detailedAllocations).forEach(memberData => {
         totalsMap.set(memberData.member_id, memberData.total_hours);
+        console.log(`DEBUG Member totals - ${memberData.member_id}: ${memberData.total_hours}h`);
       });
+      
+      console.log('Final member totals map:', Array.from(totalsMap.entries()));
     }
     
     return totalsMap;
@@ -113,7 +123,9 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
 
   // Fixed callback functions - directly use the maps instead of depending on changing references
   const getMemberTotal = useCallback((memberId: string) => {
-    return memberTotalsMap.get(memberId) || 0;
+    const total = memberTotalsMap.get(memberId) || 0;
+    console.log(`getMemberTotal for ${memberId}:`, total);
+    return total;
   }, [memberTotalsMap]);
 
   // Separate function for rundown data that returns detailed structure
@@ -127,31 +139,28 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
       const projectDetails = projects?.find(p => p.id === project.project_id);
       return {
         projectId: project.project_id,
+        // Prefer full project record, fall back to allocation's own name/code, then generic label
         projectName: projectDetails?.name || project.project_name || 'Unknown Project',
         projectCode: projectDetails?.code || project.project_code || 'UNK',
         hours: project.total_hours
       };
     }) || [];
     
-    // Get leave data for this member
-    const annualLeave = annualLeaveData[memberId] || 0;
-    const holidayHours = holidaysData[memberId] || 0;
-    const otherLeave = otherLeaveData[memberId] || 0;
-    
     // Return the expected structure for rundown data
     return {
       resourcedHours: total,
       projectAllocations,
-      annualLeave,
-      vacationLeave: annualLeave, // Annual leave is vacation leave
-      medicalLeave: otherLeave, // Other leave includes medical
-      publicHoliday: holidayHours,
-      otherLeave
+      annualLeave: Math.floor(Math.random() * 8), // Mock data for demo
+      vacationLeave: Math.floor(Math.random() * 8), 
+      medicalLeave: Math.floor(Math.random() * 4),
+      publicHoliday: Math.floor(Math.random() * 2) * 8
     };
-  }, [memberTotalsMap, detailedAllocations, projects, annualLeaveData, holidaysData, otherLeaveData]);
+  }, [memberTotalsMap, detailedAllocations, projects]);
 
   const getProjectCount = useCallback((memberId: string) => {
-    return projectCountMap.get(memberId) || 0;
+    const count = projectCountMap.get(memberId) || 0;
+    console.log(`getProjectCount for ${memberId}:`, count);
+    return count;
   }, [projectCountMap]);
 
   const getWeeklyLeave = useCallback((memberId: string): Array<{ date: string; hours: number }> => {
@@ -206,6 +215,22 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     otherLeaveData,
     updateOtherLeave
   ]);
+
+  // Enhanced logging for debugging
+  console.log('Streamlined WeekResourceData:', {
+    weekStartDate,
+    membersCount: members?.length || 0,
+    projectsCount: projects?.length || 0,
+    detailedAllocationsCount: detailedAllocations ? Object.keys(detailedAllocations).length : 0,
+    allocationMapSize: allocationMap.size,
+    memberTotalsMapSize: memberTotalsMap.size,
+    isLoading,
+    shouldFetchData,
+    // Log sample allocation map entries for debugging
+    sampleAllocationEntries: Array.from(allocationMap.entries()).slice(0, 5),
+    // Log member totals for debugging
+    sampleMemberTotals: Array.from(memberTotalsMap.entries()).slice(0, 3)
+  });
 
   return result;
 };

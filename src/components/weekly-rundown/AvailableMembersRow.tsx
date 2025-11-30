@@ -4,10 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
-import { MemberFilterTabs } from './MemberFilterTabs';
-import { MemberSearchSort, SortOption } from './MemberSearchSort';
+import { MemberFilterTabs, UtilizationZone } from './MemberFilterTabs';
 import { VirtualizedMemberList } from './VirtualizedMemberList';
-import { UtilizationZone, ZoneCounts, AvailableMember as SharedAvailableMember, ProjectAllocation } from '@/types/weekly-overview';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -22,6 +20,33 @@ interface AvailableMembersRowProps {
   };
 }
 
+type SortBy = 'hours' | 'name';
+type FilterBy = 'all' | 'department' | 'practiceArea';
+
+interface ProjectAllocation {
+  projectId: string;
+  projectName: string;
+  projectCode: string;
+  hours: number;
+}
+
+interface AvailableMember {
+  id: string;
+  memberType: 'active' | 'pre_registered';
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+  availableHours: number;
+  allocatedHours: number;
+  utilization: number;
+  capacity: number;
+  department?: string;
+  practiceArea?: string;
+  location?: string;
+  sectors: string[];
+  projectAllocations: ProjectAllocation[];
+}
+
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
@@ -31,8 +56,6 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
   const [activeZone, setActiveZone] = React.useState<UtilizationZone>('needs-attention');
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [sortBy, setSortBy] = React.useState<SortOption>('available-hours');
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['available-members-profiles'],
@@ -98,7 +121,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     staleTime: 60_000,
   });
 
-  const availableMembers: SharedAvailableMember[] = React.useMemo(() => {
+  const availableMembers: AvailableMember[] = React.useMemo(() => {
     const allMembers = [
       ...profiles.map(p => ({
         id: p.id,
@@ -190,10 +213,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           availableHours,
           allocatedHours,
           utilization,
-          weeklyCapacity: member.capacity,
-          department: member.department || null,
-          practiceArea: member.practiceArea || null,
-          location: member.location || '',
+          capacity: member.capacity,
+          department: member.department,
+          practiceArea: member.practiceArea,
+          location: member.location,
           sectors,
           projectAllocations
         };
@@ -203,20 +226,13 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         if (!filters) return true;
 
         // Practice Area filter (from project allocations)
-        if (filters.practiceArea) {
-          const practiceFilter = filters.practiceArea.toLowerCase();
-          if (practiceFilter !== 'all') {
-            const memberSectorsLower = member.sectors.map((s) => s.toLowerCase());
-            if (!memberSectorsLower.includes(practiceFilter)) return false;
-          }
+        if (filters.practiceArea && filters.practiceArea !== 'all') {
+          if (!member.sectors.includes(filters.practiceArea)) return false;
         }
- 
+
         // Department filter
-        if (filters.department) {
-          const departmentFilter = filters.department.toLowerCase();
-          if (departmentFilter !== 'all') {
-            if ((member.department || '').toLowerCase() !== departmentFilter) return false;
-          }
+        if (filters.department && filters.department !== 'all') {
+          if (member.department !== filters.department) return false;
         }
 
         // Location filter - we don't have location in this data, so skip
@@ -228,59 +244,28 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         }
 
         return true;
-      });
+      })
+      .sort((a, b) => b.availableHours - a.availableHours);
 
     return available;
   }, [profiles, invites, allocations, threshold, filters]);
 
-  // Apply local search and sort
-  const searchedAndSortedMembers = React.useMemo(() => {
-    let result = [...availableMembers];
-
-    // Apply search
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      result = result.filter(member => {
-        const fullName = `${member.firstName} ${member.lastName}`.toLowerCase();
-        return fullName.includes(searchLower);
-      });
-    }
-
-    // Apply sort
-    result.sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
-          const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
-          return nameA.localeCompare(nameB);
-        case 'utilization':
-          return b.utilization - a.utilization;
-        case 'available-hours':
-          return b.availableHours - a.availableHours;
-        default:
-          return 0;
-      }
-    });
-
-    return result;
-  }, [availableMembers, searchTerm, sortBy]);
-
   // Calculate zone counts
-  const zoneCounts: ZoneCounts = React.useMemo(() => {
+  const zoneCounts = React.useMemo(() => {
     return {
-      'needs-attention': searchedAndSortedMembers.filter(m => m.utilization > 100 || m.utilization < 60).length,
-      'available': searchedAndSortedMembers.filter(m => m.utilization < threshold).length,
-      'at-capacity': searchedAndSortedMembers.filter(m => m.utilization >= threshold && m.utilization <= 100).length,
-      'over-allocated': searchedAndSortedMembers.filter(m => m.utilization > 100).length,
-      'all': searchedAndSortedMembers.length,
+      needsAttention: availableMembers.filter(m => m.utilization > 100 || m.utilization < 60).length,
+      available: availableMembers.filter(m => m.utilization < threshold).length,
+      atCapacity: availableMembers.filter(m => m.utilization >= threshold && m.utilization <= 100).length,
+      overAllocated: availableMembers.filter(m => m.utilization > 100).length,
+      all: availableMembers.length,
     };
-  }, [searchedAndSortedMembers, threshold]);
+  }, [availableMembers, threshold]);
 
   // Apply zone filtering
   const filteredMembers = React.useMemo(() => {
-    if (activeZone === 'all') return searchedAndSortedMembers;
+    if (activeZone === 'all') return availableMembers;
     
-    return searchedAndSortedMembers.filter(m => {
+    return availableMembers.filter(m => {
       const util = m.utilization;
       switch (activeZone) {
         case 'needs-attention':
@@ -295,7 +280,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           return true;
       }
     });
-  }, [searchedAndSortedMembers, activeZone, threshold]);
+  }, [availableMembers, activeZone, threshold]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
@@ -319,7 +304,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       container.removeEventListener('scroll', checkScrollPosition);
       window.removeEventListener('resize', checkScrollPosition);
     };
-  }, [checkScrollPosition, filteredMembers]);
+  }, [checkScrollPosition, availableMembers]);
 
   const scrollMembers = (direction: 'left' | 'right') => {
     const container = membersScrollRef.current;
@@ -335,19 +320,11 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
   return (
     <div className="w-full space-y-4">
-      {/* Search and Sort */}
-      <MemberSearchSort
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-      />
-
       {/* Filter Tabs */}
       <MemberFilterTabs
         activeZone={activeZone}
         onZoneChange={setActiveZone}
-        zoneCounts={zoneCounts}
+        counts={zoneCounts}
       />
 
       {/* Member List Container */}
@@ -405,18 +382,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         )}
 
         {/* Empty state */}
-        {filteredMembers.length === 0 && searchedAndSortedMembers.length > 0 && (
+        {filteredMembers.length === 0 && availableMembers.length > 0 && (
           <div className="flex-1 flex items-center justify-center py-6">
             <p className="text-sm text-muted-foreground text-center">
               No members in this category
-            </p>
-          </div>
-        )}
-        
-        {searchedAndSortedMembers.length === 0 && availableMembers.length > 0 && (
-          <div className="flex-1 flex items-center justify-center py-6">
-            <p className="text-sm text-muted-foreground text-center">
-              No members match your search
             </p>
           </div>
         )}

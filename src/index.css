@@ -101,10 +101,6 @@
     --glass-blur: 20px;
 
     /* Status semantic colors */
-    --status-success: 142 76% 36%;
-    --status-error: 0 84% 60%;
-    --status-warning: 38 92% 50%;
-    --status-info: 221 83% 53%;
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
@@ -146,10 +142,6 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* Status semantic colors (dark) */
-    --status-success: 142 76% 40%;
-    --status-error: 0 84% 60%;
-    --status-warning: 45 97% 51%;
-    --status-info: 221 83% 53%;
     --success: 142 76% 40%;
     --success-foreground: 210 40% 98%;
     --warning: 45 97% 51%;
