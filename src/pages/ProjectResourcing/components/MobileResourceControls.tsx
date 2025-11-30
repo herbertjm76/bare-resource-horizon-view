@@ -112,7 +112,7 @@ export const MobileResourceControls: React.FC<MobileResourceControlsProps> = ({
 
   return (
     <div className="lg:hidden">
-      {/* Compact Header with Month & Period */}
+      {/* Compact Header with Month Navigation - No Period Selector */}
       <div {...swipeHandlers} className="bg-card rounded-lg border p-2 mb-2 touch-pan-y">
         <div className="flex items-center justify-between gap-2">
           <Button 
@@ -128,22 +128,6 @@ export const MobileResourceControls: React.FC<MobileResourceControlsProps> = ({
             <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="font-medium text-sm">{monthLabel}</span>
           </div>
-
-          <Select 
-            value={periodToShow.toString()}
-            onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
-          >
-            <SelectTrigger className="h-9 w-20 text-xs bg-muted border">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {periodOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           
           <Button 
             variant="outline" 
@@ -156,7 +140,7 @@ export const MobileResourceControls: React.FC<MobileResourceControlsProps> = ({
         </div>
       </div>
 
-      {/* Compact Actions Row */}
+      {/* Compact Actions Row - No Expand/Export buttons */}
       <div className="bg-card rounded-lg border p-2 mb-2">
         <div className="flex items-center gap-2">
           {/* Sort Controls */}
@@ -184,16 +168,6 @@ export const MobileResourceControls: React.FC<MobileResourceControlsProps> = ({
             title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
           >
             <ArrowUpDown className={`h-3.5 w-3.5 transition-transform ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={allExpanded ? onCollapseAll : onExpandAll}
-            className="h-8 w-8 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
-            disabled={totalProjects === 0}
-          >
-            {allExpanded ? <Shrink className="h-3.5 w-3.5" /> : <Expand className="h-3.5 w-3.5" />}
           </Button>
 
           <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
@@ -244,15 +218,6 @@ export const MobileResourceControls: React.FC<MobileResourceControlsProps> = ({
               </div>
             </SheetContent>
           </Sheet>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onExport}
-            className="h-8 w-8 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all active:scale-95"
-          >
-            <Download className="h-3.5 w-3.5" />
-          </Button>
         </div>
       </div>
     </div>
