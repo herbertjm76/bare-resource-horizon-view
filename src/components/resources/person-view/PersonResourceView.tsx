@@ -19,6 +19,8 @@ interface PersonResourceViewProps {
   displayOptions: any;
   onMonthChange: (date: Date) => void;
   onPeriodChange: (period: number) => void;
+  showOnlyControls?: boolean;
+  showOnlyGrid?: boolean;
 }
 
 export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
@@ -26,7 +28,9 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   periodToShow,
   displayOptions,
   onMonthChange,
-  onPeriodChange
+  onPeriodChange,
+  showOnlyControls = false,
+  showOnlyGrid = false
 }) => {
   const { personData, isLoading, refetch } = usePersonResourceData(startDate, periodToShow);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
@@ -117,6 +121,136 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
     );
   }
 
+  // Render only controls if requested
+  if (showOnlyControls) {
+    return (
+      <div className="bg-muted/30 border border-border rounded-lg p-3">
+        <div className="flex flex-wrap items-center gap-3">
+          
+          {/* Time navigation group */}
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handlePreviousMonth}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 min-w-[90px]">
+                  <Calendar className="h-3 w-3 mr-2" />
+                  {monthLabel}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={startDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      const startOfSelectedMonth = startOfMonth(date);
+                      onMonthChange(startOfSelectedMonth);
+                      setCalendarOpen(false);
+                    }
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleNextMonth}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Period selector */}
+          <Select 
+            value={periodToShow.toString()}
+            onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
+          >
+            <SelectTrigger className="w-[120px] h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {periodOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Divider */}
+          <div className="h-6 w-px bg-border" />
+
+          {/* View controls group */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleToggleExpand}
+            className="h-8"
+            disabled={totalPeople === 0}
+          >
+            {allExpanded ? (
+              <>
+                <Shrink className="h-3 w-3 mr-2" />
+                Collapse
+              </>
+            ) : (
+              <>
+                <Expand className="h-3 w-3 mr-2" />
+                Expand
+              </>
+            )}
+          </Button>
+
+          {/* Spacer to push secondary actions to the right */}
+          <div className="flex-1" />
+
+          {/* Secondary actions */}
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="h-8">
+              <Download className="h-3 w-3 mr-2" />
+              Export
+            </Button>
+            <Button variant="outline" size="sm" className="h-8">
+              <Settings className="h-3 w-3 mr-2" />
+              Settings
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render only grid if requested
+  if (showOnlyGrid) {
+    return (
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-[1400px] overflow-hidden">
+          <PersonResourceGrid
+            personData={personData}
+            weeks={weeks}
+            expandedPeople={expandedPeople}
+            onTogglePersonExpand={handleTogglePersonExpand}
+            selectedDate={startDate}
+            periodToShow={periodToShow}
+            onRefresh={refetch}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Default: render both
   return (
     <div className="space-y-3">
       

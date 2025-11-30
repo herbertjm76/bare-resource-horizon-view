@@ -47,6 +47,8 @@ interface ProjectResourcingContentProps {
   onSortDirectionToggle: () => void;
   onDisplayOptionChange: (option: string, value: boolean | string[]) => void;
   onClearFilters: () => void;
+  showOnlyControls?: boolean;
+  showOnlyGrid?: boolean;
 }
 
 // Inner component that uses office settings
@@ -68,7 +70,9 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onSortChange,
   onSortDirectionToggle,
   onDisplayOptionChange,
-  onClearFilters
+  onClearFilters,
+  showOnlyControls = false,
+  showOnlyGrid = false
 }) => {
   // Fetch projects only for expand all functionality and total count
   const { projects, isLoading } = useProjects(sortBy, sortDirection);
@@ -224,6 +228,60 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
     return <GridLoadingState />;
   }
 
+  // Show only controls if requested
+  if (showOnlyControls) {
+    return (
+      <StreamlinedActionBar
+        selectedDate={selectedMonth}
+        onDateChange={onMonthChange}
+        periodToShow={filters.periodToShow}
+        onPeriodChange={onPeriodChange}
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+        onSortChange={onSortChange}
+        onSortDirectionToggle={onSortDirectionToggle}
+        filters={filters}
+        searchTerm={searchTerm}
+        onFilterChange={onFilterChange}
+        onSearchChange={onSearchChange}
+        officeOptions={officeOptions}
+        countryOptions={countryOptions}
+        managers={managers}
+        activeFiltersCount={activeFiltersCount}
+        displayOptions={displayOptions}
+        onDisplayOptionChange={onDisplayOptionChange}
+        onClearFilters={onClearFilters}
+        onExpandAll={expandAll}
+        onCollapseAll={collapseAll}
+        expandedProjects={expandedProjects}
+        totalProjects={totalProjects}
+        onExport={handleExport}
+      />
+    );
+  }
+
+  // Show only grid if requested
+  if (showOnlyGrid) {
+    return (
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-[1400px] overflow-hidden">
+          <ModernResourceGrid
+            startDate={selectedMonth}
+            periodToShow={filters.periodToShow}
+            filters={combinedFilters}
+            displayOptions={displayOptions}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            expandedProjects={expandedProjects}
+            totalProjects={totalProjects}
+            onToggleProjectExpand={handleToggleProjectExpand}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Default: show both
   return (
     <div className="space-y-3">
       {/* Compact Action Bar */}

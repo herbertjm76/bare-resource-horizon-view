@@ -139,7 +139,34 @@ const ResourceScheduling = () => {
               </TabsList>
 
           <TabsContent value="by-project" className="mt-0 py-3">
-            <div>
+            <div className="space-y-3">
+              {/* Control buttons first */}
+              <div className="overflow-x-auto">
+                <div className="px-3 sm:px-6">
+                  <ProjectResourcingContent
+                    selectedMonth={selectedMonth}
+                    searchTerm={projectSearchTerm}
+                    sortBy={sortBy}
+                    sortDirection={sortDirection}
+                    filters={filters}
+                    displayOptions={displayOptions}
+                    officeOptions={officeOptions}
+                    countryOptions={countryOptions}
+                    managers={managers}
+                    activeFiltersCount={activeFiltersCount}
+                    onMonthChange={handleMonthChange}
+                    onSearchChange={handleProjectSearchChange}
+                    onFilterChange={handleFilterChange}
+                    onPeriodChange={handlePeriodChange}
+                    onSortChange={handleSortChange}
+                    onSortDirectionToggle={handleSortDirectionToggle}
+                    onDisplayOptionChange={handleDisplayOptionChange}
+                    onClearFilters={clearProjectFilters}
+                    showOnlyControls={true}
+                  />
+                </div>
+              </div>
+              
               {/* Member Filter and Available Members */}
               <div className="px-3 sm:px-6">
                 <div className="bg-card rounded-lg p-1 space-y-1">
@@ -157,35 +184,51 @@ const ResourceScheduling = () => {
                 </div>
               </div>
               
+              {/* Grid below */}
               <div className="overflow-x-auto">
                 <div className="px-3 sm:px-6">
                   <ProjectResourcingContent
-                  selectedMonth={selectedMonth}
-                  searchTerm={projectSearchTerm}
-                  sortBy={sortBy}
-                  sortDirection={sortDirection}
-                  filters={filters}
-                  displayOptions={displayOptions}
-                  officeOptions={officeOptions}
-                  countryOptions={countryOptions}
-                  managers={managers}
-                  activeFiltersCount={activeFiltersCount}
-                  onMonthChange={handleMonthChange}
-                  onSearchChange={handleProjectSearchChange}
-                  onFilterChange={handleFilterChange}
-                  onPeriodChange={handlePeriodChange}
-                  onSortChange={handleSortChange}
-                  onSortDirectionToggle={handleSortDirectionToggle}
-                  onDisplayOptionChange={handleDisplayOptionChange}
-                  onClearFilters={clearProjectFilters}
-                />
+                    selectedMonth={selectedMonth}
+                    searchTerm={projectSearchTerm}
+                    sortBy={sortBy}
+                    sortDirection={sortDirection}
+                    filters={filters}
+                    displayOptions={displayOptions}
+                    officeOptions={officeOptions}
+                    countryOptions={countryOptions}
+                    managers={managers}
+                    activeFiltersCount={activeFiltersCount}
+                    onMonthChange={handleMonthChange}
+                    onSearchChange={handleProjectSearchChange}
+                    onFilterChange={handleFilterChange}
+                    onPeriodChange={handlePeriodChange}
+                    onSortChange={handleSortChange}
+                    onSortDirectionToggle={handleSortDirectionToggle}
+                    onDisplayOptionChange={handleDisplayOptionChange}
+                    onClearFilters={clearProjectFilters}
+                    showOnlyGrid={true}
+                  />
                 </div>
               </div>
             </div>
           </TabsContent>
 
           <TabsContent value="by-person" className="mt-0 py-3">
-            <div>
+            <div className="space-y-3">
+              {/* Control buttons first */}
+              <div className="overflow-x-auto">
+                <div className="px-3 sm:px-6">
+                  <PersonResourceView
+                    startDate={selectedMonth}
+                    periodToShow={filters.periodToShow}
+                    displayOptions={displayOptions}
+                    onMonthChange={handleMonthChange}
+                    onPeriodChange={handlePeriodChange}
+                    showOnlyControls={true}
+                  />
+                </div>
+              </div>
+              
               {/* Member Filter and Available Members */}
               <div className="px-3 sm:px-6">
                 <div className="bg-card rounded-lg p-1 space-y-1">
@@ -203,15 +246,17 @@ const ResourceScheduling = () => {
                 </div>
               </div>
               
+              {/* Grid below */}
               <div className="overflow-x-auto">
                 <div className="px-3 sm:px-6">
                   <PersonResourceView
-                  startDate={selectedMonth}
-                  periodToShow={filters.periodToShow}
-                  displayOptions={displayOptions}
-                  onMonthChange={handleMonthChange}
-                  onPeriodChange={handlePeriodChange}
-                />
+                    startDate={selectedMonth}
+                    periodToShow={filters.periodToShow}
+                    displayOptions={displayOptions}
+                    onMonthChange={handleMonthChange}
+                    onPeriodChange={handlePeriodChange}
+                    showOnlyGrid={true}
+                  />
                 </div>
               </div>
             </div>
