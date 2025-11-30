@@ -1,12 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-interface ProjectAllocation {
-  projectId: string;
-  projectName: string;
-  projectCode: string;
-  hours: number;
-}
+import { ProjectAllocation } from '@/types/weekly-overview';
 
 interface MemberAvailabilityCardProps {
   avatarUrl?: string | null;
@@ -19,7 +13,6 @@ interface MemberAvailabilityCardProps {
   memberId: string;
   memberType: 'active' | 'pre_registered';
   weekStartDate: string;
-  disableDialog?: boolean;
 }
 
 export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
@@ -33,7 +26,6 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   memberId,
   memberType,
   weekStartDate,
-  disableDialog = false,
 }) => {
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
@@ -44,12 +36,12 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (Math.min(utilization, 100) / 100) * circumference;
   
-  // Determine color based on utilization zones with actual HSL colors
+  // Determine color based on utilization zones using semantic tokens
   const getUtilizationColor = () => {
-    if (utilization > 100) return 'hsl(0, 84%, 60%)'; // Red - overbooked
-    if (utilization === 100) return 'hsl(142, 71%, 45%)'; // Green - fully booked
-    if (utilization < 100 && utilization >= threshold) return 'hsl(38, 92%, 50%)'; // Amber - slightly available
-    return 'hsl(221, 83%, 53%)'; // Blue - highly available
+    if (utilization > 100) return 'hsl(var(--status-error))'; // Over-allocated
+    if (utilization === 100) return 'hsl(var(--status-success))'; // At capacity
+    if (utilization < 100 && utilization >= threshold) return 'hsl(var(--status-warning))'; // Near capacity
+    return 'hsl(var(--status-info))'; // Available
   };
   return (
     <div 

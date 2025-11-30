@@ -4,8 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
-import { MemberFilterTabs, UtilizationZone } from './MemberFilterTabs';
+import { MemberFilterTabs } from './MemberFilterTabs';
 import { VirtualizedMemberList } from './VirtualizedMemberList';
+import { UtilizationZone, ZoneCounts, AvailableMember as SharedAvailableMember, ProjectAllocation } from '@/types/weekly-overview';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -22,30 +23,6 @@ interface AvailableMembersRowProps {
 
 type SortBy = 'hours' | 'name';
 type FilterBy = 'all' | 'department' | 'practiceArea';
-
-interface ProjectAllocation {
-  projectId: string;
-  projectName: string;
-  projectCode: string;
-  hours: number;
-}
-
-interface AvailableMember {
-  id: string;
-  memberType: 'active' | 'pre_registered';
-  firstName: string;
-  lastName: string;
-  avatarUrl?: string;
-  availableHours: number;
-  allocatedHours: number;
-  utilization: number;
-  capacity: number;
-  department?: string;
-  practiceArea?: string;
-  location?: string;
-  sectors: string[];
-  projectAllocations: ProjectAllocation[];
-}
 
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
@@ -121,7 +98,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     staleTime: 60_000,
   });
 
-  const availableMembers: AvailableMember[] = React.useMemo(() => {
+  const availableMembers: SharedAvailableMember[] = React.useMemo(() => {
     const allMembers = [
       ...profiles.map(p => ({
         id: p.id,
@@ -213,10 +190,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           availableHours,
           allocatedHours,
           utilization,
-          capacity: member.capacity,
-          department: member.department,
-          practiceArea: member.practiceArea,
-          location: member.location,
+          weeklyCapacity: member.capacity,
+          department: member.department || null,
+          practiceArea: member.practiceArea || null,
+          location: member.location || '',
           sectors,
           projectAllocations
         };
@@ -251,13 +228,13 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [profiles, invites, allocations, threshold, filters]);
 
   // Calculate zone counts
-  const zoneCounts = React.useMemo(() => {
+  const zoneCounts: ZoneCounts = React.useMemo(() => {
     return {
-      needsAttention: availableMembers.filter(m => m.utilization > 100 || m.utilization < 60).length,
-      available: availableMembers.filter(m => m.utilization < threshold).length,
-      atCapacity: availableMembers.filter(m => m.utilization >= threshold && m.utilization <= 100).length,
-      overAllocated: availableMembers.filter(m => m.utilization > 100).length,
-      all: availableMembers.length,
+      'needs-attention': availableMembers.filter(m => m.utilization > 100 || m.utilization < 60).length,
+      'available': availableMembers.filter(m => m.utilization < threshold).length,
+      'at-capacity': availableMembers.filter(m => m.utilization >= threshold && m.utilization <= 100).length,
+      'over-allocated': availableMembers.filter(m => m.utilization > 100).length,
+      'all': availableMembers.length,
     };
   }, [availableMembers, threshold]);
 
@@ -324,7 +301,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       <MemberFilterTabs
         activeZone={activeZone}
         onZoneChange={setActiveZone}
-        counts={zoneCounts}
+        zoneCounts={zoneCounts}
       />
 
       {/* Member List Container */}

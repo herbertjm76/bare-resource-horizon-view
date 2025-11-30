@@ -1,25 +1,18 @@
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-
-export type UtilizationZone = 'needs-attention' | 'available' | 'at-capacity' | 'over-allocated' | 'all';
+import { UtilizationZone, ZoneCounts } from '@/types/weekly-overview';
 
 interface MemberFilterTabsProps {
   activeZone: UtilizationZone;
   onZoneChange: (zone: UtilizationZone) => void;
-  counts: {
-    needsAttention: number;
-    available: number;
-    atCapacity: number;
-    overAllocated: number;
-    all: number;
-  };
+  zoneCounts: ZoneCounts;
 }
 
 export const MemberFilterTabs: React.FC<MemberFilterTabsProps> = ({
   activeZone,
   onZoneChange,
-  counts,
+  zoneCounts,
 }) => {
   return (
     <Tabs value={activeZone} onValueChange={(v) => onZoneChange(v as UtilizationZone)} className="w-full">
@@ -30,7 +23,7 @@ export const MemberFilterTabs: React.FC<MemberFilterTabsProps> = ({
         >
           <span className="text-xs font-medium">Needs Attention</span>
           <Badge variant="destructive" className="h-5 min-w-[24px] text-[10px] px-1.5">
-            {counts.needsAttention}
+            {zoneCounts['needs-attention']}
           </Badge>
         </TabsTrigger>
         
@@ -40,7 +33,7 @@ export const MemberFilterTabs: React.FC<MemberFilterTabsProps> = ({
         >
           <span className="text-xs font-medium">Available</span>
           <Badge variant="default" className="h-5 min-w-[24px] text-[10px] px-1.5 bg-primary/20 text-primary hover:bg-primary/30">
-            {counts.available}
+            {zoneCounts['available']}
           </Badge>
         </TabsTrigger>
         
@@ -50,7 +43,7 @@ export const MemberFilterTabs: React.FC<MemberFilterTabsProps> = ({
         >
           <span className="text-xs font-medium">At Capacity</span>
           <Badge variant="secondary" className="h-5 min-w-[24px] text-[10px] px-1.5">
-            {counts.atCapacity}
+            {zoneCounts['at-capacity']}
           </Badge>
         </TabsTrigger>
         
@@ -60,7 +53,7 @@ export const MemberFilterTabs: React.FC<MemberFilterTabsProps> = ({
         >
           <span className="text-xs font-medium">Over-allocated</span>
           <Badge variant="destructive" className="h-5 min-w-[24px] text-[10px] px-1.5">
-            {counts.overAllocated}
+            {zoneCounts['over-allocated']}
           </Badge>
         </TabsTrigger>
         
@@ -70,7 +63,7 @@ export const MemberFilterTabs: React.FC<MemberFilterTabsProps> = ({
         >
           <span className="text-xs font-medium">All Members</span>
           <Badge variant="outline" className="h-5 min-w-[24px] text-[10px] px-1.5">
-            {counts.all}
+            {zoneCounts['all']}
           </Badge>
         </TabsTrigger>
       </TabsList>
