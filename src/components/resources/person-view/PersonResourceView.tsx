@@ -135,14 +135,14 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
                 variant="outline" 
                 size="sm" 
                 onClick={handlePreviousMonth}
-                className="h-7 w-7 p-0"
+                className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </Button>
               
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-7 min-w-[90px]">
+                  <Button variant="outline" size="sm" className="h-7 min-w-[90px] bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
                     {monthLabel}
                   </Button>
                 </PopoverTrigger>
@@ -166,7 +166,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
                 variant="outline" 
                 size="sm" 
                 onClick={handleNextMonth}
-                className="h-7 w-7 p-0"
+                className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
               </Button>
@@ -180,7 +180,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
               value={periodToShow.toString()}
               onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
             >
-              <SelectTrigger className="w-28 h-7 text-xs">
+              <SelectTrigger className="w-28 h-7 text-xs bg-muted border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -197,7 +197,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
               variant="outline"
               size="sm"
               onClick={handleToggleExpand}
-              className="h-7 px-2"
+              className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
               disabled={totalPeople === 0}
             >
               {allExpanded ? (
@@ -208,12 +208,12 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
             </Button>
 
             {/* Export */}
-            <Button variant="outline" size="sm" className="h-7 px-2">
+            <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
               <Download className="h-3.5 w-3.5" />
             </Button>
             
             {/* Settings */}
-            <Button variant="outline" size="sm" className="h-7 px-2">
+            <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
               <Settings className="h-3.5 w-3.5" />
             </Button>
           </div>
@@ -272,14 +272,14 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
                 variant="outline" 
                 size="sm" 
                 onClick={handlePreviousMonth}
-                className="h-7 w-7 p-0"
+                className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </Button>
               
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-7 min-w-[90px]">
+                  <Button variant="outline" size="sm" className="h-7 min-w-[90px] bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
                     {monthLabel}
                   </Button>
                 </PopoverTrigger>
@@ -303,7 +303,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
                 variant="outline" 
                 size="sm" 
                 onClick={handleNextMonth}
-                className="h-7 w-7 p-0"
+                className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
               </Button>
@@ -317,7 +317,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
               value={periodToShow.toString()}
               onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
             >
-              <SelectTrigger className="w-28 h-7 text-xs">
+              <SelectTrigger className="w-28 h-7 text-xs bg-muted border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -334,7 +334,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
               variant="outline"
               size="sm"
               onClick={handleToggleExpand}
-              className="h-7 px-2"
+              className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
               disabled={totalPeople === 0}
             >
               {allExpanded ? (
@@ -345,12 +345,12 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
             </Button>
 
             {/* Export */}
-            <Button variant="outline" size="sm" className="h-7 px-2">
+            <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
               <Download className="h-3.5 w-3.5" />
             </Button>
             
             {/* Settings */}
-            <Button variant="outline" size="sm" className="h-7 px-2">
+            <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
               <Settings className="h-3.5 w-3.5" />
             </Button>
           </div>
