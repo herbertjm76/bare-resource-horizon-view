@@ -78,6 +78,20 @@
   background-color: rgba(107, 114, 128, 0.15) !important; /* Darker gray for weekends */
 }
 
+/* Current week highlighting */
+.resource-allocation-table td.current-week,
+.resource-allocation-table th.current-week {
+  background-color: rgba(59, 130, 246, 0.08) !important;
+}
+
+/* Today highlighting - stronger */
+.resource-allocation-table td.today,
+.resource-allocation-table th.today {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  border-left: 2px solid #3b82f6 !important;
+  border-right: 2px solid #3b82f6 !important;
+}
+
 /* Sunday border - thicker separation */
 .sunday-border {
   border-left: 2px solid rgba(111, 75, 246, 0.3);

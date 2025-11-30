@@ -26,7 +26,8 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
         const isSundayDay = day.isSunday;
         const isFirstOfMonthDay = day.isFirstOfMonth;
         const isNewMonth = index === 0 || days[index - 1].monthLabel !== day.monthLabel;
-        const isTodayDay = isToday(day.date);
+        const isTodayDay = day.isToday;
+        const isCurrentWeekDay = day.isCurrentWeek;
         
         const uniqueKey = `${day.date.toISOString().split('T')[0]}-${index}`;
         
@@ -38,8 +39,11 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
         if (isFirstOfMonthDay) {
           headerClasses += ' border-l-4 border-orange-400';
         }
+        if (isCurrentWeekDay) {
+          headerClasses += ' current-week bg-blue-50 border-t-4 border-blue-500';
+        }
         if (isTodayDay) {
-          headerClasses += ' ring-2 ring-purple-300 ring-inset';
+          headerClasses += ' today ring-2 ring-blue-500 ring-inset bg-blue-100 font-bold';
         }
         
         return (

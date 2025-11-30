@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { format, addDays, isWeekend, isSunday, eachDayOfInterval, addWeeks, startOfWeek } from 'date-fns';
+import { format, addDays, isWeekend, isSunday, eachDayOfInterval, addWeeks, startOfWeek, isToday, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 import { DayInfo } from '../grid/types';
 
 interface DisplayOptions {
@@ -118,6 +118,8 @@ export const useGridDays = (
       return displayOptions.selectedDays.includes(dayId);
     });
     
+    const today = startOfDay(new Date());
+    
     return allDays.map((day, index, days) => {
       const dayOfWeek = getDayOfWeek(day, displayOptions.weekStartsOnSunday);
       const lastDayOfWeek = displayOptions.weekStartsOnSunday ? 6 : 6; // Saturday is always last day
@@ -130,6 +132,21 @@ export const useGridDays = (
       // Check if day is in the previous week
       const isPreviousWeek = day < adjustedStartDate;
       
+      // Check if today
+      const isTodayDay = isToday(day);
+      
+      // Find week boundaries for this day
+      const weekStart = startOfWeek(day, { 
+        weekStartsOn: displayOptions.weekStartsOnSunday ? 0 : 1 
+      });
+      const weekEnd = addDays(weekStart, 6);
+      
+      // Check if today falls within this week
+      const isCurrentWeek = isWithinInterval(today, {
+        start: startOfDay(weekStart),
+        end: endOfDay(weekEnd)
+      });
+      
       return {
         date: day,
         label: format(day, 'd'), // Day of month
@@ -139,7 +156,9 @@ export const useGridDays = (
         isSunday: isSunday(day),
         isFirstOfMonth: day.getDate() === 1,
         isEndOfWeek: isEndOfWeek,
-        isPreviousWeek: isPreviousWeek
+        isPreviousWeek: isPreviousWeek,
+        isToday: isTodayDay,
+        isCurrentWeek: isCurrentWeek
       };
     });
   }, [

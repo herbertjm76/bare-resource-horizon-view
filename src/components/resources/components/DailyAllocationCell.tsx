@@ -11,6 +11,9 @@ interface DayInfo {
   isSunday: boolean;
   isFirstOfMonth: boolean;
   isEndOfWeek?: boolean;
+  isPreviousWeek?: boolean;
+  isToday?: boolean;
+  isCurrentWeek?: boolean;
 }
 
 interface DailyAllocationCellProps {
@@ -35,11 +38,14 @@ export const DailyAllocationCell: React.FC<DailyAllocationCellProps> = ({
   const isSundayClass = day.isSunday ? 'sunday-border' : '';
   const isFirstOfMonthClass = day.isFirstOfMonth ? 'border-l-2 border-l-brand-primary/40' : '';
   const isEndOfWeekClass = day.isEndOfWeek ? 'border-r border-r-gray-300' : '';
+  const isPreviousWeekClass = day.isPreviousWeek ? 'opacity-50' : '';
+  const isCurrentWeekClass = day.isCurrentWeek ? 'current-week' : '';
+  const isTodayClass = day.isToday ? 'today' : '';
   
   return (
     <td 
       key={dayKey} 
-      className={`p-0 text-center w-[30px] ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass} ${isEndOfWeekClass}`}
+      className={`p-0 text-center w-[30px] ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass} ${isEndOfWeekClass} ${isPreviousWeekClass} ${isCurrentWeekClass} ${isTodayClass}`}
     >
       <StageTimelineOverlay
         isInStageTimeline={isInStageTimeline}

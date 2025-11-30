@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { format } from 'date-fns';
 import { ProjectRow } from '@/components/resources/ProjectRow';
@@ -10,6 +10,7 @@ import { GridEmptyState } from './grid/GridEmptyState';
 import { useGridDays } from './hooks/useGridDays';
 import { useFilteredProjects } from './hooks/useFilteredProjects';
 import { useGridTableWidth } from './hooks/useGridTableWidth';
+import { useScrollToCurrentWeek } from './hooks/useScrollToCurrentWeek';
 import { Card } from '@/components/ui/card';
 import './resources-grid.css';
 
@@ -39,6 +40,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   const { projects, isLoading } = useProjects();
   const { office_stages } = useOfficeSettings();
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Generate array of days for the selected period
   const days = useGridDays(startDate, periodToShow, displayOptions);
@@ -48,6 +50,9 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
 
   // Calculate the table width
   const tableWidth = useGridTableWidth(days.length);
+  
+  // Auto-scroll to current week on mount
+  useScrollToCurrentWeek(days, scrollContainerRef);
   
   // Toggle project expansion
   const toggleProjectExpanded = (projectId: string) => {
@@ -67,7 +72,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   return (
     <div className="w-full max-w-full">
       <Card className="w-full overflow-hidden border">
-        <div className="grid-table-card-scroll">
+        <div className="grid-table-card-scroll" ref={scrollContainerRef}>
           <div className="grid-table-container">
             <table 
               className="resource-allocation-table" 
