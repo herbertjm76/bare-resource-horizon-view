@@ -267,7 +267,7 @@ const WeeklyOverview = () => {
               onFullscreenToggle={handleFullscreenToggle}
             />
 
-            {/* Available Members Row */}
+            {/* Combined Filter and Available Members Card */}
             <div className="px-3 sm:px-6">
               <div className="bg-card rounded-lg p-1">
                 <AvailableMembersRow 
