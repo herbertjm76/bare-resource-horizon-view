@@ -24,13 +24,13 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
   periodToShow
 }) => {
   // Calculate total table width: project column (250px) + week columns (80px each)
-  const tableWidth = 250 + (weeks.length * 80);
-
+  const tableWidth = 250 + weeks.length * 80;
+ 
   return (
     <div className="workload-resource-grid-container center-aligned">
       <div className="workload-resource-table-wrapper">
         <table 
-          className="workload-resource-table"
+          className="workload-resource-table modern-week-view-table"
           style={{ 
             width: `${tableWidth}px`,
             minWidth: `${tableWidth}px`

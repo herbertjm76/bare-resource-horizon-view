@@ -287,6 +287,28 @@
   }
 }
 
+/* Modern week-view (Project + THIS WEEK) layout tweaks for mobile & tablet */
+@media (max-width: 1024px) {
+  .modern-week-view-table {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .modern-week-view-table .workload-resource-header.project-resource-column,
+  .modern-week-view-table .workload-resource-cell.project-resource-column {
+    width: 70% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  .modern-week-view-table .workload-resource-header.week-column,
+  .modern-week-view-table .workload-resource-cell.week-column {
+    width: 30% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
 
 /* Ensure proper z-index stacking - only for sticky elements */
 .workload-resource-header.project-resource-column,
