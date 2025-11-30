@@ -16,6 +16,10 @@ interface AvailableMembersRowProps {
     location: string;
     searchTerm: string;
   };
+  // Optional pre-fetched data to avoid duplicate queries
+  profiles?: any[];
+  invites?: any[];
+  allocations?: any[];
 }
 
 type SortBy = 'hours' | 'name';
@@ -46,13 +50,17 @@ interface AvailableMember {
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
-  filters
+  filters,
+  profiles: prefetchedProfiles,
+  invites: prefetchedInvites,
+  allocations: prefetchedAllocations
 }) => {
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
 
-  const { data: profiles = [] } = useQuery({
+  // Use pre-fetched data if available, otherwise fetch
+  const { data: fetchedProfiles = [] } = useQuery({
     queryKey: ['available-members-profiles'],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -64,9 +72,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       return data || [];
     },
     staleTime: 60_000,
+    enabled: !prefetchedProfiles
   });
 
-  const { data: invites = [] } = useQuery({
+  const { data: fetchedInvites = [] } = useQuery({
     queryKey: ['available-members-invites'],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -80,15 +89,15 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       return data || [];
     },
     staleTime: 60_000,
+    enabled: !prefetchedInvites
   });
 
-  const { data: allocations = [] } = useQuery({
+  const { data: fetchedAllocations = [] } = useQuery({
     queryKey: ['available-allocations', weekStartDate],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return [];
       
-      // Calculate the full week range (Monday to Sunday)
       const weekStart = new Date(weekStartDate);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);
@@ -114,7 +123,12 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       return data || [];
     },
     staleTime: 60_000,
+    enabled: !prefetchedAllocations
   });
+
+  const profiles = prefetchedProfiles || fetchedProfiles;
+  const invites = prefetchedInvites || fetchedInvites;
+  const allocations = prefetchedAllocations || fetchedAllocations;
 
   const availableMembers: AvailableMember[] = React.useMemo(() => {
     const allMembers = [
