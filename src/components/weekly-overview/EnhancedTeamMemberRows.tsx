@@ -72,7 +72,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
               return (
                 <TableRow key={member.id} className={`member-row ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
                   {/* Member Name */}
-                  <TableCell className="sticky left-0 z-10 bg-inherit">
+                  <TableCell className="sticky left-0 z-10 bg-inherit pl-3">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
