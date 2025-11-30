@@ -43,7 +43,7 @@ interface PersonRundownCardProps {
   onDataChange?: () => void;
 }
 
-export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
+export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
   person,
   isActive,
   isFullscreen,
@@ -257,4 +257,14 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
       </div>
     </TooltipProvider>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent unnecessary re-renders
+  return (
+    prevProps.person.id === nextProps.person.id &&
+    prevProps.person.totalHours === nextProps.person.totalHours &&
+    prevProps.isActive === nextProps.isActive &&
+    prevProps.isFullscreen === nextProps.isFullscreen &&
+    JSON.stringify(prevProps.person.projects) === JSON.stringify(nextProps.person.projects) &&
+    JSON.stringify(prevProps.person.leave) === JSON.stringify(nextProps.person.leave)
+  );
+});

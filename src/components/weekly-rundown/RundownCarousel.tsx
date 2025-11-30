@@ -143,9 +143,12 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
             const isActive = index === currentIndex;
             const position = index - currentIndex;
             
+            // Use stable key to prevent re-mounting
+            const stableKey = `${item.id}-${rundownMode}`;
+            
             return (
               <div 
-                key={item.id} 
+                key={stableKey}
                 className={`
                   flex-[0_0_60%] min-w-0 px-4
                   transition-all duration-500 ease-out
