@@ -120,14 +120,14 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
               variant="outline" 
               size="sm" 
               onClick={handlePreviousMonth}
-              className="h-7 w-7 p-0"
+              className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
             
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 min-w-[90px]">
+                <Button variant="outline" size="sm" className="h-7 min-w-[90px] bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
                   {monthLabel}
                 </Button>
               </PopoverTrigger>
@@ -151,7 +151,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
               variant="outline" 
               size="sm" 
               onClick={handleNextMonth}
-              className="h-7 w-7 p-0"
+              className="h-7 w-7 p-0 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
             >
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>
@@ -165,7 +165,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
             value={periodToShow.toString()}
             onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
           >
-            <SelectTrigger className="w-28 h-7 text-xs">
+            <SelectTrigger className="w-28 h-7 text-xs bg-muted border">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -182,7 +182,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
             value={sortBy}
             onValueChange={onSortChange}
           >
-            <SelectTrigger className="w-32 h-7 text-xs">
+            <SelectTrigger className="w-32 h-7 text-xs bg-muted border">
               <SelectValue placeholder="Sort by..." />
             </SelectTrigger>
             <SelectContent>
@@ -199,7 +199,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
             variant="outline"
             size="sm"
             onClick={onSortDirectionToggle}
-            className="h-7 px-2"
+            className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
             title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
           >
             <ArrowUpDown className={`h-3.5 w-3.5 transition-transform ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
@@ -210,7 +210,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
             variant="outline"
             size="sm"
             onClick={handleToggleExpand}
-            className="h-7 px-2"
+            className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
             disabled={totalProjects === 0}
           >
             {allExpanded ? (
@@ -223,7 +223,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
           {/* Filters */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-7 px-2">
+              <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all">
                 <Filter className="h-3.5 w-3.5 mr-1.5" />
                 {activeFiltersCount > 0 && (
                   <Badge variant="secondary" className="ml-1 h-4 px-1 text-[10px]">
@@ -258,14 +258,14 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
               variant="ghost" 
               size="sm"
               onClick={onClearFilters}
-              className="h-7 px-2 text-xs text-muted-foreground"
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
             >
               Clear
             </Button>
           )}
 
           {/* Export */}
-          <Button variant="outline" size="sm" className="h-7 px-2" onClick={onExport}>
+          <Button variant="outline" size="sm" className="h-7 px-2 bg-muted hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all" onClick={onExport}>
             <Download className="h-3.5 w-3.5" />
           </Button>
         </div>
