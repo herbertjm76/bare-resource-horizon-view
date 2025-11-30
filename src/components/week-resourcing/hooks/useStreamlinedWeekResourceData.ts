@@ -128,7 +128,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     return total;
   }, [memberTotalsMap]);
 
-  // Separate function for rundown data that returns detailed structure
+  // Separate function for rundown data that returns detailed structure with REAL leave data
   const getMemberTotalForRundown = useCallback((memberId: string) => {
     const total = memberTotalsMap.get(memberId) || 0;
     
@@ -146,16 +146,23 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
       };
     }) || [];
     
-    // Return the expected structure for rundown data
+    // Get REAL leave data from the fetched leave details
+    const memberLeaveDetails = weeklyLeaveDetails[memberId] || [];
+    const annualLeaveHours = memberLeaveDetails.reduce((sum, leave) => sum + leave.hours, 0);
+    
+    const holidayHours = holidaysData[memberId] || 0;
+    const otherLeaveHours = otherLeaveData[memberId] || 0;
+    
+    // Return the expected structure for rundown data with REAL data
     return {
       resourcedHours: total,
       projectAllocations,
-      annualLeave: Math.floor(Math.random() * 8), // Mock data for demo
-      vacationLeave: Math.floor(Math.random() * 8), 
-      medicalLeave: Math.floor(Math.random() * 4),
-      publicHoliday: Math.floor(Math.random() * 2) * 8
+      annualLeave: annualLeaveHours,
+      vacationLeave: 0, // Not tracked separately in current schema
+      medicalLeave: otherLeaveHours, // Other leave includes medical
+      publicHoliday: holidayHours
     };
-  }, [memberTotalsMap, detailedAllocations, projects]);
+  }, [memberTotalsMap, detailedAllocations, projects, weeklyLeaveDetails, holidaysData, otherLeaveData]);
 
   const getProjectCount = useCallback((memberId: string) => {
     const count = projectCountMap.get(memberId) || 0;
