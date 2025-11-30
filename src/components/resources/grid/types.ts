@@ -9,4 +9,6 @@ export interface DayInfo {
   isFirstOfMonth: boolean;
   isEndOfWeek: boolean;
   isPreviousWeek: boolean;
+  isToday: boolean;
+  isCurrentWeek: boolean;
 }
