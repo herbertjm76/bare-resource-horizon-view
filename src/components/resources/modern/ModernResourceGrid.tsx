@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { WorkloadStyleResourceGrid } from './WorkloadStyleResourceGrid';
+import { startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 import { useProjects } from '@/hooks/useProjects';
 import { useFilteredProjects } from '../hooks/useFilteredProjects';
 import { useGridWeeks } from '../hooks/useGridWeeks';
@@ -38,6 +39,26 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   const filteredProjects = useFilteredProjects(projects, filters);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
 
+  // On tablet and mobile, only show the current week column
+  const displayedWeeks = React.useMemo(() => {
+    if (!weeks || weeks.length === 0) return weeks;
+
+    if (typeof window === 'undefined') return weeks;
+    const isMobileOrTablet = window.innerWidth <= 1024;
+    if (!isMobileOrTablet) return weeks;
+
+    const today = startOfDay(new Date());
+
+    const currentWeek = weeks.find((week) =>
+      isWithinInterval(today, {
+        start: startOfDay(week.weekStartDate),
+        end: endOfDay(week.weekEndDate)
+      })
+    );
+
+    return currentWeek ? [currentWeek] : weeks;
+  }, [weeks]);
+
   if (isLoadingProjects) {
     return <GridLoadingState />;
   }
@@ -49,7 +70,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   return (
     <WorkloadStyleResourceGrid
       projects={filteredProjects}
-      weeks={weeks}
+      weeks={displayedWeeks}
       expandedProjects={expandedProjects}
       onToggleProjectExpand={onToggleProjectExpand}
       selectedDate={startDate}
