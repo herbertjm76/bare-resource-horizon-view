@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GanttChartSquare, Users, Calendar, TrendingUp } from 'lucide-react';
+import { WeeklyResourceFilters } from '@/components/weekly-overview/WeeklyResourceFilters';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectResourcingData';
@@ -57,13 +58,39 @@ const ResourceScheduling = () => {
     return format(weekStart, 'yyyy-MM-dd');
   }, [selectedMonth]);
 
-  // Build filters object for AvailableMembersRow (empty filters to show all)
-  const memberFilters = useMemo(() => ({
-    practiceArea: 'all',
-    department: 'all',
-    location: 'all',
-    searchTerm: ''
-  }), []);
+  // Member filters state
+  const [memberFilters, setMemberFilters] = useState({
+    office: "all",
+    practiceArea: "all",
+    department: "all",
+    location: "all",
+    searchTerm: ""
+  });
+
+  const handleMemberFilterChange = useCallback((key: string, value: string) => {
+    setMemberFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  }, []);
+
+  const clearMemberFilters = useCallback(() => {
+    setMemberFilters({
+      office: 'all',
+      practiceArea: 'all',
+      department: 'all',
+      location: 'all',
+      searchTerm: ''
+    });
+  }, []);
+
+  const activeMemberFiltersCount = useMemo(() => [
+    memberFilters.office !== 'all' ? 'office' : '',
+    memberFilters.practiceArea !== 'all' ? 'practiceArea' : '',
+    memberFilters.department !== 'all' ? 'department' : '',
+    memberFilters.location !== 'all' ? 'location' : '',
+    memberFilters.searchTerm ? 'search' : ''
+  ].filter(Boolean).length, [memberFilters.office, memberFilters.practiceArea, memberFilters.department, memberFilters.location, memberFilters.searchTerm]);
 
   return (
     <StandardLayout>
@@ -116,6 +143,14 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-project" className="mt-0 py-3">
             <div className="space-y-3">
+              {/* Member Filters */}
+              <div className="px-3 sm:px-6">
+                <WeeklyResourceFilters
+                  filters={{ office: memberFilters.office }}
+                  onFilterChange={handleMemberFilterChange}
+                />
+              </div>
+
               {/* Available Members Row */}
               <div className="px-3 sm:px-6">
                 <AvailableMembersRow
@@ -154,6 +189,14 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-person" className="mt-0 py-3">
             <div className="space-y-3">
+              {/* Member Filters */}
+              <div className="px-3 sm:px-6">
+                <WeeklyResourceFilters
+                  filters={{ office: memberFilters.office }}
+                  onFilterChange={handleMemberFilterChange}
+                />
+              </div>
+
               {/* Available Members Row */}
               <div className="px-3 sm:px-6">
                 <AvailableMembersRow
