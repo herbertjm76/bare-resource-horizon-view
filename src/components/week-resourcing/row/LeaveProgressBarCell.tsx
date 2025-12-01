@@ -30,7 +30,7 @@ export const LeaveProgressBarCell: React.FC<LeaveProgressBarCellProps> = ({
   const colors = {
     annual: "bg-blue-500",
     holiday: "bg-yellow-500",
-    other: "bg-brand-violet",
+    other: "bg-theme-primary",
     empty: "bg-gray-200",
   };
 
@@ -96,7 +96,7 @@ export const LeaveProgressBarCell: React.FC<LeaveProgressBarCellProps> = ({
               <span className="inline-flex items-center text-yellow-500 whitespace-nowrap">H: {holidayHours}h</span>
             )}
             {otherLeave > 0 && (
-              <span className="inline-flex items-center text-brand-violet whitespace-nowrap">O: {otherLeave}h</span>
+              <span className="inline-flex items-center text-theme-primary whitespace-nowrap">O: {otherLeave}h</span>
             )}
             {totalLeave === 0 && (
               <span className="text-gray-400">No leave</span>

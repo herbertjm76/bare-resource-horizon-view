@@ -26,7 +26,7 @@ const TeamMemberDetailPage = () => {
         <StandardLayout>
           <div className="flex items-center justify-center h-96">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-brand-primary" />
+              <Loader2 className="h-8 w-8 animate-spin text-theme-primary" />
               <span className="text-lg text-gray-600">Loading team member details...</span>
               <p className="text-sm text-gray-500">This may take a moment</p>
             </div>

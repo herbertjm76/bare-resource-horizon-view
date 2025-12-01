@@ -64,7 +64,7 @@ export const ResourceStatusCards: React.FC<ResourceStatusCardsProps> = ({
           {membersToShow.map(({ member }) => (
             <Avatar key={member.id} className="h-8 w-8">
               <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-              <AvatarFallback className="bg-brand-violet text-white text-xs">
+              <AvatarFallback className="bg-theme-primary text-white text-xs">
                 {getUserInitials(member)}
               </AvatarFallback>
             </Avatar>

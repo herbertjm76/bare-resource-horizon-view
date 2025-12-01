@@ -52,7 +52,7 @@ export const SecuritySection: React.FC = () => {
     <Card>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-brand-violet" />
+          <Shield className="h-5 w-5 text-theme-primary" />
           Security Settings
         </CardTitle>
       </CardHeader>
@@ -114,7 +114,7 @@ export const SecuritySection: React.FC = () => {
 
             <Button
               type="submit"
-              className="w-full bg-brand-primary hover:bg-brand-primary/90"
+              className="w-full bg-theme-primary hover:bg-theme-primary/90"
               disabled={passwordLoading}
             >
               {passwordLoading ? "Updating..." : "Update Password"}

@@ -28,7 +28,7 @@ export const PeriodViewSelector: React.FC<PeriodViewSelectorProps> = ({
           size="sm"
           className={`h-8 px-4 ${
             selectedView === key 
-              ? "bg-brand-primary text-white shadow-sm" 
+              ? "bg-theme-primary text-white shadow-sm" 
               : "text-gray-600 hover:text-gray-900 hover:bg-white"
           }`}
           onClick={() => onViewChange(key)}

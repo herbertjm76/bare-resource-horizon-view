@@ -19,8 +19,8 @@ export const WeeklyOverviewHeader: React.FC<WeeklyOverviewHeaderProps> = ({
       <div className="flex flex-col space-y-3 sm:space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
           <div className="space-y-1 sm:space-y-2">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-2 sm:gap-3">
-              <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-brand-violet flex-shrink-0" />
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground flex items-center gap-2 sm:gap-3">
+              <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-theme-primary flex-shrink-0" />
               <span className="break-words">Weekly Overview</span>
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">

@@ -85,7 +85,7 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
         <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
           <CardContent className="p-1.5 sm:p-2">
             <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
-              <div className="p-0.5 sm:p-1 rounded-full text-brand-violet bg-brand-violet/10 flex-shrink-0">
+              <div className="p-0.5 sm:p-1 rounded-full text-theme-primary bg-theme-primary/10 flex-shrink-0">
                 <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
               </div>
               <p className="font-medium text-gray-700 text-xs leading-tight truncate">Week Utilization</p>
@@ -110,7 +110,7 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
         <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
           <CardContent className="p-1.5 sm:p-2">
             <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
-              <div className="p-0.5 sm:p-1 rounded-full text-brand-violet bg-brand-violet/10 flex-shrink-0">
+              <div className="p-0.5 sm:p-1 rounded-full text-theme-primary bg-theme-primary/10 flex-shrink-0">
                 <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
               </div>
               <p className="font-medium text-gray-700 text-xs leading-tight truncate">Available Hours</p>
@@ -130,7 +130,7 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
         <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
           <CardContent className="p-1.5 sm:p-2">
             <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
-              <div className="p-0.5 sm:p-1 rounded-full text-brand-violet bg-brand-violet/10 flex-shrink-0">
+              <div className="p-0.5 sm:p-1 rounded-full text-theme-primary bg-theme-primary/10 flex-shrink-0">
                 <Users className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
               </div>
               <p className="font-medium text-gray-700 text-xs leading-tight truncate">Overloaded</p>
@@ -152,7 +152,7 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
         <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
           <CardContent className="p-1.5 sm:p-2">
             <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
-              <div className="p-0.5 sm:p-1 rounded-full text-brand-violet bg-brand-violet/10 flex-shrink-0">
+              <div className="p-0.5 sm:p-1 rounded-full text-theme-primary bg-theme-primary/10 flex-shrink-0">
                 <Calendar className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
               </div>
               <p className="font-medium text-gray-700 text-xs leading-tight truncate">Under-utilized</p>

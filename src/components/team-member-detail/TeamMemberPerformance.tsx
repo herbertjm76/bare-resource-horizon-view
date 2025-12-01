@@ -135,7 +135,7 @@ export const TeamMemberPerformance: React.FC<TeamMemberPerformanceProps> = ({ me
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-brand-violet" />
+            <Target className="h-5 w-5 text-theme-primary" />
             Goals & Development
           </CardTitle>
         </CardHeader>
@@ -204,7 +204,7 @@ export const TeamMemberPerformance: React.FC<TeamMemberPerformanceProps> = ({ me
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-brand-violet" />
+            <Award className="h-5 w-5 text-theme-primary" />
             Recent Feedback
           </CardTitle>
         </CardHeader>
@@ -225,7 +225,7 @@ export const TeamMemberPerformance: React.FC<TeamMemberPerformanceProps> = ({ me
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-brand-violet" />
+            <Calendar className="h-5 w-5 text-theme-primary" />
             Review Schedule
           </CardTitle>
         </CardHeader>

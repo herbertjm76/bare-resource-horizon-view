@@ -212,11 +212,11 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
           
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'vacation' | 'project')}>
             <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-bg-tertiary">
-              <TabsTrigger value="vacation" className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="vacation" className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-theme-primary data-[state=active]:text-white data-[state=active]:shadow-sm">
                 <CalendarIcon className="h-4 w-4" />
                 Vacation
               </TabsTrigger>
-              <TabsTrigger value="project" className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="project" className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-theme-primary data-[state=active]:text-white data-[state=active]:shadow-sm">
                 <Briefcase className="h-4 w-4" />
                 Project
               </TabsTrigger>
@@ -295,7 +295,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               <Button 
                 onClick={handleSaveVacation}
                 disabled={!vacationDate || isSavingVacation}
-                className="w-full h-10 bg-brand-primary hover:bg-brand-primary/90 text-white font-medium"
+                className="w-full h-10 bg-theme-primary hover:bg-theme-primary/90 text-white font-medium"
               >
                 {isSavingVacation ? 'Saving...' : 'Save Vacation'}
               </Button>
@@ -381,7 +381,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               <Button 
                 onClick={handleSaveProject}
                 disabled={!selectedProject || isSavingProject}
-                className="w-full h-10 bg-brand-primary hover:bg-brand-primary/90 text-white font-medium"
+                className="w-full h-10 bg-theme-primary hover:bg-theme-primary/90 text-white font-medium"
               >
                 {isSavingProject ? 'Saving...' : 'Save Project Allocation'}
               </Button>

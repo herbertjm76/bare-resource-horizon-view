@@ -15,10 +15,10 @@ export const RateCard = ({ name, value, unit, type, onEdit, onDelete }: RateCard
   return (
     <div className="group flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
       <div className="flex flex-col gap-1">
-        <div className="font-medium text-brand-primary">{name}</div>
+        <div className="font-medium text-foreground">{name}</div>
         <div className="text-sm text-muted-foreground flex items-center gap-2">
           <span className="font-semibold text-base">${value.toFixed(2)}</span>
-          <span className="text-xs bg-brand-primary/10 px-2 py-0.5 rounded-full">
+          <span className="text-xs bg-theme-primary/10 px-2 py-0.5 rounded-full">
             per {unit}
           </span>
         </div>

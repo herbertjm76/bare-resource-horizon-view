@@ -25,11 +25,11 @@ export const TeamMemberDetailHeader: React.FC = () => {
       {/* Page Header - Standardized without member name to avoid redundancy */}
       <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-brand-violet/10">
-            <User className="h-5 w-5 text-brand-violet" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-theme-primary/10">
+            <User className="h-5 w-5 text-theme-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-brand-primary">
+            <h1 className="text-3xl font-bold text-foreground">
               Team Member Profile
             </h1>
             <p className="text-muted-foreground">

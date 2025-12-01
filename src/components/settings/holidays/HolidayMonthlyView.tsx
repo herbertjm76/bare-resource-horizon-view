@@ -101,7 +101,7 @@ export const HolidayMonthlyView: React.FC<HolidayMonthlyViewProps> = ({
                       ? 'cursor-pointer hover:bg-gray-50' 
                       : 'bg-gray-50/50'
                   } ${
-                    selected.includes(holiday.id) ? 'ring-2 ring-brand-primary bg-brand-violet-light' : ''
+                    selected.includes(holiday.id) ? 'ring-2 ring-theme-primary bg-theme-primary/10' : ''
                   }`}
                   onClick={() => editMode && onSelect(holiday.id)}
                 >

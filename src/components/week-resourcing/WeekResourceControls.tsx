@@ -317,7 +317,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
                 <Filter className="h-4 w-4" />
                 <span className="hidden xs:inline">Filters</span>
                 {activeFilterCount > 0 && (
-                  <Badge variant="secondary" className="h-5 px-1.5 text-xs bg-brand-violet/10 text-brand-violet border-0 ml-0.5">
+                  <Badge variant="secondary" className="h-5 px-1.5 text-xs bg-theme-primary/10 text-theme-primary border-0 ml-0.5">
                     {activeFilterCount}
                   </Badge>
                 )}

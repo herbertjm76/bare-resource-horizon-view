@@ -28,7 +28,7 @@ export const ResourcesHeader: React.FC<ResourcesHeaderProps> = ({
   return (
     <div className="space-y-4 mb-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-brand-primary">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
           {title}
         </h1>
         

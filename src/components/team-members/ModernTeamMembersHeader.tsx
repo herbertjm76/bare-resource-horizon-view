@@ -26,11 +26,11 @@ export const ModernTeamMembersHeader: React.FC<ModernTeamMembersHeaderProps> = (
       />
       
       <div className="grid grid-cols-4 gap-4 mt-4">
-        <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
+        <Card className="px-4 py-2 bg-gradient-to-r from-theme-primary/10 to-theme-primary/5 border-theme-primary/20">
           <div className="flex items-center gap-2">
-            <Users className="h-3.5 w-3.5 text-brand-violet" strokeWidth={1.5} />
+            <Users className="h-3.5 w-3.5 text-theme-primary" strokeWidth={1.5} />
             <div className="text-sm">
-              <span className="font-semibold text-brand-violet">{totalActiveMembers}</span>
+              <span className="font-semibold text-theme-primary">{totalActiveMembers}</span>
               <span className="text-muted-foreground ml-1">Active</span>
             </div>
           </div>
@@ -56,11 +56,11 @@ export const ModernTeamMembersHeader: React.FC<ModernTeamMembersHeaderProps> = (
           </div>
         </Card>
         
-        <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
+        <Card className="px-4 py-2 bg-gradient-to-r from-theme-primary/10 to-theme-primary/5 border-theme-primary/20">
           <div className="flex items-center gap-2">
-            <Clock className="h-3.5 w-3.5 text-brand-violet" strokeWidth={1.5} />
+            <Clock className="h-3.5 w-3.5 text-theme-primary" strokeWidth={1.5} />
             <div className="text-sm">
-              <span className="font-semibold text-brand-violet">{totalLocations}</span>
+              <span className="font-semibold text-theme-primary">{totalLocations}</span>
               <span className="text-muted-foreground ml-1">Locations</span>
             </div>
           </div>
