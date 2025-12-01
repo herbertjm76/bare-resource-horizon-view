@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 interface AvailableMembersRowProps {
   weekStartDate: string;
   threshold?: number;
+  sortOption?: 'alphabetical' | 'utilization' | 'location' | 'department';
   filters?: {
     practiceArea: string;
     department: string;
@@ -52,6 +53,7 @@ interface AvailableMember {
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
+  sortOption = 'alphabetical',
   filters,
   profiles: prefetchedProfiles,
   invites: prefetchedInvites,
@@ -262,10 +264,27 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
         return true;
       })
-      .sort((a, b) => b.availableHours - a.availableHours);
+      .sort((a, b) => {
+        // Apply the same sorting as the carousel/grid view below
+        const fullNameA = `${a.firstName} ${a.lastName}`;
+        const fullNameB = `${b.firstName} ${b.lastName}`;
+        
+        switch (sortOption) {
+          case 'alphabetical':
+            return fullNameA.localeCompare(fullNameB);
+          case 'utilization':
+            return b.utilization - a.utilization;
+          case 'location':
+            return (a.location || '').localeCompare(b.location || '');
+          case 'department':
+            return (a.department || '').localeCompare(b.department || '');
+          default:
+            return 0;
+        }
+      });
 
     return available;
-  }, [profiles, invites, allocations, threshold, filters]);
+  }, [profiles, invites, allocations, threshold, filters, sortOption]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
