@@ -253,6 +253,7 @@ const WeeklyOverview = () => {
                 profiles={profiles}
                 invites={invites}
                 allocations={availableMembersAllocations}
+                sortOption={sortOption}
               />
 
               {/* Table View */}
