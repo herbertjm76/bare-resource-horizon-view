@@ -43,7 +43,8 @@ export const useRundownData = ({
           code: allocation.projectCode,
           hours: allocation.hours,
           percentage: capacity > 0 ? (allocation.hours / capacity) * 100 : 0,
-          color: allocation.color
+          color: allocation.color,
+          allocationId: allocation.allocationId // Include the allocation ID for edit/delete
         }));
 
         return {
