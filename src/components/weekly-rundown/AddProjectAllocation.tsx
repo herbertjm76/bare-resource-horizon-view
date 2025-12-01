@@ -156,6 +156,7 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
       toast.success('Project allocation added');
       queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       setOpen(false);
       setSelectedProjectId('');
       setHours('');

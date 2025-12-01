@@ -152,6 +152,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       toast.success('Project allocation added');
       queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       setShowAddProject(false);
       setSelectedNewProjectId('');
       setNewAllocationHours('');
@@ -203,6 +204,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       toast.success('Allocation updated');
       queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       setHours({});
     },
     onError: (error) => {
@@ -224,6 +226,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       toast.success('Allocation deleted');
       queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
     },
     onError: (error) => {
       toast.error('Failed to delete allocation');
