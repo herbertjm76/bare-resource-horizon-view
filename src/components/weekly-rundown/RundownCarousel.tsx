@@ -108,7 +108,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   const canScrollNext = currentIndex < items.length - 1;
 
   return (
-    <div className="carousel-container relative flex items-center min-h-[70vh]">
+    <div className="carousel-container relative flex items-center min-h-[70vh] py-8">
       <div className="w-full">
       {/* Navigation buttons - Enhanced */}
       <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
@@ -136,7 +136,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
       </div>
 
       {/* Carousel content - simplified to avoid flicker and keep cards visible */}
-      <div className="overflow-hidden" ref={emblaRef}>
+      <div className="overflow-visible" ref={emblaRef}>
         <div className="flex">
           {items.map((item, index) => {
             const isActive = index === currentIndex;
