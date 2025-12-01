@@ -26,7 +26,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const ProjectsList = () => {
+interface ProjectsListProps {
+  onNewProject?: () => void;
+}
+
+export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
   const { projects, isLoading, error, refetch } = useProjects();
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
   const [editMode, setEditMode] = useState(false);
@@ -198,6 +202,7 @@ export const ProjectsList = () => {
                 onSelectAll={handleSelectAll}
                 allSelected={allFilteredSelected}
                 iconOnly={true}
+                onNewProject={onNewProject}
               />
               <FilterPopover
                 activeFiltersCount={activeFiltersCount}
@@ -285,6 +290,7 @@ export const ProjectsList = () => {
               onSelectAll={handleSelectAll}
               allSelected={allFilteredSelected}
               iconOnly={false}
+              onNewProject={onNewProject}
             />
           </div>
         </CardHeader>

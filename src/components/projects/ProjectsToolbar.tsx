@@ -16,6 +16,7 @@ interface ProjectsToolbarProps {
   onManageStatuses?: () => void;
   onSelectAll: () => void;
   allSelected: boolean;
+  onNewProject?: () => void;
 }
 
 const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({ 
@@ -27,7 +28,8 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
   iconOnly = false,
   onManageStatuses,
   onSelectAll,
-  allSelected
+  allSelected,
+  onNewProject
 }) => {
   const handleImportComplete = () => {
     if (onProjectCreated) {
@@ -38,6 +40,22 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
   return (
     <TooltipProvider>
       <div className="flex items-center gap-2">
+        {onNewProject && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                onClick={onNewProject}
+                size={iconOnly ? "icon" : "sm"}
+              >
+                <Plus className="h-4 w-4" />
+                {!iconOnly && <span className="ml-1">New Project</span>}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Create new project</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button 
