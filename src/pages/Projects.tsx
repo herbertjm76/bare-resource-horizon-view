@@ -25,10 +25,8 @@ const Projects = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         <SimpleBreadcrumbs />
         
-        <ProjectsHeader onNewProject={() => setShowWizard(true)} />
-        
         <OfficeSettingsProvider>
-          <ProjectsList />
+          <ProjectsList onNewProject={() => setShowWizard(true)} />
         </OfficeSettingsProvider>
 
         <Dialog open={showWizard} onOpenChange={setShowWizard}>
