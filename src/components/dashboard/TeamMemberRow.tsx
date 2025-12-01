@@ -75,7 +75,13 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
       )}
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
-          <TeamMemberAvatar member={member} />
+          <button
+            type="button"
+            onClick={() => onEditMember(member)}
+            className="focus:outline-none rounded-full cursor-pointer"
+          >
+            <TeamMemberAvatar member={member} />
+          </button>
           <div className="flex-1">
             {editMode && ['owner', 'admin'].includes(userRole) ? (
               <div className="space-y-1">
