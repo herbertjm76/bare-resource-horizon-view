@@ -338,7 +338,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   return (
     <div className="mb-0 space-y-0">
-      <div className="relative px-1.5 sm:px-2 py-1.5 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-hidden weekly-cards-container transition-all duration-300">
+      <div className="relative px-1.5 sm:px-2 py-2 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-visible weekly-cards-container transition-all duration-300">
         {/* Collapse Toggle Button - Top Right */}
         <Button
           variant="ghost"

@@ -182,14 +182,16 @@ const WeeklyOverview = () => {
           }
           className="pull-to-refresh-container"
         >
-          <div className={`space-y-1.5 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
+          <div className={`space-y-0 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
             {/* Page Header */}
             {!isFullscreen && (
-              <StandardizedPageHeader
-                title="Weekly Overview"
-                description="Switch between table, grid, and carousel views to manage your team's weekly resource allocation"
-                icon={Calendar}
-              />
+              <div className="mb-1.5">
+                <StandardizedPageHeader
+                  title="Weekly Overview"
+                  description="Switch between table, grid, and carousel views to manage your team's weekly resource allocation"
+                  icon={Calendar}
+                />
+              </div>
             )}
 
             {/* Summary Cards */}
@@ -209,7 +211,7 @@ const WeeklyOverview = () => {
             />
 
             {/* Connected Filter and Content Section */}
-            <div>
+            <div className="mt-0">
               {/* Unified Controls */}
               <UnifiedWeeklyControls
                 selectedWeek={selectedWeek}
