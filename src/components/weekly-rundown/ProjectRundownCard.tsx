@@ -6,6 +6,8 @@ import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
 import * as LucideIcons from 'lucide-react';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface ProjectRundownCardProps {
   project: {
@@ -40,7 +42,11 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
   onDataChange
 }) => {
   const { departments } = useOfficeSettings();
+  const { projectDisplayPreference } = useAppSettings();
   const sortedMembers = [...project.teamMembers].sort((a, b) => b.hours - a.hours);
+  
+  const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
+  const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
   
   const weekStartDate = new Date(selectedWeek);
   weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1);
@@ -86,19 +92,21 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                {/* Project Name - Primary */}
+                {/* Project Primary Display */}
                 <h1 className={`font-bold text-foreground tracking-tight mb-1 ${
                   isFullscreen ? 'text-5xl' : 'text-4xl'
                 }`}>
-                  {project.name}
+                  {primaryDisplay}
                 </h1>
                 
-                {/* Project Code - Secondary */}
-                <h2 className={`font-semibold text-muted-foreground mb-0.5 ${
-                  isFullscreen ? 'text-xl' : 'text-lg'
-                }`}>
-                  {project.code}
-                </h2>
+                {/* Project Secondary Display */}
+                {secondaryDisplay && (
+                  <h2 className={`font-semibold text-muted-foreground mb-0.5 ${
+                    isFullscreen ? 'text-xl' : 'text-lg'
+                  }`}>
+                    {secondaryDisplay}
+                  </h2>
+                )}
                 
                 {/* Department - Tertiary */}
                 {project.department && (
