@@ -6,11 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
-import { CalendarIcon, Briefcase } from 'lucide-react';
+import { CalendarIcon, Briefcase, Check, ChevronsUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -40,6 +48,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   
   // Project state
   const [selectedProject, setSelectedProject] = useState('');
+  const [projectComboboxOpen, setProjectComboboxOpen] = useState(false);
   const [projectWeeks, setProjectWeeks] = useState<Record<string, string>>({});
   const [isSavingProject, setIsSavingProject] = useState(false);
 
@@ -289,18 +298,49 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
             <TabsContent value="project" className="mt-4 space-y-4">
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-text-primary">Project</Label>
-                <Select value={selectedProject} onValueChange={setSelectedProject}>
-                  <SelectTrigger className="h-10 border-border-primary">
-                    <SelectValue placeholder="Select project" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {projects.map((project) => (
-                      <SelectItem key={project.id} value={project.id}>
-                        {project.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover open={projectComboboxOpen} onOpenChange={setProjectComboboxOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={projectComboboxOpen}
+                      className="w-full justify-between h-10 border-border-primary"
+                    >
+                      {selectedProject
+                        ? projects.find((project) => project.id === selectedProject)?.name || "Select project"
+                        : "Select project"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0 bg-background" align="start">
+                    <Command className="bg-background">
+                      <CommandInput placeholder="Search projects..." className="h-9" />
+                      <CommandList>
+                        <CommandEmpty>No project found.</CommandEmpty>
+                        <CommandGroup>
+                          {projects.map((project) => (
+                            <CommandItem
+                              key={project.id}
+                              value={`${project.name} ${project.code}`}
+                              onSelect={() => {
+                                setSelectedProject(project.id);
+                                setProjectComboboxOpen(false);
+                              }}
+                            >
+                              {project.name}
+                              <Check
+                                className={cn(
+                                  "ml-auto h-4 w-4",
+                                  selectedProject === project.id ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div className="space-y-2">
