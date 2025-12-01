@@ -14,16 +14,6 @@ export const ProjectDialogActions: React.FC<ProjectDialogActionsProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (onSubmit) {
-      const success = await onSubmit();
-      if (success) {
-        onClose();
-      }
-    }
-  };
-
   return (
     <DialogFooter className="px-6 py-4 border-t mt-6">
       <Button type="button" variant="outline" onClick={onClose}>
@@ -32,7 +22,6 @@ export const ProjectDialogActions: React.FC<ProjectDialogActionsProps> = ({
       <Button 
         type="submit" 
         disabled={isLoading}
-        onClick={handleSubmit}
       >
         {isLoading ? "Saving..." : "Save Changes"}
       </Button>
