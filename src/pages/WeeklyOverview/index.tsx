@@ -83,6 +83,15 @@ const WeeklyOverview = () => {
     getProjectCount
   });
 
+  // Debug logging
+  console.log('WeeklyOverview - View State:', {
+    viewType,
+    rundownMode,
+    rundownItemsCount: rundownItems.length,
+    allMembersCount: allMembers.length,
+    projectsCount: projects.length
+  });
+
   // Carousel navigation
   const {
     currentIndex,
@@ -258,26 +267,30 @@ const WeeklyOverview = () => {
 
               {/* Grid View */}
               {viewType === 'grid' && (
-                <RundownGridView
-                  items={rundownItems}
-                  rundownMode={rundownMode}
-                  isFullscreen={isFullscreen}
-                  selectedWeek={selectedWeek}
-                />
+                <div className="mt-4">
+                  <RundownGridView
+                    items={rundownItems}
+                    rundownMode={rundownMode}
+                    isFullscreen={isFullscreen}
+                    selectedWeek={selectedWeek}
+                  />
+                </div>
               )}
 
               {/* Carousel View */}
               {viewType === 'carousel' && (
-                <RundownCarousel
-                  items={rundownItems}
-                  rundownMode={rundownMode}
-                  currentIndex={currentIndex}
-                  onNext={nextItem}
-                  onPrev={prevItem}
-                  onGoTo={goToItem}
-                  selectedWeek={selectedWeek}
-                  isFullscreen={isFullscreen}
-                />
+                <div className="mt-4">
+                  <RundownCarousel
+                    items={rundownItems}
+                    rundownMode={rundownMode}
+                    currentIndex={currentIndex}
+                    onNext={nextItem}
+                    onPrev={prevItem}
+                    onGoTo={goToItem}
+                    selectedWeek={selectedWeek}
+                    isFullscreen={isFullscreen}
+                  />
+                </div>
               )}
             </div>
           </div>
