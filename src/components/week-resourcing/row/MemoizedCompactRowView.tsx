@@ -173,7 +173,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           <PopoverTrigger asChild>
             <div className="cursor-pointer">
               <LongCapacityBar
-                totalUsedHours={capacityDisplay.projectHours}
+                totalUsedHours={capacityDisplay.totalHours}
                 totalCapacity={capacityDisplay.capacity}
                 compact
               />
