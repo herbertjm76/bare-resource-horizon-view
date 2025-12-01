@@ -45,11 +45,22 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
   const { projectDisplayPreference } = useAppSettings();
   const sortedMembers = [...project.teamMembers].sort((a, b) => b.hours - a.hours);
   
+  const { startOfWorkWeek } = useAppSettings();
   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
   
+  // Calculate week start based on company settings
   const weekStartDate = new Date(selectedWeek);
-  weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1);
+  const day = weekStartDate.getDay();
+  let diff = 0;
+  if (startOfWorkWeek === 'Monday') {
+    diff = day === 0 ? -6 : 1 - day;
+  } else if (startOfWorkWeek === 'Sunday') {
+    diff = -day;
+  } else if (startOfWorkWeek === 'Saturday') {
+    diff = day === 6 ? 0 : -(day + 1);
+  }
+  weekStartDate.setDate(weekStartDate.getDate() + diff);
   const weekStartDateString = weekStartDate.toISOString().split('T')[0];
 
   // Get the icon component for the department from office settings

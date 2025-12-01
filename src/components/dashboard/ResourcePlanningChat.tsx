@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Bot, User, Lightbulb, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 import { StandardizedBadge } from "@/components/ui/standardized-badge";
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface Message {
   id: string;
@@ -25,6 +26,7 @@ export const ResourcePlanningChat: React.FC<ResourcePlanningChatProps> = ({
   activeProjects,
   utilizationRate
 }) => {
+  const { workWeekHours } = useAppSettings();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -61,7 +63,7 @@ export const ResourcePlanningChat: React.FC<ResourcePlanningChatProps> = ({
         };
       } else if (utilizationRate < 60) {
         return {
-          content: `With ${utilizationRate}% utilization, hiring isn't urgent. Focus on winning more projects first. Your team has capacity for ${Math.round((80 - utilizationRate) * teamSize * 40 / 100)} more hours per week.`,
+          content: `With ${utilizationRate}% utilization, hiring isn't urgent. Focus on winning more projects first. Your team has capacity for ${Math.round((80 - utilizationRate) * teamSize * workWeekHours / 100)} more hours per week.`,
           suggestions: ["How to find more projects?", "Should we reduce team size?", "Business development strategy?"]
         };
       } else {
@@ -87,9 +89,9 @@ export const ResourcePlanningChat: React.FC<ResourcePlanningChatProps> = ({
     }
     
     if (lowerMessage.includes('capacity') || lowerMessage.includes('new project')) {
-      const availableHours = teamSize * 40 * (1 - utilizationRate / 100);
+      const availableHours = teamSize * workWeekHours * (1 - utilizationRate / 100);
       return {
-        content: `You have ~${Math.round(availableHours)} hours/week available capacity. This equals about ${Math.floor(availableHours / 20)} part-time projects or ${Math.floor(availableHours / 40)} full-time projects, depending on project size.`,
+        content: `You have ~${Math.round(availableHours)} hours/week available capacity. This equals about ${Math.floor(availableHours / 20)} part-time projects or ${Math.floor(availableHours / workWeekHours)} full-time projects, depending on project size.`,
         suggestions: ["What size projects fit?", "Pipeline analysis", "Resource allocation strategy"]
       };
     }

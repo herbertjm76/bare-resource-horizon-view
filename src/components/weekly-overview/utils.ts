@@ -1,5 +1,6 @@
 
 import { format, startOfWeek, endOfWeek, parseISO, isValid } from 'date-fns';
+import type { WeekStartDay } from '@/hooks/useAppSettings';
 
 /**
  * Format a number to 1 decimal place
@@ -13,27 +14,27 @@ export const formatNumber = (num: number): string => {
  * Calculate utilization percentage based on hours used and capacity
  * 
  * @param hoursUsed Number of hours used by the resource
- * @param weeklyCapacity Weekly capacity of the resource (default: 40)
+ * @param weeklyCapacity Weekly capacity of the resource
  * @returns Utilization percentage
  */
-export const calculateUtilization = (hoursUsed: number, weeklyCapacity: number = 40): number => {
+export const calculateUtilization = (hoursUsed: number, weeklyCapacity: number): number => {
   if (weeklyCapacity === 0) return 0;
   const percentage = (hoursUsed / weeklyCapacity) * 100;
   return Math.min(parseFloat(percentage.toFixed(1)), 100); // Cap at 100% and format to 1 decimal place
 };
 
 /**
- * Format a date to a week key (YYYY-MM-DD format of Monday)
+ * Format a date to a week key based on company preference
  * 
  * @param date Date to format
+ * @param weekStartDay Start day of work week from company settings
  * @returns Week key in YYYY-MM-DD format
  */
-export const formatWeekKey = (date: Date): string => {
-  // Explicitly set to start on Monday (1)
-  const monday = startOfWeek(date, { weekStartsOn: 1 });
-  // Format to YYYY-MM-DD for consistent database queries
-  const formattedDate = format(monday, 'yyyy-MM-dd');
-  console.log(`formatWeekKey: Input date ${date.toISOString()}, Monday date: ${monday.toISOString()}, formatted: ${formattedDate}`);
+export const formatWeekKey = (date: Date, weekStartDay: WeekStartDay = 'Monday'): string => {
+  const weekStartsOn = weekStartDay === 'Sunday' ? 0 : weekStartDay === 'Saturday' ? 6 : 1;
+  const weekStart = startOfWeek(date, { weekStartsOn });
+  const formattedDate = format(weekStart, 'yyyy-MM-dd');
+  console.log(`formatWeekKey: Input date ${date.toISOString()}, ${weekStartDay} date: ${weekStart.toISOString()}, formatted: ${formattedDate}`);
   return formattedDate;
 };
 
@@ -56,28 +57,31 @@ export const formatDateString = (dateStr: string): string => {
 };
 
 /**
- * Get the week start date (Monday) from a given date
+ * Get the week start date from a given date based on company preference
  */
-export const getWeekStartDate = (date: Date): Date => {
-  return startOfWeek(date, { weekStartsOn: 1 });
+export const getWeekStartDate = (date: Date, weekStartDay: WeekStartDay = 'Monday'): Date => {
+  const weekStartsOn = weekStartDay === 'Sunday' ? 0 : weekStartDay === 'Saturday' ? 6 : 1;
+  return startOfWeek(date, { weekStartsOn });
 };
 
 /**
- * Get the week end date (Sunday) from a given date
+ * Get the week end date from a given date based on company preference
  */
-export const getWeekEndDate = (date: Date): Date => {
-  return endOfWeek(date, { weekStartsOn: 1 });
+export const getWeekEndDate = (date: Date, weekStartDay: WeekStartDay = 'Monday'): Date => {
+  const weekStartsOn = weekStartDay === 'Sunday' ? 0 : weekStartDay === 'Saturday' ? 6 : 1;
+  return endOfWeek(date, { weekStartsOn });
 };
 
 /**
- * Get a date range for a week (start and end dates)
+ * Get a date range for a week (start and end dates) based on company preference
  * 
  * @param date Any date in the week
+ * @param weekStartDay Start day of work week from company settings
  * @returns Object with startDate and endDate
  */
-export const getWeekDateRange = (date: Date) => {
-  const startDate = getWeekStartDate(date);
-  const endDate = getWeekEndDate(date);
+export const getWeekDateRange = (date: Date, weekStartDay: WeekStartDay = 'Monday') => {
+  const startDate = getWeekStartDate(date, weekStartDay);
+  const endDate = getWeekEndDate(date, weekStartDay);
   return { 
     startDate, 
     endDate,

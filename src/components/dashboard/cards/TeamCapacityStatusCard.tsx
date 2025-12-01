@@ -4,6 +4,7 @@ import { Gauge, Users, Clock } from 'lucide-react';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
 import { UnifiedDashboardData } from '../hooks/useDashboardData';
 import { TimeRange } from '../TimeRangeSelector';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface TeamCapacityStatusCardProps {
   data: UnifiedDashboardData;
@@ -34,14 +35,18 @@ const CapacityGauge: React.FC<{ value: number; max: number; label: string; color
           <span className="text-lg font-bold">{Math.round(percentage)}%</span>
         </div>
       </div>
-      <div className="text-sm text-gray-600">{label}</div>
+      <div className="space-y-0.5">
+        <p className="text-xs font-medium text-gray-700">{label}</p>
+        <p className="text-xs text-gray-500">{Math.round(value)}h</p>
+      </div>
     </div>
   );
 };
 
 export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ data, selectedTimeRange }) => {
-  // Calculate time period multiplier based on selected time range
-  const getTimePeriodMultiplier = () => {
+  const { workWeekHours } = useAppSettings();
+  
+  const getTimePeriodMultiplier = (): number => {
     switch (selectedTimeRange) {
       case 'week':
         return 1;
@@ -73,107 +78,90 @@ export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ 
   };
 
   const timePeriodMultiplier = getTimePeriodMultiplier();
-  const totalCapacity = data.teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0) * timePeriodMultiplier;
+  const totalCapacity = data.teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || workWeekHours), 0) * timePeriodMultiplier;
   const utilizationCapacity = (data.currentUtilizationRate / 100) * totalCapacity;
   const availableCapacity = totalCapacity - utilizationCapacity;
   
   const capacityMetrics = [
     {
-      label: 'Current Usage',
       value: utilizationCapacity,
       max: totalCapacity,
-      color: 'blue'
+      label: 'Utilized',
+      color: 'primary'
     },
     {
-      label: 'Available',
       value: availableCapacity,
       max: totalCapacity,
-      color: 'green'
+      label: 'Available',
+      color: 'chart-2'
     },
     {
-      label: 'Team Health',
-      value: data.currentUtilizationRate < 85 ? 85 : data.currentUtilizationRate,
-      max: 100,
-      color: data.currentUtilizationRate < 85 ? 'green' : data.currentUtilizationRate < 95 ? 'yellow' : 'red'
+      value: totalCapacity,
+      max: totalCapacity,
+      label: 'Total',
+      color: 'accent'
     }
   ];
 
-  const getStatusColor = (utilization: number) => {
-    if (utilization >= 95) return 'text-red-600 bg-red-50';
-    if (utilization >= 85) return 'text-orange-600 bg-orange-50';
-    return 'text-green-600 bg-green-50';
-  };
-
-  const getStatusText = (utilization: number) => {
-    if (utilization >= 95) return 'Overutilized';
-    if (utilization >= 85) return 'At Capacity';
-    return 'Healthy';
-  };
-
   return (
-    <Card className="rounded-2xl border-2 border-zinc-300 bg-white shadow-sm h-[500px]">
-      <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
+    <Card className="border-border/40">
+      <CardContent className="p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2" style={{ color: 'hsl(var(--theme-primary))' }}>
-            <div className="p-1.5 rounded-lg bg-gradient-modern">
-              <Gauge className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-            </div>
-            Team Capacity
-          </h2>
+          <div className="flex items-center gap-2">
+            <Gauge className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-base">Capacity Status</h3>
+          </div>
           <StandardizedHeaderBadge>
-            {data.totalTeamSize} Members
+            {getTimeRangeLabel()}
           </StandardizedHeaderBadge>
         </div>
 
-        <div className="flex-1 space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            {capacityMetrics.map((metric, index) => (
-              <CapacityGauge
-                key={index}
-                value={metric.value}
-                max={metric.max}
-                label={metric.label}
-                color={metric.color}
-              />
-            ))}
-          </div>
+        <div className="grid grid-cols-3 gap-6">
+          {capacityMetrics.map((metric, index) => (
+            <CapacityGauge key={index} {...metric} />
+          ))}
+        </div>
 
-          <div className="space-y-4">
-            <div className={`p-4 rounded-lg ${getStatusColor(data.currentUtilizationRate)}`}>
-              <div className="flex items-center justify-between">
-                <span className="font-medium">Team Status</span>
-                <span className="text-sm font-semibold">{getStatusText(data.currentUtilizationRate)}</span>
-              </div>
+        <div className="mt-4 pt-4 border-t border-border/40">
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <Users className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-muted-foreground">Team Size</span>
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center gap-2 mb-1">
-                  <Users className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium">Active Members</span>
-                </div>
-                <span className="text-lg font-bold">{data.teamMembers.length}</span>
-              </div>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center gap-2 mb-1">
-                  <Clock className="h-4 w-4 text-green-500" />
-                  <span className="text-sm font-medium">Weekly Hours</span>
-                </div>
-                <span className="text-lg font-bold">{totalCapacity}h</span>
-              </div>
-            </div>
-
-            <div className="text-xs text-gray-600">
-              <div className="flex justify-between mb-1">
-                <span>Utilization Trend (7d)</span>
-                <span className={data.utilizationTrends.days7 > data.utilizationTrends.days30 ? 'text-red-600' : 'text-green-600'}>
-                  {data.utilizationTrends.days7 > data.utilizationTrends.days30 ? '↗' : '↘'} 
-                  {Math.abs(data.utilizationTrends.days7 - data.utilizationTrends.days30).toFixed(1)}%
-                </span>
-              </div>
-            </div>
+            <span className="font-semibold">{data.teamMembers.length} members</span>
           </div>
         </div>
+
+        {/* Status indicator */}
+        <div className="mt-3 flex items-center justify-between p-2 rounded-md bg-muted/30">
+          <span className="text-xs text-muted-foreground">Utilization Rate</span>
+          <div className="flex items-center gap-2">
+            <div className={`h-2 w-2 rounded-full ${
+              data.currentUtilizationRate > 85 ? 'bg-red-500' :
+              data.currentUtilizationRate > 70 ? 'bg-yellow-500' :
+              'bg-green-500'
+            }`} />
+            <span className="text-xs font-semibold">
+              {Math.round(data.currentUtilizationRate)}%
+            </span>
+          </div>
+        </div>
+
+        {data.currentUtilizationRate > 85 && (
+          <div className="mt-3 p-2 rounded-md bg-red-50 border border-red-200">
+            <p className="text-xs text-red-700">
+              ⚠️ Team capacity is running high. Consider allocating resources carefully or hiring additional team members.
+            </p>
+          </div>
+        )}
+
+        {data.currentUtilizationRate < 50 && (
+          <div className="mt-3 p-2 rounded-md bg-blue-50 border border-blue-200">
+            <p className="text-xs text-blue-700">
+              💡 Team has significant available capacity. Good time to take on new projects or focus on training.
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
