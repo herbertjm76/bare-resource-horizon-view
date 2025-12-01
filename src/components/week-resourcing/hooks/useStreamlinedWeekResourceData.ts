@@ -15,7 +15,8 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
   // Fetch team members first - this is the foundation
   const { members, loadingMembers, membersError } = useWeekResourceTeamMembers({
     department: filters?.department,
-    location: filters?.location
+    location: filters?.location,
+    practiceArea: filters?.practiceArea
   });
   
   // Only proceed with other data fetching if we have members

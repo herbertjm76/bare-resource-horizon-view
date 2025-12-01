@@ -30,7 +30,16 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
   clearFilters
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeFilterType, setActiveFilterType] = useState<FilterType>('department');
+  
+  // Determine initial filter type based on which filter is set
+  const getInitialFilterType = (): FilterType => {
+    if (filters.practiceArea && filters.practiceArea !== 'all') return 'practiceArea';
+    if (filters.department && filters.department !== 'all') return 'department';
+    if (filters.location && filters.location !== 'all') return 'location';
+    return 'practiceArea'; // Default to practice area
+  };
+  
+  const [activeFilterType, setActiveFilterType] = useState<FilterType>(getInitialFilterType);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
