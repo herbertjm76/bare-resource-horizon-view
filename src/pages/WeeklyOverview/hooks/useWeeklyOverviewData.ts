@@ -37,7 +37,7 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any) => {
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department')
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location')
         .eq('company_id', company.id);
       if (error) throw error;
       return data || [];
@@ -53,7 +53,7 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any) => {
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('invites')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department')
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location')
         .eq('company_id', company.id)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');

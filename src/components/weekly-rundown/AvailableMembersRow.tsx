@@ -43,6 +43,8 @@ interface AvailableMember {
   utilization: number;
   capacity: number;
   department?: string;
+  practiceArea?: string;
+  location?: string;
   sectors: string[];
   projectAllocations: ProjectAllocation[];
 }
@@ -139,6 +141,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         avatarUrl: p.avatar_url,
         capacity: p.weekly_capacity || 40,
         department: p.department || undefined,
+        practiceArea: p.practice_area || undefined,
+        location: p.location || undefined,
         type: 'active' as const
       })),
       ...invites.map(i => ({
@@ -148,6 +152,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         avatarUrl: i.avatar_url,
         capacity: i.weekly_capacity || 40,
         department: i.department || undefined,
+        practiceArea: i.practice_area || undefined,
+        location: i.location || undefined,
         type: 'pre_registered' as const
       }))
     ];
@@ -220,6 +226,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           utilization,
           capacity: member.capacity,
           department: member.department,
+          practiceArea: member.practiceArea,
+          location: member.location,
           sectors,
           projectAllocations
         };
@@ -228,9 +236,11 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         // Apply filters
         if (!filters) return true;
 
-        // Practice Area filter (from project allocations)
+        // Practice Area filter - check member's own practice area first, then project allocations
         if (filters.practiceArea && filters.practiceArea !== 'all') {
-          if (!member.sectors.includes(filters.practiceArea)) return false;
+          const hasMemberPracticeArea = member.practiceArea === filters.practiceArea;
+          const hasProjectInPracticeArea = member.sectors.includes(filters.practiceArea);
+          if (!hasMemberPracticeArea && !hasProjectInPracticeArea) return false;
         }
 
         // Department filter
@@ -238,7 +248,11 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           if (member.department !== filters.department) return false;
         }
 
-        // Location filter - we don't have location in this data, so skip
+        // Location filter
+        if (filters.location && filters.location !== 'all') {
+          if (member.location !== filters.location) return false;
+        }
+
         // Search term filter
         if (filters.searchTerm) {
           const searchLower = filters.searchTerm.toLowerCase();
