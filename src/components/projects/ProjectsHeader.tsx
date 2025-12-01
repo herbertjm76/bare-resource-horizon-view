@@ -4,33 +4,19 @@ import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHead
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
-interface ProjectsHeaderProps {
-  onNewProject?: () => void;
-}
-
-export const ProjectsHeader: React.FC<ProjectsHeaderProps> = ({
-  onNewProject
-}) => {
+export const ProjectsHeader: React.FC = () => {
   return (
     <StandardizedPageHeader
       title="All Projects"
       description="View and manage all your ongoing projects across different locations and teams"
       icon={FolderOpen}
     >
-      <div className="flex gap-3">
-        <Link to="/projects/onboarding">
-          <Button variant="outline" size="lg">
-            <Play className="h-4 w-4 mr-2" />
-            View Workflow
-          </Button>
-        </Link>
-        {onNewProject && (
-          <Button onClick={onNewProject} size="lg">
-            <Plus className="h-4 w-4 mr-2" />
-            New Project Wizard
-          </Button>
-        )}
-      </div>
+      <Link to="/projects/onboarding">
+        <Button variant="outline" size="lg">
+          <Play className="h-4 w-4 mr-2" />
+          View Workflow
+        </Button>
+      </Link>
     </StandardizedPageHeader>
   );
 };
