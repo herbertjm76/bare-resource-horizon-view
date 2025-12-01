@@ -120,7 +120,7 @@ export const WorkflowBreadcrumbs: React.FC = () => {
                     variant={step.status === 'current' ? 'default' : 'secondary'}
                     className={`
                       px-3 py-1 text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity
-                      ${step.status === 'current' ? 'bg-brand-violet text-white' : 'bg-green-100 text-green-700 border-green-200'}
+                      ${step.status === 'current' ? 'bg-theme-primary text-white' : 'bg-green-100 text-green-700 border-green-200'}
                     `}
                   >
                     {step.name}
@@ -131,7 +131,7 @@ export const WorkflowBreadcrumbs: React.FC = () => {
                   variant={step.status === 'current' ? 'default' : step.status === 'completed' ? 'secondary' : 'outline'}
                   className={`
                     px-3 py-1 text-xs font-medium
-                    ${step.status === 'current' ? 'bg-brand-violet text-white' : ''}
+                    ${step.status === 'current' ? 'bg-theme-primary text-white' : ''}
                     ${step.status === 'completed' ? 'bg-green-100 text-green-700 border-green-200' : ''}
                     ${step.status === 'upcoming' ? 'bg-muted text-muted-foreground' : ''}
                   `}

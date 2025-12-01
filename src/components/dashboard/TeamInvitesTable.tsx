@@ -35,7 +35,7 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
   const getRoleBadgeColor = (role: string) => {
     switch (role?.toLowerCase()) {
       case 'owner':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+        return 'bg-theme-primary/10 text-theme-primary border-theme-primary/20';
       case 'admin':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'manager':
@@ -68,7 +68,7 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
               <tr key={invite.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-brand-violet text-white flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-full bg-theme-primary text-white flex items-center justify-center">
                       <Mail className="h-5 w-5" />
                     </div>
                     <div>

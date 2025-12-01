@@ -162,7 +162,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
           
           <div className="flex flex-col items-center p-2 sm:p-3 lg:p-4 rounded-xl sm:rounded-2xl bg-white/60 backdrop-blur-sm border border-white/40 shadow-sm">
             <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-              <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-brand-violet flex-shrink-0" />
+              <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-theme-primary flex-shrink-0" />
               <span className="text-[10px] sm:text-xs lg:text-sm font-bold text-foreground whitespace-nowrap">This Month</span>
             </div>
             <span className="text-[10px] sm:text-xs text-muted-foreground text-center">Period</span>

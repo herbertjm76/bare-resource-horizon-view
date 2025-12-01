@@ -16,7 +16,7 @@ interface DonutProps {
 export const Donut: React.FC<DonutProps> = ({ 
   data = [],
   title, 
-  colors = ['hsl(var(--brand-violet))', 'hsl(var(--brand-violet) / 0.7)', 'hsl(var(--brand-violet) / 0.5)'],
+  colors = ['hsl(var(--theme-primary))', 'hsl(var(--theme-primary) / 0.7)', 'hsl(var(--theme-primary) / 0.5)'],
   height = 250 
 }) => {
   const safeData = data || [];

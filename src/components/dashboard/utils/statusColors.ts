@@ -22,7 +22,7 @@ export const getStatusStyle = (status: StatusType): StatusStyle => {
       return {
         label: 'Active',
         variant: 'default',
-        className: 'bg-brand-violet hover:bg-brand-violet/80 border-transparent text-white'
+        className: 'bg-theme-primary hover:bg-theme-primary/80 border-transparent text-white'
       };
     case 'pre_registered':
       return {

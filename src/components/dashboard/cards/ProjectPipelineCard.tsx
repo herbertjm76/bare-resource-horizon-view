@@ -61,13 +61,13 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
     {
       label: 'Planning',
       count: projectStats.planning.count,
-      color: 'hsl(var(--brand-violet))',
+      color: 'hsl(var(--theme-primary))',
       textColor: 'text-white'
     },
     {
       label: 'Complete',
       count: projectStats.complete.count,
-      color: 'hsl(var(--brand-violet) / 0.7)',
+      color: 'hsl(var(--theme-primary) / 0.7)',
       textColor: 'text-white'
     }
   ];
@@ -76,10 +76,10 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
     <Card className="rounded-2xl bg-white border border-border shadow-sm hover:shadow-md transition-shadow h-full">
       <CardContent className="p-6 h-full flex flex-col">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-lg bg-brand-violet/10">
-            <BarChart3 className="h-5 w-5 text-brand-violet" />
+          <div className="p-2 rounded-lg bg-theme-primary/10">
+            <BarChart3 className="h-5 w-5 text-theme-primary" />
           </div>
-          <span className="text-lg font-semibold text-brand-violet">Project Pipeline</span>
+          <span className="text-lg font-semibold text-theme-primary">Project Pipeline</span>
         </div>
         
         {/* Main content - flex-1 to fill remaining space */}
@@ -101,11 +101,11 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
                 <span className="text-sm text-muted-foreground">Active</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-brand-violet"></div>
+                <div className="w-4 h-4 rounded-full bg-theme-primary"></div>
                 <span className="text-sm text-muted-foreground">Plan</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-brand-violet/70"></div>
+                <div className="w-4 h-4 rounded-full bg-theme-primary/70"></div>
                 <span className="text-sm text-muted-foreground">Done</span>
               </div>
             </div>

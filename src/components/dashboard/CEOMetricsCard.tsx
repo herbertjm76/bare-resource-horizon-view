@@ -34,7 +34,7 @@ export const CEOMetricsCard: React.FC<CEOMetricsCardProps> = ({
       case 'good': return 'text-green-600 bg-green-100'; // Pastel green
       case 'warning': return 'text-orange-600 bg-orange-100'; // Pastel orange
       case 'danger': return 'text-red-600 bg-red-100'; // Pastel red
-      default: return 'text-brand-violet bg-brand-violet/10'; // Brand violet
+      default: return 'text-theme-primary bg-theme-primary/10'; // Theme primary
     }
   };
 

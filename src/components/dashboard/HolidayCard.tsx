@@ -57,10 +57,10 @@ export const HolidayCard: React.FC = () => {
       <Card className="h-[320px] flex flex-col bg-white border-border shadow-sm">
         <CardHeader className="flex-shrink-0 pb-3">
           <CardTitle className="text-lg flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-brand-violet/10">
-              <Calendar className="h-5 w-5 text-brand-violet" />
+            <div className="p-2 rounded-lg bg-theme-primary/10">
+              <Calendar className="h-5 w-5 text-theme-primary" />
             </div>
-            <span className="font-semibold text-brand-violet">
+            <span className="font-semibold text-theme-primary">
               Upcoming Holidays
             </span>
           </CardTitle>
@@ -80,10 +80,10 @@ export const HolidayCard: React.FC = () => {
       <Card className="h-[320px] flex flex-col bg-white border-border shadow-sm">
         <CardHeader className="flex-shrink-0 pb-3">
           <CardTitle className="text-lg flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-brand-violet/10">
-              <Calendar className="h-5 w-5 text-brand-violet" />
+            <div className="p-2 rounded-lg bg-theme-primary/10">
+              <Calendar className="h-5 w-5 text-theme-primary" />
             </div>
-            <span className="font-semibold text-brand-violet">
+            <span className="font-semibold text-theme-primary">
               Upcoming Holidays
             </span>
           </CardTitle>
@@ -103,10 +103,10 @@ export const HolidayCard: React.FC = () => {
     <Card className="h-[320px] flex flex-col bg-white border-border shadow-sm">
       <CardHeader className="flex-shrink-0 pb-2">
         <CardTitle className="text-lg flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-brand-violet/10">
-            <Calendar className="h-5 w-5 text-brand-violet" />
+          <div className="p-2 rounded-lg bg-theme-primary/10">
+            <Calendar className="h-5 w-5 text-theme-primary" />
           </div>
-          <span className="font-semibold text-brand-violet">
+          <span className="font-semibold text-theme-primary">
             Upcoming Holidays
           </span>
           {upcomingHolidays.length > 0 && (
@@ -129,7 +129,7 @@ export const HolidayCard: React.FC = () => {
                   <div className="flex items-center gap-3">
                     {/* Compact Date Display */}
                     <div className="flex-shrink-0">
-                      <div className="bg-brand-violet/10 text-brand-violet rounded-md px-2 py-1.5 border border-brand-violet/20">
+                      <div className="bg-theme-primary/10 text-theme-primary rounded-md px-2 py-1.5 border border-theme-primary/20">
                         <div className="text-xs font-bold leading-none">
                           {dateInfo.day}
                         </div>
@@ -145,7 +145,7 @@ export const HolidayCard: React.FC = () => {
                         {holiday.name}
                       </h4>
                       <div className="flex items-center gap-1 mt-0.5">
-                        <MapPin className="h-3 w-3 text-brand-violet" />
+                        <MapPin className="h-3 w-3 text-theme-primary" />
                         <span className="text-xs text-muted-foreground truncate">{holiday.office}</span>
                       </div>
                     </div>
@@ -166,8 +166,8 @@ export const HolidayCard: React.FC = () => {
             
             {upcomingHolidays.length === 0 && (
               <div className="text-center py-8">
-                <div className="p-4 rounded-full bg-brand-violet/10 mx-auto w-16 h-16 flex items-center justify-center mb-3">
-                  <Calendar className="h-8 w-8 text-brand-violet" />
+                <div className="p-4 rounded-full bg-theme-primary/10 mx-auto w-16 h-16 flex items-center justify-center mb-3">
+                  <Calendar className="h-8 w-8 text-theme-primary" />
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-medium text-foreground">No Upcoming Holidays</h3>

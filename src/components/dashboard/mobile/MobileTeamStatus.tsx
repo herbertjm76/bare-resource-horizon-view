@@ -31,8 +31,8 @@ export const MobileTeamStatus: React.FC<MobileTeamStatusProps> = ({
     <Card className="rounded-2xl border-0 shadow-sm bg-white">
       <CardHeader className="pb-3 px-4">
         <CardTitle className="text-lg flex items-center gap-3">
-          <Users className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
-          <span className="text-brand-violet font-semibold">
+          <Users className="h-5 w-5 text-theme-primary" strokeWidth={1.5} />
+          <span className="text-theme-primary font-semibold">
             Staff Status
           </span>
           <StandardizedHeaderBadge>
