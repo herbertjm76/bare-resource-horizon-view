@@ -29,8 +29,8 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
             <CardContent className="p-3 sm:p-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-brand-violet/10 rounded-lg">
-                    <Users className="h-4 w-4 text-brand-violet" />
+                  <div className="p-1.5 bg-theme-primary/10 rounded-lg">
+                    <Users className="h-4 w-4 text-theme-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs text-gray-600">Total Members</div>
@@ -64,8 +64,8 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
             <CardContent className="p-3 sm:p-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-brand-violet/10 rounded-lg">
-                    <Building2 className="h-4 w-4 text-brand-violet" />
+                  <div className="p-1.5 bg-theme-primary/10 rounded-lg">
+                    <Building2 className="h-4 w-4 text-theme-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs text-gray-600">Departments</div>
@@ -100,8 +100,8 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
             <CardContent className="p-3 sm:p-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-brand-violet/10 rounded-lg">
-                    <MapPin className="h-4 w-4 text-brand-violet" />
+                  <div className="p-1.5 bg-theme-primary/10 rounded-lg">
+                    <MapPin className="h-4 w-4 text-theme-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs text-gray-600">Locations</div>

@@ -136,10 +136,10 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
     <Card className="rounded-2xl bg-white border border-border shadow-sm hover:shadow-md transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-lg bg-brand-violet/10">
-            <Clock className="h-5 w-5 text-brand-violet" />
+          <div className="p-2 rounded-lg bg-theme-primary/10">
+            <Clock className="h-5 w-5 text-theme-primary" />
           </div>
-          <span className="text-lg font-semibold text-brand-violet">Workload</span>
+          <span className="text-lg font-semibold text-theme-primary">Workload</span>
         </div>
         
         <div className="flex flex-col justify-between h-full min-h-[300px]">
@@ -190,8 +190,8 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
             <span>Low</span>
             <div className="flex items-center gap-2">
               <div className="w-4 h-3 rounded-sm bg-muted/60"></div>
-              <div className="w-4 h-3 rounded-sm bg-brand-violet"></div>
-              <div className="w-4 h-3 rounded-sm bg-brand-violet/70"></div>
+              <div className="w-4 h-3 rounded-sm bg-theme-primary"></div>
+              <div className="w-4 h-3 rounded-sm bg-theme-primary/70"></div>
             </div>
             <span>Over</span>
           </div>

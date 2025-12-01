@@ -28,7 +28,7 @@ export const StaffAvailability: React.FC<StaffAvailabilityProps> = ({ staffMembe
                 </div>
                 <div className="w-full h-2 bg-[#ECECFB] rounded-full">
                   <div 
-                    className="h-2 rounded-full bg-brand-violet"
+                    className="h-2 rounded-full bg-theme-primary"
                     style={{ width: `${member.availability}%` }}
                   />
                 </div>

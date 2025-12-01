@@ -87,10 +87,10 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
     <Card className="rounded-2xl bg-white border border-border shadow-sm hover:shadow-md transition-shadow h-full">
       <CardContent className="p-6 h-full flex flex-col">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-lg bg-brand-violet/10">
-            <Calendar className="h-5 w-5 text-brand-violet" />
+          <div className="p-2 rounded-lg bg-theme-primary/10">
+            <Calendar className="h-5 w-5 text-theme-primary" />
           </div>
-          <span className="text-lg font-semibold text-brand-violet">Team Leave</span>
+          <span className="text-lg font-semibold text-theme-primary">Team Leave</span>
         </div>
         
         <div className="flex-1 flex flex-col min-h-0">

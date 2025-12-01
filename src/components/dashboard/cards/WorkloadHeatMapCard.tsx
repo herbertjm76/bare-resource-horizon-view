@@ -11,9 +11,9 @@ interface WorkloadHeatMapCardProps {
 }
 
 const getWorkloadColor = (utilization: number) => {
-  if (utilization >= 100) return 'bg-brand-violet/70';
-  if (utilization >= 70) return 'bg-brand-violet'; 
-  if (utilization >= 40) return 'bg-brand-violet/50';
+  if (utilization >= 100) return 'bg-theme-primary/70';
+  if (utilization >= 70) return 'bg-theme-primary'; 
+  if (utilization >= 40) return 'bg-theme-primary/50';
   return 'bg-muted';
 };
 
@@ -122,11 +122,11 @@ export const WorkloadHeatMapCard: React.FC<WorkloadHeatMapCardProps> = ({ data, 
                 <span>Low</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-brand-violet" />
+                <div className="w-2 h-2 rounded-full bg-theme-primary" />
                 <span>Optimal</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-brand-violet/70" />
+                <div className="w-2 h-2 rounded-full bg-theme-primary/70" />
                 <span>Over</span>
               </div>
             </div>

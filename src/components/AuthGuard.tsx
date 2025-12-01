@@ -224,7 +224,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[hsl(var(--gradient-start))] via-[hsl(var(--gradient-mid))] to-[hsl(var(--gradient-end))]">
         <div className="flex flex-col items-center gap-3 bg-white/10 p-6 rounded-lg shadow-lg border border-white/20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
           <p className="text-sm text-white font-medium">Verifying access...</p>

@@ -18,7 +18,7 @@ export const TeamMemberInsightsHighlight: React.FC<TeamMemberInsightsHighlightPr
       <CardContent className="p-0">
         <div className="relative">
           {/* Compact Header with gradient background */}
-          <div className="bg-gradient-to-r from-brand-violet to-purple-600 p-4 text-white relative overflow-hidden">
+          <div className="bg-gradient-to-r from-[hsl(var(--gradient-start))] to-[hsl(var(--gradient-end))] p-4 text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-3 translate-x-3"></div>
             <div className="absolute bottom-0 left-0 w-12 h-12 bg-white/5 rounded-full translate-y-2 -translate-x-2"></div>
             
@@ -46,7 +46,7 @@ export const TeamMemberInsightsHighlight: React.FC<TeamMemberInsightsHighlightPr
                 value={searchQuery}
                 onChange={onSearchChange}
                 placeholder="Search by name, department, or role..."
-                className="h-10 text-sm bg-gray-50/80 border-2 border-gray-200/80 focus-within:border-brand-violet focus-within:bg-white focus-within:shadow-md rounded-lg transition-all duration-200"
+                className="h-10 text-sm bg-gray-50/80 border-2 border-gray-200/80 focus-within:border-theme-primary focus-within:bg-white focus-within:shadow-md rounded-lg transition-all duration-200"
               />
               <p className="text-xs text-gray-500 mt-2 text-center">
                 Press Enter to view detailed insights for team members

@@ -36,8 +36,8 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   console.log('StandardizedExecutiveSummary render (unified desktop/mobile format)');
 
   const getIconColor = () => {
-    // Always use brand-violet for consistency across all executive summary cards
-    return 'text-brand-violet bg-brand-violet/10';
+    // Always use theme-primary for consistency across all executive summary cards
+    return 'text-theme-primary bg-theme-primary/10';
   };
 
   const getBadgeVariant = (badgeColor?: string, isGood?: boolean) => {
@@ -177,9 +177,9 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
       case 'emerald':
         return 'bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600';
       case 'violet':
-        return 'bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-600';
+        return 'bg-gradient-to-br from-[hsl(var(--gradient-start))] via-[hsl(var(--gradient-mid))] to-[hsl(var(--gradient-end))]';
       default:
-        return 'bg-gradient-to-br from-brand-violet via-purple-600 to-indigo-600';
+        return 'bg-gradient-to-br from-[hsl(var(--gradient-start))] via-[hsl(var(--gradient-mid))] to-[hsl(var(--gradient-end))]';
     }
   };
 

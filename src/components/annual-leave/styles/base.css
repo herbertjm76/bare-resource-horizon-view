@@ -75,7 +75,7 @@
   position: sticky;
   left: 0;
   z-index: 10;
-  background: #6465F0;
+  background: hsl(var(--theme-primary));
   border-right: 2px solid rgba(255,255,255,0.2);
   color: white;
 }

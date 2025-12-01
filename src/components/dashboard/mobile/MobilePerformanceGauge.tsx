@@ -15,8 +15,8 @@ export const MobilePerformanceGauge: React.FC<MobilePerformanceGaugeProps> = ({
     <Card className="rounded-2xl border-0 shadow-sm bg-white">
       <CardHeader className="pb-3 px-4">
         <CardTitle className="text-base flex items-center gap-2">
-          <div className="p-1.5 bg-brand-violet/10 rounded-lg flex-shrink-0">
-            <Target className="h-4 w-4 text-brand-violet" />
+          <div className="p-1.5 bg-theme-primary/10 rounded-lg flex-shrink-0">
+            <Target className="h-4 w-4 text-theme-primary" />
           </div>
           <span className="truncate font-medium">Current Performance</span>
         </CardTitle>

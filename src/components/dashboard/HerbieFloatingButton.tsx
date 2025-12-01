@@ -31,7 +31,7 @@ export const HerbieFloatingButton: React.FC = () => {
         >
           <DialogHeader className="p-4 pb-2">
             <DialogTitle className="flex items-center gap-2 text-sm">
-              <Bot className="h-4 w-4 text-brand-violet" />
+              <Bot className="h-4 w-4 text-theme-primary" />
               Herbie
             </DialogTitle>
           </DialogHeader>

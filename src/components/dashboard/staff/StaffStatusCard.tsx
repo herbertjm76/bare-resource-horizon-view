@@ -48,10 +48,10 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
     <Card className="h-[400px] flex flex-col bg-white border-border shadow-sm">
       <CardHeader className="flex-shrink-0 pb-4">
         <CardTitle className="text-lg flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-brand-violet/10">
-            <Users className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
+          <div className="p-2 rounded-lg bg-theme-primary/10">
+            <Users className="h-5 w-5 text-theme-primary" strokeWidth={1.5} />
           </div>
-          <span className="text-brand-violet font-semibold">Staff Status</span>
+          <span className="text-theme-primary font-semibold">Staff Status</span>
           <StandardizedBadge variant="secondary" size="sm">
             {getTimeRangeText()}
           </StandardizedBadge>
