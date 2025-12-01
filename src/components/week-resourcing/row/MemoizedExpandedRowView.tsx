@@ -19,7 +19,7 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
   allocationMap,
   annualLeaveData,
   holidaysData,
-  otherLeaveData,
+  otherLeaveData = {},
   getMemberTotal,
   getProjectCount,
   getWeeklyLeave,
@@ -50,6 +50,13 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
     updateOtherLeave,
     onOtherLeaveEdit,
   });
+
+  // Get other leave from the data source
+  const otherLeave = otherLeaveData[member.id] || 0;
+
+  // Calculate total hours including leave for proper utilization display
+  const totalLeaveHours = annualLeave + holidayHours + otherLeave;
+  const totalHoursWithLeave = totalUsedHours + totalLeaveHours;
 
   return (
     <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 h-20 border-b`}>
@@ -82,10 +89,10 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
         {projectCount}
       </TableCell>
       
-      {/* Utilization: Larger Progress Bar */}
+      {/* Utilization: Larger Progress Bar - Include leave hours */}
       <TableCell className="text-center border-r border-gray-200 px-3 py-3">
         <LongCapacityBar
-          totalUsedHours={totalUsedHours}
+          totalUsedHours={totalHoursWithLeave}
           totalCapacity={weeklyCapacity}
         />
       </TableCell>

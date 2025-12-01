@@ -35,17 +35,6 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   // STANDARDIZED CALCULATIONS - Use the utility functions consistently
   const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
   
-  // Use the standardized capacity display calculation
-  const capacityDisplay = useMemo(() => 
-    calculateCapacityDisplay(member.id, allocationMap, weeklyCapacity), 
-    [member.id, allocationMap, weeklyCapacity]
-  );
-  
-  const projectCount = useMemo(() => 
-    calculateMemberProjectCount(member.id, allocationMap), 
-    [member.id, allocationMap]
-  );
-
   const {
     annualLeave,
     holidayHours,
@@ -64,6 +53,23 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
 
   // Get other leave from the new data source
   const otherLeave = otherLeaveData[member.id] || 0;
+
+  // Calculate total leave hours for utilization
+  const totalLeaveHours = useMemo(() => 
+    annualLeave + holidayHours + otherLeave, 
+    [annualLeave, holidayHours, otherLeave]
+  );
+
+  // Use the standardized capacity display calculation WITH leave hours
+  const capacityDisplay = useMemo(() => 
+    calculateCapacityDisplay(member.id, allocationMap, weeklyCapacity, totalLeaveHours), 
+    [member.id, allocationMap, weeklyCapacity, totalLeaveHours]
+  );
+  
+  const projectCount = useMemo(() => 
+    calculateMemberProjectCount(member.id, allocationMap), 
+    [member.id, allocationMap]
+  );
 
   // Fetch detailed allocations for enhanced tooltips
   const { data: detailedAllocations } = useDetailedWeeklyAllocations(selectedWeek, [member.id]);
