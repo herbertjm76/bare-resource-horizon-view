@@ -37,24 +37,29 @@ export const calculateMemberProjectHours = (
 };
 
 /**
- * Calculate utilization percentage (PROJECT hours only)
+ * Calculate utilization percentage (PROJECT hours + LEAVE hours)
  * This is the ONLY function that should be used to calculate utilization percentage
  * @param projectHours - Total project hours for the week
  * @param weeklyCapacity - Weekly capacity (default 40 hours)
+ * @param leaveHours - Optional total leave hours (annual + holiday + other)
  * @returns Utilization percentage (0-100+)
  */
 export const calculateUtilizationPercentage = (
   projectHours: number,
-  weeklyCapacity: number = 40
+  weeklyCapacity: number = 40,
+  leaveHours: number = 0
 ): number => {
   if (weeklyCapacity <= 0) return 0;
-  const percentage = Math.round((projectHours / weeklyCapacity) * 100);
+  const totalHours = projectHours + leaveHours;
+  const percentage = Math.round((totalHours / weeklyCapacity) * 100);
   
   console.log(`STANDARDIZED calculateUtilizationPercentage:`, {
     projectHours,
+    leaveHours,
+    totalHours,
     weeklyCapacity,
     calculatedPercentage: percentage,
-    formula: `${projectHours} / ${weeklyCapacity} * 100 = ${percentage}%`
+    formula: `(${projectHours} + ${leaveHours}) / ${weeklyCapacity} * 100 = ${percentage}%`
   });
   
   return percentage;
@@ -91,25 +96,31 @@ export const calculateMemberProjectCount = (
 /**
  * STANDARDIZED calculation for capacity display
  * Returns both project hours and capacity for consistent display
+ * Now includes leave hours in utilization calculation
  */
 export const calculateCapacityDisplay = (
   memberId: string,
   allocationMap: Map<string, number>,
-  weeklyCapacity: number = 40
-): { projectHours: number; capacity: number; utilizationPercentage: number } => {
+  weeklyCapacity: number = 40,
+  leaveHours: number = 0
+): { projectHours: number; capacity: number; utilizationPercentage: number; totalHours: number } => {
   const projectHours = calculateMemberProjectHours(memberId, allocationMap);
-  const utilizationPercentage = calculateUtilizationPercentage(projectHours, weeklyCapacity);
+  const totalHours = projectHours + leaveHours;
+  const utilizationPercentage = calculateUtilizationPercentage(projectHours, weeklyCapacity, leaveHours);
   
   console.log(`STANDARDIZED calculateCapacityDisplay for ${memberId}:`, {
     projectHours,
+    leaveHours,
+    totalHours,
     capacity: weeklyCapacity,
     utilizationPercentage,
-    display: `${projectHours}h / ${weeklyCapacity}h = ${utilizationPercentage}%`
+    display: `(${projectHours}h + ${leaveHours}h leave) / ${weeklyCapacity}h = ${utilizationPercentage}%`
   });
   
   return {
     projectHours,
     capacity: weeklyCapacity,
-    utilizationPercentage
+    utilizationPercentage,
+    totalHours
   };
 };

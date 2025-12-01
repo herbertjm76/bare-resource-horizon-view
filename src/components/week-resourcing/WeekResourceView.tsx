@@ -101,7 +101,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     filters.searchTerm ? 'search' : ''
   ].filter(Boolean).length, [filters.practiceArea, filters.department, filters.location, filters.searchTerm]);
 
-  // Weekly metrics calculation using the utility functions
+  // Weekly metrics calculation using the utility functions - INCLUDE LEAVE HOURS
   const metrics = useMemo(() => {
     if (!filteredMembers || filteredMembers.length === 0 || !allocationMap) {
       return {
@@ -116,6 +116,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
 
     let totalCapacity = 0;
     let totalProjectHours = 0;
+    let totalLeaveHours = 0;
     let overloadedMembers = 0;
     let underUtilizedMembers = 0;
 
@@ -126,7 +127,14 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       const memberProjectHours = calculateMemberProjectHours(member.id, allocationMap);
       totalProjectHours += memberProjectHours;
 
-      const memberUtilization = calculateUtilizationPercentage(memberProjectHours, weeklyCapacity);
+      // Include leave hours in utilization calculation
+      const memberAnnualLeave = annualLeaveData[member.id] || 0;
+      const memberHolidayHours = holidaysData[member.id] || 0;
+      const memberOtherLeave = otherLeaveData[member.id] || 0;
+      const memberLeaveHours = memberAnnualLeave + memberHolidayHours + memberOtherLeave;
+      totalLeaveHours += memberLeaveHours;
+
+      const memberUtilization = calculateUtilizationPercentage(memberProjectHours, weeklyCapacity, memberLeaveHours);
       
       if (memberUtilization > 100) {
         overloadedMembers++;
@@ -135,18 +143,19 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       }
     });
 
-    const utilizationRate = totalCapacity > 0 ? Math.round((totalProjectHours / totalCapacity) * 100) : 0;
-    const availableHours = Math.max(0, totalCapacity - totalProjectHours);
+    const totalAllocated = totalProjectHours + totalLeaveHours;
+    const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
+    const availableHours = Math.max(0, totalCapacity - totalAllocated);
 
     return {
       totalCapacity,
-      totalAllocated: totalProjectHours,
+      totalAllocated,
       utilizationRate,
       overloadedMembers,
       underUtilizedMembers,
       availableHours
     };
-  }, [filteredMembers, allocationMap]);
+  }, [filteredMembers, allocationMap, annualLeaveData, holidaysData, otherLeaveData]);
 
   if (error) {
     return (
