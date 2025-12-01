@@ -17,6 +17,8 @@ import { useCompany } from '@/context/CompanyContext';
 import { Search, Calendar, Clock, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface ResourceAllocationDialogProps {
   open: boolean;
@@ -41,6 +43,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
 }) => {
   const { company } = useCompany();
   const { toast } = useToast();
+  const { projectDisplayPreference } = useAppSettings();
   const [searchTerm, setSearchTerm] = useState('');
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [saving, setSaving] = useState(false);
@@ -245,44 +248,54 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-1.5 pr-3">
-                {filteredProjects.map((project) => (
-                  <div
-                    key={project.id}
-                    className="flex items-center gap-1.5 p-2 border border-border/60 rounded-lg hover:bg-accent/50 hover:border-border transition-all max-w-full overflow-hidden group"
-                  >
-                    <div className="flex-[3] min-w-0 overflow-hidden">
-                      <span
-                        className="block w-full font-semibold text-[11px] leading-tight truncate text-foreground"
-                        title={project.name}
-                      >
-                        {project.name && project.name.length > 15
-                          ? `${project.name.slice(0, 15)}…`
-                          : project.name}
-                      </span>
+                {filteredProjects.map((project) => {
+                  const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
+                  const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
+                  
+                  return (
+                    <div
+                      key={project.id}
+                      className="flex items-center gap-1.5 p-2 border border-border/60 rounded-lg hover:bg-accent/50 hover:border-border transition-all max-w-full overflow-hidden group"
+                    >
+                      <div className="flex-[3] min-w-0 overflow-hidden">
+                        <span
+                          className="block w-full font-semibold text-[11px] leading-tight truncate text-foreground"
+                          title={primaryDisplay}
+                        >
+                          {primaryDisplay && primaryDisplay.length > 15
+                            ? `${primaryDisplay.slice(0, 15)}…`
+                            : primaryDisplay}
+                        </span>
+                        {secondaryDisplay && (
+                          <span className="block text-[10px] text-muted-foreground truncate">
+                            {secondaryDisplay}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex-1 flex-shrink-0 min-w-[44px]">
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.5"
+                          placeholder="0"
+                          value={allocations[project.id] || ''}
+                          onChange={(e) => handleHoursChange(project.id, e.target.value)}
+                          className="w-full h-7 text-xs text-center font-semibold px-1"
+                        />
+                      </div>
+                      {allocations[project.id] > 0 && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAllocation(project.id)}
+                          className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-3 w-3 text-destructive" />
+                        </Button>
+                      )}
                     </div>
-                    <div className="flex-1 flex-shrink-0 min-w-[44px]">
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.5"
-                        placeholder="0"
-                        value={allocations[project.id] || ''}
-                        onChange={(e) => handleHoursChange(project.id, e.target.value)}
-                        className="w-full h-7 text-xs text-center font-semibold px-1"
-                      />
-                    </div>
-                    {allocations[project.id] > 0 && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDeleteAllocation(project.id)}
-                        className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-3 w-3 text-destructive" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </ScrollArea>

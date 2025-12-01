@@ -9,6 +9,7 @@ import { LoadingDashboard } from './LoadingDashboard';
 import { useDashboardData } from './hooks/useDashboardData';
 import { TimeRange } from './TimeRangeSelector';
 import { Users, Briefcase, TrendingUp, AlertCircle } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface DesktopDashboardProps {
   selectedTimeRange: TimeRange;
@@ -18,6 +19,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   selectedTimeRange
 }) => {
   const data = useDashboardData(selectedTimeRange);
+  const { workWeekHours } = useAppSettings();
 
   if (data.isLoading) {
     return <LoadingDashboard />;
@@ -103,7 +105,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   // Capacity forecast (next 8 weeks)
   const capacityForecastData = useMemo(() => {
-    const baseCapacity = teamSize * 40; // 40 hours per person per week
+    const baseCapacity = teamSize * workWeekHours;
     const baseDemand = (utilizationRate / 100) * baseCapacity;
     
     return Array.from({ length: 8 }, (_, i) => ({
@@ -111,7 +113,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
       capacity: baseCapacity + (i * 10), // Slight growth
       demand: baseDemand + (Math.random() * 100 - 50) // Fluctuation
     }));
-  }, [teamSize, utilizationRate]);
+  }, [teamSize, utilizationRate, workWeekHours]);
 
   // Determine utilization status
   const getUtilizationStatus = () => {
@@ -146,7 +148,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         />
         <SparklineMetricCard
           title="Team Capacity"
-          value={`${teamSize * 40}h`}
+          value={`${teamSize * workWeekHours}h`}
           subtitle={`${teamSize} available resources`}
           icon={Users}
           status={overloadedCount > 0 ? 'danger' : 'good'}
