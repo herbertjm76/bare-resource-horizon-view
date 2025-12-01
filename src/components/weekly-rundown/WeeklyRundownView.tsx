@@ -140,10 +140,13 @@ export const WeeklyRundownView: React.FC = () => {
         reorderCards={reorderCards}
       />
 
-      <AvailableMembersRow 
-        weekStartDate={weekStartString}
-        threshold={80}
-      />
+      {rundownMode === 'people' && (
+        <AvailableMembersRow 
+          weekStartDate={weekStartString}
+          threshold={80}
+          sortOption={sortOption}
+        />
+      )}
 
       <RundownControls
         selectedWeek={selectedWeek}
