@@ -20,7 +20,7 @@ export default {
     },
     extend: {
       backgroundImage: {
-        hero: 'linear-gradient(145deg, #6465F0 0%, #6465F0 55%, #E64FC4 100%)', // Standardized to #6465F0
+        hero: 'linear-gradient(145deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))',
       },
       colors: {
         border: "hsl(var(--border))",
@@ -28,37 +28,35 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        "brand-primary": "#6465F0",
-        "brand-violet": "#6465F0",
-        "brand-violet-light": "#ECECFB",
-        "brand-gray": "#8E9196",
-        "brand-border": "#F0F0F4",
-        "gray-250": "#e2e2e2",
         
-        // Semantic color tokens - standardized to #6465F0
-        "text-primary": "#1F2937",
-        "text-secondary": "#6B7280",
-        "text-tertiary": "#9CA3AF",
-        "text-inverse": "#FFFFFF",
-        "text-brand": "#6465F0",
+        // Theme-based colors from company settings (use these for branded elements)
+        "theme-primary": "hsl(var(--theme-primary))",
+        "theme-border": "hsl(var(--theme-border))",
         
-        "bg-primary": "#FFFFFF",
-        "bg-secondary": "#F9FAFB",
-        "bg-tertiary": "#F3F4F6",
-        "bg-accent": "#ECECFB",
-        "bg-inverse": "#1F2937",
+        // Gradient colors (for custom gradients)
+        "gradient-start": "hsl(var(--gradient-start))",
+        "gradient-mid": "hsl(var(--gradient-mid))",
+        "gradient-end": "hsl(var(--gradient-end))",
         
-        "border-primary": "#E5E7EB",
-        "border-secondary": "#D1D5DB",
-        "border-accent": "#6465F0",
-        "border-focus": "#6465F0",
+        // Semantic color tokens
+        "text-primary": "hsl(var(--text-primary))",
+        "text-secondary": "hsl(var(--text-secondary))",
+        "text-tertiary": "hsl(var(--text-tertiary))",
+        "text-inverse": "hsl(var(--text-inverse))",
         
-        // Purple shades for summary cards
+        "bg-primary": "hsl(var(--bg-primary))",
+        "bg-secondary": "hsl(var(--bg-secondary))",
+        "bg-tertiary": "hsl(var(--bg-tertiary))",
+        "bg-accent": "hsl(var(--bg-accent))",
+        "bg-inverse": "hsl(var(--bg-inverse))",
+        
+        // Card gradients
         "card-gradient-1": "hsl(var(--card-gradient-1))",
         "card-gradient-2": "hsl(var(--card-gradient-2))",
         "card-gradient-3": "hsl(var(--card-gradient-3))",
         "card-gradient-4": "hsl(var(--card-gradient-4))",
         
+        // Shadcn colors
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
