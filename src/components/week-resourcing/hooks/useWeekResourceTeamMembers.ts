@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useWeekResourceTeamMembers = (filters?: { department?: string; location?: string }) => {
+export const useWeekResourceTeamMembers = (filters?: { department?: string; location?: string; practiceArea?: string }) => {
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -23,7 +23,7 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
       
       let query = supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, location, department, weekly_capacity, avatar_url');
+        .select('id, first_name, last_name, email, location, department, practice_area, weekly_capacity, avatar_url');
       
       // Apply department filter
       if (filters?.department && filters.department !== 'all') {
@@ -33,6 +33,11 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
       // Apply location filter
       if (filters?.location && filters.location !== 'all') {
         query = query.eq('location', filters.location);
+      }
+      
+      // Apply practice area filter
+      if (filters?.practiceArea && filters.practiceArea !== 'all') {
+        query = query.eq('practice_area', filters.practiceArea);
       }
         
       const { data, error } = await query;
@@ -70,7 +75,7 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
       
       let query = supabase
         .from('invites')
-        .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
+        .select('id, first_name, last_name, email, department, location, practice_area, job_title, role, weekly_capacity')
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
       
@@ -82,6 +87,11 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
       // Apply location filter
       if (filters?.location && filters.location !== 'all') {
         query = query.eq('location', filters.location);
+      }
+      
+      // Apply practice area filter
+      if (filters?.practiceArea && filters.practiceArea !== 'all') {
+        query = query.eq('practice_area', filters.practiceArea);
       }
         
       const { data, error } = await query;
