@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { ImageCropDialog } from './ImageCropDialog';
 
 interface AvatarUploadFieldProps {
   currentAvatarUrl?: string;
@@ -18,6 +19,8 @@ export const AvatarUploadField: React.FC<AvatarUploadFieldProps> = ({
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentAvatarUrl || null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getUserInitials = () => {
@@ -41,11 +44,40 @@ export const AvatarUploadField: React.FC<AvatarUploadFieldProps> = ({
       return;
     }
 
-    // Create preview URL
+    // Create preview URL and open crop dialog
     const url = URL.createObjectURL(file);
+    setImageToCrop(url);
+    setIsCropDialogOpen(true);
+  };
+
+  const handleCropComplete = (croppedBlob: Blob) => {
+    // Convert blob to file
+    const croppedFile = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
+    
+    // Create preview URL
+    const url = URL.createObjectURL(croppedBlob);
     setPreviewUrl(url);
-    setSelectedFile(file);
-    onImageChange(file, url);
+    setSelectedFile(croppedFile);
+    onImageChange(croppedFile, url);
+    
+    // Clean up the original image URL
+    if (imageToCrop) {
+      URL.revokeObjectURL(imageToCrop);
+    }
+    setImageToCrop(null);
+  };
+
+  const handleCropCancel = () => {
+    if (imageToCrop) {
+      URL.revokeObjectURL(imageToCrop);
+    }
+    setImageToCrop(null);
+    setIsCropDialogOpen(false);
+    
+    // Clear the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleRemoveImage = () => {
@@ -136,6 +168,16 @@ export const AvatarUploadField: React.FC<AvatarUploadFieldProps> = ({
         <p className="text-sm text-green-600">
           New image selected: {selectedFile.name}
         </p>
+      )}
+
+      {/* Crop Dialog */}
+      {imageToCrop && (
+        <ImageCropDialog
+          isOpen={isCropDialogOpen}
+          imageSrc={imageToCrop}
+          onClose={handleCropCancel}
+          onCropComplete={handleCropComplete}
+        />
       )}
     </div>
   );

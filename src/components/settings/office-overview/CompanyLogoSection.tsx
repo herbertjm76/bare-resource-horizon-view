@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Building2, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ImageCropDialog } from '@/components/dashboard/memberDialog/ImageCropDialog';
 
 interface CompanyLogoSectionProps {
   company: any;
@@ -14,6 +15,8 @@ export const CompanyLogoSection: React.FC<CompanyLogoSectionProps> = ({
   onLogoUpdate
 }) => {
   const [uploading, setUploading] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
 
   const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -33,17 +36,25 @@ export const CompanyLogoSection: React.FC<CompanyLogoSectionProps> = ({
       return;
     }
 
+    // Create preview URL and open crop dialog
+    const url = URL.createObjectURL(file);
+    setImageToCrop(url);
+    setIsCropDialogOpen(true);
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    if (!company?.id) return;
+    
     setUploading(true);
 
     try {
       // Create a unique filename
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${company.id}/logo.${fileExt}`;
+      const fileName = `${company.id}/logo.jpg`;
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('company-logos')
-        .upload(fileName, file, {
+        .upload(fileName, croppedBlob, {
           cacheControl: '3600',
           upsert: true
         });
@@ -81,6 +92,20 @@ export const CompanyLogoSection: React.FC<CompanyLogoSectionProps> = ({
     } finally {
       setUploading(false);
     }
+    
+    // Clean up the original image URL
+    if (imageToCrop) {
+      URL.revokeObjectURL(imageToCrop);
+    }
+    setImageToCrop(null);
+  };
+
+  const handleCropCancel = () => {
+    if (imageToCrop) {
+      URL.revokeObjectURL(imageToCrop);
+    }
+    setImageToCrop(null);
+    setIsCropDialogOpen(false);
   };
 
   return (
@@ -111,6 +136,16 @@ export const CompanyLogoSection: React.FC<CompanyLogoSectionProps> = ({
         disabled={uploading}
         className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
       />
+
+      {/* Crop Dialog */}
+      {imageToCrop && (
+        <ImageCropDialog
+          isOpen={isCropDialogOpen}
+          imageSrc={imageToCrop}
+          onClose={handleCropCancel}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 };
