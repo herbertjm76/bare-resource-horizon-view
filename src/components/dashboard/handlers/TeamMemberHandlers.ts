@@ -9,8 +9,9 @@ export const useTeamMemberHandlers = (
 ) => {
   const { handleSaveMember, handleDeleteMember, isSaving, isDeleting } = useTeamMembers(companyId);
 
-  const handleSaveMemberWrapper = async (memberData: Partial<Profile | PendingMember>, currentMember: TeamMember | null) => {
-    console.log('Saving member data:', memberData);
+  const handleSaveMemberWrapper = async (memberData: Partial<Profile | PendingMember> & { avatarFile?: File | null }, currentMember: TeamMember | null) => {
+    console.log('handleSaveMemberWrapper - Saving member data:', memberData);
+    console.log('handleSaveMemberWrapper - avatarFile present:', !!memberData.avatarFile);
     
     // Create a fresh copy to avoid modifying the original object
     const memberDataCopy = { ...memberData };
@@ -31,6 +32,7 @@ export const useTeamMemberHandlers = (
     
     try {
       console.log('Calling handleSaveMember with data:', memberDataCopy, 'isEditing:', Boolean(currentMember));
+      console.log('Avatar file being passed to handleSaveMember:', !!memberDataCopy.avatarFile);
       const success = await handleSaveMember(memberDataCopy, Boolean(currentMember));
       
       if (success) {

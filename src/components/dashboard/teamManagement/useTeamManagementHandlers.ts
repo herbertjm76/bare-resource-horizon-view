@@ -100,7 +100,9 @@ export const useTeamManagementHandlers = ({
     }
   };
 
-  const handleSaveMemberDialogSubmit = async (memberData: Partial<Profile | PendingMember>): Promise<boolean> => {
+  const handleSaveMemberDialogSubmit = async (memberData: Partial<Profile | PendingMember> & { avatarFile?: File | null }): Promise<boolean> => {
+    console.log('handleSaveMemberDialogSubmit called with data:', memberData);
+    console.log('avatarFile present:', !!memberData.avatarFile);
     const success = await handleSaveMemberWrapper(memberData, currentMember);
     if (success) {
       closeAddEditDialog();
