@@ -5,13 +5,27 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useResourceAllocationsDB } from '@/hooks/allocations/useResourceAllocationsDB';
 import { toast } from 'sonner';
 import { format, startOfWeek } from 'date-fns';
-import { Plus, Building2 } from 'lucide-react';
+import { Plus, Building2, Check, ChevronsUpDown } from 'lucide-react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { cn } from '@/lib/utils';
 
 interface EditPersonAllocationsDialogProps {
   open: boolean;
@@ -31,6 +45,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   const [hours, setHours] = useState<Record<string, number>>({});
   const [showAddProject, setShowAddProject] = useState(false);
   const [showCreateNew, setShowCreateNew] = useState(false);
+  const [comboboxOpen, setComboboxOpen] = useState(false);
   const [selectedNewProjectId, setSelectedNewProjectId] = useState<string>('');
   const [newAllocationHours, setNewAllocationHours] = useState<string>('');
   const [newProjectCode, setNewProjectCode] = useState('');
@@ -267,24 +282,51 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="project">Project</Label>
-                    <Select value={selectedNewProjectId} onValueChange={setSelectedNewProjectId}>
-                      <SelectTrigger id="project">
-                        <SelectValue placeholder="Select a project" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableProjects.length === 0 ? (
-                          <div className="p-2 text-sm text-muted-foreground text-center">
-                            No available projects
-                          </div>
-                        ) : (
-                          availableProjects.map((project) => (
-                            <SelectItem key={project.id} value={project.id}>
-                              {project.code} - {project.name}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
+                    <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={comboboxOpen}
+                          className="w-full justify-between"
+                        >
+                          {selectedNewProjectId
+                            ? availableProjects.find((project) => project.id === selectedNewProjectId)
+                                ? `${availableProjects.find((project) => project.id === selectedNewProjectId)?.code} - ${availableProjects.find((project) => project.id === selectedNewProjectId)?.name}`
+                                : "Select a project"
+                            : "Select a project"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0 bg-background" align="start">
+                        <Command className="bg-background">
+                          <CommandInput placeholder="Search projects..." className="h-9" />
+                          <CommandList>
+                            <CommandEmpty>No project found.</CommandEmpty>
+                            <CommandGroup>
+                              {availableProjects.map((project) => (
+                                <CommandItem
+                                  key={project.id}
+                                  value={`${project.code} ${project.name}`}
+                                  onSelect={() => {
+                                    setSelectedNewProjectId(project.id);
+                                    setComboboxOpen(false);
+                                  }}
+                                >
+                                  {project.code} - {project.name}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      selectedNewProjectId === project.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
 
                   <Button
