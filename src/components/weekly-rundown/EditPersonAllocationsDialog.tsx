@@ -21,7 +21,7 @@ import {
 import { useResourceAllocationsDB } from '@/hooks/allocations/useResourceAllocationsDB';
 import { toast } from 'sonner';
 import { format, startOfWeek } from 'date-fns';
-import { Plus, Building2, Check, ChevronsUpDown } from 'lucide-react';
+import { Plus, Building2, Check, ChevronsUpDown, Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -187,16 +187,62 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
     addAllocationMutation.mutate({ projectId: selectedNewProjectId, allocationHours });
   };
 
-  const handleSave = async (projectId: string, projectName: string) => {
-    try {
-      const hoursValue = hours[projectId] || 0;
-      if (hoursValue > 0) {
-        // Here you would call your API to save the allocation
-        toast.success(`Updated allocation for ${projectName}`);
-      }
-      onOpenChange(false);
-    } catch (error) {
-      toast.error('Failed to save allocation');
+  const updateAllocationMutation = useMutation({
+    mutationFn: async ({ allocationId, newHours }: { allocationId: string; newHours: number }) => {
+      const { data, error } = await supabase
+        .from('project_resource_allocations')
+        .update({ hours: newHours })
+        .eq('id', allocationId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast.success('Allocation updated');
+      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      setHours({});
+    },
+    onError: (error) => {
+      toast.error('Failed to update allocation');
+      console.error('Update error:', error);
+    }
+  });
+
+  const deleteAllocationMutation = useMutation({
+    mutationFn: async (allocationId: string) => {
+      const { error } = await supabase
+        .from('project_resource_allocations')
+        .delete()
+        .eq('id', allocationId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Allocation deleted');
+      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+    },
+    onError: (error) => {
+      toast.error('Failed to delete allocation');
+      console.error('Delete error:', error);
+    }
+  });
+
+  const handleSave = (allocationId: string, projectName: string) => {
+    const hoursValue = hours[allocationId];
+    if (!hoursValue || hoursValue <= 0) {
+      toast.error('Please enter valid hours');
+      return;
+    }
+    updateAllocationMutation.mutate({ allocationId, newHours: hoursValue });
+  };
+
+  const handleDelete = (allocationId: string, projectName: string) => {
+    if (confirm(`Delete allocation for ${projectName}?`)) {
+      deleteAllocationMutation.mutate(allocationId);
     }
   };
 
@@ -217,7 +263,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
               {person.projects && person.projects.length > 0 ? (
                 <div className="space-y-3">
                   {person.projects.map((project: any) => (
-                    <div key={project.id} className="flex items-center justify-between gap-4 p-3 border rounded-lg">
+                    <div key={project.allocationId || project.id} className="flex items-center justify-between gap-4 p-3 border rounded-lg">
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{project.name}</p>
                         <p className="text-sm text-muted-foreground">Current: {project.hours}h</p>
@@ -228,17 +274,25 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                           min="0"
                           max="168"
                           placeholder={project.hours.toString()}
-                          value={hours[project.id] || ''}
-                          onChange={(e) => setHours({ ...hours, [project.id]: parseFloat(e.target.value) || 0 })}
+                          value={hours[project.allocationId || project.id] || ''}
+                          onChange={(e) => setHours({ ...hours, [project.allocationId || project.id]: parseFloat(e.target.value) || 0 })}
                           className="w-20"
                         />
                         <span className="text-sm text-muted-foreground">hours</span>
                         <Button 
                           size="sm" 
-                          onClick={() => handleSave(project.id, project.name)}
-                          disabled={!hours[project.id]}
+                          onClick={() => handleSave(project.allocationId || project.id, project.name)}
+                          disabled={!hours[project.allocationId || project.id] || updateAllocationMutation.isPending}
                         >
-                          Save
+                          {updateAllocationMutation.isPending ? 'Saving...' : 'Save'}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(project.allocationId || project.id, project.name)}
+                          disabled={deleteAllocationMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>

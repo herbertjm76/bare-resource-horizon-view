@@ -5,6 +5,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { format, addDays, startOfWeek } from 'date-fns';
 
 interface DailyAllocation {
+  allocation_id: string;
   project_id: string;
   project_name: string;
   project_code: string;
@@ -21,6 +22,7 @@ interface DetailedMemberAllocation {
     project_name: string;
     project_code: string;
     total_hours: number;
+    allocation_id: string; // The allocation ID for this project (from any day)
     daily_breakdown: Array<{
       date: string;
       hours: number;
@@ -47,6 +49,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
       const { data: allocations, error } = await supabase
         .from('project_resource_allocations')
         .select(`
+          id,
           resource_id,
           project_id,
           hours,
@@ -76,6 +79,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
       allocations?.forEach(allocation => {
         const memberId = allocation.resource_id;
         const projectId = allocation.project_id;
+        const allocationId = allocation.id;
         const date = allocation.allocation_date;
         const hours = Number(allocation.hours) || 0;
         const project = allocation.projects;
@@ -91,6 +95,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
 
         // Add to daily allocations
         result[memberId].daily_allocations.push({
+          allocation_id: allocationId,
           project_id: projectId,
           project_name: project.name,
           project_code: project.code || project.name,
@@ -108,6 +113,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
             project_name: project.name,
             project_code: project.code || project.name,
             total_hours: 0,
+            allocation_id: allocationId, // Store one allocation ID for this project
             daily_breakdown: []
           };
           result[memberId].projects.push(projectEntry);

@@ -143,7 +143,8 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
         // Prefer full project record, fall back to allocation's own name/code, then generic label
         projectName: projectDetails?.name || project.project_name || 'Unknown Project',
         projectCode: projectDetails?.code || project.project_code || 'UNK',
-        hours: project.total_hours
+        hours: project.total_hours,
+        allocationId: project.allocation_id // Include the allocation ID
       };
     }) || [];
     
