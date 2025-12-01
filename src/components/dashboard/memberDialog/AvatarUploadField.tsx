@@ -72,24 +72,24 @@ export const AvatarUploadField: React.FC<AvatarUploadFieldProps> = ({
       </label>
       
       <div className="flex items-center gap-4">
-        {/* Avatar Display */}
-        <div className="relative">
-          <Avatar className="h-20 w-20 border-2 border-gray-200">
+        {/* Avatar Display - Clickable */}
+        <button
+          type="button"
+          onClick={triggerFileInput}
+          className="relative group cursor-pointer"
+        >
+          <Avatar className="h-20 w-20 border-2 border-gray-200 transition-all duration-200 group-hover:border-primary">
             <AvatarImage src={previewUrl || undefined} />
             <AvatarFallback className="bg-gradient-modern text-white text-lg font-semibold">
               {getUserInitials()}
             </AvatarFallback>
           </Avatar>
           
-          {/* Camera overlay button */}
-          <button
-            type="button"
-            onClick={triggerFileInput}
-            className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-200"
-          >
+          {/* Camera overlay - always visible on hover */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <Camera className="h-6 w-6 text-white" />
-          </button>
-        </div>
+          </div>
+        </button>
 
         {/* Upload Controls */}
         <div className="flex flex-col gap-2">
@@ -110,7 +110,7 @@ export const AvatarUploadField: React.FC<AvatarUploadFieldProps> = ({
               variant="outline"
               size="sm"
               onClick={handleRemoveImage}
-              className="flex items-center gap-2 text-red-600 hover:text-red-700"
+              className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <X className="h-4 w-4" />
               Remove
