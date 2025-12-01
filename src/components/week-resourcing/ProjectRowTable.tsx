@@ -2,6 +2,8 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ResourceAllocationCell } from './ResourceAllocationCell';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface ProjectRowTableProps {
   projects: any[];
@@ -16,6 +18,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
   allocationMap,
   weekStartDate
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
   // Calculate member totals
   const getMemberTotal = (memberId: string): number => {
     let total = 0;
@@ -107,13 +110,10 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               className={`${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'} hover:bg-blue-50/80 transition-all duration-150`}
               style={{ height: 48, minHeight: 48 }}
             >
-              <TableCell className="sticky left-0 z-20 border-r border-slate-200 px-1 py-1 shadow-[2px_0_4px_rgba(0,0,0,0.1)]" style={{ background: index % 2 === 0 ? 'white' : 'rgb(248 250 252 / 0.7)' }}>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-8 h-8 bg-slate-600 text-white font-bold text-[10px] rounded">
-                    {project.code}
-                  </div>
-                  <span className="text-sm font-medium">{project.name}</span>
-                </div>
+              <TableCell className="sticky left-0 z-20 border-r border-slate-200 px-3 py-1 shadow-[2px_0_4px_rgba(0,0,0,0.1)]" style={{ background: index % 2 === 0 ? 'white' : 'rgb(248 250 252 / 0.7)' }}>
+                <span className="text-sm font-semibold">
+                  {getProjectDisplayName(project, projectDisplayPreference)}
+                </span>
               </TableCell>
               <TableCell className="text-center border-r border-slate-200 p-0 align-middle" style={{ height: 48 }}>
                 <div className="flex items-center justify-center h-full">
