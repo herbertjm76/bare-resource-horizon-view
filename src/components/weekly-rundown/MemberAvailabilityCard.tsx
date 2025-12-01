@@ -91,6 +91,11 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
       <span className="text-[11px] font-medium text-foreground truncate max-w-[55px] -mt-1">
         {firstName}
       </span>
+      
+      {/* Hours indicator */}
+      <span className="text-[10px] font-semibold text-primary mt-0.5">
+        {allocatedHours}h
+      </span>
     </div>
   );
 };
