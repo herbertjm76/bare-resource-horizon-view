@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useWeekResourceTeamMembers = (filters?: { department?: string; location?: string; practiceArea?: string }) => {
+export const useWeekResourceTeamMembers = () => {
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -13,34 +13,17 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
     }
   });
 
-  // Get active team members from profiles table
+  // Get active team members from profiles table - FETCH ALL, filter client-side
   const { data: activeMembers = [], isLoading: isLoadingActive, error: activeError } = useQuery({
-    queryKey: ['active-team-members', filters],
+    queryKey: ['active-team-members'],
     queryFn: async () => {
       // Ensure user is authenticated; rely on RLS for company scoping
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return [];
       
-      let query = supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, location, department, practice_area, weekly_capacity, avatar_url');
-      
-      // Apply department filter
-      if (filters?.department && filters.department !== 'all') {
-        query = query.eq('department', filters.department);
-      }
-      
-      // Apply location filter
-      if (filters?.location && filters.location !== 'all') {
-        query = query.eq('location', filters.location);
-      }
-      
-      // Apply practice area filter
-      if (filters?.practiceArea && filters.practiceArea !== 'all') {
-        query = query.eq('practice_area', filters.practiceArea);
-      }
-        
-      const { data, error } = await query;
         
       if (error) {
         console.error("Error fetching active team members:", error);
@@ -57,6 +40,7 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
         email: member.email || '',
         location: member.location || null,
         department: member.department || null,
+        practice_area: member.practice_area || null,
         weekly_capacity: member.weekly_capacity || 40,
         avatar_url: member.avatar_url || null,
         status: 'active'
@@ -66,35 +50,18 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
     staleTime: 60_000,
   });
 
-  // Get pre-registered team members
+  // Get pre-registered team members - FETCH ALL, filter client-side
   const { data: preRegisteredMembers = [], isLoading: isLoadingPreRegistered, error: preRegisteredError } = useQuery({
-    queryKey: ['pre-registered-members', filters],
+    queryKey: ['pre-registered-members'],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return [];
       
-      let query = supabase
+      const { data, error } = await supabase
         .from('invites')
         .select('id, first_name, last_name, email, department, location, practice_area, job_title, role, weekly_capacity')
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
-      
-      // Apply department filter
-      if (filters?.department && filters.department !== 'all') {
-        query = query.eq('department', filters.department);
-      }
-      
-      // Apply location filter
-      if (filters?.location && filters.location !== 'all') {
-        query = query.eq('location', filters.location);
-      }
-      
-      // Apply practice area filter
-      if (filters?.practiceArea && filters.practiceArea !== 'all') {
-        query = query.eq('practice_area', filters.practiceArea);
-      }
-        
-      const { data, error } = await query;
         
       if (error) {
         console.error("Error fetching pre-registered members:", error);
@@ -111,6 +78,7 @@ export const useWeekResourceTeamMembers = (filters?: { department?: string; loca
         email: member.email || '',
         location: member.location || null,
         department: member.department || null,
+        practice_area: member.practice_area || null,
         weekly_capacity: member.weekly_capacity || 40,
         avatar_url: null, // Pre-registered members don't have avatars yet
         status: 'pre_registered'

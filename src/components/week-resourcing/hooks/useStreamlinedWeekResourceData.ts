@@ -12,12 +12,26 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
   // Convert Date to string format for API calls - make this stable
   const weekStartDate = useMemo(() => format(selectedWeek, 'yyyy-MM-dd'), [selectedWeek]);
   
-  // Fetch team members first - this is the foundation
-  const { members, loadingMembers, membersError } = useWeekResourceTeamMembers({
-    department: filters?.department,
-    location: filters?.location,
-    practiceArea: filters?.practiceArea
-  });
+  // Fetch team members first - this is the foundation (fetch ALL members, filtering happens in WeekResourceView)
+  const { members: allFetchedMembers, loadingMembers, membersError } = useWeekResourceTeamMembers();
+  
+  // Apply filters client-side for instant filtering without refetching
+  const members = useMemo(() => {
+    if (!allFetchedMembers) return [];
+    
+    return allFetchedMembers.filter(member => {
+      if (filters?.department && filters.department !== 'all' && member.department !== filters.department) {
+        return false;
+      }
+      if (filters?.location && filters.location !== 'all' && member.location !== filters.location) {
+        return false;
+      }
+      if (filters?.practiceArea && filters.practiceArea !== 'all' && member.practice_area !== filters.practiceArea) {
+        return false;
+      }
+      return true;
+    });
+  }, [allFetchedMembers, filters?.department, filters?.location, filters?.practiceArea]);
   
   // Only proceed with other data fetching if we have members
   const memberIds = useMemo(() => {
