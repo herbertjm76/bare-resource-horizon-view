@@ -223,10 +223,10 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
             <ProjectIcon className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
             
             <div className="flex-1 min-w-0">
-              {/* Project Code - Large and prominent */}
-              <h3 className="font-bold text-lg truncate mb-0.5">{project.code}</h3>
-              {/* Project Name - Secondary */}
-              <p className="text-xs text-muted-foreground font-medium truncate mb-0.5">{project.name}</p>
+              {/* Project Name - Primary */}
+              <h3 className="font-bold text-lg truncate mb-0.5">{project.name}</h3>
+              {/* Project Code - Secondary */}
+              <p className="text-xs text-muted-foreground font-medium truncate mb-0.5">{project.code}</p>
               {/* Department - Tertiary */}
               {project.department && (
                 <p className="text-[10px] text-muted-foreground truncate">{project.department}</p>

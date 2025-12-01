@@ -86,18 +86,18 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                {/* Project Code - Large and prominent */}
+                {/* Project Name - Primary */}
                 <h1 className={`font-bold text-foreground tracking-tight mb-1 ${
                   isFullscreen ? 'text-5xl' : 'text-4xl'
                 }`}>
-                  {project.code}
+                  {project.name}
                 </h1>
                 
-                {/* Project Name - Secondary */}
+                {/* Project Code - Secondary */}
                 <h2 className={`font-semibold text-muted-foreground mb-0.5 ${
                   isFullscreen ? 'text-xl' : 'text-lg'
                 }`}>
-                  {project.name}
+                  {project.code}
                 </h2>
                 
                 {/* Department - Tertiary */}
