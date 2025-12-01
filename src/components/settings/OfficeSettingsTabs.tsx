@@ -9,12 +9,14 @@ import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
 import { OrganizationTab } from '@/components/settings/OrganizationTab';
 import { ThemeTab } from '@/components/settings/ThemeTab';
+import { AppSettingsTab } from '@/components/settings/AppSettingsTab';
 import { CompanyTab } from '@/components/settings/CompanyTab';
 import { StatusesTab } from '@/components/settings/StatusesTab';
 import { ProjectTypesTab } from '@/components/settings/ProjectTypesTab';
 
 export const OfficeSettingsTabs: React.FC = () => {
   const [mainTab, setMainTab] = useState('company');
+  const [companySubTab, setCompanySubTab] = useState('info');
   const [projectSubTab, setProjectSubTab] = useState('areas');
   const [teamSubTab, setTeamSubTab] = useState('organization');
   const [officeSubTab, setOfficeSubTab] = useState('locations');
@@ -42,10 +44,22 @@ export const OfficeSettingsTabs: React.FC = () => {
         </TabsList>
 
         <TabsContent value="company" className="space-y-6 mt-6">
-          <CompanyTab />
-          <div className="border-t pt-6">
-            <ThemeTab />
-          </div>
+          <Tabs value={companySubTab} onValueChange={setCompanySubTab}>
+            <TabsList>
+              <TabsTrigger value="info">Info</TabsTrigger>
+              <TabsTrigger value="theme">Theme</TabsTrigger>
+              <TabsTrigger value="app-settings">App Settings</TabsTrigger>
+            </TabsList>
+            <TabsContent value="info" className="mt-6">
+              <CompanyTab />
+            </TabsContent>
+            <TabsContent value="theme" className="mt-6">
+              <ThemeTab />
+            </TabsContent>
+            <TabsContent value="app-settings" className="mt-6">
+              <AppSettingsTab />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="projects" className="space-y-6 mt-6">
