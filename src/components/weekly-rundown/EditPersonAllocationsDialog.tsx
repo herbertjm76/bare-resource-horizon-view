@@ -2,9 +2,16 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useResourceAllocationsDB } from '@/hooks/allocations/useResourceAllocationsDB';
 import { toast } from 'sonner';
 import { format, startOfWeek } from 'date-fns';
+import { Plus, Building2 } from 'lucide-react';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useCompany } from '@/context/CompanyContext';
 
 interface EditPersonAllocationsDialogProps {
   open: boolean;
@@ -22,8 +29,148 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   selectedWeek
 }) => {
   const [hours, setHours] = useState<Record<string, number>>({});
+  const [showAddProject, setShowAddProject] = useState(false);
+  const [showCreateNew, setShowCreateNew] = useState(false);
+  const [selectedNewProjectId, setSelectedNewProjectId] = useState<string>('');
+  const [newAllocationHours, setNewAllocationHours] = useState<string>('');
+  const [newProjectCode, setNewProjectCode] = useState('');
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectCountry, setNewProjectCountry] = useState('');
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekKey = format(weekStart, 'yyyy-MM-dd');
+  const { company } = useCompany();
+  const queryClient = useQueryClient();
+
+  // Fetch available projects
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects', company?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, code, name, status')
+        .eq('company_id', company?.id)
+        .order('code', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!company?.id && open && showAddProject
+  });
+
+  // Fetch offices for new project creation
+  const { data: offices = [] } = useQuery({
+    queryKey: ['offices'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('offices')
+        .select('id, name, country')
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: showCreateNew
+  });
+
+  const existingProjectIds = person.projects?.map((p: any) => p.id) || [];
+  const availableProjects = projects.filter(p => !existingProjectIds.includes(p.id));
+
+  const createProjectMutation = useMutation({
+    mutationFn: async ({ code, name, country }: { code: string; name: string; country: string }) => {
+      const office = offices.find(o => o.country === country);
+      if (!office) {
+        throw new Error('Please select a valid country');
+      }
+
+      const { data, error } = await supabase
+        .from('projects')
+        .insert({
+          code: code.toUpperCase(),
+          name,
+          country,
+          office_id: office.id,
+          company_id: company?.id,
+          status: 'Active',
+          current_stage: 'Planning',
+          target_profit_percentage: 20
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success('Project created successfully');
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      setSelectedNewProjectId(data.id);
+      setShowCreateNew(false);
+      setNewProjectCode('');
+      setNewProjectName('');
+      setNewProjectCountry('');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to create project');
+      console.error('Create project error:', error);
+    }
+  });
+
+  const addAllocationMutation = useMutation({
+    mutationFn: async ({ projectId, allocationHours }: { projectId: string; allocationHours: number }) => {
+      const { data, error } = await supabase
+        .from('project_resource_allocations')
+        .insert({
+          resource_id: person.id,
+          project_id: projectId,
+          allocation_date: weekKey,
+          hours: allocationHours,
+          company_id: company?.id,
+          resource_type: 'active'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast.success('Project allocation added');
+      queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      setShowAddProject(false);
+      setSelectedNewProjectId('');
+      setNewAllocationHours('');
+    },
+    onError: (error) => {
+      toast.error('Failed to add allocation');
+      console.error('Add error:', error);
+    }
+  });
+
+  const handleCreateProject = () => {
+    if (!newProjectCode || !newProjectName || !newProjectCountry) {
+      toast.error('Please fill in all project fields');
+      return;
+    }
+    createProjectMutation.mutate({ 
+      code: newProjectCode, 
+      name: newProjectName,
+      country: newProjectCountry
+    });
+  };
+
+  const handleAddAllocation = () => {
+    const allocationHours = parseFloat(newAllocationHours);
+    if (!selectedNewProjectId) {
+      toast.error('Please select a project');
+      return;
+    }
+    if (isNaN(allocationHours) || allocationHours <= 0) {
+      toast.error('Please enter valid hours');
+      return;
+    }
+    addAllocationMutation.mutate({ projectId: selectedNewProjectId, allocationHours });
+  };
 
   const handleSave = async (projectId: string, projectName: string) => {
     try {
@@ -50,39 +197,203 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
             Week: {format(weekStart, 'MMM dd, yyyy')}
           </div>
 
-          {person.projects && person.projects.length > 0 ? (
-            <div className="space-y-3">
-              {person.projects.map((project: any) => (
-                <div key={project.id} className="flex items-center justify-between gap-4 p-3 border rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{project.name}</p>
-                    <p className="text-sm text-muted-foreground">Current: {project.hours}h</p>
+          {!showAddProject ? (
+            <>
+              {person.projects && person.projects.length > 0 ? (
+                <div className="space-y-3">
+                  {person.projects.map((project: any) => (
+                    <div key={project.id} className="flex items-center justify-between gap-4 p-3 border rounded-lg">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{project.name}</p>
+                        <p className="text-sm text-muted-foreground">Current: {project.hours}h</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="168"
+                          placeholder={project.hours.toString()}
+                          value={hours[project.id] || ''}
+                          onChange={(e) => setHours({ ...hours, [project.id]: parseFloat(e.target.value) || 0 })}
+                          className="w-20"
+                        />
+                        <span className="text-sm text-muted-foreground">hours</span>
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleSave(project.id, project.name)}
+                          disabled={!hours[project.id]}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  No projects allocated
+                </div>
+              )}
+
+              <div className="mt-4">
+                <Button
+                  onClick={() => setShowAddProject(true)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Project
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium">Add Project Allocation</h3>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowAddProject(false);
+                    setShowCreateNew(false);
+                  }}
+                >
+                  Back
+                </Button>
+              </div>
+
+              {!showCreateNew ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="project">Project</Label>
+                    <Select value={selectedNewProjectId} onValueChange={setSelectedNewProjectId}>
+                      <SelectTrigger id="project">
+                        <SelectValue placeholder="Select a project" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableProjects.length === 0 ? (
+                          <div className="p-2 text-sm text-muted-foreground text-center">
+                            No available projects
+                          </div>
+                        ) : (
+                          availableProjects.map((project) => (
+                            <SelectItem key={project.id} value={project.id}>
+                              {project.code} - {project.name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="flex items-center gap-2">
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setShowCreateNew(true)}
+                  >
+                    <Building2 className="h-4 w-4 mr-2" />
+                    Create New Project
+                  </Button>
+
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <Label htmlFor="hours">Hours</Label>
                     <Input
+                      id="hours"
                       type="number"
+                      value={newAllocationHours}
+                      onChange={(e) => setNewAllocationHours(e.target.value)}
+                      placeholder="Enter hours"
+                      step="0.5"
                       min="0"
-                      max="168"
-                      placeholder={project.hours.toString()}
-                      value={hours[project.id] || ''}
-                      onChange={(e) => setHours({ ...hours, [project.id]: parseFloat(e.target.value) || 0 })}
-                      className="w-20"
                     />
-                    <span className="text-sm text-muted-foreground">hours</span>
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleSave(project.id, project.name)}
-                      disabled={!hours[project.id]}
+                  </div>
+
+                  <Button
+                    onClick={handleAddAllocation}
+                    className="w-full"
+                    disabled={addAllocationMutation.isPending || !selectedNewProjectId || !newAllocationHours}
+                  >
+                    {addAllocationMutation.isPending ? 'Adding...' : 'Add Allocation'}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="projectCode">Project Code *</Label>
+                      <Input
+                        id="projectCode"
+                        value={newProjectCode}
+                        onChange={(e) => setNewProjectCode(e.target.value)}
+                        placeholder="e.g., PRJ-001"
+                        maxLength={20}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="projectName">Project Name *</Label>
+                      <Input
+                        id="projectName"
+                        value={newProjectName}
+                        onChange={(e) => setNewProjectName(e.target.value)}
+                        placeholder="Enter project name"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="projectCountry">Country *</Label>
+                      <Select value={newProjectCountry} onValueChange={setNewProjectCountry}>
+                        <SelectTrigger id="projectCountry">
+                          <SelectValue placeholder="Select a country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {offices.map((office) => (
+                            <SelectItem key={office.id} value={office.country}>
+                              {office.country} ({office.name})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button
+                      type="button"
+                      className="w-full"
+                      onClick={handleCreateProject}
+                      disabled={createProjectMutation.isPending || !newProjectCode || !newProjectName || !newProjectCountry}
                     >
-                      Save
+                      {createProjectMutation.isPending ? 'Creating...' : 'Create Project'}
                     </Button>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No projects allocated
+
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <Label htmlFor="hoursNew">Hours</Label>
+                    <Input
+                      id="hoursNew"
+                      type="number"
+                      value={newAllocationHours}
+                      onChange={(e) => setNewAllocationHours(e.target.value)}
+                      placeholder="Enter hours"
+                      step="0.5"
+                      min="0"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={handleAddAllocation}
+                    className="w-full"
+                    disabled={addAllocationMutation.isPending || !selectedNewProjectId || !newAllocationHours}
+                  >
+                    {addAllocationMutation.isPending ? 'Adding...' : 'Add Allocation'}
+                  </Button>
+                </>
+              )}
             </div>
           )}
         </div>
