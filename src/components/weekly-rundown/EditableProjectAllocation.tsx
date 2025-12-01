@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Edit2, Check, X, Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useCompany } from '@/context/CompanyContext';
+import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,27 +47,34 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   const [editedHours, setEditedHours] = useState(hours.toString());
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
+  const { company } = useCompany();
 
   const updateMutation = useMutation({
     mutationFn: async (newHours: number) => {
-      const { data, error } = await supabase
-        .from('project_resource_allocations')
-        .update({ 
-          hours: newHours,
-          updated_at: new Date().toISOString()
-        })
-        .eq('resource_id', memberId)
-        .eq('project_id', projectId)
-        .eq('allocation_date', weekStartDate)
-        .select()
-        .single();
+      if (!company?.id) {
+        throw new Error('Company context is missing');
+      }
 
-      if (error) throw error;
-      return data;
+      const success = await saveResourceAllocation(
+        projectId,
+        memberId,
+        'active',
+        weekStartDate,
+        newHours,
+        company.id
+      );
+
+      if (!success) {
+        throw new Error('Failed to save allocation');
+      }
     },
     onSuccess: () => {
       toast.success('Allocation updated');
       queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['available-members-profiles'] });
       setIsEditing(false);
       onUpdate();
     },
@@ -78,18 +86,29 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from('project_resource_allocations')
-        .delete()
-        .eq('resource_id', memberId)
-        .eq('project_id', projectId)
-        .eq('allocation_date', weekStartDate);
+      if (!company?.id) {
+        throw new Error('Company context is missing');
+      }
 
-      if (error) throw error;
+      const success = await deleteResourceAllocation(
+        projectId,
+        memberId,
+        'active',
+        weekStartDate,
+        company.id
+      );
+
+      if (!success) {
+        throw new Error('Failed to delete allocation');
+      }
     },
     onSuccess: () => {
       toast.success('Allocation removed');
       queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['available-members-profiles'] });
       onUpdate();
     },
     onError: (error) => {
@@ -136,7 +155,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
               type="number"
               value={editedHours}
               onChange={(e) => setEditedHours(e.target.value)}
-              className="w-14 h-7 text-xs text-center bg-white/90"
+              className="w-14 h-7 text-xs text-center bg-background/90 text-foreground"
               step="0.5"
               min="0"
               autoFocus
