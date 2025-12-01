@@ -1,6 +1,17 @@
 import { useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 
+// Apply theme immediately on module load to prevent flash
+const applyInitialTheme = () => {
+  const savedTheme = localStorage.getItem('app-theme') || 'default';
+  applyThemeById(savedTheme);
+};
+
+// Run immediately when module loads
+if (typeof window !== 'undefined') {
+  applyInitialTheme();
+}
+
 export const useTheme = () => {
   const { company } = useCompany();
   
@@ -11,7 +22,12 @@ export const useTheme = () => {
     const themeToApply = companyTheme || localTheme || 'default';
     
     console.log('useTheme: Applying theme:', { companyTheme, localTheme, themeToApply });
-    applyThemeById(themeToApply);
+    
+    // Only apply if different from current
+    if (themeToApply !== localTheme) {
+      applyThemeById(themeToApply);
+      localStorage.setItem('app-theme', themeToApply);
+    }
     
     // Keep localStorage in sync for offline use
     if (companyTheme && companyTheme !== localTheme) {
