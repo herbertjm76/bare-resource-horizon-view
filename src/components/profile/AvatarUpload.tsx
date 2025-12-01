@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ImageCropDialog } from '@/components/dashboard/memberDialog/ImageCropDialog';
 
 interface AvatarUploadProps {
   currentAvatarUrl?: string | null;
@@ -23,6 +24,8 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentAvatarUrl);
   const [isHovered, setIsHovered] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +45,35 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
       return;
     }
 
-    await uploadAvatar(file);
+    // Create preview URL and open crop dialog
+    const url = URL.createObjectURL(file);
+    setImageToCrop(url);
+    setIsCropDialogOpen(true);
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    // Convert blob to file
+    const croppedFile = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
+    await uploadAvatar(croppedFile);
+    
+    // Clean up the original image URL
+    if (imageToCrop) {
+      URL.revokeObjectURL(imageToCrop);
+    }
+    setImageToCrop(null);
+  };
+
+  const handleCropCancel = () => {
+    if (imageToCrop) {
+      URL.revokeObjectURL(imageToCrop);
+    }
+    setImageToCrop(null);
+    setIsCropDialogOpen(false);
+    
+    // Clear the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const uploadAvatar = async (file: File) => {
@@ -193,6 +224,16 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         className="hidden"
         disabled={uploading}
       />
+
+      {/* Crop Dialog */}
+      {imageToCrop && (
+        <ImageCropDialog
+          isOpen={isCropDialogOpen}
+          imageSrc={imageToCrop}
+          onClose={handleCropCancel}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 };
