@@ -59,12 +59,9 @@
     /* --gradient-mid: 180 65% 50%; */    /* Teal */
     /* --gradient-end: 200 70% 55%; */    /* Blue */
     
-    /* Enhanced brand colors */
-    --brand-primary: 111 75 246;
-    --brand-violet: 111 75 246;
-    --brand-violet-light: 236 236 251;
-    --brand-gray: 142 145 150;
-    --brand-border: 240 240 244;
+    /* Theme-based brand colors - derived from gradient-mid */
+    --theme-primary: var(--gradient-mid);
+    --theme-border: var(--gradient-start);
     
     /* Subtle purple gradient backgrounds for dashboard cards */
     --card-gradient-1: 263 25% 97%;
@@ -72,32 +69,19 @@
     --card-gradient-3: 263 15% 93%;
     --card-gradient-4: 263 12% 91%;
     
-    /* Semantic color tokens */
-    --text-primary: 31 41 55;
-    --text-secondary: 107 114 128;
-    --text-tertiary: 156 163 175;
-    --text-inverse: 255 255 255;
-    --text-brand: 111 75 246;
+    /* Semantic color tokens - all HSL */
+    --text-primary: 220 16% 22%;
+    --text-secondary: 220 9% 46%;
+    --text-tertiary: 220 9% 60%;
+    --text-inverse: 0 0% 100%;
     
-    --bg-primary: 255 255 255;
-    --bg-secondary: 263 45% 98%;
-    --bg-tertiary: 263 45% 95%;
-    --bg-accent: 263 45% 92%;
-    --bg-inverse: 31 41 55;
-    
-    --border-primary: 229 231 235;
-    --border-secondary: 209 213 219;
-    --border-accent: 111 75 246;
-    --border-focus: 111 75 246;
+    --bg-primary: 0 0% 100%;
+    --bg-secondary: 220 14% 96%;
+    --bg-tertiary: 220 13% 93%;
+    --bg-accent: 220 13% 90%;
+    --bg-inverse: 220 16% 22%;
     
     /* Modern glass design tokens */
-    --glass-bg: 255 255 255;
-    --glass-bg-opacity: 0.12;
-    --glass-border: 255 255 255;
-    --glass-border-opacity: 0.25;
-    --glass-shadow: 0 20px 60px 0;
-    --glass-shadow-color: 0 0 0;
-    --glass-shadow-opacity: 0.15;
     --glass-blur: 20px;
 
     /* Status semantic colors */
@@ -243,32 +227,38 @@
   
   /* Focus management for better accessibility */
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-border-focus;
+    @apply outline-2 outline-offset-2 outline-ring;
   }
   
   /* Selection styling */
   ::selection {
-    background-color: rgb(var(--brand-violet) / 0.2);
-    color: rgb(var(--text-primary));
+    background-color: hsl(var(--gradient-mid) / 0.2);
+    color: hsl(var(--foreground));
   }
 }
 
 /* Enhanced utility classes with design tokens */
 @layer utilities {
   .text-gradient {
-    background: linear-gradient(135deg, rgb(var(--brand-primary)), rgb(var(--brand-violet)));
+    background: linear-gradient(135deg, 
+      hsl(var(--gradient-start)), 
+      hsl(var(--gradient-mid))
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .shadow-glow {
-    box-shadow: 0 0 20px rgb(var(--brand-violet) / 0.3);
+    box-shadow: 0 0 20px hsl(var(--gradient-mid) / 0.3);
   }
 
   .border-gradient {
     border: 1px solid;
-    border-image: linear-gradient(135deg, rgb(var(--brand-primary)), rgb(var(--brand-violet))) 1;
+    border-image: linear-gradient(135deg, 
+      hsl(var(--gradient-start)), 
+      hsl(var(--gradient-mid))
+    ) 1;
   }
   
   /* Typography utilities */
@@ -289,13 +279,13 @@
     animation: fadeOut 0.3s ease-out;
   }
 
-  /* Modern Glass Effects */
+  /* Modern Glass Effects - using pure CSS */
   .glass {
-    background: rgba(var(--glass-bg), var(--glass-bg-opacity));
+    background: hsl(var(--background) / 0.12);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid rgba(var(--glass-border), var(--glass-border-opacity));
-    box-shadow: var(--glass-shadow) rgba(var(--glass-shadow-color), var(--glass-shadow-opacity));
+    border: 1px solid hsl(var(--border) / 0.5);
+    box-shadow: 0 20px 60px 0 hsl(var(--foreground) / 0.1);
   }
 
   .glass-card {
@@ -349,9 +339,12 @@
   }
 }
 
-/* Hero gradient background using design tokens */
+/* Hero gradient background using theme colors */
 .bg-hero {
-  background: linear-gradient(135deg, rgb(var(--brand-primary)) 0%, rgb(var(--brand-violet)) 100%);
+  background: linear-gradient(135deg, 
+    hsl(var(--gradient-start)) 0%, 
+    hsl(var(--gradient-end)) 100%
+  );
 }
 
 /* Enhanced animations with new keyframes */
