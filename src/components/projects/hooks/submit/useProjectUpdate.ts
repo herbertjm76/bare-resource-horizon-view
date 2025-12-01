@@ -4,8 +4,8 @@ import type { ProjectUpdateData } from "./types";
 
 export const useProjectUpdate = () => {
   const updateProject = async (projectId: string, projectUpdate: ProjectUpdateData) => {
-    // Ensure current_stage is properly handled - if it's an empty string, set it to null
-    const currentStage = projectUpdate.current_stage || null;
+    // Keep current_stage as-is (empty string is valid, database doesn't allow null)
+    const currentStage = projectUpdate.current_stage ?? '';
     
     console.log('Updating project with current_stage:', currentStage);
     

@@ -102,7 +102,7 @@ export const useProjectFields = (project: any, refetch: () => void) => {
     mapField('profit', 'target_profit_percentage', (v) => (v === '' ? null : Number(v)));
     mapField('country');
     mapField('department');
-    mapField('current_stage', 'current_stage', (v) => v || null);
+    mapField('current_stage', 'current_stage', (v) => v ?? '');
     mapField('status');
 
     return updateData;
