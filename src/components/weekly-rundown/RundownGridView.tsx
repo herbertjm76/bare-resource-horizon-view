@@ -11,6 +11,8 @@ import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 import { EditPersonAllocationsDialog } from './EditPersonAllocationsDialog';
 import { EditProjectAllocationsDialog } from './EditProjectAllocationsDialog';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import * as LucideIcons from 'lucide-react';
 
 interface RundownGridViewProps {
@@ -181,6 +183,10 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
 const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
+  const { projectDisplayPreference } = useAppSettings();
+  
+  const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
+  const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
   
   const getCapacityColor = (percentage: number) => {
     if (percentage > 100) return 'hsl(var(--destructive))';
@@ -223,10 +229,12 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
             <ProjectIcon className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
             
             <div className="flex-1 min-w-0">
-              {/* Project Name - Primary */}
-              <h3 className="font-bold text-lg truncate mb-0.5">{project.name}</h3>
-              {/* Project Code - Secondary */}
-              <p className="text-xs text-muted-foreground font-medium truncate mb-0.5">{project.code}</p>
+              {/* Project Primary Display */}
+              <h3 className="font-bold text-lg truncate mb-0.5">{primaryDisplay}</h3>
+              {/* Project Secondary Display */}
+              {secondaryDisplay && (
+                <p className="text-xs text-muted-foreground font-medium truncate mb-0.5">{secondaryDisplay}</p>
+              )}
               {/* Department - Tertiary */}
               {project.department && (
                 <p className="text-[10px] text-muted-foreground truncate">{project.department}</p>
