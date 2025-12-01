@@ -190,19 +190,11 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     return weeklyLeaveDetails[memberId] || [];
   }, [weeklyLeaveDetails]);
 
-  // Simplified loading state - only show loading if members are loading or if we have members but no allocation data yet
+  // Simplified loading state - only block UI while team members are loading
   const isLoading = useMemo(() => {
-    // Always loading if members are loading
-    if (loadingMembers) return true;
-    
-    // If we have no members, we're not loading
-    if (!members || members.length === 0) return false;
-    
-    // We have members, check if we're still loading critical data
-    const criticalDataLoading = isLoadingProjects || (shouldFetchData && (isLoadingLeave || isLoadingOtherLeave));
-    
-    return criticalDataLoading;
-  }, [loadingMembers, members, isLoadingProjects, shouldFetchData, isLoadingLeave, isLoadingOtherLeave]);
+    // Only treat initial member loading as blocking; other data loads in background
+    return loadingMembers;
+  }, [loadingMembers]);
 
   const error = membersError || null;
 
