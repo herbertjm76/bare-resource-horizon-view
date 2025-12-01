@@ -47,6 +47,10 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
     location: 'all',
     searchTerm: ''
   });
+  
+  // Sort state
+  const [sortBy, setSortBy] = useState<'name' | 'created_date' | 'none'>('none');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -59,6 +63,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
       location: 'all',
       searchTerm: ''
     });
+    setSortBy('none');
   };
 
   // Calculate active filters count
@@ -73,7 +78,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
 
   // Filter team members based on active filters
   const filteredTeamMembers = useMemo(() => {
-    return teamMembers.filter(member => {
+    let filtered = teamMembers.filter(member => {
       // Practice Area filter - Note: Currently practice areas are associated with projects,
       // not directly with team members. To implement this properly, you would need
       // to fetch project allocations and filter based on project practice areas.
@@ -110,7 +115,27 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
       
       return true;
     });
-  }, [teamMembers, filters]);
+    
+    // Apply sorting
+    if (sortBy !== 'none') {
+      filtered = [...filtered].sort((a, b) => {
+        if (sortBy === 'created_date') {
+          const dateA = new Date(a.created_at || 0).getTime();
+          const dateB = new Date(b.created_at || 0).getTime();
+          return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+        } else if (sortBy === 'name') {
+          const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase();
+          const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase();
+          return sortDirection === 'asc' 
+            ? nameA.localeCompare(nameB)
+            : nameB.localeCompare(nameA);
+        }
+        return 0;
+      });
+    }
+    
+    return filtered;
+  }, [teamMembers, filters, sortBy, sortDirection]);
 
   const handleFieldChange = (memberId: string, field: string, value: string) => {
     setPendingChanges(prev => ({
@@ -224,9 +249,13 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
             onFilterChange={handleFilterChange}
             activeFiltersCount={activeFiltersCount}
             clearFilters={clearFilters}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            onSortChange={setSortBy}
+            onSortDirectionChange={setSortDirection}
           />
         )}
-        <TeamMembersTable 
+        <TeamMembersTable
           teamMembers={filteredTeamMembers} 
           userRole={userRole} 
           editMode={editMode} 
