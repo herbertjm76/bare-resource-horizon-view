@@ -64,7 +64,7 @@ export const TeamMemberSmartInsights: React.FC<SmartInsightsProps> = ({
   if (isLoading) {
     return (
       <div className="space-y-4 h-full flex flex-col">
-        <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+        <h2 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
           <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5" />
           Smart Insights
         </h2>
@@ -110,7 +110,7 @@ export const TeamMemberSmartInsights: React.FC<SmartInsightsProps> = ({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+      <h2 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
         <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5" />
         Smart Insights
       </h2>

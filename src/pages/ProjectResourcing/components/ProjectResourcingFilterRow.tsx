@@ -202,7 +202,7 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
               <Filter className="h-3 w-3" />
               <span>Filters</span>
               {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs bg-brand-violet/10 text-brand-violet border-0">
+                <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs bg-theme-primary/10 text-theme-primary border-0">
                   {activeFiltersCount}
                 </Badge>
               )}

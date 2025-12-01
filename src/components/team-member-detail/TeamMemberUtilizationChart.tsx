@@ -20,7 +20,7 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
   if (isLoading) {
     return (
       <div className="h-full flex flex-col">
-        <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2 mb-4">
+        <h2 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2 mb-4">
           <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="hidden sm:inline">Utilization Analytics</span>
           <span className="sm:hidden">Analytics</span>
@@ -88,7 +88,7 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
   return (
     <div className="h-full flex flex-col">
       {/* Title */}
-      <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2 mb-4">
+      <h2 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2 mb-4">
         <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
         <span className="hidden sm:inline">Utilization Analytics</span>
         <span className="sm:hidden">Analytics</span>

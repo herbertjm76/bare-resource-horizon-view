@@ -21,11 +21,11 @@ export const ModernProjectsHeader: React.FC<ModernProjectsHeaderProps> = ({
       description="View and manage all your ongoing projects across different locations and teams"
       icon={FolderOpen}
     >
-      <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
+      <Card className="px-4 py-2 bg-gradient-to-r from-theme-primary/10 to-theme-primary/5 border-theme-primary/20">
         <div className="flex items-center gap-2">
-          <Users className="h-3.5 w-3.5 text-brand-violet" strokeWidth={1.5} />
+          <Users className="h-3.5 w-3.5 text-theme-primary" strokeWidth={1.5} />
           <div className="text-sm">
-            <span className="font-semibold text-brand-violet">{totalActiveProjects}</span>
+            <span className="font-semibold text-theme-primary">{totalActiveProjects}</span>
             <span className="text-muted-foreground ml-1">Active</span>
           </div>
         </div>

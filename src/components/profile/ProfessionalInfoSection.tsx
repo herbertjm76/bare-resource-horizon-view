@@ -48,7 +48,7 @@ export const ProfessionalInfoSection: React.FC<ProfessionalInfoSectionProps> = (
     <Card>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
-          <Building className="h-5 w-5 text-brand-violet" />
+          <Building className="h-5 w-5 text-theme-primary" />
           Professional Information
         </CardTitle>
       </CardHeader>
@@ -241,7 +241,7 @@ export const ProfessionalInfoSection: React.FC<ProfessionalInfoSectionProps> = (
           
           <Button
             type="submit"
-            className="w-full bg-brand-primary hover:bg-brand-primary/90"
+            className="w-full bg-theme-primary hover:bg-theme-primary/90"
             disabled={saving}
           >
             {saving ? "Saving..." : "Save Professional Information"}

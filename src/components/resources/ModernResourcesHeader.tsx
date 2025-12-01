@@ -40,8 +40,8 @@ export const ModernResourcesHeader: React.FC<ModernResourcesHeaderProps> = ({
       {/* Main Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div className="space-y-2">
-          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-            <BarChart3 className="h-8 w-8 text-brand-violet" />
+          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
+            <BarChart3 className="h-8 w-8 text-theme-primary" />
             {title}
           </h1>
           <p className="text-muted-foreground text-lg">
@@ -51,11 +51,11 @@ export const ModernResourcesHeader: React.FC<ModernResourcesHeaderProps> = ({
         
         {/* Quick Stats Cards */}
         <div className="flex flex-wrap items-center gap-3">
-          <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
+          <Card className="px-4 py-2 bg-gradient-to-r from-theme-primary/10 to-theme-primary/5 border-theme-primary/20">
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-brand-violet" />
+              <Users className="h-4 w-4 text-theme-primary" />
               <div className="text-sm">
-                <span className="font-semibold text-brand-violet">{totalResources}</span>
+                <span className="font-semibold text-theme-primary">{totalResources}</span>
                 <span className="text-muted-foreground ml-1">Resources</span>
               </div>
             </div>
@@ -116,7 +116,7 @@ export const ModernResourcesHeader: React.FC<ModernResourcesHeaderProps> = ({
               buttonText="Advanced Filters"
             />
             {activeFiltersCount > 0 && (
-              <Badge variant="secondary" className="bg-brand-violet/10 text-brand-violet">
+              <Badge variant="secondary" className="bg-theme-primary/10 text-theme-primary">
                 {activeFiltersCount} active
               </Badge>
             )}

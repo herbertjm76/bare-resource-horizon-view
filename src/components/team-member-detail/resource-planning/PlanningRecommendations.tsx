@@ -21,7 +21,7 @@ export const PlanningRecommendations: React.FC<PlanningRecommendationsProps> = (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-brand-violet" />
+            <Target className="h-5 w-5 text-theme-primary" />
             Planning Recommendations
           </CardTitle>
         </CardHeader>
@@ -38,7 +38,7 @@ export const PlanningRecommendations: React.FC<PlanningRecommendationsProps> = (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Target className="h-5 w-5 text-brand-violet" />
+          <Target className="h-5 w-5 text-theme-primary" />
           Planning Recommendations
         </CardTitle>
       </CardHeader>

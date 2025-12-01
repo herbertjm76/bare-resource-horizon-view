@@ -33,7 +33,7 @@ export const UtilizationTrendAnalysis: React.FC<UtilizationTrendAnalysisProps> =
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-brand-violet" />
+            <TrendingUp className="h-5 w-5 text-theme-primary" />
             Utilization Trend Analysis
           </CardTitle>
         </CardHeader>
@@ -66,7 +66,7 @@ export const UtilizationTrendAnalysis: React.FC<UtilizationTrendAnalysisProps> =
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-brand-violet" />
+          <TrendingUp className="h-5 w-5 text-theme-primary" />
           Utilization Trend Analysis
         </CardTitle>
       </CardHeader>

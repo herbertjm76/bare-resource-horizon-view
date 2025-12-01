@@ -104,7 +104,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
           {membersToShow.map(({ member }) => (
             <Avatar key={member.id} className="h-5 w-5 sm:h-6 sm:w-6">
               <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-              <AvatarFallback className="bg-brand-violet text-white text-xs">
+              <AvatarFallback className="bg-theme-primary text-white text-xs">
                 {getUserInitials(member)}
               </AvatarFallback>
             </Avatar>

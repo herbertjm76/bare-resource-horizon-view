@@ -35,8 +35,8 @@ export const StreamlinedProjectResourcingHeader: React.FC<StreamlinedProjectReso
         <div className="space-y-2">
           <EnhancedWorkflowBreadcrumbs />
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-brand-violet/10 rounded-lg flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-brand-violet" />
+            <div className="w-8 h-8 bg-theme-primary/10 rounded-lg flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-theme-primary" />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">

@@ -151,14 +151,14 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-brand-violet" />
+            <TrendingUp className="h-5 w-5 text-theme-primary" />
             Allocation Summary
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Total Allocated</span>
-            <span className="text-lg font-bold text-brand-primary">
+            <span className="text-lg font-bold text-foreground">
               {totalAllocatedHours}h / {maxCapacity}h
             </span>
           </div>
@@ -208,7 +208,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
                     <Clock className="h-4 w-4" />
                     <span>Total Allocation</span>
                   </div>
-                  <span className="font-semibold text-brand-primary">
+                  <span className="font-semibold text-foreground">
                     {allocation.totalHours}h
                   </span>
                 </div>
@@ -239,7 +239,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
                           <div className="text-xs text-gray-500">
                             {format(new Date(week.weekStart), 'MM/dd')}
                           </div>
-                          <div className="text-sm font-medium text-brand-primary">
+                          <div className="text-sm font-medium text-foreground">
                             {week.hours}h
                           </div>
                         </div>

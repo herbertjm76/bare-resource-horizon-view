@@ -116,7 +116,7 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
   if (isLoading) {
     return (
       <div className="space-y-4 h-full">
-        <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+        <h2 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
           <Briefcase className="h-4 w-4 sm:h-5 sm:w-5" />
           Project Allocations
         </h2>
@@ -134,20 +134,20 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+      <h2 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
         <Briefcase className="h-4 w-4 sm:h-5 sm:w-5" />
         Project Allocations
       </h2>
 
       {/* Combined Card content with Weekly Summary and Projects */}
-      <div className="bg-gradient-to-br from-brand-violet/5 to-brand-primary/5 border-2 rounded-lg p-4 sm:p-6 flex-1 flex flex-col overflow-hidden">
+      <div className="bg-gradient-to-br from-theme-primary/5 to-theme-primary/5 border-2 rounded-lg p-4 sm:p-6 flex-1 flex flex-col overflow-hidden">
         {/* Weekly Summary Section */}
-        <div className="text-center pb-4 border-b border-brand-primary/10 mb-4">
+        <div className="text-center pb-4 border-b border-theme-primary/10 mb-4">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Clock className="h-4 w-4 text-brand-primary" />
-            <span className="font-medium text-brand-primary">Weekly Summary</span>
+            <Clock className="h-4 w-4 text-theme-primary" />
+            <span className="font-medium text-theme-primary">Weekly Summary</span>
           </div>
-          <div className="text-2xl sm:text-3xl font-bold text-brand-violet mb-1">
+          <div className="text-2xl sm:text-3xl font-bold text-theme-primary mb-1">
             {totalWeeklyHours.toFixed(1)}h
           </div>
           <p className="text-sm text-gray-600">Average per week</p>
@@ -179,7 +179,7 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
                   </div>
                   
                   <div className="text-right flex-shrink-0 ml-3">
-                    <div className="text-lg font-bold text-brand-primary">
+                    <div className="text-lg font-bold text-foreground">
                       {project.totalHours}h
                     </div>
                     <div className="text-xs text-gray-500">total</div>

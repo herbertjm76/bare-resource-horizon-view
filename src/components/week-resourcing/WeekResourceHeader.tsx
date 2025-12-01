@@ -108,7 +108,7 @@ export const WeekResourceHeader: React.FC<WeekResourceHeaderProps> = ({
             {/* Clear Filters */}
             {activeFiltersCount > 0 && (
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-brand-violet/10 text-brand-violet">
+                <Badge variant="secondary" className="bg-theme-primary/10 text-theme-primary">
                   {activeFiltersCount} active
                 </Badge>
                 <Button

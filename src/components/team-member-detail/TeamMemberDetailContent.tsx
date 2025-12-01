@@ -71,7 +71,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
     return (
       <div className="flex items-center justify-center h-64">
         <div className="flex items-center gap-3">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-primary" />
+          <Loader2 className="h-6 w-6 animate-spin text-theme-primary" />
           <span className="text-lg text-gray-600">Loading permissions...</span>
         </div>
       </div>

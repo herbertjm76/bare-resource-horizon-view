@@ -37,7 +37,7 @@ export const CurrentProjectAssignments: React.FC<CurrentProjectAssignmentsProps>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-brand-violet" />
+            <Users className="h-5 w-5 text-theme-primary" />
             Current Project Assignments
           </CardTitle>
         </CardHeader>
@@ -67,7 +67,7 @@ export const CurrentProjectAssignments: React.FC<CurrentProjectAssignmentsProps>
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-brand-violet" />
+          <Users className="h-5 w-5 text-theme-primary" />
           Current Project Assignments
         </CardTitle>
       </CardHeader>

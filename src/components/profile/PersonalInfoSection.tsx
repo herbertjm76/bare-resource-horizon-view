@@ -27,7 +27,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
     <Card>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
-          <User className="h-5 w-5 text-brand-violet" />
+          <User className="h-5 w-5 text-theme-primary" />
           Personal Information
         </CardTitle>
       </CardHeader>
@@ -229,7 +229,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           
           <Button
             type="submit"
-            className="w-full bg-brand-primary hover:bg-brand-primary/90"
+            className="w-full bg-theme-primary hover:bg-theme-primary/90"
             disabled={saving}
           >
             {saving ? "Saving..." : "Save Personal Information"}

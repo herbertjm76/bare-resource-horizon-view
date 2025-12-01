@@ -30,7 +30,7 @@ const ProjectsOnboarding = () => {
         'Timeline planning',
         'Initial resource allocation'
       ],
-      color: 'bg-brand-violet',
+      color: 'bg-theme-primary',
       borderColor: 'border-brand-violet/20'
     },
     {

@@ -263,7 +263,7 @@ const FAQ = () => {
                     onClick={() => setSelectedCategory(category.name)}
                     className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isSelected 
-                        ? 'bg-brand-violet text-white' 
+                        ? 'bg-theme-primary text-white' 
                         : `${category.color} hover:opacity-80`
                     }`}
                   >
@@ -299,7 +299,7 @@ const FAQ = () => {
                     <AccordionItem key={faq.id} value={faq.id} className="border rounded-lg">
                       <AccordionTrigger className="px-4 py-3 hover:no-underline">
                         <div className="flex items-start gap-3 text-left">
-                          <CategoryIcon className="h-5 w-5 mt-0.5 text-brand-violet flex-shrink-0" />
+                          <CategoryIcon className="h-5 w-5 mt-0.5 text-theme-primary flex-shrink-0" />
                           <div className="flex-1">
                             <h3 className="font-medium text-foreground">
                               {faq.question}

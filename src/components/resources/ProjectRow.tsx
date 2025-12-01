@@ -62,8 +62,8 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   
   // Header row background
   const headerBgClass = isEven 
-    ? "bg-brand-violet-light/70 hover:bg-brand-violet-light" 
-    : "bg-brand-violet-light hover:bg-brand-violet-light/90";
+    ? "bg-theme-primary/5 hover:bg-theme-primary/10" 
+    : "bg-theme-primary/5 hover:bg-theme-primary/10";
 
   if ((isLoading || isLoadingAllocations) && isExpanded) {
     return (

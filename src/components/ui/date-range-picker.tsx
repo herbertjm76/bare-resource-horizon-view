@@ -82,7 +82,7 @@ export function DateRangePicker({
               "w-[300px] justify-start text-left font-normal border-slate-200 bg-white hover:bg-slate-100",
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4 text-brand-primary" />
+            <CalendarIcon className="mr-2 h-4 w-4 text-theme-primary" />
             <div className="flex-1 flex items-center">
               {format(value.from, "MMM dd, yyyy")} - {format(value.to, "MMM dd, yyyy")}
             </div>

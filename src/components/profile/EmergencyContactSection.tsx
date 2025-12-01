@@ -24,7 +24,7 @@ export const EmergencyContactSection: React.FC<EmergencyContactSectionProps> = (
     <Card>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 text-brand-violet" />
+          <AlertCircle className="h-5 w-5 text-theme-primary" />
           Emergency Contact
         </CardTitle>
       </CardHeader>
@@ -62,7 +62,7 @@ export const EmergencyContactSection: React.FC<EmergencyContactSectionProps> = (
           
           <Button
             type="submit"
-            className="w-full bg-brand-primary hover:bg-brand-primary/90"
+            className="w-full bg-theme-primary hover:bg-theme-primary/90"
             disabled={saving}
           >
             {saving ? "Saving..." : "Save Emergency Contact"}
