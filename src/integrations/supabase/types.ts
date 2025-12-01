@@ -55,12 +55,17 @@ export type Database = {
           industry: string | null
           logo_url: string | null
           name: string
+          opt_out_financials: boolean | null
           phone: string | null
+          project_display_preference: string | null
           size: string | null
+          start_of_work_week: string | null
           subdomain: string
           theme: string | null
           updated_at: string
+          use_hours_or_percentage: string | null
           website: string | null
+          work_week_hours: number | null
         }
         Insert: {
           address?: string | null
@@ -72,12 +77,17 @@ export type Database = {
           industry?: string | null
           logo_url?: string | null
           name: string
+          opt_out_financials?: boolean | null
           phone?: string | null
+          project_display_preference?: string | null
           size?: string | null
+          start_of_work_week?: string | null
           subdomain: string
           theme?: string | null
           updated_at?: string
+          use_hours_or_percentage?: string | null
           website?: string | null
+          work_week_hours?: number | null
         }
         Update: {
           address?: string | null
@@ -89,12 +99,17 @@ export type Database = {
           industry?: string | null
           logo_url?: string | null
           name?: string
+          opt_out_financials?: boolean | null
           phone?: string | null
+          project_display_preference?: string | null
           size?: string | null
+          start_of_work_week?: string | null
           subdomain?: string
           theme?: string | null
           updated_at?: string
+          use_hours_or_percentage?: string | null
           website?: string | null
+          work_week_hours?: number | null
         }
         Relationships: []
       }
