@@ -231,9 +231,7 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
                         className="w-full justify-between"
                       >
                         {selectedProjectId
-                          ? availableProjects.find((project) => project.id === selectedProjectId)
-                              ? `${availableProjects.find((project) => project.id === selectedProjectId)?.code} - ${availableProjects.find((project) => project.id === selectedProjectId)?.name}`
-                              : "Select a project"
+                          ? availableProjects.find((project) => project.id === selectedProjectId)?.name || "Select a project"
                           : "Select a project"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
@@ -247,13 +245,13 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
                             {availableProjects.map((project) => (
                               <CommandItem
                                 key={project.id}
-                                value={`${project.code} ${project.name}`}
+                                value={`${project.name} ${project.code}`}
                                 onSelect={() => {
                                   setSelectedProjectId(project.id);
                                   setComboboxOpen(false);
                                 }}
                               >
-                                {project.code} - {project.name}
+                                {project.name}
                                 <Check
                                   className={cn(
                                     "ml-auto h-4 w-4",

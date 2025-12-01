@@ -296,7 +296,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                   <SelectContent>
                     {projects.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
-                        {project.code || project.name}
+                        {project.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
