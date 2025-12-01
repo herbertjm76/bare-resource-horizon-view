@@ -129,6 +129,9 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       queryClient.invalidateQueries({ queryKey: ['weekly-leave-details'] });
       queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['available-members-profiles'] });
+      queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
       
       toast.success('Vacation hours saved');
       setVacationDate(undefined);
@@ -173,6 +176,9 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
 
       queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['available-members-profiles'] });
+      queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
       
       toast.success('Project allocation saved');
       setSelectedProject('');
