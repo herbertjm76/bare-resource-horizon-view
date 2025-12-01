@@ -150,7 +150,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
     },
     onSuccess: () => {
       toast.success('Project allocation added');
-      queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
       setShowAddProject(false);
       setSelectedNewProjectId('');
