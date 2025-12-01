@@ -15,6 +15,13 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
   // Fetch team members first - this is the foundation (fetch ALL members, filtering happens in WeekResourceView)
   const { members: allFetchedMembers, loadingMembers, membersError } = useWeekResourceTeamMembers();
   
+  // Get ALL member IDs for data fetching (fetch data for all members upfront)
+  const allMemberIds = useMemo(() => {
+    return allFetchedMembers?.map(member => member.id) || [];
+  }, [allFetchedMembers]);
+
+  const shouldFetchData = allMemberIds.length > 0 && !loadingMembers;
+  
   // Apply filters client-side for instant filtering without refetching
   const members = useMemo(() => {
     if (!allFetchedMembers) return [];
@@ -33,51 +40,44 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     });
   }, [allFetchedMembers, filters?.department, filters?.location, filters?.practiceArea]);
   
-  // Only proceed with other data fetching if we have members
-  const memberIds = useMemo(() => {
-    return members?.map(member => member.id) || [];
-  }, [members]);
-
-  const shouldFetchData = memberIds.length > 0 && !loadingMembers;
-  
   // Fetch projects - independent of members
   const { data: projects = [], isLoading: isLoadingProjects } = useWeekResourceProjects({ 
     filters,
     enabled: true // Always fetch projects
   });
   
-  // Fetch allocations - FIXED: Use detailed allocations that fetch all 7 days of the week
+  // Fetch allocations for ALL members - FIXED: Use detailed allocations that fetch all 7 days of the week
   const { data: detailedAllocations } = useDetailedWeeklyAllocations(
     selectedWeek, 
-    shouldFetchData ? memberIds : []
+    shouldFetchData ? allMemberIds : []
   );
   
-  // Fetch leave data - depends on members
+  // Fetch leave data for ALL members
   const { 
     annualLeaveData = {}, 
     holidaysData = {}, 
     isLoading: isLoadingLeave 
   } = useWeekResourceLeaveData({ 
     weekStartDate, 
-    memberIds: shouldFetchData ? memberIds : [],
+    memberIds: shouldFetchData ? allMemberIds : [],
     enabled: shouldFetchData
   });
 
-  // Fetch detailed leave data - depends on members
+  // Fetch detailed leave data for ALL members
   const { weeklyLeaveDetails = {} } = useWeeklyLeaveDetails({ 
     weekStartDate, 
-    memberIds: shouldFetchData ? memberIds : [],
+    memberIds: shouldFetchData ? allMemberIds : [],
     enabled: shouldFetchData
   });
 
-  // Fetch other leave data - depends on members
+  // Fetch other leave data for ALL members
   const { 
     otherLeaveData = {}, 
     isLoading: isLoadingOtherLeave,
     updateOtherLeave 
   } = useWeeklyOtherLeaveData(
     weekStartDate, 
-    shouldFetchData ? memberIds : [],
+    shouldFetchData ? allMemberIds : [],
     shouldFetchData
   );
 
