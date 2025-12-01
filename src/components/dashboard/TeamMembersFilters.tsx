@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Search, X, ChevronLeft, ChevronRight, Users, Calendar, FolderOpen } from 'lucide-react';
+import { Search, X, ChevronLeft, ChevronRight, Users, Calendar, FolderOpen, ArrowUpDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,13 +18,21 @@ interface TeamMembersFiltersProps {
   onFilterChange: (key: string, value: string) => void;
   activeFiltersCount: number;
   clearFilters: () => void;
+  sortBy: 'name' | 'created_date' | 'none';
+  sortDirection: 'asc' | 'desc';
+  onSortChange: (value: 'name' | 'created_date' | 'none') => void;
+  onSortDirectionChange: (value: 'asc' | 'desc') => void;
 }
 
 export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
   filters,
   onFilterChange,
   activeFiltersCount,
-  clearFilters
+  clearFilters,
+  sortBy,
+  sortDirection,
+  onSortChange,
+  onSortDirectionChange
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeFilterType, setActiveFilterType] = useState<'practiceArea' | 'department' | 'location'>('department');
@@ -239,6 +247,36 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
             title="Clear filters"
           >
             <X className="h-4 w-4" />
+          </Button>
+        )}
+
+        {/* Sort Dropdown */}
+        <Select value={sortBy} onValueChange={onSortChange}>
+          <SelectTrigger className={`w-auto h-9 shrink-0 ${sortBy !== 'none' ? 'ring-2 ring-primary' : ''}`}>
+            <div className="flex items-center gap-2">
+              <ArrowUpDown className="h-4 w-4" />
+              <span className="hidden sm:inline text-sm">
+                {sortBy === 'created_date' ? 'Created Date' : sortBy === 'name' ? 'Name' : 'Sort'}
+              </span>
+            </div>
+          </SelectTrigger>
+          <SelectContent className="bg-background z-50">
+            <SelectItem value="none">No sorting</SelectItem>
+            <SelectItem value="created_date">Created Date</SelectItem>
+            <SelectItem value="name">Name</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Sort Direction Toggle (only show when sorting is active) */}
+        {sortBy !== 'none' && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 w-9 p-0 shrink-0"
+            onClick={() => onSortDirectionChange(sortDirection === 'asc' ? 'desc' : 'asc')}
+            title={sortDirection === 'asc' ? 'Sort ascending' : 'Sort descending'}
+          >
+            {sortDirection === 'asc' ? '↑' : '↓'}
           </Button>
         )}
 
