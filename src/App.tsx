@@ -44,16 +44,12 @@ import Pipeline from "./pages/Pipeline";
 
 const queryClient = new QueryClient();
 
-function App() {
-  useTheme(); // Load saved theme on app start
+// Wrapper component to ensure theme hook has access to CompanyProvider
+function AppWithTheme() {
+  useTheme(); // Load theme from company or localStorage
   
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <CompanyProvider>
-            <Routes>
+    <Routes>
               {/* Public marketing routes */}
               <Route path="/" element={<Index />} />
               <Route path="/solutions" element={<SolutionsPage />} />
@@ -131,6 +127,17 @@ function App() {
               
               <Route path="*" element={<NotFound />} />
             </Routes>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <BrowserRouter>
+          <CompanyProvider>
+            <AppWithTheme />
           </CompanyProvider>
         </BrowserRouter>
       </TooltipProvider>
