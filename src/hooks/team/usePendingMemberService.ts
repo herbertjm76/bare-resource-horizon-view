@@ -24,8 +24,9 @@ export const usePendingMemberService = (companyId: string | undefined) => {
           department: memberData.department,
           location: memberData.location,
           job_title: memberData.job_title,
-          weekly_capacity: memberData.weekly_capacity
-          // Note: avatar_url is not stored in invites table, it will be handled when user registers
+          weekly_capacity: memberData.weekly_capacity,
+          practice_area: memberData.practice_area,
+          avatar_url: memberData.avatar_url
         })
         .eq('id', memberData.id)
         .eq('company_id', companyId);
@@ -76,6 +77,8 @@ export const usePendingMemberService = (companyId: string | undefined) => {
           location: memberData.location,
           job_title: memberData.job_title,
           weekly_capacity: memberData.weekly_capacity || 40,
+          practice_area: memberData.practice_area,
+          avatar_url: memberData.avatar_url,
           invitation_type: 'pre_registered',
           status: 'pending',
           code: Math.random().toString(36).substring(2, 15),
