@@ -86,10 +86,10 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: // Basic Info
-        return wizardData.code && wizardData.name && wizardData.totalFee > 0;
+      case 0: // Basic Info - only require minimal fields to start
+        return Boolean(wizardData.code && wizardData.name);
       case 1: // Rate Basis
-        return wizardData.rateBasisStrategy;
+        return Boolean(wizardData.rateBasisStrategy);
       case 2: // Stages
         return wizardData.selectedStages.length > 0;
       case 3: // Team Composition
@@ -98,7 +98,6 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
         return true;
     }
   };
-
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
