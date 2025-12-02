@@ -29,14 +29,14 @@ const Projects = () => {
         
         <OfficeSettingsProvider>
           <ProjectsList onNewProject={() => setShowWizard(true)} />
-        </OfficeSettingsProvider>
 
-        <Dialog open={showWizard} onOpenChange={setShowWizard}>
-          <ProjectSetupWizard
-            onSubmit={handleWizardSubmit}
-            onCancel={() => setShowWizard(false)}
-          />
-        </Dialog>
+          <Dialog open={showWizard} onOpenChange={setShowWizard}>
+            <ProjectSetupWizard
+              onSubmit={handleWizardSubmit}
+              onCancel={() => setShowWizard(false)}
+            />
+          </Dialog>
+        </OfficeSettingsProvider>
       </div>
     </StandardLayout>
   );
