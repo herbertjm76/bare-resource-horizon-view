@@ -62,75 +62,89 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   } = useRateCalculator();
 
   return (
-    <div className="space-y-4 py-4">
-      <ProjectBasicInfo
-        code={form.code}
-        name={form.name}
-        codeError={null}
-        isCheckingCode={false}
-        onCodeChange={(e) => onChange("code", e.target.value)}
-        onNameChange={(e) => onChange("name", e.target.value)}
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <ProjectManagerSelect
-          value={form.manager}
-          managers={managers}
-          onChange={(value) => onChange("manager", value)}
-        />
-
-        <div>
-          <Select value={form.status} onValueChange={(value) => onChange("status", value)} required>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Select a status</SelectItem>
-              {statusOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <div className="space-y-6 py-4">
+      {/* Required Fields Section */}
+      <div className="space-y-4">
+        <div className="pb-2 border-b">
+          <h3 className="text-sm font-medium text-muted-foreground">Required Information</h3>
         </div>
+        <ProjectBasicInfo
+          code={form.code}
+          name={form.name}
+          codeError={null}
+          isCheckingCode={false}
+          onCodeChange={(e) => onChange("code", e.target.value)}
+          onNameChange={(e) => onChange("name", e.target.value)}
+        />
       </div>
 
-      <ProjectLocationInfo
-        country={form.country}
-        office={form.office}
-        countries={countries}
-        offices={offices}
-        onCountryChange={(value) => onChange("country", value)}
-        onOfficeChange={(value) => onChange("office", value)}
-      />
+      {/* Optional Fields Section */}
+      <div className="space-y-4">
+        <div className="pb-2 border-b">
+          <h3 className="text-sm font-medium text-muted-foreground">Additional Details (Optional)</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ProjectManagerSelect
+            value={form.manager}
+            managers={managers}
+            onChange={(value) => onChange("manager", value)}
+          />
 
-      <ProjectDepartmentSelector
-        department={form.department}
-        departments={departments}
-        onDepartmentChange={(value) => onChange("department", value)}
-      />
+          <div>
+            <label className="block text-sm font-medium mb-2">Status</label>
+            <Select value={form.status} onValueChange={(value) => onChange("status", value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select status (defaults to Active)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Not Selected</SelectItem>
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
-      <ProjectProfitRate
-        profit={form.profit}
-        avgRate={form.avgRate || ''}
-        onProfitChange={(value) => onChange("profit", value)}
-        onAvgRateChange={(value) => onChange("avgRate", value)}
-        onCalculatorOpen={openRateCalculator}
-      />
+        <ProjectLocationInfo
+          country={form.country}
+          office={form.office}
+          countries={countries}
+          offices={offices}
+          onCountryChange={(value) => onChange("country", value)}
+          onOfficeChange={(value) => onChange("office", value)}
+        />
 
-      <ProjectStagesSelector
-        stages={form.stages}
-        officeStages={officeStages}
-        onChange={(stages) => onChange("stages", stages)}
-      />
+        <ProjectDepartmentSelector
+          department={form.department}
+          departments={departments}
+          onDepartmentChange={(value) => onChange("department", value)}
+        />
 
-      <ProjectCurrentStageSelector
-        currentStage={form.current_stage}
-        selectedStages={form.stages}
-        officeStages={officeStages}
-        onChange={(stageId) => onChange("current_stage", stageId)}
-      />
+        <ProjectProfitRate
+          profit={form.profit}
+          avgRate={form.avgRate || ''}
+          onProfitChange={(value) => onChange("profit", value)}
+          onAvgRateChange={(value) => onChange("avgRate", value)}
+          onCalculatorOpen={openRateCalculator}
+        />
+
+        <ProjectStagesSelector
+          stages={form.stages}
+          officeStages={officeStages}
+          onChange={(stages) => onChange("stages", stages)}
+        />
+
+        <ProjectCurrentStageSelector
+          currentStage={form.current_stage}
+          selectedStages={form.stages}
+          officeStages={officeStages}
+          onChange={(stageId) => onChange("current_stage", stageId)}
+        />
+      </div>
 
       {showRateCalc && (
         <RateCalculatorNew

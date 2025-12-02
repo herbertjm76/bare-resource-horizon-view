@@ -14,7 +14,7 @@ export const submitNewProject = async (
   
   if (!isProjectInfoValid(form)) {
     console.log('Form validation failed');
-    toast.error("Please complete all required fields: Project Code, Name, Country, Target Profit %, Status, and Office.");
+    toast.error("Please complete all required fields: Project Code and Project Name.");
     return false;
   }
 
@@ -25,10 +25,12 @@ export const submitNewProject = async (
   }
 
   try {
+    // Provide sensible defaults for non-required fields
     const projectStatus = form.status === 'none' ? "Active" : (form.status || "Active");
     const manager = form.manager === 'none' ? null : (form.manager === "not_assigned" ? null : (form.manager || null));
-    const country = form.country === 'none' ? null : form.country;
+    const country = form.country === 'none' ? "Not Specified" : (form.country || "Not Specified");
     const officeLocationId = form.office === 'none' ? null : form.office;
+    const targetProfit = form.profit ? Number(form.profit) : 0;
     
     // Set current_stage to the first selected stage name, or the first available stage name if no stages selected
     let currentStage = null;
@@ -113,7 +115,7 @@ export const submitNewProject = async (
       status: projectStatus,
       country: country,
       current_stage: currentStage,
-      target_profit_percentage: form.profit ? Number(form.profit) : null,
+      target_profit_percentage: targetProfit,
       stages: selectedStageNames,
       department: form.department || null
     }).select();
