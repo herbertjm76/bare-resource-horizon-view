@@ -25,7 +25,7 @@ export const ProjectBasicInfo: React.FC<ProjectBasicInfoProps> = ({
     <div className="grid grid-cols-2 gap-4">
       <div>
         <Label htmlFor="code" className="flex items-center gap-1">
-          <Code className="w-4 h-4" />Project Code
+          <Code className="w-4 h-4" />Project Code<span className="text-destructive ml-1">*</span>
         </Label>
         <Input
           id="code"
@@ -33,18 +33,18 @@ export const ProjectBasicInfo: React.FC<ProjectBasicInfoProps> = ({
           value={code}
           onChange={onCodeChange}
           required
-          className={codeError ? "border-red-500" : ""}
+          className={codeError ? "border-destructive" : ""}
         />
         {isCheckingCode && (
           <p className="text-xs text-muted-foreground mt-1">Checking code availability...</p>
         )}
         {codeError && (
-          <p className="text-xs text-red-500 mt-1">{codeError}</p>
+          <p className="text-xs text-destructive mt-1">{codeError}</p>
         )}
       </div>
       <div>
         <Label htmlFor="name" className="flex items-center gap-1">
-          <FileText className="w-4 h-4" />Project Name
+          <FileText className="w-4 h-4" />Project Name<span className="text-destructive ml-1">*</span>
         </Label>
         <Input
           id="name"

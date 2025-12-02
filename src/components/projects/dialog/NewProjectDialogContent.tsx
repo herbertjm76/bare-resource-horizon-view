@@ -61,14 +61,12 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
     <>
       <DialogHeader>
         <DialogTitle>Create New Project</DialogTitle>
+        <p className="text-sm text-muted-foreground mt-2">
+          Fill in the basic information to create a project. You can add more details later.
+        </p>
       </DialogHeader>
       
       <Tabs defaultValue="info" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="info">Project Info</TabsTrigger>
-          <TabsTrigger value="stageFees">Stage Fees</TabsTrigger>
-        </TabsList>
-
         <ProjectDialogContent
           form={form}
           managers={managers}

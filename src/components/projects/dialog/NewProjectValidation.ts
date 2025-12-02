@@ -5,22 +5,15 @@ import { type FormState } from '../hooks/types/projectTypes';
 export const isProjectInfoValid = (form: FormState) => {
   console.log('Validating form:', form);
   
+  // Only require code and name for minimal project creation
   const isValid = (
     !!form.code &&
-    !!form.name &&
-    form.country && form.country !== 'none' &&
-    !!form.profit &&
-    form.status && form.status !== 'none' &&
-    form.office && form.office !== 'none'
+    !!form.name
   );
   
   console.log('Form validation result:', {
     code: !!form.code,
     name: !!form.name,
-    country: form.country && form.country !== 'none',
-    profit: !!form.profit,
-    status: form.status && form.status !== 'none',
-    office: form.office && form.office !== 'none',
     isValid
   });
   
