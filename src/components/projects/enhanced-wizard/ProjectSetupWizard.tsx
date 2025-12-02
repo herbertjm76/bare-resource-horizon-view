@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ProjectBasicInfoStep } from './steps/ProjectBasicInfoStep';
@@ -9,6 +9,7 @@ import { BudgetValidationStep } from './steps/BudgetValidationStep';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 export interface ProjectWizardData {
   // Basic Info
@@ -61,7 +62,17 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
   onCancel,
   isLoading = false
 }) => {
+  const { hideFinancials } = useAppSettings();
   const [currentStep, setCurrentStep] = useState(0);
+  
+  // Filter steps based on financial settings
+  const activeSteps = useMemo(() => {
+    if (hideFinancials) {
+      // Only show basic info step when financials are hidden
+      return [STEPS[0]];
+    }
+    return STEPS;
+  }, [hideFinancials]);
   const [wizardData, setWizardData] = useState<ProjectWizardData>({
     code: '',
     name: '',
@@ -99,7 +110,7 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
     }
   };
   const handleNext = () => {
-    if (currentStep < STEPS.length - 1) {
+    if (currentStep < activeSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -114,7 +125,8 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
     await onSubmit(wizardData);
   };
 
-  const progress = ((currentStep + 1) / STEPS.length) * 100;
+  const progress = ((currentStep + 1) / activeSteps.length) * 100;
+  const isLastStep = currentStep === activeSteps.length - 1;
 
   return (
     <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -122,12 +134,12 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
         <DialogTitle>Create New Project</DialogTitle>
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span>{STEPS[currentStep].title}</span>
-            <span>Step {currentStep + 1} of {STEPS.length}</span>
+            <span>{activeSteps[currentStep].title}</span>
+            <span>Step {currentStep + 1} of {activeSteps.length}</span>
           </div>
           <Progress value={progress} className="w-full" />
           <p className="text-sm text-muted-foreground">
-            {STEPS[currentStep].description}
+            {activeSteps[currentStep].description}
           </p>
         </div>
       </DialogHeader>
@@ -179,7 +191,7 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
         </Button>
 
         <div className="flex gap-2">
-          {currentStep === STEPS.length - 1 ? (
+          {isLastStep ? (
             <Button
               onClick={handleSubmit}
               disabled={isLoading || !canProceed()}
