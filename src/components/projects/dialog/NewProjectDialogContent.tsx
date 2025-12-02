@@ -66,26 +66,25 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
         </p>
       </DialogHeader>
       
-      <Tabs defaultValue="info" className="w-full">
-        <ProjectDialogContent
-          form={form}
-          managers={managers}
-          countries={countries}
-          offices={offices}
-          officeStages={officeStages}
-          departments={departments}
-          updateStageApplicability={updateStageApplicability}
-          updateStageFee={updateStageFee}
-          handleChange={handleChange}
-          isDataLoaded={true}
-          onSuccess={onSuccess}
-        />
-      </Tabs>
+      <ProjectDialogContent
+        form={form}
+        managers={managers}
+        countries={countries}
+        offices={offices}
+        officeStages={officeStages}
+        departments={departments}
+        updateStageApplicability={updateStageApplicability}
+        updateStageFee={updateStageFee}
+        handleChange={handleChange}
+        isDataLoaded={true}
+        onSuccess={onSuccess}
+      />
 
       <ProjectDialogActions 
         isLoading={isLoading}
         onClose={handleClose}
         onSubmit={handleFormSubmit}
+        submitLabel="Create Project"
       />
     </>
   );
