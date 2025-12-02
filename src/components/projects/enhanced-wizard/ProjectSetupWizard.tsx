@@ -65,12 +65,16 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
   const { hideFinancials } = useAppSettings();
   const [currentStep, setCurrentStep] = useState(0);
   
+  console.log('ProjectSetupWizard: hideFinancials =', hideFinancials);
+  
   // Filter steps based on financial settings
   const activeSteps = useMemo(() => {
     if (hideFinancials) {
+      console.log('ProjectSetupWizard: Hiding financial steps, showing only basic info');
       // Only show basic info step when financials are hidden
       return [STEPS[0]];
     }
+    console.log('ProjectSetupWizard: Showing all steps including financials');
     return STEPS;
   }, [hideFinancials]);
   const [wizardData, setWizardData] = useState<ProjectWizardData>({
