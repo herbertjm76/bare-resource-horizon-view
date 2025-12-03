@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useWeekResourceTeamMembers } from '@/components/week-resourcing/hooks/useWeekResourceTeamMembers';
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
@@ -17,14 +17,7 @@ interface AvailableMembersRowProps {
     location: string;
     searchTerm: string;
   };
-  // Optional pre-fetched data to avoid duplicate queries
-  profiles?: any[];
-  invites?: any[];
-  allocations?: any[];
 }
-
-type SortBy = 'hours' | 'name';
-type FilterBy = 'all' | 'department' | 'practiceArea';
 
 interface ProjectAllocation {
   projectId: string;
@@ -54,49 +47,20 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
   sortOption = 'alphabetical',
-  filters,
-  profiles: prefetchedProfiles,
-  invites: prefetchedInvites,
-  allocations: prefetchedAllocations
+  filters
 }) => {
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
 
-  // Use pre-fetched data if available, otherwise fetch
-  const { data: fetchedProfiles = [] } = useQuery({
-    queryKey: ['available-members-profiles'],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location');
-      if (error) throw error;
-      return data || [];
-    },
-    staleTime: 60_000,
-    enabled: !prefetchedProfiles
-  });
+  // Use shared hook for team members - single source of truth
+  const { members } = useWeekResourceTeamMembers();
+  
+  // Separate active profiles and pre-registered invites from the unified members list
+  const profiles = members.filter(m => m.status === 'active');
+  const invites = members.filter(m => m.status === 'pre_registered');
 
-  const { data: fetchedInvites = [] } = useQuery({
-    queryKey: ['available-members-invites'],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
-      const { data, error } = await supabase
-        .from('invites')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location')
-        .eq('invitation_type', 'pre_registered')
-        .eq('status', 'pending');
-      if (error) throw error;
-      return data || [];
-    },
-    staleTime: 60_000,
-    enabled: !prefetchedInvites
-  });
-
-  const { data: fetchedAllocations = [] } = useQuery({
+  const { data: allocations = [] } = useQuery({
     queryKey: ['available-allocations', weekStartDate],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -126,13 +90,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (error) throw error;
       return data || [];
     },
-    staleTime: 60_000,
-    enabled: !prefetchedAllocations
+    staleTime: 60_000
   });
-
-  const profiles = prefetchedProfiles || fetchedProfiles;
-  const invites = prefetchedInvites || fetchedInvites;
-  const allocations = prefetchedAllocations || fetchedAllocations;
 
   const availableMembers: AvailableMember[] = React.useMemo(() => {
     const allMembers = [
