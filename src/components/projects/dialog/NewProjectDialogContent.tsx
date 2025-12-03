@@ -1,13 +1,12 @@
 
 import React from 'react';
 import { useProjectForm } from '../hooks/useProjectForm';
-import { ProjectDialogContent } from './ProjectDialogContent';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProjectDialogActions } from './ProjectDialogActions';
 import { submitNewProject } from './NewProjectSubmit';
 import { useCompany } from '@/context/CompanyContext';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
+import { NewProjectForm } from './NewProjectForm';
 
 interface NewProjectDialogContentProps {
   onSuccess?: () => void;
@@ -29,7 +28,7 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
     updateStageApplicability,
     updateStageFee,
     handleChange
-  } = useProjectForm(null, true, null); // Fixed: Added required arguments
+  } = useProjectForm(null, true, null);
 
   const handleFormSubmit = async () => {
     if (!company?.id) return false;
@@ -58,15 +57,12 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
   };
 
   return (
-    <>
-      <DialogHeader>
-        <DialogTitle>Create New Project</DialogTitle>
-        <p className="text-sm text-muted-foreground mt-2">
-          Fill in the basic information to create a project. You can add more details later.
-        </p>
+    <div className="flex flex-col">
+      <DialogHeader className="pb-4 border-b border-border/50">
+        <DialogTitle className="text-xl font-semibold">New Project</DialogTitle>
       </DialogHeader>
       
-      <ProjectDialogContent
+      <NewProjectForm
         form={form}
         managers={managers}
         countries={countries}
@@ -74,10 +70,7 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
         officeStages={officeStages}
         departments={departments}
         updateStageApplicability={updateStageApplicability}
-        updateStageFee={updateStageFee}
         handleChange={handleChange}
-        isDataLoaded={true}
-        onSuccess={onSuccess}
       />
 
       <ProjectDialogActions 
@@ -86,6 +79,6 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
         onSubmit={handleFormSubmit}
         submitLabel="Create Project"
       />
-    </>
+    </div>
   );
 };

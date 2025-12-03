@@ -33,7 +33,7 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-xl p-6">
         <NewProjectDialogContent onSuccess={handleProjectCreated} />
       </DialogContent>
     </Dialog>
