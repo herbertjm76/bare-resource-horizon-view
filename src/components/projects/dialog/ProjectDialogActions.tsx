@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
+import { Loader2 } from "lucide-react";
 
 interface ProjectDialogActionsProps {
   isLoading: boolean;
@@ -23,17 +23,30 @@ export const ProjectDialogActions: React.FC<ProjectDialogActionsProps> = ({
   };
 
   return (
-    <DialogFooter className="px-6 py-4 border-t mt-6">
-      <Button type="button" variant="outline" onClick={onClose}>
+    <div className="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-border/50">
+      <Button 
+        type="button" 
+        variant="ghost" 
+        onClick={onClose}
+        className="px-6"
+      >
         Cancel
       </Button>
       <Button 
         type="button" 
         disabled={isLoading}
         onClick={handleSubmit}
+        className="px-6 min-w-[140px]"
       >
-        {isLoading ? "Saving..." : submitLabel}
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Creating...
+          </>
+        ) : (
+          submitLabel
+        )}
       </Button>
-    </DialogFooter>
+    </div>
   );
 };
