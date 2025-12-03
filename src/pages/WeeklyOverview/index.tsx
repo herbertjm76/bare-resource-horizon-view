@@ -250,9 +250,6 @@ const WeeklyOverview = () => {
                 weekStartDate={weekStartString}
                 threshold={80}
                 filters={filters}
-                profiles={profiles}
-                invites={invites}
-                allocations={availableMembersAllocations}
                 sortOption={sortOption}
               />
 
