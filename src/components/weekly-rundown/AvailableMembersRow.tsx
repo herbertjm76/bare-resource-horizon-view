@@ -71,7 +71,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (!session?.user) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department');
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location');
       if (error) throw error;
       return data || [];
     },
@@ -86,7 +86,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (!session?.user) return [];
       const { data, error } = await supabase
         .from('invites')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department')
+        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location')
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
       if (error) throw error;
