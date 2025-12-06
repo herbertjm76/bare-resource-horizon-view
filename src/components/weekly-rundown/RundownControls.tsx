@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { PlayCircle, PauseCircle, Maximize, Minimize, Users, FolderOpen, LayoutGrid, Presentation } from 'lucide-react';
 import { RundownMode, SortOption, ViewType } from './WeeklyRundownView';
@@ -116,18 +117,31 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
           </Button>
         </div>
 
-        {/* Sort selector */}
-        <Select value={sortOption} onValueChange={onSortChange}>
-          <SelectTrigger className="w-[140px] h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="alphabetical">Alphabetical</SelectItem>
-            <SelectItem value="utilization">Utilization</SelectItem>
-            <SelectItem value="location">Location</SelectItem>
-            <SelectItem value="department">Department</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Sort selector with visual indicator */}
+        <div className="flex items-center gap-1.5">
+          <Select value={sortOption} onValueChange={onSortChange}>
+            <SelectTrigger className="w-[140px] h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="alphabetical">Alphabetical</SelectItem>
+              <SelectItem value="utilization">Utilization</SelectItem>
+              <SelectItem value="location">Location</SelectItem>
+              <SelectItem value="department">Department</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {/* Sort Indicator Badge */}
+          <Badge 
+            variant="default" 
+            className="bg-gradient-modern text-white text-xs px-2 py-0.5 h-6 whitespace-nowrap"
+          >
+            {sortOption === 'alphabetical' && 'A-Z'}
+            {sortOption === 'utilization' && '% High→Low'}
+            {sortOption === 'location' && 'Location A-Z'}
+            {sortOption === 'department' && 'Dept A-Z'}
+          </Badge>
+        </div>
 
         {/* Auto-advance toggle - only show for carousel view */}
         {viewType === 'carousel' && (
