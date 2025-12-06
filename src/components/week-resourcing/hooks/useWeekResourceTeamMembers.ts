@@ -88,8 +88,12 @@ export const useWeekResourceTeamMembers = () => {
     staleTime: 60_000,
   });
 
-  // Combine both active and pre-registered members
-  const members = [...activeMembers, ...preRegisteredMembers];
+  // Combine both active and pre-registered members, sorted alphabetically by first name then last name
+  const members = [...activeMembers, ...preRegisteredMembers].sort((a, b) => {
+    const nameA = `${a.first_name} ${a.last_name}`.toLowerCase();
+    const nameB = `${b.first_name} ${b.last_name}`.toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
 
   const loadingMembers = isLoadingActive || isLoadingPreRegistered;
   const membersError = activeError || preRegisteredError;
