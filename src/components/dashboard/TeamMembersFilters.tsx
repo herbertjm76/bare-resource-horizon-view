@@ -250,22 +250,42 @@ export const TeamMembersFilters: React.FC<TeamMembersFiltersProps> = ({
           </Button>
         )}
 
-        {/* Sort Dropdown */}
-        <Select value={sortBy} onValueChange={onSortChange}>
-          <SelectTrigger className={`w-auto h-9 shrink-0 ${sortBy !== 'none' ? 'ring-2 ring-primary' : ''}`}>
-            <div className="flex items-center gap-2">
-              <ArrowUpDown className="h-4 w-4" />
-              <span className="hidden sm:inline text-sm">
-                {sortBy === 'created_date' ? 'Created Date' : sortBy === 'name' ? 'Name' : 'Sort'}
-              </span>
-            </div>
-          </SelectTrigger>
-          <SelectContent className="bg-background z-50">
-            <SelectItem value="none">No sorting</SelectItem>
-            <SelectItem value="created_date">Created Date</SelectItem>
-            <SelectItem value="name">Name</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Sort Dropdown with Visual Indicator */}
+        <div className="flex items-center gap-1">
+          <Select value={sortBy} onValueChange={onSortChange}>
+            <SelectTrigger className={`w-auto h-9 shrink-0 ${sortBy !== 'none' ? 'ring-2 ring-primary' : ''}`}>
+              <div className="flex items-center gap-2">
+                <ArrowUpDown className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">
+                  {sortBy === 'created_date' ? 'Created Date' : sortBy === 'name' ? 'Name' : 'Sort'}
+                </span>
+              </div>
+            </SelectTrigger>
+            <SelectContent className="bg-background z-50">
+              <SelectItem value="none">No sorting</SelectItem>
+              <SelectItem value="created_date">Created Date</SelectItem>
+              <SelectItem value="name">Name</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {/* Sort Indicator Badge */}
+          {sortBy === 'name' && (
+            <Badge 
+              variant="default" 
+              className="bg-gradient-modern text-white text-xs px-2 py-0.5 h-6"
+            >
+              {sortDirection === 'asc' ? 'A-Z' : 'Z-A'}
+            </Badge>
+          )}
+          {sortBy === 'created_date' && (
+            <Badge 
+              variant="default" 
+              className="bg-gradient-modern text-white text-xs px-2 py-0.5 h-6"
+            >
+              {sortDirection === 'asc' ? 'Old→New' : 'New→Old'}
+            </Badge>
+          )}
+        </div>
 
         {/* Sort Direction Toggle (only show when sorting is active) */}
         {sortBy !== 'none' && (
