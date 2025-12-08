@@ -3,16 +3,6 @@ import React from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { NewResourceTableRow } from './NewResourceTableRow';
 import { NewResourceSummaryRow } from './NewResourceSummaryRow';
-import { ArrowDownAZ, TrendingUp, MapPin, Building2 } from 'lucide-react';
-
-type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
-
-const sortLabels: Record<SortOption, { label: string; icon: React.ComponentType<{ className?: string }> }> = {
-  alphabetical: { label: 'A-Z', icon: ArrowDownAZ },
-  utilization: { label: 'Util', icon: TrendingUp },
-  location: { label: 'Loc', icon: MapPin },
-  department: { label: 'Dept', icon: Building2 },
-};
 
 interface NewResourceTableProps {
   members: any[];
@@ -27,7 +17,6 @@ interface NewResourceTableProps {
   updateOtherLeave?: (memberId: string, hours: number, notes?: string) => Promise<boolean>;
   viewMode: 'compact' | 'expanded';
   selectedWeek?: Date;
-  sortOption?: SortOption;
 }
 
 export const NewResourceTable: React.FC<NewResourceTableProps> = ({
@@ -42,10 +31,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   getWeeklyLeave,
   updateOtherLeave,
   viewMode,
-  selectedWeek = new Date(),
-  sortOption = 'alphabetical'
+  selectedWeek = new Date()
 }) => {
-  const SortIcon = sortLabels[sortOption].icon;
   // Debug viewMode prop
   console.log('NewResourceTable RENDER - Received viewMode:', viewMode);
   
@@ -95,13 +82,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
             <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-b-2 border-slate-200">
               {/* Team Member Column */}
               <TableHead className="text-center font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm" style={{ width: 180, minWidth: 180, background: 'hsl(var(--gradient-start))' }}>
-                <div className="flex flex-col items-center gap-1">
-                  <span>Team Member</span>
-                  <div className="flex items-center gap-1 text-[10px] opacity-80 bg-white/20 px-1.5 py-0.5 rounded">
-                    <SortIcon className="h-3 w-3" />
-                    <span>{sortLabels[sortOption].label}</span>
-                  </div>
-                </div>
+                Team Member
               </TableHead>
               
               {/* Utilization Column */}

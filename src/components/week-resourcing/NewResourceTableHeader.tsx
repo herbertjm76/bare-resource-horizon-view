@@ -1,29 +1,16 @@
 
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowDownAZ, TrendingUp, MapPin, Building2 } from 'lucide-react';
-
-type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
 
 interface NewResourceTableHeaderProps {
   projects: any[];
   viewMode?: 'compact' | 'expanded';
-  sortOption?: SortOption;
 }
-
-const sortLabels: Record<SortOption, { label: string; icon: React.ComponentType<{ className?: string }> }> = {
-  alphabetical: { label: 'A-Z', icon: ArrowDownAZ },
-  utilization: { label: 'Util', icon: TrendingUp },
-  location: { label: 'Loc', icon: MapPin },
-  department: { label: 'Dept', icon: Building2 },
-};
 
 export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
   projects,
-  viewMode = 'compact',
-  sortOption = 'alphabetical'
+  viewMode = 'compact'
 }) => {
-  const SortIcon = sortLabels[sortOption].icon;
   if (viewMode === 'expanded') {
     return (
       <TableHeader>
@@ -73,14 +60,10 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           className="font-bold border-r border-gray-200 px-2 py-2 name-column rounded-tl-xl"
           style={{ width: 180, minWidth: 180, maxWidth: 180, backgroundColor: '#6465F0', color: 'white', height: '100px' }}
         >
-          <div className="text-center text-xs leading-tight h-full flex flex-col items-center justify-center gap-1">
+          <div className="text-center text-xs leading-tight h-full flex items-center justify-center">
             <div>
               <div>Team</div>
               <div>Member</div>
-            </div>
-            <div className="flex items-center gap-1 text-[10px] opacity-80 bg-white/20 px-1.5 py-0.5 rounded">
-              <SortIcon className="h-3 w-3" />
-              <span>{sortLabels[sortOption].label}</span>
             </div>
           </div>
         </TableHead>

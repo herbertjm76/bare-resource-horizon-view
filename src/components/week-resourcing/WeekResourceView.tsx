@@ -244,7 +244,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             updateOtherLeave={updateOtherLeave}
             viewMode={viewMode}
             selectedWeek={selectedWeek}
-            sortOption={sortOption}
           />
         ) : (
           <ProjectRowTable
