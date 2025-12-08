@@ -84,7 +84,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
 }) => {
   
   const showPeopleProjectToggle = viewType !== 'table';
-  const showSortOptions = viewType !== 'table';
+  const showSortOptions = true; // Show sorting for all view types
   const showCompactExpanded = viewType === 'table';
   const showTableOrientation = viewType === 'table';
   const showAutoAdvance = viewType === 'carousel';
