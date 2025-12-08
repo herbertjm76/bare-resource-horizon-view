@@ -262,6 +262,7 @@ const WeeklyOverview = () => {
                   filters={filters}
                   onFilterChange={handleFilterChange}
                   tableOrientation={tableOrientation}
+                  sortOption={sortOption}
                 />
               )}
 
