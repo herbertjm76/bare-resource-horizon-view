@@ -251,6 +251,7 @@ const WeeklyOverview = () => {
                 threshold={80}
                 filters={filters}
                 sortOption={sortOption}
+                allMembers={allMembers}
               />
 
               {/* Table View */}
