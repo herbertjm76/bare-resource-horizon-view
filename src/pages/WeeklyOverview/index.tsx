@@ -83,33 +83,28 @@ const WeeklyOverview = () => {
     getProjectCount
   });
 
-  // Create sorted members list directly from rundownItems for consistency across all views
-  // rundownItems are already sorted by useRundownData based on sortOption
+  // Sort members to match the same order as rundownItems for consistency
+  // This directly applies the same sorting logic used in useRundownData
   const sortedMembers = useMemo(() => {
-    // When in people mode with data, convert rundownItems to member format
-    if (rundownMode === 'people' && rundownItems.length > 0) {
-      return rundownItems.map(item => ({
-        id: item.id,
-        first_name: item.first_name || '',
-        last_name: item.last_name || '',
-        avatar_url: item.avatar_url || item.avatar,
-        weekly_capacity: item.capacity || 40,
-        department: item.department,
-        practice_area: undefined, // rundownItems don't have practice_area
-        location: item.location,
-        status: 'active' as const
-      }));
-    }
+    console.log('Computing sortedMembers - allMembers count:', allMembers.length, 'sortOption:', sortOption);
     
-    // Fallback: sort allMembers directly when not in people mode or no data
-    return [...allMembers].sort((a, b) => {
+    // Sort allMembers directly with the same logic as useRundownData
+    const result = [...allMembers].sort((a, b) => {
       const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
       const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
+      
       switch (sortOption) {
         case 'alphabetical':
           return nameA.localeCompare(nameB);
         case 'utilization':
-          return nameA.localeCompare(nameB); // Fallback to alpha
+          // Get utilization data for proper sorting
+          const aTotal = getMemberTotalForRundown(a.id);
+          const bTotal = getMemberTotalForRundown(b.id);
+          const aCapacity = a.weekly_capacity || 40;
+          const bCapacity = b.weekly_capacity || 40;
+          const aUtil = aCapacity > 0 ? (aTotal?.resourcedHours || 0) / aCapacity * 100 : 0;
+          const bUtil = bCapacity > 0 ? (bTotal?.resourcedHours || 0) / bCapacity * 100 : 0;
+          return bUtil - aUtil; // High to low
         case 'location':
           return (a.location || '').localeCompare(b.location || '');
         case 'department':
@@ -118,7 +113,10 @@ const WeeklyOverview = () => {
           return 0;
       }
     });
-  }, [allMembers, rundownItems, rundownMode, sortOption]);
+    
+    console.log('sortedMembers result - first 3:', result.slice(0, 3).map(m => `${m.first_name} ${m.last_name}`));
+    return result;
+  }, [allMembers, sortOption, getMemberTotalForRundown]);
 
   // Debug logging
   console.log('WeeklyOverview - View State:', {
@@ -126,7 +124,10 @@ const WeeklyOverview = () => {
     rundownMode,
     rundownItemsCount: rundownItems.length,
     allMembersCount: allMembers.length,
-    projectsCount: projects.length
+    projectsCount: projects.length,
+    sortOption,
+    firstSortedMember: sortedMembers[0] ? `${sortedMembers[0].first_name} ${sortedMembers[0].last_name}` : 'none',
+    firstRundownItem: rundownItems[0] ? rundownItems[0].name : 'none'
   });
 
   // Carousel navigation
