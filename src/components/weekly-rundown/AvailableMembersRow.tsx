@@ -219,28 +219,11 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         }
 
         return true;
-      })
-      .sort((a, b) => {
-        // Apply the same sorting as the carousel/grid view below
-        const fullNameA = `${a.firstName} ${a.lastName}`;
-        const fullNameB = `${b.firstName} ${b.lastName}`;
-        
-        switch (sortOption) {
-          case 'alphabetical':
-            return fullNameA.localeCompare(fullNameB);
-          case 'utilization':
-            return b.utilization - a.utilization;
-          case 'location':
-            return (a.location || '').localeCompare(b.location || '');
-          case 'department':
-            return (a.department || '').localeCompare(b.department || '');
-          default:
-            return 0;
-        }
       });
+      // Note: No .sort() here - we preserve the sort order from the parent (sortedMembers)
 
     return available;
-  }, [allMembersFromParent, allocations, threshold, filters, sortOption]);
+  }, [allMembersFromParent, allocations, threshold, filters]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
