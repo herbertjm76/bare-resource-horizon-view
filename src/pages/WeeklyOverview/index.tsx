@@ -83,6 +83,36 @@ const WeeklyOverview = () => {
     getProjectCount
   });
 
+  // Create sorted members list based on rundownItems order for consistency across all views
+  const sortedMembers = useMemo(() => {
+    if (rundownMode !== 'people' || !rundownItems.length) {
+      // For project mode or empty data, sort allMembers directly
+      return [...allMembers].sort((a, b) => {
+        const nameA = `${a.first_name} ${a.last_name}`;
+        const nameB = `${b.first_name} ${b.last_name}`;
+        switch (sortOption) {
+          case 'alphabetical':
+            return nameA.localeCompare(nameB);
+          case 'utilization':
+            // For utilization, we need to calculate - but for simplicity just use alphabetical as fallback
+            return nameA.localeCompare(nameB);
+          case 'location':
+            return (a.location || '').localeCompare(b.location || '');
+          case 'department':
+            return (a.department || '').localeCompare(b.department || '');
+          default:
+            return 0;
+        }
+      });
+    }
+    
+    // Map rundownItems back to allMembers format, preserving the sorted order
+    const memberMap = new Map(allMembers.map(m => [m.id, m]));
+    return rundownItems
+      .map(item => memberMap.get(item.id))
+      .filter(Boolean);
+  }, [allMembers, rundownItems, rundownMode, sortOption]);
+
   // Debug logging
   console.log('WeeklyOverview - View State:', {
     viewType,
@@ -251,7 +281,7 @@ const WeeklyOverview = () => {
                 threshold={80}
                 filters={filters}
                 sortOption={sortOption}
-                allMembers={allMembers}
+                allMembers={sortedMembers}
               />
 
               {/* Table View */}
