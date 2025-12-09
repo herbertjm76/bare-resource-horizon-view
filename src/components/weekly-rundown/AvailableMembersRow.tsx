@@ -65,9 +65,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
 
-  // Use external members if provided, otherwise empty (parent should always provide)
-  const profiles = (externalMembers || []).filter(m => m.status === 'active' || !m.status);
-  const invites = (externalMembers || []).filter(m => m.status === 'pre_registered');
+  // Use external members directly - they are already sorted by the parent
+  // Don't separate into profiles/invites as that breaks the sort order
+  const allMembersFromParent = externalMembers || [];
 
   const { data: allocations = [] } = useQuery({
     queryKey: ['available-allocations', weekStartDate],
@@ -103,30 +103,18 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   });
 
   const availableMembers: AvailableMember[] = React.useMemo(() => {
-    const allMembers = [
-      ...profiles.map(p => ({
-        id: p.id,
-        firstName: p.first_name || '',
-        lastName: p.last_name || '',
-        avatarUrl: p.avatar_url,
-        capacity: p.weekly_capacity || 40,
-        department: p.department || undefined,
-        practiceArea: p.practice_area || undefined,
-        location: p.location || undefined,
-        type: 'active' as const
-      })),
-      ...invites.map(i => ({
-        id: i.id,
-        firstName: i.first_name || '',
-        lastName: i.last_name || '',
-        avatarUrl: i.avatar_url,
-        capacity: i.weekly_capacity || 40,
-        department: i.department || undefined,
-        practiceArea: i.practice_area || undefined,
-        location: i.location || undefined,
-        type: 'pre_registered' as const
-      }))
-    ];
+    // Map members preserving the original sort order from parent
+    const allMembers = allMembersFromParent.map(m => ({
+      id: m.id,
+      firstName: m.first_name || '',
+      lastName: m.last_name || '',
+      avatarUrl: m.avatar_url,
+      capacity: m.weekly_capacity || 40,
+      department: m.department || undefined,
+      practiceArea: m.practice_area || undefined,
+      location: m.location || undefined,
+      type: (m.status === 'pre_registered' ? 'pre_registered' : 'active') as 'active' | 'pre_registered'
+    }));
 
     const allocationMap = new Map<string, number>();
     const memberSectorsMap = new Map<string, Set<string>>();
@@ -252,7 +240,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       });
 
     return available;
-  }, [profiles, invites, allocations, threshold, filters, sortOption]);
+  }, [allMembersFromParent, allocations, threshold, filters, sortOption]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
