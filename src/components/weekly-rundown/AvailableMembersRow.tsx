@@ -226,6 +226,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       });
       // Note: No .sort() here - we preserve the sort order from the parent (sortedMembers)
 
+    console.log('AvailableMembersRow after processing - first 3:', 
+      available.slice(0, 3).map(m => `${m.firstName} ${m.lastName}`));
+    
     return available;
   }, [allMembersFromParent, allocations, threshold, filters]);
 
