@@ -83,34 +83,41 @@ const WeeklyOverview = () => {
     getProjectCount
   });
 
-  // Create sorted members list based on rundownItems order for consistency across all views
+  // Create sorted members list directly from rundownItems for consistency across all views
+  // rundownItems are already sorted by useRundownData based on sortOption
   const sortedMembers = useMemo(() => {
-    if (rundownMode !== 'people' || !rundownItems.length) {
-      // For project mode or empty data, sort allMembers directly
-      return [...allMembers].sort((a, b) => {
-        const nameA = `${a.first_name} ${a.last_name}`;
-        const nameB = `${b.first_name} ${b.last_name}`;
-        switch (sortOption) {
-          case 'alphabetical':
-            return nameA.localeCompare(nameB);
-          case 'utilization':
-            // For utilization, we need to calculate - but for simplicity just use alphabetical as fallback
-            return nameA.localeCompare(nameB);
-          case 'location':
-            return (a.location || '').localeCompare(b.location || '');
-          case 'department':
-            return (a.department || '').localeCompare(b.department || '');
-          default:
-            return 0;
-        }
-      });
+    // When in people mode with data, convert rundownItems to member format
+    if (rundownMode === 'people' && rundownItems.length > 0) {
+      return rundownItems.map(item => ({
+        id: item.id,
+        first_name: item.first_name || '',
+        last_name: item.last_name || '',
+        avatar_url: item.avatar_url || item.avatar,
+        weekly_capacity: item.capacity || 40,
+        department: item.department,
+        practice_area: undefined, // rundownItems don't have practice_area
+        location: item.location,
+        status: 'active' as const
+      }));
     }
     
-    // Map rundownItems back to allMembers format, preserving the sorted order
-    const memberMap = new Map(allMembers.map(m => [m.id, m]));
-    return rundownItems
-      .map(item => memberMap.get(item.id))
-      .filter(Boolean);
+    // Fallback: sort allMembers directly when not in people mode or no data
+    return [...allMembers].sort((a, b) => {
+      const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
+      const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
+      switch (sortOption) {
+        case 'alphabetical':
+          return nameA.localeCompare(nameB);
+        case 'utilization':
+          return nameA.localeCompare(nameB); // Fallback to alpha
+        case 'location':
+          return (a.location || '').localeCompare(b.location || '');
+        case 'department':
+          return (a.department || '').localeCompare(b.department || '');
+        default:
+          return 0;
+      }
+    });
   }, [allMembers, rundownItems, rundownMode, sortOption]);
 
   // Debug logging
