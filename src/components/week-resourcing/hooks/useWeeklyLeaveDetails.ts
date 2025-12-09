@@ -21,11 +21,8 @@ export const useWeeklyLeaveDetails = ({
     queryKey: ['weekly-leave-details', company?.id, weekStartDate, memberIds],
     queryFn: async () => {
       if (!company?.id || memberIds.length === 0) {
-        console.log('Skipping weekly leave details fetch - no company or members');
         return {};
       }
-
-      console.log('Fetching weekly leave details for week:', weekStartDate, 'members:', memberIds.length);
 
       // Calculate week end date
       const weekStart = new Date(weekStartDate);
@@ -43,7 +40,6 @@ export const useWeeklyLeaveDetails = ({
         .order('date');
 
       if (error) {
-        console.error('Error fetching weekly leave details:', error);
         throw error;
       }
 
@@ -59,8 +55,6 @@ export const useWeeklyLeaveDetails = ({
           hours: leave.hours || 0
         });
       });
-
-      console.log('Successfully fetched weekly leave details:', Object.keys(weeklyLeaveDetails).length, 'members with leave');
 
       return weeklyLeaveDetails;
     },

@@ -160,8 +160,6 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   const cards = useMemo(() => {
     const allCards = [];
 
-    console.log('Building cards with visibility:', cardVisibility);
-
     // Build all available cards
     allCards.push({ 
       id: 'weekInfo', 
@@ -197,7 +195,6 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     customCardTypes.forEach(cardType => {
       const cardKey = `custom_${cardType.id}`;
       const isVisible = cardVisibility[cardKey] !== false;
-      console.log(`Custom card ${cardType.label} (${cardKey}): visibility=${cardVisibility[cardKey]}, isVisible=${isVisible}`);
       
       allCards.push({
         id: cardKey,

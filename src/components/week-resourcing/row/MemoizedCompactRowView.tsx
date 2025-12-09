@@ -93,14 +93,6 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     </div>
   ), [memberData.displayName, member]);
 
-  // Debug logging with FINAL STANDARDIZED calculations
-  console.log(`MemoizedCompactRowView FINAL STANDARDIZED for ${memberData.displayName}:`, {
-    memberId: member.id,
-    ...capacityDisplay,
-    projectCount_STANDARDIZED: projectCount,
-    allocationMapSize: allocationMap.size,
-    allocationMapEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
-  });
 
   return (
     <TableRow

@@ -13,21 +13,11 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
   allocationMap,
   members
 }) => {
-  console.log('NewResourceSummaryRow - Allocation Map:', {
-    mapSize: allocationMap.size,
-    allEntries: Array.from(allocationMap.entries()),
-    projectsCount: projects.length,
-    membersCount: members.length
-  });
-
   // Calculate total hours across all projects
   let totalHours = 0;
   allocationMap.forEach((hours) => {
-    console.log(`Adding ${hours}h from allocation, running total: ${totalHours + hours}h`);
     totalHours += hours;
   });
-
-  console.log('Final total hours across all allocations:', totalHours);
 
   // Calculate project totals
   const projectTotals = projects.map(project => {
@@ -36,11 +26,9 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
     members.forEach(member => {
       const key = `${member.id}:${project.id}`;
       const hours = allocationMap.get(key) || 0;
-      console.log(`Project ${project.id} - Member ${member.id}: ${hours}h (running total: ${projectTotal + hours}h)`);
       projectTotal += hours;
     });
     
-    console.log(`Final project total for ${project.id}: ${projectTotal}`);
     return {
       projectId: project.id,
       totalHours: projectTotal

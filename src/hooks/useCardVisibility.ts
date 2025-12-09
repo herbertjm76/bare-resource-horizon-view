@@ -106,14 +106,8 @@ export const useCardVisibility = () => {
     }
   });
 
-  console.log('Card Visibility State:', localVisibility);
-  console.log('Card Order:', localCardOrder);
-  console.log('Preferences from DB:', preferences);
-
   const toggleCard = (cardKey: string, isVisible: boolean) => {
-    console.log(`Toggling ${cardKey} to ${isVisible}`);
     const newVisibility = { ...localVisibility, [cardKey]: isVisible };
-    console.log('New visibility state:', newVisibility);
     setLocalVisibility(newVisibility); // Optimistic update for responsive UI
     updateVisibilityMutation.mutate(newVisibility);
   };

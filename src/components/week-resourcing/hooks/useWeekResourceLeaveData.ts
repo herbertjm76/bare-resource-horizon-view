@@ -21,11 +21,8 @@ export const useWeekResourceLeaveData = ({
     queryKey: ['week-resource-leave-data', company?.id, weekStartDate, memberIds],
     queryFn: async () => {
       if (!company?.id || memberIds.length === 0) {
-        console.log('Skipping leave data fetch - no company or members');
         return { annualLeaveData: {}, holidaysData: {} };
       }
-
-      console.log('Fetching leave data for week:', weekStartDate, 'members:', memberIds.length);
 
       // Calculate week end date
       const weekStart = new Date(weekStartDate);
@@ -42,7 +39,6 @@ export const useWeekResourceLeaveData = ({
         .lte('date', weekEndString);
 
       if (annualLeaveError) {
-        console.error('Error fetching annual leave:', annualLeaveError);
         throw annualLeaveError;
       }
 
@@ -55,7 +51,6 @@ export const useWeekResourceLeaveData = ({
         .lte('date', weekEndString);
 
       if (holidaysError) {
-        console.error('Error fetching holidays:', holidaysError);
         throw holidaysError;
       }
 
@@ -76,8 +71,6 @@ export const useWeekResourceLeaveData = ({
           holidaysData[memberId] = totalHolidayHours;
         });
       }
-
-      console.log('Successfully fetched leave data - Annual leave entries:', annualLeaveRaw?.length || 0, 'Holidays:', holidaysRaw?.length || 0);
 
       return {
         annualLeaveData,
