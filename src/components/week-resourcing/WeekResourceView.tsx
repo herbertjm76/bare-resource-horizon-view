@@ -2,75 +2,62 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import { NewResourceTable } from './NewResourceTable';
 import { ProjectRowTable } from './ProjectRowTable';
-import { useStreamlinedWeekResourceData } from './hooks/useStreamlinedWeekResourceData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { calculateMemberProjectHours, calculateUtilizationPercentage } from './utils/utilizationCalculations';
 import { format, startOfWeek } from 'date-fns';
 
-type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
-
 interface WeekResourceViewProps {
   selectedWeek: Date;
-  setSelectedWeek: (date: Date) => void;
-  onWeekChange?: (date: Date) => void;
   weekLabel: string;
-  filters: {
-    practiceArea: string;
-    department: string;
-    location: string;
-    searchTerm: string;
-  };
-  onFilterChange: (key: string, value: string) => void;
   tableOrientation?: 'per-person' | 'per-project';
-  sortOption?: SortOption;
+  // Data from parent - single source of truth
+  allMembers: any[];
+  projects: any[];
+  isLoading: boolean;
+  error: Error | null;
+  allocationMap: Map<string, number>;
+  annualLeaveData: Record<string, number>;
+  holidaysData: Record<string, number>;
+  otherLeaveData: Record<string, number>;
+  getMemberTotal: (memberId: string) => number;
+  getProjectCount: (memberId: string) => number;
+  getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
+  updateOtherLeave: (memberId: string, hours: number, notes?: string) => Promise<boolean>;
+  searchTerm?: string;
 }
 
 export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   selectedWeek,
-  setSelectedWeek,
-  onWeekChange,
   weekLabel,
-  filters,
-  onFilterChange,
   tableOrientation = 'per-person',
-  sortOption = 'alphabetical'
+  // Data from parent
+  allMembers,
+  projects,
+  isLoading,
+  error,
+  allocationMap,
+  annualLeaveData,
+  holidaysData,
+  otherLeaveData,
+  getMemberTotal,
+  getProjectCount,
+  getWeeklyLeave,
+  updateOtherLeave,
+  searchTerm = ''
 }) => {
   // View mode state for expand/collapse functionality
   const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
-  
-  // Stabilize filters to prevent unnecessary re-renders
-  const stableFilters = useMemo(() => ({
-    practiceArea: filters.practiceArea === 'all' ? '' : filters.practiceArea,
-    department: filters.department === 'all' ? '' : filters.department,
-    location: filters.location === 'all' ? '' : filters.location,
-    searchTerm: filters.searchTerm
-  }), [filters.practiceArea, filters.department, filters.location, filters.searchTerm]);
 
-  const { 
-    allMembers, 
-    projects, 
-    isLoading, 
-    getMemberTotal,
-    getProjectCount,
-    getWeeklyLeave,
-    allocationMap,
-    annualLeaveData,
-    holidaysData,
-    otherLeaveData,
-    updateOtherLeave,
-    error
-  } = useStreamlinedWeekResourceData(selectedWeek, stableFilters, sortOption);
-
-  // Filter members by search term only (sorting is now centralized in useStreamlinedWeekResourceData)
+  // Filter members by search term only - allMembers is already sorted from parent
   const filteredMembers = useMemo(() => {
     if (!allMembers || allMembers.length === 0) {
       return [];
     }
     
     // Apply search filter only - allMembers is already sorted
-    if (stableFilters.searchTerm) {
-      const searchLower = stableFilters.searchTerm.toLowerCase();
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
       return allMembers.filter(member => {
         const fullName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
         const email = (member.email || '').toLowerCase();
@@ -79,29 +66,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     }
     
     return allMembers;
-  }, [allMembers, stableFilters.searchTerm]);
-
-  // Stable callback functions
-  const handleWeekChange = useCallback((date: Date) => {
-    setSelectedWeek(date);
-    if (onWeekChange) {
-      onWeekChange(date);
-    }
-  }, [setSelectedWeek, onWeekChange]);
-
-  const clearFilters = useCallback(() => {
-    onFilterChange('sector', 'all');
-    onFilterChange('department', 'all');
-    onFilterChange('location', 'all');
-    onFilterChange('searchTerm', '');
-  }, [onFilterChange]);
-
-  const activeFiltersCount = useMemo(() => [
-    filters.practiceArea !== 'all' ? 'practiceArea' : '',
-    filters.department !== 'all' ? 'department' : '',
-    filters.location !== 'all' ? 'location' : '',
-    filters.searchTerm ? 'search' : ''
-  ].filter(Boolean).length, [filters.practiceArea, filters.department, filters.location, filters.searchTerm]);
+  }, [allMembers, searchTerm]);
 
   // Weekly metrics calculation using the utility functions - INCLUDE LEAVE HOURS
   const metrics = useMemo(() => {

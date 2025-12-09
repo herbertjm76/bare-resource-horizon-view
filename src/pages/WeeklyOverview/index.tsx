@@ -52,7 +52,7 @@ const WeeklyOverview = () => {
   // Card visibility preferences
   const { visibility: cardVisibility, cardOrder, toggleCard, moveCard, reorderCards } = useCardVisibility();
 
-  // Centralized data fetching with sorting
+  // Centralized data fetching with sorting - SINGLE SOURCE OF TRUTH
   const data = useWeeklyOverviewData(selectedWeek, filters, sortOption);
   const {
     allMembers,
@@ -60,7 +60,14 @@ const WeeklyOverview = () => {
     isLoading,
     error,
     getMemberTotalForRundown,
+    getMemberTotal,
     getProjectCount,
+    getWeeklyLeave,
+    allocationMap,
+    annualLeaveData,
+    holidaysData,
+    otherLeaveData,
+    updateOtherLeave,
     memberIds,
     profiles,
     invites,
@@ -251,12 +258,21 @@ const WeeklyOverview = () => {
               {viewType === 'table' && (
                 <WeekResourceView
                   selectedWeek={selectedWeek}
-                  setSelectedWeek={handleWeekChange}
                   weekLabel={weekLabel}
-                  filters={filters}
-                  onFilterChange={handleFilterChange}
                   tableOrientation={tableOrientation}
-                  sortOption={sortOption}
+                  allMembers={allMembers}
+                  projects={projects}
+                  isLoading={isLoading}
+                  error={error}
+                  allocationMap={allocationMap}
+                  annualLeaveData={annualLeaveData}
+                  holidaysData={holidaysData}
+                  otherLeaveData={otherLeaveData}
+                  getMemberTotal={getMemberTotal}
+                  getProjectCount={getProjectCount}
+                  getWeeklyLeave={getWeeklyLeave}
+                  updateOtherLeave={updateOtherLeave}
+                  searchTerm={filters.searchTerm}
                 />
               )}
 

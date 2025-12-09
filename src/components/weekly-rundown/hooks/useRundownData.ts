@@ -21,7 +21,7 @@ export const useRundownData = ({
   // Memoize the rundown items to prevent flickering
   // Note: allMembers is already sorted by the parent hook (useStreamlinedWeekResourceData)
   const rundownItems = useMemo(() => {
-    console.log('useRundownData - Computing rundown items', { rundownMode, memberCount: allMembers?.length });
+    
     
     // Early return if no data
     if (!allMembers || allMembers.length === 0) {
