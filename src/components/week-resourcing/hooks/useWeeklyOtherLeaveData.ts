@@ -16,11 +16,8 @@ export const useWeeklyOtherLeaveData = (
     queryKey: ['weekly-other-leave', company?.id, weekStartDate, memberIds],
     queryFn: async () => {
       if (!company?.id || memberIds.length === 0) {
-        console.log('Skipping other leave data fetch - no company or members');
         return {};
       }
-
-      console.log('Fetching other leave data for week:', weekStartDate, 'members:', memberIds.length);
 
       const { data, error } = await supabase
         .from('weekly_other_leave')
@@ -30,7 +27,6 @@ export const useWeeklyOtherLeaveData = (
         .in('member_id', memberIds);
 
       if (error) {
-        console.error('Error fetching other leave data:', error);
         throw error;
       }
 
@@ -39,8 +35,6 @@ export const useWeeklyOtherLeaveData = (
       data?.forEach(leave => {
         otherLeaveMap[leave.member_id] = leave.hours || 0;
       });
-
-      console.log('Successfully fetched other leave data:', data?.length || 0, 'entries');
 
       return otherLeaveMap;
     },

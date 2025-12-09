@@ -15,11 +15,8 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
     queryKey: ['week-resource-projects', company?.id, filters],
     queryFn: async () => {
       if (!company?.id) {
-        console.log('No company ID available for projects fetch');
         return [];
       }
-
-      console.log('Fetching projects for company:', company.id);
       
       let query = supabase
         .from('projects')
@@ -36,11 +33,9 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
         .order('id', { ascending: true });
 
       if (error) {
-        console.error('Error fetching projects:', error);
         throw error;
       }
 
-      console.log('Successfully fetched projects:', data?.length || 0);
       return data || [];
     },
     enabled: !!company?.id && enabled,

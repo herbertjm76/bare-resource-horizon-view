@@ -57,15 +57,6 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
   const capacityDisplay = calculateCapacityDisplay(member.id, allocationMap, weeklyCapacity);
   const projectCount = getProjectCount(member.id);
 
-  // Debug logging with STANDARDIZED values
-  console.log(`CompactRowView FINAL STANDARDIZED for ${displayName}:`, {
-    memberId: member.id,
-    ...capacityDisplay,
-    projectCount,
-    allocationMapSize: allocationMap.size,
-    allocationEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
-  });
-
   const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
 
   return (

@@ -33,14 +33,6 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   viewMode,
   selectedWeek = new Date()
 }) => {
-  // Debug viewMode prop
-  console.log('NewResourceTable RENDER - Received viewMode:', viewMode);
-  
-  // Add useEffect to track viewMode changes  
-  React.useEffect(() => {
-    console.log('NewResourceTable useEffect - viewMode prop changed to:', viewMode);
-  }, [viewMode]);
-  
   // Filter projects to only show those with allocated hours
   const projectsWithHours = React.useMemo(() => {
     return projects.filter(project => {
@@ -53,16 +45,9 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
         projectTotal += hours;
       });
       
-      console.log(`Project ${project.code || project.name}: ${projectTotal}h total - ${projectTotal > 0 ? 'SHOWING' : 'HIDING'}`);
       return projectTotal > 0;
     });
   }, [projects, members, allocationMap]);
-  
-  console.log('NewResourceTable - Projects filtering:', {
-    originalCount: projects.length,
-    filteredCount: projectsWithHours.length,
-    hiddenCount: projects.length - projectsWithHours.length
-  });
   
   const tableClassName = viewMode === 'compact' 
     ? 'resource-table-compact weekly-table' 
@@ -71,8 +56,6 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   const containerClassName = viewMode === 'compact'
     ? 'resource-table-compact-container'
     : 'resource-table-expanded-container';
-
-  console.log('NewResourceTable - Using classes:', { tableClassName, containerClassName });
 
   return (
     <div className={containerClassName}>

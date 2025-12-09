@@ -26,11 +26,8 @@ export const useWeekResourceTeamMembers = () => {
         .select('id, first_name, last_name, email, location, department, practice_area, weekly_capacity, avatar_url');
         
       if (error) {
-        console.error("Error fetching active team members:", error);
         return [];
       }
-      
-      console.log("Fetched active team members:", data?.length || 0);
       
       // Transform to match expected structure
       return data?.map(member => ({
@@ -64,11 +61,8 @@ export const useWeekResourceTeamMembers = () => {
         .eq('status', 'pending');
         
       if (error) {
-        console.error("Error fetching pre-registered members:", error);
         return [];
       }
-      
-      console.log("Fetched pre-registered members:", data?.length || 0);
       
       // Transform the pre-registered members to match team member structure
       return data.map(member => ({
@@ -98,11 +92,6 @@ export const useWeekResourceTeamMembers = () => {
 
   const loadingMembers = isLoadingActive || isLoadingPreRegistered;
   const membersError = activeError || preRegisteredError;
-
-  console.log('=== TEAM MEMBERS SUMMARY (FIXED) ===');
-  console.log('Active members:', activeMembers.length);
-  console.log('Pre-registered members:', preRegisteredMembers.length);
-  console.log('Total members:', members.length);
 
   return {
     members,

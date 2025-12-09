@@ -16,7 +16,7 @@ interface AvailableMembersRowProps {
     location: string;
     searchTerm: string;
   };
-  // Accept pre-sorted members from parent to ensure consistency with carousel/grid
+  // Accept pre-sorted and pre-filtered members from parent to ensure consistency
   allMembers?: Array<{
     id: string;
     first_name: string;
@@ -57,8 +57,6 @@ interface AvailableMember {
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
-  sortOption = 'alphabetical',
-  filters,
   allMembers: externalMembers
 }) => {
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
@@ -103,6 +101,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
   const availableMembers: AvailableMember[] = React.useMemo(() => {
     // Map members preserving the original sort order from parent
+    // allMembersFromParent is already filtered and sorted by the parent component
     const allMembers = allMembersFromParent.map(m => ({
       id: m.id,
       firstName: m.first_name || '',
@@ -153,76 +152,46 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       }
     });
 
-    const available = allMembers
-      .map(member => {
-        const key = member.id;
-        const allocatedHours = allocationMap.get(key) || 0;
-        const availableHours = member.capacity - allocatedHours;
-        const utilization = (allocatedHours / member.capacity) * 100;
-        const sectors = Array.from(memberSectorsMap.get(key) || []);
-        
-        // Get project allocations
-        const projectsMap = memberProjectsMap.get(key);
-        const projectAllocations: ProjectAllocation[] = projectsMap 
-          ? Array.from(projectsMap.entries()).map(([projectId, data]) => ({
-              projectId,
-              projectName: data.name,
-              projectCode: data.code,
-              hours: data.hours
-            }))
-          : [];
+    // Map members to AvailableMember format - preserving order from parent
+    const available = allMembers.map(member => {
+      const key = member.id;
+      const allocatedHours = allocationMap.get(key) || 0;
+      const availableHours = member.capacity - allocatedHours;
+      const utilization = (allocatedHours / member.capacity) * 100;
+      const sectors = Array.from(memberSectorsMap.get(key) || []);
+      
+      // Get project allocations
+      const projectsMap = memberProjectsMap.get(key);
+      const projectAllocations: ProjectAllocation[] = projectsMap 
+        ? Array.from(projectsMap.entries()).map(([projectId, data]) => ({
+            projectId,
+            projectName: data.name,
+            projectCode: data.code,
+            hours: data.hours
+          }))
+        : [];
 
-        return {
-          id: member.id,
-          type: member.type,
-          firstName: member.firstName,
-          lastName: member.lastName,
-          avatarUrl: member.avatarUrl,
-          availableHours,
-          allocatedHours,
-          utilization,
-          capacity: member.capacity,
-          department: member.department,
-          practiceArea: member.practiceArea,
-          location: member.location,
-          sectors,
-          projectAllocations
-        };
-      })
-      .filter(member => {
-        // Apply filters
-        if (!filters) return true;
-
-        // Practice Area filter - check member's own practice area first, then project allocations
-        if (filters.practiceArea && filters.practiceArea !== 'all') {
-          const hasMemberPracticeArea = member.practiceArea === filters.practiceArea;
-          const hasProjectInPracticeArea = member.sectors.includes(filters.practiceArea);
-          if (!hasMemberPracticeArea && !hasProjectInPracticeArea) return false;
-        }
-
-        // Department filter
-        if (filters.department && filters.department !== 'all') {
-          if (member.department !== filters.department) return false;
-        }
-
-        // Location filter
-        if (filters.location && filters.location !== 'all') {
-          if (member.location !== filters.location) return false;
-        }
-
-        // Search term filter
-        if (filters.searchTerm) {
-          const searchLower = filters.searchTerm.toLowerCase();
-          const fullName = `${member.firstName} ${member.lastName}`.toLowerCase();
-          if (!fullName.includes(searchLower)) return false;
-        }
-
-        return true;
-      });
-      // Note: No .sort() here - we preserve the sort order from the parent (allMembers)
+      return {
+        id: member.id,
+        type: member.type,
+        firstName: member.firstName,
+        lastName: member.lastName,
+        avatarUrl: member.avatarUrl,
+        availableHours,
+        allocatedHours,
+        utilization,
+        capacity: member.capacity,
+        department: member.department,
+        practiceArea: member.practiceArea,
+        location: member.location,
+        sectors,
+        projectAllocations
+      };
+    });
+    // No filtering or sorting here - parent already provides filtered+sorted members
     
     return available;
-  }, [allMembersFromParent, allocations, threshold, filters]);
+  }, [allMembersFromParent, allocations]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {

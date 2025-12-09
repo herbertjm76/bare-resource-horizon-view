@@ -16,8 +16,6 @@ export const useWeekResourceAllocations = ({ weekStartDate }: UseWeekResourceAll
     queryFn: async () => {
       if (!company?.id) return [];
 
-      console.log('Fetching week resource allocations for:', weekStartDate);
-
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select('*')
@@ -25,7 +23,6 @@ export const useWeekResourceAllocations = ({ weekStartDate }: UseWeekResourceAll
         .eq('allocation_date', weekStartDate);
 
       if (error) {
-        console.error('Error fetching week resource allocations:', error);
         throw error;
       }
 

@@ -144,7 +144,7 @@ export const WeeklyRundownView: React.FC = () => {
         <AvailableMembersRow 
           weekStartDate={weekStartString}
           threshold={80}
-          sortOption={sortOption}
+          allMembers={allMembers}
         />
       )}
 

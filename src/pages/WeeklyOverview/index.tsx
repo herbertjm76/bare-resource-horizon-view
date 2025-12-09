@@ -249,8 +249,6 @@ const WeeklyOverview = () => {
               <AvailableMembersRow
                 weekStartDate={weekStartString}
                 threshold={80}
-                filters={filters}
-                sortOption={sortOption}
                 allMembers={allMembers}
               />
 
