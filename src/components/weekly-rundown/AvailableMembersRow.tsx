@@ -5,7 +5,6 @@ import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useWeekResourceTeamMembers } from '@/components/week-resourcing/hooks/useWeekResourceTeamMembers';
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
@@ -17,6 +16,18 @@ interface AvailableMembersRowProps {
     location: string;
     searchTerm: string;
   };
+  // Accept pre-sorted members from parent to ensure consistency with carousel/grid
+  allMembers?: Array<{
+    id: string;
+    first_name: string;
+    last_name: string;
+    avatar_url?: string | null;
+    weekly_capacity?: number;
+    department?: string | null;
+    practice_area?: string | null;
+    location?: string | null;
+    status?: string;
+  }>;
 }
 
 interface ProjectAllocation {
@@ -47,18 +58,16 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
   sortOption = 'alphabetical',
-  filters
+  filters,
+  allMembers: externalMembers
 }) => {
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
 
-  // Use shared hook for team members - single source of truth
-  const { members } = useWeekResourceTeamMembers();
-  
-  // Separate active profiles and pre-registered invites from the unified members list
-  const profiles = members.filter(m => m.status === 'active');
-  const invites = members.filter(m => m.status === 'pre_registered');
+  // Use external members if provided, otherwise empty (parent should always provide)
+  const profiles = (externalMembers || []).filter(m => m.status === 'active' || !m.status);
+  const invites = (externalMembers || []).filter(m => m.status === 'pre_registered');
 
   const { data: allocations = [] } = useQuery({
     queryKey: ['available-allocations', weekStartDate],

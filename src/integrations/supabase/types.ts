@@ -1793,6 +1793,7 @@ export type Database = {
         Returns: boolean
       }
       is_company_role:
+        | { Args: never; Returns: boolean }
         | {
             Args: {
               company_uuid: string
@@ -1800,7 +1801,6 @@ export type Database = {
             }
             Returns: boolean
           }
-        | { Args: never; Returns: boolean }
       migrate_sensitive_profile_data: { Args: never; Returns: undefined }
       update_stage_budgets: {
         Args: { p_project_id: string; p_stage_id: string }
