@@ -52,8 +52,8 @@ const WeeklyOverview = () => {
   // Card visibility preferences
   const { visibility: cardVisibility, cardOrder, toggleCard, moveCard, reorderCards } = useCardVisibility();
 
-  // Centralized data fetching
-  const data = useWeeklyOverviewData(selectedWeek, filters);
+  // Centralized data fetching with sorting
+  const data = useWeeklyOverviewData(selectedWeek, filters, sortOption);
   const {
     allMembers,
     projects,
@@ -83,52 +83,7 @@ const WeeklyOverview = () => {
     getProjectCount
   });
 
-  // Sort members to match the same order as rundownItems for consistency
-  // This directly applies the same sorting logic used in useRundownData
-  const sortedMembers = useMemo(() => {
-    console.log('Computing sortedMembers - allMembers count:', allMembers.length, 'sortOption:', sortOption);
-    
-    // Sort allMembers directly with the same logic as useRundownData
-    const result = [...allMembers].sort((a, b) => {
-      const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
-      const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
-      
-      switch (sortOption) {
-        case 'alphabetical':
-          return nameA.localeCompare(nameB);
-        case 'utilization':
-          // Get utilization data for proper sorting
-          const aTotal = getMemberTotalForRundown(a.id);
-          const bTotal = getMemberTotalForRundown(b.id);
-          const aCapacity = a.weekly_capacity || 40;
-          const bCapacity = b.weekly_capacity || 40;
-          const aUtil = aCapacity > 0 ? (aTotal?.resourcedHours || 0) / aCapacity * 100 : 0;
-          const bUtil = bCapacity > 0 ? (bTotal?.resourcedHours || 0) / bCapacity * 100 : 0;
-          return bUtil - aUtil; // High to low
-        case 'location':
-          return (a.location || '').localeCompare(b.location || '');
-        case 'department':
-          return (a.department || '').localeCompare(b.department || '');
-        default:
-          return 0;
-      }
-    });
-    
-    console.log('sortedMembers result - first 3:', result.slice(0, 3).map(m => `${m.first_name} ${m.last_name}`));
-    return result;
-  }, [allMembers, sortOption, getMemberTotalForRundown]);
-
-  // Debug logging
-  console.log('WeeklyOverview - View State:', {
-    viewType,
-    rundownMode,
-    rundownItemsCount: rundownItems.length,
-    allMembersCount: allMembers.length,
-    projectsCount: projects.length,
-    sortOption,
-    firstSortedMember: sortedMembers[0] ? `${sortedMembers[0].first_name} ${sortedMembers[0].last_name}` : 'none',
-    firstRundownItem: rundownItems[0] ? rundownItems[0].name : 'none'
-  });
+  // allMembers is now already sorted from the centralized hook - no additional sorting needed
 
   // Carousel navigation
   const {
@@ -289,7 +244,7 @@ const WeeklyOverview = () => {
                 threshold={80}
                 filters={filters}
                 sortOption={sortOption}
-                allMembers={sortedMembers}
+                allMembers={allMembers}
               />
 
               {/* Table View */}
