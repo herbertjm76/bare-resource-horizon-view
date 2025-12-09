@@ -68,6 +68,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   // Use external members directly - they are already sorted by the parent
   // Don't separate into profiles/invites as that breaks the sort order
   const allMembersFromParent = externalMembers || [];
+  
+  // Debug: Log what we receive from parent
+  console.log('AvailableMembersRow received allMembers - first 3:', 
+    allMembersFromParent.slice(0, 3).map(m => `${m.first_name} ${m.last_name}`));
 
   const { data: allocations = [] } = useQuery({
     queryKey: ['available-allocations', weekStartDate],
