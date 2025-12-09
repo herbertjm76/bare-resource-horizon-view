@@ -60,66 +60,26 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     otherLeaveData,
     updateOtherLeave,
     error
-  } = useStreamlinedWeekResourceData(selectedWeek, stableFilters);
+  } = useStreamlinedWeekResourceData(selectedWeek, stableFilters, sortOption);
 
-  // Filter and sort members
+  // Filter members by search term only (sorting is now centralized in useStreamlinedWeekResourceData)
   const filteredMembers = useMemo(() => {
     if (!allMembers || allMembers.length === 0) {
       return [];
     }
     
-    // Apply search filter
-    let filtered = allMembers;
+    // Apply search filter only - allMembers is already sorted
     if (stableFilters.searchTerm) {
       const searchLower = stableFilters.searchTerm.toLowerCase();
-      filtered = allMembers.filter(member => {
+      return allMembers.filter(member => {
         const fullName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
         const email = (member.email || '').toLowerCase();
         return fullName.includes(searchLower) || email.includes(searchLower);
       });
     }
     
-    // Apply sorting
-    const sorted = [...filtered].sort((a, b) => {
-      switch (sortOption) {
-        case 'alphabetical':
-          const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase();
-          const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase();
-          return nameA.localeCompare(nameB);
-        
-        case 'utilization':
-          // Calculate utilization for sorting (higher first)
-          const mapA = allocationMap || new Map<string, number>();
-          const mapB = allocationMap || new Map<string, number>();
-          const utilizationA = calculateUtilizationPercentage(
-            calculateMemberProjectHours(a.id, mapA),
-            a.weekly_capacity || 40,
-            (annualLeaveData[a.id] || 0) + (holidaysData[a.id] || 0) + (otherLeaveData[a.id] || 0)
-          );
-          const utilizationB = calculateUtilizationPercentage(
-            calculateMemberProjectHours(b.id, mapB),
-            b.weekly_capacity || 40,
-            (annualLeaveData[b.id] || 0) + (holidaysData[b.id] || 0) + (otherLeaveData[b.id] || 0)
-          );
-          return utilizationB - utilizationA;
-        
-        case 'location':
-          const locA = (a.location || '').toLowerCase();
-          const locB = (b.location || '').toLowerCase();
-          return locA.localeCompare(locB);
-        
-        case 'department':
-          const deptA = (a.department || '').toLowerCase();
-          const deptB = (b.department || '').toLowerCase();
-          return deptA.localeCompare(deptB);
-        
-        default:
-          return 0;
-      }
-    });
-    
-    return sorted;
-  }, [allMembers, stableFilters.searchTerm, sortOption, allocationMap, annualLeaveData, holidaysData, otherLeaveData]);
+    return allMembers;
+  }, [allMembers, stableFilters.searchTerm]);
 
   // Stable callback functions
   const handleWeekChange = useCallback((date: Date) => {

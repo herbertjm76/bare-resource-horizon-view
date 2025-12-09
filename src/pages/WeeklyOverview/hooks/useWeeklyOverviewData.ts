@@ -6,7 +6,9 @@ import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hoo
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 
-export const useWeeklyOverviewData = (selectedWeek: Date, filters: any) => {
+type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
+
+export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOption: SortOption = 'alphabetical') => {
   const { company } = useCompany();
   
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
@@ -22,8 +24,8 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any) => {
     searchTerm: filters.searchTerm 
   }), [filters.practiceArea, filters.department, filters.location, filters.searchTerm]);
 
-  // Core resource data (members, projects, allocations)
-  const resourceData = useStreamlinedWeekResourceData(selectedWeek, stableFilters);
+  // Core resource data (members, projects, allocations) - now with centralized sorting
+  const resourceData = useStreamlinedWeekResourceData(selectedWeek, stableFilters, sortOption);
   
   const memberIds = useMemo(() => 
     resourceData.allMembers?.map(m => m.id) || [],

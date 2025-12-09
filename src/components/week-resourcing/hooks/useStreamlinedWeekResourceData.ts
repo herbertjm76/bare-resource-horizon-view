@@ -8,7 +8,9 @@ import { useWeeklyLeaveDetails } from './useWeeklyLeaveDetails';
 import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
 import { format } from 'date-fns';
 
-export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any) => {
+type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
+
+export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any, sortOption: SortOption = 'alphabetical') => {
   // Convert Date to string format for API calls - make this stable
   const weekStartDate = useMemo(() => format(selectedWeek, 'yyyy-MM-dd'), [selectedWeek]);
   
@@ -23,7 +25,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
   const shouldFetchData = allMemberIds.length > 0 && !loadingMembers;
   
   // Apply filters client-side for instant filtering without refetching
-  const members = useMemo(() => {
+  const filteredMembers = useMemo(() => {
     if (!allFetchedMembers) return [];
     
     return allFetchedMembers.filter(member => {
@@ -190,6 +192,36 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     return weeklyLeaveDetails[memberId] || [];
   }, [weeklyLeaveDetails]);
 
+  // Apply sorting to filtered members - centralized sorting logic
+  const members = useMemo(() => {
+    if (!filteredMembers || filteredMembers.length === 0) return [];
+    
+    return [...filteredMembers].sort((a, b) => {
+      const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
+      const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
+      
+      switch (sortOption) {
+        case 'alphabetical':
+          return nameA.localeCompare(nameB);
+        case 'utilization':
+          // Get utilization data for proper sorting
+          const aTotal = memberTotalsMap.get(a.id) || 0;
+          const bTotal = memberTotalsMap.get(b.id) || 0;
+          const aCapacity = a.weekly_capacity || 40;
+          const bCapacity = b.weekly_capacity || 40;
+          const aUtil = aCapacity > 0 ? (aTotal / aCapacity) * 100 : 0;
+          const bUtil = bCapacity > 0 ? (bTotal / bCapacity) * 100 : 0;
+          return bUtil - aUtil; // High to low
+        case 'location':
+          return (a.location || '').localeCompare(b.location || '');
+        case 'department':
+          return (a.department || '').localeCompare(b.department || '');
+        default:
+          return 0;
+      }
+    });
+  }, [filteredMembers, sortOption, memberTotalsMap]);
+
   // Simplified loading state - only block UI while team members are loading
   const isLoading = useMemo(() => {
     // Only treat initial member loading as blocking; other data loads in background
@@ -234,6 +266,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
   // Enhanced logging for debugging
   console.log('Streamlined WeekResourceData:', {
     weekStartDate,
+    sortOption,
     membersCount: members?.length || 0,
     projectsCount: projects?.length || 0,
     detailedAllocationsCount: detailedAllocations ? Object.keys(detailedAllocations).length : 0,
@@ -241,10 +274,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     memberTotalsMapSize: memberTotalsMap.size,
     isLoading,
     shouldFetchData,
-    // Log sample allocation map entries for debugging
-    sampleAllocationEntries: Array.from(allocationMap.entries()).slice(0, 5),
-    // Log member totals for debugging
-    sampleMemberTotals: Array.from(memberTotalsMap.entries()).slice(0, 3)
+    firstMember: members?.[0] ? `${members[0].first_name} ${members[0].last_name}` : 'none'
   });
 
   return result;

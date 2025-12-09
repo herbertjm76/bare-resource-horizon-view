@@ -19,6 +19,7 @@ export const useRundownData = ({
   getProjectCount
 }: UseRundownDataProps) => {
   // Memoize the rundown items to prevent flickering
+  // Note: allMembers is already sorted by the parent hook (useStreamlinedWeekResourceData)
   const rundownItems = useMemo(() => {
     console.log('useRundownData - Computing rundown items', { rundownMode, memberCount: allMembers?.length });
     
@@ -28,8 +29,8 @@ export const useRundownData = ({
     }
     
     if (rundownMode === 'people') {
-      // Process people data
-      let processedPeople = allMembers.map(member => {
+      // Process people data - preserve the sort order from allMembers (already sorted)
+      const processedPeople = allMembers.map(member => {
         const memberTotal = getMemberTotal(member.id);
         const capacity = member.weekly_capacity || 40;
         const totalHours = memberTotal?.resourcedHours || 0;
@@ -75,22 +76,7 @@ export const useRundownData = ({
         };
       });
 
-      // Sort people based on sortOption
-      processedPeople.sort((a, b) => {
-        switch (sortOption) {
-          case 'alphabetical':
-            return a.name.localeCompare(b.name);
-          case 'utilization':
-            return b.utilization - a.utilization;
-          case 'location':
-            return a.location.localeCompare(b.location);
-          case 'department':
-            return (a.department || '').localeCompare(b.department || '');
-          default:
-            return 0;
-        }
-      });
-
+      // No sorting needed - allMembers is already sorted by useStreamlinedWeekResourceData
       return processedPeople;
     } else {
       // Process projects data
