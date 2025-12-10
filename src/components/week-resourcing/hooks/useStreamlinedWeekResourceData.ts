@@ -178,35 +178,53 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
     return weeklyLeaveDetails[memberId] || [];
   }, [weeklyLeaveDetails]);
 
+  // Create a stable serialized version of memberTotalsMap for dependency tracking
+  const memberTotalsMapSerialized = useMemo(() => {
+    return JSON.stringify(Array.from(memberTotalsMap.entries()));
+  }, [memberTotalsMap]);
+
   // Apply sorting to filtered members - centralized sorting logic
+  // This is the SINGLE SOURCE OF TRUTH for member ordering
   const members = useMemo(() => {
     if (!filteredMembers || filteredMembers.length === 0) return [];
     
-    return [...filteredMembers].sort((a, b) => {
-      const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
-      const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
+    // Parse the serialized map to get actual utilization values
+    const totalsEntries: [string, number][] = JSON.parse(memberTotalsMapSerialized);
+    const totalsMap = new Map<string, number>(totalsEntries);
+    
+    const sorted = [...filteredMembers].sort((a, b) => {
+      const nameA = `${a.first_name || ''} ${a.last_name || ''}`.trim().toLowerCase();
+      const nameB = `${b.first_name || ''} ${b.last_name || ''}`.trim().toLowerCase();
       
       switch (sortOption) {
         case 'alphabetical':
           return nameA.localeCompare(nameB);
         case 'utilization':
           // Get utilization data for proper sorting
-          const aTotal = memberTotalsMap.get(a.id) || 0;
-          const bTotal = memberTotalsMap.get(b.id) || 0;
+          const aTotal = totalsMap.get(a.id) || 0;
+          const bTotal = totalsMap.get(b.id) || 0;
           const aCapacity = a.weekly_capacity || 40;
           const bCapacity = b.weekly_capacity || 40;
           const aUtil = aCapacity > 0 ? (aTotal / aCapacity) * 100 : 0;
           const bUtil = bCapacity > 0 ? (bTotal / bCapacity) * 100 : 0;
-          return bUtil - aUtil; // High to low
+          // High to low, with alphabetical fallback for ties
+          if (bUtil !== aUtil) return bUtil - aUtil;
+          return nameA.localeCompare(nameB);
         case 'location':
-          return (a.location || '').localeCompare(b.location || '');
+          const locCompare = (a.location || '').localeCompare(b.location || '');
+          if (locCompare !== 0) return locCompare;
+          return nameA.localeCompare(nameB);
         case 'department':
-          return (a.department || '').localeCompare(b.department || '');
+          const deptCompare = (a.department || '').localeCompare(b.department || '');
+          if (deptCompare !== 0) return deptCompare;
+          return nameA.localeCompare(nameB);
         default:
           return 0;
       }
     });
-  }, [filteredMembers, sortOption, memberTotalsMap]);
+    
+    return sorted;
+  }, [filteredMembers, sortOption, memberTotalsMapSerialized]);
 
   // Simplified loading state - only block UI while team members are loading
   const isLoading = useMemo(() => {
