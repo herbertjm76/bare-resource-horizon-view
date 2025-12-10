@@ -100,20 +100,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   });
 
   const availableMembers: AvailableMember[] = React.useMemo(() => {
-    // Map members preserving the original sort order from parent
-    // allMembersFromParent is already filtered and sorted by the parent component
-    const allMembers = allMembersFromParent.map(m => ({
-      id: m.id,
-      firstName: m.first_name || '',
-      lastName: m.last_name || '',
-      avatarUrl: m.avatar_url,
-      capacity: m.weekly_capacity || 40,
-      department: m.department || undefined,
-      practiceArea: m.practice_area || undefined,
-      location: m.location || undefined,
-      type: (m.status === 'pre_registered' ? 'pre_registered' : 'active') as 'active' | 'pre_registered'
-    }));
-
+    // Build allocation maps for utilization calculation
     const allocationMap = new Map<string, number>();
     const memberSectorsMap = new Map<string, Set<string>>();
     const memberProjectsMap = new Map<string, Map<string, { name: string; code: string; hours: number }>>();
@@ -153,11 +140,14 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     });
 
     // Map members to AvailableMember format - preserving order from parent
-    const available = allMembers.map(member => {
-      const key = member.id;
+    // CRITICAL: allMembersFromParent is already sorted by the parent (useStreamlinedWeekResourceData)
+    // We MUST NOT re-sort here or the order will be inconsistent
+    const available = allMembersFromParent.map(m => {
+      const key = m.id;
+      const capacity = m.weekly_capacity || 40;
       const allocatedHours = allocationMap.get(key) || 0;
-      const availableHours = member.capacity - allocatedHours;
-      const utilization = (allocatedHours / member.capacity) * 100;
+      const availableHours = capacity - allocatedHours;
+      const utilization = capacity > 0 ? (allocatedHours / capacity) * 100 : 0;
       const sectors = Array.from(memberSectorsMap.get(key) || []);
       
       // Get project allocations
@@ -172,24 +162,24 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         : [];
 
       return {
-        id: member.id,
-        type: member.type,
-        firstName: member.firstName,
-        lastName: member.lastName,
-        avatarUrl: member.avatarUrl,
+        id: m.id,
+        type: (m.status === 'pre_registered' ? 'pre_registered' : 'active') as 'active' | 'pre_registered',
+        firstName: m.first_name || '',
+        lastName: m.last_name || '',
+        avatarUrl: m.avatar_url,
         availableHours,
         allocatedHours,
         utilization,
-        capacity: member.capacity,
-        department: member.department,
-        practiceArea: member.practiceArea,
-        location: member.location,
+        capacity,
+        department: m.department || undefined,
+        practiceArea: m.practice_area || undefined,
+        location: m.location || undefined,
         sectors,
         projectAllocations
       };
     });
-    // No filtering or sorting here - parent already provides filtered+sorted members
     
+    // No filtering or sorting here - parent already provides filtered+sorted members
     return available;
   }, [allMembersFromParent, allocations]);
 
