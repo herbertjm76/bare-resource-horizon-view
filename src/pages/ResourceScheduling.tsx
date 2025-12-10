@@ -140,9 +140,18 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-project" className="mt-0 py-3">
             <div className="space-y-3">
-              {/* Control buttons first */}
-              <div className="overflow-x-auto">
-                <div className="px-3 sm:px-6">
+              {/* 1. Available Members Row - always sorted by utilization */}
+              <div className="px-3 sm:px-6">
+                <AvailableMembersRow
+                  weekStartDate={weekStartDate}
+                  threshold={80}
+                  filters={memberFilters}
+                />
+              </div>
+              
+              {/* 2. Combined Controls + Member Filters */}
+              <div className="px-3 sm:px-6">
+                <div className="space-y-2">
                   <ProjectResourcingContent
                     selectedMonth={selectedMonth}
                     searchTerm={projectSearchTerm}
@@ -164,27 +173,16 @@ const ResourceScheduling = () => {
                     onClearFilters={clearProjectFilters}
                     showOnlyControls={true}
                   />
-                </div>
-              </div>
-              
-              {/* Member Filter and Available Members */}
-              <div className="px-3 sm:px-6">
-                <div className="bg-card rounded-lg p-1 space-y-1">
                   <MemberFilterRow
                     filters={memberFilters}
                     onFilterChange={handleMemberFilterChange}
                     activeFiltersCount={activeMemberFiltersCount}
                     clearFilters={clearMemberFilters}
                   />
-                  <AvailableMembersRow
-                    weekStartDate={weekStartDate}
-                    threshold={80}
-                    filters={memberFilters}
-                  />
                 </div>
               </div>
               
-              {/* Grid below */}
+              {/* 3. Grid below */}
               <div className="overflow-x-auto">
                 <div className="px-3 sm:px-6">
                   <ProjectResourcingContent
@@ -215,9 +213,18 @@ const ResourceScheduling = () => {
 
           <TabsContent value="by-person" className="mt-0 py-3">
             <div className="space-y-3">
-              {/* Control buttons first */}
-              <div className="overflow-x-auto">
-                <div className="px-3 sm:px-6">
+              {/* 1. Available Members Row - always sorted by utilization */}
+              <div className="px-3 sm:px-6">
+                <AvailableMembersRow
+                  weekStartDate={weekStartDate}
+                  threshold={80}
+                  filters={memberFilters}
+                />
+              </div>
+              
+              {/* 2. Combined Controls + Member Filters */}
+              <div className="px-3 sm:px-6">
+                <div className="space-y-2">
                   <PersonResourceView
                     startDate={selectedMonth}
                     periodToShow={filters.periodToShow}
@@ -226,27 +233,16 @@ const ResourceScheduling = () => {
                     onPeriodChange={handlePeriodChange}
                     showOnlyControls={true}
                   />
-                </div>
-              </div>
-              
-              {/* Member Filter and Available Members */}
-              <div className="px-3 sm:px-6">
-                <div className="bg-card rounded-lg p-1 space-y-1">
                   <MemberFilterRow
                     filters={memberFilters}
                     onFilterChange={handleMemberFilterChange}
                     activeFiltersCount={activeMemberFiltersCount}
                     clearFilters={clearMemberFilters}
                   />
-                  <AvailableMembersRow
-                    weekStartDate={weekStartDate}
-                    threshold={80}
-                    filters={memberFilters}
-                  />
                 </div>
               </div>
               
-              {/* Grid below */}
+              {/* 3. Grid below */}
               <div className="overflow-x-auto">
                 <div className="px-3 sm:px-6">
                   <PersonResourceView
