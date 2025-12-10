@@ -5,6 +5,7 @@ import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useWeekResourceTeamMembers } from '@/components/week-resourcing/hooks/useWeekResourceTeamMembers';
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
@@ -57,14 +58,44 @@ interface AvailableMember {
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
+  filters,
   allMembers: externalMembers
 }) => {
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
 
-  // Use external members directly - they are already sorted by the parent
-  const allMembersFromParent = externalMembers || [];
+  // Fetch members internally if not provided externally
+  const { members: fetchedMembers } = useWeekResourceTeamMembers();
+  
+  // Use external members if provided, otherwise use fetched members
+  const baseMembers = externalMembers || fetchedMembers || [];
+  
+  // Apply filters to members
+  const allMembersFromParent = React.useMemo(() => {
+    if (!filters) return baseMembers;
+    
+    return baseMembers.filter(member => {
+      // Filter by practice area
+      if (filters.practiceArea && filters.practiceArea !== 'all') {
+        if (member.practice_area !== filters.practiceArea) return false;
+      }
+      // Filter by department
+      if (filters.department && filters.department !== 'all') {
+        if (member.department !== filters.department) return false;
+      }
+      // Filter by location
+      if (filters.location && filters.location !== 'all') {
+        if (member.location !== filters.location) return false;
+      }
+      // Filter by search term
+      if (filters.searchTerm) {
+        const fullName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
+        if (!fullName.includes(filters.searchTerm.toLowerCase())) return false;
+      }
+      return true;
+    });
+  }, [baseMembers, filters]);
 
   const { data: allocations = [] } = useQuery({
     queryKey: ['available-allocations', weekStartDate],
