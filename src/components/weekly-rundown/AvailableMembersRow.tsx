@@ -139,9 +139,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       }
     });
 
-    // Map members to AvailableMember format - preserving order from parent
-    // CRITICAL: allMembersFromParent is already sorted by the parent (useStreamlinedWeekResourceData)
-    // We MUST NOT re-sort here or the order will be inconsistent
+    // Map members to AvailableMember format
+    // Parent provides filtered members, but we apply our own utilization sorting
     const available = allMembersFromParent.map(m => {
       const key = m.id;
       const capacity = m.weekly_capacity || 40;
@@ -179,8 +178,18 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       };
     });
     
-    // No filtering or sorting here - parent already provides filtered+sorted members
-    return available;
+    // ALWAYS sort by utilization (low to high - underutilized first)
+    // This is independent of the global sort option
+    return available.sort((a, b) => {
+      // Sort by utilization ascending (underutilized first)
+      if (a.utilization !== b.utilization) {
+        return a.utilization - b.utilization;
+      }
+      // Alphabetical fallback for ties
+      const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+      const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
   }, [allMembersFromParent, allocations]);
 
   // Check scroll position for arrows
