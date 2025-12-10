@@ -199,27 +199,28 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
       switch (sortOption) {
         case 'alphabetical':
           return nameA.localeCompare(nameB);
-        case 'utilization':
-          // Get utilization data for proper sorting
+        case 'utilization': {
           const aTotal = totalsMap.get(a.id) || 0;
           const bTotal = totalsMap.get(b.id) || 0;
           const aCapacity = a.weekly_capacity || 40;
           const bCapacity = b.weekly_capacity || 40;
           const aUtil = aCapacity > 0 ? (aTotal / aCapacity) * 100 : 0;
           const bUtil = bCapacity > 0 ? (bTotal / bCapacity) * 100 : 0;
-          // High to low, with alphabetical fallback for ties
           if (bUtil !== aUtil) return bUtil - aUtil;
           return nameA.localeCompare(nameB);
-        case 'location':
+        }
+        case 'location': {
           const locCompare = (a.location || '').localeCompare(b.location || '');
           if (locCompare !== 0) return locCompare;
           return nameA.localeCompare(nameB);
-        case 'department':
+        }
+        case 'department': {
           const deptCompare = (a.department || '').localeCompare(b.department || '');
           if (deptCompare !== 0) return deptCompare;
           return nameA.localeCompare(nameB);
+        }
         default:
-          return 0;
+          return nameA.localeCompare(nameB);
       }
     });
     
