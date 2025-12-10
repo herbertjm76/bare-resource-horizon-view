@@ -7,7 +7,7 @@ import { RundownCarousel } from '@/components/weekly-rundown/RundownCarousel';
 import { UnifiedWeeklyControls } from '@/components/week-resourcing/UnifiedWeeklyControls';
 import { WeeklySummaryCards } from '@/components/weekly-rundown/WeeklySummaryCards';
 import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
-import { MemberFilterRow } from '@/components/resources/MemberFilterRow';
+
 import { useRundownData } from '@/components/weekly-rundown/hooks/useRundownData';
 import { useCarouselNavigation } from '@/components/weekly-rundown/hooks/useCarouselNavigation';
 import { useCardVisibility } from '@/hooks/useCardVisibility';
@@ -212,7 +212,14 @@ const WeeklyOverview = () => {
 
             {/* Connected Filter and Content Section */}
             <div className="mt-0">
-              {/* Unified Controls */}
+              {/* Available Members Row - FIRST (shows availability/utilization) */}
+              <AvailableMembersRow
+                weekStartDate={weekStartString}
+                threshold={80}
+                allMembers={allMembers}
+              />
+
+              {/* Unified Controls + Filters Combined */}
               <UnifiedWeeklyControls
                 selectedWeek={selectedWeek}
                 onWeekChange={handleWeekChange}
@@ -235,21 +242,6 @@ const WeeklyOverview = () => {
                 onFilterChange={handleFilterChange}
                 activeFiltersCount={activeFiltersCount}
                 clearFilters={clearFilters}
-              />
-
-              {/* Member Filter Row */}
-              <MemberFilterRow
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                clearFilters={clearFilters}
-                activeFiltersCount={activeFiltersCount}
-              />
-
-              {/* Available Members Row */}
-              <AvailableMembersRow
-                weekStartDate={weekStartString}
-                threshold={80}
-                allMembers={allMembers}
               />
 
               {/* Table View */}
