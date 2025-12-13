@@ -102,7 +102,7 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
   }, [currentOptions.length, checkScroll]);
 
   return (
-    <div className="flex gap-2 items-center p-2 pt-3 border-t border-border/50">
+    <div className="flex gap-2 items-center px-2 pb-2">
       {/* Filter Type Icon Dropdown */}
       <Select value={activeFilterType} onValueChange={(value: FilterType) => setActiveFilterType(value)}>
         <SelectTrigger className="w-9 h-9 p-0 border-input bg-background">

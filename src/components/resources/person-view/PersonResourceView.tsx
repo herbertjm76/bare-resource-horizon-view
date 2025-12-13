@@ -138,7 +138,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
         />
         
         {/* Desktop Controls */}
-        <div className="hidden lg:block p-2">
+        <div className="hidden lg:block px-2 pt-2">
           <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
             
             {/* Left section - Date Navigation */}
