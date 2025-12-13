@@ -140,7 +140,7 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
       />
       
       {/* Desktop layout */}
-      <div className="hidden lg:block bg-card rounded-lg border p-3">
+      <div className="hidden lg:block p-2">
         <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
         {/* Left section - Date Navigation */}
         <div className="flex gap-3 items-center">

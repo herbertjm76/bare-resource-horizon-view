@@ -139,7 +139,7 @@ const ResourceScheduling = () => {
               </TabsList>
 
           <TabsContent value="by-project" className="mt-0 py-3">
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* 1. Available Members Row - always sorted by utilization */}
               <div className="px-3 sm:px-6">
                 <AvailableMembersRow
@@ -149,9 +149,9 @@ const ResourceScheduling = () => {
                 />
               </div>
               
-              {/* 2. Combined Controls + Member Filters */}
+              {/* 2. Combined Controls + Member Filters - grouped in single card */}
               <div className="px-3 sm:px-6">
-                <div className="space-y-2">
+                <div className="bg-card rounded-lg border shadow-sm">
                   <ProjectResourcingContent
                     selectedMonth={selectedMonth}
                     searchTerm={projectSearchTerm}
@@ -212,7 +212,7 @@ const ResourceScheduling = () => {
           </TabsContent>
 
           <TabsContent value="by-person" className="mt-0 py-3">
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* 1. Available Members Row - always sorted by utilization */}
               <div className="px-3 sm:px-6">
                 <AvailableMembersRow
@@ -222,9 +222,9 @@ const ResourceScheduling = () => {
                 />
               </div>
               
-              {/* 2. Combined Controls + Member Filters */}
+              {/* 2. Combined Controls + Member Filters - grouped in single card */}
               <div className="px-3 sm:px-6">
-                <div className="space-y-2">
+                <div className="bg-card rounded-lg border shadow-sm">
                   <PersonResourceView
                     startDate={selectedMonth}
                     periodToShow={filters.periodToShow}
