@@ -261,7 +261,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
   return (
     <div className="w-full">
-      <div className="rounded-xl bg-gradient-to-r from-muted/50 via-muted/30 to-muted/50 p-2 animate-fade-in relative border border-border/50">
+      <div className="p-2 animate-fade-in relative">
         {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
         {availableMembers.length > 0 && (
           <div className="hidden sm:block relative">
