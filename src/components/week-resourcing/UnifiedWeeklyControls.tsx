@@ -169,9 +169,10 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
   const showProgress = viewType === 'carousel' && totalItems && totalItems > 0;
 
   return (
-    <div className="unified-weekly-controls space-y-2 mb-4">
-      {/* Row 1: Week Selector + View Controls */}
-      <div className="flex flex-col lg:flex-row gap-3 lg:items-center bg-card rounded-lg border p-3">
+    <div className="unified-weekly-controls mb-4">
+      <div className="bg-card rounded-lg border shadow-sm">
+        {/* Row 1: Week Selector + View Controls */}
+        <div className="flex flex-col lg:flex-row gap-3 lg:items-center p-3">
         {/* Left section - Week and Progress */}
         <div className="flex gap-3 items-center">
           <div className="flex items-center gap-2">
@@ -335,10 +336,10 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
               </Button>
             )}
         </div>
-      </div>
+        </div>
 
-      {/* Row 2: Filter Badges */}
-      <div className="flex gap-2 items-center bg-muted/30 rounded-lg border p-2">
+        {/* Row 2: Filter Badges */}
+        <div className="flex gap-2 items-center px-3 pb-3">
         {/* Filter Type Icon Dropdown */}
         <Select value={activeFilterType} onValueChange={(value: FilterType) => setActiveFilterType(value)}>
           <SelectTrigger className="w-8 h-8 p-0 border-input bg-background">
@@ -486,6 +487,7 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
             </div>
           </PopoverContent>
         </Popover>
+        </div>
       </div>
     </div>
   );
