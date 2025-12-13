@@ -338,8 +338,11 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
         </div>
         </div>
 
+        {/* Subtle divider */}
+        <div className="border-t border-border/50 mx-3" />
+
         {/* Row 2: Filter Badges */}
-        <div className="flex gap-2 items-center px-3 pb-3">
+        <div className="flex gap-2 items-center px-3 py-2 bg-muted/30 rounded-b-lg">
         {/* Filter Type Icon Dropdown */}
         <Select value={activeFilterType} onValueChange={(value: FilterType) => setActiveFilterType(value)}>
           <SelectTrigger className="w-8 h-8 p-0 border-input bg-background">
