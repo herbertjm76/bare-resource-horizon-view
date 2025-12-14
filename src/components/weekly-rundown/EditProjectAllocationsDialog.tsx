@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { format, startOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface EditProjectAllocationsDialogProps {
   open: boolean;
@@ -21,6 +23,8 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
 }) => {
   const [hours, setHours] = useState<Record<string, number>>({});
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const { displayPreference, workWeekHours } = useAppSettings();
+  const capacity = workWeekHours || 40;
 
   const handleSave = async (memberId: string, memberName: string) => {
     try {
@@ -59,7 +63,7 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{member.name}</p>
-                    <p className="text-sm text-muted-foreground">Current: {Math.round(member.hours || 0)}h</p>
+                    <p className="text-sm text-muted-foreground">Current: {formatAllocationValue(member.hours || 0, capacity, displayPreference)}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Input

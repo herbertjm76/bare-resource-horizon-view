@@ -49,6 +49,8 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
   const [editedHours, setEditedHours] = useState(member.hours.toString());
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
+  const { workWeekHours, displayPreference } = useAppSettings();
+  const capacity = workWeekHours || 40;
 
   const nameParts = member.name.split(' ');
   const firstName = nameParts[0] || '';

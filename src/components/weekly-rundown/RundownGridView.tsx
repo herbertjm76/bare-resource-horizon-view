@@ -221,6 +221,7 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
   const totalHours = project.totalHours || 0;
   const totalFte = perFteCapacity > 0 ? totalHours / perFteCapacity : 0;
 
+  const getCapacityColor = (percentage: number) => {
     if (percentage > 100) return 'hsl(var(--destructive))';
     if (percentage >= 90) return 'hsl(39, 100%, 50%)';
     if (percentage >= 75) return 'hsl(120, 100%, 40%)';
@@ -316,14 +317,24 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
                             {member.allProjects && member.allProjects.length > 0 ? (
                               <div className="space-y-1">
                                 <div className="text-xs font-medium text-muted-foreground mb-1">Projects this week:</div>
-                                {member.allProjects.map((proj: any, pIdx: number) => (
-                                  <div key={pIdx} className="flex justify-between items-center text-xs">
-                                    <span className="text-foreground truncate max-w-[140px]">
-                                      {getProjectDisplayName(proj, projectDisplayPreference)}
-                                    </span>
-                                    <span className="text-muted-foreground font-medium ml-2">{proj.hours}h</span>
-                                  </div>
-                                ))}
+                                {member.allProjects.map((proj: any, pIdx: number) => {
+                                  // For each project, compute percentage vs hours
+                                  const projPercent = member.totalHours > 0 
+                                    ? (proj.hours / member.totalHours) * (member.capacityPercentage || 0)
+                                    : 0;
+                                  return (
+                                    <div key={pIdx} className="flex justify-between items-center text-xs">
+                                      <span className="text-foreground truncate max-w-[140px]">
+                                        {getProjectDisplayName(proj, projectDisplayPreference)}
+                                      </span>
+                                      <span className="text-muted-foreground font-medium ml-2">
+                                        {displayPreference === 'percentage' 
+                                          ? `${Math.round(projPercent)}%` 
+                                          : `${proj.hours}h`}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
                                 <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-xs text-foreground">
                                   <span>Total:</span>
                                   <span>

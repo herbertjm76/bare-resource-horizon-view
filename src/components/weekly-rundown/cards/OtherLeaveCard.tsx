@@ -4,6 +4,8 @@ import { PartyPopper } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface OtherLeaveEntry {
   member_id: string;
@@ -15,6 +17,9 @@ interface OtherLeaveCardProps {
 }
 
 export const OtherLeaveCard: React.FC<OtherLeaveCardProps> = ({ leaves }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
+  const capacity = workWeekHours || 40;
+
   // Group by member_id and sum hours
   const leaveByMember = leaves.reduce((acc, leave) => {
     if (!acc[leave.member_id]) {
@@ -88,7 +93,7 @@ export const OtherLeaveCard: React.FC<OtherLeaveCardProps> = ({ leaves }) => {
                     <AvatarImage src={avatarUrl} />
                     <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
                   </Avatar>
-                  <span className="text-xs font-medium text-foreground">{hours}h</span>
+                  <span className="text-xs font-medium text-foreground">{formatAllocationValue(hours, capacity, displayPreference)}</span>
                 </div>
               );
             })}
