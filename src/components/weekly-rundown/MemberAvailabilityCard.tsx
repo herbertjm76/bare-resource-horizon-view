@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectAllocation {
   projectId: string;
@@ -28,6 +29,7 @@ interface MemberAvailabilityCardProps {
   memberType: 'active' | 'pre_registered';
   weekStartDate: string;
   disableDialog?: boolean;
+  capacity?: number;
 }
 
 export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
@@ -42,8 +44,10 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   memberType,
   weekStartDate,
   disableDialog = false,
+  capacity = 40,
 }) => {
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
+  const effectiveCapacity = capacity || workWeekHours;
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
   
@@ -110,7 +114,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
           <div className="space-y-2">
             <div className="font-semibold text-sm text-foreground">{fullName}</div>
             <div className="text-xs text-muted-foreground">
-              {Math.round(utilization)}% utilized • {allocatedHours}h allocated
+              {Math.round(utilization)}% utilized • {formatAllocationValue(allocatedHours, effectiveCapacity, displayPreference)} allocated
             </div>
             
             {projectAllocations.length > 0 ? (
@@ -121,7 +125,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
                     <span className="text-foreground truncate max-w-[140px]">
                       {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
                     </span>
-                    <span className="text-muted-foreground font-medium ml-2">{project.hours}h</span>
+                    <span className="text-muted-foreground font-medium ml-2">{formatAllocationValue(project.hours, effectiveCapacity, displayPreference)}</span>
                   </div>
                 ))}
               </div>

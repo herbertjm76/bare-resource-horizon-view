@@ -1,5 +1,7 @@
 
 import React from "react";
+import { useAppSettings } from "@/hooks/useAppSettings";
+import { formatUtilizationSummary } from "@/utils/allocationDisplay";
 
 interface LongCapacityBarProps {
   totalUsedHours: number;
@@ -12,6 +14,7 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
   totalCapacity,
   compact = false
 }) => {
+  const { displayPreference } = useAppSettings();
   const utilization = totalCapacity > 0 ? (totalUsedHours / totalCapacity) * 100 : 0;
   const rate = Math.round(utilization);
 
@@ -56,7 +59,7 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
     );
   }
 
-  // ... keep existing code (expanded mode/design) ...
+  // Expanded mode
   return (
     <div className="flex flex-col items-center w-full">
       <div className="w-[180px] sm:w-[240px] h-5 rounded-full border border-gray-300 bg-gray-100 overflow-hidden relative">
@@ -86,7 +89,7 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
       >
         {rate}% used
       </span>
-      <span className="text-xs text-gray-400 mt-0.5">{totalUsedHours}h of {totalCapacity}h</span>
+      <span className="text-xs text-gray-400 mt-0.5">{formatUtilizationSummary(totalUsedHours, totalCapacity, displayPreference)}</span>
     </div>
   );
 }

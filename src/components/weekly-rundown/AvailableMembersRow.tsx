@@ -350,6 +350,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                         threshold={threshold}
                         weekStartDate={weekStartDate}
                         disableDialog={true}
+                        capacity={member.capacity}
                       />
                     </div>
                   </MemberVacationPopover>
@@ -385,6 +386,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                       threshold={threshold}
                       weekStartDate={weekStartDate}
                       disableDialog={true}
+                      capacity={member.capacity}
                     />
                   </div>
                 </MemberVacationPopover>
