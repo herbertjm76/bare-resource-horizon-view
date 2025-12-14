@@ -148,12 +148,14 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                                     <span className="text-foreground truncate max-w-[140px]">
                                       {getProjectDisplayName(alloc.project, projectDisplayPreference)}
                                     </span>
-                                    <span className="text-muted-foreground font-medium ml-2">{alloc.hours}h</span>
+                                    <span className="text-muted-foreground font-medium ml-2">
+                                      {formatAllocationValue(alloc.hours, getMemberCapacity(member), displayPreference)}
+                                    </span>
                                   </div>
                                 ))}
                                 <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-sm text-foreground">
                                   <span>Total:</span>
-                                  <span>{memberTotal}h</span>
+                                  <span>{formatAllocationValue(memberTotal, getMemberCapacity(member), displayPreference)}</span>
                                 </div>
                               </div>
                             ) : (
@@ -213,7 +215,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   >
                     {hours > 0 && (
                       <span className="inline-flex items-center justify-center w-7 h-7 bg-emerald-500 text-white rounded-sm font-semibold text-xs hover:bg-emerald-600 transition-colors duration-100">
-                        {hours}
+                        {formatAllocationValue(hours, getMemberCapacity(member), displayPreference)}
                       </span>
                     )}
                   </TableCell>
@@ -223,7 +225,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                 <div className="flex items-center justify-center h-full">
                   {getProjectTotal(project.id) > 0 ? (
                     <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
-                      {getProjectTotal(project.id)}
+                      {formatAllocationValue(getProjectTotal(project.id), defaultWeeklyCapacity, displayPreference)}
                     </div>
                   ) : (
                     <span className="text-transparent select-none">0</span>
@@ -249,7 +251,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                 <div className="flex items-center justify-center h-full">
                   {getMemberTotal(member.id) > 0 ? (
                     <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
-                      {getMemberTotal(member.id)}
+                      {formatAllocationValue(getMemberTotal(member.id), getMemberCapacity(member), displayPreference)}
                     </div>
                   ) : (
                     <span className="text-transparent select-none">0</span>
@@ -260,7 +262,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             <TableCell className="text-center border-l-2 border-white/40 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
               <div className="flex items-center justify-center h-full">
                 <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
-                  {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
+                  {formatAllocationValue(members.reduce((sum, member) => sum + getMemberTotal(member.id), 0), defaultWeeklyCapacity * members.length, displayPreference)}
                 </div>
               </div>
             </TableCell>
