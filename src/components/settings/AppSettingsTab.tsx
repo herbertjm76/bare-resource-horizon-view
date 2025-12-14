@@ -19,8 +19,9 @@ export const AppSettingsTab: React.FC = () => {
     start_of_work_week: company?.start_of_work_week || 'Monday',
     opt_out_financials: company?.opt_out_financials || false,
     project_display_preference: company?.project_display_preference || 'code',
-    allocation_warning_threshold: (company as any)?.allocation_warning_threshold || 150,
-    allocation_danger_threshold: (company as any)?.allocation_danger_threshold || 180
+    allocation_warning_threshold: company?.allocation_warning_threshold || 150,
+    allocation_danger_threshold: company?.allocation_danger_threshold || 180,
+    allocation_max_limit: (company as any)?.allocation_max_limit || 200
   });
 
   const handleSave = async () => {
@@ -37,7 +38,8 @@ export const AppSettingsTab: React.FC = () => {
           opt_out_financials: formData.opt_out_financials,
           project_display_preference: formData.project_display_preference,
           allocation_warning_threshold: formData.allocation_warning_threshold,
-          allocation_danger_threshold: formData.allocation_danger_threshold
+          allocation_danger_threshold: formData.allocation_danger_threshold,
+          allocation_max_limit: formData.allocation_max_limit
         } as any)
         .eq('id', company.id);
 
@@ -185,7 +187,25 @@ export const AppSettingsTab: React.FC = () => {
             className="max-w-xs"
           />
           <p className="text-sm text-muted-foreground">
-            Show red danger warning when allocation exceeds this percentage (default: 180%)</p>
+            Show red danger warning when allocation exceeds this percentage (default: 180%)
+          </p>
+        </div>
+
+        {/* Maximum Allocation Limit */}
+        <div className="space-y-2">
+          <Label htmlFor="allocation_max_limit">Maximum Allocation Limit (%)</Label>
+          <Input
+            id="allocation_max_limit"
+            type="number"
+            min="100"
+            max="500"
+            value={formData.allocation_max_limit}
+            onChange={(e) => setFormData({ ...formData, allocation_max_limit: parseInt(e.target.value) || 200 })}
+            className="max-w-xs"
+          />
+          <p className="text-sm text-muted-foreground">
+            Block allocations that exceed this percentage (default: 200%)
+          </p>
         </div>
 
         <Button onClick={handleSave} disabled={saving}>

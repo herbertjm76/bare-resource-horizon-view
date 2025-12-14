@@ -29,7 +29,7 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   memberCapacity
 }) => {
   const { company } = useCompany();
-  const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold } = useAppSettings();
+  const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
   const capacity = memberCapacity || workWeekHours;
   
   // Convert hours to display value based on preference
@@ -67,14 +67,14 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   };
 
   const validateInput = (inputValue: number): boolean => {
-    if (displayPreference === 'percentage' && inputValue > 200) {
-      toast.error('Allocation cannot exceed 200%');
+    if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
+      toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
       return false;
     }
-    // For hours, cap at 200% of capacity
-    const maxHours = capacity * 2;
+    // For hours, cap at max limit % of capacity
+    const maxHours = (capacity * allocationMaxLimit) / 100;
     if (displayPreference === 'hours' && inputValue > maxHours) {
-      toast.error(`Allocation cannot exceed ${maxHours}h (200% of capacity)`);
+      toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
       return false;
     }
     return true;
