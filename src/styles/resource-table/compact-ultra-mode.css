@@ -57,10 +57,9 @@
   padding: 0 3px !important;
 }
 
-.resource-table-row-compact .utilization-column,
-.resource-table-row-compact .leave-column {
+.resource-table-row-compact .utilization-column {
   min-width: 30px;
-  max-width: 60px;
+  max-width: 200px;
 }
 
 .resource-table-row-compact .utilization-column .long-bar {
@@ -94,6 +93,7 @@
 .resource-table-row-compact .leave-column {
   min-width: 33px !important;
   width: 33px !important;
+  max-width: 33px !important;
 }
 
 .resource-table-row-compact .project-column {

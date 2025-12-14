@@ -42,8 +42,9 @@
 }
 
 .resource-table-compact .leave-column {
-  min-width: 33px;
-  width: 33px;
+  min-width: 33px !important;
+  width: 33px !important;
+  max-width: 33px !important;
 }
 
 .resource-table-compact .other-leave-column {
