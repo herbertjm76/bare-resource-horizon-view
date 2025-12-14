@@ -272,15 +272,15 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       <div className="p-2 animate-fade-in relative">
         {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
         {availableMembers.length > 0 && (
-          <div className="hidden sm:block relative">
-            {/* Sort Toggle Button - positioned at far left */}
+          <div className="hidden sm:flex items-center gap-2">
+            {/* Sort Toggle Button - fixed position, not overlapping */}
             <TooltipProvider delayDuration={100}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+                    className="h-8 w-8 flex-shrink-0 bg-background/95 backdrop-blur-sm shadow-sm border border-border/50 hover:scale-105 transition-all"
                     onClick={() => setSortAscending(!sortAscending)}
                   >
                     <ArrowUpDown className="h-4 w-4" />
@@ -298,36 +298,38 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               </Tooltip>
             </TooltipProvider>
             
-            {/* Left Scroll Arrow */}
-            {canScrollLeft && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute left-10 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
-                onClick={() => scrollMembers('left')}
+            {/* Scrollable avatar area with navigation arrows */}
+            <div className="relative flex-1 min-w-0">
+              {/* Left Scroll Arrow */}
+              {canScrollLeft && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+                  onClick={() => scrollMembers('left')}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              )}
+              
+              {/* Right Arrow */}
+              {canScrollRight && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+                  onClick={() => scrollMembers('right')}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              )}
+              
+              <div 
+                ref={membersScrollRef}
+                className="overflow-x-auto overflow-y-hidden px-10 scrollbar-hide"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-            )}
-            
-            {/* Right Arrow */}
-            {canScrollRight && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
-                onClick={() => scrollMembers('right')}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            )}
-            
-            <div 
-              ref={membersScrollRef}
-              className="overflow-x-auto overflow-y-hidden pl-14 pr-2 scrollbar-hide"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[40px]">
+                <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[40px]">
                 {availableMembers.map((member) => (
                   <MemberVacationPopover
                     key={member.id}
@@ -352,6 +354,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                     </div>
                   </MemberVacationPopover>
                 ))}
+                </div>
               </div>
             </div>
           </div>
