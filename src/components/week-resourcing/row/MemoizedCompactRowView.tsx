@@ -10,6 +10,8 @@ import { RowData, useRowData } from './RowUtilsHooks';
 import { EnhancedUtilizationPopover } from './components/EnhancedUtilizationPopover';
 import { ProjectCellTooltip } from '../tooltips/ProjectCellTooltip';
 import { useDetailedWeeklyAllocations } from '../hooks/useDetailedWeeklyAllocations';
+import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacationPopover';
+import { format, startOfWeek } from 'date-fns';
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
@@ -107,53 +109,62 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         className="border-r border-gray-200 px-2 py-0.5 name-column bg-gradient-to-r from-blue-50 to-indigo-50"
         style={{ width: 180, minWidth: 180, maxWidth: 180, zIndex: 5 }}
       >
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div
-                className="flex items-center w-full gap-2 cursor-pointer"
-                style={{ width: '100%', minWidth: 0, height: '26px' }}
-                title={memberData.displayName}
-              >
-                <Avatar className="h-6 w-6 min-w-[24px] min-h-[24px]" >
-                  <AvatarImage 
-                    src={memberData.avatarUrl} 
-                    alt={memberData.displayName}
-                  />
-                  <AvatarFallback className="text-white text-[11px]" style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))' }}>
-                    {memberData.initials}
-                  </AvatarFallback>
-                </Avatar>
-                <span
-                  className="font-semibold leading-tight"
-                  style={{
-                    fontSize: '15px',
-                    lineHeight: '1.2',
-                    maxWidth: 'calc(100% - 32px)',
-                    display: 'block',
-                    wordWrap: 'break-word',
-                    whiteSpace: 'normal',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    maxHeight: '2.4em',
-                  }}
-                  data-testid="compact-full-name"
+        <MemberVacationPopover
+          memberId={member.id}
+          memberName={memberData.displayName}
+          weekStartDate={format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd')}
+        >
+          <div className="cursor-pointer">
+            <TooltipProvider>
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger asChild>
+                  <div
+                    className="flex items-center w-full gap-2"
+                    style={{ width: '100%', minWidth: 0, height: '26px' }}
+                    title={memberData.displayName}
+                  >
+                    <Avatar className="h-6 w-6 min-w-[24px] min-h-[24px] hover:ring-2 hover:ring-primary/50 transition-all" >
+                      <AvatarImage 
+                        src={memberData.avatarUrl} 
+                        alt={memberData.displayName}
+                      />
+                      <AvatarFallback className="text-white text-[11px]" style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))' }}>
+                        {memberData.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span
+                      className="font-semibold leading-tight"
+                      style={{
+                        fontSize: '15px',
+                        lineHeight: '1.2',
+                        maxWidth: 'calc(100% - 32px)',
+                        display: 'block',
+                        wordWrap: 'break-word',
+                        whiteSpace: 'normal',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxHeight: '2.4em',
+                      }}
+                      data-testid="compact-full-name"
+                    >
+                      {memberData.displayName}
+                    </span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent 
+                  side="right" 
+                  align="start" 
+                  sideOffset={8}
+                  className="z-[200] max-w-xs"
+                  avoidCollisions={true}
                 >
-                  {memberData.displayName}
-                </span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent 
-              side="right" 
-              align="start" 
-              sideOffset={8}
-              className="z-[200] max-w-xs"
-              avoidCollisions={true}
-            >
-              {memberTooltip}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+                  {memberTooltip}
+                  <p className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-2">Click to add hours or leave</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </MemberVacationPopover>
       </TableCell>
       
       {/* Utilization: 200px fixed Progress Bar with STANDARDIZED calculation */}
