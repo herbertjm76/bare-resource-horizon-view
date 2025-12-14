@@ -274,7 +274,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         {availableMembers.length > 0 && (
           <div className="hidden sm:block relative">
             {/* Sort Toggle Button - positioned at far left */}
-            <TooltipProvider>
+            <TooltipProvider delayDuration={100}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -286,10 +286,14 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                     <ArrowUpDown className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p className="text-xs">
-                    {sortAscending ? 'Underutilized first' : 'Overutilized first'}
-                  </p>
+                <TooltipContent side="bottom" className="p-2">
+                  <div className="text-xs space-y-1">
+                    <p className="font-medium">Sort by utilization</p>
+                    <p className="text-muted-foreground">
+                      Currently: {sortAscending ? 'Underutilized first' : 'Overutilized first'}
+                    </p>
+                    <p className="text-muted-foreground italic">Click to toggle</p>
+                  </div>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
