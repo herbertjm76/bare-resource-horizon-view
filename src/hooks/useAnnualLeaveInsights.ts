@@ -2,7 +2,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { format, startOfWeek, endOfWeek, addWeeks, startOfMonth, endOfMonth, addMonths, eachWeekOfInterval } from 'date-fns';
+import { format, addWeeks, startOfMonth, endOfMonth, addMonths, eachWeekOfInterval } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getWeekStartDate, getWeekEndDate } from '@/components/weekly-overview/utils';
 
 interface LeaveInsight {
   nextWeekCount: number;
@@ -21,6 +23,10 @@ export const useAnnualLeaveInsights = (teamMembers: any[]) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const { company } = useCompany();
+  const { startOfWorkWeek } = useAppSettings();
+  
+  // Convert to date-fns weekStartsOn value
+  const weekStartsOn = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
 
   useEffect(() => {
     if (!company?.id || teamMembers.length === 0) {
@@ -33,8 +39,8 @@ export const useAnnualLeaveInsights = (teamMembers: any[]) => {
       
       try {
         const today = new Date();
-        const nextWeekStart = startOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
-        const nextWeekEnd = endOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
+        const nextWeekStart = getWeekStartDate(addWeeks(today, 1), startOfWorkWeek);
+        const nextWeekEnd = getWeekEndDate(addWeeks(today, 1), startOfWorkWeek);
         const nextMonthStart = startOfMonth(addMonths(today, 1));
         const nextMonthEnd = endOfMonth(addMonths(today, 1));
         
@@ -77,13 +83,13 @@ export const useAnnualLeaveInsights = (teamMembers: any[]) => {
         const weeks = eachWeekOfInterval({
           start: today,
           end: futureEnd
-        }, { weekStartsOn: 1 });
+        }, { weekStartsOn: weekStartsOn as 0 | 1 | 6 });
         
         let peakWeek = null;
         let maxCount = 0;
         
         weeks.forEach(weekStart => {
-          const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+          const weekEnd = getWeekEndDate(weekStart, startOfWorkWeek);
           const weekLeave = leaveData?.filter(leave => {
             const leaveDate = new Date(leave.date);
             return leaveDate >= weekStart && leaveDate <= weekEnd && leave.hours > 0;
@@ -114,7 +120,7 @@ export const useAnnualLeaveInsights = (teamMembers: any[]) => {
     };
 
     fetchLeaveInsights();
-  }, [company?.id, teamMembers]);
+  }, [company?.id, teamMembers, startOfWorkWeek, weekStartsOn]);
 
   return { insights, isLoading };
 };

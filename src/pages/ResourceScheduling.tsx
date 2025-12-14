@@ -10,10 +10,11 @@ import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectRe
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
 import { PersonResourceView } from '@/components/resources/person-view/PersonResourceView';
 import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
-import { format, startOfWeek } from 'date-fns';
+import { format } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
-
 const ResourceScheduling = () => {
   const [activeTab, setActiveTab] = useState<string>('by-project');
   
@@ -52,11 +53,13 @@ const ResourceScheduling = () => {
     filters.periodToShow
   );
 
+  const { startOfWorkWeek } = useAppSettings();
+  
   // Calculate week start date from selected month for the available members row
   const weekStartDate = useMemo(() => {
-    const weekStart = startOfWeek(selectedMonth, { weekStartsOn: 1 });
+    const weekStart = getWeekStartDate(selectedMonth, startOfWorkWeek);
     return format(weekStart, 'yyyy-MM-dd');
-  }, [selectedMonth]);
+  }, [selectedMonth, startOfWorkWeek]);
 
   // Member filters state
   const [memberFilters, setMemberFilters] = useState({

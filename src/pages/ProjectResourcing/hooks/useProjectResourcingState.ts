@@ -1,14 +1,22 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { format, startOfWeek } from 'date-fns';
+import { useAppSettings, WeekStartDay } from '@/hooks/useAppSettings';
 
 const SORT_PREFERENCES_KEY = 'project-sort-preferences';
 
+// Helper to convert WeekStartDay to date-fns weekStartsOn value
+const getWeekStartsOn = (weekStartDay: WeekStartDay): 0 | 1 | 6 => {
+  return weekStartDay === 'Sunday' ? 0 : weekStartDay === 'Saturday' ? 6 : 1;
+};
+
 export const useProjectResourcingState = () => {
-  // Calculate the start of the current week (Monday)
-  const getCurrentWeekStart = () => {
+  const { startOfWorkWeek } = useAppSettings();
+  
+  // Calculate the start of the current week based on company settings
+  const getCurrentWeekStart = useCallback(() => {
     const today = new Date();
-    return startOfWeek(today, { weekStartsOn: 1 }); // Start on Monday
-  };
+    return startOfWeek(today, { weekStartsOn: getWeekStartsOn(startOfWorkWeek) });
+  }, [startOfWorkWeek]);
 
   // Load sort preferences from localStorage
   const loadSortPreferences = () => {
@@ -141,17 +149,17 @@ export const useProjectResourcingState = () => {
   
   const handleMonthChange = useCallback((date: Date) => {
     // When user selects a date, we need to convert it to the start of that week
-    // based on the current week start preference
-    const weekStartsOn = displayOptions.weekStartsOnSunday ? 0 : 1;
+    // based on the company's work week start preference
+    const weekStartsOn = getWeekStartsOn(startOfWorkWeek);
     const weekStart = startOfWeek(date, { weekStartsOn });
     setSelectedMonth(weekStart);
-  }, [displayOptions.weekStartsOnSunday]);
+  }, [startOfWorkWeek]);
 
-  // Calculate the actual start date for the grid based on week start preference
+  // Calculate the actual start date for the grid based on company work week preference
   const gridStartDate = useMemo(() => {
-    const weekStartsOn = displayOptions.weekStartsOnSunday ? 0 : 1;
+    const weekStartsOn = getWeekStartsOn(startOfWorkWeek);
     return startOfWeek(selectedMonth, { weekStartsOn });
-  }, [selectedMonth, displayOptions.weekStartsOnSunday]);
+  }, [selectedMonth, startOfWorkWeek]);
 
   // Format the month label
   const monthLabel = useMemo(() => {

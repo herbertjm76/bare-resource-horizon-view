@@ -1,11 +1,13 @@
 import { TeamMember } from '@/components/dashboard/types';
 import { WeeklyWorkloadBreakdown } from '../types';
+import type { WeekStartDay } from '@/hooks/useAppSettings';
 
 export interface UnifiedWorkloadParams {
   companyId: string;
   members: TeamMember[];
   startDate: Date;
   numberOfWeeks: number;
+  weekStartDay?: WeekStartDay;
 }
 
 export interface ProjectAllocation {

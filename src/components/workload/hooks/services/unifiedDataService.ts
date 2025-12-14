@@ -1,28 +1,30 @@
-import { format, startOfWeek } from 'date-fns';
+import { format } from 'date-fns';
 import { initializeWorkloadResult } from './workloadDataInitializer';
 import { fetchProjectAllocations, fetchAnnualLeaves, fetchOtherLeaves } from './dataFetchers';
 import { processProjectAllocations, processAnnualLeaves, processOtherLeaves, calculateTotals } from './dataProcessors';
 import { UnifiedWorkloadParams, UnifiedWorkloadResult, WeeklyBreakdown } from './types';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 // Re-export types for backward compatibility
 export type { UnifiedWorkloadParams, UnifiedWorkloadResult, WeeklyBreakdown };
 
 export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): Promise<UnifiedWorkloadResult> => {
-  const { companyId, members, startDate, numberOfWeeks } = params;
+  const { companyId, members, startDate, numberOfWeeks, weekStartDay = 'Monday' } = params;
   
   console.log('🔄 UNIFIED DATA SERVICE: Fetching workload data with STANDARDIZED logic', {
     companyId,
     memberCount: members.length,
     startDate: format(startDate, 'yyyy-MM-dd'),
     numberOfWeeks,
+    weekStartDay,
     viewType: `${numberOfWeeks}-week-unified`
   });
 
   const memberIds = members.map(m => m.id);
 
   try {
-    // Calculate date range with proper week normalization
-    const normalizedStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
+    // Calculate date range with proper week normalization based on company settings
+    const normalizedStartDate = getWeekStartDate(startDate, weekStartDay);
     const endDate = new Date(normalizedStartDate);
     endDate.setDate(endDate.getDate() + (numberOfWeeks * 7) - 1);
     
@@ -31,6 +33,7 @@ export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): P
       normalizedStartDate: format(normalizedStartDate, 'yyyy-MM-dd'),
       endDate: format(endDate, 'yyyy-MM-dd'),
       numberOfWeeks,
+      weekStartDay,
       viewType: `${numberOfWeeks}-week-unified`
     });
 
