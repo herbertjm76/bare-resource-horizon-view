@@ -8,6 +8,8 @@ import { MultiLeaveBadgeCell } from './MultiLeaveBadgeCell';
 import { LongCapacityBar } from '../LongCapacityBar';
 import { RowData, useRowData } from './RowUtilsHooks';
 import { format, startOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface ExpandedRowViewProps extends RowData {
   viewMode: 'expanded';
@@ -29,6 +31,7 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
   onOtherLeaveEdit,
   selectedWeek = new Date(),
 }) => {
+  const { displayPreference } = useAppSettings();
   const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   const {
     weeklyCapacity,
@@ -104,7 +107,7 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
               </Badge>
             )}
             <Badge variant="outline" className="text-xs px-2 py-0.5 bg-gray-50 text-gray-700 border-gray-200">
-              {weeklyCapacity}h capacity
+              {formatCapacityValue(weeklyCapacity, displayPreference)} capacity
             </Badge>
             {member.department && (
               <Badge variant="outline" className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 border-purple-200">

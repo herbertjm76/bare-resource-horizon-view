@@ -14,6 +14,7 @@ import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacatio
 import { format, startOfWeek } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
@@ -36,7 +37,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   updateOtherLeave,
   ...props
 }) => {
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference } = useAppSettings();
   
   // STANDARDIZED CALCULATIONS - Use the utility functions consistently
   const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
@@ -110,7 +111,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     <div className="space-y-2">
       <div className="font-semibold text-sm text-foreground">{memberData.displayName}</div>
       <div className="text-xs text-muted-foreground">
-        {Math.round(capacityDisplay.utilizationPercentage)}% utilized • {capacityDisplay.totalHours}h allocated
+        {Math.round(capacityDisplay.utilizationPercentage)}% utilized • {formatAllocationValue(capacityDisplay.totalHours, weeklyCapacity, displayPreference)} allocated
       </div>
       
       {memberProjectAllocations.length > 0 ? (
@@ -121,7 +122,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
               <span className="text-foreground truncate max-w-[140px]">
                 {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
               </span>
-              <span className="text-muted-foreground font-medium ml-2">{project.hours}h</span>
+              <span className="text-muted-foreground font-medium ml-2">{formatAllocationValue(project.hours, weeklyCapacity, displayPreference)}</span>
             </div>
           ))}
         </div>
@@ -131,7 +132,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         </div>
       )}
     </div>
-  ), [memberData.displayName, capacityDisplay, memberProjectAllocations, projectDisplayPreference]);
+  ), [memberData.displayName, capacityDisplay, memberProjectAllocations, projectDisplayPreference, displayPreference, weeklyCapacity]);
 
 
   return (
