@@ -32,18 +32,18 @@
 }
 
 .resource-table-compact .count-column {
-  min-width: 35px;
-  width: 35px;
+  min-width: 28px;
+  width: 28px;
 }
 
 .resource-table-compact .utilization-column {
-  min-width: 200px;
-  width: 200px;
+  min-width: 140px;
+  width: 140px;
 }
 
 .resource-table-compact .leave-column {
-  min-width: 150px;
-  width: 150px;
+  min-width: 100px;
+  width: 100px;
 }
 
 .resource-table-compact .other-leave-column {
