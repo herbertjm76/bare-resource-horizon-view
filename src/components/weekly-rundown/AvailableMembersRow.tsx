@@ -326,8 +326,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               
               <div 
                 ref={membersScrollRef}
-                className="overflow-x-auto overflow-y-hidden px-10 scrollbar-hide"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                className="overflow-x-auto overflow-y-hidden pr-10 scrollbar-hide"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', paddingLeft: canScrollLeft ? '40px' : '0px' }}
               >
                 <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[40px]">
                 {availableMembers.map((member) => (
