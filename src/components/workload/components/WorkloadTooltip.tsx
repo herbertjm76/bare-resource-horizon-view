@@ -1,11 +1,15 @@
 import React from 'react';
 import { WeeklyWorkloadBreakdown } from '../hooks/types';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface WorkloadTooltipProps {
   weekData: WeeklyWorkloadBreakdown | undefined;
 }
 
 export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({ weekData }) => {
+  const { projectDisplayPreference } = useAppSettings();
+  
   if (!weekData || weekData.total === 0) {
     return <div>No allocation for this week</div>;
   }
@@ -28,7 +32,7 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({ weekData }) =>
               {weekData.projects.map((project, index) => (
                 <div key={index} className="flex justify-between items-center text-xs">
                   <span className="font-medium text-foreground truncate max-w-[120px]">
-                    {project.project_code || project.project_name}
+                    {getProjectDisplayName({ code: project.project_code, name: project.project_name }, projectDisplayPreference)}
                   </span>
                   <span className="text-muted-foreground">{project.hours}h</span>
                 </div>

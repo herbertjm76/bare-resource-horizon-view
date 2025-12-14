@@ -2,6 +2,8 @@
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { WorkloadBreakdown } from './hooks/types';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface ProjectAllocation {
   project_id: string;
@@ -25,17 +27,11 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
   memberName,
   date
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
+  
   if (breakdown.total === 0) {
     return <>{children}</>;
   }
-
-  // Debug logging for workload tooltip
-  console.log(`WorkloadTooltip for ${memberName} on ${date}:`, {
-    breakdown,
-    projects: breakdown.projects,
-    totalHours: breakdown.total,
-    projectHours: breakdown.projectHours
-  });
 
   return (
     <Tooltip>
@@ -63,7 +59,7 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
                   {breakdown.projects.map((project, index) => (
                     <div key={project.project_id || index} className="flex justify-between items-center">
                       <span className="text-blue-700 truncate max-w-[120px]" title={project.project_name}>
-                        {project.project_code || project.project_name}
+                        {getProjectDisplayName({ code: project.project_code, name: project.project_name }, projectDisplayPreference)}
                       </span>
                       <span className="font-medium text-blue-800 ml-2">
                         {project.hours}h
