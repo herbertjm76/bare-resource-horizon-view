@@ -32,8 +32,9 @@
 }
 
 .resource-table-compact .count-column {
-  min-width: 28px;
-  width: 28px;
+  min-width: 33px !important;
+  width: 33px !important;
+  max-width: 33px !important;
 }
 
 .resource-table-compact .utilization-column {
@@ -58,8 +59,8 @@
 }
 
 .resource-table-compact .project-column {
+  flex: 1 1 auto;
   min-width: 35px;
-  width: 35px;
 }
 
 /* Enhanced Table Container - Centered and properly sized with rounded corners */
