@@ -24,6 +24,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { MemberVacationPopover } from './MemberVacationPopover';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface TeamMemberAvatarProps {
   member: {
@@ -210,14 +212,14 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
                     <div className="flex flex-col items-center gap-1">
                       <p className="font-semibold text-sm text-foreground">{firstName}</p>
                       <StandardizedBadge variant="metric" size="sm">
-                        {member.hours}h
+                        {formatAllocationValue(member.hours, capacity, displayPreference)}
                       </StandardizedBadge>
                     </div>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="font-semibold">{member.name}</p>
-                  <p className="text-xs text-muted-foreground">{member.hours} hours</p>
+                  <p className="text-xs text-muted-foreground">{formatAllocationValue(member.hours, capacity, displayPreference)} this week</p>
                   <p className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-1">Click to add hours or leave</p>
                 </TooltipContent>
               </Tooltip>
@@ -231,7 +233,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Remove team member?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove {member.name}'s allocation of {member.hours}h from this project for this week.
+              This will remove {member.name}'s allocation of {formatAllocationValue(member.hours, capacity, displayPreference)} from this project for this week.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

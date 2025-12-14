@@ -208,7 +208,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
 const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ project, selectedWeek }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
-  const { projectDisplayPreference, startOfWorkWeek } = useAppSettings();
+  const { projectDisplayPreference, startOfWorkWeek, displayPreference, workWeekHours } = useAppSettings();
   
   // Calculate week start date string for MemberVacationPopover
   const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
@@ -216,7 +216,11 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
   
-  const getCapacityColor = (percentage: number) => {
+  const perFteCapacity = workWeekHours || 40;
+  const teamCapacity = perFteCapacity * Math.max(project.teamMembers?.length || 1, 1);
+  const totalHours = project.totalHours || 0;
+  const totalFte = perFteCapacity > 0 ? totalHours / perFteCapacity : 0;
+
     if (percentage > 100) return 'hsl(var(--destructive))';
     if (percentage >= 90) return 'hsl(39, 100%, 50%)';
     if (percentage >= 75) return 'hsl(120, 100%, 40%)';
@@ -267,7 +271,7 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
             )}
           </div>
           <StandardizedBadge variant="metric" size="sm" className="flex-shrink-0">
-            {((project.totalHours || 0) / 40).toFixed(1)} FTE
+            {totalFte.toFixed(1)} FTE
           </StandardizedBadge>
         </div>
 
@@ -297,7 +301,9 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
                             <div className="flex flex-col items-center gap-0.5">
                               <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
                               <StandardizedBadge variant="metric" size="sm">
-                                {Math.round(member.hours || 0)}h
+                                {displayPreference === 'percentage'
+                                  ? `${Math.round(member.capacityPercentage || 0)}%`
+                                  : `${Math.round(member.hours || 0)}h`}
                               </StandardizedBadge>
                             </div>
                           </div>
@@ -320,12 +326,18 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
                                 ))}
                                 <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-xs text-foreground">
                                   <span>Total:</span>
-                                  <span>{member.totalHours || member.hours}h ({Math.round(member.capacityPercentage || 0)}% capacity)</span>
+                                  <span>
+                                    {displayPreference === 'percentage'
+                                      ? `${Math.round(member.capacityPercentage || 0)}% capacity`
+                                      : `${member.totalHours || member.hours}h (${Math.round(member.capacityPercentage || 0)}% capacity)`}
+                                  </span>
                                 </div>
                               </div>
                             ) : (
                               <div className="text-xs text-muted-foreground">
-                                {member.hours}h on this project ({Math.round(member.capacityPercentage || 0)}% capacity)
+                                {displayPreference === 'percentage'
+                                  ? `${Math.round(member.capacityPercentage || 0)}% capacity on this project`
+                                  : `${member.hours}h on this project (${Math.round(member.capacityPercentage || 0)}% capacity)`}
                               </div>
                             )}
                             <div className="text-[10px] text-muted-foreground pt-1 border-t border-border">
@@ -355,7 +367,7 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
             </div>
             <div className="flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs font-semibold">{project.totalHours || 0}h</span>
+              <span className="text-xs font-semibold">{formatAllocationValue(totalHours, teamCapacity, displayPreference)}</span>
               <span className="text-[10px] text-muted-foreground">total</span>
             </div>
           </div>
