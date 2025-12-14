@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
 
 interface ProjectAllocation {
   project_id: string;
@@ -36,6 +38,7 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
   otherLeave,
   projects
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   
@@ -51,6 +54,8 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
     });
   });
 
+  const capacity = weeklyCapacity || workWeekHours;
+
   return (
     <div className="space-y-3 max-w-sm">
       <div className="font-bold text-base text-[#6465F0] border-b border-gray-200 pb-2">
@@ -65,7 +70,7 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
         </div>
         <div className="bg-green-50 p-2 rounded">
           <div className="font-semibold text-green-700">Capacity</div>
-          <div className="text-green-600">{totalUsedHours}h / {weeklyCapacity}h</div>
+          <div className="text-green-600">{formatUtilizationSummary(totalUsedHours, capacity, displayPreference)}</div>
         </div>
       </div>
 
@@ -84,7 +89,7 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
                     ? 'bg-blue-100 text-blue-700' 
                     : 'bg-gray-50 text-gray-400'
                 }`}>
-                  {hours > 0 ? `${hours}h` : '—'}
+                  {hours > 0 ? formatAllocationValue(hours, capacity, displayPreference) : '—'}
                 </div>
               </div>
             );
@@ -103,14 +108,14 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
                   {project.project_code}
                 </span>
                 <span className="font-medium text-blue-600 ml-2">
-                  {project.total_hours}h
+                  {formatAllocationValue(project.total_hours, capacity, displayPreference)}
                 </span>
               </div>
             ))}
           </div>
           <div className="flex justify-between items-center font-medium text-xs mt-2 pt-1 border-t border-gray-200">
             <span>Total Projects:</span>
-            <span className="text-blue-600">{totalProjectHours}h</span>
+            <span className="text-blue-600">{formatAllocationValue(totalProjectHours, capacity, displayPreference)}</span>
           </div>
         </div>
       )}
@@ -123,19 +128,19 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
             {annualLeave > 0 && (
               <div className="flex justify-between">
                 <span className="text-green-600">Annual Leave:</span>
-                <span className="font-medium">{annualLeave}h</span>
+                <span className="font-medium">{formatAllocationValue(annualLeave, capacity, displayPreference)}</span>
               </div>
             )}
             {holidayHours > 0 && (
               <div className="flex justify-between">
                 <span className="text-purple-600">Holiday Hours:</span>
-                <span className="font-medium">{holidayHours}h</span>
+                <span className="font-medium">{formatAllocationValue(holidayHours, capacity, displayPreference)}</span>
               </div>
             )}
             {otherLeave > 0 && (
               <div className="flex justify-between">
                 <span className="text-orange-600">Other Leave:</span>
-                <span className="font-medium">{otherLeave}h</span>
+                <span className="font-medium">{formatAllocationValue(otherLeave, capacity, displayPreference)}</span>
               </div>
             )}
           </div>

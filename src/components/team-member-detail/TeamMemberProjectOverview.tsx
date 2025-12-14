@@ -9,6 +9,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { format, startOfWeek, addWeeks } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
 
 interface TeamMemberProjectOverviewProps {
   memberId: string;
@@ -29,7 +30,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
   const [projectAllocations, setProjectAllocations] = useState<ProjectAllocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
 
   useEffect(() => {
     const fetchProjectAllocations = async () => {
@@ -118,7 +119,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
   };
 
   const totalAllocatedHours = projectAllocations.reduce((sum, project) => sum + project.totalHours, 0);
-  const maxCapacity = 40 * 12; // 40 hours per week for 12 weeks
+  const maxCapacity = workWeekHours * 12; // capacity per week for 12 weeks
 
   if (isLoading) {
     return (
@@ -146,7 +147,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-gray-800">Project Allocations</h2>
         <div className="text-sm text-gray-600">
-          Next 12 weeks: {totalAllocatedHours}h allocated
+          Next 12 weeks: {formatAllocationValue(totalAllocatedHours, maxCapacity, displayPreference)} allocated
         </div>
       </div>
 
@@ -162,7 +163,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Total Allocated</span>
             <span className="text-lg font-bold text-foreground">
-              {totalAllocatedHours}h / {maxCapacity}h
+              {formatUtilizationSummary(totalAllocatedHours, maxCapacity, displayPreference)}
             </span>
           </div>
           <Progress 
@@ -212,7 +213,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
                     <span>Total Allocation</span>
                   </div>
                   <span className="font-semibold text-foreground">
-                    {allocation.totalHours}h
+                    {formatAllocationValue(allocation.totalHours, maxCapacity, displayPreference)}
                   </span>
                 </div>
                 
@@ -243,7 +244,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
                             {format(new Date(week.weekStart), 'MM/dd')}
                           </div>
                           <div className="text-sm font-medium text-foreground">
-                            {week.hours}h
+                            {formatAllocationValue(week.hours, workWeekHours, displayPreference)}
                           </div>
                         </div>
                       ))}

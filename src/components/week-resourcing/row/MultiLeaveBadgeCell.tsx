@@ -4,6 +4,8 @@ import { TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { EnhancedTooltip } from '../EnhancedTooltip';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface MultiLeaveBadgeCellProps {
   annualLeave: number;
@@ -28,6 +30,7 @@ export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
   onOtherLeaveChange,
   compact = false,
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
   const [isEditing, setIsEditing] = useState(false);
   const [localValue, setLocalValue] = useState(otherLeave.toString());
 
@@ -58,9 +61,9 @@ export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
   // Build tooltip content with breakdown
   const buildTooltipContent = () => {
     const parts: string[] = [];
-    if (annualLeave > 0) parts.push(`Annual: ${annualLeave}h`);
-    if (holidayHours > 0) parts.push(`Holiday: ${holidayHours}h`);
-    if (otherLeave > 0) parts.push(`Other: ${otherLeave}h`);
+    if (annualLeave > 0) parts.push(`Annual: ${formatAllocationValue(annualLeave, workWeekHours, displayPreference)}`);
+    if (holidayHours > 0) parts.push(`Holiday: ${formatAllocationValue(holidayHours, workWeekHours, displayPreference)}`);
+    if (otherLeave > 0) parts.push(`Other: ${formatAllocationValue(otherLeave, workWeekHours, displayPreference)}`);
     
     // Add leave days breakdown if available
     if (leaveDays && leaveDays.length > 0) {
@@ -69,7 +72,7 @@ export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
         const date = new Date(day.date);
         const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
         const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        parts.push(`${dayName}, ${dateStr}: ${day.hours}h`);
+        parts.push(`${dayName}, ${dateStr}: ${formatAllocationValue(day.hours, workWeekHours, displayPreference)}`);
       });
     }
     
@@ -113,7 +116,7 @@ export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
                 className={`text-xs px-2 py-0.5 bg-amber-50 text-amber-700 border-amber-200 font-medium ${editableOther ? 'cursor-pointer hover:bg-amber-100' : ''}`}
                 onClick={editableOther ? handleOtherLeaveEdit : undefined}
               >
-                {totalLeave}h
+                {formatAllocationValue(totalLeave, workWeekHours, displayPreference)}
               </Badge>
             )}
           </div>
@@ -136,12 +139,12 @@ export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
           <div className="flex flex-wrap gap-1 justify-center">
             {annualLeave > 0 && (
               <Badge variant="outline" className="text-xs px-2 py-1 bg-blue-50 text-blue-700 border-blue-200">
-                Annual: {annualLeave}h
+                Annual: {formatAllocationValue(annualLeave, workWeekHours, displayPreference)}
               </Badge>
             )}
             {holidayHours > 0 && (
               <Badge variant="outline" className="text-xs px-2 py-1 bg-yellow-50 text-yellow-700 border-yellow-200">
-                Holiday: {holidayHours}h
+                Holiday: {formatAllocationValue(holidayHours, workWeekHours, displayPreference)}
               </Badge>
             )}
             {(otherLeave > 0 || editableOther) && (
@@ -161,7 +164,7 @@ export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
                   className={`text-xs px-2 py-1 bg-purple-50 text-purple-700 border-purple-200 ${editableOther ? 'cursor-pointer hover:bg-purple-100' : ''}`}
                   onClick={handleOtherLeaveEdit}
                 >
-                  Other: {otherLeave}h
+                  Other: {formatAllocationValue(otherLeave, workWeekHours, displayPreference)}
                 </Badge>
               )
             )}

@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
 
 interface ProjectBreakdown {
   projectName?: string;
@@ -38,6 +40,9 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
   projectBreakdown,
   weekLabel
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
+  const capacity = weeklyCapacity || workWeekHours;
+  
   let content = null;
 
   switch (type) {
@@ -52,10 +57,10 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
               <span className="font-semibold">Utilization:</span> {utilizationPercentage ?? '-'}%
             </div>
             <div>
-              <span className="font-semibold">Total Used:</span> {totalUsedHours ?? '-'}h / {weeklyCapacity ?? '-'}h
+              <span className="font-semibold">Total Used:</span> {formatUtilizationSummary(totalUsedHours ?? 0, capacity, displayPreference)}
             </div>
             <div>
-              <span className="font-semibold">Annual Leave:</span> {annualLeave}h, <span className="font-semibold">Holiday:</span> {holidayHours}h
+              <span className="font-semibold">Annual Leave:</span> {formatAllocationValue(annualLeave, capacity, displayPreference)}, <span className="font-semibold">Holiday:</span> {formatAllocationValue(holidayHours, capacity, displayPreference)}
             </div>
             <div className="text-gray-500 mt-1">
               <span>* Strategic tip:</span> <br />
@@ -71,6 +76,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
       break;
 
     case 'total':
+      const otherLeaveHours = (totalUsedHours ?? 0) - annualLeave - holidayHours;
       content = (
         <div className="space-y-2">
           <div className="font-bold mb-2 text-[#6465F0]">
@@ -79,21 +85,21 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
           <div className="text-xs space-y-1">
             {annualLeave > 0 && (
               <div>
-                <span className="font-semibold">Annual Leave:</span> {annualLeave}h
+                <span className="font-semibold">Annual Leave:</span> {formatAllocationValue(annualLeave, capacity, displayPreference)}
               </div>
             )}
             {holidayHours > 0 && (
               <div>
-                <span className="font-semibold">Holiday:</span> {holidayHours}h
+                <span className="font-semibold">Holiday:</span> {formatAllocationValue(holidayHours, capacity, displayPreference)}
               </div>
             )}
-            {(totalUsedHours ?? 0) - annualLeave - holidayHours > 0 && (
+            {otherLeaveHours > 0 && (
               <div>
-                <span className="font-semibold">Other Leave:</span> {(totalUsedHours ?? 0) - annualLeave - holidayHours}h
+                <span className="font-semibold">Other Leave:</span> {formatAllocationValue(otherLeaveHours, capacity, displayPreference)}
               </div>
             )}
             <div className="border-t border-gray-200 pt-1 mt-1">
-              <span className="font-semibold">Total:</span> {totalUsedHours ?? 0}h
+              <span className="font-semibold">Total:</span> {formatAllocationValue(totalUsedHours ?? 0, capacity, displayPreference)}
             </div>
             {!!leaveDays.length && (
               <div className="mt-2 border-t border-gray-200 pt-2">
@@ -105,7 +111,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
                   return (
                     <div key={i} className="flex justify-between gap-3">
                       <span>{dayName}, {dateStr}</span>
-                      <span className="font-medium">{day.hours}h</span>
+                      <span className="font-medium">{formatAllocationValue(day.hours, capacity, displayPreference)}</span>
                     </div>
                   );
                 })}
@@ -133,7 +139,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
               <span className="font-semibold">Fee:</span> {projectBreakdown?.projectFee ? `$${projectBreakdown.projectFee}` : '—'}
             </div>
             <div>
-              <span className="font-semibold">Weekly Allocation:</span> {projectBreakdown?.hours ?? 0}h
+              <span className="font-semibold">Weekly Allocation:</span> {formatAllocationValue(projectBreakdown?.hours ?? 0, capacity, displayPreference)}
             </div>
             <div>
               <span className="font-semibold">Status:</span> {projectBreakdown?.isActive ? "Active" : "Inactive"}
