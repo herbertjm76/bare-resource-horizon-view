@@ -49,7 +49,7 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
         {items.map((item) => (
           <div key={item.id}>
             {rundownMode === 'people' ? (
-              <PersonGridCard person={item} />
+              <PersonGridCard person={item} selectedWeek={selectedWeek} />
             ) : (
               <ProjectGridCard project={item} selectedWeek={selectedWeek} />
             )}
@@ -60,23 +60,43 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
   );
 };
 
-const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
+const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person, selectedWeek }) => {
   const capacity = person.capacity || 40;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  
+  // Calculate week start date string for MemberVacationPopover
+  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  const personName = `${person.first_name || ''} ${person.last_name || ''}`.trim() || person.name || 'Unknown';
   
   return (
     <>
       <div className="glass-card rounded-xl border p-4 hover:shadow-lg transition-all duration-300 relative">
       {/* Header */}
       <div className="flex items-center gap-3 mb-3">
-        <Avatar className="h-10 w-10 ring-2 ring-primary/20">
-          <AvatarImage src={person.avatar} alt={person.name} />
-          <AvatarFallback className="text-xs bg-gradient-modern text-white">
-            {person.name?.split(' ').map((n: string) => n[0]).join('')}
-          </AvatarFallback>
-        </Avatar>
+        <MemberVacationPopover
+          memberId={person.id}
+          memberName={personName}
+          weekStartDate={weekStartDate}
+        >
+          <div className="cursor-pointer">
+            <Tooltip delayDuration={200}>
+              <TooltipTrigger asChild>
+                <Avatar className="h-10 w-10 ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
+                  <AvatarImage src={person.avatar} alt={personName} />
+                  <AvatarFallback className="text-xs bg-gradient-modern text-white">
+                    {personName?.split(' ').map((n: string) => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p className="font-medium">{personName}</p>
+                <p className="text-xs text-muted-foreground">Click to add hours or leave</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </MemberVacationPopover>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm truncate">{person.name}</h3>
+          <h3 className="font-semibold text-sm truncate">{personName}</h3>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Building className="h-3 w-3" />
             <span className="truncate">{person.department || 'No Department'}</span>
