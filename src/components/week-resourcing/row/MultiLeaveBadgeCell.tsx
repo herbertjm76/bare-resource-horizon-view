@@ -76,12 +76,12 @@ export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
             <div className="flex gap-0.5">
               {annualLeave > 0 && (
                 <Badge variant="outline" className="compact-leave-badge bg-blue-50 text-blue-700 border-blue-200">
-                  A:{annualLeave}
+                  {annualLeave}
                 </Badge>
               )}
               {holidayHours > 0 && (
                 <Badge variant="outline" className="compact-leave-badge bg-yellow-50 text-yellow-700 border-yellow-200">
-                  H:{holidayHours}
+                  {holidayHours}
                 </Badge>
               )}
               {(otherLeave > 0 || editableOther) && (
@@ -101,7 +101,7 @@ export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
                     className={`compact-leave-badge bg-purple-50 text-purple-700 border-purple-200 ${editableOther ? 'cursor-pointer hover:bg-purple-100' : ''}`}
                     onClick={handleOtherLeaveEdit}
                   >
-                    O:{otherLeave}
+                    {otherLeave}
                   </Badge>
                 )
               )}
