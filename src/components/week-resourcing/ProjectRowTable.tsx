@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacationPopover';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectRowTableProps {
   projects: any[];
@@ -19,8 +20,16 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
   allocationMap,
   weekStartDate
 }) => {
-  const { projectDisplayPreference, workWeekHours } = useAppSettings();
-  // Calculate member totals
+  const { projectDisplayPreference, workWeekHours, displayPreference } = useAppSettings();
+
+  const defaultWeeklyCapacity = workWeekHours || 40;
+
+  // Helper to get a member's weekly capacity (falls back to company workWeekHours)
+  const getMemberCapacity = (member: any): number => {
+    return member?.weekly_capacity || defaultWeeklyCapacity;
+  };
+
+  // Calculate member totals (in hours)
   const getMemberTotal = (memberId: string): number => {
     let total = 0;
     projects.forEach(project => {
@@ -30,7 +39,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
     return total;
   };
 
-  // Calculate project totals
+  // Calculate project totals (in hours)
   const getProjectTotal = (projectId: string): number => {
     let total = 0;
     members.forEach(member => {
