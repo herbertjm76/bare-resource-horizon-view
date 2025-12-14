@@ -252,28 +252,20 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
               <div>
                 <div className="flex flex-wrap gap-3 justify-center">
                   {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
-                    <Tooltip key={idx}>
-                      <TooltipTrigger>
-                        <div className="flex flex-col items-center gap-1.5">
-                          <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md">
-                            <AvatarImage src={member.avatar} alt={member.name} />
-                            <AvatarFallback className="text-xs bg-gradient-modern text-white">
-                              {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col items-center gap-0.5">
-                            <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
-                            <StandardizedBadge variant="metric" size="sm">
-                              {Math.round(member.hours || 0)}h
-                            </StandardizedBadge>
-                          </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="text-xs">
-                        <p className="font-medium">{member.name}</p>
-                        <p>{member.hours}h ({Math.round(member.capacityPercentage || 0)}% capacity)</p>
-                      </TooltipContent>
-                    </Tooltip>
+                    <div key={idx} className="flex flex-col items-center gap-1.5">
+                      <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md">
+                        <AvatarImage src={member.avatar} alt={member.name} />
+                        <AvatarFallback className="text-xs bg-gradient-modern text-white">
+                          {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col items-center gap-0.5">
+                        <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
+                        <StandardizedBadge variant="metric" size="sm">
+                          {Math.round(member.hours || 0)}h
+                        </StandardizedBadge>
+                      </div>
+                    </div>
                   ))}
                   {project.teamMembers.length > 8 && (
                     <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
