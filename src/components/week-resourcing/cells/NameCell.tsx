@@ -5,16 +5,38 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacationPopover';
 import { format, startOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
+
+interface ProjectAllocation {
+  projectId: string;
+  projectName: string;
+  projectCode: string;
+  hours: number;
+}
 
 interface NameCellProps {
   member: any;
   compact?: boolean;
   weekStartDate?: string;
+  projectAllocations?: ProjectAllocation[];
+  utilizationPercentage?: number;
+  totalAllocatedHours?: number;
 }
 
-export const NameCell: React.FC<NameCellProps> = ({ member, compact = false, weekStartDate }) => {
+export const NameCell: React.FC<NameCellProps> = ({ 
+  member, 
+  compact = false, 
+  weekStartDate,
+  projectAllocations = [],
+  utilizationPercentage = 0,
+  totalAllocatedHours = 0
+}) => {
+  const { projectDisplayPreference } = useAppSettings();
+  
   // Calculate week start date if not provided
   const effectiveWeekStartDate = weekStartDate || format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  
   // Helper to get user initials
   const getUserInitials = (): string => {
     if (!member) return '??';
@@ -26,12 +48,6 @@ export const NameCell: React.FC<NameCellProps> = ({ member, compact = false, wee
   // Helper to get avatar URL safely
   const getAvatarUrl = (): string | undefined => {
     if (!member) return undefined;
-    
-    // Debug logging to check the member object and avatar_url
-    console.log('NameCell - Member object:', member);
-    console.log('NameCell - Avatar URL:', member.avatar_url);
-    console.log('NameCell - Member has avatar_url property:', 'avatar_url' in member);
-    
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
@@ -42,13 +58,29 @@ export const NameCell: React.FC<NameCellProps> = ({ member, compact = false, wee
   };
 
   const memberTooltip = (
-    <div className="space-y-1 text-xs">
-      <p className="font-semibold">{getMemberDisplayName()}</p>
-      {member.role && <p>Role: {member.role}</p>}
-      {member.department && <p>Department: {member.department}</p>}
-      {member.location && <p>Location: {member.location}</p>}
-      {member.weekly_capacity && <p>Weekly Capacity: {member.weekly_capacity}h</p>}
-      {member.email && <p>Email: {member.email}</p>}
+    <div className="space-y-2">
+      <div className="font-semibold text-sm text-foreground">{getMemberDisplayName()}</div>
+      <div className="text-xs text-muted-foreground">
+        {Math.round(utilizationPercentage)}% utilized • {totalAllocatedHours}h allocated
+      </div>
+      
+      {projectAllocations.length > 0 ? (
+        <div className="space-y-1.5 pt-1 border-t border-border">
+          <div className="text-xs font-medium text-muted-foreground">Working on:</div>
+          {projectAllocations.map((project) => (
+            <div key={project.projectId} className="flex justify-between items-center text-xs">
+              <span className="text-foreground truncate max-w-[140px]">
+                {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
+              </span>
+              <span className="text-muted-foreground font-medium ml-2">{project.hours}h</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-xs text-muted-foreground italic pt-1 border-t border-border">
+          No projects assigned this week
+        </div>
+      )}
     </div>
   );
 

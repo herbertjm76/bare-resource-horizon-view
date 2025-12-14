@@ -12,6 +12,8 @@ import { ProjectCellTooltip } from '../tooltips/ProjectCellTooltip';
 import { useDetailedWeeklyAllocations } from '../hooks/useDetailedWeeklyAllocations';
 import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacationPopover';
 import { format, startOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
@@ -34,6 +36,8 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   updateOtherLeave,
   ...props
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
+  
   // STANDARDIZED CALCULATIONS - Use the utility functions consistently
   const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
   
@@ -84,16 +88,50 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     avatarUrl: member?.avatar_url
   }), [member]);
 
+  // Get project allocations for tooltip
+  const memberProjectAllocations = useMemo(() => {
+    const allocations: { projectId: string; projectName: string; projectCode: string; hours: number }[] = [];
+    projects.forEach(project => {
+      const key = `${member.id}:${project.id}`;
+      const hours = allocationMap.get(key) || 0;
+      if (hours > 0) {
+        allocations.push({
+          projectId: project.id,
+          projectName: project.name,
+          projectCode: project.code,
+          hours
+        });
+      }
+    });
+    return allocations;
+  }, [member.id, projects, allocationMap]);
+
   const memberTooltip = useMemo(() => (
-    <div className="space-y-1 text-xs">
-      <p className="font-semibold">{memberData.displayName}</p>
-      {member.role && <p>Role: {member.role}</p>}
-      {member.department && <p>Department: {member.department}</p>}
-      {member.location && <p>Location: {member.location}</p>}
-      {member.weekly_capacity && <p>Weekly Capacity: {member.weekly_capacity}h</p>}
-      {member.email && <p>Email: {member.email}</p>}
+    <div className="space-y-2">
+      <div className="font-semibold text-sm text-foreground">{memberData.displayName}</div>
+      <div className="text-xs text-muted-foreground">
+        {Math.round(capacityDisplay.utilizationPercentage)}% utilized • {capacityDisplay.totalHours}h allocated
+      </div>
+      
+      {memberProjectAllocations.length > 0 ? (
+        <div className="space-y-1.5 pt-1 border-t border-border">
+          <div className="text-xs font-medium text-muted-foreground">Working on:</div>
+          {memberProjectAllocations.map((project) => (
+            <div key={project.projectId} className="flex justify-between items-center text-xs">
+              <span className="text-foreground truncate max-w-[140px]">
+                {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
+              </span>
+              <span className="text-muted-foreground font-medium ml-2">{project.hours}h</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-xs text-muted-foreground italic pt-1 border-t border-border">
+          No projects assigned this week
+        </div>
+      )}
     </div>
-  ), [memberData.displayName, member]);
+  ), [memberData.displayName, capacityDisplay, memberProjectAllocations, projectDisplayPreference]);
 
 
   return (

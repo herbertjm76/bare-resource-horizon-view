@@ -1,5 +1,5 @@
 
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { NameCell } from '../cells/NameCell';
@@ -62,13 +62,40 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
   const totalLeaveHours = annualLeave + holidayHours + otherLeave;
   const totalHoursWithLeave = totalUsedHours + totalLeaveHours;
 
+  // Get project allocations for tooltip
+  const memberProjectAllocations = useMemo(() => {
+    const allocations: { projectId: string; projectName: string; projectCode: string; hours: number }[] = [];
+    projects.forEach(project => {
+      const key = `${member.id}:${project.id}`;
+      const hours = allocationMap.get(key) || 0;
+      if (hours > 0) {
+        allocations.push({
+          projectId: project.id,
+          projectName: project.name,
+          projectCode: project.code,
+          hours
+        });
+      }
+    });
+    return allocations;
+  }, [member.id, projects, allocationMap]);
+
+  // Calculate utilization percentage
+  const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalHoursWithLeave / weeklyCapacity) * 100) : 0;
+
   return (
     <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 h-20 border-b`}>
       {/* Name Cell */}
       <TableCell className="border-r border-gray-200 px-4 py-3 min-w-[180px]">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
-            <NameCell member={member} weekStartDate={weekStartDate} />
+            <NameCell 
+              member={member} 
+              weekStartDate={weekStartDate}
+              projectAllocations={memberProjectAllocations}
+              utilizationPercentage={utilizationPercentage}
+              totalAllocatedHours={totalHoursWithLeave}
+            />
           </div>
           <div className="flex flex-wrap gap-1">
             {member.office_location && (
