@@ -262,7 +262,7 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
                     weekStartDate={weekStartDate}
                   >
                     <div className="cursor-pointer">
-                      <Tooltip>
+                      <Tooltip delayDuration={200}>
                         <TooltipTrigger asChild>
                           <div className="flex flex-col items-center gap-1.5">
                             <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md hover:ring-primary/40 transition-all">
