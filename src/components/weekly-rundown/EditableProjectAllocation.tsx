@@ -7,6 +7,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +50,9 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
   const { company } = useCompany();
+  const { projectDisplayPreference } = useAppSettings();
+  
+  const displayText = getProjectDisplayName({ code: projectCode, name: projectName }, projectDisplayPreference);
 
   const updateMutation = useMutation({
     mutationFn: async (newHours: number) => {
@@ -192,7 +197,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
           <>
             {/* Only show text label if segment is wide enough */}
             {percentage > 10 && (
-              <span>{projectCode} • {hours}h</span>
+              <span>{displayText} • {hours}h</span>
             )}
             <Button
               size="sm"
