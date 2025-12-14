@@ -80,6 +80,23 @@ export const useRundownData = ({
       return processedPeople;
     } else {
       // Process projects data
+      // First, build a map of all project allocations per member
+      const memberProjectsMap = new Map<string, Array<{ id: string; name: string; code: string; hours: number }>>();
+      
+      allMembers.forEach(member => {
+        const memberTotal = getMemberTotal(member.id);
+        const projectAllocations = memberTotal?.projectAllocations || [];
+        const memberProjects = projectAllocations
+          .filter(p => p.hours > 0)
+          .map(p => ({
+            id: p.projectId,
+            name: p.projectName,
+            code: p.projectCode,
+            hours: p.hours
+          }));
+        memberProjectsMap.set(member.id, memberProjects);
+      });
+
       let processedProjects = projects.map(project => {
         // Get all team members working on this project
         const teamMembers = allMembers
@@ -92,13 +109,19 @@ export const useRundownData = ({
               const capacity = member.weekly_capacity || 40;
               const capacityPercentage = capacity > 0 ? (projectAllocation.hours / capacity) * 100 : 0;
               
+              // Get all projects for this member
+              const allProjects = memberProjectsMap.get(member.id) || [];
+              const totalHours = allProjects.reduce((sum, p) => sum + p.hours, 0);
+              
               return {
                 id: member.id,
                 name: `${member.first_name} ${member.last_name}`,
                 avatar: member.avatar_url,
                 location: member.location || 'Unknown',
                 hours: projectAllocation.hours,
-                capacityPercentage
+                capacityPercentage,
+                allProjects,
+                totalHours
               };
             }
             return null;

@@ -252,7 +252,7 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                 {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
                   <Tooltip key={idx}>
                     <TooltipTrigger asChild>
-                      <div className="flex flex-col items-center gap-1.5 cursor-help">
+                      <div className="flex flex-col items-center gap-1.5 cursor-default">
                         <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md">
                           <AvatarImage src={member.avatar} alt={member.name} />
                           <AvatarFallback className="text-xs bg-gradient-modern text-white">
@@ -272,12 +272,9 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                         <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
                           {member.name}
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {member.hours}h on this project ({Math.round(member.capacityPercentage || 0)}% capacity)
-                        </div>
-                        {member.allProjects && member.allProjects.length > 1 && (
-                          <div className="space-y-1 pt-1 border-t border-border">
-                            <div className="text-xs font-medium text-muted-foreground">All projects this week:</div>
+                        {member.allProjects && member.allProjects.length > 0 ? (
+                          <div className="space-y-1">
+                            <div className="text-xs font-medium text-muted-foreground mb-1">Projects this week:</div>
                             {member.allProjects.map((proj: any, pIdx: number) => (
                               <div key={pIdx} className="flex justify-between items-center text-xs">
                                 <span className="text-foreground truncate max-w-[140px]">
@@ -286,6 +283,14 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                                 <span className="text-muted-foreground font-medium ml-2">{proj.hours}h</span>
                               </div>
                             ))}
+                            <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-xs text-foreground">
+                              <span>Total:</span>
+                              <span>{member.totalHours || member.hours}h ({Math.round(member.capacityPercentage || 0)}% capacity)</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-muted-foreground">
+                            {member.hours}h on this project ({Math.round(member.capacityPercentage || 0)}% capacity)
                           </div>
                         )}
                       </div>
