@@ -39,15 +39,6 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
       case '3months':
         startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
         break;
-      case '4months':
-        startDate = new Date(now.getTime() - 120 * 24 * 60 * 60 * 1000);
-        break;
-      case '6months':
-        startDate = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
-        break;
-      case 'year':
-        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-        break;
       default:
         startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     }

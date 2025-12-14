@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export type TimeRange = 'week' | 'month' | '3months' | '4months' | '6months' | 'year';
+export type TimeRange = 'week' | 'month' | '3months';
 
 interface TimeRangeSelectorProps {
   selectedRange: TimeRange;
@@ -22,10 +22,7 @@ export const TimeRangeSelector: React.FC<TimeRangeSelectorProps> = ({
   const timeRangeOptions = [
     { value: 'week' as TimeRange, label: 'This Week' },
     { value: 'month' as TimeRange, label: 'This Month' },
-    { value: '3months' as TimeRange, label: '3 Months' },
-    { value: '4months' as TimeRange, label: '4 Months' },
-    { value: '6months' as TimeRange, label: '6 Months' },
-    { value: 'year' as TimeRange, label: '1 Year' }
+    { value: '3months' as TimeRange, label: 'This Quarter' }
   ];
 
   return (

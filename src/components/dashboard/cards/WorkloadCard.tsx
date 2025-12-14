@@ -54,38 +54,20 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
       case 'week':
         return {
           periods: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-          columnCount: 6, // 1 for name + 5 for days
+          columnCount: 6,
           label: 'This Week'
         };
       case 'month':
         return {
           periods: ['W1', 'W2', 'W3', 'W4'],
-          columnCount: 5, // 1 for name + 4 for weeks
+          columnCount: 5,
           label: 'This Month'
         };
       case '3months':
         return {
           periods: ['Month 1', 'Month 2', 'Month 3'],
-          columnCount: 4, // 1 for name + 3 for months
-          label: '3 Months'
-        };
-      case '4months':
-        return {
-          periods: ['Month 1', 'Month 2', 'Month 3', 'Month 4'],
-          columnCount: 5, // 1 for name + 4 for months
-          label: '4 Months'
-        };
-      case '6months':
-        return {
-          periods: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6'],
-          columnCount: 7, // 1 for name + 6 for months
-          label: '6 Months'
-        };
-      case 'year':
-        return {
-          periods: ['Q1', 'Q2', 'Q3', 'Q4'],
-          columnCount: 5, // 1 for name + 4 for quarters
-          label: 'This Year'
+          columnCount: 4,
+          label: 'This Quarter'
         };
       default:
         return {

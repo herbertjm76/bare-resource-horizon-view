@@ -60,10 +60,7 @@ export const TeamCompositionCard: React.FC<TeamCompositionCardProps> = ({
     switch (selectedTimeRange) {
       case 'week': return 'This Week';
       case 'month': return 'This Month';
-      case '3months': return '3 Months';
-      case '4months': return '4 Months';
-      case '6months': return '6 Months';
-      case 'year': return 'This Year';
+      case '3months': return 'This Quarter';
       default: return 'This Month';
     }
   };

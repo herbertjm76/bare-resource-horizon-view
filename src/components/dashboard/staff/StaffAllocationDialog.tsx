@@ -83,10 +83,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
     switch (selectedTimeRange || 'week') {
       case 'week': return 'Current Week';
       case 'month': return 'Current Month';
-      case '3months': return 'Last 3 Months';
-      case '4months': return 'Last 4 Months';
-      case '6months': return 'Last 6 Months';
-      case 'year': return 'Current Year';
+      case '3months': return 'This Quarter';
       default: return 'Selected Period';
     }
   };

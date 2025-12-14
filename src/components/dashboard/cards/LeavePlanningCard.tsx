@@ -25,10 +25,7 @@ export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data, sele
     switch (selectedTimeRange) {
       case 'week': return 'This Week';
       case 'month': return 'This Month';
-      case '3months': return 'Next 3 Months';
-      case '4months': return 'Next 4 Months';
-      case '6months': return 'Next 6 Months';
-      case 'year': return 'This Year';
+      case '3months': return 'This Quarter';
       default: return 'This Month';
     }
   };
@@ -43,12 +40,6 @@ export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data, sele
         return addMonths(currentDate, 1);
       case '3months':
         return addMonths(currentDate, 3);
-      case '4months':
-        return addMonths(currentDate, 4);
-      case '6months':
-        return addMonths(currentDate, 6);
-      case 'year':
-        return addMonths(currentDate, 12);
       default:
         return addMonths(currentDate, 1);
     }

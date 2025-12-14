@@ -20,9 +20,6 @@ export const MobileTeamStatus: React.FC<MobileTeamStatusProps> = ({
       case 'week': return 'This Week';
       case 'month': return 'This Month';
       case '3months': return 'This Quarter';
-      case '4months': return '4 Months';
-      case '6months': return '6 Months';
-      case 'year': return 'This Year';
       default: return 'This Month';
     }
   };

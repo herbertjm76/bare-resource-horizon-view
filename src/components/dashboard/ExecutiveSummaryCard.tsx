@@ -25,9 +25,6 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
           case 'week': return utilizationTrends.days7;
           case 'month': return utilizationTrends.days30;
           case '3months': 
-          case '4months':
-          case '6months':
-          case 'year':
             return utilizationTrends.days90;
           default: return utilizationTrends.days30;
         }
