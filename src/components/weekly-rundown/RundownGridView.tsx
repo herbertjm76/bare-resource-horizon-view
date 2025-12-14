@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { format, startOfWeek } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +11,7 @@ import { AvatarWithHourDial } from './AvatarWithHourDial';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 import { EditPersonAllocationsDialog } from './EditPersonAllocationsDialog';
 import { EditProjectAllocationsDialog } from './EditProjectAllocationsDialog';
+import { MemberVacationPopover } from './MemberVacationPopover';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
@@ -49,7 +51,7 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
             {rundownMode === 'people' ? (
               <PersonGridCard person={item} />
             ) : (
-              <ProjectGridCard project={item} />
+              <ProjectGridCard project={item} selectedWeek={selectedWeek} />
             )}
           </div>
         ))}
@@ -180,10 +182,13 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
   );
 };
 
-const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
+const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ project, selectedWeek }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
   const { projectDisplayPreference } = useAppSettings();
+  
+  // Calculate week start date string for MemberVacationPopover
+  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   
   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
@@ -250,52 +255,62 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
             <div>
               <div className="flex flex-wrap gap-3 justify-center">
                 {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
-                  <Tooltip key={idx}>
-                    <TooltipTrigger asChild>
-                      <div className="flex flex-col items-center gap-1.5 cursor-default">
-                        <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md">
-                          <AvatarImage src={member.avatar} alt={member.name} />
-                          <AvatarFallback className="text-xs bg-gradient-modern text-white">
-                            {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col items-center gap-0.5">
-                          <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
-                          <StandardizedBadge variant="metric" size="sm">
-                            {Math.round(member.hours || 0)}h
-                          </StandardizedBadge>
+                  <MemberVacationPopover
+                    key={idx}
+                    memberId={member.id}
+                    memberName={member.name}
+                    weekStartDate={weekStartDate}
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex flex-col items-center gap-1.5 cursor-pointer">
+                          <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md hover:ring-primary/40 transition-all">
+                            <AvatarImage src={member.avatar} alt={member.name} />
+                            <AvatarFallback className="text-xs bg-gradient-modern text-white">
+                              {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col items-center gap-0.5">
+                            <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
+                            <StandardizedBadge variant="metric" size="sm">
+                              {Math.round(member.hours || 0)}h
+                            </StandardizedBadge>
+                          </div>
                         </div>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" align="center" sideOffset={8} className="bg-popover border border-border shadow-lg p-3 max-w-xs z-[300]">
-                      <div className="space-y-2">
-                        <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
-                          {member.name}
-                        </div>
-                        {member.allProjects && member.allProjects.length > 0 ? (
-                          <div className="space-y-1">
-                            <div className="text-xs font-medium text-muted-foreground mb-1">Projects this week:</div>
-                            {member.allProjects.map((proj: any, pIdx: number) => (
-                              <div key={pIdx} className="flex justify-between items-center text-xs">
-                                <span className="text-foreground truncate max-w-[140px]">
-                                  {getProjectDisplayName(proj, projectDisplayPreference)}
-                                </span>
-                                <span className="text-muted-foreground font-medium ml-2">{proj.hours}h</span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" align="center" sideOffset={8} className="bg-popover border border-border shadow-lg p-3 max-w-xs">
+                        <div className="space-y-2">
+                          <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
+                            {member.name}
+                          </div>
+                          {member.allProjects && member.allProjects.length > 0 ? (
+                            <div className="space-y-1">
+                              <div className="text-xs font-medium text-muted-foreground mb-1">Projects this week:</div>
+                              {member.allProjects.map((proj: any, pIdx: number) => (
+                                <div key={pIdx} className="flex justify-between items-center text-xs">
+                                  <span className="text-foreground truncate max-w-[140px]">
+                                    {getProjectDisplayName(proj, projectDisplayPreference)}
+                                  </span>
+                                  <span className="text-muted-foreground font-medium ml-2">{proj.hours}h</span>
+                                </div>
+                              ))}
+                              <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-xs text-foreground">
+                                <span>Total:</span>
+                                <span>{member.totalHours || member.hours}h ({Math.round(member.capacityPercentage || 0)}% capacity)</span>
                               </div>
-                            ))}
-                            <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-xs text-foreground">
-                              <span>Total:</span>
-                              <span>{member.totalHours || member.hours}h ({Math.round(member.capacityPercentage || 0)}% capacity)</span>
                             </div>
+                          ) : (
+                            <div className="text-xs text-muted-foreground">
+                              {member.hours}h on this project ({Math.round(member.capacityPercentage || 0)}% capacity)
+                            </div>
+                          )}
+                          <div className="text-[10px] text-muted-foreground pt-1 border-t border-border">
+                            Click to add hours or leave
                           </div>
-                        ) : (
-                          <div className="text-xs text-muted-foreground">
-                            {member.hours}h on this project ({Math.round(member.capacityPercentage || 0)}% capacity)
-                          </div>
-                        )}
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </MemberVacationPopover>
                 ))}
                 {project.teamMembers.length > 8 && (
                   <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
