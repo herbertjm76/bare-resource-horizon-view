@@ -221,163 +221,123 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
 
   return (
     <>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="glass-card glass-hover rounded-2xl border-0 p-4 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-start gap-2.5 mb-3 relative z-10">
-            {/* Small Line Art Icon */}
-            <ProjectIcon className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-            
-            <div className="flex-1 min-w-0">
-              {/* Project Primary Display */}
-              <h3 className="font-bold text-lg truncate mb-0.5">{primaryDisplay}</h3>
-              {/* Project Secondary Display */}
-              {secondaryDisplay && (
-                <p className="text-xs text-muted-foreground font-medium truncate mb-0.5">{secondaryDisplay}</p>
-              )}
-              {/* Department - Tertiary */}
-              {project.department && (
-                <p className="text-[10px] text-muted-foreground truncate">{project.department}</p>
-              )}
-            </div>
-            <StandardizedBadge variant="metric" size="sm" className="flex-shrink-0">
-              {((project.totalHours || 0) / 40).toFixed(1)} FTE
-            </StandardizedBadge>
-          </div>
-
-          <div className="space-y-3 relative z-10">
-
-            {/* Team Member Avatars */}
-            {project.teamMembers && project.teamMembers.length > 0 && (
-              <div>
-                <div className="flex flex-wrap gap-3 justify-center">
-                  {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
-                    <div key={idx} className="flex flex-col items-center gap-1.5">
-                      <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md">
-                        <AvatarImage src={member.avatar} alt={member.name} />
-                        <AvatarFallback className="text-xs bg-gradient-modern text-white">
-                          {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col items-center gap-0.5">
-                        <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
-                        <StandardizedBadge variant="metric" size="sm">
-                          {Math.round(member.hours || 0)}h
-                        </StandardizedBadge>
-                      </div>
-                    </div>
-                  ))}
-                  {project.teamMembers.length > 8 && (
-                    <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                      +{project.teamMembers.length - 8}
-                    </div>
-                  )}
-                </div>
-              </div>
+      <div className="glass-card glass-hover rounded-2xl border-0 p-4 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
+        <div className="flex items-start gap-2.5 mb-3 relative z-10">
+          {/* Small Line Art Icon */}
+          <ProjectIcon className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+          
+          <div className="flex-1 min-w-0">
+            {/* Project Primary Display */}
+            <h3 className="font-bold text-lg truncate mb-0.5">{primaryDisplay}</h3>
+            {/* Project Secondary Display */}
+            {secondaryDisplay && (
+              <p className="text-xs text-muted-foreground font-medium truncate mb-0.5">{secondaryDisplay}</p>
             )}
-
-            {/* Stats Row */}
-            <div className="flex items-center justify-between pt-2 mt-2 border-t border-border/50">
-              <div className="flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs font-semibold">{project.teamMembers?.length || 0}</span>
-                <span className="text-[10px] text-muted-foreground">team</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs font-semibold">{project.totalHours || 0}h</span>
-                <span className="text-[10px] text-muted-foreground">total</span>
-              </div>
-            </div>
-
-            {/* Edit Button */}
-            <div className="flex justify-end mt-2">
-              <Button 
-                size="icon"
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditDialogOpen(true);
-                }}
-                className="h-7 w-7"
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
-            </div>
+            {/* Department - Tertiary */}
+            {project.department && (
+              <p className="text-[10px] text-muted-foreground truncate">{project.department}</p>
+            )}
           </div>
+          <StandardizedBadge variant="metric" size="sm" className="flex-shrink-0">
+            {((project.totalHours || 0) / 40).toFixed(1)} FTE
+          </StandardizedBadge>
         </div>
-      </TooltipTrigger>
-      <TooltipContent side="top" className="max-w-sm glass-card border-0 shadow-2xl">
-        <div className="space-y-3">
-          <div>
-            <h4 className="font-medium">{project.name}</h4>
-            <p className="text-sm text-muted-foreground">{project.code}</p>
-            <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-              {project.office && (
-                <span className="flex items-center gap-1">
-                  <Building className="h-3 w-3" />
-                  {project.office}
-                </span>
-              )}
-              <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {Math.round(project.totalHours || 0)}h total
-              </span>
-            </div>
-          </div>
 
+        <div className="space-y-3 relative z-10">
+
+          {/* Team Member Avatars */}
           {project.teamMembers && project.teamMembers.length > 0 && (
             <div>
-              <p className="text-sm font-medium mb-2 flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                Team Members ({project.teamMembers.length})
-              </p>
-              <div className="space-y-1">
-                {project.teamMembers.slice(0, 5).map((member: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <Avatar className="h-5 w-5">
-                        <AvatarImage src={member.avatar} alt={member.name} />
-                        <AvatarFallback className="text-xs">
-                          {member.name?.split(' ').map((n: string) => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="truncate">{member.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2 ml-2">
-                      <StandardizedBadge variant="metric" size="sm">{Math.round(member.hours || 0)}h</StandardizedBadge>
-                      <StandardizedBadge
-                        variant={member.capacityPercentage > 100 ? 'error' : 'secondary'}
-                        size="sm"
-                      >
-                        {Math.round(member.capacityPercentage || 0)}%
-                      </StandardizedBadge>
-                    </div>
-                  </div>
+              <div className="flex flex-wrap gap-3 justify-center">
+                {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
+                  <Tooltip key={idx}>
+                    <TooltipTrigger asChild>
+                      <div className="flex flex-col items-center gap-1.5 cursor-help">
+                        <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md">
+                          <AvatarImage src={member.avatar} alt={member.name} />
+                          <AvatarFallback className="text-xs bg-gradient-modern text-white">
+                            {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col items-center gap-0.5">
+                          <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
+                          <StandardizedBadge variant="metric" size="sm">
+                            {Math.round(member.hours || 0)}h
+                          </StandardizedBadge>
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="bg-popover border border-border shadow-lg p-3 max-w-xs z-[100]">
+                      <div className="space-y-2">
+                        <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
+                          {member.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {member.hours}h on this project ({Math.round(member.capacityPercentage || 0)}% capacity)
+                        </div>
+                        {member.allProjects && member.allProjects.length > 1 && (
+                          <div className="space-y-1 pt-1 border-t border-border">
+                            <div className="text-xs font-medium text-muted-foreground">All projects this week:</div>
+                            {member.allProjects.map((proj: any, pIdx: number) => (
+                              <div key={pIdx} className="flex justify-between items-center text-xs">
+                                <span className="text-foreground truncate max-w-[140px]">
+                                  {getProjectDisplayName(proj, projectDisplayPreference)}
+                                </span>
+                                <span className="text-muted-foreground font-medium ml-2">{proj.hours}h</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
-                {project.teamMembers.length > 5 && (
-                  <p className="text-xs text-muted-foreground">+{project.teamMembers.length - 5} more members</p>
+                {project.teamMembers.length > 8 && (
+                  <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                    +{project.teamMembers.length - 8}
+                  </div>
                 )}
               </div>
             </div>
           )}
 
-          {project.teamMembers?.length === 0 && (
-            <div className="text-center py-2">
-              <Calendar className="h-8 w-8 mx-auto text-muted-foreground/50 mb-1" />
-              <p className="text-xs text-muted-foreground">No team members allocated</p>
+          {/* Stats Row */}
+          <div className="flex items-center justify-between pt-2 mt-2 border-t border-border/50">
+            <div className="flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-semibold">{project.teamMembers?.length || 0}</span>
+              <span className="text-[10px] text-muted-foreground">team</span>
             </div>
-          )}
-        </div>
-      </TooltipContent>
-    </Tooltip>
+            <div className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-semibold">{project.totalHours || 0}h</span>
+              <span className="text-[10px] text-muted-foreground">total</span>
+            </div>
+          </div>
 
-    <EditProjectAllocationsDialog
-      open={editDialogOpen}
-      onOpenChange={setEditDialogOpen}
-      project={project}
-      selectedWeek={new Date()}
-    />
+          {/* Edit Button */}
+          <div className="flex justify-end mt-2">
+            <Button 
+              size="icon"
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditDialogOpen(true);
+              }}
+              className="h-7 w-7"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <EditProjectAllocationsDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        project={project}
+        selectedWeek={new Date()}
+      />
     </>
   );
 };
