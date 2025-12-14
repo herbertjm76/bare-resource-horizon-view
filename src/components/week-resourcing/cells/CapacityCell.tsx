@@ -3,6 +3,8 @@ import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { CapacityBar } from '../CapacityBar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface CapacityCellProps {
   availableHours: number;

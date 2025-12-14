@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Building2, Check, ChevronsUpDown } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 import {
   Dialog,
   DialogContent,
@@ -61,6 +63,7 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
   const [newProjectCountry, setNewProjectCountry] = useState('');
   const { company } = useCompany();
   const queryClient = useQueryClient();
+  const { projectDisplayPreference } = useAppSettings();
 
   // Fetch available projects
   const { data: projects = [] } = useQuery({
@@ -251,7 +254,7 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
                                   setComboboxOpen(false);
                                 }}
                               >
-                                {project.name}
+                                {getProjectDisplayName(project, projectDisplayPreference)}
                                 <Check
                                   className={cn(
                                     "ml-auto h-4 w-4",

@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface NewResourceTableHeaderProps {
   projects: any[];
@@ -11,6 +13,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
   projects,
   viewMode = 'compact'
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
   if (viewMode === 'expanded') {
     return (
       <TableHeader>
@@ -35,10 +38,10 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
             >
               <div className="flex flex-col items-center gap-1">
                 <span className="text-xs font-semibold text-gray-600">
-                  {project.code || 'N/A'}
+                  {getProjectSecondaryText(project, projectDisplayPreference) || 'N/A'}
                 </span>
                 <span className="text-sm font-bold text-gray-800 leading-tight">
-                  {project.name}
+                  {getProjectDisplayName(project, projectDisplayPreference)}
                 </span>
               </div>
             </TableHead>
@@ -130,7 +133,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
                 whiteSpace: 'nowrap'
               }}
             >
-              {project.code || 'N/A'}
+              {getProjectDisplayName(project, projectDisplayPreference) || 'N/A'}
             </div>
           </TableHead>
         ))}
