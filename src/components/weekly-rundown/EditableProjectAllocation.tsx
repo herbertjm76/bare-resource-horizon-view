@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/alloca
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { getAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -66,6 +67,15 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   
   const displayText = getProjectDisplayName({ code: projectCode, name: projectName }, projectDisplayPreference);
   const formattedHours = formatAllocationValue(hours, effectiveCapacity, displayPreference);
+
+  // Calculate warning status based on current input value
+  const warningStatus = useMemo(() => {
+    const inputValue = parseFloat(editedValue) || 0;
+    const percentage = displayPreference === 'percentage' 
+      ? inputValue 
+      : (effectiveCapacity > 0 ? (inputValue / effectiveCapacity) * 100 : 0);
+    return getAllocationWarningStatus(percentage);
+  }, [editedValue, displayPreference, effectiveCapacity]);
 
   const updateMutation = useMutation({
     mutationFn: async (newHours: number) => {
@@ -190,7 +200,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
               type="number"
               value={editedValue}
               onChange={(e) => setEditedValue(e.target.value)}
-              className="w-14 h-7 text-xs text-center bg-background/90 text-foreground"
+              className={`w-14 h-7 text-xs text-center bg-background/90 ${warningStatus.textClass || 'text-foreground'} ${warningStatus.borderClass} ${warningStatus.bgClass}`}
               step={displayPreference === 'percentage' ? '1' : '0.5'}
               min="0"
               placeholder={displayPreference === 'percentage' ? '%' : 'h'}

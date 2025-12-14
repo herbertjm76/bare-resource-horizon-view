@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,6 +22,7 @@ import { CalendarIcon, Briefcase, Check, ChevronsUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { getAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
 
 interface MemberVacationPopoverProps {
   memberId: string;
@@ -244,6 +245,24 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     }));
   };
 
+  // Calculate warning status for vacation input
+  const vacationWarningStatus = useMemo(() => {
+    const inputValue = parseFloat(vacationValue) || 0;
+    const percentage = displayPreference === 'percentage' 
+      ? inputValue 
+      : (workWeekHours > 0 ? (inputValue / workWeekHours) * 100 : 0);
+    return getAllocationWarningStatus(percentage);
+  }, [vacationValue, displayPreference, workWeekHours]);
+
+  // Calculate warning status for each week input
+  const getWeekWarningStatus = (weekValue: string) => {
+    const inputValue = parseFloat(weekValue) || 0;
+    const percentage = displayPreference === 'percentage' 
+      ? inputValue 
+      : (workWeekHours > 0 ? (inputValue / workWeekHours) * 100 : 0);
+    return getAllocationWarningStatus(percentage);
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -335,7 +354,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                   value={vacationValue}
                   onChange={(e) => setVacationValue(e.target.value)}
                   placeholder={displayPreference === 'percentage' ? '20' : '8'}
-                  className="h-10 border-border-primary"
+                  className={`h-10 ${vacationWarningStatus.borderClass} ${vacationWarningStatus.bgClass} ${vacationWarningStatus.textClass}`}
                 />
               </div>
 
@@ -419,7 +438,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                           value={projectWeeks[weekKey] || ''}
                           onChange={(e) => handleWeekHoursChange(weekKey, e.target.value)}
                           placeholder="0"
-                          className="flex-1 h-9 border-border-primary"
+                          className={`flex-1 h-9 ${getWeekWarningStatus(projectWeeks[weekKey] || '').borderClass} ${getWeekWarningStatus(projectWeeks[weekKey] || '').bgClass} ${getWeekWarningStatus(projectWeeks[weekKey] || '').textClass}`}
                         />
                       </div>
                     );
