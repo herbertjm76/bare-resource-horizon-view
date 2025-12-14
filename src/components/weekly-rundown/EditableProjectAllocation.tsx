@@ -9,6 +9,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,9 +51,10 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
   const { company } = useCompany();
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
   
   const displayText = getProjectDisplayName({ code: projectCode, name: projectName }, projectDisplayPreference);
+  const formattedHours = formatAllocationValue(hours, capacity || workWeekHours, displayPreference);
 
   const updateMutation = useMutation({
     mutationFn: async (newHours: number) => {
@@ -197,7 +199,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
           <>
             {/* Only show text label if segment is wide enough */}
             {percentage > 10 && (
-              <span>{displayText} • {hours}h</span>
+              <span>{displayText} • {formattedHours}</span>
             )}
             <Button
               size="sm"

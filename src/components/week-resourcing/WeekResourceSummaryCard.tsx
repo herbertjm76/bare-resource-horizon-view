@@ -4,6 +4,8 @@ import { Users, Calendar, Clock, TrendingUp } from 'lucide-react';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatUtilizationSummary, formatAvailableValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface WeekResourceSummaryCardProps {
   projects: any[];
@@ -20,6 +22,8 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
   weekStartDate,
   selectedWeek
 }) => {
+  const { displayPreference } = useAppSettings();
+  
   // Use standardized utilization data
   const {
     teamSummary,
@@ -64,7 +68,7 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
       title: "Team Utilization",
       value: `${utilizationRate}%`,
       icon: TrendingUp,
-      subtitle: `${totalAllocatedHours}h of ${totalCapacity}h for selected week`,
+      subtitle: formatUtilizationSummary(totalAllocatedHours, totalCapacity, displayPreference) + ' for selected week',
       badgeText: utilizationBadgeText,
       badgeColor: utilizationColor
     },
@@ -80,13 +84,13 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
       title: "Team Members",
       value: members.length,
       icon: Users,
-      subtitle: `Total weekly capacity: ${totalCapacity}h`,
+      subtitle: `Total weekly capacity: ${formatCapacityValue(totalCapacity, displayPreference)}`,
       badgeText: members.length > 0 ? 'Active' : 'None',
       badgeColor: members.length > 0 ? 'green' : 'red'
     },
     {
       title: "Available Hours",
-      value: `${availableHours}h`,
+      value: formatAvailableValue(availableHours, totalCapacity, displayPreference),
       icon: Clock,
       subtitle: "Remaining capacity for selected week",
       badgeText: availableHoursBadgeText,

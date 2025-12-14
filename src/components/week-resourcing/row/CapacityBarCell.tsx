@@ -3,6 +3,8 @@ import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { CapacityBar } from '../CapacityBar';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatUtilizationSummary, formatAvailableValue } from '@/utils/allocationDisplay';
 
 interface CapacityBarCellProps {
   totalUsedHours: number;
@@ -13,6 +15,8 @@ export const CapacityBarCell: React.FC<CapacityBarCellProps> = ({
   totalUsedHours,
   totalCapacity
 }) => {
+  const { displayPreference } = useAppSettings();
+  
   return (
     <TableCell className="text-center border-r p-1">
       <TooltipProvider>
@@ -27,8 +31,8 @@ export const CapacityBarCell: React.FC<CapacityBarCellProps> = ({
           </TooltipTrigger>
           <TooltipContent>
             <div className="text-sm font-medium">
-              <p>Used: {totalUsedHours}h / {totalCapacity}h</p>
-              <p>Available: {Math.max(0, totalCapacity - totalUsedHours)}h</p>
+              <p>Used: {formatUtilizationSummary(totalUsedHours, totalCapacity, displayPreference)}</p>
+              <p>Available: {formatAvailableValue(Math.max(0, totalCapacity - totalUsedHours), totalCapacity, displayPreference)}</p>
             </div>
           </TooltipContent>
         </Tooltip>
