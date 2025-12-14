@@ -267,7 +267,7 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                         </div>
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent side="bottom" className="bg-popover border border-border shadow-lg p-3 max-w-xs z-[100]">
+                    <TooltipContent side="top" align="center" className="bg-popover border border-border shadow-lg p-3 max-w-xs z-[100]">
                       <div className="space-y-2">
                         <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
                           {member.name}
