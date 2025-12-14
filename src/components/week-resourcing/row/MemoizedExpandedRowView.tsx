@@ -7,9 +7,11 @@ import { EnhancedTooltip } from '../EnhancedTooltip';
 import { MultiLeaveBadgeCell } from './MultiLeaveBadgeCell';
 import { LongCapacityBar } from '../LongCapacityBar';
 import { RowData, useRowData } from './RowUtilsHooks';
+import { format, startOfWeek } from 'date-fns';
 
 interface ExpandedRowViewProps extends RowData {
   viewMode: 'expanded';
+  selectedWeek?: Date;
 }
 
 const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
@@ -25,7 +27,9 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
   getWeeklyLeave,
   updateOtherLeave,
   onOtherLeaveEdit,
+  selectedWeek = new Date(),
 }) => {
+  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   const {
     weeklyCapacity,
     totalUsedHours,
@@ -64,7 +68,7 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
       <TableCell className="border-r border-gray-200 px-4 py-3 min-w-[180px]">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
-            <NameCell member={member} />
+            <NameCell member={member} weekStartDate={weekStartDate} />
           </div>
           <div className="flex flex-wrap gap-1">
             {member.office_location && (

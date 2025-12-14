@@ -3,13 +3,18 @@ import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacationPopover';
+import { format, startOfWeek } from 'date-fns';
 
 interface NameCellProps {
   member: any;
   compact?: boolean;
+  weekStartDate?: string;
 }
 
-export const NameCell: React.FC<NameCellProps> = ({ member, compact = false }) => {
+export const NameCell: React.FC<NameCellProps> = ({ member, compact = false, weekStartDate }) => {
+  // Calculate week start date if not provided
+  const effectiveWeekStartDate = weekStartDate || format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
   // Helper to get user initials
   const getUserInitials = (): string => {
     if (!member) return '??';
@@ -51,82 +56,88 @@ export const NameCell: React.FC<NameCellProps> = ({ member, compact = false }) =
 
   if (compact) {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center gap-1 text-xs cursor-pointer" title={getMemberDisplayName()}>
-              <Avatar className="h-5 w-5">
-                <AvatarImage 
-                  src={avatarUrl} 
-                  alt={getMemberDisplayName()}
-                  onError={() => {
-                    console.log('NameCell - Avatar image failed to load:', avatarUrl);
-                  }}
-                  onLoad={() => {
-                    console.log('NameCell - Avatar image loaded successfully:', avatarUrl);
-                  }}
-                />
-                <AvatarFallback className="text-white text-[10px]" style={{ background: 'hsl(var(--gradient-start))' }}>
-                  {getUserInitials()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="truncate flex-1 name-cell-label">
-                <span className="text-[11px]">{member.first_name?.substring(0, 1)}. {member.last_name}</span>
-              </div>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent 
-            side="right" 
-            align="start" 
-            sideOffset={8}
-            className="z-[200] max-w-xs"
-            avoidCollisions={true}
-          >
-            {memberTooltip}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <MemberVacationPopover
+        memberId={member.id}
+        memberName={getMemberDisplayName()}
+        weekStartDate={effectiveWeekStartDate}
+      >
+        <div className="cursor-pointer">
+          <TooltipProvider>
+            <Tooltip delayDuration={200}>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1 text-xs" title={getMemberDisplayName()}>
+                  <Avatar className="h-5 w-5 hover:ring-2 hover:ring-primary/50 transition-all">
+                    <AvatarImage 
+                      src={avatarUrl} 
+                      alt={getMemberDisplayName()}
+                    />
+                    <AvatarFallback className="text-white text-[10px]" style={{ background: 'hsl(var(--gradient-start))' }}>
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="truncate flex-1 name-cell-label">
+                    <span className="text-[11px]">{member.first_name?.substring(0, 1)}. {member.last_name}</span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent 
+                side="right" 
+                align="start" 
+                sideOffset={8}
+                className="z-[200] max-w-xs"
+                avoidCollisions={true}
+              >
+                {memberTooltip}
+                <p className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-2">Click to add hours or leave</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </MemberVacationPopover>
     );
   }
 
   return (
     <TableCell className="font-medium border-r bg-white sticky left-0 z-10 min-w-[120px] max-w-[150px]">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center gap-2 px-2 text-sm cursor-pointer" title={getMemberDisplayName()}>
-              <Avatar className="h-6 w-6">
-                <AvatarImage 
-                  src={avatarUrl} 
-                  alt={getMemberDisplayName()}
-                  onError={() => {
-                    console.log('NameCell - Avatar image failed to load:', avatarUrl);
-                  }}
-                  onLoad={() => {
-                    console.log('NameCell - Avatar image loaded successfully:', avatarUrl);
-                  }}
-                />
-                <AvatarFallback className="text-white text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
-                  {getUserInitials()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="truncate flex-1">
-                <span className="hidden sm:inline">{getMemberDisplayName()}</span>
-                <span className="sm:hidden">{member.first_name?.substring(0, 1)}. {member.last_name}</span>
-              </div>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent 
-            side="right" 
-            align="start" 
-            sideOffset={8}
-            className="z-[200] max-w-xs"
-            avoidCollisions={true}
-          >
-            {memberTooltip}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <MemberVacationPopover
+        memberId={member.id}
+        memberName={getMemberDisplayName()}
+        weekStartDate={effectiveWeekStartDate}
+      >
+        <div className="cursor-pointer">
+          <TooltipProvider>
+            <Tooltip delayDuration={200}>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2 px-2 text-sm" title={getMemberDisplayName()}>
+                  <Avatar className="h-6 w-6 hover:ring-2 hover:ring-primary/50 transition-all">
+                    <AvatarImage 
+                      src={avatarUrl} 
+                      alt={getMemberDisplayName()}
+                    />
+                    <AvatarFallback className="text-white text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="truncate flex-1">
+                    <span className="hidden sm:inline">{getMemberDisplayName()}</span>
+                    <span className="sm:hidden">{member.first_name?.substring(0, 1)}. {member.last_name}</span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent 
+                side="right" 
+                align="start" 
+                sideOffset={8}
+                className="z-[200] max-w-xs"
+                avoidCollisions={true}
+              >
+                {memberTooltip}
+                <p className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-2">Click to add hours or leave</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </MemberVacationPopover>
     </TableCell>
   );
 };
