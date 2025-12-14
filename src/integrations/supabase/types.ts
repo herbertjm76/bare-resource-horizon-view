@@ -48,6 +48,7 @@ export type Database = {
         Row: {
           address: string | null
           allocation_danger_threshold: number | null
+          allocation_max_limit: number | null
           allocation_warning_threshold: number | null
           city: string | null
           country: string | null
@@ -72,6 +73,7 @@ export type Database = {
         Insert: {
           address?: string | null
           allocation_danger_threshold?: number | null
+          allocation_max_limit?: number | null
           allocation_warning_threshold?: number | null
           city?: string | null
           country?: string | null
@@ -96,6 +98,7 @@ export type Database = {
         Update: {
           address?: string | null
           allocation_danger_threshold?: number | null
+          allocation_max_limit?: number | null
           allocation_warning_threshold?: number | null
           city?: string | null
           country?: string | null

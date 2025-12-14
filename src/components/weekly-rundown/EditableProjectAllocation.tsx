@@ -52,7 +52,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
   const { company } = useCompany();
-  const { projectDisplayPreference, displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
   
   const effectiveCapacity = capacity || workWeekHours;
   
@@ -153,14 +153,14 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
       return;
     }
     
-    // Validate max 200%
-    if (displayPreference === 'percentage' && inputValue > 200) {
-      toast.error('Allocation cannot exceed 200%');
+    // Validate against max limit
+    if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
+      toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
       return;
     }
-    const maxHours = effectiveCapacity * 2;
+    const maxHours = (effectiveCapacity * allocationMaxLimit) / 100;
     if (displayPreference === 'hours' && inputValue > maxHours) {
-      toast.error(`Allocation cannot exceed ${maxHours}h (200% of capacity)`);
+      toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
       return;
     }
     

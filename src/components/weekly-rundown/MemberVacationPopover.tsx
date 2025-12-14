@@ -39,7 +39,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   children
 }) => {
   const { company } = useCompany();
-  const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold } = useAppSettings();
+  const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('vacation');
@@ -99,14 +99,14 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
 
     const inputValue = parseFloat(vacationValue) || 8;
     
-    // Validate max 200% for vacation (though typically 100% max for leave per day)
-    if (displayPreference === 'percentage' && inputValue > 200) {
-      toast.error('Allocation cannot exceed 200%');
+    // Validate against max limit
+    if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
+      toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
       return;
     }
-    const maxHours = workWeekHours * 2;
+    const maxHours = (workWeekHours * allocationMaxLimit) / 100;
     if (displayPreference === 'hours' && inputValue > maxHours) {
-      toast.error(`Allocation cannot exceed ${maxHours}h (200% of capacity)`);
+      toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
       return;
     }
 
@@ -173,16 +173,16 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     if (!selectedProject || !company?.id) return;
 
     // Validate all week entries before saving
-    const maxHours = workWeekHours * 2;
+    const maxHours = (workWeekHours * allocationMaxLimit) / 100;
     for (const [weekKey, value] of Object.entries(projectWeeks)) {
       if (value && parseFloat(value) > 0) {
         const inputValue = parseFloat(value);
-        if (displayPreference === 'percentage' && inputValue > 200) {
-          toast.error('Allocation cannot exceed 200%');
+        if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
+          toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
           return;
         }
         if (displayPreference === 'hours' && inputValue > maxHours) {
-          toast.error(`Allocation cannot exceed ${maxHours}h (200% of capacity)`);
+          toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
           return;
         }
       }
