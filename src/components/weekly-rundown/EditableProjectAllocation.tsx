@@ -142,6 +142,17 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
       return;
     }
     
+    // Validate max 200%
+    if (displayPreference === 'percentage' && inputValue > 200) {
+      toast.error('Allocation cannot exceed 200%');
+      return;
+    }
+    const maxHours = effectiveCapacity * 2;
+    if (displayPreference === 'hours' && inputValue > maxHours) {
+      toast.error(`Allocation cannot exceed ${maxHours}h (200% of capacity)`);
+      return;
+    }
+    
     // Convert display value back to hours if needed
     const newHours = displayPreference === 'percentage' 
       ? (inputValue / 100) * effectiveCapacity 
