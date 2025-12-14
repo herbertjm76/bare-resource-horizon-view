@@ -18,7 +18,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
   allocationMap,
   weekStartDate
 }) => {
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, workWeekHours } = useAppSettings();
   // Calculate member totals
   const getMemberTotal = (memberId: string): number => {
     let total = 0;
@@ -119,7 +119,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                 <div className="flex items-center justify-center h-full">
                   {getProjectTotal(project.id) > 0 ? (
                     <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
-                      {getProjectTotal(project.id)}
+                      {(getProjectTotal(project.id) / workWeekHours).toFixed(1)}
                     </div>
                   ) : (
                     <span className="text-transparent select-none">0</span>
@@ -164,7 +164,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             <TableCell className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
               <div className="flex items-center justify-center h-full">
                 <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
-                  {members.reduce((sum, member) => sum + getMemberTotal(member.id), 0)}
+                  {(members.reduce((sum, member) => sum + getMemberTotal(member.id), 0) / workWeekHours).toFixed(1)}
                 </div>
               </div>
             </TableCell>
