@@ -19,7 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
-import { CalendarIcon, Briefcase, Check, ChevronsUpDown } from 'lucide-react';
+import { CalendarIcon, Briefcase, Check, ChevronsUpDown, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAppSettings } from '@/hooks/useAppSettings';
@@ -347,27 +347,32 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                 <Label className="text-sm font-medium text-text-primary">
                   {displayPreference === 'percentage' ? 'Percentage per Day' : 'Hours per Day'}
                 </Label>
-                <TooltipProvider>
-                  <Tooltip open={vacationWarningStatus.level !== 'normal'}>
-                    <TooltipTrigger asChild>
-                      <Input
-                        type="number"
-                        min="0"
-                        max={displayPreference === 'percentage' ? '100' : '24'}
-                        step={displayPreference === 'percentage' ? '5' : '0.5'}
-                        value={vacationValue}
-                        onChange={(e) => setVacationValue(e.target.value)}
-                        placeholder={displayPreference === 'percentage' ? '20' : '8'}
-                        className={`h-10 ${vacationWarningStatus.borderClass} ${vacationWarningStatus.bgClass} ${vacationWarningStatus.textClass}`}
-                      />
-                    </TooltipTrigger>
-                    {vacationWarningStatus.message && (
-                      <TooltipContent side="top" className={vacationWarningStatus.level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
-                        <p>{vacationWarningStatus.message}</p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
+                <div className="flex items-center gap-2">
+                  {vacationWarningStatus.level !== 'normal' && (
+                    <AlertTriangle className={`h-4 w-4 flex-shrink-0 ${vacationWarningStatus.level === 'warning' ? 'text-amber-500' : 'text-destructive'}`} />
+                  )}
+                  <TooltipProvider>
+                    <Tooltip open={vacationWarningStatus.level !== 'normal'}>
+                      <TooltipTrigger asChild>
+                        <Input
+                          type="number"
+                          min="0"
+                          max={displayPreference === 'percentage' ? '100' : '24'}
+                          step={displayPreference === 'percentage' ? '5' : '0.5'}
+                          value={vacationValue}
+                          onChange={(e) => setVacationValue(e.target.value)}
+                          placeholder={displayPreference === 'percentage' ? '20' : '8'}
+                          className={`h-10 flex-1 ${vacationWarningStatus.borderClass} ${vacationWarningStatus.bgClass} ${vacationWarningStatus.textClass}`}
+                        />
+                      </TooltipTrigger>
+                      {vacationWarningStatus.message && (
+                        <TooltipContent side="top" className={vacationWarningStatus.level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
+                          <p>{vacationWarningStatus.message}</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
 
               <Button 
@@ -442,6 +447,9 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                         <Label className="text-xs text-text-secondary w-32 flex-shrink-0">
                           {format(weekDate, 'MMM d')} - {format(weekEnd, 'MMM d')}
                         </Label>
+                        {getWeekWarningStatus(projectWeeks[weekKey] || '').level !== 'normal' && (
+                          <AlertTriangle className={`h-3 w-3 flex-shrink-0 ${getWeekWarningStatus(projectWeeks[weekKey] || '').level === 'warning' ? 'text-amber-500' : 'text-destructive'}`} />
+                        )}
                         <TooltipProvider>
                           <Tooltip open={getWeekWarningStatus(projectWeeks[weekKey] || '').level !== 'normal'}>
                             <TooltipTrigger asChild>

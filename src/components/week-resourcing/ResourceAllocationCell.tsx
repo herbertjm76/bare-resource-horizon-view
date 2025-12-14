@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
-import { Trash2 } from 'lucide-react';
+import { Trash2, AlertTriangle } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { convertToHours, convertFromHours } from '@/utils/displayFormatters';
 import { getAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
@@ -157,27 +157,32 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {isEditing ? (
-        <TooltipProvider>
-          <Tooltip open={warningStatus.level !== 'normal'}>
-            <TooltipTrigger asChild>
-              <Input
-                className={`w-full h-8 text-center p-0 text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${warningStatus.borderClass} ${warningStatus.bgClass} ${warningStatus.textClass}`}
-                type="number"
-                value={value}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                autoFocus
-                disabled={isSaving}
-                placeholder={displayPreference === 'percentage' ? '%' : 'h'}
-              />
-            </TooltipTrigger>
-            {warningStatus.message && (
-              <TooltipContent side="top" className={warningStatus.level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
-                <p>{warningStatus.message}</p>
-              </TooltipContent>
-            )}
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex items-center gap-1 w-full">
+          {warningStatus.level !== 'normal' && (
+            <AlertTriangle className={`h-4 w-4 flex-shrink-0 ${warningStatus.level === 'warning' ? 'text-amber-500' : 'text-destructive'}`} />
+          )}
+          <TooltipProvider>
+            <Tooltip open={warningStatus.level !== 'normal'}>
+              <TooltipTrigger asChild>
+                <Input
+                  className={`w-full h-8 text-center p-0 text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${warningStatus.borderClass} ${warningStatus.bgClass} ${warningStatus.textClass}`}
+                  type="number"
+                  value={value}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  autoFocus
+                  disabled={isSaving}
+                  placeholder={displayPreference === 'percentage' ? '%' : 'h'}
+                />
+              </TooltipTrigger>
+              {warningStatus.message && (
+                <TooltipContent side="top" className={warningStatus.level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
+                  <p>{warningStatus.message}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       ) : (
         <>
           <div
