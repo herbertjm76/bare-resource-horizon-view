@@ -4,6 +4,7 @@ import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Clock } from 'lucide-react';
 import { TimeRange } from '../TimeRangeSelector';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
+import { getTimeRangeLabel } from '@/hooks/useTimeRangeCapacity';
 
 
 interface WorkloadCardProps {

@@ -10,6 +10,7 @@ import { useDashboardData } from './hooks/useDashboardData';
 import { TimeRange } from './TimeRangeSelector';
 import { Users, Briefcase, TrendingUp, AlertCircle } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { useTimeRangeCapacity, getTimeRangeLabel } from '@/hooks/useTimeRangeCapacity';
 
 interface DesktopDashboardProps {
   selectedTimeRange: TimeRange;
@@ -20,29 +21,45 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 }) => {
   const data = useDashboardData(selectedTimeRange);
   const { workWeekHours } = useAppSettings();
+  const { weekMultiplier, getTotalCapacity, label: timeRangeLabel, shortLabel } = useTimeRangeCapacity(selectedTimeRange);
 
   if (data.isLoading) {
     return <LoadingDashboard />;
   }
 
-  // Calculate metrics - use time-range-filtered data from metrics
-  const utilizationRate = data.currentUtilizationRate;
+  // Team metrics
+  const teamSize = data.teamMembers.length + data.preRegisteredMembers.length;
   const activeProjects = data.metrics?.activeProjects || 0;
   const totalProjects = data.projects.length;
-  const teamSize = data.teamMembers.length + data.preRegisteredMembers.length;
-  const activeResources = data.metrics?.activeResources || teamSize;
+  
+  // TIME-RANGE-AWARE CAPACITY CALCULATIONS
+  // Total team capacity for the selected time range
+  const totalTeamCapacityForRange = teamSize * getTotalCapacity(workWeekHours);
+  
+  // Calculate total allocated hours for the time range from member utilizations
+  const totalAllocatedHoursForRange = useMemo(() => {
+    return data.memberUtilizations.reduce((sum, m) => {
+      // m.totalAllocatedHours is per-week average, multiply by weeks in range
+      return sum + (m.totalAllocatedHours * weekMultiplier);
+    }, 0);
+  }, [data.memberUtilizations, weekMultiplier]);
+  
+  // Overall utilization rate (already calculated correctly in the hook)
+  const utilizationRate = data.currentUtilizationRate;
   
   // Calculate overloaded resources (>100% utilization)
   const overloadedResources = data.memberUtilizations.filter(m => m.utilization > 100);
   const overloadedCount = overloadedResources.length;
   
-  // Calculate at-risk projects (projects with overallocated resources)
-  const atRiskProjects = data.projects.filter(p => p.status === 'Active' || p.status === 'Planning').length > 0 && overloadedCount > 3 ? 2 : 0;
+  // Calculate at-risk projects
+  const atRiskProjects = (activeProjects > 0 && overloadedCount > 3) ? Math.min(2, activeProjects) : 0;
   
-  // Simulate capacity gaps (weeks where utilization > 100%)
-  const upcomingGaps = utilizationRate > 100 ? 2 : 0;
+  // Capacity gap (remaining capacity)
+  const remainingCapacity = totalTeamCapacityForRange - totalAllocatedHoursForRange;
+  const hasCapacityGap = remainingCapacity < 0;
+  const capacityGapHours = Math.abs(remainingCapacity);
 
-  // Sparkline trends - use actual utilization trends from database
+  // Sparkline trends
   const utilizationTrend = data.metrics?.utilizationTrends 
     ? [
         data.metrics.utilizationTrends.days90,
@@ -55,9 +72,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
       ]
     : [utilizationRate, utilizationRate, utilizationRate, utilizationRate, utilizationRate, utilizationRate, utilizationRate];
 
-  // Project pipeline data - use time-range-filtered metrics
+  // Project pipeline data
   const projectsByStatus = useMemo(() => {
-    // Use metrics data if available (time-range filtered), otherwise fall back to all projects
     const statusData = data.metrics?.projectsByStatus || [];
     
     if (statusData.length > 0) {
@@ -71,7 +87,6 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
       }));
     }
     
-    // Fallback to counting all projects
     const statusCount = data.projects.reduce((acc, p) => {
       acc[p.status] = (acc[p.status] || 0) + 1;
       return acc;
@@ -85,10 +100,11 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     ];
   }, [data.projects, data.metrics?.projectsByStatus, totalProjects]);
 
-  // Top overloaded resources
+  // Top overloaded resources with time-range-aware hours
   const topOverloadedResources = useMemo(() => {
     return overloadedResources
       .sort((a, b) => b.utilization - a.utilization)
+      .slice(0, 5)
       .map(m => {
         const member = data.teamMembers.find(tm => tm.id === m.memberId);
         const projectCount = 3; // Mock for now
@@ -97,25 +113,25 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           name: m.memberName,
           avatarUrl: member?.avatar_url,
           thisWeek: Math.round(m.utilization),
-          nextWeek: Math.round(m.utilization - 10), // Mock next week
+          nextWeek: Math.round(m.utilization - 10),
           projectCount
         };
       });
   }, [overloadedResources, data.teamMembers]);
 
-  // Capacity forecast (next 8 weeks)
+  // Capacity forecast (next 8 weeks from now)
   const capacityForecastData = useMemo(() => {
-    const baseCapacity = teamSize * workWeekHours;
-    const baseDemand = (utilizationRate / 100) * baseCapacity;
+    const weeklyCapacity = teamSize * workWeekHours;
+    const weeklyDemand = (utilizationRate / 100) * weeklyCapacity;
     
     return Array.from({ length: 8 }, (_, i) => ({
       week: `W${i + 1}`,
-      capacity: baseCapacity + (i * 10), // Slight growth
-      demand: baseDemand + (Math.random() * 100 - 50) // Fluctuation
+      capacity: weeklyCapacity,
+      demand: Math.round(weeklyDemand + (Math.random() * 40 - 20))
     }));
   }, [teamSize, utilizationRate, workWeekHours]);
 
-  // Determine utilization status
+  // Utilization status
   const getUtilizationStatus = () => {
     if (utilizationRate > 120) return { status: 'danger' as const, badge: 'Critical - Need Hiring' };
     if (utilizationRate > 100) return { status: 'warning' as const, badge: 'High - Monitor Closely' };
@@ -132,7 +148,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         <SparklineMetricCard
           title="Team Utilization"
           value={`${Math.round(utilizationRate)}%`}
-          subtitle={`${teamSize} team members`}
+          subtitle={`${timeRangeLabel} • ${teamSize} members`}
           icon={TrendingUp}
           trend={utilizationTrend}
           status={utilizationStatus.status}
@@ -147,20 +163,20 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           badge={atRiskProjects > 0 ? `${atRiskProjects} at risk` : 'On Track'}
         />
         <SparklineMetricCard
-          title="Team Capacity"
-          value={`${teamSize * workWeekHours}h`}
-          subtitle={`${teamSize} available resources`}
+          title={`${timeRangeLabel} Capacity`}
+          value={`${Math.round(totalTeamCapacityForRange)}h`}
+          subtitle={`${teamSize} resources × ${workWeekHours}h × ${weekMultiplier}w`}
           icon={Users}
           status={overloadedCount > 0 ? 'danger' : 'good'}
           badge={overloadedCount > 0 ? `${overloadedCount} overbooked` : 'Balanced'}
         />
         <SparklineMetricCard
           title="Capacity Gap"
-          value={upcomingGaps > 0 ? `${upcomingGaps} weeks` : 'None'}
-          subtitle="Upcoming shortfalls"
+          value={hasCapacityGap ? `${Math.round(capacityGapHours)}h over` : `${Math.round(remainingCapacity)}h free`}
+          subtitle={`${timeRangeLabel} ${hasCapacityGap ? 'overbooked' : 'available'}`}
           icon={AlertCircle}
-          status={upcomingGaps > 0 ? 'warning' : 'good'}
-          badge={upcomingGaps > 0 ? 'Action Needed' : 'Well Planned'}
+          status={hasCapacityGap ? 'danger' : remainingCapacity < totalTeamCapacityForRange * 0.1 ? 'warning' : 'good'}
+          badge={hasCapacityGap ? 'Over Capacity' : remainingCapacity < totalTeamCapacityForRange * 0.1 ? 'Nearly Full' : 'Well Planned'}
         />
       </div>
 
@@ -169,7 +185,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         <RiskAlertsSection
           overloadedCount={overloadedCount}
           atRiskProjects={atRiskProjects}
-          upcomingGaps={upcomingGaps}
+          upcomingGaps={hasCapacityGap ? 1 : 0}
         />
         <CapacityForecastChart data={capacityForecastData} />
       </div>
