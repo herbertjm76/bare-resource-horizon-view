@@ -12,6 +12,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, Briefcase, Calendar, User } from 'lucide-react';
 import { StaffMember } from './types';
 import { TimeRange } from '../TimeRangeSelector';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
 
 interface StaffAllocationDialogProps {
   open: boolean;
@@ -40,6 +42,8 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
   utilizationRate,
   selectedTimeRange
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
+  
   if (!member) return null;
 
   // Consolidate allocations by project
@@ -126,12 +130,12 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="flex flex-col items-center">
                   <Clock className="h-5 w-5 text-blue-500 mb-1" />
-                  <div className="text-lg font-semibold">{totalAllocatedHours}h</div>
+                  <div className="text-lg font-semibold">{formatAllocationValue(totalAllocatedHours, memberDetails.weeklyCapacity, displayPreference)}</div>
                   <div className="text-xs text-gray-500">For {getTimePeriodText()}</div>
                 </div>
                 <div className="flex flex-col items-center">
                   <Calendar className="h-5 w-5 text-green-500 mb-1" />
-                  <div className="text-lg font-semibold">{memberDetails.weeklyCapacity}h</div>
+                  <div className="text-lg font-semibold">{formatAllocationValue(memberDetails.weeklyCapacity, memberDetails.weeklyCapacity, displayPreference)}</div>
                   <div className="text-xs text-gray-500">Capacity</div>
                 </div>
                 <div className="flex flex-col items-center">
@@ -194,7 +198,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
                           </div>
                         </div>
                         <StandardizedBadge variant="metric" size="sm" className="ml-2">
-                          {allocation.hours}h
+                          {formatAllocationValue(allocation.hours, memberDetails.weeklyCapacity, displayPreference)}
                         </StandardizedBadge>
                       </div>
                     </CardContent>
@@ -222,7 +226,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
             </div>
             <div className="text-xs text-gray-500 mt-1">
               {utilizationPercentage > 100 && 'Over-allocated! '}
-              {totalAllocatedHours}h allocated of {memberDetails.weeklyCapacity}h capacity
+              {formatUtilizationSummary(totalAllocatedHours, memberDetails.weeklyCapacity, displayPreference)} capacity
             </div>
           </div>
         </div>

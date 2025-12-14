@@ -7,6 +7,7 @@ import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacatio
 import { format, startOfWeek } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectAllocation {
   projectId: string;
@@ -32,10 +33,13 @@ export const NameCell: React.FC<NameCellProps> = ({
   utilizationPercentage = 0,
   totalAllocatedHours = 0
 }) => {
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
   
   // Calculate week start date if not provided
   const effectiveWeekStartDate = weekStartDate || format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  
+  // Get member capacity
+  const memberCapacity = member?.weekly_capacity || workWeekHours;
   
   // Helper to get user initials
   const getUserInitials = (): string => {
@@ -61,7 +65,7 @@ export const NameCell: React.FC<NameCellProps> = ({
     <div className="space-y-2">
       <div className="font-semibold text-sm text-foreground">{getMemberDisplayName()}</div>
       <div className="text-xs text-muted-foreground">
-        {Math.round(utilizationPercentage)}% utilized • {totalAllocatedHours}h allocated
+        {Math.round(utilizationPercentage)}% utilized • {formatAllocationValue(totalAllocatedHours, memberCapacity, displayPreference)} allocated
       </div>
       
       {projectAllocations.length > 0 ? (
@@ -72,7 +76,7 @@ export const NameCell: React.FC<NameCellProps> = ({
               <span className="text-foreground truncate max-w-[140px]">
                 {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
               </span>
-              <span className="text-muted-foreground font-medium ml-2">{project.hours}h</span>
+              <span className="text-muted-foreground font-medium ml-2">{formatAllocationValue(project.hours, memberCapacity, displayPreference)}</span>
             </div>
           ))}
         </div>
