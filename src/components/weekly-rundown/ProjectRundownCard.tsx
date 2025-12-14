@@ -8,6 +8,7 @@ import * as LucideIcons from 'lucide-react';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectRundownCardProps {
   project: {
@@ -42,13 +43,12 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
   onDataChange
 }) => {
   const { departments } = useOfficeSettings();
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, startOfWorkWeek, workWeekHours, displayPreference } = useAppSettings();
   const sortedMembers = [...project.teamMembers].sort((a, b) => b.hours - a.hours);
   
-  const { startOfWorkWeek } = useAppSettings();
   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
-  
+
   // Calculate week start based on company settings
   const weekStartDate = new Date(selectedWeek);
   const day = weekStartDate.getDay();
@@ -62,6 +62,13 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
   }
   weekStartDate.setDate(weekStartDate.getDate() + diff);
   const weekStartDateString = weekStartDate.toISOString().split('T')[0];
+
+  const perFteCapacity = workWeekHours || 40;
+  const teamCapacity = perFteCapacity * Math.max(project.teamMembers.length || 0, 1);
+  const totalValue = displayPreference === 'percentage'
+    ? (teamCapacity > 0 ? (project.totalHours / teamCapacity) * 100 : 0)
+    : project.totalHours;
+  const totalUnit = displayPreference === 'percentage' ? '%' : 'h';
 
   // Get the icon component for the department from office settings
   const getIconComponent = () => {
@@ -131,7 +138,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                 <StandardizedBadge variant="metric" size="sm" className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {project.totalHours}h
+                  {formatAllocationValue(project.totalHours, teamCapacity, displayPreference)}
                 </StandardizedBadge>
                 {project.office && (
                   <StandardizedBadge variant="secondary" size="sm">
@@ -161,7 +168,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-primary" />
                 <span className="text-2xl font-bold text-foreground">
-                  <CountUpNumber end={project.totalHours} duration={1500} />h
+                  <CountUpNumber end={totalValue} duration={1500} />{totalUnit}
                 </span>
                 <span className="text-xs text-muted-foreground">total</span>
               </div>
