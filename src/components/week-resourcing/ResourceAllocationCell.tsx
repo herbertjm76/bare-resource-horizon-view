@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { Trash2 } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { convertToHours, convertFromHours } from '@/utils/displayFormatters';
 import { getAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ResourceAllocationCellProps {
   resourceId: string;
@@ -155,16 +157,27 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {isEditing ? (
-        <Input
-          className={`w-full h-8 text-center p-0 text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${warningStatus.borderClass} ${warningStatus.bgClass} ${warningStatus.textClass}`}
-          type="number"
-          value={value}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          autoFocus
-          disabled={isSaving}
-          placeholder={displayPreference === 'percentage' ? '%' : 'h'}
-        />
+        <TooltipProvider>
+          <Tooltip open={warningStatus.level !== 'normal'}>
+            <TooltipTrigger asChild>
+              <Input
+                className={`w-full h-8 text-center p-0 text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${warningStatus.borderClass} ${warningStatus.bgClass} ${warningStatus.textClass}`}
+                type="number"
+                value={value}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                autoFocus
+                disabled={isSaving}
+                placeholder={displayPreference === 'percentage' ? '%' : 'h'}
+              />
+            </TooltipTrigger>
+            {warningStatus.message && (
+              <TooltipContent side="top" className={warningStatus.level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
+                <p>{warningStatus.message}</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
       ) : (
         <>
           <div

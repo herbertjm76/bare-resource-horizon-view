@@ -14,6 +14,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
@@ -346,16 +347,27 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                 <Label className="text-sm font-medium text-text-primary">
                   {displayPreference === 'percentage' ? 'Percentage per Day' : 'Hours per Day'}
                 </Label>
-                <Input
-                  type="number"
-                  min="0"
-                  max={displayPreference === 'percentage' ? '100' : '24'}
-                  step={displayPreference === 'percentage' ? '5' : '0.5'}
-                  value={vacationValue}
-                  onChange={(e) => setVacationValue(e.target.value)}
-                  placeholder={displayPreference === 'percentage' ? '20' : '8'}
-                  className={`h-10 ${vacationWarningStatus.borderClass} ${vacationWarningStatus.bgClass} ${vacationWarningStatus.textClass}`}
-                />
+                <TooltipProvider>
+                  <Tooltip open={vacationWarningStatus.level !== 'normal'}>
+                    <TooltipTrigger asChild>
+                      <Input
+                        type="number"
+                        min="0"
+                        max={displayPreference === 'percentage' ? '100' : '24'}
+                        step={displayPreference === 'percentage' ? '5' : '0.5'}
+                        value={vacationValue}
+                        onChange={(e) => setVacationValue(e.target.value)}
+                        placeholder={displayPreference === 'percentage' ? '20' : '8'}
+                        className={`h-10 ${vacationWarningStatus.borderClass} ${vacationWarningStatus.bgClass} ${vacationWarningStatus.textClass}`}
+                      />
+                    </TooltipTrigger>
+                    {vacationWarningStatus.message && (
+                      <TooltipContent side="top" className={vacationWarningStatus.level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
+                        <p>{vacationWarningStatus.message}</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
               </div>
 
               <Button 
@@ -430,16 +442,27 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                         <Label className="text-xs text-text-secondary w-32 flex-shrink-0">
                           {format(weekDate, 'MMM d')} - {format(weekEnd, 'MMM d')}
                         </Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          max={displayPreference === 'percentage' ? '200' : '168'}
-                          step={displayPreference === 'percentage' ? '5' : '0.5'}
-                          value={projectWeeks[weekKey] || ''}
-                          onChange={(e) => handleWeekHoursChange(weekKey, e.target.value)}
-                          placeholder="0"
-                          className={`flex-1 h-9 ${getWeekWarningStatus(projectWeeks[weekKey] || '').borderClass} ${getWeekWarningStatus(projectWeeks[weekKey] || '').bgClass} ${getWeekWarningStatus(projectWeeks[weekKey] || '').textClass}`}
-                        />
+                        <TooltipProvider>
+                          <Tooltip open={getWeekWarningStatus(projectWeeks[weekKey] || '').level !== 'normal'}>
+                            <TooltipTrigger asChild>
+                              <Input
+                                type="number"
+                                min="0"
+                                max={displayPreference === 'percentage' ? '200' : '168'}
+                                step={displayPreference === 'percentage' ? '5' : '0.5'}
+                                value={projectWeeks[weekKey] || ''}
+                                onChange={(e) => handleWeekHoursChange(weekKey, e.target.value)}
+                                placeholder="0"
+                                className={`flex-1 h-9 ${getWeekWarningStatus(projectWeeks[weekKey] || '').borderClass} ${getWeekWarningStatus(projectWeeks[weekKey] || '').bgClass} ${getWeekWarningStatus(projectWeeks[weekKey] || '').textClass}`}
+                              />
+                            </TooltipTrigger>
+                            {getWeekWarningStatus(projectWeeks[weekKey] || '').message && (
+                              <TooltipContent side="top" className={getWeekWarningStatus(projectWeeks[weekKey] || '').level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
+                                <p>{getWeekWarningStatus(projectWeeks[weekKey] || '').message}</p>
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     );
                   })}

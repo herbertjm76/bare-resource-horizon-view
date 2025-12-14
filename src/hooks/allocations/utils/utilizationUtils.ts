@@ -65,34 +65,40 @@ export const getAllocationWarningStatus = (percentage: number): {
   borderClass: string;
   bgClass: string;
   textClass: string;
+  message: string;
 } => {
+  const roundedPercentage = Math.round(percentage);
   if (percentage > 200) {
     return { 
       level: 'exceeded', 
       borderClass: 'border-destructive',
       bgClass: 'bg-destructive/10',
-      textClass: 'text-destructive'
+      textClass: 'text-destructive',
+      message: `Allocation exceeds 200% of capacity (${roundedPercentage}%)`
     };
   } else if (percentage >= 180) {
     return { 
       level: 'danger', 
       borderClass: 'border-destructive/70',
       bgClass: 'bg-destructive/5',
-      textClass: 'text-destructive'
+      textClass: 'text-destructive',
+      message: `Allocation is at ${roundedPercentage}% of capacity`
     };
   } else if (percentage >= 150) {
     return { 
       level: 'warning', 
       borderClass: 'border-amber-500',
       bgClass: 'bg-amber-500/5',
-      textClass: 'text-amber-600'
+      textClass: 'text-amber-600',
+      message: `Allocation is at ${roundedPercentage}% of capacity`
     };
   }
   return { 
     level: 'normal', 
     borderClass: 'border-border',
     bgClass: '',
-    textClass: ''
+    textClass: '',
+    message: ''
   };
 };
 
