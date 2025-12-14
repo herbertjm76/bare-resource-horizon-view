@@ -291,7 +291,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-sm font-semibold text-[11px] hover:bg-emerald-600 transition-colors duration-100 cursor-pointer">
-                      {hours}
+                      {formatAllocationValue(hours, weeklyCapacity, displayPreference)}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent 
@@ -305,6 +305,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
                       memberName={memberData.displayName}
                       selectedWeek={selectedWeek}
                       totalHours={hours}
+                      capacity={weeklyCapacity}
                       dailyBreakdown={projectDetailedData?.daily_breakdown}
                     />
                   </TooltipContent>

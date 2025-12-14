@@ -9,7 +9,7 @@ import { LongCapacityBar } from '../LongCapacityBar';
 import { RowData, useRowData } from './RowUtilsHooks';
 import { format, startOfWeek } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { formatCapacityValue } from '@/utils/allocationDisplay';
+import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface ExpandedRowViewProps extends RowData {
   viewMode: 'expanded';
@@ -155,7 +155,7 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
             >
               {hours > 0 && (
                 <span className="inline-flex items-center justify-center w-10 h-8 bg-green-500 text-white rounded-lg font-semibold text-sm shadow-sm">
-                  {hours}
+                  {formatAllocationValue(hours, weeklyCapacity, displayPreference)}
                 </span>
               )}
             </EnhancedTooltip>

@@ -1,6 +1,7 @@
-
 import React from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectCellTooltipProps {
   projectName: string;
@@ -8,6 +9,7 @@ interface ProjectCellTooltipProps {
   memberName: string;
   selectedWeek: Date;
   totalHours: number;
+  capacity: number;
   dailyBreakdown?: Array<{
     date: string;
     hours: number;
@@ -20,10 +22,15 @@ export const ProjectCellTooltip: React.FC<ProjectCellTooltipProps> = ({
   memberName,
   selectedWeek,
   totalHours,
+  capacity,
   dailyBreakdown = []
 }) => {
+  const { displayPreference } = useAppSettings();
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  
+  const formatValue = (value: number) =>
+    formatAllocationValue(value, capacity, displayPreference);
   
   // Create daily hours map
   const dailyHours = new Map<string, number>();
@@ -39,7 +46,7 @@ export const ProjectCellTooltip: React.FC<ProjectCellTooltipProps> = ({
       
       <div className="text-xs text-gray-600">
         <div><strong>Member:</strong> {memberName}</div>
-        <div><strong>Total Hours:</strong> {totalHours}h this week</div>
+        <div><strong>Total:</strong> {formatValue(totalHours)} this week</div>
       </div>
 
       {dailyBreakdown.length > 0 && (
@@ -57,7 +64,7 @@ export const ProjectCellTooltip: React.FC<ProjectCellTooltipProps> = ({
                       ? 'bg-emerald-100 text-emerald-700' 
                       : 'bg-gray-50 text-gray-400'
                   }`}>
-                    {hours > 0 ? `${hours}h` : '—'}
+                    {hours > 0 ? formatValue(hours) : '—'}
                   </div>
                 </div>
               );
