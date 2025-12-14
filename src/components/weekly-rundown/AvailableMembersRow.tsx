@@ -4,8 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 import { useWeekResourceTeamMembers } from '@/components/week-resourcing/hooks/useWeekResourceTeamMembers';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AvailableMembersRowProps {
   weekStartDate: string;
@@ -64,6 +70,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
+  const [sortAscending, setSortAscending] = React.useState(true); // true = underutilized first
 
   // Fetch members internally if not provided externally
   const { members: fetchedMembers } = useWeekResourceTeamMembers();
@@ -209,19 +216,20 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       };
     });
     
-    // ALWAYS sort by utilization (low to high - underutilized first)
-    // This is independent of the global sort option
+    // Sort by utilization based on sortAscending state
     return available.sort((a, b) => {
-      // Sort by utilization ascending (underutilized first)
+      // Sort by utilization
       if (a.utilization !== b.utilization) {
-        return a.utilization - b.utilization;
+        return sortAscending 
+          ? a.utilization - b.utilization  // Ascending: underutilized first
+          : b.utilization - a.utilization; // Descending: overutilized first
       }
       // Alphabetical fallback for ties
       const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
       const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
       return nameA.localeCompare(nameB);
     });
-  }, [allMembersFromParent, allocations]);
+  }, [allMembersFromParent, allocations, sortAscending]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
@@ -265,12 +273,33 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         {/* Members Avatars - Horizontal Scroll with Arrow Navigation - Desktop/Tablet */}
         {availableMembers.length > 0 && (
           <div className="hidden sm:block relative">
-            {/* Left Arrow */}
+            {/* Sort Toggle Button - positioned at far left */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+                    onClick={() => setSortAscending(!sortAscending)}
+                  >
+                    <ArrowUpDown className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p className="text-xs">
+                    {sortAscending ? 'Underutilized first' : 'Overutilized first'}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            {/* Left Scroll Arrow */}
             {canScrollLeft && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+                className="absolute left-10 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
                 onClick={() => scrollMembers('left')}
               >
                 <ChevronLeft className="h-4 w-4" />
