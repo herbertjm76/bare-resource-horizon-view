@@ -135,15 +135,6 @@ const getDateRangeForTimeRange = (timeRange: TimeRange) => {
     case '3months':
       startDate = subMonths(startOfMonth(now), 3);
       break;
-    case '4months':
-      startDate = subMonths(startOfMonth(now), 4);
-      break;
-    case '6months':
-      startDate = subMonths(startOfMonth(now), 6);
-      break;
-    case 'year':
-      startDate = subMonths(startOfMonth(now), 12);
-      break;
     default:
       startDate = startOfMonth(now);
   }

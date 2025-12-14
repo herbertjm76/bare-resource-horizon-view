@@ -37,18 +37,6 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
         startDate = subMonths(startOfMonth(now), 3);
         endDate = endOfMonth(now);
         break;
-      case '4months':
-        startDate = subMonths(startOfMonth(now), 4);
-        endDate = endOfMonth(now);
-        break;
-      case '6months':
-        startDate = subMonths(startOfMonth(now), 6);
-        endDate = endOfMonth(now);
-        break;
-      case 'year':
-        startDate = subMonths(startOfMonth(now), 12);
-        endDate = endOfMonth(now);
-        break;
       default:
         startDate = startOfMonth(now);
         endDate = endOfMonth(now);
@@ -64,19 +52,13 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
   const getTotalCapacity = (weeklyCapacity: number) => {
     switch (selectedTimeRange) {
       case 'week':
-        return weeklyCapacity; // 1 week
+        return weeklyCapacity;
       case 'month':
-        return weeklyCapacity * 4; // 4 weeks
+        return weeklyCapacity * 4;
       case '3months':
-        return weeklyCapacity * 12; // 12 weeks
-      case '4months':
-        return weeklyCapacity * 16; // 16 weeks
-      case '6months':
-        return weeklyCapacity * 24; // 24 weeks
-      case 'year':
-        return weeklyCapacity * 48; // 48 weeks
+        return weeklyCapacity * 12;
       default:
-        return weeklyCapacity * 4; // Default to 4 weeks
+        return weeklyCapacity * 4;
     }
   };
 

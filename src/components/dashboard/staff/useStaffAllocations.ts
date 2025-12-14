@@ -42,18 +42,6 @@ export const useStaffAllocations = (memberId: string | null, timeRange?: TimeRan
             rangeStart = startOfMonth(addMonths(now, -2));
             rangeEnd = endOfMonth(now);
             break;
-          case '4months':
-            rangeStart = startOfMonth(addMonths(now, -3));
-            rangeEnd = endOfMonth(now);
-            break;
-          case '6months':
-            rangeStart = startOfMonth(addMonths(now, -5));
-            rangeEnd = endOfMonth(now);
-            break;
-          case 'year':
-            rangeStart = startOfYear(now);
-            rangeEnd = endOfYear(now);
-            break;
           case 'week':
           default:
             rangeStart = startOfWeek(now, { weekStartsOn: 1 });

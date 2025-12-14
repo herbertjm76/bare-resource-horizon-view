@@ -51,15 +51,9 @@ export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ 
       case 'week':
         return 1;
       case 'month':
-        return 4; // ~4 weeks in a month
+        return 4;
       case '3months':
-        return 13; // ~13 weeks in 3 months
-      case '4months':
-        return 17; // ~17 weeks in 4 months
-      case '6months':
-        return 26; // ~26 weeks in 6 months
-      case 'year':
-        return 52; // 52 weeks in a year
+        return 13;
       default:
         return 4;
     }
@@ -69,10 +63,7 @@ export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ 
     switch (selectedTimeRange) {
       case 'week': return 'This Week';
       case 'month': return 'This Month';
-      case '3months': return '3 Months';
-      case '4months': return '4 Months';
-      case '6months': return '6 Months';
-      case 'year': return 'This Year';
+      case '3months': return 'This Quarter';
       default: return 'This Month';
     }
   };

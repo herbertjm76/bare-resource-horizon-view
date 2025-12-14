@@ -23,10 +23,7 @@ export const DashboardMetrics = () => {
     const rangeText = {
       'week': 'This Week',
       'month': 'This Month',
-      '3months': 'This Quarter',
-      '4months': '4 Months',
-      '6months': '6 Months',
-      'year': 'This Year'
+      '3months': 'This Quarter'
     }[newRange];
     
     toast.success(`Dashboard updated to show data for ${rangeText}`);

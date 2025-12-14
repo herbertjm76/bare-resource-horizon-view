@@ -21,10 +21,7 @@ interface DashboardHeaderProps {
 const timeRangeOptions = [
   { value: 'week' as TimeRange, label: 'This Week' },
   { value: 'month' as TimeRange, label: 'This Month' },
-  { value: '3months' as TimeRange, label: 'This Quarter' },
-  { value: '4months' as TimeRange, label: '4 Months' },
-  { value: '6months' as TimeRange, label: '6 Months' },
-  { value: 'year' as TimeRange, label: 'This Year' }
+  { value: '3months' as TimeRange, label: 'This Quarter' }
 ];
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({

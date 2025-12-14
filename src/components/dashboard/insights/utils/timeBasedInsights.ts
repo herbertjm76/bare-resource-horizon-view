@@ -18,10 +18,10 @@ export const getTimeBasedInsights = (
       priority: 2,
       category: "Short-term Planning"
     });
-  } else if (selectedTimeRange === 'year' && utilizationRate < 65) {
+  } else if (selectedTimeRange === '3months' && utilizationRate < 65) {
     insights.push({
-      title: "Annual Growth Potential",
-      description: `Year-to-date utilization of ${utilizationRate}% indicates significant opportunity for business expansion and revenue growth.`,
+      title: "Quarterly Growth Potential",
+      description: `Quarter-to-date utilization of ${utilizationRate}% indicates significant opportunity for business expansion and revenue growth.`,
       type: "info",
       icon: Calendar,
       priority: 2,
