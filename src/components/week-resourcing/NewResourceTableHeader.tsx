@@ -84,10 +84,10 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </div>
         </TableHead>
         
-        {/* Leave Status - 150px fixed */}
+        {/* Leave Status - 33px fixed */}
         <TableHead 
           className="text-center font-bold border-r border-gray-200 px-1 py-2 leave-column"
-          style={{ width: 150, minWidth: 150, maxWidth: 150, backgroundColor: '#6465F0', color: 'white', height: '100px' }}
+          style={{ width: 33, minWidth: 33, maxWidth: 33, backgroundColor: '#6465F0', color: 'white', height: '100px' }}
         >
           <div className="text-xs leading-tight h-full flex items-center justify-center">
             <div>

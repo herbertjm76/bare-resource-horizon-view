@@ -92,8 +92,8 @@
 }
 
 .resource-table-row-compact .leave-column {
-  min-width: 150px !important;
-  width: 150px !important;
+  min-width: 33px !important;
+  width: 33px !important;
 }
 
 .resource-table-row-compact .project-column {
