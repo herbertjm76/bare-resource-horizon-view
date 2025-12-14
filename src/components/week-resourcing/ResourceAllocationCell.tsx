@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +9,7 @@ import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/alloca
 import { Trash2 } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { convertToHours, convertFromHours } from '@/utils/displayFormatters';
+import { getAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
 
 interface ResourceAllocationCellProps {
   resourceId: string;
@@ -42,6 +43,15 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   
+  // Calculate warning status based on current input value
+  const warningStatus = useMemo(() => {
+    const inputValue = parseFloat(value) || 0;
+    const percentage = displayPreference === 'percentage' 
+      ? inputValue 
+      : (capacity > 0 ? (inputValue / capacity) * 100 : 0);
+    return getAllocationWarningStatus(percentage);
+  }, [value, displayPreference, capacity]);
+
   // Update local state when props change
   useEffect(() => {
     setValue(getDisplayValue(hours));
@@ -146,7 +156,7 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
     >
       {isEditing ? (
         <Input
-          className="w-full h-8 text-center p-0 text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className={`w-full h-8 text-center p-0 text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${warningStatus.borderClass} ${warningStatus.bgClass} ${warningStatus.textClass}`}
           type="number"
           value={value}
           onChange={handleChange}

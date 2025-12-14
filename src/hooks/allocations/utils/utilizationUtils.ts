@@ -56,6 +56,47 @@ export const formatUtilization = (percentage: number): string => {
 };
 
 /**
+ * Get allocation warning status for input fields
+ * @param percentage Allocation percentage (based on capacity)
+ * @returns Object with warning level and color classes
+ */
+export const getAllocationWarningStatus = (percentage: number): {
+  level: 'normal' | 'warning' | 'danger' | 'exceeded';
+  borderClass: string;
+  bgClass: string;
+  textClass: string;
+} => {
+  if (percentage > 200) {
+    return { 
+      level: 'exceeded', 
+      borderClass: 'border-destructive',
+      bgClass: 'bg-destructive/10',
+      textClass: 'text-destructive'
+    };
+  } else if (percentage >= 180) {
+    return { 
+      level: 'danger', 
+      borderClass: 'border-destructive/70',
+      bgClass: 'bg-destructive/5',
+      textClass: 'text-destructive'
+    };
+  } else if (percentage >= 150) {
+    return { 
+      level: 'warning', 
+      borderClass: 'border-amber-500',
+      bgClass: 'bg-amber-500/5',
+      textClass: 'text-amber-600'
+    };
+  }
+  return { 
+    level: 'normal', 
+    borderClass: 'border-border',
+    bgClass: '',
+    textClass: ''
+  };
+};
+
+/**
  * Calculate appropriate capacity for a resource based on their contract or role
  * @param resourceId Resource ID
  * @param resourceType Type of resource (full-time, part-time, contractor, etc.)
