@@ -27,6 +27,16 @@ export const AppSettingsTab: React.FC = () => {
   const handleSave = async () => {
     if (!company?.id) return;
 
+    // Validate threshold ordering
+    if (formData.allocation_warning_threshold >= formData.allocation_danger_threshold) {
+      toast.error('Warning threshold must be lower than danger threshold');
+      return;
+    }
+    if (formData.allocation_danger_threshold >= formData.allocation_max_limit) {
+      toast.error('Danger threshold must be lower than maximum allocation limit');
+      return;
+    }
+
     setSaving(true);
     try {
       const { error } = await supabase
