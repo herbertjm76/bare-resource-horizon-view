@@ -5,6 +5,7 @@ import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeader
 import { UnifiedDashboardData } from '../hooks/useDashboardData';
 import { TimeRange } from '../TimeRangeSelector';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { useTimeRangeCapacity } from '@/hooks/useTimeRangeCapacity';
 
 interface TeamCapacityStatusCardProps {
   data: UnifiedDashboardData;
@@ -45,31 +46,10 @@ const CapacityGauge: React.FC<{ value: number; max: number; label: string; color
 
 export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ data, selectedTimeRange }) => {
   const { workWeekHours } = useAppSettings();
+  const { weekMultiplier, label: timeRangeLabel } = useTimeRangeCapacity(selectedTimeRange);
   
-  const getTimePeriodMultiplier = (): number => {
-    switch (selectedTimeRange) {
-      case 'week':
-        return 1;
-      case 'month':
-        return 4;
-      case '3months':
-        return 13;
-      default:
-        return 4;
-    }
-  };
-
-  const getTimeRangeLabel = () => {
-    switch (selectedTimeRange) {
-      case 'week': return 'This Week';
-      case 'month': return 'This Month';
-      case '3months': return 'This Quarter';
-      default: return 'This Month';
-    }
-  };
-
-  const timePeriodMultiplier = getTimePeriodMultiplier();
-  const totalCapacity = data.teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || workWeekHours), 0) * timePeriodMultiplier;
+  // Calculate total capacity for the time range
+  const totalCapacity = data.teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || workWeekHours), 0) * weekMultiplier;
   const utilizationCapacity = (data.currentUtilizationRate / 100) * totalCapacity;
   const availableCapacity = totalCapacity - utilizationCapacity;
   
@@ -103,7 +83,7 @@ export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ 
             <h3 className="font-semibold text-base">Capacity Status</h3>
           </div>
           <StandardizedHeaderBadge>
-            {getTimeRangeLabel()}
+            {timeRangeLabel}
           </StandardizedHeaderBadge>
         </div>
 

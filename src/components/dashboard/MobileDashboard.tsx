@@ -8,6 +8,8 @@ import { HerbieFloatingButton } from './HerbieFloatingButton';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
 import { Users, Briefcase, TrendingUp, AlertCircle } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { useTimeRangeCapacity } from '@/hooks/useTimeRangeCapacity';
 
 interface MobileDashboardProps {
   selectedTimeRange: TimeRange;
@@ -17,6 +19,8 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   selectedTimeRange
 }) => {
   const data = useUnifiedDashboardData();
+  const { workWeekHours } = useAppSettings();
+  const { weekMultiplier, getTotalCapacity, label: timeRangeLabel } = useTimeRangeCapacity(selectedTimeRange);
 
   // Calculate metrics
   const utilizationRate = data.currentUtilizationRate;
@@ -24,10 +28,17 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   const totalProjects = data.projects.length;
   const teamSize = data.teamMembers.length + data.preRegisteredMembers.length;
   
+  // Time-range-aware capacity
+  const totalTeamCapacityForRange = teamSize * getTotalCapacity(workWeekHours);
+  const totalAllocatedHoursForRange = data.memberUtilizations.reduce((sum, m) => {
+    return sum + (m.totalAllocatedHours * weekMultiplier);
+  }, 0);
+  const remainingCapacity = totalTeamCapacityForRange - totalAllocatedHoursForRange;
+  const hasCapacityGap = remainingCapacity < 0;
+  
   const overloadedResources = data.memberUtilizations.filter(m => m.utilization > 100);
   const overloadedCount = overloadedResources.length;
   const atRiskProjects = overloadedCount > 3 ? 2 : 0;
-  const upcomingGaps = utilizationRate > 100 ? 2 : 0;
 
   // Sparkline trends
   const utilizationTrend = [
@@ -56,6 +67,7 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   const topOverloadedResources = useMemo(() => {
     return overloadedResources
       .sort((a, b) => b.utilization - a.utilization)
+      .slice(0, 5)
       .map(m => {
         const member = data.teamMembers.find(tm => tm.id === m.memberId);
         return {
@@ -85,18 +97,27 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         <RiskAlertsSection
           overloadedCount={overloadedCount}
           atRiskProjects={atRiskProjects}
-          upcomingGaps={upcomingGaps}
+          upcomingGaps={hasCapacityGap ? 1 : 0}
         />
 
         {/* Key Metrics */}
         <SparklineMetricCard
           title="Team Utilization"
           value={`${Math.round(utilizationRate)}%`}
-          subtitle={`${teamSize} team members`}
+          subtitle={`${timeRangeLabel} • ${teamSize} members`}
           icon={TrendingUp}
           trend={utilizationTrend}
           status={utilizationStatus.status}
           badge={utilizationStatus.badge}
+        />
+
+        <SparklineMetricCard
+          title={`${timeRangeLabel} Capacity`}
+          value={`${Math.round(totalTeamCapacityForRange)}h`}
+          subtitle={`${teamSize} × ${workWeekHours}h × ${weekMultiplier}w`}
+          icon={Users}
+          status={overloadedCount > 0 ? 'danger' : 'good'}
+          badge={overloadedCount > 0 ? `${overloadedCount} overbooked` : 'Balanced'}
         />
 
         <SparklineMetricCard
