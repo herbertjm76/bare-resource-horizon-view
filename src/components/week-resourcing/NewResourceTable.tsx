@@ -3,6 +3,8 @@ import React from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { NewResourceTableRow } from './NewResourceTableRow';
 import { NewResourceSummaryRow } from './NewResourceSummaryRow';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface NewResourceTableProps {
   members: any[];
@@ -33,6 +35,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   viewMode,
   selectedWeek = new Date()
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
   // Filter projects to only show those with allocated hours
   const projectsWithHours = React.useMemo(() => {
     return projects.filter(project => {
@@ -99,9 +102,9 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                         overflow: 'hidden',
                         textOverflow: 'ellipsis'
                       }}
-                      title={`${project.code || project.name} - ${project.name}`}
+                      title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
                     >
-                      {project.code || project.name}
+                      {getProjectDisplayName(project, projectDisplayPreference)}
                     </div>
                   </div>
                 </TableHead>

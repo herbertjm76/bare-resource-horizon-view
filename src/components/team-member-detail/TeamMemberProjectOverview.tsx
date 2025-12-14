@@ -7,6 +7,8 @@ import { FolderOpen, Calendar, Clock, TrendingUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { format, startOfWeek, addWeeks } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface TeamMemberProjectOverviewProps {
   memberId: string;
@@ -27,6 +29,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
   const [projectAllocations, setProjectAllocations] = useState<ProjectAllocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
+  const { projectDisplayPreference } = useAppSettings();
 
   useEffect(() => {
     const fetchProjectAllocations = async () => {

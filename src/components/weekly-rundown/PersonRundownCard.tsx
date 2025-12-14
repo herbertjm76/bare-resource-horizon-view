@@ -10,6 +10,8 @@ import { format, startOfWeek } from 'date-fns';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface PersonRundownCardProps {
   person: {

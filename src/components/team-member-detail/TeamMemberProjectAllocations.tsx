@@ -6,6 +6,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { format, startOfWeek, addWeeks } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface ProjectAllocation {
   id: string;

@@ -7,6 +7,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface AddProjectRowProps {
   personId: string;
@@ -22,6 +24,7 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
   onProjectAdded
 }) => {
   const { company } = useCompany();
+  const { projectDisplayPreference } = useAppSettings();
   const [isAdding, setIsAdding] = useState(false);
   const [selectedProject, setSelectedProject] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -169,7 +172,7 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
                         }}
                         className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
                       >
-                        {project.name}
+                        {getProjectDisplayName(project, projectDisplayPreference)}
                       </div>
                     ))
                   )}

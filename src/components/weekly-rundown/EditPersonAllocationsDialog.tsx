@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 import {
   Command,
   CommandEmpty,
@@ -55,6 +57,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   const weekKey = format(weekStart, 'yyyy-MM-dd');
   const { company } = useCompany();
   const queryClient = useQueryClient();
+  const { projectDisplayPreference } = useAppSettings();
 
   // Fetch available projects
   const { data: projects = [] } = useQuery({
@@ -268,7 +271,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                   {person.projects.map((project: any) => (
                     <div key={project.allocationId || project.id} className="flex items-center justify-between gap-4 p-3 border rounded-lg">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{project.name}</p>
+                        <p className="font-medium truncate">{getProjectDisplayName(project, projectDisplayPreference)}</p>
                         <p className="text-sm text-muted-foreground">Current: {project.hours}h</p>
                       </div>
                       <div className="flex items-center gap-2">

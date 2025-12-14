@@ -2,6 +2,8 @@
 import React from 'react';
 import { TableHeader, TableRow, TableHead } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface ResourceTableHeaderProps {
   projects: any[];
@@ -9,6 +11,7 @@ interface ResourceTableHeaderProps {
 }
 
 export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projects, showRemarks = false }) => {
+  const { projectDisplayPreference } = useAppSettings();
   return (
     <TableHeader className="sticky top-0 z-10 bg-[#6465F0] border-b">
       <TableRow className="h-20 bg-[#6465F0] hover:bg-[#6465F0]">

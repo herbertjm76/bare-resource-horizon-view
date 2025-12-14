@@ -2,6 +2,8 @@
 import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface ProjectCountCellProps {
   projectCount: number;
@@ -9,12 +11,13 @@ interface ProjectCountCellProps {
 }
 
 export const ProjectCountCell: React.FC<ProjectCountCellProps> = ({ projectCount, projects = [] }) => {
+  const { projectDisplayPreference } = useAppSettings();
   const projectsTooltip = projects.length > 0 ? (
     <div className="space-y-1 text-xs max-w-xs">
       <p className="font-semibold">Assigned Projects:</p>
       {projects.map((project, idx) => (
         <div key={idx} className="flex justify-between gap-2">
-          <span className="truncate">{project.name}</span>
+          <span className="truncate">{getProjectDisplayName(project, projectDisplayPreference)}</span>
           <span className="font-medium">{project.hours}h</span>
         </div>
       ))}
