@@ -74,29 +74,41 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
       content = (
         <div className="space-y-2">
           <div className="font-bold mb-2 text-[#6465F0]">
-            {member?.first_name} — Worked Hours
+            Leave Summary
           </div>
-          <div className="text-xs">
-            <div>
-              <span className="font-semibold">Project Hours:</span> {(totalUsedHours ?? 0) - annualLeave - holidayHours}h
-            </div>
-            <div>
-              <span className="font-semibold">Annual Leave:</span> {annualLeave}h
-            </div>
-            <div>
-              <span className="font-semibold">Holiday:</span> {holidayHours}h
-            </div>
-            <div>
-              <span className="font-semibold">Total Used:</span> {totalUsedHours ?? '-'}h / {weeklyCapacity ?? '-'}h
+          <div className="text-xs space-y-1">
+            {annualLeave > 0 && (
+              <div>
+                <span className="font-semibold">Annual Leave:</span> {annualLeave}h
+              </div>
+            )}
+            {holidayHours > 0 && (
+              <div>
+                <span className="font-semibold">Holiday:</span> {holidayHours}h
+              </div>
+            )}
+            {(totalUsedHours ?? 0) - annualLeave - holidayHours > 0 && (
+              <div>
+                <span className="font-semibold">Other Leave:</span> {(totalUsedHours ?? 0) - annualLeave - holidayHours}h
+              </div>
+            )}
+            <div className="border-t border-gray-200 pt-1 mt-1">
+              <span className="font-semibold">Total:</span> {totalUsedHours ?? 0}h
             </div>
             {!!leaveDays.length && (
-              <div className="mt-2">
-                <span className="underline">Leave Details:</span>
-                {leaveDays.map((day, i) => (
-                  <div key={i}>
-                    {day.date}: <b>{day.hours}h</b>
-                  </div>
-                ))}
+              <div className="mt-2 border-t border-gray-200 pt-2">
+                <div className="font-semibold mb-1">Dates Out:</div>
+                {leaveDays.map((day, i) => {
+                  const date = new Date(day.date);
+                  const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                  const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                  return (
+                    <div key={i} className="flex justify-between gap-3">
+                      <span>{dayName}, {dateStr}</span>
+                      <span className="font-medium">{day.hours}h</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
