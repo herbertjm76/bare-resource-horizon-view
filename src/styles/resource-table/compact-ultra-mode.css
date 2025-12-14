@@ -81,8 +81,9 @@
 }
 
 .resource-table-row-compact .count-column {
-  min-width: 35px !important;
-  width: 35px !important;
+  min-width: 33px !important;
+  width: 33px !important;
+  max-width: 33px !important;
 }
 
 .resource-table-row-compact .utilization-column {
@@ -97,6 +98,6 @@
 }
 
 .resource-table-row-compact .project-column {
+  flex: 1 1 auto !important;
   min-width: 35px !important;
-  width: 35px !important;
 }

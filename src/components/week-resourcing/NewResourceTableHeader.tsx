@@ -97,10 +97,10 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </div>
         </TableHead>
 
-        {/* Project Count - 35px fixed with rotated text */}
+        {/* Project Count - 33px fixed with rotated text */}
         <TableHead 
           className={`text-center font-bold border-r border-gray-200 count-column count-column-header relative ${projects.length === 0 ? 'rounded-tr-xl' : ''}`}
-          style={{ width: 35, minWidth: 35, maxWidth: 35, backgroundColor: '#6465F0', color: 'white', height: '100px' }}
+          style={{ width: 33, minWidth: 33, maxWidth: 33, backgroundColor: '#6465F0', color: 'white', height: '100px' }}
         >
           <div 
             className="absolute inset-0 flex items-center justify-center"
@@ -116,12 +116,12 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </div>
         </TableHead>
         
-        {/* Project columns - all 35px fixed with rotated text */}
+        {/* Project columns - flexible width with rotated text */}
         {projects.map((project, index) => (
           <TableHead
             key={project.id}
             className={`text-center font-bold border-r border-gray-200 px-1 py-2 project-column project-code-header relative ${index === projects.length - 1 ? 'rounded-tr-xl' : ''}`}
-            style={{ width: 35, minWidth: 35, maxWidth: 35, backgroundColor: '#6465F0', color: 'white', height: '100px' }}
+            style={{ flex: '1 1 auto', minWidth: 35, backgroundColor: '#6465F0', color: 'white', height: '100px' }}
           >
             <div 
               className="absolute inset-0 flex items-center justify-center"
