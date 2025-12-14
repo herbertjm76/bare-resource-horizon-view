@@ -6,6 +6,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface ProjectAllocation {
   projectId: string;
@@ -41,6 +43,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   weekStartDate,
   disableDialog = false,
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
   
@@ -116,7 +119,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
                 {projectAllocations.map((project) => (
                   <div key={project.projectId} className="flex justify-between items-center text-xs">
                     <span className="text-foreground truncate max-w-[140px]">
-                      {project.projectCode || project.projectName}
+                      {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
                     </span>
                     <span className="text-muted-foreground font-medium ml-2">{project.hours}h</span>
                   </div>
