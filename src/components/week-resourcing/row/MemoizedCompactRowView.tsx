@@ -244,7 +244,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
       {/* Leave Badge Cells + editable Other - 150px fixed */}
       <TableCell 
         className="text-center border-r border-gray-200 px-0.5 py-0.5 bg-gradient-to-r from-yellow-50 to-orange-50 leave-column" 
-        style={{ width: 150, minWidth: 150, maxWidth: 150 }}
+        style={{ width: 33, minWidth: 33, maxWidth: 33 }}
       >
         <MultiLeaveBadgeCell
           annualLeave={annualLeave}
