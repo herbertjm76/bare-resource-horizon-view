@@ -47,6 +47,8 @@ export type Database = {
       companies: {
         Row: {
           address: string | null
+          allocation_danger_threshold: number | null
+          allocation_warning_threshold: number | null
           city: string | null
           country: string | null
           created_at: string
@@ -69,6 +71,8 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          allocation_danger_threshold?: number | null
+          allocation_warning_threshold?: number | null
           city?: string | null
           country?: string | null
           created_at?: string
@@ -91,6 +95,8 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          allocation_danger_threshold?: number | null
+          allocation_warning_threshold?: number | null
           city?: string | null
           country?: string | null
           created_at?: string

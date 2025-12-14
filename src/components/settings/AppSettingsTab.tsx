@@ -18,7 +18,9 @@ export const AppSettingsTab: React.FC = () => {
     use_hours_or_percentage: company?.use_hours_or_percentage || 'hours',
     start_of_work_week: company?.start_of_work_week || 'Monday',
     opt_out_financials: company?.opt_out_financials || false,
-    project_display_preference: company?.project_display_preference || 'code'
+    project_display_preference: company?.project_display_preference || 'code',
+    allocation_warning_threshold: (company as any)?.allocation_warning_threshold || 150,
+    allocation_danger_threshold: (company as any)?.allocation_danger_threshold || 180
   });
 
   const handleSave = async () => {
@@ -33,8 +35,10 @@ export const AppSettingsTab: React.FC = () => {
           use_hours_or_percentage: formData.use_hours_or_percentage,
           start_of_work_week: formData.start_of_work_week,
           opt_out_financials: formData.opt_out_financials,
-          project_display_preference: formData.project_display_preference
-        })
+          project_display_preference: formData.project_display_preference,
+          allocation_warning_threshold: formData.allocation_warning_threshold,
+          allocation_danger_threshold: formData.allocation_danger_threshold
+        } as any)
         .eq('id', company.id);
 
       if (error) throw error;
@@ -149,6 +153,39 @@ export const AppSettingsTab: React.FC = () => {
           <p className="text-sm text-muted-foreground">
             Choose whether to display projects by code or name in lists
           </p>
+        </div>
+
+        {/* Allocation Warning Threshold */}
+        <div className="space-y-2">
+          <Label htmlFor="allocation_warning_threshold">Warning Threshold (%)</Label>
+          <Input
+            id="allocation_warning_threshold"
+            type="number"
+            min="100"
+            max="200"
+            value={formData.allocation_warning_threshold}
+            onChange={(e) => setFormData({ ...formData, allocation_warning_threshold: parseInt(e.target.value) || 150 })}
+            className="max-w-xs"
+          />
+          <p className="text-sm text-muted-foreground">
+            Show yellow warning when allocation exceeds this percentage (default: 150%)
+          </p>
+        </div>
+
+        {/* Allocation Danger Threshold */}
+        <div className="space-y-2">
+          <Label htmlFor="allocation_danger_threshold">Danger Threshold (%)</Label>
+          <Input
+            id="allocation_danger_threshold"
+            type="number"
+            min="100"
+            max="200"
+            value={formData.allocation_danger_threshold}
+            onChange={(e) => setFormData({ ...formData, allocation_danger_threshold: parseInt(e.target.value) || 180 })}
+            className="max-w-xs"
+          />
+          <p className="text-sm text-muted-foreground">
+            Show red danger warning when allocation exceeds this percentage (default: 180%)</p>
         </div>
 
         <Button onClick={handleSave} disabled={saving}>
