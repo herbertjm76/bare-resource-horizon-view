@@ -330,14 +330,14 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', paddingLeft: canScrollLeft ? '80px' : undefined }}
               >
                 <div className="flex gap-1.5 sm:gap-2 items-center justify-center member-avatars-scroll min-h-[40px]">
-                {availableMembers.map((member) => (
+                {availableMembers.map((member, index) => (
                   <MemberVacationPopover
                     key={member.id}
                     memberId={member.id}
                     memberName={`${member.firstName} ${member.lastName}`}
                     weekStartDate={weekStartDate}
                   >
-                    <div className="cursor-pointer">
+                    <div className={`cursor-pointer ${index === 0 ? 'ml-8' : ''}`}>
                       <MemberAvailabilityCard
                         memberId={member.id}
                         memberType={member.type}
@@ -354,6 +354,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                     </div>
                   </MemberVacationPopover>
                 ))}
+
                 </div>
               </div>
             </div>
@@ -364,14 +365,14 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         {availableMembers.length > 0 && (
           <div className="block sm:hidden overflow-x-auto overflow-y-hidden px-2">
             <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[40px]">
-              {availableMembers.map((member) => (
+              {availableMembers.map((member, index) => (
                 <MemberVacationPopover
                   key={member.id}
                   memberId={member.id}
                   memberName={`${member.firstName} ${member.lastName}`}
                   weekStartDate={weekStartDate}
                 >
-                  <div className="cursor-pointer">
+                  <div className={`cursor-pointer ${index === 0 ? 'ml-6' : ''}`}>
                     <MemberAvailabilityCard
                       memberId={member.id}
                       memberType={member.type}
@@ -388,6 +389,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                   </div>
                 </MemberVacationPopover>
               ))}
+
             </div>
           </div>
         )}
