@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Check, X, Trash2 } from 'lucide-react';
+import { Check, X, Trash2, Plus } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -23,6 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { MemberVacationPopover } from './MemberVacationPopover';
 
 interface TeamMemberAvatarProps {
   member: {
@@ -161,58 +162,67 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
             </div>
           </div>
         ) : (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="relative cursor-pointer flex flex-col items-center gap-2">
-                <div className="relative">
-                  <Avatar className="h-24 w-24 ring-2 ring-primary/20 shadow-lg hover:ring-primary/40 transition-all hover:scale-105">
-                    <AvatarImage src={member.avatar} />
-                    <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm text-lg">
-                      {firstName.charAt(0)}{lastName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  {/* Edit/Delete buttons on hover */}
-                  <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsEditing(true);
-                      }}
-                      className="h-6 w-6 p-0 rounded-full shadow-lg"
-                    >
-                      <Check className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowDeleteDialog(true);
-                      }}
-                      className="h-6 w-6 p-0 rounded-full shadow-lg"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+          <MemberVacationPopover
+            memberId={member.id}
+            memberName={member.name}
+            weekStartDate={weekStartDate}
+          >
+            <div className="cursor-pointer">
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger asChild>
+                  <div className="relative flex flex-col items-center gap-2">
+                    <div className="relative">
+                      <Avatar className="h-24 w-24 ring-2 ring-primary/20 shadow-lg hover:ring-primary/40 transition-all hover:scale-105">
+                        <AvatarImage src={member.avatar} />
+                        <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm text-lg">
+                          {firstName.charAt(0)}{lastName.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      {/* Edit/Delete buttons on hover */}
+                      <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsEditing(true);
+                          }}
+                          className="h-6 w-6 p-0 rounded-full shadow-lg"
+                        >
+                          <Check className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowDeleteDialog(true);
+                          }}
+                          className="h-6 w-6 p-0 rounded-full shadow-lg"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* Name and hours below avatar */}
+                    <div className="flex flex-col items-center gap-1">
+                      <p className="font-semibold text-sm text-foreground">{firstName}</p>
+                      <StandardizedBadge variant="metric" size="sm">
+                        {member.hours}h
+                      </StandardizedBadge>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Name and hours below avatar */}
-                <div className="flex flex-col items-center gap-1">
-                  <p className="font-semibold text-sm text-foreground">{firstName}</p>
-                  <StandardizedBadge variant="metric" size="sm">
-                    {member.hours}h
-                  </StandardizedBadge>
-                </div>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="font-semibold">{member.name}</p>
-              <p className="text-xs text-muted-foreground">{member.hours} hours</p>
-            </TooltipContent>
-          </Tooltip>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="font-semibold">{member.name}</p>
+                  <p className="text-xs text-muted-foreground">{member.hours} hours</p>
+                  <p className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-1">Click to add hours or leave</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </MemberVacationPopover>
         )}
       </div>
 
