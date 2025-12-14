@@ -53,6 +53,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
   onDataChange
 }) => {
   const [refreshKey, setRefreshKey] = useState(0);
+  const { projectDisplayPreference } = useAppSettings();
   
   const getUtilizationStatus = (percentage: number) => {
     if (percentage > 100) return { color: 'destructive', label: 'Overloaded', icon: AlertTriangle };
@@ -218,19 +219,23 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
             {/* Project List */}
             {person.projects && person.projects.length > 0 && (
               <div className="mt-3 space-y-1.5 max-h-48 overflow-y-auto">
-                {person.projects.slice(0, 8).map((project, idx) => (
-                  <div key={`${project.id}-list-${idx}`} className="flex items-center text-xs project-list-item">
-                    <div
-                      className="w-2 h-2 rounded-full flex-shrink-0 mr-2"
-                      style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
-                    />
-                    <span className="font-semibold text-foreground mr-2 project-code" data-project-code>{project.code}</span>
-                    <span className="text-muted-foreground mr-2 truncate max-w-[200px] project-name">{project.name}</span>
-                    <StandardizedBadge variant="metric" size="sm" className="project-hours-badge">
-                      {project.hours}h
-                    </StandardizedBadge>
-                  </div>
-                ))}
+                {person.projects.slice(0, 8).map((project, idx) => {
+                  const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
+                  const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
+                  return (
+                    <div key={`${project.id}-list-${idx}`} className="flex items-center text-xs project-list-item">
+                      <div
+                        className="w-2 h-2 rounded-full flex-shrink-0 mr-2"
+                        style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
+                      />
+                      <span className="font-semibold text-foreground mr-2 project-code" data-project-code>{primaryDisplay}</span>
+                      {secondaryDisplay && <span className="text-muted-foreground mr-2 truncate max-w-[200px] project-name">{secondaryDisplay}</span>}
+                      <StandardizedBadge variant="metric" size="sm" className="project-hours-badge">
+                        {project.hours}h
+                      </StandardizedBadge>
+                    </div>
+                  );
+                })}
                 {person.projects.length > 8 && (
                   <p className="text-xs text-muted-foreground text-center pt-1">
                     +{person.projects.length - 8} more projects
