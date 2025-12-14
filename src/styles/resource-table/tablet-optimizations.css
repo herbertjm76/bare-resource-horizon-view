@@ -88,9 +88,9 @@
   
   /* Make leave column more compact */
   .resource-table-row-compact .leave-column {
-    width: 120px !important;
-    min-width: 120px !important;
-    max-width: 120px !important;
+    width: 33px !important;
+    min-width: 33px !important;
+    max-width: 33px !important;
   }
 }
 
