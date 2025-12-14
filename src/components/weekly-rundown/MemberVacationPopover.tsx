@@ -21,6 +21,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { CalendarIcon, Briefcase, Check, ChevronsUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface MemberVacationPopoverProps {
   memberId: string;
@@ -36,14 +37,18 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   children
 }) => {
   const { company } = useCompany();
+  const { displayPreference, workWeekHours } = useAppSettings();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('vacation');
   
+  // Get default value based on display preference
+  const getDefaultHours = () => displayPreference === 'percentage' ? '20' : '8'; // 20% of 40h = 8h
+  
   // Vacation state
   const [vacationDate, setVacationDate] = useState<Date>();
   const [vacationEndDate, setVacationEndDate] = useState<Date>();
-  const [vacationHours, setVacationHours] = useState('8');
+  const [vacationValue, setVacationValue] = useState(getDefaultHours());
   const [isSavingVacation, setIsSavingVacation] = useState(false);
   
   // Project state
@@ -92,7 +97,11 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
 
     setIsSavingVacation(true);
     try {
-      const hours = parseFloat(vacationHours) || 8;
+      const inputValue = parseFloat(vacationValue) || 8;
+      // Convert display value to hours if percentage mode
+      const hours = displayPreference === 'percentage' 
+        ? (inputValue / 100) * workWeekHours 
+        : inputValue;
       const startDate = vacationDate;
       const endDate = vacationEndDate || vacationDate;
       
@@ -136,7 +145,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       toast.success('Vacation hours saved');
       setVacationDate(undefined);
       setVacationEndDate(undefined);
-      setVacationHours('8');
+      setVacationValue(getDefaultHours());
       setOpen(false);
     } catch (error) {
       console.error('Error saving vacation hours:', error);
@@ -151,20 +160,28 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
 
     setIsSavingProject(true);
     try {
-      // Get all weeks with hours entered
+      // Get all weeks with values entered and convert to hours
       const weekEntries = Object.entries(projectWeeks)
-        .filter(([_, hours]) => hours && parseFloat(hours) > 0)
-        .map(([weekKey, hours]) => ({
-          project_id: selectedProject,
-          resource_id: memberId,
-          resource_type: 'active' as const,
-          allocation_date: weekKey,
-          hours: parseFloat(hours),
-          company_id: company.id
-        }));
+        .filter(([_, value]) => value && parseFloat(value) > 0)
+        .map(([weekKey, value]) => {
+          const inputValue = parseFloat(value);
+          // Convert display value to hours if percentage mode
+          const hours = displayPreference === 'percentage' 
+            ? (inputValue / 100) * workWeekHours 
+            : inputValue;
+          
+          return {
+            project_id: selectedProject,
+            resource_id: memberId,
+            resource_type: 'active' as const,
+            allocation_date: weekKey,
+            hours,
+            company_id: company.id
+          };
+        });
 
       if (weekEntries.length === 0) {
-        toast.error('Please enter hours for at least one week');
+        toast.error(`Please enter ${displayPreference === 'percentage' ? 'percentage' : 'hours'} for at least one week`);
         return;
       }
 
@@ -279,15 +296,17 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-text-primary">Hours per Day</Label>
+                <Label className="text-sm font-medium text-text-primary">
+                  {displayPreference === 'percentage' ? 'Percentage per Day' : 'Hours per Day'}
+                </Label>
                 <Input
                   type="number"
                   min="0"
-                  max="24"
-                  step="0.5"
-                  value={vacationHours}
-                  onChange={(e) => setVacationHours(e.target.value)}
-                  placeholder="8"
+                  max={displayPreference === 'percentage' ? '100' : '24'}
+                  step={displayPreference === 'percentage' ? '5' : '0.5'}
+                  value={vacationValue}
+                  onChange={(e) => setVacationValue(e.target.value)}
+                  placeholder={displayPreference === 'percentage' ? '20' : '8'}
                   className="h-10 border-border-primary"
                 />
               </div>
@@ -350,7 +369,9 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-text-primary">Hours per Week</Label>
+                <Label className="text-sm font-medium text-text-primary">
+                  {displayPreference === 'percentage' ? 'Percentage per Week' : 'Hours per Week'}
+                </Label>
                 <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
                   {weeks.map((weekKey) => {
                     const weekDate = new Date(weekKey);
@@ -365,8 +386,8 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                         <Input
                           type="number"
                           min="0"
-                          max="168"
-                          step="0.5"
+                          max={displayPreference === 'percentage' ? '200' : '168'}
+                          step={displayPreference === 'percentage' ? '5' : '0.5'}
                           value={projectWeeks[weekKey] || ''}
                           onChange={(e) => handleWeekHoursChange(weekKey, e.target.value)}
                           placeholder="0"
