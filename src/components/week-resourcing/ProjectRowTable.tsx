@@ -90,7 +90,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               
               return (
                 <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-0 align-bottom" style={{ width: 40, minWidth: 40, background: 'hsl(var(--gradient-start))', verticalAlign: 'bottom' }}>
-                  <Tooltip>
+                  <Tooltip delayDuration={100}>
                     <TooltipTrigger asChild>
                       <div className="flex flex-col items-center gap-1 pb-1 cursor-help">
                         <div 
