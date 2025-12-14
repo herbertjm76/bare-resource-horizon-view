@@ -95,9 +95,21 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const handleSaveVacation = async () => {
     if (!vacationDate || !company?.id) return;
 
+    const inputValue = parseFloat(vacationValue) || 8;
+    
+    // Validate max 200% for vacation (though typically 100% max for leave per day)
+    if (displayPreference === 'percentage' && inputValue > 200) {
+      toast.error('Allocation cannot exceed 200%');
+      return;
+    }
+    const maxHours = workWeekHours * 2;
+    if (displayPreference === 'hours' && inputValue > maxHours) {
+      toast.error(`Allocation cannot exceed ${maxHours}h (200% of capacity)`);
+      return;
+    }
+
     setIsSavingVacation(true);
     try {
-      const inputValue = parseFloat(vacationValue) || 8;
       // Convert display value to hours if percentage mode
       const hours = displayPreference === 'percentage' 
         ? (inputValue / 100) * workWeekHours 
@@ -157,6 +169,22 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
 
   const handleSaveProject = async () => {
     if (!selectedProject || !company?.id) return;
+
+    // Validate all week entries before saving
+    const maxHours = workWeekHours * 2;
+    for (const [weekKey, value] of Object.entries(projectWeeks)) {
+      if (value && parseFloat(value) > 0) {
+        const inputValue = parseFloat(value);
+        if (displayPreference === 'percentage' && inputValue > 200) {
+          toast.error('Allocation cannot exceed 200%');
+          return;
+        }
+        if (displayPreference === 'hours' && inputValue > maxHours) {
+          toast.error(`Allocation cannot exceed ${maxHours}h (200% of capacity)`);
+          return;
+        }
+      }
+    }
 
     setIsSavingProject(true);
     try {

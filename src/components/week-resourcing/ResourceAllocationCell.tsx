@@ -54,10 +54,32 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
     }
   };
 
+  const validateInput = (inputValue: number): boolean => {
+    if (displayPreference === 'percentage' && inputValue > 200) {
+      toast.error('Allocation cannot exceed 200%');
+      return false;
+    }
+    // For hours, cap at 200% of capacity
+    const maxHours = capacity * 2;
+    if (displayPreference === 'hours' && inputValue > maxHours) {
+      toast.error(`Allocation cannot exceed ${maxHours}h (200% of capacity)`);
+      return false;
+    }
+    return true;
+  };
+
   const handleBlur = async () => {
     if (!company?.id) return;
     
     const inputValue = parseFloat(value) || 0;
+    
+    // Validate before saving
+    if (!validateInput(inputValue)) {
+      setValue(getDisplayValue(hours));
+      setIsEditing(false);
+      return;
+    }
+    
     // Convert display value back to hours if needed
     const newHours = displayPreference === 'percentage' 
       ? (inputValue / 100) * capacity 
