@@ -221,7 +221,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove project allocation?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove the allocation of {hours}h for {projectName} ({projectCode}) from this week.
+              This will remove the allocation of {formattedHours} for {projectName} ({projectCode}) from this week.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

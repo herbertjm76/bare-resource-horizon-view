@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface LeaveEntry {
   member_id: string;
@@ -17,6 +19,9 @@ interface AnnualLeaveCardProps {
 }
 
 export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
+  const capacity = workWeekHours || 40;
+
   // Group by member_id with dates and hours
   const leaveByMember = leaves.reduce((acc, leave) => {
     if (!acc[leave.member_id]) {
@@ -99,7 +104,7 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
                   <div className="flex flex-wrap gap-1 justify-center">
                     {leaveDays.map((day, idx) => (
                       <StandardizedBadge key={idx} variant="metric" size="sm">
-                        {getDayInitial(day.date)}-{day.hours}h
+                        {getDayInitial(day.date)}-{formatAllocationValue(day.hours, capacity, displayPreference)}
                       </StandardizedBadge>
                     ))}
                   </div>

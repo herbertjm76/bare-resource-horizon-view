@@ -8,6 +8,7 @@ import { format, startOfWeek, addWeeks } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectAllocation {
   id: string;
@@ -29,6 +30,8 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
   const [projectAllocations, setProjectAllocations] = useState<ProjectAllocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
+  const { displayPreference, workWeekHours } = useAppSettings();
+  const capacity = weeklyCapacity || workWeekHours || 40;
 
   useEffect(() => {
     const fetchProjectAllocations = async () => {
@@ -176,13 +179,13 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
                     </div>
                     <div className="flex items-center gap-1 text-xs text-gray-600">
                       <Clock className="h-3 w-3" />
-                      <span>{project.weeklyAverage.toFixed(1)}h/week</span>
+                      <span>{formatAllocationValue(project.weeklyAverage, capacity, displayPreference)}/week</span>
                     </div>
                   </div>
                   
                   <div className="text-right flex-shrink-0 ml-3">
                     <div className="text-lg font-bold text-foreground">
-                      {project.totalHours}h
+                      {formatAllocationValue(project.totalHours, capacity, displayPreference)}
                     </div>
                     <div className="text-xs text-gray-500">total</div>
                   </div>
