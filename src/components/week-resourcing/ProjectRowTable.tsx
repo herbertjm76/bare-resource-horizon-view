@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ResourceAllocationCell } from './ResourceAllocationCell';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 
@@ -39,6 +39,19 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
     return total;
   };
 
+  // Get member's project allocations for tooltip
+  const getMemberProjectAllocations = (memberId: string) => {
+    const allocations: { project: any; hours: number }[] = [];
+    projects.forEach(project => {
+      const key = `${memberId}:${project.id}`;
+      const hours = allocationMap.get(key) || 0;
+      if (hours > 0) {
+        allocations.push({ project, hours });
+      }
+    });
+    return allocations;
+  };
+
   const getUserInitials = (firstName?: string, lastName?: string) => {
     const first = (firstName || '').trim();
     const last = (lastName || '').trim();
@@ -70,32 +83,74 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             </TableHead>
             
             {/* Member Columns */}
-            {members.map(member => (
-              <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-0 align-bottom" style={{ width: 40, minWidth: 40, background: 'hsl(var(--gradient-start))', verticalAlign: 'bottom' }}>
-                <div className="flex flex-col items-center gap-1 pb-1">
-                  <div 
-                    className="text-xs font-medium"
-                    style={{
-                      writingMode: 'vertical-rl',
-                      textOrientation: 'mixed',
-                      transform: 'rotate(180deg)',
-                      whiteSpace: 'nowrap',
-                      maxHeight: '120px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}
-                  >
-                    {getFirstName(member)}
-                  </div>
-                  <Avatar className="h-7 w-7 border border-white/30">
-                    <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
-                    <AvatarFallback className="bg-white/20 text-white text-[10px]">
-                      {getUserInitials(member.first_name, member.last_name)}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-              </TableHead>
-            ))}
+            {members.map(member => {
+              const memberAllocations = getMemberProjectAllocations(member.id);
+              const memberTotal = getMemberTotal(member.id);
+              const fullName = [member.first_name, member.last_name].filter(Boolean).join(' ') || 'Unknown';
+              
+              return (
+                <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-0 align-bottom" style={{ width: 40, minWidth: 40, background: 'hsl(var(--gradient-start))', verticalAlign: 'bottom' }}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex flex-col items-center gap-1 pb-1 cursor-help">
+                        <div 
+                          className="text-xs font-medium"
+                          style={{
+                            writingMode: 'vertical-rl',
+                            textOrientation: 'mixed',
+                            transform: 'rotate(180deg)',
+                            whiteSpace: 'nowrap',
+                            maxHeight: '120px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                        >
+                          {getFirstName(member)}
+                        </div>
+                        <Avatar className="h-7 w-7 border border-white/30">
+                          <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
+                          <AvatarFallback className="bg-white/20 text-white text-[10px]">
+                            {getUserInitials(member.first_name, member.last_name)}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent 
+                      side="bottom" 
+                      className="bg-popover border border-border shadow-lg p-3 max-w-xs z-[100]"
+                    >
+                      <div className="space-y-2">
+                        <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
+                          {fullName}
+                        </div>
+                        
+                        {memberAllocations.length > 0 ? (
+                          <div className="space-y-1">
+                            <div className="text-xs font-medium text-muted-foreground mb-1">Projects:</div>
+                            {memberAllocations.map((alloc) => (
+                              <div key={alloc.project.id} className="flex justify-between items-center text-xs">
+                                <span className="text-foreground truncate max-w-[140px]">
+                                  {getProjectDisplayName(alloc.project, projectDisplayPreference)}
+                                </span>
+                                <span className="text-muted-foreground font-medium ml-2">{alloc.hours}h</span>
+                              </div>
+                            ))}
+                            <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-sm text-foreground">
+                              <span>Total:</span>
+                              <span>{memberTotal}h</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-muted-foreground">
+                            No projects assigned this week
+                          </div>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+              );
+            })}
             
             {/* Total Column */}
             <TableHead className="text-center font-semibold text-white border-l-2 border-white/40 text-xs px-0" style={{ width: 60, minWidth: 60, background: 'hsl(var(--gradient-start))' }}>
