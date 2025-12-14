@@ -42,8 +42,8 @@
 }
 
 .resource-table-compact .leave-column {
-  min-width: 100px;
-  width: 100px;
+  min-width: 33px;
+  width: 33px;
 }
 
 .resource-table-compact .other-leave-column {
