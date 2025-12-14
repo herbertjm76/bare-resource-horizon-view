@@ -82,35 +82,35 @@ const DashboardContent: React.FC<{
 
   return (
     <div className="min-h-screen bg-background">
-      <ModernDashboardHeader
-        totalTeamMembers={totalTeamMembers}
-        totalActiveProjects={totalActiveProjects}
-        totalOffices={totalOffices}
-        utilizationRate={utilizationRate}
-      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ModernDashboardHeader
+          totalTeamMembers={totalTeamMembers}
+          totalActiveProjects={totalActiveProjects}
+          totalOffices={totalOffices}
+          utilizationRate={utilizationRate}
+        />
 
-      {/* Filters Header */}
-      <DashboardHeader
-        selectedOffice={selectedOffice}
-        setSelectedOffice={setSelectedOffice}
-        selectedTimeRange={selectedTimeRange}
-        setSelectedTimeRange={handleTimeRangeChange}
-        officeOptions={officeOptions}
-      />
+        {/* Centered Time Range Selector */}
+        <DashboardHeader
+          selectedOffice={selectedOffice}
+          setSelectedOffice={setSelectedOffice}
+          selectedTimeRange={selectedTimeRange}
+          setSelectedTimeRange={handleTimeRangeChange}
+          officeOptions={officeOptions}
+        />
 
-      {/* Main Content */}
-      <div className="pb-0">
-        {isMobile ? (
-          <MobileDashboard
-            selectedTimeRange={selectedTimeRange}
-          />
-        ) : (
-          <div className="px-0">
+        {/* Main Content - Centered */}
+        <div className="pb-8">
+          {isMobile ? (
+            <MobileDashboard
+              selectedTimeRange={selectedTimeRange}
+            />
+          ) : (
             <DesktopDashboard
               selectedTimeRange={selectedTimeRange}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
