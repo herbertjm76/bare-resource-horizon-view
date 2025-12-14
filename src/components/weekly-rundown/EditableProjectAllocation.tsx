@@ -11,6 +11,7 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -196,20 +197,31 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
       >
         {isEditing ? (
           <div className="flex items-center gap-1 px-2">
-            <Input
-              type="number"
-              value={editedValue}
-              onChange={(e) => setEditedValue(e.target.value)}
-              className={`w-14 h-7 text-xs text-center bg-background/90 ${warningStatus.textClass || 'text-foreground'} ${warningStatus.borderClass} ${warningStatus.bgClass}`}
-              step={displayPreference === 'percentage' ? '1' : '0.5'}
-              min="0"
-              placeholder={displayPreference === 'percentage' ? '%' : 'h'}
-              autoFocus
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSave();
-                if (e.key === 'Escape') handleCancel();
-              }}
-            />
+            <TooltipProvider>
+              <Tooltip open={warningStatus.level !== 'normal'}>
+                <TooltipTrigger asChild>
+                  <Input
+                    type="number"
+                    value={editedValue}
+                    onChange={(e) => setEditedValue(e.target.value)}
+                    className={`w-14 h-7 text-xs text-center bg-background/90 ${warningStatus.textClass || 'text-foreground'} ${warningStatus.borderClass} ${warningStatus.bgClass}`}
+                    step={displayPreference === 'percentage' ? '1' : '0.5'}
+                    min="0"
+                    placeholder={displayPreference === 'percentage' ? '%' : 'h'}
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSave();
+                      if (e.key === 'Escape') handleCancel();
+                    }}
+                  />
+                </TooltipTrigger>
+                {warningStatus.message && (
+                  <TooltipContent side="top" className={warningStatus.level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
+                    <p>{warningStatus.message}</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
             <Button
               size="sm"
               variant="ghost"
