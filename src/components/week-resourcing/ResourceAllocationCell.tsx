@@ -29,7 +29,7 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   memberCapacity
 }) => {
   const { company } = useCompany();
-  const { displayPreference, workWeekHours } = useAppSettings();
+  const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold } = useAppSettings();
   const capacity = memberCapacity || workWeekHours;
   
   // Convert hours to display value based on preference
@@ -51,8 +51,8 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
     const percentage = displayPreference === 'percentage' 
       ? inputValue 
       : (capacity > 0 ? (inputValue / capacity) * 100 : 0);
-    return getAllocationWarningStatus(percentage);
-  }, [value, displayPreference, capacity]);
+    return getAllocationWarningStatus(percentage, allocationWarningThreshold, allocationDangerThreshold);
+  }, [value, displayPreference, capacity, allocationWarningThreshold, allocationDangerThreshold]);
 
   // Update local state when props change
   useEffect(() => {

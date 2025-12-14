@@ -58,9 +58,15 @@ export const formatUtilization = (percentage: number): string => {
 /**
  * Get allocation warning status for input fields
  * @param percentage Allocation percentage (based on capacity)
+ * @param warningThreshold Percentage threshold for yellow warning (default 150)
+ * @param dangerThreshold Percentage threshold for red danger (default 180)
  * @returns Object with warning level and color classes
  */
-export const getAllocationWarningStatus = (percentage: number): {
+export const getAllocationWarningStatus = (
+  percentage: number,
+  warningThreshold: number = 150,
+  dangerThreshold: number = 180
+): {
   level: 'normal' | 'warning' | 'danger' | 'exceeded';
   borderClass: string;
   bgClass: string;
@@ -76,7 +82,7 @@ export const getAllocationWarningStatus = (percentage: number): {
       textClass: 'text-destructive',
       message: `Allocation exceeds 200% of capacity (${roundedPercentage}%)`
     };
-  } else if (percentage >= 180) {
+  } else if (percentage >= dangerThreshold) {
     return { 
       level: 'danger', 
       borderClass: 'border-destructive/70',
@@ -84,7 +90,7 @@ export const getAllocationWarningStatus = (percentage: number): {
       textClass: 'text-destructive',
       message: `Allocation is at ${roundedPercentage}% of capacity`
     };
-  } else if (percentage >= 150) {
+  } else if (percentage >= warningThreshold) {
     return { 
       level: 'warning', 
       borderClass: 'border-amber-500',

@@ -10,6 +10,8 @@ export interface AppSettings {
   startOfWorkWeek: WeekStartDay;
   hideFinancials: boolean;
   projectDisplayPreference: ProjectDisplayPreference;
+  allocationWarningThreshold: number;
+  allocationDangerThreshold: number;
 }
 
 /**
@@ -24,6 +26,8 @@ export const useAppSettings = (): AppSettings => {
     start_of_work_week: company?.start_of_work_week,
     opt_out_financials: company?.opt_out_financials,
     project_display_preference: company?.project_display_preference,
+    allocation_warning_threshold: (company as any)?.allocation_warning_threshold,
+    allocation_danger_threshold: (company as any)?.allocation_danger_threshold,
   });
 
   return {
@@ -32,5 +36,7 @@ export const useAppSettings = (): AppSettings => {
     startOfWorkWeek: (company?.start_of_work_week as WeekStartDay) || 'Monday',
     hideFinancials: company?.opt_out_financials === true,
     projectDisplayPreference: (company?.project_display_preference as ProjectDisplayPreference) || 'code',
+    allocationWarningThreshold: (company as any)?.allocation_warning_threshold || 150,
+    allocationDangerThreshold: (company as any)?.allocation_danger_threshold || 180,
   };
 };

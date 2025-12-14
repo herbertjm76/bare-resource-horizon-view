@@ -39,7 +39,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   children
 }) => {
   const { company } = useCompany();
-  const { displayPreference, workWeekHours } = useAppSettings();
+  const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold } = useAppSettings();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('vacation');
@@ -252,8 +252,8 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     const percentage = displayPreference === 'percentage' 
       ? inputValue 
       : (workWeekHours > 0 ? (inputValue / workWeekHours) * 100 : 0);
-    return getAllocationWarningStatus(percentage);
-  }, [vacationValue, displayPreference, workWeekHours]);
+    return getAllocationWarningStatus(percentage, allocationWarningThreshold, allocationDangerThreshold);
+  }, [vacationValue, displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold]);
 
   // Calculate warning status for each week input
   const getWeekWarningStatus = (weekValue: string) => {
@@ -261,7 +261,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     const percentage = displayPreference === 'percentage' 
       ? inputValue 
       : (workWeekHours > 0 ? (inputValue / workWeekHours) * 100 : 0);
-    return getAllocationWarningStatus(percentage);
+    return getAllocationWarningStatus(percentage, allocationWarningThreshold, allocationDangerThreshold);
   };
 
   return (

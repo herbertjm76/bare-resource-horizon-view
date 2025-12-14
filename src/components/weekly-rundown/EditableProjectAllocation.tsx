@@ -52,7 +52,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
   const { company } = useCompany();
-  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold } = useAppSettings();
   
   const effectiveCapacity = capacity || workWeekHours;
   
@@ -75,8 +75,8 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
     const percentage = displayPreference === 'percentage' 
       ? inputValue 
       : (effectiveCapacity > 0 ? (inputValue / effectiveCapacity) * 100 : 0);
-    return getAllocationWarningStatus(percentage);
-  }, [editedValue, displayPreference, effectiveCapacity]);
+    return getAllocationWarningStatus(percentage, allocationWarningThreshold, allocationDangerThreshold);
+  }, [editedValue, displayPreference, effectiveCapacity, allocationWarningThreshold, allocationDangerThreshold]);
 
   const updateMutation = useMutation({
     mutationFn: async (newHours: number) => {
