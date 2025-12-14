@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Edit2, Check, X, Trash2 } from 'lucide-react';
+import { Edit2, Check, X, Trash2, AlertTriangle } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
@@ -197,6 +197,9 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
       >
         {isEditing ? (
           <div className="flex items-center gap-1 px-2">
+            {warningStatus.level !== 'normal' && (
+              <AlertTriangle className={`h-3 w-3 flex-shrink-0 ${warningStatus.level === 'warning' ? 'text-amber-500' : 'text-destructive'}`} />
+            )}
             <TooltipProvider>
               <Tooltip open={warningStatus.level !== 'normal'}>
                 <TooltipTrigger asChild>
