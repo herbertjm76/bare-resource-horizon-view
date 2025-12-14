@@ -47,14 +47,25 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   onUpdate
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedHours, setEditedHours] = useState(hours.toString());
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
   const { company } = useCompany();
   const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
   
+  const effectiveCapacity = capacity || workWeekHours;
+  
+  // Convert hours to display value based on preference
+  const getDisplayValue = (h: number) => {
+    if (displayPreference === 'percentage') {
+      return effectiveCapacity > 0 ? ((h / effectiveCapacity) * 100).toFixed(1) : '0';
+    }
+    return h.toString();
+  };
+  
+  const [editedValue, setEditedValue] = useState(getDisplayValue(hours));
+  
   const displayText = getProjectDisplayName({ code: projectCode, name: projectName }, projectDisplayPreference);
-  const formattedHours = formatAllocationValue(hours, capacity || workWeekHours, displayPreference);
+  const formattedHours = formatAllocationValue(hours, effectiveCapacity, displayPreference);
 
   const updateMutation = useMutation({
     mutationFn: async (newHours: number) => {
@@ -125,16 +136,22 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   });
 
   const handleSave = () => {
-    const newHours = parseFloat(editedHours);
-    if (isNaN(newHours) || newHours < 0) {
+    const inputValue = parseFloat(editedValue);
+    if (isNaN(inputValue) || inputValue < 0) {
       toast.error('Please enter a valid number');
       return;
     }
+    
+    // Convert display value back to hours if needed
+    const newHours = displayPreference === 'percentage' 
+      ? (inputValue / 100) * effectiveCapacity 
+      : inputValue;
+    
     updateMutation.mutate(newHours);
   };
 
   const handleCancel = () => {
-    setEditedHours(hours.toString());
+    setEditedValue(getDisplayValue(hours));
     setIsEditing(false);
   };
 
@@ -143,7 +160,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
     setShowDeleteDialog(false);
   };
 
-  const calculatedPercentage = capacity > 0 ? (parseFloat(editedHours) / capacity) * 100 : 0;
+  const calculatedPercentage = effectiveCapacity > 0 ? (parseFloat(editedValue) / (displayPreference === 'percentage' ? 100 : effectiveCapacity)) * 100 : 0;
 
   return (
     <>
@@ -160,11 +177,12 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
           <div className="flex items-center gap-1 px-2">
             <Input
               type="number"
-              value={editedHours}
-              onChange={(e) => setEditedHours(e.target.value)}
+              value={editedValue}
+              onChange={(e) => setEditedValue(e.target.value)}
               className="w-14 h-7 text-xs text-center bg-background/90 text-foreground"
-              step="0.5"
+              step={displayPreference === 'percentage' ? '1' : '0.5'}
               min="0"
+              placeholder={displayPreference === 'percentage' ? '%' : 'h'}
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleSave();

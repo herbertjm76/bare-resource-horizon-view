@@ -7,30 +7,45 @@ import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
 import { Trash2 } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { convertToHours, convertFromHours } from '@/utils/displayFormatters';
 
 interface ResourceAllocationCellProps {
   resourceId: string;
   projectId: string;
   hours: number;
   weekStartDate: string;
+  memberCapacity?: number;
 }
 
 export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   resourceId,
   projectId,
   hours,
-  weekStartDate
+  weekStartDate,
+  memberCapacity
 }) => {
   const { company } = useCompany();
-  const [value, setValue] = useState<string>(hours.toString());
+  const { displayPreference, workWeekHours } = useAppSettings();
+  const capacity = memberCapacity || workWeekHours;
+  
+  // Convert hours to display value based on preference
+  const getDisplayValue = (h: number) => {
+    if (displayPreference === 'percentage') {
+      return capacity > 0 ? ((h / capacity) * 100).toString() : '0';
+    }
+    return h.toString();
+  };
+  
+  const [value, setValue] = useState<string>(getDisplayValue(hours));
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   
   // Update local state when props change
   useEffect(() => {
-    setValue(hours.toString());
-  }, [hours]);
+    setValue(getDisplayValue(hours));
+  }, [hours, displayPreference, capacity]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only allow valid numbers
@@ -42,11 +57,16 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   const handleBlur = async () => {
     if (!company?.id) return;
     
-    const newHours = parseFloat(value) || 0;
+    const inputValue = parseFloat(value) || 0;
+    // Convert display value back to hours if needed
+    const newHours = displayPreference === 'percentage' 
+      ? (inputValue / 100) * capacity 
+      : inputValue;
+    
     setIsEditing(false);
     
     // No change - skip update
-    if (newHours === hours) return;
+    if (Math.abs(newHours - hours) < 0.01) return;
     
     setIsSaving(true);
     
@@ -62,7 +82,7 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
     } catch (error) {
       console.error('Error updating allocation:', error);
       toast.error('Failed to update allocation');
-      setValue(hours.toString());
+      setValue(getDisplayValue(hours));
     } finally {
       setIsSaving(false);
     }
@@ -92,6 +112,9 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   };
 
   const filledClass = hours > 0 ? 'leave-cell-filled' : '';
+  const displayValue = displayPreference === 'percentage' 
+    ? `${Math.round((hours / capacity) * 100)}%` 
+    : hours;
 
   return (
     <div 
@@ -108,6 +131,7 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
           onBlur={handleBlur}
           autoFocus
           disabled={isSaving}
+          placeholder={displayPreference === 'percentage' ? '%' : 'h'}
         />
       ) : (
         <>
@@ -115,7 +139,7 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
             className="cursor-pointer w-full h-8 flex items-center justify-center hover:bg-gray-50 text-lg font-medium"
             onClick={() => setIsEditing(true)}
           >
-            {hours > 0 ? hours : '—'}
+            {hours > 0 ? displayValue : '—'}
           </div>
           {hours > 0 && isHovered && !isSaving && (
             <Button
