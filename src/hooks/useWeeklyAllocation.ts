@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { startOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 interface WeeklyAllocation {
   memberId: string;
@@ -19,6 +20,7 @@ interface WeeklyAllocation {
 export const useWeeklyAllocation = (selectedWeek: Date, memberId?: string) => {
   const [allocation, setAllocation] = useState<WeeklyAllocation | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { startOfWorkWeek } = useAppSettings();
 
   useEffect(() => {
     const fetchAllocation = async () => {
@@ -27,7 +29,7 @@ export const useWeeklyAllocation = (selectedWeek: Date, memberId?: string) => {
       try {
         // For now, we're just generating mock data
         // In a real implementation, we'd fetch this from Supabase
-        const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+        const weekStart = getWeekStartDate(selectedWeek, startOfWorkWeek);
         
         // Mock data
         setTimeout(() => {
@@ -54,7 +56,7 @@ export const useWeeklyAllocation = (selectedWeek: Date, memberId?: string) => {
     };
 
     fetchAllocation();
-  }, [selectedWeek, memberId]);
+  }, [selectedWeek, memberId, startOfWorkWeek]);
 
   return { allocation, isLoading };
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { format, startOfWeek } from 'date-fns';
+import { format } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ import { MemberVacationPopover } from './MemberVacationPopover';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 import * as LucideIcons from 'lucide-react';
 
 interface RundownGridViewProps {
@@ -63,9 +64,10 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
 const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person, selectedWeek }) => {
   const capacity = person.capacity || 40;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const { startOfWorkWeek } = useAppSettings();
   
   // Calculate week start date string for MemberVacationPopover
-  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
   const personName = `${person.first_name || ''} ${person.last_name || ''}`.trim() || person.name || 'Unknown';
   
   return (
@@ -205,10 +207,10 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
 const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ project, selectedWeek }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, startOfWorkWeek } = useAppSettings();
   
   // Calculate week start date string for MemberVacationPopover
-  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
   
   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);

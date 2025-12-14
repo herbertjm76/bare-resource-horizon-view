@@ -2,7 +2,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { format, addDays, startOfWeek } from 'date-fns';
+import { format, addDays } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 interface DailyAllocation {
   allocation_id: string;
@@ -30,16 +32,18 @@ interface DetailedMemberAllocation {
   }>;
 }
 
-export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: string[]) => {
+export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: string[], weekStartDay?: 'Monday' | 'Sunday' | 'Saturday') => {
   const { company } = useCompany();
+  const { startOfWorkWeek } = useAppSettings();
+  const effectiveWeekStart = weekStartDay || startOfWorkWeek;
 
   return useQuery({
-    queryKey: ['detailed-weekly-allocations', selectedWeek, company?.id, memberIds],
+    queryKey: ['detailed-weekly-allocations', selectedWeek, company?.id, memberIds, effectiveWeekStart],
     queryFn: async (): Promise<Record<string, DetailedMemberAllocation>> => {
       if (!company?.id || memberIds.length === 0) return {};
 
-      const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
-      const weekEnd = addDays(weekStart, 6); // Sunday
+      const weekStart = getWeekStartDate(selectedWeek, effectiveWeekStart);
+      const weekEnd = addDays(weekStart, 6);
       const weekStartDate = format(weekStart, 'yyyy-MM-dd');
       const weekEndDate = format(weekEnd, 'yyyy-MM-dd');
       

@@ -22,12 +22,13 @@ import {
 } from "@/components/ui/popover";
 import { useResourceAllocationsDB } from '@/hooks/allocations/useResourceAllocationsDB';
 import { toast } from 'sonner';
-import { format, startOfWeek } from 'date-fns';
+import { format } from 'date-fns';
 import { Plus, Building2, Check, ChevronsUpDown, Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { cn } from '@/lib/utils';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 interface EditPersonAllocationsDialogProps {
   open: boolean;
@@ -53,11 +54,11 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   const [newProjectCode, setNewProjectCode] = useState('');
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectCountry, setNewProjectCountry] = useState('');
-  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const { projectDisplayPreference, startOfWorkWeek } = useAppSettings();
+  const weekStart = getWeekStartDate(selectedWeek, startOfWorkWeek);
   const weekKey = format(weekStart, 'yyyy-MM-dd');
   const { company } = useCompany();
   const queryClient = useQueryClient();
-  const { projectDisplayPreference } = useAppSettings();
 
   // Fetch available projects
   const { data: projects = [] } = useQuery({
