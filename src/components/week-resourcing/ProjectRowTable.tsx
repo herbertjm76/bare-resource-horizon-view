@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacationPopover';
 
 interface ProjectRowTableProps {
   projects: any[];
@@ -90,64 +91,75 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               
               return (
                 <TableHead key={member.id} className="text-center font-semibold text-white border-r border-white/20 text-xs px-0 align-bottom" style={{ width: 40, minWidth: 40, background: 'hsl(var(--gradient-start))', verticalAlign: 'bottom' }}>
-                  <Tooltip delayDuration={100}>
-                    <TooltipTrigger asChild>
-                      <div className="flex flex-col items-center gap-1 pb-1 cursor-help">
-                        <div 
-                          className="text-xs font-medium"
-                          style={{
-                            writingMode: 'vertical-rl',
-                            textOrientation: 'mixed',
-                            transform: 'rotate(180deg)',
-                            whiteSpace: 'nowrap',
-                            maxHeight: '120px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                          }}
+                  <MemberVacationPopover
+                    memberId={member.id}
+                    memberName={fullName}
+                    weekStartDate={weekStartDate}
+                  >
+                    <div className="cursor-pointer">
+                      <Tooltip delayDuration={200}>
+                        <TooltipTrigger asChild>
+                          <div className="flex flex-col items-center gap-1 pb-1">
+                            <div 
+                              className="text-xs font-medium"
+                              style={{
+                                writingMode: 'vertical-rl',
+                                textOrientation: 'mixed',
+                                transform: 'rotate(180deg)',
+                                whiteSpace: 'nowrap',
+                                maxHeight: '120px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}
+                            >
+                              {getFirstName(member)}
+                            </div>
+                            <Avatar className="h-7 w-7 border border-white/30 hover:ring-2 hover:ring-white/50 transition-all">
+                              <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
+                              <AvatarFallback className="bg-white/20 text-white text-[10px]">
+                                {getUserInitials(member.first_name, member.last_name)}
+                              </AvatarFallback>
+                            </Avatar>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent 
+                          side="bottom" 
+                          className="bg-popover border border-border shadow-lg p-3 max-w-xs z-[100]"
                         >
-                          {getFirstName(member)}
-                        </div>
-                        <Avatar className="h-7 w-7 border border-white/30">
-                          <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
-                          <AvatarFallback className="bg-white/20 text-white text-[10px]">
-                            {getUserInitials(member.first_name, member.last_name)}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent 
-                      side="bottom" 
-                      className="bg-popover border border-border shadow-lg p-3 max-w-xs z-[100]"
-                    >
-                      <div className="space-y-2">
-                        <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
-                          {fullName}
-                        </div>
-                        
-                        {memberAllocations.length > 0 ? (
-                          <div className="space-y-1">
-                            <div className="text-xs font-medium text-muted-foreground mb-1">Projects:</div>
-                            {memberAllocations.map((alloc) => (
-                              <div key={alloc.project.id} className="flex justify-between items-center text-xs">
-                                <span className="text-foreground truncate max-w-[140px]">
-                                  {getProjectDisplayName(alloc.project, projectDisplayPreference)}
-                                </span>
-                                <span className="text-muted-foreground font-medium ml-2">{alloc.hours}h</span>
+                          <div className="space-y-2">
+                            <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
+                              {fullName}
+                            </div>
+                            
+                            {memberAllocations.length > 0 ? (
+                              <div className="space-y-1">
+                                <div className="text-xs font-medium text-muted-foreground mb-1">Projects:</div>
+                                {memberAllocations.map((alloc) => (
+                                  <div key={alloc.project.id} className="flex justify-between items-center text-xs">
+                                    <span className="text-foreground truncate max-w-[140px]">
+                                      {getProjectDisplayName(alloc.project, projectDisplayPreference)}
+                                    </span>
+                                    <span className="text-muted-foreground font-medium ml-2">{alloc.hours}h</span>
+                                  </div>
+                                ))}
+                                <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-sm text-foreground">
+                                  <span>Total:</span>
+                                  <span>{memberTotal}h</span>
+                                </div>
                               </div>
-                            ))}
-                            <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-sm text-foreground">
-                              <span>Total:</span>
-                              <span>{memberTotal}h</span>
+                            ) : (
+                              <div className="text-xs text-muted-foreground">
+                                No projects assigned this week
+                              </div>
+                            )}
+                            <div className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-2">
+                              Click to add hours or leave
                             </div>
                           </div>
-                        ) : (
-                          <div className="text-xs text-muted-foreground">
-                            No projects assigned this week
-                          </div>
-                        )}
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </MemberVacationPopover>
                 </TableHead>
               );
             })}
