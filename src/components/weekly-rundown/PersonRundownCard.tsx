@@ -12,7 +12,7 @@ import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
-import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { formatAllocationValue, formatCapacityValue, formatAvailableValue } from '@/utils/allocationDisplay';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 interface PersonRundownCardProps {
@@ -70,8 +70,9 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
   const totalLeaveHours = person.leave 
     ? person.leave.annualLeave + person.leave.vacationLeave + person.leave.medicalLeave + person.leave.publicHoliday
     : 0;
-
-  const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
+  const availableHours = Math.max(0, person.capacity - person.totalHours - totalLeaveHours);
+ 
+   const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
   
   const handleDataChange = () => {
     setRefreshKey(prev => prev + 1);
@@ -136,9 +137,23 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-primary" />
                   <span className="text-2xl font-bold text-foreground">
-                    <CountUpNumber end={person.totalHours} duration={1500} />h
+                    <CountUpNumber
+                      end={
+                        displayPreference === 'percentage'
+                          ? person.capacity
+                            ? Math.round((person.totalHours / person.capacity) * 100)
+                            : 0
+                          : person.totalHours
+                      }
+                      duration={1500}
+                    />
+                    {displayPreference === 'percentage' ? '%' : 'h'}
                   </span>
-                  <span className="text-xs text-muted-foreground">/ {person.capacity}h</span>
+                  <span className="text-xs text-muted-foreground">
+                    {displayPreference === 'percentage'
+                      ? 'of 100%'
+                      : `/ ${person.capacity}h`}
+                  </span>
                 </div>
               </div>
             </div>
@@ -186,33 +201,39 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                       backgroundColor: 'hsl(var(--primary) / 0.1)',
                     }}
                   >
-                    <span>🏖️ {totalLeaveHours}h</span>
+                    <span>🏖️ {formatAllocationValue(totalLeaveHours, person.capacity, displayPreference)}</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="font-semibold">Leave</p>
-                  <p className="text-xs">{totalLeaveHours}h total</p>
+                  <p className="text-xs">
+                    {formatAllocationValue(totalLeaveHours, person.capacity, displayPreference)} total
+                  </p>
                 </TooltipContent>
               </Tooltip>
             )}
             
             {/* Unallocated Segment */}
-            {person.totalHours + totalLeaveHours < person.capacity && (
+            {availableHours > 0 && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
                     className="h-full flex items-center justify-center text-muted-foreground font-medium text-sm cursor-pointer hover:bg-muted/40 transition-all"
                     style={{
-                      width: `${((person.capacity - person.totalHours - totalLeaveHours) / person.capacity) * 100}%`,
+                      width: `${(availableHours / person.capacity) * 100}%`,
                       backgroundColor: 'hsl(var(--muted))',
                     }}
                   >
-                    <span>Available {person.capacity - person.totalHours - totalLeaveHours}h</span>
+                    <span>
+                      Available {formatAvailableValue(availableHours, person.capacity, displayPreference)}
+                    </span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="font-semibold">Unallocated Hours</p>
-                  <p className="text-xs">{person.capacity - person.totalHours - totalLeaveHours}h available</p>
+                  <p className="text-xs">
+                    {formatAvailableValue(availableHours, person.capacity, displayPreference)} available
+                  </p>
                 </TooltipContent>
               </Tooltip>
             )}
