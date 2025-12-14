@@ -7,6 +7,8 @@ import { Edit2, Check, X, Trash2, MapPin, Clock } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +46,7 @@ export const EditableTeamMemberAllocation: React.FC<EditableTeamMemberAllocation
   const [editedHours, setEditedHours] = useState(member.hours.toString());
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
+  const { displayPreference } = useAppSettings();
 
   const getCapacityColor = (percentage: number) => {
     if (percentage > 100) return 'text-destructive';
@@ -190,7 +193,7 @@ export const EditableTeamMemberAllocation: React.FC<EditableTeamMemberAllocation
                   <>
                     <div className="text-right">
                       <div className="font-semibold text-foreground">
-                        {member.hours}h
+                        {formatAllocationValue(member.hours, capacity, displayPreference)}
                       </div>
                       <div className={`text-sm font-medium ${getCapacityColor(member.capacityPercentage)}`}>
                         {member.capacityPercentage.toFixed(0)}% capacity
@@ -239,7 +242,7 @@ export const EditableTeamMemberAllocation: React.FC<EditableTeamMemberAllocation
           <AlertDialogHeader>
             <AlertDialogTitle>Remove team member?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove {member.name}'s allocation of {member.hours}h from this project for this week.
+              This will remove {member.name}'s allocation of {formatAllocationValue(member.hours, capacity, displayPreference)} from this project for this week.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

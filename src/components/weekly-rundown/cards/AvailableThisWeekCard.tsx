@@ -7,6 +7,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAvailableValue } from '@/utils/allocationDisplay';
 
 interface AvailableThisWeekCardProps {
   weekStartDate: string;
@@ -29,6 +31,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
   threshold = 80
 }) => {
   const { company } = useCompany();
+  const { displayPreference } = useAppSettings();
 
   // Fetch all active members and pre-registered invites
   const { data: profiles = [] } = useQuery({
@@ -155,7 +158,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
                   </Avatar>
                   <span className="text-xs font-medium text-foreground">{member.firstName}</span>
                   <StandardizedBadge variant="metric" size="sm">
-                    {member.availableHours}h
+                    {formatAvailableValue(member.availableHours, member.capacity, displayPreference)}
                   </StandardizedBadge>
                 </div>
               );

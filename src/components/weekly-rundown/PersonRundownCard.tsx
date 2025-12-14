@@ -6,12 +6,14 @@ import { MapPin, Clock, AlertTriangle, CheckCircle, Calendar, TrendingUp } from 
 import { EditableProjectAllocation } from './EditableProjectAllocation';
 import { AddProjectAllocation } from './AddProjectAllocation';
 import { OtherLeaveSection } from './OtherLeaveSection';
-import { format, startOfWeek } from 'date-fns';
+import { format } from 'date-fns';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 interface PersonRundownCardProps {
   person: {
@@ -53,7 +55,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
   onDataChange
 }) => {
   const [refreshKey, setRefreshKey] = useState(0);
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, startOfWorkWeek } = useAppSettings();
   
   const getUtilizationStatus = (percentage: number) => {
     if (percentage > 100) return { color: 'destructive', label: 'Overloaded', icon: AlertTriangle };
@@ -69,7 +71,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
     ? person.leave.annualLeave + person.leave.vacationLeave + person.leave.medicalLeave + person.leave.publicHoliday
     : 0;
 
-  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
   
   const handleDataChange = () => {
     setRefreshKey(prev => prev + 1);
@@ -231,7 +233,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                       <span className="font-semibold text-foreground mr-2 project-code" data-project-code>{primaryDisplay}</span>
                       {secondaryDisplay && <span className="text-muted-foreground mr-2 truncate max-w-[200px] project-name">{secondaryDisplay}</span>}
                       <StandardizedBadge variant="metric" size="sm" className="project-hours-badge">
-                        {project.hours}h
+                        {formatAllocationValue(project.hours, person.capacity, displayPreference)}
                       </StandardizedBadge>
                     </div>
                   );

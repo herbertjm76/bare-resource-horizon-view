@@ -16,6 +16,7 @@ import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 import * as LucideIcons from 'lucide-react';
 
 interface RundownGridViewProps {
@@ -64,7 +65,7 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
 const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person, selectedWeek }) => {
   const capacity = person.capacity || 40;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const { startOfWorkWeek } = useAppSettings();
+  const { startOfWorkWeek, displayPreference } = useAppSettings();
   
   // Calculate week start date string for MemberVacationPopover
   const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
@@ -142,7 +143,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
                     </TooltipTrigger>
                     <TooltipContent side="top" className="text-xs">
                       <p className="font-medium">{project.name}</p>
-                      <p>{project.hours}h ({Math.round(percentage)}%)</p>
+                      <p>{formatAllocationValue(project.hours, capacity, displayPreference)} ({Math.round(percentage)}%)</p>
                     </TooltipContent>
                   </Tooltip>
                 );
@@ -170,7 +171,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
                   {project.name}
                 </span>
               </div>
-              <StandardizedBadge variant="metric" size="sm" className="ml-2">{project.hours}h</StandardizedBadge>
+              <StandardizedBadge variant="metric" size="sm" className="ml-2">{formatAllocationValue(project.hours, capacity, displayPreference)}</StandardizedBadge>
             </div>
           ))}
           {person.projects.length > 5 && (

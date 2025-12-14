@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { WorkloadBreakdown } from './hooks/types';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectAllocation {
   project_id: string;
@@ -19,15 +20,18 @@ interface WorkloadTooltipProps {
   };
   memberName: string;
   date: string;
+  capacity?: number;
 }
 
 export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
   children,
   breakdown,
   memberName,
-  date
+  date,
+  capacity = 40
 }) => {
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
+  const effectiveCapacity = capacity || workWeekHours;
   
   if (breakdown.total === 0) {
     return <>{children}</>;
@@ -49,7 +53,7 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-blue-600 font-medium">Project Hours:</span>
-                <span className="font-bold text-blue-700">{breakdown.projectHours}h</span>
+                <span className="font-bold text-blue-700">{formatAllocationValue(breakdown.projectHours, effectiveCapacity, displayPreference)}</span>
               </div>
               
               {/* Itemized Projects */}
@@ -62,7 +66,7 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
                         {getProjectDisplayName({ code: project.project_code, name: project.project_name }, projectDisplayPreference)}
                       </span>
                       <span className="font-medium text-blue-800 ml-2">
-                        {project.hours}h
+                        {formatAllocationValue(project.hours, effectiveCapacity, displayPreference)}
                       </span>
                     </div>
                   ))}
@@ -76,26 +80,26 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
             {breakdown.annualLeave > 0 && (
               <div className="flex justify-between">
                 <span className="text-green-600">Annual Leave:</span>
-                <span className="font-medium">{breakdown.annualLeave}h</span>
+                <span className="font-medium">{formatAllocationValue(breakdown.annualLeave, effectiveCapacity, displayPreference)}</span>
               </div>
             )}
             {breakdown.officeHolidays > 0 && (
               <div className="flex justify-between">
                 <span className="text-purple-600">Holiday Hours:</span>
-                <span className="font-medium">{breakdown.officeHolidays}h</span>
+                <span className="font-medium">{formatAllocationValue(breakdown.officeHolidays, effectiveCapacity, displayPreference)}</span>
               </div>
             )}
             {breakdown.otherLeave > 0 && (
               <div className="flex justify-between">
                 <span className="text-orange-600">Other Leave:</span>
-                <span className="font-medium">{breakdown.otherLeave}h</span>
+                <span className="font-medium">{formatAllocationValue(breakdown.otherLeave, effectiveCapacity, displayPreference)}</span>
               </div>
             )}
             
             {/* Total */}
             <div className="border-t pt-1 mt-2 flex justify-between font-bold text-gray-900">
-              <span>Total Hours:</span>
-              <span>{breakdown.total}h</span>
+              <span>Total:</span>
+              <span>{formatAllocationValue(breakdown.total, effectiveCapacity, displayPreference)}</span>
             </div>
           </div>
         </div>
