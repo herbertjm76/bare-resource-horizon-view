@@ -246,57 +246,21 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         className="text-center border-r border-gray-200 px-0.5 py-0.5 bg-gradient-to-r from-yellow-50 to-orange-50 leave-column" 
         style={{ width: 150, minWidth: 150, maxWidth: 150 }}
       >
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="cursor-pointer">
-                <MultiLeaveBadgeCell
-                  annualLeave={annualLeave}
-                  holidayHours={holidayHours}
-                  otherLeave={otherLeave}
-                  remarks={remarks}
-                  leaveDays={leaveDays}
-                  className="px-0.5 py-0.5"
-                  editableOther={true}
-                  onOtherLeaveChange={async (value: number) => {
-                    if (updateOtherLeave) {
-                      await updateOtherLeave(member.id, value);
-                    }
-                  }}
-                  compact
-                />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent 
-              className="z-[250] max-w-xs px-3 py-2 bg-white border border-gray-200 shadow-xl"
-            >
-              <div className="space-y-2 text-xs">
-                <p className="font-semibold mb-2">Leave Breakdown</p>
-                {annualLeave > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-green-600">Annual Leave:</span>
-                    <span className="font-medium">{annualLeave}h</span>
-                  </div>
-                )}
-                {holidayHours > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-purple-600">Holiday Hours:</span>
-                    <span className="font-medium">{holidayHours}h</span>
-                  </div>
-                )}
-                {otherLeave > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-orange-600">Other Leave:</span>
-                    <span className="font-medium">{otherLeave}h</span>
-                  </div>
-                )}
-                {annualLeave === 0 && holidayHours === 0 && otherLeave === 0 && (
-                  <p className="text-gray-500">No leave this week</p>
-                )}
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <MultiLeaveBadgeCell
+          annualLeave={annualLeave}
+          holidayHours={holidayHours}
+          otherLeave={otherLeave}
+          remarks={remarks}
+          leaveDays={leaveDays}
+          className="px-0.5 py-0.5"
+          editableOther={true}
+          onOtherLeaveChange={async (value: number) => {
+            if (updateOtherLeave) {
+              await updateOtherLeave(member.id, value);
+            }
+          }}
+          compact
+        />
       </TableCell>
 
       {/* Project Count - 35px fixed */}
