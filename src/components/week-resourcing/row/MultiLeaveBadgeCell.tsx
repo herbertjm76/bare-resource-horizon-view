@@ -112,7 +112,6 @@ export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
                 variant="outline" 
                 className={`text-xs px-2 py-0.5 bg-amber-50 text-amber-700 border-amber-200 font-medium ${editableOther ? 'cursor-pointer hover:bg-amber-100' : ''}`}
                 onClick={editableOther ? handleOtherLeaveEdit : undefined}
-                title={buildTooltipContent()}
               >
                 {totalLeave}h
               </Badge>
