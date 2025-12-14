@@ -254,62 +254,64 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
           {project.teamMembers && project.teamMembers.length > 0 && (
             <div>
               <div className="flex flex-wrap gap-3 justify-center">
-                {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
+                {project.teamMembers.slice(0, 8).map((member: any) => (
                   <MemberVacationPopover
-                    key={idx}
+                    key={member.id}
                     memberId={member.id}
                     memberName={member.name}
                     weekStartDate={weekStartDate}
                   >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex flex-col items-center gap-1.5 cursor-pointer">
-                          <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md hover:ring-primary/40 transition-all">
-                            <AvatarImage src={member.avatar} alt={member.name} />
-                            <AvatarFallback className="text-xs bg-gradient-modern text-white">
-                              {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col items-center gap-0.5">
-                            <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
-                            <StandardizedBadge variant="metric" size="sm">
-                              {Math.round(member.hours || 0)}h
-                            </StandardizedBadge>
+                    <div className="cursor-pointer">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex flex-col items-center gap-1.5">
+                            <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md hover:ring-primary/40 transition-all">
+                              <AvatarImage src={member.avatar} alt={member.name} />
+                              <AvatarFallback className="text-xs bg-gradient-modern text-white">
+                                {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col items-center gap-0.5">
+                              <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
+                              <StandardizedBadge variant="metric" size="sm">
+                                {Math.round(member.hours || 0)}h
+                              </StandardizedBadge>
+                            </div>
                           </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" align="center" sideOffset={8} className="bg-popover border border-border shadow-lg p-3 max-w-xs">
-                        <div className="space-y-2">
-                          <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
-                            {member.name}
-                          </div>
-                          {member.allProjects && member.allProjects.length > 0 ? (
-                            <div className="space-y-1">
-                              <div className="text-xs font-medium text-muted-foreground mb-1">Projects this week:</div>
-                              {member.allProjects.map((proj: any, pIdx: number) => (
-                                <div key={pIdx} className="flex justify-between items-center text-xs">
-                                  <span className="text-foreground truncate max-w-[140px]">
-                                    {getProjectDisplayName(proj, projectDisplayPreference)}
-                                  </span>
-                                  <span className="text-muted-foreground font-medium ml-2">{proj.hours}h</span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" align="center" sideOffset={8} className="bg-popover border border-border shadow-lg p-3 max-w-xs">
+                          <div className="space-y-2">
+                            <div className="font-semibold text-sm text-foreground border-b border-border pb-2">
+                              {member.name}
+                            </div>
+                            {member.allProjects && member.allProjects.length > 0 ? (
+                              <div className="space-y-1">
+                                <div className="text-xs font-medium text-muted-foreground mb-1">Projects this week:</div>
+                                {member.allProjects.map((proj: any, pIdx: number) => (
+                                  <div key={pIdx} className="flex justify-between items-center text-xs">
+                                    <span className="text-foreground truncate max-w-[140px]">
+                                      {getProjectDisplayName(proj, projectDisplayPreference)}
+                                    </span>
+                                    <span className="text-muted-foreground font-medium ml-2">{proj.hours}h</span>
+                                  </div>
+                                ))}
+                                <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-xs text-foreground">
+                                  <span>Total:</span>
+                                  <span>{member.totalHours || member.hours}h ({Math.round(member.capacityPercentage || 0)}% capacity)</span>
                                 </div>
-                              ))}
-                              <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-xs text-foreground">
-                                <span>Total:</span>
-                                <span>{member.totalHours || member.hours}h ({Math.round(member.capacityPercentage || 0)}% capacity)</span>
                               </div>
+                            ) : (
+                              <div className="text-xs text-muted-foreground">
+                                {member.hours}h on this project ({Math.round(member.capacityPercentage || 0)}% capacity)
+                              </div>
+                            )}
+                            <div className="text-[10px] text-muted-foreground pt-1 border-t border-border">
+                              Click to add hours or leave
                             </div>
-                          ) : (
-                            <div className="text-xs text-muted-foreground">
-                              {member.hours}h on this project ({Math.round(member.capacityPercentage || 0)}% capacity)
-                            </div>
-                          )}
-                          <div className="text-[10px] text-muted-foreground pt-1 border-t border-border">
-                            Click to add hours or leave
                           </div>
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                   </MemberVacationPopover>
                 ))}
                 {project.teamMembers.length > 8 && (
