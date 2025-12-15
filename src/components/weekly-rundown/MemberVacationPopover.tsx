@@ -50,8 +50,12 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   // Vacation state
   const [vacationDate, setVacationDate] = useState<Date>();
   const [vacationEndDate, setVacationEndDate] = useState<Date>();
-  const [vacationValue, setVacationValue] = useState(getDefaultHours());
+  const [startDayPortion, setStartDayPortion] = useState<'full' | 'am' | 'pm'>('full');
+  const [endDayPortion, setEndDayPortion] = useState<'full' | 'am' | 'pm'>('full');
   const [isSavingVacation, setIsSavingVacation] = useState(false);
+  
+  // Calculate daily hours (working hours per day)
+  const dailyHours = workWeekHours / 5;
   
   // Project state
   const [selectedProject, setSelectedProject] = useState('');
@@ -94,37 +98,71 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     enabled: !!company?.id && open,
   });
 
+  // Helper to check if a date is a working day (Mon-Fri)
+  const isWorkingDay = (date: Date): boolean => {
+    const day = date.getDay();
+    return day !== 0 && day !== 6; // 0 = Sunday, 6 = Saturday
+  };
+
+  // Calculate hours for a given day portion
+  const getHoursForPortion = (portion: 'full' | 'am' | 'pm'): number => {
+    return portion === 'full' ? dailyHours : dailyHours / 2;
+  };
+
   const handleSaveVacation = async () => {
     if (!vacationDate || !company?.id) return;
 
-    const inputValue = parseFloat(vacationValue) || 8;
-    
-    // Validate against max limit
-    if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
-      toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
-      return;
-    }
-    const maxHours = (workWeekHours * allocationMaxLimit) / 100;
-    if (displayPreference === 'hours' && inputValue > maxHours) {
-      toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
-      return;
-    }
-
     setIsSavingVacation(true);
     try {
-      // Convert display value to hours if percentage mode
-      const hours = displayPreference === 'percentage' 
-        ? (inputValue / 100) * workWeekHours 
-        : inputValue;
       const startDate = vacationDate;
       const endDate = vacationEndDate || vacationDate;
       
-      // Generate all dates in range
-      const dates = [];
+      // Generate leave records for working days only
+      const leaveRecords: { member_id: string; company_id: string; date: string; hours: number }[] = [];
       const currentDate = new Date(startDate);
+      const allDates: string[] = [];
+      
       while (currentDate <= endDate) {
-        dates.push(format(currentDate, 'yyyy-MM-dd'));
+        const dateString = format(currentDate, 'yyyy-MM-dd');
+        allDates.push(dateString);
+        
+        // Only include working days
+        if (isWorkingDay(currentDate)) {
+          let hours: number;
+          
+          // Determine hours based on position in range
+          const isStartDate = currentDate.getTime() === startDate.getTime();
+          const isEndDate = currentDate.getTime() === endDate.getTime();
+          
+          if (isStartDate && isEndDate) {
+            // Single day - use start portion
+            hours = getHoursForPortion(startDayPortion);
+          } else if (isStartDate) {
+            // First day of range
+            hours = getHoursForPortion(startDayPortion);
+          } else if (isEndDate) {
+            // Last day of range
+            hours = getHoursForPortion(endDayPortion);
+          } else {
+            // Middle days - full day
+            hours = dailyHours;
+          }
+          
+          leaveRecords.push({
+            member_id: memberId,
+            company_id: company.id,
+            date: dateString,
+            hours
+          });
+        }
+        
         currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      if (leaveRecords.length === 0) {
+        toast.error('No working days in selected date range');
+        setIsSavingVacation(false);
+        return;
       }
 
       // Delete existing leave records for these dates
@@ -133,15 +171,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
         .delete()
         .eq('member_id', memberId)
         .eq('company_id', company.id)
-        .in('date', dates);
-
-      // Insert new leave records
-      const leaveRecords = dates.map(date => ({
-        member_id: memberId,
-        company_id: company.id,
-        date: date,
-        hours: hours
-      }));
+        .in('date', allDates);
 
       const { error } = await supabase
         .from('annual_leaves')
@@ -156,10 +186,12 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
       
-      toast.success('Vacation hours saved');
+      const totalHours = leaveRecords.reduce((sum, r) => sum + r.hours, 0);
+      toast.success(`Vacation saved: ${totalHours}h across ${leaveRecords.length} working day(s)`);
       setVacationDate(undefined);
       setVacationEndDate(undefined);
-      setVacationValue(getDefaultHours());
+      setStartDayPortion('full');
+      setEndDayPortion('full');
       setOpen(false);
     } catch (error) {
       console.error('Error saving vacation hours:', error);
@@ -246,15 +278,6 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     }));
   };
 
-  // Calculate warning status for vacation input
-  const vacationWarningStatus = useMemo(() => {
-    const inputValue = parseFloat(vacationValue) || 0;
-    const percentage = displayPreference === 'percentage' 
-      ? inputValue 
-      : (workWeekHours > 0 ? (inputValue / workWeekHours) * 100 : 0);
-    return getAllocationWarningStatus(percentage, allocationWarningThreshold, allocationDangerThreshold);
-  }, [vacationValue, displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold]);
-
   // Calculate warning status for each week input
   const getWeekWarningStatus = (weekValue: string) => {
     const inputValue = parseFloat(weekValue) || 0;
@@ -263,6 +286,38 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       : (workWeekHours > 0 ? (inputValue / workWeekHours) * 100 : 0);
     return getAllocationWarningStatus(percentage, allocationWarningThreshold, allocationDangerThreshold);
   };
+  
+  // Calculate preview of vacation hours
+  const vacationPreview = useMemo(() => {
+    if (!vacationDate) return null;
+    
+    const startDate = vacationDate;
+    const endDate = vacationEndDate || vacationDate;
+    let totalHours = 0;
+    let workingDays = 0;
+    
+    const currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      if (isWorkingDay(currentDate)) {
+        const isStart = currentDate.getTime() === startDate.getTime();
+        const isEnd = currentDate.getTime() === endDate.getTime();
+        
+        if (isStart && isEnd) {
+          totalHours += getHoursForPortion(startDayPortion);
+        } else if (isStart) {
+          totalHours += getHoursForPortion(startDayPortion);
+        } else if (isEnd) {
+          totalHours += getHoursForPortion(endDayPortion);
+        } else {
+          totalHours += dailyHours;
+        }
+        workingDays++;
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    return { totalHours, workingDays };
+  }, [vacationDate, vacationEndDate, startDayPortion, endDayPortion, dailyHours]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -316,6 +371,20 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </div>
 
               <div className="space-y-2">
+                <Label className="text-sm font-medium text-text-primary">Start Day</Label>
+                <Select value={startDayPortion} onValueChange={(v) => setStartDayPortion(v as 'full' | 'am' | 'pm')}>
+                  <SelectTrigger className="w-full h-10 border-border-primary">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full">Full Day ({dailyHours}h)</SelectItem>
+                    <SelectItem value="am">Morning Only ({dailyHours / 2}h)</SelectItem>
+                    <SelectItem value="pm">Afternoon Only ({dailyHours / 2}h)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-sm font-medium text-text-primary">End Date (Optional)</Label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -343,37 +412,35 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                 </Popover>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-text-primary">
-                  {displayPreference === 'percentage' ? 'Percentage per Day' : 'Hours per Day'}
-                </Label>
-                <div className="flex items-center gap-2">
-                  {vacationWarningStatus.level !== 'normal' && (
-                    <AlertTriangle className={`h-4 w-4 flex-shrink-0 ${vacationWarningStatus.level === 'warning' ? 'text-amber-500' : 'text-destructive'}`} />
-                  )}
-                  <TooltipProvider>
-                    <Tooltip open={vacationWarningStatus.level !== 'normal'}>
-                      <TooltipTrigger asChild>
-                        <Input
-                          type="number"
-                          min="0"
-                          max={displayPreference === 'percentage' ? '100' : '24'}
-                          step={displayPreference === 'percentage' ? '5' : '0.5'}
-                          value={vacationValue}
-                          onChange={(e) => setVacationValue(e.target.value)}
-                          placeholder={displayPreference === 'percentage' ? '20' : '8'}
-                          className={`h-10 flex-1 ${vacationWarningStatus.borderClass} ${vacationWarningStatus.bgClass} ${vacationWarningStatus.textClass}`}
-                        />
-                      </TooltipTrigger>
-                      {vacationWarningStatus.message && (
-                        <TooltipContent side="top" className={vacationWarningStatus.level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
-                          <p>{vacationWarningStatus.message}</p>
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </TooltipProvider>
+              {vacationEndDate && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-text-primary">End Day</Label>
+                  <Select value={endDayPortion} onValueChange={(v) => setEndDayPortion(v as 'full' | 'am' | 'pm')}>
+                    <SelectTrigger className="w-full h-10 border-border-primary">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full">Full Day ({dailyHours}h)</SelectItem>
+                      <SelectItem value="am">Morning Only ({dailyHours / 2}h)</SelectItem>
+                      <SelectItem value="pm">Afternoon Only ({dailyHours / 2}h)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
+              )}
+
+              {vacationPreview && (
+                <div className="p-3 bg-bg-tertiary rounded-md text-sm">
+                  <div className="flex justify-between text-text-secondary">
+                    <span>Working days:</span>
+                    <span className="font-medium text-text-primary">{vacationPreview.workingDays}</span>
+                  </div>
+                  <div className="flex justify-between text-text-secondary mt-1">
+                    <span>Total hours:</span>
+                    <span className="font-medium text-text-primary">{vacationPreview.totalHours}h</span>
+                  </div>
+                  <p className="text-xs text-text-tertiary mt-2">Weekends are automatically excluded</p>
+                </div>
+              )}
 
               <Button 
                 onClick={handleSaveVacation}
