@@ -324,7 +324,13 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-80 border-border-primary shadow-elevation-2" align="start" side="top" sideOffset={12}>
+      <PopoverContent
+        className="w-[360px] max-h-[85vh] overflow-auto border-border-primary shadow-elevation-2"
+        align="start"
+        side="bottom"
+        sideOffset={10}
+        collisionPadding={12}
+      >
         <div className="space-y-3">
           <div className="flex items-center gap-2 pb-3 border-b border-border-primary">
             <h4 className="font-semibold text-base text-text-primary">{memberName}</h4>
@@ -332,11 +338,17 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
           
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'vacation' | 'project')}>
             <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-bg-tertiary">
-              <TabsTrigger value="vacation" className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-theme-primary data-[state=active]:text-white data-[state=active]:shadow-sm">
+              <TabsTrigger
+                value="vacation"
+                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
                 <CalendarIcon className="h-4 w-4" />
                 Vacation
               </TabsTrigger>
-              <TabsTrigger value="project" className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-theme-primary data-[state=active]:text-white data-[state=active]:shadow-sm">
+              <TabsTrigger
+                value="project"
+                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
                 <Briefcase className="h-4 w-4" />
                 Project
               </TabsTrigger>
@@ -369,15 +381,16 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                     />
                   </PopoverContent>
                 </Popover>
-                <div className="flex rounded-md border border-input overflow-hidden h-8">
+                <div className="grid grid-cols-3 min-w-[126px] rounded-md border border-input overflow-hidden h-8">
                   {(['full', 'am', 'pm'] as const).map((portion) => (
                     <button
                       key={portion}
+                      type="button"
                       onClick={() => setStartDayPortion(portion)}
                       className={cn(
-                        "px-2 text-xs font-medium transition-colors",
-                        startDayPortion === portion 
-                          ? "bg-theme-primary text-white" 
+                        "h-full px-0 text-xs font-medium whitespace-nowrap transition-colors",
+                        startDayPortion === portion
+                          ? "bg-primary text-primary-foreground"
                           : "bg-background text-muted-foreground hover:bg-muted"
                       )}
                     >
@@ -414,16 +427,22 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                     />
                   </PopoverContent>
                 </Popover>
-                <div className={cn("flex rounded-md border border-input overflow-hidden h-8", !vacationEndDate && "opacity-40")}>
+                <div
+                  className={cn(
+                    "grid grid-cols-3 min-w-[126px] rounded-md border border-input overflow-hidden h-8",
+                    !vacationEndDate && "opacity-40"
+                  )}
+                >
                   {(['full', 'am', 'pm'] as const).map((portion) => (
                     <button
                       key={portion}
+                      type="button"
                       onClick={() => vacationEndDate && setEndDayPortion(portion)}
                       disabled={!vacationEndDate}
                       className={cn(
-                        "px-2 text-xs font-medium transition-colors",
-                        endDayPortion === portion 
-                          ? "bg-theme-primary text-white" 
+                        "h-full px-0 text-xs font-medium whitespace-nowrap transition-colors",
+                        endDayPortion === portion
+                          ? "bg-primary text-primary-foreground"
                           : "bg-background text-muted-foreground hover:bg-muted",
                         !vacationEndDate && "cursor-not-allowed"
                       )}
@@ -444,7 +463,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                 size="sm"
                 onClick={handleSaveVacation}
                 disabled={!vacationDate || isSavingVacation}
-                className="w-full h-8 bg-theme-primary hover:bg-theme-primary/90"
+                className="w-full h-9"
               >
                 {isSavingVacation ? 'Saving...' : 'Save Vacation'}
               </Button>
@@ -546,7 +565,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               <Button 
                 onClick={handleSaveProject}
                 disabled={!selectedProject || isSavingProject}
-                className="w-full h-10 bg-theme-primary hover:bg-theme-primary/90 text-white font-medium"
+                className="w-full h-10"
               >
                 {isSavingProject ? 'Saving...' : 'Save Project Allocation'}
               </Button>
