@@ -324,7 +324,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-96 border-border-primary shadow-elevation-2" align="start" side="top" sideOffset={12}>
+      <PopoverContent className="w-80 border-border-primary shadow-elevation-2" align="start" side="top" sideOffset={12}>
         <div className="space-y-3">
           <div className="flex items-center gap-2 pb-3 border-b border-border-primary">
             <h4 className="font-semibold text-base text-text-primary">{memberName}</h4>
@@ -342,113 +342,112 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="vacation" className="mt-4 space-y-4">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-text-primary">Start Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal h-10 border-border-primary hover:bg-bg-secondary",
-                        !vacationDate && "text-text-tertiary"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {vacationDate ? format(vacationDate, "PPP") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={vacationDate}
-                      onSelect={setVacationDate}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-text-primary">Start Day</Label>
+            <TabsContent value="vacation" className="mt-4 space-y-3">
+              {/* Start Date Row */}
+              <div className="flex items-end gap-2">
+                <div className="flex-1 space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Start</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={cn(
+                          "w-full justify-start text-left font-normal h-9",
+                          !vacationDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                        {vacationDate ? format(vacationDate, "MMM d, yyyy") : "Select date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={vacationDate}
+                        onSelect={setVacationDate}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 <Select value={startDayPortion} onValueChange={(v) => setStartDayPortion(v as 'full' | 'am' | 'pm')}>
-                  <SelectTrigger className="w-full h-10 border-border-primary">
+                  <SelectTrigger className="w-20 h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="full">Full Day ({dailyHours}h)</SelectItem>
-                    <SelectItem value="am">Morning Only ({dailyHours / 2}h)</SelectItem>
-                    <SelectItem value="pm">Afternoon Only ({dailyHours / 2}h)</SelectItem>
+                    <SelectItem value="full">Full</SelectItem>
+                    <SelectItem value="am">AM</SelectItem>
+                    <SelectItem value="pm">PM</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-text-primary">End Date (Optional)</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal h-10 border-border-primary hover:bg-bg-secondary",
-                        !vacationEndDate && "text-text-tertiary"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {vacationEndDate ? format(vacationEndDate, "PPP") : "Same as start date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={vacationEndDate}
-                      onSelect={setVacationEndDate}
-                      disabled={(date) => vacationDate ? date < vacationDate : false}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
+              {/* End Date Row */}
+              <div className="flex items-end gap-2">
+                <div className="flex-1 space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">End</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={cn(
+                          "w-full justify-start text-left font-normal h-9",
+                          !vacationEndDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                        {vacationEndDate ? format(vacationEndDate, "MMM d, yyyy") : "Same as start"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={vacationEndDate}
+                        onSelect={setVacationEndDate}
+                        disabled={(date) => vacationDate ? date < vacationDate : false}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <Select 
+                  value={endDayPortion} 
+                  onValueChange={(v) => setEndDayPortion(v as 'full' | 'am' | 'pm')}
+                  disabled={!vacationEndDate}
+                >
+                  <SelectTrigger className={cn("w-20 h-9 text-xs", !vacationEndDate && "opacity-50")}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full">Full</SelectItem>
+                    <SelectItem value="am">AM</SelectItem>
+                    <SelectItem value="pm">PM</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              {vacationEndDate && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-text-primary">End Day</Label>
-                  <Select value={endDayPortion} onValueChange={(v) => setEndDayPortion(v as 'full' | 'am' | 'pm')}>
-                    <SelectTrigger className="w-full h-10 border-border-primary">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="full">Full Day ({dailyHours}h)</SelectItem>
-                      <SelectItem value="am">Morning Only ({dailyHours / 2}h)</SelectItem>
-                      <SelectItem value="pm">Afternoon Only ({dailyHours / 2}h)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {vacationPreview && (
-                <div className="p-3 bg-bg-tertiary rounded-md text-sm">
-                  <div className="flex justify-between text-text-secondary">
-                    <span>Working days:</span>
-                    <span className="font-medium text-text-primary">{vacationPreview.workingDays}</span>
+              {/* Summary & Save */}
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                {vacationPreview ? (
+                  <div className="text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">{vacationPreview.workingDays}</span> day{vacationPreview.workingDays !== 1 ? 's' : ''} · <span className="font-medium text-foreground">{vacationPreview.totalHours}h</span>
                   </div>
-                  <div className="flex justify-between text-text-secondary mt-1">
-                    <span>Total hours:</span>
-                    <span className="font-medium text-text-primary">{vacationPreview.totalHours}h</span>
-                  </div>
-                  <p className="text-xs text-text-tertiary mt-2">Weekends are automatically excluded</p>
-                </div>
-              )}
-
-              <Button 
-                onClick={handleSaveVacation}
-                disabled={!vacationDate || isSavingVacation}
-                className="w-full h-10 bg-theme-primary hover:bg-theme-primary/90 text-white font-medium"
-              >
-                {isSavingVacation ? 'Saving...' : 'Save Vacation'}
-              </Button>
+                ) : (
+                  <div className="text-xs text-muted-foreground">Select dates</div>
+                )}
+                <Button 
+                  onClick={handleSaveVacation}
+                  disabled={!vacationDate || isSavingVacation}
+                  size="sm"
+                  className="h-8 px-4 bg-theme-primary hover:bg-theme-primary/90 text-white"
+                >
+                  {isSavingVacation ? 'Saving...' : 'Save'}
+                </Button>
+              </div>
             </TabsContent>
             
             <TabsContent value="project" className="mt-4 space-y-4">
