@@ -340,14 +340,14 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
             <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-muted">
               <TabsTrigger
                 value="project"
-                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-colors"
+                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm transition-colors"
               >
                 <Briefcase className="h-4 w-4" />
                 Project
               </TabsTrigger>
               <TabsTrigger
                 value="vacation"
-                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-colors"
+                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm transition-colors"
               >
                 <CalendarIcon className="h-4 w-4" />
                 Vacation
@@ -391,7 +391,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                         className={cn(
                           "h-full px-3 text-sm font-medium transition-colors whitespace-nowrap",
                           startDayPortion === portion
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-gradient-start text-white"
                             : "bg-background text-muted-foreground hover:bg-muted"
                         )}
                       >
@@ -445,7 +445,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                         className={cn(
                           "h-full px-3 text-sm font-medium transition-colors whitespace-nowrap",
                           endDayPortion === portion
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-gradient-start text-white"
                             : "bg-background text-muted-foreground hover:bg-muted",
                           !vacationEndDate && "cursor-not-allowed"
                         )}
@@ -471,7 +471,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               <Button
                 onClick={handleSaveVacation}
                 disabled={!vacationDate || isSavingVacation}
-                className="w-full h-10"
+                className="w-full h-10 bg-gradient-start hover:bg-gradient-mid text-white"
               >
                 {isSavingVacation ? 'Saving...' : 'Save Vacation'}
               </Button>
@@ -573,7 +573,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               <Button 
                 onClick={handleSaveProject}
                 disabled={!selectedProject || isSavingProject}
-                className="w-full h-10"
+                className="w-full h-10 bg-gradient-start hover:bg-gradient-mid text-white"
               >
                 {isSavingProject ? 'Saving...' : 'Save Project Allocation'}
               </Button>
