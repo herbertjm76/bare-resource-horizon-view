@@ -42,7 +42,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('vacation');
+  const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('project');
   
   // Get default value based on display preference
   const getDefaultHours = () => displayPreference === 'percentage' ? '20' : '8'; // 20% of 40h = 8h
@@ -337,20 +337,20 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
           </div>
           
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'vacation' | 'project')}>
-            <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-bg-tertiary">
-              <TabsTrigger
-                value="vacation"
-                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-              >
-                <CalendarIcon className="h-4 w-4" />
-                Vacation
-              </TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-muted">
               <TabsTrigger
                 value="project"
-                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-colors"
               >
                 <Briefcase className="h-4 w-4" />
                 Project
+              </TabsTrigger>
+              <TabsTrigger
+                value="vacation"
+                className="flex items-center justify-center gap-2 h-9 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-colors"
+              >
+                <CalendarIcon className="h-4 w-4" />
+                Vacation
               </TabsTrigger>
             </TabsList>
 
