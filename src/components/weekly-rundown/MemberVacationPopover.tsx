@@ -63,7 +63,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const [projectWeeks, setProjectWeeks] = useState<Record<string, string>>({});
   const [isSavingProject, setIsSavingProject] = useState(false);
 
-  // Generate next 8 weeks starting from current week
+  // Generate next 4 weeks starting from current week
   const generateWeeks = () => {
     const weeks = [];
     const today = new Date();
@@ -72,7 +72,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     const monday = new Date(today);
     monday.setDate(today.getDate() + diff);
     
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 4; i++) {
       const weekStart = new Date(monday);
       weekStart.setDate(monday.getDate() + (i * 7));
       weeks.push(format(weekStart, 'yyyy-MM-dd'));
