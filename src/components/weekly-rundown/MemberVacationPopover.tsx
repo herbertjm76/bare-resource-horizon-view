@@ -325,11 +325,11 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
         {children}
       </PopoverTrigger>
       <PopoverContent
-        className="w-[360px] max-h-[85vh] overflow-auto border-border-primary shadow-elevation-2"
+        className="w-[400px] max-h-[85vh] overflow-auto border-border-primary shadow-elevation-2"
         align="start"
         side="bottom"
         sideOffset={10}
-        collisionPadding={12}
+        collisionPadding={16}
       >
         <div className="space-y-3">
           <div className="flex items-center gap-2 pb-3 border-b border-border-primary">
@@ -354,116 +354,124 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="vacation" className="mt-3 space-y-2">
+            <TabsContent value="vacation" className="mt-4 space-y-4">
               {/* Start Date */}
-              <div className="grid grid-cols-[1fr,auto] gap-2 items-center">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "justify-start text-left font-normal h-8 text-xs",
-                        !vacationDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-1.5 h-3 w-3" />
-                      {vacationDate ? format(vacationDate, "MMM d") : "Start date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 pointer-events-auto z-50" align="start" side="bottom">
-                    <Calendar
-                      mode="single"
-                      selected={vacationDate}
-                      onSelect={setVacationDate}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-                <div className="grid grid-cols-3 min-w-[126px] rounded-md border border-input overflow-hidden h-8">
-                  {(['full', 'am', 'pm'] as const).map((portion) => (
-                    <button
-                      key={portion}
-                      type="button"
-                      onClick={() => setStartDayPortion(portion)}
-                      className={cn(
-                        "h-full px-0 text-xs font-medium whitespace-nowrap transition-colors",
-                        startDayPortion === portion
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-background text-muted-foreground hover:bg-muted"
-                      )}
-                    >
-                      {portion === 'full' ? 'Full' : portion.toUpperCase()}
-                    </button>
-                  ))}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground">Start Date</Label>
+                <div className="flex gap-3 items-center">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "flex-1 justify-start text-left font-normal h-10",
+                          !vacationDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {vacationDate ? format(vacationDate, "MMM d, yyyy") : "Select date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 pointer-events-auto z-[100]" align="start" side="bottom">
+                      <Calendar
+                        mode="single"
+                        selected={vacationDate}
+                        onSelect={setVacationDate}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <div className="flex rounded-md border border-input overflow-hidden h-10 shrink-0">
+                    {(['full', 'am', 'pm'] as const).map((portion) => (
+                      <button
+                        key={portion}
+                        type="button"
+                        onClick={() => setStartDayPortion(portion)}
+                        className={cn(
+                          "h-full px-3 text-sm font-medium transition-colors whitespace-nowrap",
+                          startDayPortion === portion
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-background text-muted-foreground hover:bg-muted"
+                        )}
+                      >
+                        {portion === 'full' ? 'Full' : portion.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               {/* End Date */}
-              <div className="grid grid-cols-[1fr,auto] gap-2 items-center">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "justify-start text-left font-normal h-8 text-xs",
-                        !vacationEndDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-1.5 h-3 w-3" />
-                      {vacationEndDate ? format(vacationEndDate, "MMM d") : "End (optional)"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 pointer-events-auto z-50" align="start" side="bottom">
-                    <Calendar
-                      mode="single"
-                      selected={vacationEndDate}
-                      onSelect={setVacationEndDate}
-                      disabled={(date) => vacationDate ? date < vacationDate : false}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-                <div
-                  className={cn(
-                    "grid grid-cols-3 min-w-[126px] rounded-md border border-input overflow-hidden h-8",
-                    !vacationEndDate && "opacity-40"
-                  )}
-                >
-                  {(['full', 'am', 'pm'] as const).map((portion) => (
-                    <button
-                      key={portion}
-                      type="button"
-                      onClick={() => vacationEndDate && setEndDayPortion(portion)}
-                      disabled={!vacationEndDate}
-                      className={cn(
-                        "h-full px-0 text-xs font-medium whitespace-nowrap transition-colors",
-                        endDayPortion === portion
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-background text-muted-foreground hover:bg-muted",
-                        !vacationEndDate && "cursor-not-allowed"
-                      )}
-                    >
-                      {portion === 'full' ? 'Full' : portion.toUpperCase()}
-                    </button>
-                  ))}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground">End Date (optional)</Label>
+                <div className="flex gap-3 items-center">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "flex-1 justify-start text-left font-normal h-10",
+                          !vacationEndDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {vacationEndDate ? format(vacationEndDate, "MMM d, yyyy") : "Select date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 pointer-events-auto z-[100]" align="start" side="bottom">
+                      <Calendar
+                        mode="single"
+                        selected={vacationEndDate}
+                        onSelect={setVacationEndDate}
+                        disabled={(date) => vacationDate ? date < vacationDate : false}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <div
+                    className={cn(
+                      "flex rounded-md border border-input overflow-hidden h-10 shrink-0",
+                      !vacationEndDate && "opacity-50"
+                    )}
+                  >
+                    {(['full', 'am', 'pm'] as const).map((portion) => (
+                      <button
+                        key={portion}
+                        type="button"
+                        onClick={() => vacationEndDate && setEndDayPortion(portion)}
+                        disabled={!vacationEndDate}
+                        className={cn(
+                          "h-full px-3 text-sm font-medium transition-colors whitespace-nowrap",
+                          endDayPortion === portion
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-background text-muted-foreground hover:bg-muted",
+                          !vacationEndDate && "cursor-not-allowed"
+                        )}
+                      >
+                        {portion === 'full' ? 'Full' : portion.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* Summary & Save */}
+              {/* Preview Summary */}
               {vacationPreview && (
-                <div className="text-xs text-muted-foreground text-center py-1">
-                  {vacationPreview.workingDays} working day{vacationPreview.workingDays !== 1 ? 's' : ''} · {vacationPreview.totalHours}h total
+                <div className="bg-muted/50 rounded-md p-3 text-sm">
+                  <span className="text-muted-foreground">Total: </span>
+                  <span className="font-medium text-foreground">{vacationPreview.totalHours}h</span>
+                  <span className="text-muted-foreground"> across </span>
+                  <span className="font-medium text-foreground">{vacationPreview.workingDays} working day{vacationPreview.workingDays !== 1 ? 's' : ''}</span>
                 </div>
               )}
+
+              {/* Save Button */}
               <Button
-                size="sm"
                 onClick={handleSaveVacation}
                 disabled={!vacationDate || isSavingVacation}
-                className="w-full h-9"
+                className="w-full h-10"
               >
                 {isSavingVacation ? 'Saving...' : 'Save Vacation'}
               </Button>
