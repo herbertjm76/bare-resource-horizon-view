@@ -10,7 +10,7 @@ import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/alloca
 import { Trash2, AlertTriangle } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { convertToHours, convertFromHours } from '@/utils/displayFormatters';
-import { getAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
+import { getTotalAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ResourceAllocationCellProps {
@@ -19,6 +19,10 @@ interface ResourceAllocationCellProps {
   hours: number;
   weekStartDate: string;
   memberCapacity?: number;
+  /** Sum of hours from OTHER projects (excluding this one) */
+  totalOtherHours?: number;
+  /** Total leave hours for this person/week */
+  leaveHours?: number;
 }
 
 export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
@@ -26,7 +30,9 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   projectId,
   hours,
   weekStartDate,
-  memberCapacity
+  memberCapacity,
+  totalOtherHours = 0,
+  leaveHours = 0
 }) => {
   const { company } = useCompany();
   const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
@@ -45,14 +51,25 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   
-  // Calculate warning status based on current input value
+  // Calculate warning status based on TOTAL allocation (this project + other projects + leave)
   const warningStatus = useMemo(() => {
     const inputValue = parseFloat(value) || 0;
-    const percentage = displayPreference === 'percentage' 
-      ? inputValue 
-      : (capacity > 0 ? (inputValue / capacity) * 100 : 0);
-    return getAllocationWarningStatus(percentage, allocationWarningThreshold, allocationDangerThreshold);
-  }, [value, displayPreference, capacity, allocationWarningThreshold, allocationDangerThreshold]);
+    // Convert input to hours if in percentage mode
+    const currentProjectHours = displayPreference === 'percentage' 
+      ? (inputValue / 100) * capacity 
+      : inputValue;
+    
+    return getTotalAllocationWarningStatus(
+      currentProjectHours,
+      totalOtherHours,
+      leaveHours,
+      capacity,
+      displayPreference,
+      allocationWarningThreshold,
+      allocationDangerThreshold,
+      allocationMaxLimit
+    );
+  }, [value, displayPreference, capacity, totalOtherHours, leaveHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit]);
 
   // Update local state when props change
   useEffect(() => {
@@ -67,14 +84,22 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   };
 
   const validateInput = (inputValue: number): boolean => {
-    if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
-      toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
-      return false;
-    }
-    // For hours, cap at max limit % of capacity
-    const maxHours = (capacity * allocationMaxLimit) / 100;
-    if (displayPreference === 'hours' && inputValue > maxHours) {
-      toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
+    // Convert to hours if in percentage mode
+    const newHours = displayPreference === 'percentage' 
+      ? (inputValue / 100) * capacity 
+      : inputValue;
+    
+    // Calculate total allocation
+    const totalHours = newHours + totalOtherHours + leaveHours;
+    const totalPercentage = capacity > 0 ? (totalHours / capacity) * 100 : 0;
+    
+    if (totalPercentage > allocationMaxLimit) {
+      if (displayPreference === 'percentage') {
+        toast.error(`Total allocation cannot exceed ${allocationMaxLimit}% (currently ${Math.round(totalPercentage)}%)`);
+      } else {
+        const maxHours = (capacity * allocationMaxLimit) / 100;
+        toast.error(`Total allocation cannot exceed ${Math.round(maxHours)}h (currently ${Math.round(totalHours)}h)`);
+      }
       return false;
     }
     return true;

@@ -8,14 +8,30 @@ interface ProjectAllocationCellsProps {
   member: any;
   allocationMap: Map<string, number>;
   weekStartDate: string;
+  /** Total leave hours for this member/week */
+  leaveHours?: number;
 }
 
 export const ProjectAllocationCells: React.FC<ProjectAllocationCellsProps> = ({
   projects,
   member,
   allocationMap,
-  weekStartDate
+  weekStartDate,
+  leaveHours = 0
 }) => {
+  // Calculate total hours from all projects for this member
+  const getMemberTotalProjectHours = () => {
+    let total = 0;
+    allocationMap.forEach((hours, key) => {
+      if (key.startsWith(`${member.id}:`)) {
+        total += hours;
+      }
+    });
+    return total;
+  };
+  
+  const totalProjectHours = getMemberTotalProjectHours();
+  
   return (
     <>
       {projects.map((project, index) => {
@@ -31,6 +47,8 @@ export const ProjectAllocationCells: React.FC<ProjectAllocationCellsProps> = ({
         
         const key = `${member.id}:${project.id}`;
         const hours = allocationMap.get(key) || 0;
+        // Other projects hours = total minus current project
+        const otherProjectsHours = totalProjectHours - hours;
         
         return (
           <TableCell 
@@ -42,6 +60,8 @@ export const ProjectAllocationCells: React.FC<ProjectAllocationCellsProps> = ({
               resourceId={member.id}
               projectId={project.id}
               weekStartDate={weekStartDate}
+              totalOtherHours={otherProjectsHours}
+              leaveHours={leaveHours}
             />
           </TableCell>
         );

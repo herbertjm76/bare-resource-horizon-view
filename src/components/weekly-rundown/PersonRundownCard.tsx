@@ -173,6 +173,11 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
             {/* Project Segments */}
             {person.projects && person.projects.length > 0 && person.projects.map((project: any, idx: number) => {
               const percentage = (project.hours / person.capacity) * 100;
+              // Calculate other projects hours (excluding current project)
+              const otherProjectsHours = person.projects
+                .filter((p: any) => p.id !== project.id)
+                .reduce((sum: number, p: any) => sum + (p.hours || 0), 0);
+              
               return (
                 <EditableProjectAllocation
                   key={`${project.id}-${refreshKey}`}
@@ -185,6 +190,8 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                   color={generateMonochromaticShades(idx, person.projects.length)}
                   weekStartDate={weekStartDate}
                   capacity={person.capacity}
+                  totalOtherHours={otherProjectsHours}
+                  leaveHours={totalLeaveHours}
                   onUpdate={handleDataChange}
                 />
               );

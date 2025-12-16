@@ -96,6 +96,10 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       {projects.map((project, projectIdx) => {
         const key = `${member.id}:${project.id}`;
         const hours = allocationMap.get(key) || 0;
+        // Calculate other projects hours (excluding current project)
+        const otherProjectsHours = totalHours - hours;
+        // Total leave = annual + holiday + other
+        const totalLeave = annualLeave + holidayHours + otherLeave;
         
         return (
           <ResourceAllocationCell 
@@ -104,6 +108,8 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
             projectId={project.id}
             hours={hours}
             weekStartDate={weekStartDate}
+            totalOtherHours={otherProjectsHours}
+            leaveHours={totalLeave}
           />
         );
       })}
