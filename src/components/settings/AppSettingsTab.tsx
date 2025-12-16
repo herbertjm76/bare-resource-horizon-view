@@ -167,54 +167,49 @@ export const AppSettingsTab: React.FC = () => {
           </p>
         </div>
 
-        {/* Allocation Warning Threshold */}
+        {/* Allocation Thresholds */}
         <div className="space-y-2">
-          <Label htmlFor="allocation_warning_threshold">Warning Threshold (%)</Label>
-          <Input
-            id="allocation_warning_threshold"
-            type="number"
-            min="100"
-            max="200"
-            value={formData.allocation_warning_threshold}
-            onChange={(e) => setFormData({ ...formData, allocation_warning_threshold: parseInt(e.target.value) || 150 })}
-            className="max-w-xs"
-          />
+          <Label>Allocation Thresholds (%)</Label>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-amber-600 font-medium w-14">Warning</span>
+              <Input
+                id="allocation_warning_threshold"
+                type="number"
+                min="100"
+                max="200"
+                value={formData.allocation_warning_threshold}
+                onChange={(e) => setFormData({ ...formData, allocation_warning_threshold: parseInt(e.target.value) || 150 })}
+                className="w-20"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-destructive font-medium w-12">Danger</span>
+              <Input
+                id="allocation_danger_threshold"
+                type="number"
+                min="100"
+                max="200"
+                value={formData.allocation_danger_threshold}
+                onChange={(e) => setFormData({ ...formData, allocation_danger_threshold: parseInt(e.target.value) || 180 })}
+                className="w-20"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground font-medium w-8">Max</span>
+              <Input
+                id="allocation_max_limit"
+                type="number"
+                min="100"
+                max="500"
+                value={formData.allocation_max_limit}
+                onChange={(e) => setFormData({ ...formData, allocation_max_limit: parseInt(e.target.value) || 200 })}
+                className="w-20"
+              />
+            </div>
+          </div>
           <p className="text-sm text-muted-foreground">
-            Show yellow warning when allocation exceeds this percentage (default: 150%)
-          </p>
-        </div>
-
-        {/* Allocation Danger Threshold */}
-        <div className="space-y-2">
-          <Label htmlFor="allocation_danger_threshold">Danger Threshold (%)</Label>
-          <Input
-            id="allocation_danger_threshold"
-            type="number"
-            min="100"
-            max="200"
-            value={formData.allocation_danger_threshold}
-            onChange={(e) => setFormData({ ...formData, allocation_danger_threshold: parseInt(e.target.value) || 180 })}
-            className="max-w-xs"
-          />
-          <p className="text-sm text-muted-foreground">
-            Show red danger warning when allocation exceeds this percentage (default: 180%)
-          </p>
-        </div>
-
-        {/* Maximum Allocation Limit */}
-        <div className="space-y-2">
-          <Label htmlFor="allocation_max_limit">Maximum Allocation Limit (%)</Label>
-          <Input
-            id="allocation_max_limit"
-            type="number"
-            min="100"
-            max="500"
-            value={formData.allocation_max_limit}
-            onChange={(e) => setFormData({ ...formData, allocation_max_limit: parseInt(e.target.value) || 200 })}
-            className="max-w-xs"
-          />
-          <p className="text-sm text-muted-foreground">
-            Block allocations that exceed this percentage (default: 200%)
+            Yellow warning at {formData.allocation_warning_threshold}%, red at {formData.allocation_danger_threshold}%, blocked above {formData.allocation_max_limit}%
           </p>
         </div>
 
