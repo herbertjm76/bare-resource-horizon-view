@@ -292,6 +292,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                           size="sm" 
                           onClick={() => handleSave(project.allocationId || project.id, project.name)}
                           disabled={!hours[project.allocationId || project.id] || updateAllocationMutation.isPending}
+                          className="bg-gradient-start hover:bg-gradient-mid text-white"
                         >
                           {updateAllocationMutation.isPending ? 'Saving...' : 'Save'}
                         </Button>
@@ -417,7 +418,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
 
                   <Button
                     onClick={handleAddAllocation}
-                    className="w-full"
+                    className="w-full bg-gradient-start hover:bg-gradient-mid text-white"
                     disabled={addAllocationMutation.isPending || !selectedNewProjectId || !newAllocationHours}
                   >
                     {addAllocationMutation.isPending ? 'Adding...' : 'Add Allocation'}
@@ -465,7 +466,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
 
                     <Button
                       type="button"
-                      className="w-full"
+                      className="w-full bg-gradient-start hover:bg-gradient-mid text-white"
                       onClick={handleCreateProject}
                       disabled={createProjectMutation.isPending || !newProjectCode || !newProjectName || !newProjectCountry}
                     >
@@ -490,7 +491,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
 
                   <Button
                     onClick={handleAddAllocation}
-                    className="w-full"
+                    className="w-full bg-gradient-start hover:bg-gradient-mid text-white"
                     disabled={addAllocationMutation.isPending || !selectedNewProjectId || !newAllocationHours}
                   >
                     {addAllocationMutation.isPending ? 'Adding...' : 'Add Allocation'}

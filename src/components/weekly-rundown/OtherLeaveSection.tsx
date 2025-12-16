@@ -196,6 +196,7 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
             <Button
               onClick={() => updateMutation.mutate()}
               disabled={updateMutation.isPending || hours <= 0}
+              className="bg-gradient-start hover:bg-gradient-mid text-white"
             >
               {updateMutation.isPending ? 'Saving...' : (otherLeave ? 'Update' : 'Save')}
             </Button>
