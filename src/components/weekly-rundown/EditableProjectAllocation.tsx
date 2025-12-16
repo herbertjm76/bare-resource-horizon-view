@@ -10,7 +10,7 @@ import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/alloca
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
-import { getAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
+import { getTotalAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   AlertDialog,
@@ -33,6 +33,10 @@ interface EditableProjectAllocationProps {
   color?: string;
   weekStartDate: string;
   capacity: number;
+  /** Sum of hours from OTHER projects (excluding this one) */
+  totalOtherHours?: number;
+  /** Total leave hours for this person/week */
+  leaveHours?: number;
   onUpdate: () => void;
 }
 
@@ -46,6 +50,8 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   color,
   weekStartDate,
   capacity,
+  totalOtherHours = 0,
+  leaveHours = 0,
   onUpdate
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -69,14 +75,25 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   const displayText = getProjectDisplayName({ code: projectCode, name: projectName }, projectDisplayPreference);
   const formattedHours = formatAllocationValue(hours, effectiveCapacity, displayPreference);
 
-  // Calculate warning status based on current input value
+  // Calculate warning status based on TOTAL allocation (this project + other projects + leave)
   const warningStatus = useMemo(() => {
     const inputValue = parseFloat(editedValue) || 0;
-    const percentage = displayPreference === 'percentage' 
-      ? inputValue 
-      : (effectiveCapacity > 0 ? (inputValue / effectiveCapacity) * 100 : 0);
-    return getAllocationWarningStatus(percentage, allocationWarningThreshold, allocationDangerThreshold);
-  }, [editedValue, displayPreference, effectiveCapacity, allocationWarningThreshold, allocationDangerThreshold]);
+    // Convert input to hours if in percentage mode
+    const currentProjectHours = displayPreference === 'percentage' 
+      ? (inputValue / 100) * effectiveCapacity 
+      : inputValue;
+    
+    return getTotalAllocationWarningStatus(
+      currentProjectHours,
+      totalOtherHours,
+      leaveHours,
+      effectiveCapacity,
+      displayPreference,
+      allocationWarningThreshold,
+      allocationDangerThreshold,
+      allocationMaxLimit
+    );
+  }, [editedValue, displayPreference, effectiveCapacity, totalOtherHours, leaveHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit]);
 
   const updateMutation = useMutation({
     mutationFn: async (newHours: number) => {
@@ -153,21 +170,25 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
       return;
     }
     
-    // Validate against max limit
-    if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
-      toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
-      return;
-    }
-    const maxHours = (effectiveCapacity * allocationMaxLimit) / 100;
-    if (displayPreference === 'hours' && inputValue > maxHours) {
-      toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
-      return;
-    }
-    
-    // Convert display value back to hours if needed
+    // Convert display value to hours
     const newHours = displayPreference === 'percentage' 
       ? (inputValue / 100) * effectiveCapacity 
       : inputValue;
+    
+    // Calculate total allocation for validation
+    const totalHours = newHours + totalOtherHours + leaveHours;
+    const totalPercentage = effectiveCapacity > 0 ? (totalHours / effectiveCapacity) * 100 : 0;
+    
+    // Validate against max limit using TOTAL allocation
+    if (totalPercentage > allocationMaxLimit) {
+      if (displayPreference === 'percentage') {
+        toast.error(`Total allocation cannot exceed ${allocationMaxLimit}% (currently ${Math.round(totalPercentage)}%)`);
+      } else {
+        const maxHours = (effectiveCapacity * allocationMaxLimit) / 100;
+        toast.error(`Total allocation cannot exceed ${Math.round(maxHours)}h (currently ${Math.round(totalHours)}h)`);
+      }
+      return;
+    }
     
     updateMutation.mutate(newHours);
   };

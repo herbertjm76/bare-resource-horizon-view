@@ -23,7 +23,7 @@ import { CalendarIcon, Briefcase, Check, ChevronsUpDown, AlertTriangle } from 'l
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
+import { getTotalAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
 
 interface MemberVacationPopoverProps {
   memberId: string;
@@ -278,13 +278,24 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     }));
   };
 
-  // Calculate warning status for each week input
+  // Calculate warning status for each week input (simplified - just checks single project allocation)
+  // Full total allocation check happens in the parent components where context is available
   const getWeekWarningStatus = (weekValue: string) => {
     const inputValue = parseFloat(weekValue) || 0;
-    const percentage = displayPreference === 'percentage' 
-      ? inputValue 
-      : (workWeekHours > 0 ? (inputValue / workWeekHours) * 100 : 0);
-    return getAllocationWarningStatus(percentage, allocationWarningThreshold, allocationDangerThreshold);
+    const currentHours = displayPreference === 'percentage' 
+      ? (inputValue / 100) * workWeekHours 
+      : inputValue;
+    // For new allocations, we don't have other project context, so check this allocation only
+    return getTotalAllocationWarningStatus(
+      currentHours, 
+      0, // other projects hours - not available in this context
+      0, // leave hours - not available in this context
+      workWeekHours, 
+      displayPreference, 
+      allocationWarningThreshold, 
+      allocationDangerThreshold, 
+      allocationMaxLimit
+    );
   };
   
   // Calculate preview of vacation hours
