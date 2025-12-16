@@ -80,6 +80,7 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
                       size="sm" 
                       onClick={() => handleSave(member.id, member.name)}
                       disabled={!hours[member.id]}
+                      className="bg-gradient-start hover:bg-gradient-mid text-white"
                     >
                       Save
                     </Button>
