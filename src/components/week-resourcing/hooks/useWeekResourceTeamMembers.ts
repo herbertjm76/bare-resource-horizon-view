@@ -56,7 +56,7 @@ export const useWeekResourceTeamMembers = () => {
       
       const { data, error } = await supabase
         .from('invites')
-        .select('id, first_name, last_name, email, department, location, practice_area, job_title, role, weekly_capacity')
+        .select('id, first_name, last_name, email, department, location, practice_area, job_title, role, weekly_capacity, avatar_url')
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
         
@@ -74,7 +74,7 @@ export const useWeekResourceTeamMembers = () => {
         department: member.department || null,
         practice_area: member.practice_area || null,
         weekly_capacity: member.weekly_capacity || 40,
-        avatar_url: null, // Pre-registered members don't have avatars yet
+        avatar_url: member.avatar_url || null,
         status: 'pre_registered'
       }));
     },
