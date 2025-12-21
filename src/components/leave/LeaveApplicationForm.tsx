@@ -1,13 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format, differenceInBusinessDays, isAfter, isBefore, startOfDay } from 'date-fns';
-import { CalendarIcon, Send, AlertCircle } from 'lucide-react';
+import { format, differenceInBusinessDays, isBefore, startOfDay } from 'date-fns';
+import { CalendarIcon, Send, Info, Clock, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LeaveTypeSelector } from './LeaveTypeSelector';
 import { LeaveDurationSelector } from './LeaveDurationSelector';
@@ -15,7 +14,7 @@ import { LeaveAttachmentUpload } from './LeaveAttachmentUpload';
 import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
 import { useLeaveRequests } from '@/hooks/leave/useLeaveRequests';
 import { LeaveFormData } from '@/types/leave';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 interface LeaveApplicationFormProps {
   onSuccess?: () => void;
@@ -44,7 +43,6 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
     if (!selectedLeaveType) return false;
     if (!selectedLeaveType.requires_attachment) return false;
     
-    // For sick leave, require attachment if > 1 day
     if (startDate && endDate && selectedLeaveType.code === 'sick') {
       const days = differenceInBusinessDays(endDate, startDate) + 1;
       return days > 1;
@@ -69,33 +67,26 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
     if (!formData.leave_type_id) {
       newErrors.leave_type_id = 'Please select a leave type';
     }
-
     if (!startDate) {
-      newErrors.start_date = 'Please select a start date';
+      newErrors.start_date = 'Required';
     }
-
     if (!endDate) {
-      newErrors.end_date = 'Please select an end date';
+      newErrors.end_date = 'Required';
     }
-
     if (startDate && endDate && isBefore(endDate, startDate)) {
       newErrors.end_date = 'End date must be after start date';
     }
-
     if (startDate && isBefore(startDate, startOfDay(new Date()))) {
-      newErrors.start_date = 'Start date cannot be in the past';
+      newErrors.start_date = 'Cannot be in the past';
     }
-
     if (!formData.remarks?.trim()) {
-      newErrors.remarks = 'Please provide remarks or reason for leave';
+      newErrors.remarks = 'Please provide a reason';
     }
-
     if (!formData.manager_confirmed) {
-      newErrors.manager_confirmed = 'Please confirm you have discussed with your manager';
+      newErrors.manager_confirmed = 'Please confirm';
     }
-
     if (requiresAttachment && !attachment) {
-      newErrors.attachment = 'Medical certificate is required for sick leave > 1 day';
+      newErrors.attachment = 'Medical certificate required';
     }
 
     setErrors(newErrors);
@@ -104,7 +95,6 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     const success = await submitLeaveRequest({
@@ -118,7 +108,6 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
     });
 
     if (success) {
-      // Reset form
       setFormData({
         leave_type_id: '',
         duration_type: 'full_day',
@@ -134,21 +123,14 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CalendarIcon className="w-5 h-5 text-primary" />
-          Leave Application Form
-        </CardTitle>
-        <CardDescription>
-          Submit your leave request for approval by your project manager
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Leave Type */}
-          <div className="space-y-2">
-            <Label>Type of Absence <span className="text-destructive">*</span></Label>
+    <div className="w-full max-w-xl mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Leave Type & Duration Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Leave Type
+            </Label>
             <LeaveTypeSelector
               leaveTypes={leaveTypes}
               value={formData.leave_type_id || ''}
@@ -156,189 +138,186 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
               disabled={isLoadingTypes || isSubmitting}
             />
             {errors.leave_type_id && (
-              <p className="text-sm text-destructive">{errors.leave_type_id}</p>
+              <p className="text-xs text-destructive">{errors.leave_type_id}</p>
             )}
           </div>
 
-          {/* Duration */}
-          <div className="space-y-2">
-            <Label>Duration <span className="text-destructive">*</span></Label>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Duration
+            </Label>
             <LeaveDurationSelector
               value={formData.duration_type || 'full_day'}
               onChange={(value) => setFormData(prev => ({ ...prev, duration_type: value }))}
               disabled={isSubmitting}
             />
           </div>
+        </div>
 
-          {/* Date Range */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>From Date <span className="text-destructive">*</span></Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !startDate && "text-muted-foreground"
-                    )}
-                    disabled={isSubmitting}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, 'PPP') : 'Select start date'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                    disabled={(date) => isBefore(date, startOfDay(new Date()))}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              {errors.start_date && (
-                <p className="text-sm text-destructive">{errors.start_date}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>To Date <span className="text-destructive">*</span></Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !endDate && "text-muted-foreground"
-                    )}
-                    disabled={isSubmitting}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? format(endDate, 'PPP') : 'Select end date'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={setEndDate}
-                    disabled={(date) => 
-                      isBefore(date, startOfDay(new Date())) || 
-                      (startDate ? isBefore(date, startDate) : false)
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              {errors.end_date && (
-                <p className="text-sm text-destructive">{errors.end_date}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Summary */}
-          {startDate && endDate && (
-            <div className="p-4 bg-accent/30 rounded-lg">
-              <p className="text-sm">
-                <span className="font-medium">Duration:</span>{' '}
-                {totalDays} working day{totalDays !== 1 ? 's' : ''} ({totalHours} hours)
-              </p>
-            </div>
-          )}
-
-          {/* Remarks */}
-          <div className="space-y-2">
-            <Label>Remarks <span className="text-destructive">*</span></Label>
-            <Textarea
-              placeholder="Please provide details about your leave request..."
-              value={formData.remarks || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
-              disabled={isSubmitting}
-              rows={4}
-            />
-            {selectedLeaveType?.code === 'sick' && (
-              <p className="text-xs text-muted-foreground">
-                For sick leave, briefly describe your symptoms or condition
-              </p>
-            )}
-            {errors.remarks && (
-              <p className="text-sm text-destructive">{errors.remarks}</p>
-            )}
-          </div>
-
-          {/* Manager Confirmation */}
-          <div className="space-y-2">
-            <div className="flex items-start space-x-3 p-4 border rounded-lg">
-              <Checkbox
-                id="manager_confirmed"
-                checked={formData.manager_confirmed}
-                onCheckedChange={(checked) => 
-                  setFormData(prev => ({ ...prev, manager_confirmed: checked as boolean }))
-                }
-                disabled={isSubmitting}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <Label
-                  htmlFor="manager_confirmed"
-                  className="text-sm font-medium cursor-pointer"
+        {/* Date Range - Compact Inline */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Period
+          </Label>
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "flex-1 justify-start text-left font-normal h-9",
+                    !startDate && "text-muted-foreground",
+                    errors.start_date && "border-destructive"
+                  )}
+                  disabled={isSubmitting}
                 >
-                  I confirm that I have informed and received confirmation from my project leader / studio head regarding my leave application
-                </Label>
-              </div>
-            </div>
-            {errors.manager_confirmed && (
-              <p className="text-sm text-destructive">{errors.manager_confirmed}</p>
+                  <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                  {startDate ? format(startDate, 'MMM d, yyyy') : 'From'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 z-50" align="start">
+                <Calendar
+                  mode="single"
+                  selected={startDate}
+                  onSelect={setStartDate}
+                  disabled={(date) => isBefore(date, startOfDay(new Date()))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+
+            <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "flex-1 justify-start text-left font-normal h-9",
+                    !endDate && "text-muted-foreground",
+                    errors.end_date && "border-destructive"
+                  )}
+                  disabled={isSubmitting}
+                >
+                  <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                  {endDate ? format(endDate, 'MMM d, yyyy') : 'To'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 z-50" align="end">
+                <Calendar
+                  mode="single"
+                  selected={endDate}
+                  onSelect={setEndDate}
+                  disabled={(date) => 
+                    isBefore(date, startOfDay(new Date())) || 
+                    (startDate ? isBefore(date, startDate) : false)
+                  }
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+
+            {/* Duration Badge */}
+            {startDate && endDate && (
+              <Badge variant="secondary" className="shrink-0 gap-1">
+                <Clock className="h-3 w-3" />
+                {totalDays}d · {totalHours}h
+              </Badge>
             )}
           </div>
-
-          {/* Attachment */}
-          {(requiresAttachment || selectedLeaveType?.requires_attachment) && (
-            <div>
-              <LeaveAttachmentUpload
-                file={attachment}
-                onFileChange={setAttachment}
-                disabled={isSubmitting}
-                required={requiresAttachment}
-                label={
-                  selectedLeaveType?.code === 'sick' 
-                    ? 'Medical Certificate (required for sick leave > 1 day)' 
-                    : 'Supporting Document'
-                }
-              />
-              {errors.attachment && (
-                <p className="text-sm text-destructive mt-1">{errors.attachment}</p>
-              )}
-            </div>
+          {(errors.start_date || errors.end_date) && (
+            <p className="text-xs text-destructive">
+              {errors.start_date || errors.end_date}
+            </p>
           )}
+        </div>
 
-          {/* Info Alert */}
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Your leave request will be sent to your project manager for approval. 
-              You will be notified once it has been reviewed.
-            </AlertDescription>
-          </Alert>
+        {/* Remarks - Compact */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Reason
+          </Label>
+          <Textarea
+            placeholder="Brief reason for your leave request..."
+            value={formData.remarks || ''}
+            onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
+            disabled={isSubmitting}
+            rows={2}
+            className="resize-none text-sm"
+          />
+          {errors.remarks && (
+            <p className="text-xs text-destructive">{errors.remarks}</p>
+          )}
+        </div>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isSubmitting || isLoadingTypes}
-          >
-            {isSubmitting ? (
-              'Submitting...'
-            ) : (
-              <>
-                <Send className="w-4 h-4 mr-2" />
-                Submit Leave Request
-              </>
+        {/* Attachment - Only when needed */}
+        {(requiresAttachment || selectedLeaveType?.requires_attachment) && (
+          <div className="space-y-1.5">
+            <LeaveAttachmentUpload
+              file={attachment}
+              onFileChange={setAttachment}
+              disabled={isSubmitting}
+              required={requiresAttachment}
+              label={
+                selectedLeaveType?.code === 'sick' 
+                  ? 'Medical Certificate' 
+                  : 'Attachment'
+              }
+            />
+            {errors.attachment && (
+              <p className="text-xs text-destructive">{errors.attachment}</p>
             )}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+          </div>
+        )}
+
+        {/* Manager Confirmation - Compact */}
+        <div 
+          className={cn(
+            "flex items-start gap-3 p-3 rounded-lg border bg-muted/30 transition-colors",
+            errors.manager_confirmed && "border-destructive bg-destructive/5"
+          )}
+        >
+          <Checkbox
+            id="manager_confirmed"
+            checked={formData.manager_confirmed}
+            onCheckedChange={(checked) => 
+              setFormData(prev => ({ ...prev, manager_confirmed: checked as boolean }))
+            }
+            disabled={isSubmitting}
+            className="mt-0.5"
+          />
+          <Label
+            htmlFor="manager_confirmed"
+            className="text-sm leading-snug cursor-pointer"
+          >
+            I've discussed this leave with my manager
+          </Label>
+        </div>
+
+        {/* Info Note */}
+        <div className="flex items-start gap-2 text-xs text-muted-foreground">
+          <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+          <span>Your request will be sent to your project manager for approval.</span>
+        </div>
+
+        {/* Submit */}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isSubmitting || isLoadingTypes}
+        >
+          {isSubmitting ? (
+            'Submitting...'
+          ) : (
+            <>
+              <Send className="w-4 h-4 mr-2" />
+              Submit Request
+            </>
+          )}
+        </Button>
+      </form>
+    </div>
   );
 };
