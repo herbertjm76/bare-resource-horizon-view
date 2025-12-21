@@ -21,6 +21,8 @@ export type Database = {
           date: string
           hours: number
           id: string
+          leave_request_id: string | null
+          leave_type_id: string | null
           member_id: string
           updated_at: string | null
         }
@@ -30,6 +32,8 @@ export type Database = {
           date: string
           hours: number
           id?: string
+          leave_request_id?: string | null
+          leave_type_id?: string | null
           member_id: string
           updated_at?: string | null
         }
@@ -39,10 +43,27 @@ export type Database = {
           date?: string
           hours?: number
           id?: string
+          leave_request_id?: string | null
+          leave_type_id?: string | null
           member_id?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "annual_leaves_leave_request_id_fkey"
+            columns: ["leave_request_id"]
+            isOneToOne: false
+            referencedRelation: "leave_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "annual_leaves_leave_type_id_fkey"
+            columns: ["leave_type_id"]
+            isOneToOne: false
+            referencedRelation: "leave_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       companies: {
         Row: {
@@ -192,6 +213,189 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "invites_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_digest_settings: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          digest_email: string
+          frequency: string | null
+          id: string
+          is_enabled: boolean | null
+          last_sent_at: string | null
+          send_day: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          digest_email: string
+          frequency?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          last_sent_at?: string | null
+          send_day?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          digest_email?: string
+          frequency?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          last_sent_at?: string | null
+          send_day?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_digest_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          attachment_url: string | null
+          company_id: string
+          created_at: string | null
+          duration_type: string
+          end_date: string
+          id: string
+          leave_type_id: string
+          manager_confirmed: boolean | null
+          member_id: string
+          rejection_reason: string | null
+          remarks: string
+          start_date: string
+          status: string | null
+          total_hours: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          attachment_url?: string | null
+          company_id: string
+          created_at?: string | null
+          duration_type: string
+          end_date: string
+          id?: string
+          leave_type_id: string
+          manager_confirmed?: boolean | null
+          member_id: string
+          rejection_reason?: string | null
+          remarks: string
+          start_date: string
+          status?: string | null
+          total_hours?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          attachment_url?: string | null
+          company_id?: string
+          created_at?: string | null
+          duration_type?: string
+          end_date?: string
+          id?: string
+          leave_type_id?: string
+          manager_confirmed?: boolean | null
+          member_id?: string
+          rejection_reason?: string | null
+          remarks?: string
+          start_date?: string
+          status?: string | null
+          total_hours?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_requests_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_requests_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_requests_leave_type_id_fkey"
+            columns: ["leave_type_id"]
+            isOneToOne: false
+            referencedRelation: "leave_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_requests_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_types: {
+        Row: {
+          code: string
+          color: string | null
+          company_id: string
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          order_index: number | null
+          requires_attachment: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          color?: string | null
+          company_id: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          order_index?: number | null
+          requires_attachment?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          color?: string | null
+          company_id?: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          order_index?: number | null
+          requires_attachment?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_types_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
@@ -1491,6 +1695,7 @@ export type Database = {
           company_id: string
           created_at: string
           id: string
+          is_leave_admin: boolean | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
           user_id: string
@@ -1499,6 +1704,7 @@ export type Database = {
           company_id: string
           created_at?: string
           id?: string
+          is_leave_admin?: boolean | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id: string
@@ -1507,6 +1713,7 @@ export type Database = {
           company_id?: string
           created_at?: string
           id?: string
+          is_leave_admin?: boolean | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id?: string
@@ -1811,6 +2018,10 @@ export type Database = {
             Returns: boolean
           }
       migrate_sensitive_profile_data: { Args: never; Returns: undefined }
+      seed_default_leave_types: {
+        Args: { p_company_id: string }
+        Returns: undefined
+      }
       update_stage_budgets: {
         Args: { p_project_id: string; p_stage_id: string }
         Returns: undefined
@@ -1824,7 +2035,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "owner" | "admin" | "member"
+      app_role: "owner" | "admin" | "member" | "project_manager" | "contractor"
       data_sensitivity: "public" | "internal" | "confidential" | "restricted"
       member_type: "active" | "pre_registered"
       user_role: "owner" | "admin" | "member"
@@ -1955,7 +2166,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner", "admin", "member"],
+      app_role: ["owner", "admin", "member", "project_manager", "contractor"],
       data_sensitivity: ["public", "internal", "confidential", "restricted"],
       member_type: ["active", "pre_registered"],
       user_role: ["owner", "admin", "member"],
