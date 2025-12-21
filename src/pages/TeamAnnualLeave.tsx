@@ -9,8 +9,9 @@ import { useTeamFilters } from '@/hooks/useTeamFilters';
 import { TeamAnnualLeaveContent } from '@/components/annual-leave/TeamAnnualLeaveContent';
 import { LeaveApplicationForm } from '@/components/leave/LeaveApplicationForm';
 import { MyLeaveRequests } from '@/components/leave/MyLeaveRequests';
+import { LeaveApprovalQueue } from '@/components/leave/LeaveApprovalQueue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, FileText, ClipboardList } from 'lucide-react';
+import { Calendar, FileText, ClipboardList, CheckSquare } from 'lucide-react';
 import '@/styles/enhanced-tables.css';
 import '@/components/annual-leave/annual-leave.css';
 
@@ -86,6 +87,10 @@ const TeamAnnualLeave = () => {
             <ClipboardList className="w-4 h-4" />
             My Requests
           </TabsTrigger>
+          <TabsTrigger value="approvals" className="flex items-center gap-2">
+            <CheckSquare className="w-4 h-4" />
+            Approvals
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="calendar">
@@ -115,6 +120,10 @@ const TeamAnnualLeave = () => {
 
         <TabsContent value="my-requests">
           <MyLeaveRequests />
+        </TabsContent>
+
+        <TabsContent value="approvals">
+          <LeaveApprovalQueue />
         </TabsContent>
       </Tabs>
     </StandardLayout>
