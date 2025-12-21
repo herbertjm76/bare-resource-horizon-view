@@ -7,6 +7,7 @@ import { LocationsTab } from '@/components/settings/LocationsTab';
 import { RolesTab } from '@/components/settings/roles/RolesTab';
 import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
+import { LeaveTypesTab } from '@/components/settings/LeaveTypesTab';
 import { OrganizationTab } from '@/components/settings/OrganizationTab';
 import { ThemeTab } from '@/components/settings/ThemeTab';
 import { AppSettingsTab } from '@/components/settings/AppSettingsTab';
@@ -109,12 +110,16 @@ export const OfficeSettingsTabs: React.FC = () => {
             <TabsList>
               <TabsTrigger value="locations">Locations</TabsTrigger>
               <TabsTrigger value="holidays">Holidays</TabsTrigger>
+              <TabsTrigger value="leave-types">Leave Types</TabsTrigger>
             </TabsList>
             <TabsContent value="locations" className="mt-6">
               <LocationsTab />
             </TabsContent>
             <TabsContent value="holidays" className="mt-6">
               <HolidaysTab />
+            </TabsContent>
+            <TabsContent value="leave-types" className="mt-6">
+              <LeaveTypesTab />
             </TabsContent>
           </Tabs>
         </TabsContent>
