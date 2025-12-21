@@ -133,6 +133,9 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
           inviteRecord = invite;
         }
 
+        // Use role from invite if available, otherwise default to member
+        const inviteRole = inviteRecord?.role || 'member';
+
         // Register new user as a member of existing company
         const { data, error } = await supabase.auth.signUp({
           email: validatedData.email,
@@ -142,7 +145,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
               first_name: validatedData.firstName,
               last_name: validatedData.lastName,
               company_id: company?.id,
-              role: 'member'
+              role: inviteRole
             }
           }
         });
@@ -155,7 +158,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
             firstName: validatedData.firstName,
             lastName: validatedData.lastName,
             companyId: company?.id,
-            role: 'member'
+            role: inviteRole
           });
           
           // Add role to user_roles table
@@ -163,7 +166,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
             .from('user_roles')
             .insert({
               user_id: data.user.id,
-              role: 'member',
+              role: inviteRole as any,
               company_id: company?.id
             });
 

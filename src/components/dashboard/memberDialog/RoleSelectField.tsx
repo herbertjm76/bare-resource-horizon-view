@@ -6,7 +6,7 @@ import { Database } from '@/integrations/supabase/types';
 import { UseFormSetValue } from 'react-hook-form';
 import { MemberFormData } from './types';
 
-type UserRole = Database['public']['Enums']['user_role'];
+type AppRole = Database['public']['Enums']['app_role'];
 
 interface RoleSelectFieldProps {
   defaultValue?: string;
@@ -19,15 +19,17 @@ const RoleSelectField: React.FC<RoleSelectFieldProps> = ({ defaultValue = 'membe
       <Label htmlFor="role">System Role</Label>
       <Select 
         defaultValue={defaultValue}
-        onValueChange={(value: UserRole) => setValue('role', value)}
+        onValueChange={(value: AppRole) => setValue('role', value as any)}
       >
         <SelectTrigger>
           <SelectValue placeholder="Select role" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="member">Member</SelectItem>
+          <SelectItem value="project_manager">Project Manager</SelectItem>
           <SelectItem value="admin">Admin</SelectItem>
           <SelectItem value="owner">Owner</SelectItem>
+          <SelectItem value="contractor">Contractor</SelectItem>
         </SelectContent>
       </Select>
     </div>
