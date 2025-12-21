@@ -32,19 +32,13 @@ const CompanyInfoFields: React.FC<CompanyInfoFieldsProps> = ({
       />
     </div>
     <div>
-      <label htmlFor="companySubdomain" className="block text-white/90 font-medium mb-2 text-sm">Company Identifier (URL Slug)</label>
+      <label className="block text-white/90 font-medium mb-2 text-sm">Company URL</label>
       <div className="space-y-2">
-        <Input
-          type="text"
-          id="companySubdomain"
-          value={company.subdomain}
-          onChange={e => handleCompanyChange('subdomain', e.target.value.toLowerCase())}
-          className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all placeholder:text-white/40"
-          required
-          placeholder="yourcompany"
-        />
+        <div className="w-full px-4 py-3 rounded-xl bg-white/5 text-white/70 border border-white/10">
+          bareresource.com/<span className="font-medium text-white">{company.subdomain || 'yourcompany-0000'}</span>
+        </div>
         <p className="text-white/50 text-xs">
-          Your company URL: bareresource.com/<span className="font-medium text-white/70">{company.subdomain || 'yourcompany'}</span>
+          Auto-generated from your company name for security
         </p>
       </div>
       {subdomainCheck.isChecking && (
