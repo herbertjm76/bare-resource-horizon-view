@@ -26,10 +26,10 @@ const RoleSelectField: React.FC<RoleSelectFieldProps> = ({ defaultValue = 'membe
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="member">Member</SelectItem>
-          <SelectItem value="project_manager">Project Manager</SelectItem>
-          <SelectItem value="admin">Admin</SelectItem>
-          <SelectItem value="owner">Owner</SelectItem>
+          <SelectItem value="project_manager">PM (Project Manager)</SelectItem>
           <SelectItem value="contractor">Contractor</SelectItem>
+          <SelectItem value="admin">Admin</SelectItem>
+          <SelectItem value="owner">Super Admin</SelectItem>
         </SelectContent>
       </Select>
     </div>
