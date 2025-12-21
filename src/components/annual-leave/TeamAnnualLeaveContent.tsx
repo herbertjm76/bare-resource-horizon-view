@@ -46,13 +46,6 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
 }) => {
   return (
     <div className="mx-auto space-y-4">
-      {/* Annual Leave Insights */}
-      <AnnualLeaveInsights 
-        teamMembers={allMembers} 
-        selectedMonth={selectedMonth}
-        leaveData={leaveData}
-      />
-      
       <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
           <MonthSelector 
