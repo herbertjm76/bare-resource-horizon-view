@@ -24,6 +24,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getTotalAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
+import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
 
 interface MemberVacationPopoverProps {
   memberId: string;
@@ -44,6 +45,9 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('project');
   
+  // Leave types from company settings
+  const { leaveTypes } = useLeaveTypes();
+  
   // Get default value based on display preference
   const getDefaultHours = () => displayPreference === 'percentage' ? '20' : '8'; // 20% of 40h = 8h
   
@@ -52,6 +56,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const [vacationEndDate, setVacationEndDate] = useState<Date>();
   const [startDayPortion, setStartDayPortion] = useState<'full' | 'am' | 'pm'>('full');
   const [endDayPortion, setEndDayPortion] = useState<'full' | 'am' | 'pm'>('full');
+  const [selectedLeaveTypeId, setSelectedLeaveTypeId] = useState<string>('');
   const [isSavingVacation, setIsSavingVacation] = useState(false);
   
   // Calculate daily hours (working hours per day)
@@ -62,6 +67,13 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const [projectComboboxOpen, setProjectComboboxOpen] = useState(false);
   const [projectWeeks, setProjectWeeks] = useState<Record<string, string>>({});
   const [isSavingProject, setIsSavingProject] = useState(false);
+  
+  // Auto-select first leave type (usually Annual Leave)
+  React.useEffect(() => {
+    if (leaveTypes.length > 0 && !selectedLeaveTypeId) {
+      setSelectedLeaveTypeId(leaveTypes[0].id);
+    }
+  }, [leaveTypes, selectedLeaveTypeId]);
 
   // Generate next 4 weeks starting from current week
   const generateWeeks = () => {
@@ -118,7 +130,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       const endDate = vacationEndDate || vacationDate;
       
       // Generate leave records for working days only
-      const leaveRecords: { member_id: string; company_id: string; date: string; hours: number }[] = [];
+      const leaveRecords: { member_id: string; company_id: string; date: string; hours: number; leave_type_id?: string }[] = [];
       const currentDate = new Date(startDate);
       const allDates: string[] = [];
       
@@ -152,7 +164,8 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
             member_id: memberId,
             company_id: company.id,
             date: dateString,
-            hours
+            hours,
+            leave_type_id: selectedLeaveTypeId || undefined
           });
         }
         
@@ -192,6 +205,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       setVacationEndDate(undefined);
       setStartDayPortion('full');
       setEndDayPortion('full');
+      // Keep selectedLeaveTypeId for convenience on next use
       setOpen(false);
     } catch (error) {
       console.error('Error saving vacation hours:', error);
@@ -366,6 +380,39 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
             </TabsList>
 
             <TabsContent value="vacation" className="mt-4 space-y-4">
+              {/* Leave Type Selection - Compact */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground">Leave Type</Label>
+                <Select value={selectedLeaveTypeId} onValueChange={setSelectedLeaveTypeId}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Select type">
+                      {selectedLeaveTypeId && leaveTypes.find(t => t.id === selectedLeaveTypeId) && (
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-2.5 h-2.5 rounded-full" 
+                            style={{ backgroundColor: leaveTypes.find(t => t.id === selectedLeaveTypeId)?.color || '#3B82F6' }}
+                          />
+                          <span>{leaveTypes.find(t => t.id === selectedLeaveTypeId)?.name}</span>
+                        </div>
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {leaveTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-2.5 h-2.5 rounded-full" 
+                            style={{ backgroundColor: type.color || '#3B82F6' }}
+                          />
+                          <span>{type.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Start Date */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-foreground">Start Date</Label>
