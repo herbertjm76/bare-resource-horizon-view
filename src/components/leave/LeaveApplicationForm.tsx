@@ -122,7 +122,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 w-full max-w-md">
+    <form onSubmit={handleSubmit} className="space-y-5 w-full max-w-md mx-auto">
       {/* Leave Type */}
       <div className="space-y-2">
         <Label>Leave Type</Label>
