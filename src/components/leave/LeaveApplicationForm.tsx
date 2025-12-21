@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format, differenceInBusinessDays, isBefore, startOfDay, addDays } from 'date-fns';
-import { CalendarIcon, Send, Info, Clock, Check, ChevronRight, Sparkles, Calendar as CalendarIconSolid, FileText, Upload } from 'lucide-react';
+import { CalendarIcon, Send, Info, Clock, Check, ChevronRight, Sparkles, Calendar as CalendarIconSolid, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LeaveAttachmentUpload } from './LeaveAttachmentUpload';
 import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
@@ -14,7 +14,6 @@ import { useLeaveRequests } from '@/hooks/leave/useLeaveRequests';
 import { LeaveFormData } from '@/types/leave';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface LeaveApplicationFormProps {
   onSuccess?: () => void;
@@ -155,7 +154,6 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
 
   const handleLeaveTypeSelect = (typeId: string) => {
     setFormData(prev => ({ ...prev, leave_type_id: typeId }));
-    // Auto advance to next step
     setTimeout(() => setActiveStep(1), 200);
   };
 
@@ -189,7 +187,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
                 type="button"
                 onClick={() => setActiveStep(index)}
                 className={cn(
-                  "relative z-10 flex flex-col items-center gap-2 transition-all",
+                  "relative z-10 flex flex-col items-center gap-2 transition-all duration-200",
                   activeStep === index && "scale-110"
                 )}
               >
@@ -229,369 +227,349 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Step 1: Leave Type Selection */}
-        <AnimatePresence mode="wait">
-          {activeStep === 0 && (
-            <motion.div
-              key="step-0"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">What type of leave?</h3>
-                </div>
-                
-                {isLoadingTypes ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {[1, 2, 3, 4, 5, 6].map(i => (
-                      <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {leaveTypes.map((type) => (
-                      <button
-                        key={type.id}
-                        type="button"
-                        onClick={() => handleLeaveTypeSelect(type.id)}
-                        className={cn(
-                          "relative p-4 rounded-xl border-2 text-left transition-all duration-200 hover:scale-[1.02] group",
-                          formData.leave_type_id === type.id
-                            ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-                            : "border-border hover:border-primary/50 hover:bg-muted/50"
-                        )}
-                      >
-                        <div className="flex flex-col gap-2">
-                          <span className="text-2xl">{getLeaveTypeIcon(type.code)}</span>
-                          <div>
-                            <p className="font-medium text-sm">{type.name}</p>
-                            <div 
-                              className="w-8 h-1 rounded-full mt-1.5 transition-all group-hover:w-12"
-                              style={{ backgroundColor: type.color || '#3B82F6' }}
-                            />
-                          </div>
-                        </div>
-                        {formData.leave_type_id === type.id && (
-                          <div className="absolute top-2 right-2">
-                            <Check className="w-4 h-4 text-primary" />
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {errors.leave_type_id && (
-                  <p className="text-sm text-destructive">{errors.leave_type_id}</p>
-                )}
+        {activeStep === 0 && (
+          <div className="animate-fade-in">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">What type of leave?</h3>
               </div>
-            </motion.div>
-          )}
+              
+              {isLoadingTypes ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {[1, 2, 3, 4, 5, 6].map(i => (
+                    <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {leaveTypes.map((type) => (
+                    <button
+                      key={type.id}
+                      type="button"
+                      onClick={() => handleLeaveTypeSelect(type.id)}
+                      className={cn(
+                        "relative p-4 rounded-xl border-2 text-left transition-all duration-200 hover:scale-[1.02] group",
+                        formData.leave_type_id === type.id
+                          ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                          : "border-border hover:border-primary/50 hover:bg-muted/50"
+                      )}
+                    >
+                      <div className="flex flex-col gap-2">
+                        <span className="text-2xl">{getLeaveTypeIcon(type.code)}</span>
+                        <div>
+                          <p className="font-medium text-sm">{type.name}</p>
+                          <div 
+                            className="w-8 h-1 rounded-full mt-1.5 transition-all group-hover:w-12"
+                            style={{ backgroundColor: type.color || '#3B82F6' }}
+                          />
+                        </div>
+                      </div>
+                      {formData.leave_type_id === type.id && (
+                        <div className="absolute top-2 right-2">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {errors.leave_type_id && (
+                <p className="text-sm text-destructive">{errors.leave_type_id}</p>
+              )}
+            </div>
+          </div>
+        )}
 
-          {/* Step 2: Date Selection */}
-          {activeStep === 1 && (
-            <motion.div
-              key="step-1"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="space-y-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <CalendarIconSolid className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">When are you taking leave?</h3>
+        {/* Step 2: Date Selection */}
+        {activeStep === 1 && (
+          <div className="animate-fade-in">
+            <div className="space-y-5">
+              <div className="flex items-center gap-2 mb-4">
+                <CalendarIconSolid className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">When are you taking leave?</h3>
+              </div>
+
+              {/* Quick Presets */}
+              <div className="flex flex-wrap gap-2">
+                {datePresets.map((preset) => (
+                  <Button
+                    key={preset.label}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDatePreset(preset)}
+                    className="rounded-full"
+                  >
+                    {preset.label}
+                  </Button>
+                ))}
+              </div>
+
+              {/* Date Pickers */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Start Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal h-12",
+                          !startDate && "text-muted-foreground",
+                          errors.start_date && "border-destructive"
+                        )}
+                        disabled={isSubmitting}
+                      >
+                        <CalendarIcon className="mr-3 h-4 w-4" />
+                        {startDate ? format(startDate, 'EEE, MMM d, yyyy') : 'Select start date'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-50 pointer-events-auto" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        disabled={(date) => isBefore(date, startOfDay(new Date()))}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
-                {/* Quick Presets */}
-                <div className="flex flex-wrap gap-2">
-                  {datePresets.map((preset) => (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">End Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal h-12",
+                          !endDate && "text-muted-foreground",
+                          errors.end_date && "border-destructive"
+                        )}
+                        disabled={isSubmitting}
+                      >
+                        <CalendarIcon className="mr-3 h-4 w-4" />
+                        {endDate ? format(endDate, 'EEE, MMM d, yyyy') : 'Select end date'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-50 pointer-events-auto" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        disabled={(date) => 
+                          isBefore(date, startOfDay(new Date())) || 
+                          (startDate ? isBefore(date, startDate) : false)
+                        }
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              {(errors.start_date || errors.end_date) && (
+                <p className="text-sm text-destructive">
+                  {errors.start_date || errors.end_date}
+                </p>
+              )}
+
+              {/* Duration Type */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Duration per day</Label>
+                <div className="flex gap-2">
+                  {[
+                    { value: 'full_day', label: 'Full Day', hours: 8 },
+                    { value: 'half_day_am', label: 'Half Day (AM)', hours: 4 },
+                    { value: 'half_day_pm', label: 'Half Day (PM)', hours: 4 },
+                  ].map((option) => (
                     <Button
-                      key={preset.label}
+                      key={option.value}
                       type="button"
-                      variant="outline"
+                      variant={formData.duration_type === option.value ? "default" : "outline"}
                       size="sm"
-                      onClick={() => handleDatePreset(preset)}
-                      className="rounded-full"
+                      onClick={() => setFormData(prev => ({ ...prev, duration_type: option.value as any }))}
+                      className="flex-1"
                     >
-                      {preset.label}
+                      {option.label}
                     </Button>
                   ))}
                 </div>
-
-                {/* Date Pickers */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Start Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal h-12",
-                            !startDate && "text-muted-foreground",
-                            errors.start_date && "border-destructive"
-                          )}
-                          disabled={isSubmitting}
-                        >
-                          <CalendarIcon className="mr-3 h-4 w-4" />
-                          {startDate ? format(startDate, 'EEE, MMM d, yyyy') : 'Select start date'}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-50 pointer-events-auto" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={startDate}
-                          onSelect={setStartDate}
-                          disabled={(date) => isBefore(date, startOfDay(new Date()))}
-                          initialFocus
-                          className="pointer-events-auto"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">End Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal h-12",
-                            !endDate && "text-muted-foreground",
-                            errors.end_date && "border-destructive"
-                          )}
-                          disabled={isSubmitting}
-                        >
-                          <CalendarIcon className="mr-3 h-4 w-4" />
-                          {endDate ? format(endDate, 'EEE, MMM d, yyyy') : 'Select end date'}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-50 pointer-events-auto" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={endDate}
-                          onSelect={setEndDate}
-                          disabled={(date) => 
-                            isBefore(date, startOfDay(new Date())) || 
-                            (startDate ? isBefore(date, startDate) : false)
-                          }
-                          initialFocus
-                          className="pointer-events-auto"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-
-                {(errors.start_date || errors.end_date) && (
-                  <p className="text-sm text-destructive">
-                    {errors.start_date || errors.end_date}
-                  </p>
-                )}
-
-                {/* Duration Type */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Duration per day</Label>
-                  <div className="flex gap-2">
-                    {[
-                      { value: 'full_day', label: 'Full Day', hours: 8 },
-                      { value: 'half_day_am', label: 'Half Day (AM)', hours: 4 },
-                      { value: 'half_day_pm', label: 'Half Day (PM)', hours: 4 },
-                    ].map((option) => (
-                      <Button
-                        key={option.value}
-                        type="button"
-                        variant={formData.duration_type === option.value ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setFormData(prev => ({ ...prev, duration_type: option.value as any }))}
-                        className="flex-1"
-                      >
-                        {option.label}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Summary Card */}
-                {startDate && endDate && (
-                  <Card className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Clock className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Total Duration</p>
-                          <p className="text-lg font-semibold">
-                            {totalDays} {totalDays === 1 ? 'day' : 'days'} · {totalHours} hours
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant="secondary" className="text-sm">
-                        {selectedLeaveType?.name || 'Leave'}
-                      </Badge>
-                    </div>
-                  </Card>
-                )}
-
-                <Button
-                  type="button"
-                  onClick={() => setActiveStep(2)}
-                  disabled={!startDate || !endDate}
-                  className="w-full"
-                >
-                  Continue
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
               </div>
-            </motion.div>
-          )}
 
-          {/* Step 3: Details & Submit */}
-          {activeStep === 2 && (
-            <motion.div
-              key="step-2"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="space-y-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">Final Details</h3>
-                </div>
-
-                {/* Summary */}
-                <Card className="p-4 bg-muted/50">
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">{selectedLeaveType ? getLeaveTypeIcon(selectedLeaveType.code) : '📅'}</span>
-                    <div className="flex-1">
-                      <p className="font-medium">{selectedLeaveType?.name || 'Leave'}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {startDate && format(startDate, 'MMM d')} 
-                        {endDate && startDate && endDate.getTime() !== startDate.getTime() && ` - ${format(endDate, 'MMM d')}`}
-                        {startDate && `, ${format(startDate, 'yyyy')}`}
-                        {' · '}{totalDays} {totalDays === 1 ? 'day' : 'days'}
-                      </p>
+              {/* Summary Card */}
+              {startDate && endDate && (
+                <Card className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Clock className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Duration</p>
+                        <p className="text-lg font-semibold">
+                          {totalDays} {totalDays === 1 ? 'day' : 'days'} · {totalHours} hours
+                        </p>
+                      </div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setActiveStep(0)}
-                    >
-                      Edit
-                    </Button>
+                    <Badge variant="secondary" className="text-sm">
+                      {selectedLeaveType?.name || 'Leave'}
+                    </Badge>
                   </div>
                 </Card>
+              )}
 
-                {/* Remarks */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Reason for Leave</Label>
-                  <Textarea
-                    placeholder="Please provide a brief reason for your leave request..."
-                    value={formData.remarks || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
-                    disabled={isSubmitting}
-                    rows={3}
-                    className={cn(
-                      "resize-none",
-                      errors.remarks && "border-destructive"
-                    )}
-                  />
-                  {errors.remarks && (
-                    <p className="text-sm text-destructive">{errors.remarks}</p>
-                  )}
-                </div>
+              <Button
+                type="button"
+                onClick={() => setActiveStep(2)}
+                disabled={!startDate || !endDate}
+                className="w-full"
+              >
+                Continue
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        )}
 
-                {/* Attachment */}
-                {(requiresAttachment || selectedLeaveType?.requires_attachment) && (
-                  <div className="space-y-2">
-                    <LeaveAttachmentUpload
-                      file={attachment}
-                      onFileChange={setAttachment}
-                      disabled={isSubmitting}
-                      required={requiresAttachment}
-                      label={
-                        selectedLeaveType?.code === 'sick' 
-                          ? 'Medical Certificate' 
-                          : 'Supporting Document'
-                      }
-                    />
-                    {errors.attachment && (
-                      <p className="text-sm text-destructive">{errors.attachment}</p>
-                    )}
-                  </div>
-                )}
+        {/* Step 3: Details & Submit */}
+        {activeStep === 2 && (
+          <div className="animate-fade-in">
+            <div className="space-y-5">
+              <div className="flex items-center gap-2 mb-4">
+                <FileText className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Final Details</h3>
+              </div>
 
-                {/* Manager Confirmation */}
-                <div 
-                  className={cn(
-                    "flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer",
-                    formData.manager_confirmed 
-                      ? "border-emerald-500 bg-emerald-500/5" 
-                      : errors.manager_confirmed 
-                      ? "border-destructive bg-destructive/5"
-                      : "border-border hover:border-primary/50"
-                  )}
-                  onClick={() => setFormData(prev => ({ ...prev, manager_confirmed: !prev.manager_confirmed }))}
-                >
-                  <Checkbox
-                    id="manager_confirmed"
-                    checked={formData.manager_confirmed}
-                    onCheckedChange={(checked) => 
-                      setFormData(prev => ({ ...prev, manager_confirmed: checked as boolean }))
-                    }
-                    disabled={isSubmitting}
-                    className="mt-0.5"
-                  />
+              {/* Summary */}
+              <Card className="p-4 bg-muted/50">
+                <div className="flex items-center gap-4">
+                  <span className="text-2xl">{selectedLeaveType ? getLeaveTypeIcon(selectedLeaveType.code) : '📅'}</span>
                   <div className="flex-1">
-                    <Label
-                      htmlFor="manager_confirmed"
-                      className="text-sm font-medium cursor-pointer"
-                    >
-                      I've discussed this leave with my manager
-                    </Label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Confirm that you have informed your manager about this leave request
+                    <p className="font-medium">{selectedLeaveType?.name || 'Leave'}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {startDate && format(startDate, 'MMM d')} 
+                      {endDate && startDate && endDate.getTime() !== startDate.getTime() && ` - ${format(endDate, 'MMM d')}`}
+                      {startDate && `, ${format(startDate, 'yyyy')}`}
+                      {' · '}{totalDays} {totalDays === 1 ? 'day' : 'days'}
                     </p>
                   </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setActiveStep(0)}
+                  >
+                    Edit
+                  </Button>
                 </div>
+              </Card>
 
-                {/* Info Note */}
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground">
-                  <Info className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span>Your request will be sent to your project manager for approval. You'll be notified once it's reviewed.</span>
-                </div>
-
-                {/* Submit */}
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full h-12 text-base"
-                  disabled={isSubmitting || isLoadingTypes}
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      Submitting...
-                    </span>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      Submit Leave Request
-                    </>
+              {/* Remarks */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Reason for Leave</Label>
+                <Textarea
+                  placeholder="Please provide a brief reason for your leave request..."
+                  value={formData.remarks || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
+                  disabled={isSubmitting}
+                  rows={3}
+                  className={cn(
+                    "resize-none",
+                    errors.remarks && "border-destructive"
                   )}
-                </Button>
+                />
+                {errors.remarks && (
+                  <p className="text-sm text-destructive">{errors.remarks}</p>
+                )}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+
+              {/* Attachment */}
+              {(requiresAttachment || selectedLeaveType?.requires_attachment) && (
+                <div className="space-y-2">
+                  <LeaveAttachmentUpload
+                    file={attachment}
+                    onFileChange={setAttachment}
+                    disabled={isSubmitting}
+                    required={requiresAttachment}
+                    label={
+                      selectedLeaveType?.code === 'sick' 
+                        ? 'Medical Certificate' 
+                        : 'Supporting Document'
+                    }
+                  />
+                  {errors.attachment && (
+                    <p className="text-sm text-destructive">{errors.attachment}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Manager Confirmation */}
+              <div 
+                className={cn(
+                  "flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer",
+                  formData.manager_confirmed 
+                    ? "border-emerald-500 bg-emerald-500/5" 
+                    : errors.manager_confirmed 
+                    ? "border-destructive bg-destructive/5"
+                    : "border-border hover:border-primary/50"
+                )}
+                onClick={() => setFormData(prev => ({ ...prev, manager_confirmed: !prev.manager_confirmed }))}
+              >
+                <Checkbox
+                  id="manager_confirmed"
+                  checked={formData.manager_confirmed}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, manager_confirmed: checked as boolean }))
+                  }
+                  disabled={isSubmitting}
+                  className="mt-0.5"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="manager_confirmed"
+                    className="text-sm font-medium cursor-pointer"
+                  >
+                    I've discussed this leave with my manager
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Confirm that you have informed your manager about this leave request
+                  </p>
+                </div>
+              </div>
+
+              {/* Info Note */}
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground">
+                <Info className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>Your request will be sent to your project manager for approval. You'll be notified once it's reviewed.</span>
+              </div>
+
+              {/* Submit */}
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full h-12 text-base"
+                disabled={isSubmitting || isLoadingTypes}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Submitting...
+                  </span>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Submit Leave Request
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );
