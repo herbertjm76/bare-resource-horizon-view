@@ -86,25 +86,35 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           console.log('Fetched profiles:', profiles.length || 0);
         }
         
-        // Determine current user's role from auth metadata (owner/admin/member)
-        const rawRole = (authData.user.user_metadata as any)?.role as string | undefined;
-        const currentUserRole = rawRole && ['owner', 'admin', 'member'].includes(rawRole)
-          ? rawRole
-          : 'member';
+        // Fetch roles from user_roles table for all profiles
+        const userIds = profiles.map(p => p.id);
+        const { data: userRoles, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('user_id, role')
+          .eq('company_id', companyId)
+          .in('user_id', userIds);
 
-        // Map profiles to include role, ensuring the current user reflects their real role
-        const profilesWithRoles = profiles.map(profile => {
-          let role = 'member';
+        if (rolesError) {
+          console.error('Failed to fetch user roles:', rolesError);
+        }
 
-          if (profile.id === authData.user.id) {
-            role = currentUserRole;
+        // Create a map of user_id to role
+        const roleMap = new Map<string, string>();
+        userRoles?.forEach(ur => {
+          // Prefer higher privilege roles (owner > admin > member)
+          const existing = roleMap.get(ur.user_id);
+          if (!existing || 
+              (ur.role === 'owner') || 
+              (ur.role === 'admin' && existing === 'member')) {
+            roleMap.set(ur.user_id, ur.role);
           }
-
-          return {
-            ...profile,
-            role,
-          };
         });
+
+        // Map profiles to include role from user_roles table
+        const profilesWithRoles = profiles.map(profile => ({
+          ...profile,
+          role: roleMap.get(profile.id) || 'member',
+        }));
         
         return profilesWithRoles as Profile[];
       } catch (fetchError) {

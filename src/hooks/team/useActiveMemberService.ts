@@ -2,6 +2,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Profile } from '@/components/dashboard/types';
+import { Database } from '@/integrations/supabase/types';
+
+type AppRole = Database['public']['Enums']['app_role'];
 
 export const useActiveMemberService = (companyId: string | undefined) => {
   const updateActiveMember = async (memberData: Partial<Profile>): Promise<boolean> => {
@@ -13,7 +16,7 @@ export const useActiveMemberService = (companyId: string | undefined) => {
     try {
       console.log('Updating active member:', memberData.id, memberData);
 
-      // Only update the profiles table, never touch auth.users or roles
+      // Update the profiles table
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -35,6 +38,32 @@ export const useActiveMemberService = (companyId: string | undefined) => {
         throw error;
       }
 
+      // Update role in user_roles table if role is provided
+      if (memberData.role) {
+        console.log('Updating user role to:', memberData.role);
+        
+        // First, delete existing roles for this user in this company
+        await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', memberData.id)
+          .eq('company_id', companyId);
+
+        // Then insert the new role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: memberData.id,
+            role: memberData.role as AppRole,
+            company_id: companyId
+          });
+
+        if (roleError) {
+          console.error('Error updating user role:', roleError);
+          // Don't throw, just log - profile update was successful
+        }
+      }
+
       toast.success('Team member updated successfully');
       return true;
     } catch (error: any) {
@@ -51,7 +80,14 @@ export const useActiveMemberService = (companyId: string | undefined) => {
     }
 
     try {
-      // Only delete from profiles table
+      // Delete user roles first
+      await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', memberId)
+        .eq('company_id', companyId);
+
+      // Delete from profiles table
       const { error } = await supabase
         .from('profiles')
         .delete()
