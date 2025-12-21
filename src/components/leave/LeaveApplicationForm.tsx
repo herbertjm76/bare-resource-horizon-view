@@ -489,24 +489,24 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
               </div>
 
               {/* Attachment */}
-              {(requiresAttachment || selectedLeaveType?.requires_attachment) && (
-                <div className="space-y-2">
-                  <LeaveAttachmentUpload
-                    file={attachment}
-                    onFileChange={setAttachment}
-                    disabled={isSubmitting}
-                    required={requiresAttachment}
-                    label={
-                      selectedLeaveType?.code === 'sick' 
-                        ? 'Medical Certificate' 
-                        : 'Supporting Document'
-                    }
-                  />
-                  {errors.attachment && (
-                    <p className="text-sm text-destructive">{errors.attachment}</p>
-                  )}
-                </div>
-              )}
+              <div className="space-y-2">
+                <LeaveAttachmentUpload
+                  file={attachment}
+                  onFileChange={setAttachment}
+                  disabled={isSubmitting}
+                  required={requiresAttachment}
+                  label={
+                    requiresAttachment
+                      ? selectedLeaveType?.code === 'sick' 
+                        ? 'Medical Certificate (Required)' 
+                        : 'Supporting Document (Required)'
+                      : 'Attachment (Optional)'
+                  }
+                />
+                {errors.attachment && (
+                  <p className="text-sm text-destructive">{errors.attachment}</p>
+                )}
+              </div>
 
               {/* Manager Confirmation */}
               <div 
