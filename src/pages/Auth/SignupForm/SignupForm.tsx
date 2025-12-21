@@ -49,8 +49,26 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
     }
   };
 
+  // Generate a random 4-digit suffix for security
+  const generateSubdomain = (name: string): string => {
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+    return slug ? `${slug}-${randomSuffix}` : '';
+  };
+
   const handleCompanyChange = (field: keyof CompanyFormData, value: string) => {
-    setCompany((prev) => ({ ...prev, [field]: value }));
+    if (field === 'name') {
+      // Auto-generate subdomain when company name changes
+      const subdomain = generateSubdomain(value);
+      setCompany((prev) => ({ ...prev, name: value, subdomain }));
+    } else {
+      setCompany((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
