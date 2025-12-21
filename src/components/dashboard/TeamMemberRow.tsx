@@ -148,23 +148,33 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         </div>
       </td>
       <td className="px-4 py-3">
-        {'isPending' in member ? (
+        {isPending ? (
           <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 border">
             Pending
           </Badge>
         ) : (
-          <Badge 
-            className={
-              member.role === 'owner' 
-                ? "bg-purple-100 text-purple-800 border-purple-200 border" 
-                : member.role === 'admin'
-                ? "bg-blue-100 text-blue-800 border-blue-200 border"
-                : "bg-gray-100 text-gray-800 border-gray-200 border"
-            }
-          >
-            {(member.role || 'member').charAt(0).toUpperCase() + (member.role || 'member').slice(1)}
+          <Badge className="bg-green-100 text-green-800 border-green-200 border">
+            Active
           </Badge>
         )}
+      </td>
+      <td className="px-4 py-3">
+        {(() => {
+          const role = member.role || 'member';
+          const roleConfig: Record<string, { bg: string; text: string; label: string }> = {
+            owner: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'Super Admin' },
+            admin: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Admin' },
+            project_manager: { bg: 'bg-indigo-100', text: 'text-indigo-800', label: 'PM' },
+            member: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Member' },
+            contractor: { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Contractor' },
+          };
+          const config = roleConfig[role] || { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Other' };
+          return (
+            <Badge className={`${config.bg} ${config.text} border border-current/20`}>
+              {config.label}
+            </Badge>
+          );
+        })()}
       </td>
       <td className="px-4 py-3">
         {editMode && ['owner', 'admin'].includes(userRole) ? (

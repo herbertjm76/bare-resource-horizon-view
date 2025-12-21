@@ -30,6 +30,7 @@ export const TeamMemberTableHeader: React.FC<TeamMemberTableHeaderProps> = ({
           </th>
         )}
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Member</th>
+        <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Type</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Role</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Department</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Practice Area</th>
