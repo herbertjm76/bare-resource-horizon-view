@@ -279,6 +279,7 @@ export type Database = {
           member_id: string
           rejection_reason: string | null
           remarks: string
+          requested_approver_id: string | null
           start_date: string
           status: string | null
           total_hours: number | null
@@ -298,6 +299,7 @@ export type Database = {
           member_id: string
           rejection_reason?: string | null
           remarks: string
+          requested_approver_id?: string | null
           start_date: string
           status?: string | null
           total_hours?: number | null
@@ -317,6 +319,7 @@ export type Database = {
           member_id?: string
           rejection_reason?: string | null
           remarks?: string
+          requested_approver_id?: string | null
           start_date?: string
           status?: string | null
           total_hours?: number | null
@@ -347,6 +350,13 @@ export type Database = {
           {
             foreignKeyName: "leave_requests_member_id_fkey"
             columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_requests_requested_approver_id_fkey"
+            columns: ["requested_approver_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

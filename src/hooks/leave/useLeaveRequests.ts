@@ -119,6 +119,7 @@ export const useLeaveRequests = (memberId?: string) => {
           total_hours: totalHours,
           remarks: formData.remarks,
           manager_confirmed: formData.manager_confirmed,
+          requested_approver_id: formData.requested_approver_id || null,
           attachment_url: attachmentUrl,
           status: 'pending'
         });

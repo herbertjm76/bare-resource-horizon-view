@@ -53,6 +53,7 @@ export interface LeaveFormData {
   end_date: Date;
   remarks: string;
   manager_confirmed: boolean;
+  requested_approver_id?: string;
   attachment?: File;
 }
 

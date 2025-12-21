@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { LeaveAttachmentUpload } from './LeaveAttachmentUpload';
 import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
 import { useLeaveRequests } from '@/hooks/leave/useLeaveRequests';
+import { useProjectManagers } from '@/hooks/leave/useProjectManagers';
 import { LeaveFormData } from '@/types/leave';
 import { Card } from '@/components/ui/card';
 
@@ -22,12 +23,14 @@ interface LeaveApplicationFormProps {
 export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSuccess }) => {
   const { leaveTypes, isLoading: isLoadingTypes } = useLeaveTypes();
   const { submitLeaveRequest, isSubmitting } = useLeaveRequests();
+  const { projectManagers, isLoading: isLoadingPMs } = useProjectManagers();
 
   const [formData, setFormData] = useState<Partial<LeaveFormData>>({
     leave_type_id: '',
     duration_type: 'full_day',
     remarks: '',
-    manager_confirmed: false
+    manager_confirmed: false,
+    requested_approver_id: ''
   });
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
@@ -103,6 +106,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
       end_date: endDate!,
       remarks: formData.remarks!,
       manager_confirmed: formData.manager_confirmed!,
+      requested_approver_id: formData.requested_approver_id || undefined,
       attachment: attachment || undefined
     });
 
@@ -111,7 +115,8 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
         leave_type_id: '',
         duration_type: 'full_day',
         remarks: '',
-        manager_confirmed: false
+        manager_confirmed: false,
+        requested_approver_id: ''
       });
       setStartDate(undefined);
       setEndDate(undefined);
@@ -149,6 +154,30 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
           </SelectContent>
         </Select>
         {errors.leave_type_id && <p className="text-sm text-destructive">{errors.leave_type_id}</p>}
+      </div>
+
+      {/* Approver (PM) Selection */}
+      <div className="space-y-2">
+        <Label>Approving Manager</Label>
+        <Select
+          value={formData.requested_approver_id}
+          onValueChange={(value) => setFormData(prev => ({ ...prev, requested_approver_id: value }))}
+          disabled={isLoadingPMs || isSubmitting}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select approving manager" />
+          </SelectTrigger>
+          <SelectContent>
+            {projectManagers.map((pm) => (
+              <SelectItem key={pm.id} value={pm.id}>
+                {pm.first_name} {pm.last_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {projectManagers.length === 0 && !isLoadingPMs && (
+          <p className="text-sm text-muted-foreground">No project managers available</p>
+        )}
       </div>
 
       {/* Date Pickers */}
