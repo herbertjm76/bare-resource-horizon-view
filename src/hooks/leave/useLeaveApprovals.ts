@@ -256,6 +256,50 @@ export const useLeaveApprovals = () => {
       toast.error('Failed to reject request');
       return false;
     } finally {
+    setIsProcessing(false);
+    }
+  }, [fetchPendingApprovals]);
+
+  const reassignApprover = useCallback(async (
+    requestId: string,
+    newApproverId: string
+  ): Promise<boolean> => {
+    if (!newApproverId) {
+      toast.error('Please select a new approver');
+      return false;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('You must be logged in');
+        return false;
+      }
+
+      const { error } = await supabase
+        .from('leave_requests')
+        .update({
+          requested_approver_id: newApproverId
+        })
+        .eq('id', requestId)
+        .eq('status', 'pending'); // Only allow reassigning pending requests
+
+      if (error) {
+        console.error('Error reassigning approver:', error);
+        toast.error('Failed to reassign approver');
+        return false;
+      }
+
+      toast.success('Approver reassigned successfully');
+      await fetchPendingApprovals();
+      return true;
+    } catch (error) {
+      console.error('Error in reassignApprover:', error);
+      toast.error('Failed to reassign approver');
+      return false;
+    } finally {
       setIsProcessing(false);
     }
   }, [fetchPendingApprovals]);
@@ -275,6 +319,7 @@ export const useLeaveApprovals = () => {
     canApprove,
     approveRequest,
     rejectRequest,
+    reassignApprover,
     refreshApprovals: fetchPendingApprovals
   };
 };
