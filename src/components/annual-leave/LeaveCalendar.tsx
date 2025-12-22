@@ -59,6 +59,14 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
     return 'bg-primary'; // Full day
   };
 
+  if (members.length === 0) {
+    return (
+      <div className="p-8 text-center text-muted-foreground">
+        No team members to display
+      </div>
+    );
+  }
+
   return (
     <TooltipProvider>
       <div className="annual-leave-grid-container">

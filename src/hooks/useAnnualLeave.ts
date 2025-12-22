@@ -16,29 +16,36 @@ export interface LeaveEntry {
 export const useAnnualLeave = (month: Date) => {
   const [leaveData, setLeaveData] = useState<Record<string, Record<string, number>>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const { company } = useCompany();
+  const { company, loading: companyLoading } = useCompany();
 
   // Function to fetch annual leave data
   const fetchLeaveData = useCallback(async () => {
-    if (!company?.id) return;
+    if (!company?.id) {
+      // If no company ID, we can't fetch - but don't leave loading stuck
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
 
     try {
-      // Format month for query: YYYY-MM (removed the % character)
+      // Format month for query: YYYY-MM
       const monthStr = format(month, 'yyyy-MM');
+      
+      console.log('useAnnualLeave - Fetching leave data for:', { companyId: company.id, month: monthStr });
 
       // Fetch all leaves for the month using the edge function
       const { data, error } = await supabase.functions.invoke('get_annual_leaves', {
         body: { 
           company_id_param: company.id,
-          month_param: monthStr  // Removed the '%' that was causing the issue
+          month_param: monthStr
         }
       });
 
       if (error) {
         console.error('Error fetching leave data:', error);
         toast.error('Failed to load annual leave data');
+        setIsLoading(false);
         return;
       }
 
@@ -53,6 +60,11 @@ export const useAnnualLeave = (month: Date) => {
           formattedData[leave.member_id][leave.date] = leave.hours;
         });
       }
+
+      console.log('useAnnualLeave - Fetched leave data:', { 
+        entriesCount: data?.length || 0, 
+        formattedData 
+      });
 
       setLeaveData(formattedData);
     } catch (error) {
@@ -190,7 +202,7 @@ export const useAnnualLeave = (month: Date) => {
 
   return {
     leaveData,
-    isLoading,
+    isLoading: isLoading || companyLoading,
     updateLeaveHours,
     refreshLeaveData: fetchLeaveData
   };
