@@ -170,13 +170,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
           <SelectContent>
             {projectManagers.map((approver) => (
               <SelectItem key={approver.id} value={approver.id}>
-                <div className="flex items-center gap-2">
-                  <span>{approver.first_name} {approver.last_name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    ({approver.role === 'owner' ? 'Super Admin' : 
-                      approver.role === 'admin' ? 'Admin' : 'PM'})
-                  </span>
-                </div>
+                {approver.first_name} {approver.last_name}
               </SelectItem>
             ))}
           </SelectContent>
