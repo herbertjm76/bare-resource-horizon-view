@@ -102,7 +102,7 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
   }, [currentOptions.length, checkScroll]);
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-2 items-center w-full min-w-0">
       {/* Filter Type Icon Dropdown */}
       <Select value={activeFilterType} onValueChange={(value: FilterType) => setActiveFilterType(value)}>
         <SelectTrigger className="w-9 h-9 p-0 border-input bg-background">
@@ -141,7 +141,7 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
       {/* Badges Container */}
       <div 
         ref={badgeContainerRef}
-        className="flex gap-2 overflow-x-auto flex-1 scrollbar-none"
+        className="flex gap-2 overflow-x-auto flex-1 min-w-0 scrollbar-none"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <Badge

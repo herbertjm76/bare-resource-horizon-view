@@ -45,7 +45,7 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
         />
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="w-full overflow-hidden">
         <TeamAnnualLeaveFilters 
           filters={filters}
           onFilterChange={onFilterChange}
