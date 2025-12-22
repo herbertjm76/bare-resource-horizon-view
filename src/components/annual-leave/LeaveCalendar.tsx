@@ -1,17 +1,19 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TeamMember } from '@/components/dashboard/types';
-import { format, getDaysInMonth, getDay } from 'date-fns';
+import { format, subWeeks, addWeeks, addMonths, eachDayOfInterval, getDay, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from 'lucide-react';
 import { LeaveDataByDate } from '@/hooks/useAnnualLeave';
+import { TimeRange } from './MonthSelector';
 
 interface LeaveCalendarProps {
   members: TeamMember[];
   selectedMonth: Date;
   leaveData: Record<string, Record<string, number>>;
   leaveDetails?: Record<string, Record<string, LeaveDataByDate>>;
+  timeRange: TimeRange;
   onLeaveChange?: (memberId: string, date: string, hours: number) => void;
 }
 
@@ -19,23 +21,45 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   members,
   selectedMonth,
   leaveData,
-  leaveDetails
+  leaveDetails,
+  timeRange
 }) => {
-  const daysInMonth = getDaysInMonth(selectedMonth);
+  // Calculate date range based on time range selection
+  // Always start from one week before today
+  const today = new Date();
+  const startDate = subWeeks(today, 1);
   
-  const days = Array.from({ length: daysInMonth }, (_, i) => {
-    const day = i + 1;
-    const date = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day);
+  const getEndDate = () => {
+    switch (timeRange) {
+      case 'week':
+        return endOfWeek(today, { weekStartsOn: 1 }); // End of current week
+      case 'month':
+        return endOfMonth(selectedMonth);
+      case 'next-month':
+        return endOfMonth(addMonths(today, 1));
+      default:
+        return endOfMonth(selectedMonth);
+    }
+  };
+  
+  const endDate = getEndDate();
+  
+  // Generate all days in the range
+  const days = eachDayOfInterval({ start: startDate, end: endDate }).map(date => {
     const dayOfWeek = getDay(date);
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    const isToday = format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
     return {
-      day,
+      day: date.getDate(),
       date: format(date, 'yyyy-MM-dd'),
+      month: format(date, 'MMM'),
       dayOfWeek,
       isWeekend,
       isSunday: dayOfWeek === 0,
+      isToday,
       formattedDate: format(date, 'MMM d, yyyy'),
-      dayName: format(date, 'EEE').charAt(0)
+      dayName: format(date, 'EEE').charAt(0),
+      isNewMonth: date.getDate() === 1
     };
   });
 
@@ -57,7 +81,10 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
 
   const getMemberTotalHours = (memberId: string): number => {
     const memberLeave = leaveData[memberId] || {};
-    return Object.values(memberLeave).reduce((sum, hours) => sum + hours, 0);
+    // Only count hours within the visible date range
+    return days.reduce((sum, day) => {
+      return sum + (memberLeave[day.date] || 0);
+    }, 0);
   };
 
   if (members.length === 0) {
@@ -77,18 +104,25 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
               <th className="sticky left-0 z-20 w-40 min-w-40 bg-card text-left px-3 py-2 font-semibold text-sm text-foreground">
                 Team Member
               </th>
-              {days.map((day) => (
+              {days.map((day, idx) => (
                 <th 
-                  key={day.day} 
+                  key={day.date} 
                   className={`
                     w-8 min-w-8 text-center font-medium px-0.5 py-1.5
                     ${day.isWeekend ? 'bg-muted/50 text-muted-foreground' : 'text-foreground'}
                     ${day.isSunday ? 'border-l-2 border-border' : ''}
+                    ${day.isToday ? 'bg-primary/10' : ''}
+                    ${day.isNewMonth && idx > 0 ? 'border-l-2 border-primary/30' : ''}
                   `}
                 >
                   <div className="flex flex-col items-center leading-tight">
+                    {day.isNewMonth && idx > 0 && (
+                      <span className="text-[8px] text-primary font-semibold">{day.month}</span>
+                    )}
                     <span className="text-[10px] opacity-60">{day.dayName}</span>
-                    <span className="text-xs font-semibold">{day.day}</span>
+                    <span className={`text-xs font-semibold ${day.isToday ? 'text-primary' : ''}`}>
+                      {day.day}
+                    </span>
                   </div>
                 </th>
               ))}
@@ -115,7 +149,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6 shrink-0">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback className="bg-gradient-modern text-white text-[10px] font-medium">
+                        <AvatarFallback className="bg-primary text-primary-foreground text-[10px] font-medium">
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>
@@ -124,7 +158,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                       </span>
                     </div>
                   </td>
-                  {days.map((day) => {
+                  {days.map((day, idx) => {
                     const hours = memberLeaveData[day.date] || 0;
                     const details = memberLeaveDetails[day.date];
                     const hasLeave = hours > 0;
@@ -137,6 +171,8 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                           text-center p-0.5 h-8
                           ${day.isWeekend ? 'bg-muted/30' : ''}
                           ${day.isSunday ? 'border-l-2 border-border' : ''}
+                          ${day.isToday ? 'bg-primary/5' : ''}
+                          ${day.isNewMonth && idx > 0 ? 'border-l-2 border-primary/30' : ''}
                         `}
                       >
                         {hasLeave ? (
@@ -164,7 +200,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                               style={{ zIndex: 9999 }}
                             >
                               <div className="bg-primary p-2.5">
-                                <div className="flex items-center gap-2 text-white">
+                                <div className="flex items-center gap-2 text-primary-foreground">
                                   <Calendar className="h-4 w-4" />
                                   <span className="font-semibold text-sm">{day.formattedDate}</span>
                                 </div>
@@ -249,7 +285,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
       </div>
       
       {/* Legend */}
-      <div className="flex items-center justify-end gap-4 mt-3 px-2 text-xs">
+      <div className="flex items-center justify-center gap-4 mt-3 px-2 text-xs">
         <div className="flex items-center gap-1.5">
           <div className="w-3.5 h-3.5 rounded bg-primary" />
           <span className="text-muted-foreground">Full Day (8h)</span>
@@ -261,6 +297,10 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
         <div className="flex items-center gap-1.5">
           <div className="w-3.5 h-3.5 rounded bg-muted/50 border border-border" />
           <span className="text-muted-foreground">Weekend</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3.5 h-3.5 rounded bg-primary/10 border border-primary/30" />
+          <span className="text-muted-foreground">Today</span>
         </div>
       </div>
     </div>

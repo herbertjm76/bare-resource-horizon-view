@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MonthSelector } from './MonthSelector';
+import { MonthSelector, TimeRange } from './MonthSelector';
 import { TeamAnnualLeaveFilters } from './TeamAnnualLeaveFilters';
 import { LeaveCalendar } from './LeaveCalendar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,6 +25,8 @@ interface TeamAnnualLeaveContentProps {
   setSearchQuery: (query: string) => void;
   clearFilters: () => void;
   allMembers: TeamMember[];
+  timeRange: TimeRange;
+  onTimeRangeChange: (range: TimeRange) => void;
 }
 
 export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
@@ -44,29 +46,31 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
   setFilterValue,
   setSearchQuery,
   clearFilters,
-  allMembers
+  allMembers,
+  timeRange,
+  onTimeRangeChange
 }) => {
   return (
     <div className="mx-auto space-y-4">
-      <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
-        <div className="flex items-center gap-2">
-          <MonthSelector 
-            selectedMonth={selectedMonth}
-            onMonthChange={onMonthChange}
-          />
-          
-          <TeamAnnualLeaveFilters 
-            departments={departments}
-            locations={locations}
-            activeFilter={activeFilter}
-            filterValue={filterValue}
-            searchQuery={searchQuery}
-            setActiveFilter={setActiveFilter}
-            setFilterValue={setFilterValue}
-            setSearchQuery={setSearchQuery}
-            clearFilters={clearFilters}
-          />
-        </div>
+      <div className="flex flex-row justify-center items-center gap-4 flex-wrap">
+        <MonthSelector 
+          selectedMonth={selectedMonth}
+          onMonthChange={onMonthChange}
+          timeRange={timeRange}
+          onTimeRangeChange={onTimeRangeChange}
+        />
+        
+        <TeamAnnualLeaveFilters 
+          departments={departments}
+          locations={locations}
+          activeFilter={activeFilter}
+          filterValue={filterValue}
+          searchQuery={searchQuery}
+          setActiveFilter={setActiveFilter}
+          setFilterValue={setFilterValue}
+          setSearchQuery={setSearchQuery}
+          clearFilters={clearFilters}
+        />
       </div>
       
       <div className="border rounded-lg bg-card shadow-sm">
@@ -87,6 +91,7 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
             selectedMonth={selectedMonth}
             leaveData={leaveData}
             leaveDetails={leaveDetails}
+            timeRange={timeRange}
             onLeaveChange={onLeaveChange}
           />
         )}
