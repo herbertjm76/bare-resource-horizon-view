@@ -7,6 +7,7 @@ import { TeamMembersFilters } from './TeamMembersFilters';
 import { TeamMember } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface TeamMemberSectionProps {
   teamMembers: TeamMember[];
@@ -37,6 +38,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
   onAdd,
   onRefresh
 }) => {
+  const { isAdmin } = usePermissions();
   const [pendingChanges, setPendingChanges] = useState<Record<string, Partial<TeamMember>>>({});
   const [isSaving, setIsSaving] = useState(false);
   
@@ -262,7 +264,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="text-lg font-medium">Team Members</CardTitle>
-        {['owner', 'admin'].includes(userRole) && (
+        {isAdmin && (
           <TeamMembersToolbar 
             editMode={editMode} 
             setEditMode={setEditMode} 

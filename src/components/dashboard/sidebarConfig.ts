@@ -8,13 +8,28 @@ import {
   HelpCircle,
   Layers
 } from "lucide-react"
+import { Permission } from '@/hooks/usePermissions';
 
-export const getNavigationItems = (companySlug: string | null) => {
+export interface NavigationItem {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  comingSoon?: boolean;
+}
+
+export interface NavigationSection {
+  label: string;
+  requiredPermission?: Permission;
+  items: NavigationItem[];
+}
+
+export const getNavigationItems = (companySlug: string | null): NavigationSection[] => {
   const baseUrl = companySlug ? `/${companySlug}` : '';
   
   return [
     {
       label: "OVERVIEW",
+      requiredPermission: 'view:overview',
       items: [
         {
           title: "Dashboard",
@@ -30,6 +45,7 @@ export const getNavigationItems = (companySlug: string | null) => {
     },
     {
       label: "RESOURCE SCHEDULING",
+      requiredPermission: 'view:scheduling',
       items: [
         {
           title: "Schedule",
@@ -40,6 +56,7 @@ export const getNavigationItems = (companySlug: string | null) => {
     },
     {
       label: "PROJECTS",
+      requiredPermission: 'view:projects',
       items: [
         {
           title: "Projects",
@@ -56,6 +73,7 @@ export const getNavigationItems = (companySlug: string | null) => {
     },
     {
       label: "TEAM",
+      requiredPermission: 'view:team',
       items: [
         {
           title: "Team Members",
@@ -76,6 +94,7 @@ export const getNavigationItems = (companySlug: string | null) => {
     },
     {
       label: "SETTINGS",
+      requiredPermission: 'view:settings',
       items: [
         {
           title: "Company Settings",

@@ -9,6 +9,7 @@ import { Eye, Trash2, Mail, AlertTriangle, Send } from 'lucide-react';
 import { TeamMember } from './types';
 import { TeamMemberAvatar } from './TeamMemberAvatar';
 import { useOfficeSettings } from '@/context/officeSettings';
+import { usePermissions } from '@/hooks/usePermissions';
 import { 
   Select,
   SelectContent,
@@ -47,6 +48,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   onFieldChange
 }) => {
   const { locations, departments, practice_areas, loading } = useOfficeSettings();
+  const { isAdmin, isSuperAdmin } = usePermissions();
   
   const getValue = (field: keyof TeamMember): string => {
     if (pendingChanges[field] !== undefined) {
@@ -71,7 +73,8 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
     contractor: { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Contractor' },
   };
 
-  const canEdit = editMode && ['owner', 'admin'].includes(userRole);
+  // Only admins can edit in edit mode
+  const canEdit = editMode && isAdmin;
 
   return (
     <tr key={member.id} className={`hover:bg-gray-50 ${canEdit ? 'bg-blue-50/30' : ''}`}>
