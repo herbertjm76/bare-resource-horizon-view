@@ -39,18 +39,12 @@ const TeamAnnualLeave = () => {
   
   // Use filtering hook
   const {
-    activeFilter,
-    setActiveFilter,
-    filterValue,
-    setFilterValue,
-    searchQuery,
-    setSearchQuery,
-    departments,
-    locations,
+    filters,
+    onFilterChange,
     filteredMembers,
+    activeFiltersCount,
     clearFilters
   } = useTeamFilters(allMembers);
-  
   
   // Handle leave hours change
   const handleLeaveChange = (memberId: string, date: string, hours: number) => {
@@ -99,16 +93,10 @@ const TeamAnnualLeave = () => {
             leaveData={leaveData}
             leaveDetails={leaveDetails}
             onLeaveChange={handleLeaveChange}
-            departments={departments}
-            locations={locations}
-            activeFilter={activeFilter}
-            filterValue={filterValue}
-            searchQuery={searchQuery}
-            setActiveFilter={setActiveFilter}
-            setFilterValue={setFilterValue}
-            setSearchQuery={setSearchQuery}
+            filters={filters}
+            onFilterChange={onFilterChange}
+            activeFiltersCount={activeFiltersCount}
             clearFilters={clearFilters}
-            allMembers={allMembers}
             timeRange={timeRange}
             onTimeRangeChange={setTimeRange}
           />
