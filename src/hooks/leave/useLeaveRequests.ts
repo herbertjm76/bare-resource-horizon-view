@@ -146,8 +146,9 @@ export const useLeaveRequests = (memberId?: string) => {
     try {
       const { error } = await supabase
         .from('leave_requests')
-        .update({ status: 'cancelled' })
-        .eq('id', requestId);
+        .delete()
+        .eq('id', requestId)
+        .eq('status', 'pending'); // Only allow deleting pending requests
 
       if (error) {
         console.error('Error cancelling leave request:', error);
