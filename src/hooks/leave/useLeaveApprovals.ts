@@ -164,20 +164,33 @@ export const useLeaveApprovals = () => {
       }
 
       // Create entries in annual_leaves for each day of the leave
-      const startDate = new Date(request.start_date);
-      const endDate = new Date(request.end_date);
+      // Parse dates as local dates to avoid timezone issues
+      const [startYear, startMonth, startDay] = request.start_date.split('-').map(Number);
+      const [endYear, endMonth, endDay] = request.end_date.split('-').map(Number);
+      const startDate = new Date(startYear, startMonth - 1, startDay);
+      const endDate = new Date(endYear, endMonth - 1, endDay);
       const hoursPerDay = request.duration_type === 'full_day' ? 8 : 4;
       
       const leaveEntries = [];
       const currentDate = new Date(startDate);
       
+      console.log('Creating leave entries from', request.start_date, 'to', request.end_date);
+      
       while (currentDate <= endDate) {
         const dayOfWeek = currentDate.getDay();
         // Skip weekends (0 = Sunday, 6 = Saturday)
         if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+          // Format date as YYYY-MM-DD without timezone issues
+          const year = currentDate.getFullYear();
+          const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+          const day = String(currentDate.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+          
+          console.log('Adding leave entry for date:', dateStr);
+          
           leaveEntries.push({
             member_id: request.member_id,
-            date: currentDate.toISOString().split('T')[0],
+            date: dateStr,
             hours: hoursPerDay,
             company_id: request.company_id,
             leave_request_id: requestId,

@@ -68,12 +68,16 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
       </div>
       
       <div className="border rounded-lg bg-card shadow-sm">
-        {isLoading && filteredMembers.length === 0 ? (
+        {filteredMembers.length === 0 && isLoading ? (
           <div className="p-8 space-y-4">
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
+          </div>
+        ) : filteredMembers.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground">
+            No team members found. Try adjusting your filters.
           </div>
         ) : (
           <LeaveCalendar 
