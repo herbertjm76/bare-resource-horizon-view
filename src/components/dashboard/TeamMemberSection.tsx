@@ -170,19 +170,54 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
 
     setIsSaving(true);
     try {
-      const savePromises = [];
-      
-      // Update active members in profiles table
+      const savePromises: any[] = [];
+
+      // Update active members (profiles + user_roles)
       activeIds.forEach((memberId) => {
-        savePromises.push(
-          supabase
-            .from('profiles')
-            .update(pendingChanges[memberId])
-            .eq('id', memberId)
-        );
+        const changes = pendingChanges[memberId] || {};
+        const { role, ...profileChanges } = changes as any;
+
+        // Never write role into profiles (role lives in user_roles)
+        if (Object.keys(profileChanges).length > 0) {
+          savePromises.push(
+            supabase
+              .from('profiles')
+              .update(profileChanges)
+              .eq('id', memberId)
+          );
+        }
+
+        if (role) {
+          const member = teamMembers.find((m) => m.id === memberId);
+          const companyId = member?.company_id;
+
+          if (!companyId) {
+            savePromises.push(Promise.resolve({ error: new Error('Missing company_id for role update') }));
+            return;
+          }
+
+          // Replace role in user_roles for that company
+          savePromises.push(
+            (async () => {
+              const del = await supabase
+                .from('user_roles')
+                .delete()
+                .eq('user_id', memberId)
+                .eq('company_id', companyId);
+
+              if (del.error) return del;
+
+              const ins = await supabase
+                .from('user_roles')
+                .insert({ user_id: memberId, company_id: companyId, role: role as any });
+
+              return ins;
+            })()
+          );
+        }
       });
-      
-      // Update pending members in invites table
+
+      // Update pending members in invites table (role is a column there)
       pendingIds.forEach((memberId) => {
         savePromises.push(
           supabase
