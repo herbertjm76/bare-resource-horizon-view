@@ -33,6 +33,7 @@ import { useLeaveApprovals } from '@/hooks/leave/useLeaveApprovals';
 import { LeaveRequest } from '@/types/leave';
 import { cn } from '@/lib/utils';
 import { ReassignApproverDialog } from './ReassignApproverDialog';
+import { LeaveRequestCardSkeleton } from './LeaveRequestCardSkeleton';
 
 type LeaveApprovalQueueProps = {
   active?: boolean;
@@ -150,19 +151,20 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Leave Approval Queue
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className="w-full space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <Skeleton className="h-10 w-64" />
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-9 w-24" />
+          </div>
+        </div>
+        <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-40 w-full" />
+            <LeaveRequestCardSkeleton key={i} showActions />
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
