@@ -32,7 +32,7 @@ export const useAnnualLeave = (month: Date) => {
       // Format month for query: YYYY-MM
       const monthStr = format(month, 'yyyy-MM');
       
-      console.log('useAnnualLeave - Fetching leave data for:', { companyId: company.id, month: monthStr });
+      
 
       // Fetch all leaves for the month using the edge function
       const { data, error } = await supabase.functions.invoke('get_annual_leaves', {
@@ -60,11 +60,6 @@ export const useAnnualLeave = (month: Date) => {
           formattedData[leave.member_id][leave.date] = leave.hours;
         });
       }
-
-      console.log('useAnnualLeave - Fetched leave data:', { 
-        entriesCount: data?.length || 0, 
-        formattedData 
-      });
 
       setLeaveData(formattedData);
     } catch (error) {
