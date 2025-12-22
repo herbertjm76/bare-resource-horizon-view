@@ -272,16 +272,16 @@ function AppWithTheme() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
+      <BrowserRouter>
+        <TooltipProvider>
+          <Toaster />
           <CompanyProvider>
             <ViewAsProvider>
               <AppWithTheme />
             </ViewAsProvider>
           </CompanyProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+        </TooltipProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
