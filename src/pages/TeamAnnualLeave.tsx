@@ -12,12 +12,14 @@ import { MyLeaveRequests } from '@/components/leave/MyLeaveRequests';
 import { LeaveApprovalQueue } from '@/components/leave/LeaveApprovalQueue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, FileText, ClipboardList, CheckSquare } from 'lucide-react';
+import { TimeRange } from '@/components/annual-leave/MonthSelector';
 import '@/styles/enhanced-tables.css';
 import '@/components/annual-leave/annual-leave.css';
 
 const TeamAnnualLeave = () => {
-  // State for selected month
+  // State for selected month and time range
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [timeRange, setTimeRange] = useState<TimeRange>('month');
   const [activeTab, setActiveTab] = useState('calendar');
 
   // Fetch team members data
@@ -112,6 +114,8 @@ const TeamAnnualLeave = () => {
             setSearchQuery={setSearchQuery}
             clearFilters={clearFilters}
             allMembers={allMembers}
+            timeRange={timeRange}
+            onTimeRangeChange={setTimeRange}
           />
         </TabsContent>
 
