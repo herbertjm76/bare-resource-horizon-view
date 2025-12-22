@@ -145,7 +145,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                               <div 
                                 className={`
                                   w-7 h-6 mx-auto rounded flex items-center justify-center
-                                  text-[11px] font-bold cursor-default transition-transform
+                                  text-sm font-bold cursor-default transition-transform leading-none
                                   hover:scale-110 hover:shadow-md
                                   ${fullDay 
                                     ? 'bg-primary text-primary-foreground' 
