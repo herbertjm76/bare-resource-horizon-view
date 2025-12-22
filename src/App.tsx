@@ -1,9 +1,9 @@
-
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CompanyProvider } from "./context/CompanyContext";
+import { ViewAsProvider } from "./hooks/usePermissions";
 import { useTheme } from "./hooks/useTheme";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -137,7 +137,9 @@ function App() {
         <Toaster />
         <BrowserRouter>
           <CompanyProvider>
-            <AppWithTheme />
+            <ViewAsProvider>
+              <AppWithTheme />
+            </ViewAsProvider>
           </CompanyProvider>
         </BrowserRouter>
       </TooltipProvider>
