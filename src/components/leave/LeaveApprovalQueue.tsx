@@ -25,11 +25,13 @@ import {
   AlertCircle,
   FileText,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  UserCheck
 } from 'lucide-react';
 import { useLeaveApprovals } from '@/hooks/leave/useLeaveApprovals';
 import { LeaveRequest } from '@/types/leave';
 import { cn } from '@/lib/utils';
+import { ReassignApproverDialog } from './ReassignApproverDialog';
 
 export const LeaveApprovalQueue: React.FC = () => {
   const { 
@@ -39,10 +41,12 @@ export const LeaveApprovalQueue: React.FC = () => {
     isProcessing,
     canApprove,
     approveRequest, 
-    rejectRequest 
+    rejectRequest,
+    reassignApprover
   } = useLeaveApprovals();
 
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [reassignDialogOpen, setReassignDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
 
@@ -54,6 +58,11 @@ export const LeaveApprovalQueue: React.FC = () => {
     setSelectedRequest(request);
     setRejectionReason('');
     setRejectDialogOpen(true);
+  };
+
+  const handleReassignClick = (request: LeaveRequest) => {
+    setSelectedRequest(request);
+    setReassignDialogOpen(true);
   };
 
   const handleRejectConfirm = async () => {
@@ -247,6 +256,16 @@ export const LeaveApprovalQueue: React.FC = () => {
                 <XCircle className="w-4 h-4 mr-1" />
                 Reject
               </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleReassignClick(request)}
+                disabled={isProcessing}
+                className="text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                <UserCheck className="w-4 h-4 mr-1" />
+                Reassign
+              </Button>
             </div>
           )}
         </div>
@@ -347,6 +366,15 @@ export const LeaveApprovalQueue: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Reassign Dialog */}
+      <ReassignApproverDialog
+        open={reassignDialogOpen}
+        onOpenChange={setReassignDialogOpen}
+        request={selectedRequest}
+        onReassign={reassignApprover}
+        isProcessing={isProcessing}
+      />
     </>
   );
 };

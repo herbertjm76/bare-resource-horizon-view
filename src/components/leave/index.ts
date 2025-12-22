@@ -6,3 +6,4 @@ export * from './LeaveApprovalQueue';
 export * from './MyLeaveRequests';
 export * from './LeaveRequestCard';
 export * from './EditLeaveDialog';
+export * from './ReassignApproverDialog';
