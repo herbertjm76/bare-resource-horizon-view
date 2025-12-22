@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
@@ -144,12 +144,49 @@ export const useAnnualLeave = (month: Date) => {
     }
   }, [company?.id, fetchLeaveData]);
 
+  const realtimeRefreshTimerRef = useRef<number | null>(null);
+
   // Fetch data when component mounts or month changes
   useEffect(() => {
     if (company?.id) {
       fetchLeaveData();
     }
   }, [company?.id, month, fetchLeaveData]);
+
+  // Subscribe to realtime changes on annual_leaves table
+  useEffect(() => {
+    if (!company?.id) return;
+
+    const channel = supabase
+      .channel(`annual-leaves-calendar:${company.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'annual_leaves',
+          filter: `company_id=eq.${company.id}`,
+        },
+        () => {
+          // Debounce to handle bursts of updates
+          if (realtimeRefreshTimerRef.current) {
+            window.clearTimeout(realtimeRefreshTimerRef.current);
+          }
+          realtimeRefreshTimerRef.current = window.setTimeout(() => {
+            fetchLeaveData();
+          }, 300);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (realtimeRefreshTimerRef.current) {
+        window.clearTimeout(realtimeRefreshTimerRef.current);
+        realtimeRefreshTimerRef.current = null;
+      }
+      supabase.removeChannel(channel);
+    };
+  }, [company?.id, fetchLeaveData]);
 
   return {
     leaveData,
