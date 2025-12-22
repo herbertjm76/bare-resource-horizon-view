@@ -123,7 +123,7 @@ const TeamAnnualLeave = () => {
         </TabsContent>
 
         <TabsContent value="approvals">
-          <LeaveApprovalQueue />
+          <LeaveApprovalQueue active={activeTab === 'approvals'} />
         </TabsContent>
       </Tabs>
     </StandardLayout>

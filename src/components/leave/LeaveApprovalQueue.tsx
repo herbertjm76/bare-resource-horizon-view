@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,34 +16,43 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
-import { 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Calendar, 
-  Users, 
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  Calendar,
+  Users,
   AlertCircle,
   FileText,
   ExternalLink,
   ShieldCheck,
-  UserCheck
+  UserCheck,
 } from 'lucide-react';
 import { useLeaveApprovals } from '@/hooks/leave/useLeaveApprovals';
 import { LeaveRequest } from '@/types/leave';
 import { cn } from '@/lib/utils';
 import { ReassignApproverDialog } from './ReassignApproverDialog';
 
-export const LeaveApprovalQueue: React.FC = () => {
-  const { 
-    pendingApprovals, 
-    allRequests, 
-    isLoading, 
+type LeaveApprovalQueueProps = {
+  active?: boolean;
+};
+
+export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }) => {
+  const {
+    pendingApprovals,
+    allRequests,
+    isLoading,
     isProcessing,
     canApprove,
-    approveRequest, 
+    approveRequest,
     rejectRequest,
-    reassignApprover
+    reassignApprover,
+    refreshApprovals,
   } = useLeaveApprovals();
+
+  useEffect(() => {
+    if (active) refreshApprovals();
+  }, [active, refreshApprovals]);
 
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [reassignDialogOpen, setReassignDialogOpen] = useState(false);
