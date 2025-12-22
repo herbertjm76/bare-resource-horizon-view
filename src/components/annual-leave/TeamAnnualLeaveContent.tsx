@@ -68,7 +68,7 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
       </div>
       
       <div className="border rounded-lg bg-card shadow-sm">
-        {isLoading ? (
+        {isLoading && filteredMembers.length === 0 ? (
           <div className="p-8 space-y-4">
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />

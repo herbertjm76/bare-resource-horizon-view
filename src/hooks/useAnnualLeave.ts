@@ -16,7 +16,7 @@ export interface LeaveEntry {
 export const useAnnualLeave = (month: Date) => {
   const [leaveData, setLeaveData] = useState<Record<string, Record<string, number>>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const { company, loading: companyLoading } = useCompany();
+  const { company } = useCompany();
 
   // Function to fetch annual leave data
   const fetchLeaveData = useCallback(async () => {
@@ -202,7 +202,7 @@ export const useAnnualLeave = (month: Date) => {
 
   return {
     leaveData,
-    isLoading: isLoading || companyLoading,
+    isLoading,
     updateLeaveHours,
     refreshLeaveData: fetchLeaveData
   };
