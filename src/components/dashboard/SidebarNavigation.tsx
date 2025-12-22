@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { getNavigationItems } from './sidebarConfig';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useCompany } from '@/context/CompanyContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { Badge } from '@/components/ui/badge';
 import {
   SidebarGroup,
@@ -19,13 +20,20 @@ export const SidebarNavigation: React.FC = () => {
   const location = useLocation();
   const { state } = useSidebar();
   const { companySlug } = useCompany();
+  const { hasPermission } = usePermissions();
   const collapsed = state === "collapsed";
   
   const navigationItems = getNavigationItems(companySlug);
 
+  // Filter sections based on user permissions
+  const visibleSections = navigationItems.filter(section => {
+    if (!section.requiredPermission) return true;
+    return hasPermission(section.requiredPermission);
+  });
+
   return (
     <nav className="mt-4 px-2 space-y-1">
-      {navigationItems.map((section) => (
+      {visibleSections.map((section) => (
         <SidebarGroup key={section.label} className={collapsed ? "space-y-0" : "space-y-1"}>
           {!collapsed && (
             <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold text-indigo-200 uppercase tracking-wider">
@@ -98,7 +106,7 @@ export const SidebarNavigation: React.FC = () => {
               })}
             </SidebarMenu>
           </SidebarGroupContent>
-          {!collapsed && section !== navigationItems[navigationItems.length - 1] && (
+          {!collapsed && section !== visibleSections[visibleSections.length - 1] && (
             <div className="border-t border-[hsl(var(--theme-border))] my-2 opacity-30" />
           )}
         </SidebarGroup>
