@@ -33,10 +33,21 @@ serve(async (req) => {
 
     console.log(`Fetching annual leaves for company: ${company_id_param}, date range: ${startDate} to ${endDate}`);
 
-    // Query annual leaves
+    // Query annual leaves with leave type info
     const { data, error } = await supabase
       .from('annual_leaves')
-      .select('id, member_id, date, hours')
+      .select(`
+        id, 
+        member_id, 
+        date, 
+        hours,
+        leave_type_id,
+        leave_types (
+          name,
+          color,
+          code
+        )
+      `)
       .eq('company_id', company_id_param)
       .gte('date', startDate)
       .lt('date', endDate);
@@ -46,10 +57,22 @@ serve(async (req) => {
       throw error;
     }
 
-    console.log(`Found ${data?.length || 0} annual leave entries`);
+    // Transform data to include leave type fields at top level
+    const transformedData = data?.map(entry => ({
+      id: entry.id,
+      member_id: entry.member_id,
+      date: entry.date,
+      hours: entry.hours,
+      leave_type_id: entry.leave_type_id,
+      leave_type_name: entry.leave_types?.name || 'Leave',
+      leave_type_color: entry.leave_types?.color || '#3B82F6',
+      leave_type_code: entry.leave_types?.code || 'other'
+    })) || [];
+
+    console.log(`Found ${transformedData.length} annual leave entries`);
 
     // Return the data
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(transformedData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
