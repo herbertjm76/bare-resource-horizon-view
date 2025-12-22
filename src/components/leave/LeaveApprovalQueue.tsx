@@ -200,7 +200,7 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
                   {request.leave_type.name}
                 </Badge>
               )}
-              {getStatusBadge(request.status)}
+              {getStatusBadge(request.status ?? 'pending')}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -254,7 +254,7 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
           </div>
 
           {/* Actions */}
-          {showActions && request.status === 'pending' && (
+          {showActions && (request.status ?? 'pending') === 'pending' && (
             <div className="flex lg:flex-col gap-2 lg:w-auto">
               <Button
                 size="sm"
