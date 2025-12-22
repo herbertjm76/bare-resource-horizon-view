@@ -165,6 +165,70 @@ export const useLeaveRequests = (memberId?: string) => {
     }
   }, [fetchLeaveRequests]);
 
+  const updateLeaveRequest = useCallback(async (
+    requestId: string,
+    formData: Omit<LeaveFormData, 'manager_confirmed'>
+  ): Promise<boolean> => {
+    if (!company?.id) return false;
+
+    setIsSubmitting(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('You must be logged in');
+        return false;
+      }
+
+      let attachmentUrl: string | null = null;
+      if (formData.attachment) {
+        attachmentUrl = await uploadAttachment(formData.attachment, user.id);
+      }
+
+      const totalHours = calculateTotalHours(
+        formData.start_date,
+        formData.end_date,
+        formData.duration_type
+      );
+
+      const updateData: Record<string, any> = {
+        leave_type_id: formData.leave_type_id,
+        duration_type: formData.duration_type,
+        start_date: formData.start_date.toISOString().split('T')[0],
+        end_date: formData.end_date.toISOString().split('T')[0],
+        total_hours: totalHours,
+        remarks: formData.remarks,
+        requested_approver_id: formData.requested_approver_id || null
+      };
+
+      if (attachmentUrl) {
+        updateData.attachment_url = attachmentUrl;
+      }
+
+      const { error } = await supabase
+        .from('leave_requests')
+        .update(updateData)
+        .eq('id', requestId)
+        .eq('status', 'pending'); // Only allow updating pending requests
+
+      if (error) {
+        console.error('Error updating leave request:', error);
+        toast.error('Failed to update leave request');
+        return false;
+      }
+
+      toast.success('Leave request updated successfully');
+      await fetchLeaveRequests();
+      return true;
+    } catch (error) {
+      console.error('Error in updateLeaveRequest:', error);
+      toast.error('Failed to update leave request');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [company?.id, fetchLeaveRequests]);
+
   useEffect(() => {
     if (company?.id) {
       fetchLeaveRequests();
@@ -177,6 +241,7 @@ export const useLeaveRequests = (memberId?: string) => {
     isSubmitting,
     submitLeaveRequest,
     cancelLeaveRequest,
+    updateLeaveRequest,
     refreshLeaveRequests: fetchLeaveRequests
   };
 };

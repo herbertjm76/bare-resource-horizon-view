@@ -5,3 +5,4 @@ export * from './LeaveAttachmentUpload';
 export * from './LeaveApprovalQueue';
 export * from './MyLeaveRequests';
 export * from './LeaveRequestCard';
+export * from './EditLeaveDialog';
