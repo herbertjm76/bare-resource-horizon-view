@@ -96,17 +96,10 @@ export const useProjectManagers = () => {
           });
         }
 
-        // Sort by role priority (owner first, then admin, then PM), then by name
+        // Sort alphabetically by name
         approvers.sort((a, b) => {
-          const priorityDiff = getRolePriority(b.role) - getRolePriority(a.role);
-          if (priorityDiff !== 0) return priorityDiff;
-          
-          // Sort pending after active
-          if (a.isPending !== b.isPending) return a.isPending ? 1 : -1;
-          
-          // Then by name
-          const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase();
-          const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase();
+          const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase().trim();
+          const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase().trim();
           return nameA.localeCompare(nameB);
         });
 
