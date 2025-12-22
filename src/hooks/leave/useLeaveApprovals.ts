@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
@@ -11,6 +11,8 @@ export const useLeaveApprovals = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [canApprove, setCanApprove] = useState(false);
   const { company } = useCompany();
+
+  const realtimeRefreshTimerRef = useRef<number | null>(null);
 
   const getRoleFlags = useCallback(async (userId: string, companyId: string) => {
     const { data: roles, error } = await supabase
@@ -310,6 +312,40 @@ export const useLeaveApprovals = () => {
       fetchPendingApprovals();
     }
   }, [company?.id, checkApprovalPermissions, fetchPendingApprovals]);
+
+  useEffect(() => {
+    if (!company?.id) return;
+
+    const channel = supabase
+      .channel(`leave-requests-approvals:${company.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'leave_requests',
+          filter: `company_id=eq.${company.id}`,
+        },
+        () => {
+          // Debounce bursts of updates (e.g. multiple row updates/joins)
+          if (realtimeRefreshTimerRef.current) {
+            window.clearTimeout(realtimeRefreshTimerRef.current);
+          }
+          realtimeRefreshTimerRef.current = window.setTimeout(() => {
+            fetchPendingApprovals();
+          }, 250);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (realtimeRefreshTimerRef.current) {
+        window.clearTimeout(realtimeRefreshTimerRef.current);
+        realtimeRefreshTimerRef.current = null;
+      }
+      supabase.removeChannel(channel);
+    };
+  }, [company?.id, fetchPendingApprovals]);
 
   return {
     pendingApprovals,
