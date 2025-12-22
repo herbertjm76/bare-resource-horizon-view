@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { format, differenceInBusinessDays, isBefore, startOfDay } from 'date-fns';
+import { format, isBefore, startOfDay, isWeekend, addDays } from 'date-fns';
 import { CalendarIcon, Send, Clock, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LeaveAttachmentUpload } from './LeaveAttachmentUpload';
@@ -43,22 +43,34 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
     return leaveTypes.find(lt => lt.id === formData.leave_type_id);
   }, [leaveTypes, formData.leave_type_id]);
 
+  // Calculate business days (excluding weekends)
+  const calculateBusinessDays = (start: Date, end: Date): number => {
+    let count = 0;
+    const current = new Date(start);
+    while (current <= end) {
+      if (!isWeekend(current)) {
+        count++;
+      }
+      current.setDate(current.getDate() + 1);
+    }
+    return count;
+  };
+
+  const totalDays = useMemo(() => {
+    if (!startDate || !endDate) return 0;
+    return calculateBusinessDays(startDate, endDate);
+  }, [startDate, endDate]);
+
   const requiresAttachment = useMemo(() => {
     if (!selectedLeaveType) return false;
     if (!selectedLeaveType.requires_attachment) return false;
     
     if (startDate && endDate && selectedLeaveType.code === 'sick') {
-      const days = differenceInBusinessDays(endDate, startDate) + 1;
-      return days > 1;
+      return totalDays > 1;
     }
     
     return selectedLeaveType.requires_attachment;
-  }, [selectedLeaveType, startDate, endDate]);
-
-  const totalDays = useMemo(() => {
-    if (!startDate || !endDate) return 0;
-    return differenceInBusinessDays(endDate, startDate) + 1;
-  }, [startDate, endDate]);
+  }, [selectedLeaveType, startDate, endDate, totalDays]);
 
   const totalHours = useMemo(() => {
     if (totalDays === 0) return 0;
