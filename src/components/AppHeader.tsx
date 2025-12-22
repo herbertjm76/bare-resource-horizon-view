@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
@@ -9,6 +8,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { DateDisplay } from "@/components/ui/date-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { ViewAsRoleSwitcher } from "@/components/ViewAsRoleSwitcher";
 
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
@@ -62,8 +62,11 @@ export const AppHeader: React.FC = () => {
 
         {/* Right side - User actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* View As Role Switcher (admin only) */}
+          <ViewAsRoleSwitcher />
+          
           {/* Desktop Profile button */}
-          <Button 
+          <Button
             asChild 
             variant="ghost" 
             size="sm" 

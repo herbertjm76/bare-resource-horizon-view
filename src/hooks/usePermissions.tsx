@@ -1,8 +1,33 @@
-import { useMemo } from 'react';
+import { useMemo, createContext, useContext, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export type AppRole = 'owner' | 'admin' | 'project_manager' | 'member' | 'contractor';
+
+// Context for "View As" role simulation (admin feature)
+interface ViewAsContextType {
+  simulatedRole: AppRole | null;
+  setSimulatedRole: (role: AppRole | null) => void;
+}
+
+const ViewAsContext = createContext<ViewAsContextType>({
+  simulatedRole: null,
+  setSimulatedRole: () => {},
+});
+
+export function ViewAsProvider({ children }: { children: ReactNode }) {
+  const [simulatedRole, setSimulatedRole] = useState<AppRole | null>(null);
+  return (
+    <ViewAsContext.Provider value={{ simulatedRole, setSimulatedRole }}>
+      {children}
+    </ViewAsContext.Provider>
+  );
+}
+
+export function useViewAs() {
+  return useContext(ViewAsContext);
+}
 
 // Define which roles can access which sections
 // Roles are hierarchical: owner > admin > project_manager > member/contractor
@@ -57,8 +82,10 @@ export const SECTION_PERMISSIONS: Record<string, Permission> = {
   'SETTINGS': 'view:settings',
 };
 
-export const usePermissions = () => {
-  // Fetch user's role from user_roles table
+export function usePermissions() {
+  const { simulatedRole } = useViewAs();
+  
+  // Fetch user's actual role from user_roles table
   const { data: userRole, isLoading } = useQuery({
     queryKey: ['currentUserRole'],
     queryFn: async () => {
@@ -80,16 +107,17 @@ export const usePermissions = () => {
         .select('role')
         .eq('user_id', authData.user.id)
         .eq('company_id', profile.company_id)
-        .order('role') // Will order by enum value
+        .order('role')
         .limit(1)
         .single();
 
       return (roleData?.role as AppRole) || 'member';
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
-  const currentRole: AppRole = userRole || 'member';
+  const actualRole: AppRole = userRole || 'member';
+  const currentRole: AppRole = simulatedRole || actualRole;
   const permissions = ROLE_PERMISSIONS[currentRole] || ROLE_PERMISSIONS.member;
 
   const hasPermission = useMemo(() => {
@@ -101,7 +129,7 @@ export const usePermissions = () => {
   const canViewSection = useMemo(() => {
     return (sectionLabel: string): boolean => {
       const requiredPermission = SECTION_PERMISSIONS[sectionLabel];
-      if (!requiredPermission) return true; // Unknown sections are visible by default
+      if (!requiredPermission) return true;
       return permissions.includes(requiredPermission);
     };
   }, [permissions]);
@@ -124,6 +152,8 @@ export const usePermissions = () => {
 
   return {
     role: currentRole,
+    actualRole,
+    isSimulating: simulatedRole !== null,
     permissions,
     hasPermission,
     canViewSection,
@@ -131,11 +161,11 @@ export const usePermissions = () => {
     canEditAll,
     isAtLeastRole,
     isLoading,
-    // Convenience checks
+    canUseViewAs: actualRole === 'owner' || actualRole === 'admin',
     isSuperAdmin: currentRole === 'owner',
     isAdmin: currentRole === 'admin' || currentRole === 'owner',
     isPM: currentRole === 'project_manager',
     isMember: currentRole === 'member',
     isContractor: currentRole === 'contractor',
   };
-};
+}
