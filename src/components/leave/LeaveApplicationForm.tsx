@@ -176,11 +176,6 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
                     ({approver.role === 'owner' ? 'Super Admin' : 
                       approver.role === 'admin' ? 'Admin' : 'PM'})
                   </span>
-                  {approver.isPending && (
-                    <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
-                      Pending
-                    </span>
-                  )}
                 </div>
               </SelectItem>
             ))}
