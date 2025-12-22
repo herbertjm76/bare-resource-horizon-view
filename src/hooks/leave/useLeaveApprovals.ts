@@ -67,20 +67,8 @@ export const useLeaveApprovals = () => {
       const isAdminOrOwner = roleData?.role === 'admin' || roleData?.role === 'owner';
       const isLeaveAdmin = roleData?.is_leave_admin === true;
 
-      // Check if user is the only admin/owner in the company
-      let isOnlyAdmin = false;
-      if (isAdminOrOwner) {
-        const { data: allAdmins } = await supabase
-          .from('user_roles')
-          .select('user_id')
-          .eq('company_id', company.id)
-          .in('role', ['admin', 'owner']);
-        
-        const uniqueAdminIds = [...new Set(allAdmins?.map(a => a.user_id) || [])];
-        isOnlyAdmin = uniqueAdminIds.length === 1 && uniqueAdminIds[0] === user.id;
-      }
-
-      // Build the query - include own requests only if user is the only admin
+      // Build the query
+      // Admin/Owner/Leave admin should be able to see ALL requests (including their own)
       let query = supabase
         .from('leave_requests')
         .select(`
@@ -90,12 +78,8 @@ export const useLeaveApprovals = () => {
           approver:profiles!leave_requests_approved_by_fkey(id, first_name, last_name)
         `)
         .eq('company_id', company.id)
+        .neq('status', 'cancelled')
         .order('created_at', { ascending: false });
-
-      // Only exclude own requests if there are other admins who can approve
-      if (!isOnlyAdmin) {
-        query = query.neq('member_id', user.id);
-      }
 
       const { data, error } = await query;
 
