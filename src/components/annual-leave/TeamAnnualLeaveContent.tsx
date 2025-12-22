@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MonthSelector, TimeRange } from './MonthSelector';
 import { TeamAnnualLeaveFilters } from './TeamAnnualLeaveFilters';
@@ -6,6 +5,7 @@ import { LeaveCalendar } from './LeaveCalendar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 import { LeaveDataByDate } from '@/hooks/useAnnualLeave';
+import { TeamFilters } from '@/hooks/useTeamFilters';
 
 interface TeamAnnualLeaveContentProps {
   selectedMonth: Date;
@@ -14,16 +14,10 @@ interface TeamAnnualLeaveContentProps {
   leaveData: Record<string, Record<string, number>>;
   leaveDetails?: Record<string, Record<string, LeaveDataByDate>>;
   onLeaveChange: (memberId: string, date: string, hours: number) => void;
-  departments: string[];
-  locations: string[];
-  activeFilter: 'all' | 'department' | 'location';
-  filterValue: string;
-  searchQuery: string;
-  setActiveFilter: (filter: 'all' | 'department' | 'location') => void;
-  setFilterValue: (value: string) => void;
-  setSearchQuery: (query: string) => void;
+  filters: TeamFilters;
+  onFilterChange: (key: string, value: string) => void;
+  activeFiltersCount: number;
   clearFilters: () => void;
-  allMembers: TeamMember[];
   timeRange: TimeRange;
   onTimeRangeChange: (range: TimeRange) => void;
 }
@@ -35,14 +29,9 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
   leaveData,
   leaveDetails,
   onLeaveChange,
-  departments,
-  locations,
-  activeFilter,
-  filterValue,
-  searchQuery,
-  setActiveFilter,
-  setFilterValue,
-  setSearchQuery,
+  filters,
+  onFilterChange,
+  activeFiltersCount,
   clearFilters,
   timeRange,
   onTimeRangeChange
@@ -54,16 +43,13 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
           timeRange={timeRange}
           onTimeRangeChange={onTimeRangeChange}
         />
-        
+      </div>
+
+      <div className="flex items-center gap-2">
         <TeamAnnualLeaveFilters 
-          departments={departments}
-          locations={locations}
-          activeFilter={activeFilter}
-          filterValue={filterValue}
-          searchQuery={searchQuery}
-          setActiveFilter={setActiveFilter}
-          setFilterValue={setFilterValue}
-          setSearchQuery={setSearchQuery}
+          filters={filters}
+          onFilterChange={onFilterChange}
+          activeFiltersCount={activeFiltersCount}
           clearFilters={clearFilters}
         />
       </div>

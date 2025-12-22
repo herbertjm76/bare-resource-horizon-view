@@ -1,41 +1,35 @@
-
 import { useMemo, useState } from 'react';
 import { TeamMember } from '@/components/dashboard/types';
 
-type FilterType = 'all' | 'department' | 'location';
+export interface TeamFilters {
+  practiceArea: string;
+  department: string;
+  location: string;
+  searchTerm: string;
+}
 
 export const useTeamFilters = (allMembers: TeamMember[]) => {
-  // State for active filters
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const [filterValue, setFilterValue] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  // State for filters matching MemberFilterRow format
+  const [filters, setFilters] = useState<TeamFilters>({
+    practiceArea: 'all',
+    department: 'all',
+    location: 'all',
+    searchTerm: ''
+  });
   
-  // Get unique departments and locations for filters
-  const departments = useMemo(() => {
-    const depts = new Set<string>();
-    allMembers.forEach(member => {
-      if (member.department) depts.add(member.department);
-    });
-    return Array.from(depts).sort();
-  }, [allMembers]);
+  // Handle filter changes
+  const onFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
   
-  const locations = useMemo(() => {
-    const locs = new Set<string>();
-    allMembers.forEach(member => {
-      if (member.location) locs.add(member.location);
-    });
-    return Array.from(locs).sort();
-  }, [allMembers]);
-  
-  // Filter members based on active filters and search query
+  // Filter members based on active filters
   const filteredMembers = useMemo(() => {
     return allMembers.filter(member => {
-      // Filter by search query
-      if (searchQuery) {
+      // Filter by search term
+      if (filters.searchTerm) {
         const memberName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
-        const searchLower = searchQuery.toLowerCase();
+        const searchLower = filters.searchTerm.toLowerCase();
         
-        // Search in name, department, job_title, or location
         if (!memberName.includes(searchLower) && 
             !(member.department && member.department.toLowerCase().includes(searchLower)) &&
             !(member.job_title && member.job_title.toLowerCase().includes(searchLower)) &&
@@ -44,36 +38,48 @@ export const useTeamFilters = (allMembers: TeamMember[]) => {
         }
       }
       
-      // Apply department/location filter if active
-      if (activeFilter === 'department' && filterValue) {
-        return member.department === filterValue;
-      } else if (activeFilter === 'location' && filterValue) {
-        return member.location === filterValue;
+      // Filter by practice area
+      if (filters.practiceArea && filters.practiceArea !== 'all') {
+        if (member.practice_area !== filters.practiceArea) return false;
+      }
+      
+      // Filter by department
+      if (filters.department && filters.department !== 'all') {
+        if (member.department !== filters.department) return false;
+      }
+      
+      // Filter by location
+      if (filters.location && filters.location !== 'all') {
+        if (member.location !== filters.location) return false;
       }
       
       return true;
     });
-  }, [allMembers, activeFilter, filterValue, searchQuery]);
+  }, [allMembers, filters]);
   
-  // Calculate active filters count for filter button
-  const activeFiltersCount = (activeFilter === 'all' ? 0 : 1) + (searchQuery ? 1 : 0);
+  // Calculate active filters count
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filters.practiceArea && filters.practiceArea !== 'all') count++;
+    if (filters.department && filters.department !== 'all') count++;
+    if (filters.location && filters.location !== 'all') count++;
+    if (filters.searchTerm) count++;
+    return count;
+  }, [filters]);
   
   // Clear all filters
   const clearFilters = () => {
-    setActiveFilter('all');
-    setFilterValue('');
-    setSearchQuery('');
+    setFilters({
+      practiceArea: 'all',
+      department: 'all',
+      location: 'all',
+      searchTerm: ''
+    });
   };
   
   return {
-    activeFilter,
-    setActiveFilter,
-    filterValue,
-    setFilterValue,
-    searchQuery,
-    setSearchQuery,
-    departments,
-    locations,
+    filters,
+    onFilterChange,
     filteredMembers,
     activeFiltersCount,
     clearFilters
