@@ -129,6 +129,20 @@ export const useLeaveApprovals = () => {
         return false;
       }
 
+      // First, get the leave request details
+      const { data: request, error: fetchError } = await supabase
+        .from('leave_requests')
+        .select('*')
+        .eq('id', requestId)
+        .single();
+
+      if (fetchError || !request) {
+        console.error('Error fetching request:', fetchError);
+        toast.error('Failed to fetch request details');
+        return false;
+      }
+
+      // Update the leave request status
       const { error } = await supabase
         .from('leave_requests')
         .update({
@@ -142,6 +156,41 @@ export const useLeaveApprovals = () => {
         console.error('Error approving request:', error);
         toast.error('Failed to approve request');
         return false;
+      }
+
+      // Create entries in annual_leaves for each day of the leave
+      const startDate = new Date(request.start_date);
+      const endDate = new Date(request.end_date);
+      const hoursPerDay = request.duration_type === 'full_day' ? 8 : 4;
+      
+      const leaveEntries = [];
+      const currentDate = new Date(startDate);
+      
+      while (currentDate <= endDate) {
+        const dayOfWeek = currentDate.getDay();
+        // Skip weekends (0 = Sunday, 6 = Saturday)
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+          leaveEntries.push({
+            member_id: request.member_id,
+            date: currentDate.toISOString().split('T')[0],
+            hours: hoursPerDay,
+            company_id: request.company_id,
+            leave_request_id: requestId,
+            leave_type_id: request.leave_type_id
+          });
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      if (leaveEntries.length > 0) {
+        const { error: insertError } = await supabase
+          .from('annual_leaves')
+          .insert(leaveEntries);
+
+        if (insertError) {
+          console.error('Error creating leave entries:', insertError);
+          // Don't fail the approval, just log the error
+        }
       }
 
       toast.success('Leave request approved');
