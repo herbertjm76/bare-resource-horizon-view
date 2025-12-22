@@ -11,6 +11,7 @@ interface PermissionGuardProps {
   requiredSection?: string;
   fallback?: React.ReactNode;
   redirectTo?: string;
+  showAccessDenied?: boolean; // If false (default), redirects to dashboard
 }
 
 export const PermissionGuard: React.FC<PermissionGuardProps> = ({
@@ -19,6 +20,7 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   requiredSection,
   fallback,
   redirectTo,
+  showAccessDenied = false,
 }) => {
   const { hasPermission, canViewSection, isLoading } = usePermissions();
   const { companySlug } = useCompany();
@@ -44,12 +46,20 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   }
 
   if (!hasAccess) {
+    // Default: redirect to dashboard
+    const defaultRedirect = companySlug ? `/${companySlug}/dashboard` : '/dashboard';
+    
     if (redirectTo) {
       return <Navigate to={redirectTo} state={{ from: location }} replace />;
     }
 
     if (fallback) {
       return <>{fallback}</>;
+    }
+
+    // If showAccessDenied is false, redirect to dashboard
+    if (!showAccessDenied) {
+      return <Navigate to={defaultRedirect} replace />;
     }
 
     // Default access denied UI
