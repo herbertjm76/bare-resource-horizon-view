@@ -27,6 +27,7 @@ import {
   ExternalLink,
   ShieldCheck,
   UserCheck,
+  RefreshCw,
 } from 'lucide-react';
 import { useLeaveApprovals } from '@/hooks/leave/useLeaveApprovals';
 import { LeaveRequest } from '@/types/leave';
@@ -50,9 +51,18 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
     refreshApprovals,
   } = useLeaveApprovals();
 
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const handleRefresh = async () => {
+    await refreshApprovals();
+    setLastUpdated(new Date());
+  };
+
   useEffect(() => {
-    if (active) refreshApprovals();
-  }, [active, refreshApprovals]);
+    if (active) {
+      handleRefresh();
+    }
+  }, [active]);
 
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [reassignDialogOpen, setReassignDialogOpen] = useState(false);
@@ -285,21 +295,40 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
   return (
     <>
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="pending" className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4" />
-            Pending
-            {pendingApprovals.length > 0 && (
-              <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-800">
-                {pendingApprovals.length}
-              </Badge>
+        <div className="flex items-center justify-between mb-4">
+          <TabsList>
+            <TabsTrigger value="pending" className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              Pending
+              {pendingApprovals.length > 0 && (
+                <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-800">
+                  {pendingApprovals.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="all" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              All Requests
+            </TabsTrigger>
+          </TabsList>
+          <div className="flex items-center gap-3">
+            {lastUpdated && (
+              <span className="text-xs text-muted-foreground">
+                Updated {format(lastUpdated, 'h:mm a')}
+              </span>
             )}
-          </TabsTrigger>
-          <TabsTrigger value="all" className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            All Requests
-          </TabsTrigger>
-        </TabsList>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isLoading}
+              className="gap-1.5"
+            >
+              <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+              Refresh
+            </Button>
+          </div>
+        </div>
 
         <TabsContent value="pending">
           {pendingApprovals.length === 0 ? (
