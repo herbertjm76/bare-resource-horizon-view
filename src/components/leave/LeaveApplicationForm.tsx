@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, differenceInBusinessDays, isBefore, startOfDay } from 'date-fns';
-import { CalendarIcon, Send, Clock } from 'lucide-react';
+import { CalendarIcon, Send, Clock, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LeaveAttachmentUpload } from './LeaveAttachmentUpload';
 import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
@@ -36,6 +37,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [attachment, setAttachment] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [approverSearch, setApproverSearch] = useState('');
 
   const selectedLeaveType = useMemo(() => {
     return leaveTypes.find(lt => lt.id === formData.leave_type_id);
@@ -161,18 +163,44 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
         <Label>Approving Manager</Label>
         <Select
           value={formData.requested_approver_id}
-          onValueChange={(value) => setFormData(prev => ({ ...prev, requested_approver_id: value }))}
+          onValueChange={(value) => {
+            setFormData(prev => ({ ...prev, requested_approver_id: value }));
+            setApproverSearch('');
+          }}
           disabled={isLoadingPMs || isSubmitting}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select approving manager" />
           </SelectTrigger>
           <SelectContent>
-            {projectManagers.map((approver) => (
-              <SelectItem key={approver.id} value={approver.id}>
-                {approver.first_name} {approver.last_name}
-              </SelectItem>
-            ))}
+            <div className="p-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search..."
+                  value={approverSearch}
+                  onChange={(e) => setApproverSearch(e.target.value)}
+                  className="pl-8"
+                  onKeyDown={(e) => e.stopPropagation()}
+                />
+              </div>
+            </div>
+            {projectManagers
+              .filter((approver) => {
+                const fullName = `${approver.first_name || ''} ${approver.last_name || ''}`.toLowerCase();
+                return fullName.includes(approverSearch.toLowerCase());
+              })
+              .map((approver) => (
+                <SelectItem key={approver.id} value={approver.id}>
+                  {approver.first_name} {approver.last_name}
+                </SelectItem>
+              ))}
+            {projectManagers.filter((approver) => {
+              const fullName = `${approver.first_name || ''} ${approver.last_name || ''}`.toLowerCase();
+              return fullName.includes(approverSearch.toLowerCase());
+            }).length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-2">No results found</p>
+            )}
           </SelectContent>
         </Select>
         {projectManagers.length === 0 && !isLoadingPMs && (
