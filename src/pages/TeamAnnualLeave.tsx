@@ -30,7 +30,7 @@ const TeamAnnualLeave = () => {
   const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
   
   // Fetch annual leave data
-  const { leaveData, isLoading: isLoadingLeave, updateLeaveHours } = useAnnualLeave(selectedMonth);
+  const { leaveData, leaveDetails, isLoading: isLoadingLeave, updateLeaveHours } = useAnnualLeave(selectedMonth);
   
   // Combine active and pre-registered members
   const allMembers = [...teamMembers, ...preRegisteredMembers];
@@ -100,6 +100,7 @@ const TeamAnnualLeave = () => {
             isLoading={isLoading}
             filteredMembers={filteredMembers}
             leaveData={leaveData}
+            leaveDetails={leaveDetails}
             onLeaveChange={handleLeaveChange}
             departments={departments}
             locations={locations}

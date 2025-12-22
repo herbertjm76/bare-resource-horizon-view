@@ -3,16 +3,17 @@ import React from 'react';
 import { MonthSelector } from './MonthSelector';
 import { TeamAnnualLeaveFilters } from './TeamAnnualLeaveFilters';
 import { LeaveCalendar } from './LeaveCalendar';
-import { AnnualLeaveInsights } from './AnnualLeaveInsights';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
+import { LeaveDataByDate } from '@/hooks/useAnnualLeave';
 
 interface TeamAnnualLeaveContentProps {
   selectedMonth: Date;
   onMonthChange: (month: Date) => void;
   isLoading: boolean;
   filteredMembers: TeamMember[];
-  leaveData: any;
+  leaveData: Record<string, Record<string, number>>;
+  leaveDetails?: Record<string, Record<string, LeaveDataByDate>>;
   onLeaveChange: (memberId: string, date: string, hours: number) => void;
   departments: string[];
   locations: string[];
@@ -32,6 +33,7 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
   isLoading,
   filteredMembers,
   leaveData,
+  leaveDetails,
   onLeaveChange,
   departments,
   locations,
@@ -84,6 +86,7 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
             members={filteredMembers}
             selectedMonth={selectedMonth}
             leaveData={leaveData}
+            leaveDetails={leaveDetails}
             onLeaveChange={onLeaveChange}
           />
         )}

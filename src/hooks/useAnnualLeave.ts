@@ -11,17 +11,31 @@ export interface LeaveEntry {
   date: string;
   hours: number;
   company_id: string;
+  leave_type_id?: string;
+  leave_type_name?: string;
+  leave_type_color?: string;
+}
+
+export interface LeaveDetail {
+  hours: number;
+  leave_type_name: string;
+  leave_type_color: string;
+}
+
+export interface LeaveDataByDate {
+  totalHours: number;
+  entries: LeaveDetail[];
 }
 
 export const useAnnualLeave = (month: Date) => {
   const [leaveData, setLeaveData] = useState<Record<string, Record<string, number>>>({});
+  const [leaveDetails, setLeaveDetails] = useState<Record<string, Record<string, LeaveDataByDate>>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
 
   // Function to fetch annual leave data
   const fetchLeaveData = useCallback(async () => {
     if (!company?.id) {
-      // If no company ID, we can't fetch - but don't leave loading stuck
       setIsLoading(false);
       return;
     }
@@ -29,12 +43,8 @@ export const useAnnualLeave = (month: Date) => {
     setIsLoading(true);
 
     try {
-      // Format month for query: YYYY-MM
       const monthStr = format(month, 'yyyy-MM');
-      
-      
 
-      // Fetch all leaves for the month using the edge function
       const { data, error } = await supabase.functions.invoke('get_annual_leaves', {
         body: { 
           company_id_param: company.id,
@@ -51,17 +61,35 @@ export const useAnnualLeave = (month: Date) => {
 
       // Transform data into nested structure by member_id and date
       const formattedData: Record<string, Record<string, number>> = {};
+      const detailedData: Record<string, Record<string, LeaveDataByDate>> = {};
       
       if (data) {
         data.forEach((leave: any) => {
+          // Simple hours data (existing format)
           if (!formattedData[leave.member_id]) {
             formattedData[leave.member_id] = {};
           }
-          formattedData[leave.member_id][leave.date] = leave.hours;
+          formattedData[leave.member_id][leave.date] = 
+            (formattedData[leave.member_id][leave.date] || 0) + leave.hours;
+          
+          // Detailed data with leave type info
+          if (!detailedData[leave.member_id]) {
+            detailedData[leave.member_id] = {};
+          }
+          if (!detailedData[leave.member_id][leave.date]) {
+            detailedData[leave.member_id][leave.date] = { totalHours: 0, entries: [] };
+          }
+          detailedData[leave.member_id][leave.date].totalHours += leave.hours;
+          detailedData[leave.member_id][leave.date].entries.push({
+            hours: leave.hours,
+            leave_type_name: leave.leave_type_name || 'Leave',
+            leave_type_color: leave.leave_type_color || '#3B82F6'
+          });
         });
       }
 
       setLeaveData(formattedData);
+      setLeaveDetails(detailedData);
     } catch (error) {
       console.error('Error in fetchLeaveData:', error);
       toast.error('Failed to load annual leave data');
@@ -79,7 +107,6 @@ export const useAnnualLeave = (month: Date) => {
     if (!company?.id) return;
 
     try {
-      // Update local state first (optimistic update)
       setLeaveData(prev => {
         const updated = { ...prev };
         if (!updated[memberId]) {
@@ -87,9 +114,7 @@ export const useAnnualLeave = (month: Date) => {
         }
         
         if (hours === 0) {
-          // If hours is zero, remove the entry
           delete updated[memberId][date];
-          // If no entries left for member, remove the member object
           if (Object.keys(updated[memberId]).length === 0) {
             delete updated[memberId];
           }
@@ -100,7 +125,6 @@ export const useAnnualLeave = (month: Date) => {
         return updated;
       });
 
-      // Use the edge function to check if entry exists
       const { data: existingData, error: checkError } = await supabase.functions.invoke('check_annual_leave_entry', {
         body: {
           member_id_param: memberId,
@@ -115,7 +139,6 @@ export const useAnnualLeave = (month: Date) => {
       }
 
       if (hours === 0 && existingData?.id) {
-        // Delete entry if hours is zero and entry exists
         await supabase.functions.invoke('delete_annual_leave', {
           body: {
             leave_id_param: existingData.id
@@ -123,7 +146,6 @@ export const useAnnualLeave = (month: Date) => {
         });
       } else if (hours > 0) {
         if (existingData?.id) {
-          // Update existing entry
           await supabase.functions.invoke('update_annual_leave', {
             body: {
               leave_id_param: existingData.id,
@@ -131,7 +153,6 @@ export const useAnnualLeave = (month: Date) => {
             }
           });
         } else {
-          // Create new entry
           await supabase.functions.invoke('create_annual_leave', {
             body: {
               member_id_param: memberId,
@@ -145,22 +166,18 @@ export const useAnnualLeave = (month: Date) => {
     } catch (error) {
       console.error('Error updating leave hours:', error);
       toast.error('Failed to update leave hours');
-      
-      // Refresh data to ensure UI is in sync with database
       fetchLeaveData();
     }
   }, [company?.id, fetchLeaveData]);
 
   const realtimeRefreshTimerRef = useRef<number | null>(null);
 
-  // Fetch data when component mounts or month changes
   useEffect(() => {
     if (company?.id) {
       fetchLeaveData();
     }
   }, [company?.id, month, fetchLeaveData]);
 
-  // Subscribe to realtime changes on annual_leaves table
   useEffect(() => {
     if (!company?.id) return;
 
@@ -175,7 +192,6 @@ export const useAnnualLeave = (month: Date) => {
           filter: `company_id=eq.${company.id}`,
         },
         () => {
-          // Debounce to handle bursts of updates
           if (realtimeRefreshTimerRef.current) {
             window.clearTimeout(realtimeRefreshTimerRef.current);
           }
@@ -197,6 +213,7 @@ export const useAnnualLeave = (month: Date) => {
 
   return {
     leaveData,
+    leaveDetails,
     isLoading,
     updateLeaveHours,
     refreshLeaveData: fetchLeaveData
