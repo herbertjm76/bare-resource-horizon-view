@@ -129,10 +129,24 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
               </div>
             )}
 
-            {/* Approver info */}
+            {/* Assigned approver info (for pending) */}
+            {request.status === 'pending' && request.requested_approver && (
+              <p className="text-xs text-muted-foreground">
+                Assigned to: {request.requested_approver.first_name} {request.requested_approver.last_name}
+              </p>
+            )}
+
+            {/* Approver info (for approved/rejected) */}
             {request.status === 'approved' && request.approver && (
               <p className="text-xs text-muted-foreground">
                 Approved by {request.approver.first_name} {request.approver.last_name}
+                {request.approved_at && <> on {format(new Date(request.approved_at), 'PPP')}</>}
+              </p>
+            )}
+            
+            {request.status === 'rejected' && request.approver && (
+              <p className="text-xs text-muted-foreground">
+                Rejected by {request.approver.first_name} {request.approver.last_name}
                 {request.approved_at && <> on {format(new Date(request.approved_at), 'PPP')}</>}
               </p>
             )}

@@ -45,6 +45,11 @@ export interface LeaveRequest {
     first_name: string | null;
     last_name: string | null;
   };
+  requested_approver?: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+  };
 }
 
 export interface LeaveFormData {

@@ -71,6 +71,9 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
     if (!formData.leave_type_id) {
       newErrors.leave_type_id = 'Please select a leave type';
     }
+    if (!formData.requested_approver_id) {
+      newErrors.requested_approver_id = 'Please select an approving manager';
+    }
     if (!startDate) {
       newErrors.start_date = 'Start date is required';
     }
@@ -160,7 +163,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
 
       {/* Approver Selection */}
       <div className="space-y-2">
-        <Label>Approving Manager</Label>
+        <Label>Approving Manager <span className="text-destructive">*</span></Label>
         <Select
           value={formData.requested_approver_id}
           onValueChange={(value) => {
@@ -169,7 +172,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
           }}
           disabled={isLoadingPMs || isSubmitting}
         >
-          <SelectTrigger>
+          <SelectTrigger className={cn(errors.requested_approver_id && "border-destructive")}>
             <SelectValue placeholder="Select approving manager" />
           </SelectTrigger>
           <SelectContent>
@@ -203,6 +206,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
             )}
           </SelectContent>
         </Select>
+        {errors.requested_approver_id && <p className="text-sm text-destructive">{errors.requested_approver_id}</p>}
         {projectManagers.length === 0 && !isLoadingPMs && (
           <p className="text-sm text-muted-foreground">No approvers available</p>
         )}

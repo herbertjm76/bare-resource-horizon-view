@@ -75,7 +75,8 @@ export const useLeaveApprovals = () => {
           *,
           leave_type:leave_types(*),
           member:profiles!leave_requests_member_id_fkey(id, first_name, last_name, avatar_url, email),
-          approver:profiles!leave_requests_approved_by_fkey(id, first_name, last_name)
+          approver:profiles!leave_requests_approved_by_fkey(id, first_name, last_name),
+          requested_approver:profiles!leave_requests_requested_approver_id_fkey(id, first_name, last_name)
         `)
         .eq('company_id', company.id)
         .neq('status', 'cancelled')
@@ -93,7 +94,9 @@ export const useLeaveApprovals = () => {
       let filteredData = data as LeaveRequest[] || [];
 
       if (!isAdminOrOwner && !isLeaveAdmin) {
-        // Manager can only see their direct reports' requests
+        // Non-admins can see:
+        // 1. Requests where they are the assigned approver (requested_approver_id)
+        // 2. Requests from their direct reports (if they are a manager)
         const { data: managedProfiles } = await supabase
           .from('profiles')
           .select('id')
@@ -101,9 +104,14 @@ export const useLeaveApprovals = () => {
           .eq('company_id', company.id);
         
         const managedIds = managedProfiles?.map(p => p.id) || [];
-        filteredData = filteredData.filter(
-          (req) => managedIds.includes(req.member_id)
-        );
+        
+        filteredData = filteredData.filter((req) => {
+          // Show if user is the assigned approver
+          if (req.requested_approver_id === user.id) return true;
+          // Show if user is the manager of the requester
+          if (managedIds.includes(req.member_id)) return true;
+          return false;
+        });
       }
 
       // Separate pending from processed
