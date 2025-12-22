@@ -4,34 +4,21 @@ import { TeamMember } from '@/components/dashboard/types';
 import { format, getDaysInMonth, startOfMonth, getDay } from 'date-fns';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Calendar, User } from 'lucide-react';
-
-interface LeaveEntry {
-  date: string;
-  hours: number;
-  leave_type?: string;
-  leave_type_color?: string;
-  is_full_day?: boolean;
-}
+import { Clock, Calendar } from 'lucide-react';
 
 interface LeaveCalendarProps {
   members: TeamMember[];
   selectedMonth: Date;
   leaveData: Record<string, Record<string, number>>;
-  leaveDetails?: Record<string, Record<string, LeaveEntry[]>>;
   onLeaveChange?: (memberId: string, date: string, hours: number) => void;
 }
 
 export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   members,
   selectedMonth,
-  leaveData,
-  leaveDetails
+  leaveData
 }) => {
-  // Generate days for the selected month
   const daysInMonth = getDaysInMonth(selectedMonth);
-  const firstDayOfMonth = startOfMonth(selectedMonth);
-  const firstDayWeekday = getDay(firstDayOfMonth);
   
   const days = Array.from({ length: daysInMonth }, (_, i) => {
     const day = i + 1;
@@ -44,31 +31,27 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
       dayOfWeek,
       isWeekend,
       isSunday: dayOfWeek === 0,
-      formattedDate: format(date, 'MMM d, yyyy')
+      formattedDate: format(date, 'MMM d, yyyy'),
+      dayName: format(date, 'EEEEE') // Single letter day name
     };
   });
 
-  // Helper to get user initials
   const getUserInitials = (member: TeamMember): string => {
     const firstName = member.first_name || '';
     const lastName = member.last_name || '';
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  // Helper to get avatar URL safely
   const getAvatarUrl = (member: TeamMember): string | undefined => {
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  // Helper to get member display name
   const getMemberDisplayName = (member: TeamMember): string => {
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
 
-  // Helper to determine if it's a full day based on hours
   const isFullDay = (hours: number): boolean => hours >= 8;
 
-  // Calculate total hours for a member in the month
   const getMemberTotalHours = (memberId: string): number => {
     const memberLeave = leaveData[memberId] || {};
     return Object.values(memberLeave).reduce((sum, hours) => sum + hours, 0);
@@ -83,37 +66,32 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   }
 
   return (
-    <div className="annual-leave-grid-container">
-      <div className="enhanced-table-container overflow-x-auto scrollbar-grey">
-        <table className="enhanced-table w-full border-collapse">
+    <div className="w-full">
+      <div className="overflow-x-auto scrollbar-grey">
+        <table className="w-full border-collapse text-xs">
           <thead>
             <tr className="border-b border-border">
-              <th className="sticky left-0 z-20 min-w-56 bg-card text-left px-4 py-3 font-semibold text-sm text-foreground border-r border-border">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  Team Member
-                </div>
-              </th>
-              <th className="sticky left-56 z-20 min-w-16 bg-card text-center px-2 py-3 font-semibold text-xs text-muted-foreground border-r border-border">
-                Total
+              <th className="sticky left-0 z-20 w-36 min-w-36 max-w-36 bg-card text-left px-2 py-1.5 font-medium text-foreground text-xs">
+                Name
               </th>
               {days.map((day) => (
                 <th 
                   key={day.day} 
                   className={`
-                    min-w-10 text-center text-xs font-medium px-1 py-2 transition-colors
-                    ${day.isWeekend ? 'bg-muted/50 text-muted-foreground' : 'text-foreground'}
-                    ${day.isSunday ? 'border-l-2 border-l-border' : ''}
+                    w-7 min-w-7 max-w-7 text-center font-medium px-0 py-1 text-[10px]
+                    ${day.isWeekend ? 'bg-muted/40 text-muted-foreground' : 'text-foreground'}
+                    ${day.isSunday ? 'border-l border-border' : ''}
                   `}
                 >
-                  <div className="flex flex-col items-center gap-0.5">
-                    <span className="text-[10px] uppercase tracking-wide opacity-70">
-                      {format(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day.day), 'EEE')}
-                    </span>
-                    <span className="text-xs font-semibold">{day.day}</span>
+                  <div className="flex flex-col items-center leading-tight">
+                    <span className="opacity-60">{day.dayName}</span>
+                    <span className="font-semibold">{day.day}</span>
                   </div>
                 </th>
               ))}
+              <th className="w-12 min-w-12 bg-card text-center px-1 py-1.5 font-medium text-[10px] text-muted-foreground border-l border-border">
+                Total
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -125,41 +103,22 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 <tr 
                   key={member.id} 
                   className={`
-                    group transition-colors hover:bg-muted/30
-                    ${memberIndex % 2 === 0 ? 'bg-background' : 'bg-muted/10'}
+                    group hover:bg-muted/20 transition-colors
+                    ${memberIndex % 2 === 0 ? 'bg-background' : 'bg-muted/5'}
                   `}
                 >
-                  <td className="sticky left-0 z-10 bg-inherit border-r border-border px-4 py-2.5">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8 ring-2 ring-background shadow-sm">
+                  <td className="sticky left-0 z-10 bg-inherit px-2 py-1 border-r border-border">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-5 w-5 shrink-0">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback className="bg-gradient-modern text-white text-xs font-medium">
+                        <AvatarFallback className="bg-gradient-modern text-white text-[8px] font-medium">
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-foreground truncate">
-                          {member.first_name} {member.last_name}
-                        </div>
-                        {member.job_title && (
-                          <div className="text-xs text-muted-foreground truncate">
-                            {member.job_title}
-                          </div>
-                        )}
-                      </div>
+                      <span className="text-xs font-medium text-foreground truncate max-w-24">
+                        {member.first_name} {member.last_name?.charAt(0)}.
+                      </span>
                     </div>
-                  </td>
-                  <td className="sticky left-56 z-10 bg-inherit border-r border-border text-center px-2 py-2.5">
-                    {totalHours > 0 ? (
-                      <Badge 
-                        variant="secondary" 
-                        className="text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20"
-                      >
-                        {totalHours}h
-                      </Badge>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">-</span>
-                    )}
                   </td>
                   {days.map((day) => {
                     const hours = memberLeaveData[day.date] || 0;
@@ -170,84 +129,87 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                       <td 
                         key={day.date} 
                         className={`
-                          text-center p-0.5 transition-colors
+                          text-center p-0 h-7
                           ${day.isWeekend ? 'bg-muted/30' : ''}
-                          ${day.isSunday ? 'border-l-2 border-l-border' : ''}
+                          ${day.isSunday ? 'border-l border-border' : ''}
                         `}
                       >
                         {hasLeave ? (
-                          <HoverCard openDelay={200} closeDelay={100}>
+                          <HoverCard openDelay={100} closeDelay={50}>
                             <HoverCardTrigger asChild>
                               <div 
                                 className={`
-                                  w-9 h-9 mx-auto rounded-lg flex items-center justify-center
-                                  text-xs font-semibold cursor-default transition-all
-                                  hover:scale-110 hover:shadow-md
+                                  w-6 h-5 mx-auto rounded flex items-center justify-center
+                                  text-[9px] font-semibold cursor-default transition-transform
+                                  hover:scale-110
                                   ${fullDay 
-                                    ? 'bg-gradient-modern text-white shadow-sm' 
-                                    : 'bg-gradient-to-br from-primary/40 to-primary/60 text-primary-foreground'
+                                    ? 'bg-gradient-modern text-white' 
+                                    : 'bg-primary/30 text-primary-foreground'
                                   }
                                 `}
-                                style={{
-                                  opacity: fullDay ? 1 : 0.75
-                                }}
                               >
-                                {hours}h
+                                {hours}
                               </div>
                             </HoverCardTrigger>
                             <HoverCardContent 
-                              className="w-64 p-0 overflow-hidden" 
+                              className="w-56 p-0 overflow-hidden z-[100] bg-popover border border-border shadow-lg" 
                               side="top" 
                               align="center"
+                              sideOffset={5}
                             >
-                              <div className="bg-gradient-modern p-3">
-                                <div className="flex items-center gap-2 text-white">
-                                  <Calendar className="h-4 w-4" />
-                                  <span className="font-medium text-sm">{day.formattedDate}</span>
+                              <div className="bg-gradient-modern p-2">
+                                <div className="flex items-center gap-1.5 text-white">
+                                  <Calendar className="h-3 w-3" />
+                                  <span className="font-medium text-xs">{day.formattedDate}</span>
                                 </div>
                               </div>
-                              <div className="p-3 space-y-3">
-                                <div className="flex items-center gap-3">
-                                  <Avatar className="h-8 w-8">
+                              <div className="p-2 space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Avatar className="h-6 w-6">
                                     <AvatarImage src={getAvatarUrl(member)} />
-                                    <AvatarFallback className="bg-gradient-modern text-white text-xs">
+                                    <AvatarFallback className="bg-gradient-modern text-white text-[8px]">
                                       {getUserInitials(member)}
                                     </AvatarFallback>
                                   </Avatar>
                                   <div>
-                                    <p className="font-medium text-sm text-foreground">
+                                    <p className="font-medium text-xs text-foreground">
                                       {getMemberDisplayName(member)}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                      {member.job_title || 'Team Member'}
                                     </p>
                                   </div>
                                 </div>
-                                <div className="flex items-center justify-between pt-2 border-t border-border">
-                                  <div className="flex items-center gap-2 text-muted-foreground">
-                                    <Clock className="h-3.5 w-3.5" />
-                                    <span className="text-xs">Duration</span>
+                                <div className="flex items-center justify-between pt-1 border-t border-border">
+                                  <div className="flex items-center gap-1 text-muted-foreground">
+                                    <Clock className="h-3 w-3" />
+                                    <span className="text-[10px]">Duration</span>
                                   </div>
                                   <Badge 
                                     variant={fullDay ? "default" : "secondary"}
-                                    className={fullDay ? "bg-gradient-modern" : ""}
+                                    className={`text-[10px] px-1.5 py-0 ${fullDay ? "bg-gradient-modern" : ""}`}
                                   >
-                                    {hours} hours ({fullDay ? 'Full Day' : 'Half Day'})
+                                    {hours}h ({fullDay ? 'Full' : 'Half'})
                                   </Badge>
                                 </div>
                               </div>
                             </HoverCardContent>
                           </HoverCard>
                         ) : (
-                          <div className={`
-                            w-9 h-9 mx-auto rounded-lg
-                            ${day.isWeekend ? '' : 'group-hover:bg-muted/50'}
-                            transition-colors
-                          `} />
+                          <div className="w-6 h-5 mx-auto" />
                         )}
                       </td>
                     );
                   })}
+                  <td className="text-center px-1 py-1 border-l border-border">
+                    {totalHours > 0 ? (
+                      <Badge 
+                        variant="secondary" 
+                        className="text-[9px] px-1 py-0 bg-primary/10 text-primary font-semibold"
+                      >
+                        {totalHours}h
+                      </Badge>
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground">-</span>
+                    )}
+                  </td>
                 </tr>
               );
             })}
@@ -255,19 +217,19 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
         </table>
       </div>
       
-      {/* Legend */}
-      <div className="flex items-center justify-end gap-4 mt-4 px-2">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gradient-modern shadow-sm" />
-          <span className="text-xs text-muted-foreground">Full Day (8h)</span>
+      {/* Compact Legend */}
+      <div className="flex items-center justify-end gap-3 mt-2 px-2 text-[10px]">
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-gradient-modern" />
+          <span className="text-muted-foreground">Full Day</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gradient-to-br from-primary/40 to-primary/60 opacity-75" />
-          <span className="text-xs text-muted-foreground">Half Day (4h)</span>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-primary/30" />
+          <span className="text-muted-foreground">Half Day</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-muted/50 border border-border" />
-          <span className="text-xs text-muted-foreground">Weekend</span>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-muted/40" />
+          <span className="text-muted-foreground">Weekend</span>
         </div>
       </div>
     </div>
