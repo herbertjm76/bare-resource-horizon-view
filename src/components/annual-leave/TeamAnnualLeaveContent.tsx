@@ -9,7 +9,6 @@ import { LeaveDataByDate } from '@/hooks/useAnnualLeave';
 
 interface TeamAnnualLeaveContentProps {
   selectedMonth: Date;
-  onMonthChange: (month: Date) => void;
   isLoading: boolean;
   filteredMembers: TeamMember[];
   leaveData: Record<string, Record<string, number>>;
@@ -31,7 +30,6 @@ interface TeamAnnualLeaveContentProps {
 
 export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
   selectedMonth,
-  onMonthChange,
   isLoading,
   filteredMembers,
   leaveData,
@@ -46,7 +44,6 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
   setFilterValue,
   setSearchQuery,
   clearFilters,
-  allMembers,
   timeRange,
   onTimeRangeChange
 }) => {
@@ -54,8 +51,6 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
     <div className="mx-auto space-y-4">
       <div className="flex flex-row justify-center items-center gap-4 flex-wrap">
         <MonthSelector 
-          selectedMonth={selectedMonth}
-          onMonthChange={onMonthChange}
           timeRange={timeRange}
           onTimeRangeChange={onTimeRangeChange}
         />

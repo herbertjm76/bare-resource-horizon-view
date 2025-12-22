@@ -51,10 +51,6 @@ const TeamAnnualLeave = () => {
     clearFilters
   } = useTeamFilters(allMembers);
   
-  // Handle month change
-  const handleMonthChange = (newMonth: Date) => {
-    setSelectedMonth(newMonth);
-  };
   
   // Handle leave hours change
   const handleLeaveChange = (memberId: string, date: string, hours: number) => {
@@ -98,7 +94,6 @@ const TeamAnnualLeave = () => {
         <TabsContent value="calendar">
           <TeamAnnualLeaveContent
             selectedMonth={selectedMonth}
-            onMonthChange={handleMonthChange}
             isLoading={isLoading}
             filteredMembers={filteredMembers}
             leaveData={leaveData}
