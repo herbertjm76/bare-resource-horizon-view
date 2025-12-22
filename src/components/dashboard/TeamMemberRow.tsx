@@ -63,9 +63,19 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   const missingEmail = !getValue('email') || getValue('email').trim() === '';
   const showWarning = isPending && missingEmail;
 
+  const roleConfig: Record<string, { bg: string; text: string; label: string }> = {
+    owner: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'Super Admin' },
+    admin: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Admin' },
+    project_manager: { bg: 'bg-indigo-100', text: 'text-indigo-800', label: 'PM' },
+    member: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Member' },
+    contractor: { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Contractor' },
+  };
+
+  const canEdit = editMode && ['owner', 'admin'].includes(userRole);
+
   return (
-    <tr key={member.id} className="hover:bg-gray-50">
-      {editMode && ['owner', 'admin'].includes(userRole) && (
+    <tr key={member.id} className={`hover:bg-gray-50 ${canEdit ? 'bg-blue-50/30' : ''}`}>
+      {canEdit && (
         <td className="px-4 py-3">
           <Checkbox
             checked={isSelected}
@@ -78,33 +88,33 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
           <button
             type="button"
             onClick={() => onEditMember(member)}
-            className="focus:outline-none rounded-full cursor-pointer"
+            className="focus:outline-none rounded-full cursor-pointer flex-shrink-0"
           >
             <TeamMemberAvatar member={member} />
           </button>
-          <div className="flex-1">
-            {editMode && ['owner', 'admin'].includes(userRole) ? (
-              <div className="space-y-1">
-                <div className="flex gap-1">
+          <div className="flex-1 min-w-0">
+            {canEdit ? (
+              <div className="space-y-2">
+                <div className="flex gap-2">
                   <Input
                     value={getValue('first_name')}
                     onChange={(e) => handleChange('first_name', e.target.value)}
                     placeholder="First name"
-                    className="h-7 text-sm"
+                    className="h-9 text-sm font-medium min-w-[120px]"
                   />
                   <Input
                     value={getValue('last_name')}
                     onChange={(e) => handleChange('last_name', e.target.value)}
                     placeholder="Last name"
-                    className="h-7 text-sm"
+                    className="h-9 text-sm font-medium min-w-[120px]"
                   />
                 </div>
                 <div className="flex items-center gap-2">
                   <Input
                     value={getValue('email')}
                     onChange={(e) => handleChange('email', e.target.value)}
-                    placeholder="Email"
-                    className={`h-7 text-sm ${showWarning ? 'border-amber-500 focus-visible:ring-amber-500' : ''}`}
+                    placeholder="Email address"
+                    className={`h-9 text-sm min-w-[200px] ${showWarning ? 'border-amber-500 focus-visible:ring-amber-500' : ''}`}
                     type="email"
                   />
                   {showWarning && (
@@ -159,31 +169,42 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         )}
       </td>
       <td className="px-4 py-3">
-        {(() => {
-          const role = member.role || 'member';
-          const roleConfig: Record<string, { bg: string; text: string; label: string }> = {
-            owner: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'Super Admin' },
-            admin: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Admin' },
-            project_manager: { bg: 'bg-indigo-100', text: 'text-indigo-800', label: 'PM' },
-            member: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Member' },
-            contractor: { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Contractor' },
-          };
-          const config = roleConfig[role] || { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Other' };
-          return (
-            <Badge className={`${config.bg} ${config.text} border border-current/20`}>
-              {config.label}
-            </Badge>
-          );
-        })()}
+        {canEdit ? (
+          <Select
+            value={getValue('role') || 'member'}
+            onValueChange={(value) => handleChange('role', value)}
+          >
+            <SelectTrigger className="h-9 text-sm min-w-[140px]">
+              <SelectValue placeholder="Select role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="member">Member</SelectItem>
+              <SelectItem value="project_manager">PM (Project Manager)</SelectItem>
+              <SelectItem value="contractor">Contractor</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="owner">Super Admin</SelectItem>
+            </SelectContent>
+          </Select>
+        ) : (
+          (() => {
+            const role = member.role || 'member';
+            const config = roleConfig[role] || { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Other' };
+            return (
+              <Badge className={`${config.bg} ${config.text} border border-current/20`}>
+                {config.label}
+              </Badge>
+            );
+          })()
+        )}
       </td>
       <td className="px-4 py-3">
-        {editMode && ['owner', 'admin'].includes(userRole) ? (
+        {canEdit ? (
           <Select
             disabled={loading}
             value={getValue('department')}
             onValueChange={(value) => handleChange('department', value)}
           >
-            <SelectTrigger className="h-8 text-sm">
+            <SelectTrigger className="h-9 text-sm min-w-[140px]">
               <SelectValue placeholder="Select department" />
             </SelectTrigger>
             <SelectContent>
@@ -202,13 +223,13 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         )}
       </td>
       <td className="px-4 py-3">
-        {editMode && ['owner', 'admin'].includes(userRole) ? (
+        {canEdit ? (
           <Select
             disabled={loading}
             value={getValue('practice_area')}
             onValueChange={(value) => handleChange('practice_area', value)}
           >
-            <SelectTrigger className="h-8 text-sm">
+            <SelectTrigger className="h-9 text-sm min-w-[140px]">
               <SelectValue placeholder="Select practice area" />
             </SelectTrigger>
             <SelectContent>
@@ -227,13 +248,13 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         )}
       </td>
       <td className="px-4 py-3">
-        {editMode && ['owner', 'admin'].includes(userRole) ? (
+        {canEdit ? (
           <Select
             disabled={loading}
             value={getValue('location')}
             onValueChange={(value) => handleChange('location', value)}
           >
-            <SelectTrigger className="h-8 text-sm">
+            <SelectTrigger className="h-9 text-sm min-w-[140px]">
               <SelectValue placeholder="Select location" />
             </SelectTrigger>
             <SelectContent>
@@ -253,7 +274,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
-          {editMode && ['owner', 'admin'].includes(userRole) ? (
+          {canEdit ? (
             <>
               {isPending && onSendInvite && (
                 <TooltipProvider>
