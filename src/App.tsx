@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CompanyProvider } from "./context/CompanyContext";
 import { ViewAsProvider } from "./hooks/usePermissions";
 import { useTheme } from "./hooks/useTheme";
+import { PermissionGuard } from "./components/auth/PermissionGuard";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
@@ -71,56 +72,194 @@ function AppWithTheme() {
               {/* Company-scoped app routes: /:companySlug/* */}
               <Route path="/:companySlug/dashboard" element={<Dashboard />} />
               <Route path="/:companySlug/profile" element={<Profile />} />
-              <Route path="/:companySlug/projects" element={<Projects />} />
-              <Route path="/:companySlug/projects/onboarding" element={<ProjectsOnboarding />} />
-              <Route path="/:companySlug/pipeline" element={<Pipeline />} />
+              
+              {/* Protected: Projects (requires view:projects) */}
+              <Route path="/:companySlug/projects" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <Projects />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/projects/onboarding" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <ProjectsOnboarding />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/pipeline" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <Pipeline />
+                </PermissionGuard>
+              } />
+              
+              {/* Team routes (accessible to all) */}
               <Route path="/:companySlug/team-members" element={<TeamMembers />} />
               <Route path="/:companySlug/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/:companySlug/team-workload" element={<TeamWorkload />} />
-              <Route path="/:companySlug/office-settings" element={<OfficeSettings />} />
+              <Route path="/:companySlug/team-annual-leave" element={<TeamAnnualLeave />} />
+              
+              {/* Protected: Settings (requires view:settings) */}
+              <Route path="/:companySlug/office-settings" element={
+                <PermissionGuard requiredPermission="view:settings">
+                  <OfficeSettings />
+                </PermissionGuard>
+              } />
+              
+              {/* Overview routes (accessible to all) */}
               <Route path="/:companySlug/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/:companySlug/weekly-rundown" element={<WeeklyRundown />} />
-              <Route path="/:companySlug/resource-scheduling" element={<ResourceScheduling />} />
-              <Route path="/:companySlug/timeline" element={<Timeline />} />
-              <Route path="/:companySlug/capacity-planning" element={<CapacityPlanning />} />
-              {/* Legacy routes - redirect to unified scheduling */}
-              <Route path="/:companySlug/team-workload" element={<ResourceScheduling />} />
-              <Route path="/:companySlug/project-resourcing" element={<ResourceScheduling />} />
-              <Route path="/:companySlug/team-annual-leave" element={<TeamAnnualLeave />} />
-              <Route path="/:companySlug/financial-control" element={<FinancialControl />} />
-              <Route path="/:companySlug/help-center" element={<HelpCenter />} />
-              <Route path="/:companySlug/workflow" element={<WorkflowPage />} />
-              <Route path="/:companySlug/financial-overview" element={<FinancialOverview />} />
-              <Route path="/:companySlug/project-profit-dashboard" element={<ProjectProfitDashboard />} />
-              <Route path="/:companySlug/project-billing" element={<ProjectBilling />} />
-              <Route path="/:companySlug/aging-invoices" element={<AgingInvoices />} />
               
-              {/* Fallback for legacy routes without company slug - redirect to auth */}
+              {/* Protected: Resource Scheduling (requires view:scheduling) */}
+              <Route path="/:companySlug/resource-scheduling" element={
+                <PermissionGuard requiredPermission="view:scheduling">
+                  <ResourceScheduling />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/timeline" element={
+                <PermissionGuard requiredPermission="view:scheduling">
+                  <Timeline />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/capacity-planning" element={
+                <PermissionGuard requiredPermission="view:scheduling">
+                  <CapacityPlanning />
+                </PermissionGuard>
+              } />
+              
+              {/* Legacy scheduling redirects - also protected */}
+              <Route path="/:companySlug/project-resourcing" element={
+                <PermissionGuard requiredPermission="view:scheduling">
+                  <ResourceScheduling />
+                </PermissionGuard>
+              } />
+              
+              {/* Protected: Financial routes (requires view:projects) */}
+              <Route path="/:companySlug/financial-control" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <FinancialControl />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/financial-overview" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <FinancialOverview />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/project-profit-dashboard" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <ProjectProfitDashboard />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/project-billing" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <ProjectBilling />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/aging-invoices" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <AgingInvoices />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/workflow" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <WorkflowPage />
+                </PermissionGuard>
+              } />
+              
+              {/* Help center (accessible to all with settings access) */}
+              <Route path="/:companySlug/help-center" element={<HelpCenter />} />
+              
+              {/* Fallback for legacy routes without company slug */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/projects/onboarding" element={<ProjectsOnboarding />} />
-              <Route path="/pipeline" element={<Pipeline />} />
+              
+              {/* Protected: Projects */}
+              <Route path="/projects" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <Projects />
+                </PermissionGuard>
+              } />
+              <Route path="/projects/onboarding" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <ProjectsOnboarding />
+                </PermissionGuard>
+              } />
+              <Route path="/pipeline" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <Pipeline />
+                </PermissionGuard>
+              } />
+              
+              {/* Team routes */}
               <Route path="/team-members" element={<TeamMembers />} />
               <Route path="/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/team-workload" element={<TeamWorkload />} />
-              <Route path="/office-settings" element={<OfficeSettings />} />
+              <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
+              
+              {/* Protected: Settings */}
+              <Route path="/office-settings" element={
+                <PermissionGuard requiredPermission="view:settings">
+                  <OfficeSettings />
+                </PermissionGuard>
+              } />
+              
+              {/* Overview routes */}
               <Route path="/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/weekly-rundown" element={<WeeklyRundown />} />
-              <Route path="/resource-scheduling" element={<ResourceScheduling />} />
-              <Route path="/timeline" element={<Timeline />} />
-              <Route path="/capacity-planning" element={<CapacityPlanning />} />
-              {/* Legacy routes - redirect to unified scheduling */}
-              <Route path="/team-workload" element={<ResourceScheduling />} />
-              <Route path="/project-resourcing" element={<ResourceScheduling />} />
-              <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
-              <Route path="/financial-control" element={<FinancialControl />} />
+              
+              {/* Protected: Scheduling */}
+              <Route path="/resource-scheduling" element={
+                <PermissionGuard requiredPermission="view:scheduling">
+                  <ResourceScheduling />
+                </PermissionGuard>
+              } />
+              <Route path="/timeline" element={
+                <PermissionGuard requiredPermission="view:scheduling">
+                  <Timeline />
+                </PermissionGuard>
+              } />
+              <Route path="/capacity-planning" element={
+                <PermissionGuard requiredPermission="view:scheduling">
+                  <CapacityPlanning />
+                </PermissionGuard>
+              } />
+              <Route path="/project-resourcing" element={
+                <PermissionGuard requiredPermission="view:scheduling">
+                  <ResourceScheduling />
+                </PermissionGuard>
+              } />
+              
+              {/* Protected: Financial */}
+              <Route path="/financial-control" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <FinancialControl />
+                </PermissionGuard>
+              } />
+              <Route path="/financial-overview" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <FinancialOverview />
+                </PermissionGuard>
+              } />
+              <Route path="/project-profit-dashboard" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <ProjectProfitDashboard />
+                </PermissionGuard>
+              } />
+              <Route path="/project-billing" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <ProjectBilling />
+                </PermissionGuard>
+              } />
+              <Route path="/aging-invoices" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <AgingInvoices />
+                </PermissionGuard>
+              } />
+              <Route path="/workflow" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <WorkflowPage />
+                </PermissionGuard>
+              } />
+              
+              {/* Help center */}
               <Route path="/help-center" element={<HelpCenter />} />
-              <Route path="/workflow" element={<WorkflowPage />} />
-              <Route path="/financial-overview" element={<FinancialOverview />} />
-              <Route path="/project-profit-dashboard" element={<ProjectProfitDashboard />} />
-              <Route path="/project-billing" element={<ProjectBilling />} />
-              <Route path="/aging-invoices" element={<AgingInvoices />} />
               
               {/* Company landing page with smart redirect */}
               <Route path="/:companySlug" element={<CompanyLanding />} />
