@@ -23,7 +23,8 @@ export const useLeaveRequests = (memberId?: string) => {
           *,
           leave_type:leave_types(*),
           member:profiles!leave_requests_member_id_fkey(id, first_name, last_name, avatar_url, email),
-          approver:profiles!leave_requests_approved_by_fkey(id, first_name, last_name)
+          approver:profiles!leave_requests_approved_by_fkey(id, first_name, last_name),
+          requested_approver:profiles!leave_requests_requested_approver_id_fkey(id, first_name, last_name)
         `)
         .eq('company_id', company.id)
         .order('created_at', { ascending: false });
