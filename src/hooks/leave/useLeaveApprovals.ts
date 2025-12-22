@@ -12,6 +12,26 @@ export const useLeaveApprovals = () => {
   const [canApprove, setCanApprove] = useState(false);
   const { company } = useCompany();
 
+  const getRoleFlags = useCallback(async (userId: string, companyId: string) => {
+    const { data: roles, error } = await supabase
+      .from('user_roles')
+      .select('role, is_leave_admin')
+      .eq('user_id', userId)
+      .eq('company_id', companyId);
+
+    if (error) {
+      // If role lookup fails for any reason, default to least privilege.
+      return { isAdminOrOwner: false, isLeaveAdmin: false };
+    }
+
+    const isAdminOrOwner = (roles ?? []).some(
+      (r) => r.role === 'admin' || r.role === 'owner'
+    );
+    const isLeaveAdmin = (roles ?? []).some((r) => r.is_leave_admin === true);
+
+    return { isAdminOrOwner, isLeaveAdmin };
+  }, []);
+
   const checkApprovalPermissions = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -20,16 +40,7 @@ export const useLeaveApprovals = () => {
         return;
       }
 
-      // Check if user is admin, owner, or leave admin
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role, is_leave_admin')
-        .eq('user_id', user.id)
-        .eq('company_id', company.id)
-        .single();
-
-      const isAdminOrOwner = roleData?.role === 'admin' || roleData?.role === 'owner';
-      const isLeaveAdmin = roleData?.is_leave_admin === true;
+      const { isAdminOrOwner, isLeaveAdmin } = await getRoleFlags(user.id, company.id);
 
       // Check if user is a manager of any team members
       const { data: directReports } = await supabase
@@ -45,7 +56,7 @@ export const useLeaveApprovals = () => {
       console.error('Error checking approval permissions:', error);
       setCanApprove(false);
     }
-  }, [company?.id]);
+  }, [company?.id, getRoleFlags]);
 
   const fetchPendingApprovals = useCallback(async () => {
     if (!company?.id) return;
@@ -56,20 +67,11 @@ export const useLeaveApprovals = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Check user permissions
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role, is_leave_admin')
-        .eq('user_id', user.id)
-        .eq('company_id', company.id)
-        .maybeSingle();
-
-      const isAdminOrOwner = roleData?.role === 'admin' || roleData?.role === 'owner';
-      const isLeaveAdmin = roleData?.is_leave_admin === true;
+      const { isAdminOrOwner, isLeaveAdmin } = await getRoleFlags(user.id, company.id);
 
       // Build the query
       // Admin/Owner/Leave admin should be able to see ALL requests (including their own)
-      let query = supabase
+      const { data, error } = await supabase
         .from('leave_requests')
         .select(`
           *,
@@ -82,8 +84,6 @@ export const useLeaveApprovals = () => {
         .neq('status', 'cancelled')
         .order('created_at', { ascending: false });
 
-      const { data, error } = await query;
-
       if (error) {
         console.error('Error fetching leave requests:', error);
         toast.error('Failed to load leave requests');
@@ -91,7 +91,7 @@ export const useLeaveApprovals = () => {
       }
 
       // Filter based on permissions
-      let filteredData = data as LeaveRequest[] || [];
+      let filteredData = (data as LeaveRequest[]) || [];
 
       if (!isAdminOrOwner && !isLeaveAdmin) {
         // Non-admins can see:
@@ -102,20 +102,18 @@ export const useLeaveApprovals = () => {
           .select('id')
           .eq('manager_id', user.id)
           .eq('company_id', company.id);
-        
-        const managedIds = managedProfiles?.map(p => p.id) || [];
-        
+
+        const managedIds = managedProfiles?.map((p) => p.id) || [];
+
         filteredData = filteredData.filter((req) => {
-          // Show if user is the assigned approver
           if (req.requested_approver_id === user.id) return true;
-          // Show if user is the manager of the requester
           if (managedIds.includes(req.member_id)) return true;
           return false;
         });
       }
 
       // Separate pending from processed
-      const pending = filteredData.filter(req => req.status === 'pending');
+      const pending = filteredData.filter((req) => req.status === 'pending');
       const all = filteredData;
 
       setPendingApprovals(pending);
@@ -126,7 +124,7 @@ export const useLeaveApprovals = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [company?.id]);
+  }, [company?.id, getRoleFlags]);
 
   const approveRequest = useCallback(async (requestId: string): Promise<boolean> => {
     setIsProcessing(true);
