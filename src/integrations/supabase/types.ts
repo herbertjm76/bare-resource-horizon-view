@@ -2018,6 +2018,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_for_company: {
+        Args: { check_company_id: string }
+        Returns: boolean
+      }
       is_company_role:
         | { Args: never; Returns: boolean }
         | {
