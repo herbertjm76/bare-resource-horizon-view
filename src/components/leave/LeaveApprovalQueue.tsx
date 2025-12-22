@@ -133,22 +133,6 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
     );
   };
 
-  if (!canApprove) {
-    return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <ShieldCheck className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-          <p className="text-muted-foreground">
-            You don't have permission to approve leave requests.
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">
-            Only managers, admins, and leave administrators can approve requests.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   if (isLoading) {
     return (
       <div className="w-full space-y-4">
@@ -165,6 +149,22 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (!canApprove) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center">
+          <ShieldCheck className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+          <p className="text-muted-foreground">
+            You don't have permission to approve leave requests.
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Only managers, admins, and leave administrators can approve requests.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
