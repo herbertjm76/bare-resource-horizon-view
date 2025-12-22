@@ -156,7 +156,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
         {errors.leave_type_id && <p className="text-sm text-destructive">{errors.leave_type_id}</p>}
       </div>
 
-      {/* Approver (PM) Selection */}
+      {/* Approver Selection */}
       <div className="space-y-2">
         <Label>Approving Manager</Label>
         <Select
@@ -168,15 +168,21 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
             <SelectValue placeholder="Select approving manager" />
           </SelectTrigger>
           <SelectContent>
-            {projectManagers.map((pm) => (
-              <SelectItem key={pm.id} value={pm.id}>
-                {pm.first_name} {pm.last_name}
+            {projectManagers.map((approver) => (
+              <SelectItem key={approver.id} value={approver.id}>
+                <div className="flex items-center gap-2">
+                  <span>{approver.first_name} {approver.last_name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    ({approver.role === 'owner' ? 'Super Admin' : 
+                      approver.role === 'admin' ? 'Admin' : 'PM'})
+                  </span>
+                </div>
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         {projectManagers.length === 0 && !isLoadingPMs && (
-          <p className="text-sm text-muted-foreground">No project managers available</p>
+          <p className="text-sm text-muted-foreground">No approvers available</p>
         )}
       </div>
 
