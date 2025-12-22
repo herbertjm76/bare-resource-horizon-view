@@ -81,7 +81,8 @@ export const useLeaveApprovals = () => {
           requested_approver:profiles!leave_requests_requested_approver_id_fkey(id, first_name, last_name)
         `)
         .eq('company_id', company.id)
-        .neq('status', 'cancelled')
+        // Include legacy rows where status is NULL; exclude cancelled.
+        .or('status.is.null,status.neq.cancelled')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -113,7 +114,8 @@ export const useLeaveApprovals = () => {
       }
 
       // Separate pending from processed
-      const pending = filteredData.filter((req) => req.status === 'pending');
+      // Treat legacy NULL status as pending.
+      const pending = filteredData.filter((req) => !req.status || req.status === 'pending');
       const all = filteredData;
 
       setPendingApprovals(pending);
