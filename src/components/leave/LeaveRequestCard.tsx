@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
-import { Clock, Calendar, X, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Clock, Calendar, X, CheckCircle, XCircle, AlertCircle, Pencil } from 'lucide-react';
 import { LeaveRequest } from '@/types/leave';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +12,7 @@ interface LeaveRequestCardProps {
   request: LeaveRequest;
   showMember?: boolean;
   onCancel?: (id: string) => void;
+  onEdit?: (request: LeaveRequest) => void;
   isLoading?: boolean;
 }
 
@@ -26,6 +27,7 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
   request,
   showMember = false,
   onCancel,
+  onEdit,
   isLoading = false
 }) => {
   const status = statusConfig[request.status] || statusConfig.pending;
@@ -137,17 +139,33 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
           </div>
 
           {/* Actions */}
-          {request.status === 'pending' && onCancel && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onCancel(request.id)}
-              disabled={isLoading}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-            >
-              <X className="w-4 h-4 mr-1" />
-              Cancel
-            </Button>
+          {request.status === 'pending' && (
+            <div className="flex flex-col gap-2">
+              {onEdit && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(request)}
+                  disabled={isLoading}
+                  className="text-primary hover:text-primary hover:bg-primary/10"
+                >
+                  <Pencil className="w-4 h-4 mr-1" />
+                  Edit
+                </Button>
+              )}
+              {onCancel && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onCancel(request.id)}
+                  disabled={isLoading}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Cancel
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </CardContent>

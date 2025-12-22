@@ -23,6 +23,7 @@ export interface LeaveRequest {
   total_hours: number;
   remarks: string;
   manager_confirmed: boolean;
+  requested_approver_id: string | null;
   status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   approved_by: string | null;
   approved_at: string | null;
