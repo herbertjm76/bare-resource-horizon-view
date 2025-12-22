@@ -6,9 +6,10 @@ interface Approver {
   id: string;
   first_name: string | null;
   last_name: string | null;
-  email: string;
+  email: string | null;
   avatar_url: string | null;
   role: string;
+  isPending?: boolean;
 }
 
 export const useProjectManagers = () => {
@@ -23,54 +24,91 @@ export const useProjectManagers = () => {
       setIsLoading(true);
 
       try {
-        // Get users with owner, admin, or project_manager roles (these can approve leave)
+        // Fetch active users with owner, admin, or project_manager roles
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
           .select('user_id, role')
           .eq('company_id', company.id)
           .in('role', ['owner', 'admin', 'project_manager']);
 
+        // Fetch pending invites with approver roles
+        const { data: pendingInvites, error: inviteError } = await supabase
+          .from('invites')
+          .select('id, first_name, last_name, email, avatar_url, role')
+          .eq('company_id', company.id)
+          .eq('status', 'pending')
+          .in('role', ['owner', 'admin', 'project_manager']);
+
         if (roleError) {
           console.error('Error fetching approver roles:', roleError);
-          return;
         }
 
-        if (!roleData || roleData.length === 0) {
-          setProjectManagers([]);
-          return;
+        if (inviteError) {
+          console.error('Error fetching pending invites:', inviteError);
         }
 
-        // Get unique user IDs (a user might have multiple roles)
-        const userRoleMap = new Map<string, string>();
-        roleData.forEach(r => {
-          // Keep the highest role (owner > admin > project_manager)
-          const existingRole = userRoleMap.get(r.user_id);
-          if (!existingRole || getRolePriority(r.role) > getRolePriority(existingRole)) {
-            userRoleMap.set(r.user_id, r.role);
+        const approvers: Approver[] = [];
+
+        // Process active users
+        if (roleData && roleData.length > 0) {
+          // Get unique user IDs (a user might have multiple roles)
+          const userRoleMap = new Map<string, string>();
+          roleData.forEach(r => {
+            const existingRole = userRoleMap.get(r.user_id);
+            if (!existingRole || getRolePriority(r.role) > getRolePriority(existingRole)) {
+              userRoleMap.set(r.user_id, r.role);
+            }
+          });
+
+          const approverIds = Array.from(userRoleMap.keys());
+
+          // Fetch profiles for these users
+          const { data: profiles, error: profileError } = await supabase
+            .from('profiles')
+            .select('id, first_name, last_name, email, avatar_url')
+            .in('id', approverIds);
+
+          if (profileError) {
+            console.error('Error fetching approver profiles:', profileError);
+          } else if (profiles) {
+            profiles.forEach(profile => {
+              approvers.push({
+                ...profile,
+                role: userRoleMap.get(profile.id) || 'project_manager',
+                isPending: false
+              });
+            });
           }
-        });
-
-        const approverIds = Array.from(userRoleMap.keys());
-
-        // Fetch profiles for these users
-        const { data: profiles, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, first_name, last_name, email, avatar_url')
-          .in('id', approverIds);
-
-        if (profileError) {
-          console.error('Error fetching approver profiles:', profileError);
-          return;
         }
 
-        // Combine profile data with role info
-        const approvers: Approver[] = (profiles || []).map(profile => ({
-          ...profile,
-          role: userRoleMap.get(profile.id) || 'project_manager'
-        }));
+        // Add pending invites
+        if (pendingInvites && pendingInvites.length > 0) {
+          pendingInvites.forEach(invite => {
+            approvers.push({
+              id: invite.id,
+              first_name: invite.first_name,
+              last_name: invite.last_name,
+              email: invite.email,
+              avatar_url: invite.avatar_url,
+              role: invite.role || 'project_manager',
+              isPending: true
+            });
+          });
+        }
 
-        // Sort by role priority (owner first, then admin, then PM)
-        approvers.sort((a, b) => getRolePriority(b.role) - getRolePriority(a.role));
+        // Sort by role priority (owner first, then admin, then PM), then by name
+        approvers.sort((a, b) => {
+          const priorityDiff = getRolePriority(b.role) - getRolePriority(a.role);
+          if (priorityDiff !== 0) return priorityDiff;
+          
+          // Sort pending after active
+          if (a.isPending !== b.isPending) return a.isPending ? 1 : -1;
+          
+          // Then by name
+          const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase();
+          const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
 
         setProjectManagers(approvers);
       } catch (error) {
