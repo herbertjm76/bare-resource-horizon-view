@@ -32,6 +32,9 @@ export const useLeaveRequests = (memberId?: string) => {
         query = query.eq('member_id', memberId);
       }
 
+      // Exclude cancelled requests - they should be deleted but filter as safety measure
+      query = query.neq('status', 'cancelled');
+
       const { data, error } = await query;
 
       if (error) {
