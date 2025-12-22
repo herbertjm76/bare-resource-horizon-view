@@ -13,8 +13,21 @@ export const useLeaveApprovals = () => {
   const { company } = useCompany();
 
   const realtimeRefreshTimerRef = useRef<number | null>(null);
+  const roleFlagsCache = useRef<{ userId: string; companyId: string; isAdminOrOwner: boolean; isLeaveAdmin: boolean } | null>(null);
 
   const getRoleFlags = useCallback(async (userId: string, companyId: string) => {
+    // Return cached result if available for same user/company
+    if (
+      roleFlagsCache.current &&
+      roleFlagsCache.current.userId === userId &&
+      roleFlagsCache.current.companyId === companyId
+    ) {
+      return {
+        isAdminOrOwner: roleFlagsCache.current.isAdminOrOwner,
+        isLeaveAdmin: roleFlagsCache.current.isLeaveAdmin,
+      };
+    }
+
     const { data: roles, error } = await supabase
       .from('user_roles')
       .select('role, is_leave_admin')
@@ -22,7 +35,6 @@ export const useLeaveApprovals = () => {
       .eq('company_id', companyId);
 
     if (error) {
-      // If role lookup fails for any reason, default to least privilege.
       return { isAdminOrOwner: false, isLeaveAdmin: false };
     }
 
@@ -31,34 +43,11 @@ export const useLeaveApprovals = () => {
     );
     const isLeaveAdmin = (roles ?? []).some((r) => r.is_leave_admin === true);
 
+    // Cache the result
+    roleFlagsCache.current = { userId, companyId, isAdminOrOwner, isLeaveAdmin };
+
     return { isAdminOrOwner, isLeaveAdmin };
   }, []);
-
-  const checkApprovalPermissions = useCallback(async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user || !company?.id) {
-        setCanApprove(false);
-        return;
-      }
-
-      const { isAdminOrOwner, isLeaveAdmin } = await getRoleFlags(user.id, company.id);
-
-      // Check if user is a manager of any team members
-      const { data: directReports } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('manager_id', user.id)
-        .eq('company_id', company.id);
-
-      const isManager = (directReports?.length ?? 0) > 0;
-
-      setCanApprove(isAdminOrOwner || isLeaveAdmin || isManager);
-    } catch (error) {
-      console.error('Error checking approval permissions:', error);
-      setCanApprove(false);
-    }
-  }, [company?.id, getRoleFlags]);
 
   const fetchPendingApprovals = useCallback(async () => {
     if (!company?.id) return;
@@ -67,25 +56,40 @@ export const useLeaveApprovals = () => {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
 
-      const { isAdminOrOwner, isLeaveAdmin } = await getRoleFlags(user.id, company.id);
+      // Run role flags query and leave requests query in PARALLEL
+      const [roleFlags, leaveRequestsResult, directReportsResult] = await Promise.all([
+        getRoleFlags(user.id, company.id),
+        supabase
+          .from('leave_requests')
+          .select(`
+            *,
+            leave_type:leave_types(*),
+            member:profiles!leave_requests_member_id_fkey(id, first_name, last_name, avatar_url, email),
+            approver:profiles!leave_requests_approved_by_fkey(id, first_name, last_name),
+            requested_approver:profiles!leave_requests_requested_approver_id_fkey(id, first_name, last_name)
+          `)
+          .eq('company_id', company.id)
+          .or('status.is.null,status.neq.cancelled')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('profiles')
+          .select('id')
+          .eq('manager_id', user.id)
+          .eq('company_id', company.id),
+      ]);
 
-      // Build the query
-      // Admin/Owner/Leave admin should be able to see ALL requests (including their own)
-      const { data, error } = await supabase
-        .from('leave_requests')
-        .select(`
-          *,
-          leave_type:leave_types(*),
-          member:profiles!leave_requests_member_id_fkey(id, first_name, last_name, avatar_url, email),
-          approver:profiles!leave_requests_approved_by_fkey(id, first_name, last_name),
-          requested_approver:profiles!leave_requests_requested_approver_id_fkey(id, first_name, last_name)
-        `)
-        .eq('company_id', company.id)
-        // Include legacy rows where status is NULL; exclude cancelled.
-        .or('status.is.null,status.neq.cancelled')
-        .order('created_at', { ascending: false });
+      const { isAdminOrOwner, isLeaveAdmin } = roleFlags;
+      const { data, error } = leaveRequestsResult;
+      const { data: managedProfiles } = directReportsResult;
+
+      // Update canApprove based on fetched data
+      const isManager = (managedProfiles?.length ?? 0) > 0;
+      setCanApprove(isAdminOrOwner || isLeaveAdmin || isManager);
 
       if (error) {
         console.error('Error fetching leave requests:', error);
@@ -97,15 +101,6 @@ export const useLeaveApprovals = () => {
       let filteredData = (data as LeaveRequest[]) || [];
 
       if (!isAdminOrOwner && !isLeaveAdmin) {
-        // Non-admins can see:
-        // 1. Requests where they are the assigned approver (requested_approver_id)
-        // 2. Requests from their direct reports (if they are a manager)
-        const { data: managedProfiles } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('manager_id', user.id)
-          .eq('company_id', company.id);
-
         const managedIds = managedProfiles?.map((p) => p.id) || [];
 
         filteredData = filteredData.filter((req) => {
@@ -116,7 +111,6 @@ export const useLeaveApprovals = () => {
       }
 
       // Separate pending from processed
-      // Treat legacy NULL status as pending.
       const pending = filteredData.filter((req) => !req.status || req.status === 'pending');
       const all = filteredData;
 
@@ -258,7 +252,7 @@ export const useLeaveApprovals = () => {
       toast.error('Failed to reject request');
       return false;
     } finally {
-    setIsProcessing(false);
+      setIsProcessing(false);
     }
   }, [fetchPendingApprovals]);
 
@@ -286,7 +280,7 @@ export const useLeaveApprovals = () => {
           requested_approver_id: newApproverId
         })
         .eq('id', requestId)
-        .eq('status', 'pending'); // Only allow reassigning pending requests
+        .eq('status', 'pending');
 
       if (error) {
         console.error('Error reassigning approver:', error);
@@ -308,10 +302,9 @@ export const useLeaveApprovals = () => {
 
   useEffect(() => {
     if (company?.id) {
-      checkApprovalPermissions();
       fetchPendingApprovals();
     }
-  }, [company?.id, checkApprovalPermissions, fetchPendingApprovals]);
+  }, [company?.id, fetchPendingApprovals]);
 
   useEffect(() => {
     if (!company?.id) return;
@@ -327,7 +320,6 @@ export const useLeaveApprovals = () => {
           filter: `company_id=eq.${company.id}`,
         },
         () => {
-          // Debounce bursts of updates (e.g. multiple row updates/joins)
           if (realtimeRefreshTimerRef.current) {
             window.clearTimeout(realtimeRefreshTimerRef.current);
           }
