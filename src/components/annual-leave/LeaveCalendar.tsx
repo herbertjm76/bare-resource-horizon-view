@@ -148,8 +148,8 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                                   text-[11px] font-bold cursor-default transition-transform
                                   hover:scale-110 hover:shadow-md
                                   ${fullDay 
-                                    ? 'bg-gradient-modern text-white shadow-sm' 
-                                    : 'bg-primary/40 text-foreground'
+                                    ? 'bg-primary text-primary-foreground' 
+                                    : 'bg-primary/50 text-primary-foreground'
                                   }
                                 `}
                               >
@@ -163,7 +163,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                               sideOffset={8}
                               style={{ zIndex: 9999 }}
                             >
-                              <div className="bg-gradient-modern p-2.5">
+                              <div className="bg-primary p-2.5">
                                 <div className="flex items-center gap-2 text-white">
                                   <Calendar className="h-4 w-4" />
                                   <span className="font-semibold text-sm">{day.formattedDate}</span>
@@ -173,7 +173,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                                 <div className="flex items-center gap-2">
                                   <Avatar className="h-7 w-7">
                                     <AvatarImage src={getAvatarUrl(member)} />
-                                    <AvatarFallback className="bg-gradient-modern text-white text-[9px]">
+                                    <AvatarFallback className="bg-primary text-primary-foreground text-[9px]">
                                       {getUserInitials(member)}
                                     </AvatarFallback>
                                   </Avatar>
@@ -251,11 +251,11 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
       {/* Legend */}
       <div className="flex items-center justify-end gap-4 mt-3 px-2 text-xs">
         <div className="flex items-center gap-1.5">
-          <div className="w-3.5 h-3.5 rounded bg-gradient-modern" />
+          <div className="w-3.5 h-3.5 rounded bg-primary" />
           <span className="text-muted-foreground">Full Day (8h)</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3.5 h-3.5 rounded bg-primary/40" />
+          <div className="w-3.5 h-3.5 rounded bg-primary/50" />
           <span className="text-muted-foreground">Half Day (4h)</span>
         </div>
         <div className="flex items-center gap-1.5">
