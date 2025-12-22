@@ -23,21 +23,22 @@ export type Permission =
   | 'view:settings'
   | 'edit:all'
   | 'edit:team'
-  | 'edit:projects';
+  | 'edit:projects'
+  | 'edit:scheduling';
 
 // Role-based permission mapping
 const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
   owner: [
     'view:overview', 'view:team', 'view:projects', 'view:scheduling', 'view:settings',
-    'edit:all', 'edit:team', 'edit:projects'
+    'edit:all', 'edit:team', 'edit:projects', 'edit:scheduling'
   ],
   admin: [
     'view:overview', 'view:team', 'view:projects', 'view:scheduling', 'view:settings',
-    'edit:team', 'edit:projects'
+    'edit:team', 'edit:projects', 'edit:scheduling'
   ],
   project_manager: [
     'view:overview', 'view:team', 'view:projects', 'view:scheduling', 'view:settings',
-    'edit:projects'
+    'edit:projects', 'edit:scheduling'
   ],
   member: [
     'view:overview', 'view:team'
