@@ -177,11 +177,38 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
           </div>
 
           <div className="text-center">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Dates</div>
-            <div className="mt-1 flex items-center justify-center gap-2 text-sm font-medium">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span>{formatDateRange()}</span>
-            </div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">Dates</div>
+            {(() => {
+              const start = new Date(request.start_date);
+              const end = new Date(request.end_date);
+              const days: Date[] = [];
+              for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                days.push(new Date(d));
+              }
+              const showCompact = days.length > 7;
+              return (
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-0.5">
+                    {(showCompact ? [days[0], days[days.length - 1]] : days).map((day, i) => (
+                      <div
+                        key={i}
+                        className="flex flex-col items-center justify-center h-10 w-9 rounded border bg-background text-center"
+                        style={{ borderColor: request.leave_type?.color || 'hsl(var(--primary))' }}
+                      >
+                        <span className="text-[9px] uppercase text-muted-foreground leading-none">
+                          {format(day, 'EEE')}
+                        </span>
+                        <span className="text-sm font-semibold leading-tight">{format(day, 'd')}</span>
+                      </div>
+                    ))}
+                    {showCompact && days.length > 2 && (
+                      <span className="text-xs text-muted-foreground px-1">+{days.length - 2}</span>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">{format(start, 'MMM yyyy')}</span>
+                </div>
+              );
+            })()}
           </div>
 
           <div className="text-center">
