@@ -44,7 +44,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // Company-scoped app routes (must be prefixed by a company slug)
     const companyRoutes = [
       'dashboard', 'profile', 'projects', 'team-members', 'office-settings', 'weekly-overview',
-      'weekly-rundown', 'team-workload', 'team-annual-leave', 'project-resourcing', 'financial-control',
+      'weekly-rundown', 'team-workload', 'team-leave', 'project-resourcing', 'financial-control',
       'help-center', 'workflow', 'financial-overview', 'project-profit-dashboard', 'project-billing',
       'aging-invoices', 'resource-scheduling'
     ];

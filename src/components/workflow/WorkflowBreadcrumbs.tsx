@@ -38,7 +38,7 @@ export const WorkflowBreadcrumbs: React.FC = () => {
       case '/team-workload':
         breadcrumbs.push({ label: 'Team Workload' });
         break;
-      case '/team-annual-leave':
+      case '/team-leave':
         breadcrumbs.push({ label: 'Team Leave' });
         break;
       case '/weekly-overview':

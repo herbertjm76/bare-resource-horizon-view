@@ -24,7 +24,7 @@ export const generateLeaveInsights = (
       description: `${leaveInsights.nextWeekCount} team members on leave next week.`,
       severity: leaveInsights.nextWeekCount > teamSize * 0.3 ? 'high' : 'medium',
       actionLabel: "View Calendar",
-      onAction: () => navigate('/team-annual-leave'),
+      onAction: () => navigate('/team-leave'),
       metric: `${leaveInsights.nextWeekCount} people`,
       icon: { name: 'plane', className: 'h-4 w-4 text-blue-500' }
     });
@@ -36,7 +36,7 @@ export const generateLeaveInsights = (
       description: `${leaveInsights.nextMonthCount} team members on leave next month.`,
       severity: 'low',
       actionLabel: "Plan Ahead",
-      onAction: () => navigate('/team-annual-leave'),
+      onAction: () => navigate('/team-leave'),
       metric: `${leaveInsights.nextMonthCount} people`,
       icon: { name: 'calendar', className: 'h-4 w-4 text-green-500' }
     });
@@ -48,7 +48,7 @@ export const generateLeaveInsights = (
       description: `Week of ${leaveInsights.peakWeek.weekStart} has ${leaveInsights.peakWeek.count} people on leave.`,
       severity: leaveInsights.peakWeek.count > teamSize * 0.4 ? 'critical' : 'medium',
       actionLabel: "Review Schedule",
-      onAction: () => navigate('/team-annual-leave'),
+      onAction: () => navigate('/team-leave'),
       metric: `${leaveInsights.peakWeek.count} people`,
       icon: { name: 'alert-triangle', className: 'h-4 w-4 text-orange-500' }
     });

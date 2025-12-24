@@ -94,7 +94,7 @@ function AppWithTheme() {
               <Route path="/:companySlug/team-members" element={<TeamMembers />} />
               <Route path="/:companySlug/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/:companySlug/team-workload" element={<TeamWorkload />} />
-              <Route path="/:companySlug/team-annual-leave" element={<TeamAnnualLeave />} />
+              <Route path="/:companySlug/team-leave" element={<TeamAnnualLeave />} />
               
               {/* Protected: Settings (requires view:settings) */}
               <Route path="/:companySlug/office-settings" element={
@@ -191,7 +191,7 @@ function AppWithTheme() {
               <Route path="/team-members" element={<TeamMembers />} />
               <Route path="/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/team-workload" element={<TeamWorkload />} />
-              <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
+              <Route path="/team-leave" element={<TeamAnnualLeave />} />
               
               {/* Protected: Settings */}
               <Route path="/office-settings" element={
