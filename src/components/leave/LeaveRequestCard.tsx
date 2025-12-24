@@ -1,10 +1,9 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
-import { Clock, Calendar, X, CheckCircle, XCircle, AlertCircle, Pencil } from 'lucide-react';
+import { Clock, Calendar, X, CheckCircle, XCircle, AlertCircle, Pencil, User } from 'lucide-react';
 import { LeaveRequest } from '@/types/leave';
 import { cn } from '@/lib/utils';
 
@@ -17,10 +16,10 @@ interface LeaveRequestCardProps {
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  pending: { label: 'Pending', color: 'bg-amber-100 text-amber-800', icon: AlertCircle },
-  approved: { label: 'Approved', color: 'bg-green-100 text-green-800', icon: CheckCircle },
-  rejected: { label: 'Rejected', color: 'bg-red-100 text-red-800', icon: XCircle },
-  cancelled: { label: 'Cancelled', color: 'bg-gray-100 text-gray-800', icon: X }
+  pending: { label: 'Pending', color: 'bg-amber-500/10 text-amber-600 border-amber-200', icon: AlertCircle },
+  approved: { label: 'Approved', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-200', icon: CheckCircle },
+  rejected: { label: 'Rejected', color: 'bg-red-500/10 text-red-600 border-red-200', icon: XCircle },
+  cancelled: { label: 'Cancelled', color: 'bg-muted text-muted-foreground border-border', icon: X }
 };
 
 export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
@@ -47,142 +46,137 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
 
   const getDurationLabel = () => {
     switch (request.duration_type) {
-      case 'full_day': return 'Full Day';
-      case 'half_day_am': return 'Half Day (AM)';
-      case 'half_day_pm': return 'Half Day (PM)';
+      case 'full_day': return 'Full';
+      case 'half_day_am': return 'AM';
+      case 'half_day_pm': return 'PM';
       default: return request.duration_type;
     }
   };
 
+  const formatDateRange = () => {
+    const start = new Date(request.start_date);
+    const end = new Date(request.end_date);
+    if (request.start_date === request.end_date) {
+      return format(start, 'MMM d, yyyy');
+    }
+    return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
+  };
+
   return (
-    <Card className="transition-shadow hover:shadow-md">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            {/* Header with member info and status */}
-            <div className="flex items-center gap-3 mb-3">
-              {showMember && request.member && (
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={request.member.avatar_url || undefined} alt={getMemberName()} />
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    {getMemberInitials()}
-                  </AvatarFallback>
-                </Avatar>
-              )}
-              <div className="flex-1 min-w-0">
-                {showMember && (
-                  <p className="font-medium truncate">{getMemberName()}</p>
-                )}
-                <div className="flex items-center gap-2">
-                  {request.leave_type && (
-                    <Badge 
-                      variant="secondary" 
-                      style={{ 
-                        backgroundColor: `${request.leave_type.color}20`,
-                        color: request.leave_type.color,
-                        borderColor: request.leave_type.color
-                      }}
-                      className="border"
-                    >
-                      {request.leave_type.name}
-                    </Badge>
-                  )}
-                  <Badge className={cn("flex items-center gap-1", status.color)}>
-                    <StatusIcon className="w-3 h-3" />
-                    {status.label}
-                  </Badge>
-                </div>
-              </div>
-            </div>
+    <div className="group flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
+      {/* Left: Avatar or Leave Type Color */}
+      {showMember && request.member ? (
+        <Avatar className="h-9 w-9 shrink-0">
+          <AvatarImage src={request.member.avatar_url || undefined} alt={getMemberName()} />
+          <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+            {getMemberInitials()}
+          </AvatarFallback>
+        </Avatar>
+      ) : (
+        <div 
+          className="h-9 w-9 rounded-full shrink-0 flex items-center justify-center"
+          style={{ backgroundColor: `${request.leave_type?.color}15` }}
+        >
+          <div 
+            className="h-3 w-3 rounded-full"
+            style={{ backgroundColor: request.leave_type?.color }}
+          />
+        </div>
+      )}
 
-            {/* Date and Duration */}
-            <div className="grid grid-cols-2 gap-4 mb-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  {format(new Date(request.start_date), 'MMM d')}
-                  {request.start_date !== request.end_date && (
-                    <> - {format(new Date(request.end_date), 'MMM d, yyyy')}</>
-                  )}
-                  {request.start_date === request.end_date && (
-                    <>, {format(new Date(request.start_date), 'yyyy')}</>
-                  )}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="w-4 h-4" />
-                <span>{getDurationLabel()} ({request.total_hours}h)</span>
-              </div>
-            </div>
-
-            {/* Remarks */}
-            {request.remarks && (
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                {request.remarks}
-              </p>
+      {/* Main Content */}
+      <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+        {/* Primary Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            {showMember && (
+              <span className="font-medium text-sm truncate">{getMemberName()}</span>
             )}
-
-            {/* Rejection reason */}
-            {request.status === 'rejected' && request.rejection_reason && (
-              <div className="p-2 bg-red-50 rounded text-sm text-red-700">
-                <strong>Reason:</strong> {request.rejection_reason}
-              </div>
-            )}
-
-            {/* Assigned approver info (for pending) */}
-            {request.status === 'pending' && request.requested_approver && (
-              <p className="text-xs text-muted-foreground">
-                Assigned to: {request.requested_approver.first_name} {request.requested_approver.last_name}
-              </p>
-            )}
-
-            {/* Approver info (for approved/rejected) */}
-            {request.status === 'approved' && request.approver && (
-              <p className="text-xs text-muted-foreground">
-                Approved by {request.approver.first_name} {request.approver.last_name}
-                {request.approved_at && <> on {format(new Date(request.approved_at), 'PPP')}</>}
-              </p>
-            )}
-            
-            {request.status === 'rejected' && request.approver && (
-              <p className="text-xs text-muted-foreground">
-                Rejected by {request.approver.first_name} {request.approver.last_name}
-                {request.approved_at && <> on {format(new Date(request.approved_at), 'PPP')}</>}
-              </p>
+            {request.leave_type && (
+              <Badge 
+                variant="outline" 
+                className="text-xs px-1.5 py-0 h-5 shrink-0 border"
+                style={{ 
+                  backgroundColor: `${request.leave_type.color}10`,
+                  color: request.leave_type.color,
+                  borderColor: `${request.leave_type.color}40`
+                }}
+              >
+                {request.leave_type.name}
+              </Badge>
             )}
           </div>
-
-          {/* Actions */}
-          {request.status === 'pending' && (
-            <div className="flex flex-col gap-2">
-              {onEdit && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEdit(request)}
-                  disabled={isLoading}
-                  className="text-primary hover:text-primary hover:bg-primary/10"
-                >
-                  <Pencil className="w-4 h-4 mr-1" />
-                  Edit
-                </Button>
-              )}
-              {onCancel && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onCancel(request.id)}
-                  disabled={isLoading}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                >
-                  <X className="w-4 h-4 mr-1" />
-                  Cancel
-                </Button>
-              )}
-            </div>
+          {request.remarks && (
+            <p className="text-xs text-muted-foreground truncate mt-0.5">
+              {request.remarks}
+            </p>
           )}
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Date & Duration */}
+        <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+          <span className="flex items-center gap-1">
+            <Calendar className="h-3 w-3" />
+            {formatDateRange()}
+          </span>
+          <span className="flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {getDurationLabel()} · {request.total_hours}h
+          </span>
+        </div>
+      </div>
+
+      {/* Status Badge */}
+      <Badge 
+        variant="outline" 
+        className={cn("text-xs px-2 py-0.5 h-6 shrink-0 border gap-1", status.color)}
+      >
+        <StatusIcon className="w-3 h-3" />
+        {status.label}
+      </Badge>
+
+      {/* Actions */}
+      {request.status === 'pending' && (onEdit || onCancel) && (
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {onEdit && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => onEdit(request)}
+              disabled={isLoading}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          {onCancel && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-destructive hover:text-destructive"
+              onClick={() => onCancel(request.id)}
+              disabled={isLoading}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Approval Info (compact) */}
+      {request.status === 'pending' && request.requested_approver && (
+        <span className="hidden lg:flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+          <User className="h-3 w-3" />
+          {request.requested_approver.first_name}
+        </span>
+      )}
+
+      {/* Rejection reason tooltip-style */}
+      {request.status === 'rejected' && request.rejection_reason && (
+        <span className="hidden lg:block text-xs text-red-600 max-w-32 truncate" title={request.rejection_reason}>
+          {request.rejection_reason}
+        </span>
+      )}
+    </div>
   );
 };
