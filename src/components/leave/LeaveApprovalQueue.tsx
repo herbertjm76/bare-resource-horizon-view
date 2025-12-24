@@ -304,16 +304,16 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
               })()}
             </div>
 
-            <div className="text-center">
+            <div className="flex flex-col items-center justify-center">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">Duration</div>
               <Badge 
                 variant="secondary" 
-                className="text-sm font-semibold px-3 py-1"
+                className="text-xs font-semibold px-2 py-0.5 w-fit"
                 style={{ backgroundColor: `${request.leave_type?.color}20`, color: request.leave_type?.color }}
               >
                 {(() => {
                   const hours = request.total_hours || 0;
-                  if (hours < 8) return `${hours} Hrs`;
+                  if (hours < 8) return `${hours}h`;
                   const days = hours / 8;
                   return days === 1 ? '1 Day' : `${days % 1 === 0 ? days : days.toFixed(1)} Days`;
                 })()}
