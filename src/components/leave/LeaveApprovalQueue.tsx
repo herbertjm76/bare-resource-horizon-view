@@ -185,33 +185,28 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
     const isPending = (request.status ?? 'pending') === 'pending';
 
     return (
-      <div 
-        key={request.id} 
-        className={cn(
-          "group rounded-xl border bg-card p-4 hover:shadow-md transition-all duration-200"
-        )}
-      >
-        {/* Header Row - Avatar, Name, Status/Actions */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10">
+      <article key={request.id} className="group rounded-xl border bg-card p-4 transition-shadow hover:shadow-md">
+        <header className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar className="h-9 w-9 shrink-0">
               <AvatarImage src={request.member?.avatar_url || undefined} alt={getMemberName(request)} />
-              <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
                 {getMemberInitials(request)}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <div className="font-medium text-sm">{getMemberName(request)}</div>
-              <div className="text-xs text-muted-foreground">{request.member?.email}</div>
+
+            <div className="min-w-0">
+              <div className="text-sm font-medium truncate">{getMemberName(request)}</div>
+              <div className="text-xs text-muted-foreground truncate">{request.member?.email}</div>
             </div>
           </div>
 
           {showActions && isPending ? (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 shrink-0">
               <Button
                 size="sm"
-                variant="ghost"
-                className="h-8 px-3 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 gap-1.5"
+                variant="outline"
+                className="h-8 px-3 gap-1.5"
                 onClick={() => handleApprove(request)}
                 disabled={isProcessing}
               >
@@ -220,8 +215,8 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
               </Button>
               <Button
                 size="sm"
-                variant="ghost"
-                className="h-8 px-3 text-red-600 hover:text-red-700 hover:bg-red-50 gap-1.5"
+                variant="destructive"
+                className="h-8 px-3 gap-1.5"
                 onClick={() => handleRejectClick(request)}
                 disabled={isProcessing}
               >
@@ -237,95 +232,102 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleReassignClick(request)}>
                     <UserCheck className="h-4 w-4 mr-2" />
-                    Reassign Approver
+                    Reassign approver
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           ) : (
-            <Badge 
-              variant="outline" 
-              className={cn("text-xs px-2.5 py-1 gap-1.5 font-medium", statusConfig.className)}
+            <Badge
+              variant="outline"
+              className={cn("h-7 px-2.5 text-xs font-medium gap-1.5", statusConfig.className)}
             >
-              <StatusIcon className="w-3.5 h-3.5" />
+              <StatusIcon className="h-3.5 w-3.5" />
               {statusConfig.label}
             </Badge>
           )}
-        </div>
+        </header>
 
-        {/* Content Grid - Inset Boxes */}
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          {/* Leave Type Box */}
-          <div className="p-2.5 rounded-lg bg-muted/40 text-center">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Type</div>
-            {request.leave_type && (
-              <div className="flex items-center justify-center gap-1.5">
-                <div 
-                  className="h-2 w-2 rounded-full shrink-0"
-                  style={{ backgroundColor: request.leave_type.color }}
-                />
-                <span className="text-xs font-medium">{request.leave_type.name}</span>
+        {/* Single inset block (reduces fragmentation) */}
+        <section className="mt-4 rounded-lg border bg-muted/30 p-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+            <div className="text-center">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Type</div>
+              <div className="mt-1 flex items-center justify-center gap-2 text-sm font-medium">
+                {request.leave_type ? (
+                  <>
+                    <span
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: request.leave_type.color || undefined }}
+                      aria-hidden
+                    />
+                    <span className="truncate max-w-[14rem]">{request.leave_type.name}</span>
+                  </>
+                ) : (
+                  <span className="text-muted-foreground">—</span>
+                )}
               </div>
+            </div>
+
+            <div className="text-center">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Dates</div>
+              <div className="mt-1 flex items-center justify-center gap-2 text-sm font-medium">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>{formatDateRange(request.start_date, request.end_date)}</span>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Hours</div>
+              <div className="mt-1 flex items-center justify-center gap-2 text-sm font-medium">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span>{request.total_hours}h</span>
+                <span className="text-xs text-muted-foreground">· {getDurationLabel(request.duration_type)}</span>
+              </div>
+            </div>
+          </div>
+
+          {request.remarks && (
+            <div className="mt-3 pt-3 border-t">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground text-center">Notes</div>
+              <p className="mt-1 text-xs text-muted-foreground text-center break-words">{request.remarks}</p>
+            </div>
+          )}
+        </section>
+
+        {(request.status === 'approved' && request.approver) ||
+        (request.status === 'rejected' && request.rejection_reason) ||
+        request.attachment_url ? (
+          <footer className="mt-3 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
+            {request.attachment_url && (
+              <a
+                href={request.attachment_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                Attachment
+                <ExternalLink className="h-3 w-3" />
+              </a>
             )}
-          </div>
 
-          {/* Dates Box */}
-          <div className="p-2.5 rounded-lg bg-muted/40 text-center">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Dates</div>
-            <div className="flex items-center justify-center gap-1 text-xs font-medium">
-              <Calendar className="h-3 w-3 text-muted-foreground" />
-              {formatDateRange(request.start_date, request.end_date)}
-            </div>
-          </div>
+            {request.status === 'approved' && request.approver && (
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle className="h-3.5 w-3.5 text-primary" />
+                Approved by {request.approver.first_name}
+              </span>
+            )}
 
-          {/* Duration Box */}
-          <div className="p-2.5 rounded-lg bg-muted/40 text-center">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Hours</div>
-            <div className="flex items-center justify-center gap-1 text-xs font-medium">
-              <Clock className="h-3 w-3 text-muted-foreground" />
-              {request.total_hours}h · {getDurationLabel(request.duration_type)}
-            </div>
-          </div>
-        </div>
-
-        {/* Remarks */}
-        {request.remarks && (
-          <div className="p-2.5 rounded-lg bg-muted/40 mb-3">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5 text-center">Notes</div>
-            <p className="text-xs text-muted-foreground text-center">{request.remarks}</p>
-          </div>
-        )}
-
-        {/* Footer Row - Attachment & Extra Info */}
-        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-          {request.attachment_url && (
-            <a 
-              href={request.attachment_url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-primary transition-colors"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              Attachment
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          )}
-
-          {request.status === 'rejected' && request.rejection_reason && (
-            <div className="flex items-center gap-1 text-red-600">
-              <XCircle className="h-3.5 w-3.5" />
-              <span className="truncate max-w-48">{request.rejection_reason}</span>
-            </div>
-          )}
-
-          {request.status === 'approved' && request.approver && (
-            <div className="flex items-center gap-1">
-              <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
-              Approved by {request.approver.first_name}
-            </div>
-          )}
-        </div>
-      </div>
+            {request.status === 'rejected' && request.rejection_reason && (
+              <span className="inline-flex items-center gap-1 text-destructive">
+                <XCircle className="h-3.5 w-3.5" />
+                <span className="truncate max-w-[18rem]">{request.rejection_reason}</span>
+              </span>
+            )}
+          </footer>
+        ) : null}
+      </article>
     );
   };
 
@@ -379,7 +381,7 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {pendingApprovals.map((request) => renderApprovalCard(request, true))}
             </div>
           )}
@@ -394,7 +396,7 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {allRequests.map((request) => renderApprovalCard(request, request.status === 'pending'))}
             </div>
           )}
