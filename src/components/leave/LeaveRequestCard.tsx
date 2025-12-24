@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
-import { Clock, Calendar, X, CheckCircle, XCircle, AlertCircle, Pencil, User } from 'lucide-react';
+import { Clock, Calendar, X, CheckCircle, XCircle, AlertCircle, Pencil, User, CalendarCheck } from 'lucide-react';
 import { LeaveRequest } from '@/types/leave';
 import { cn } from '@/lib/utils';
 
@@ -239,6 +239,13 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
       </section>
 
       {/* Footer */}
+      {request.status === 'approved' && (request as any).sent_to_calendar_at && (
+        <footer className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+          <CalendarCheck className="h-3.5 w-3.5 text-primary" />
+          <span>Sent to calendar on {format(new Date((request as any).sent_to_calendar_at), 'MMM d, yyyy')}</span>
+        </footer>
+      )}
+
       {request.status === 'pending' && request.requested_approver && (
         <footer className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
           <User className="h-3.5 w-3.5" />

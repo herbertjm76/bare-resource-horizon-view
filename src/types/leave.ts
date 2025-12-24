@@ -29,6 +29,8 @@ export interface LeaveRequest {
   approved_at: string | null;
   rejection_reason: string | null;
   attachment_url: string | null;
+  sent_to_calendar_at: string | null;
+  calendar_uid: string | null;
   created_at: string;
   updated_at: string;
   // Joined data

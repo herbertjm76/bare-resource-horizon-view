@@ -269,6 +269,7 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           attachment_url: string | null
+          calendar_uid: string | null
           company_id: string
           created_at: string | null
           duration_type: string
@@ -280,6 +281,7 @@ export type Database = {
           rejection_reason: string | null
           remarks: string
           requested_approver_id: string | null
+          sent_to_calendar_at: string | null
           start_date: string
           status: string | null
           total_hours: number | null
@@ -289,6 +291,7 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           attachment_url?: string | null
+          calendar_uid?: string | null
           company_id: string
           created_at?: string | null
           duration_type: string
@@ -300,6 +303,7 @@ export type Database = {
           rejection_reason?: string | null
           remarks: string
           requested_approver_id?: string | null
+          sent_to_calendar_at?: string | null
           start_date: string
           status?: string | null
           total_hours?: number | null
@@ -309,6 +313,7 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           attachment_url?: string | null
+          calendar_uid?: string | null
           company_id?: string
           created_at?: string | null
           duration_type?: string
@@ -320,6 +325,7 @@ export type Database = {
           rejection_reason?: string | null
           remarks?: string
           requested_approver_id?: string | null
+          sent_to_calendar_at?: string | null
           start_date?: string
           status?: string | null
           total_hours?: number | null
