@@ -33,7 +33,7 @@ const Documentation = () => {
       items: [
         "Inviting team members",
         "Setting roles and permissions",
-        "Managing annual leave",
+        "Managing leave",
         "Tracking team utilization"
       ]
     },

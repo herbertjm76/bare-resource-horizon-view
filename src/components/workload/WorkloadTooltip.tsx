@@ -79,7 +79,7 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
           <div className="space-y-1 text-xs">
             {breakdown.annualLeave > 0 && (
               <div className="flex justify-between">
-                <span className="text-green-600">Annual Leave:</span>
+                <span className="text-green-600">Leave:</span>
                 <span className="font-medium">{formatAllocationValue(breakdown.annualLeave, effectiveCapacity, displayPreference)}</span>
               </div>
             )}
