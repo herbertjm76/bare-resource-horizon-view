@@ -181,57 +181,50 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
             {(() => {
               const start = new Date(request.start_date);
               const end = new Date(request.end_date);
-              const days: Date[] = [];
-              for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                days.push(new Date(d));
-              }
-              const showCompact = days.length > 7;
+              const isSingleDay = request.start_date === request.end_date;
+              const leaveColor = request.leave_type?.color || 'hsl(var(--primary))';
+              
+              const DateTile = ({ date }: { date: Date }) => (
+                <div
+                  className="flex flex-col items-center justify-center h-11 w-10 rounded-lg border-2 bg-background text-center"
+                  style={{ borderColor: leaveColor }}
+                >
+                  <span className="text-[9px] uppercase text-muted-foreground leading-none">
+                    {format(date, 'EEE')}
+                  </span>
+                  <span className="text-base font-bold leading-tight">{format(date, 'd')}</span>
+                  <span className="text-[8px] text-muted-foreground leading-none">{format(date, 'MMM')}</span>
+                </div>
+              );
+              
               return (
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-0.5">
-                    {(showCompact ? [days[0], days[days.length - 1]] : days).map((day, i) => (
-                      <div
-                        key={i}
-                        className="flex flex-col items-center justify-center h-10 w-9 rounded border bg-background text-center"
-                        style={{ borderColor: request.leave_type?.color || 'hsl(var(--primary))' }}
-                      >
-                        <span className="text-[9px] uppercase text-muted-foreground leading-none">
-                          {format(day, 'EEE')}
-                        </span>
-                        <span className="text-sm font-semibold leading-tight">{format(day, 'd')}</span>
-                      </div>
-                    ))}
-                    {showCompact && days.length > 2 && (
-                      <span className="text-xs text-muted-foreground px-1">+{days.length - 2}</span>
-                    )}
-                  </div>
-                  <span className="text-[10px] text-muted-foreground">{format(start, 'MMM yyyy')}</span>
+                <div className="flex items-center justify-center gap-2">
+                  <DateTile date={start} />
+                  {!isSingleDay && (
+                    <>
+                      <span className="text-muted-foreground text-lg">→</span>
+                      <DateTile date={end} />
+                    </>
+                  )}
                 </div>
               );
             })()}
           </div>
 
           <div className="text-center">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Duration</div>
-            <div className="mt-1 flex items-center justify-center gap-1.5">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">Duration</div>
+            <Badge 
+              variant="secondary" 
+              className="text-sm font-semibold px-3 py-1"
+              style={{ backgroundColor: `${request.leave_type?.color}20`, color: request.leave_type?.color }}
+            >
               {(() => {
-                const days = (request.total_hours || 0) / 8;
-                const fullDays = Math.floor(days);
-                const hasHalf = days % 1 >= 0.5;
-                return (
-                  <>
-                    <div className="flex items-center gap-0.5">
-                      {Array.from({ length: Math.min(fullDays, 5) }).map((_, i) => (
-                        <div key={i} className="h-5 w-5 rounded bg-primary/80" />
-                      ))}
-                      {hasHalf && <div className="h-5 w-2.5 rounded-l bg-primary/50" />}
-                      {fullDays > 5 && <span className="text-xs text-muted-foreground ml-1">+{fullDays - 5}</span>}
-                    </div>
-                    <span className="text-sm font-medium ml-1.5">{days % 1 === 0 ? days : days.toFixed(1)}d</span>
-                  </>
-                );
+                const hours = request.total_hours || 0;
+                if (hours < 8) return `${hours} Hrs`;
+                const days = hours / 8;
+                return days === 1 ? '1 Day' : `${days % 1 === 0 ? days : days.toFixed(1)} Days`;
               })()}
-            </div>
+            </Badge>
           </div>
         </div>
 
