@@ -179,7 +179,7 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
     );
   }
 
-  const renderCompactCard = (request: LeaveRequest, showActions: boolean = false) => {
+  const renderApprovalCard = (request: LeaveRequest, showActions: boolean = false) => {
     const statusConfig = getStatusConfig(request.status ?? 'pending');
     const StatusIcon = statusConfig.icon;
     const isPending = (request.status ?? 'pending') === 'pending';
@@ -188,136 +188,143 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
       <div 
         key={request.id} 
         className={cn(
-          "group flex items-center gap-3 p-3 rounded-lg border bg-card transition-colors",
-          isPending && "hover:bg-accent/5"
+          "group rounded-xl border bg-card p-4 hover:shadow-md transition-all duration-200"
         )}
       >
-        {/* Avatar */}
-        <Avatar className="h-9 w-9 shrink-0">
-          <AvatarImage src={request.member?.avatar_url || undefined} alt={getMemberName(request)} />
-          <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-            {getMemberInitials(request)}
-          </AvatarFallback>
-        </Avatar>
-
-        {/* Main Content */}
-        <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
-          {/* Name & Leave Type */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-sm truncate">{getMemberName(request)}</span>
-              {request.leave_type && (
-                <Badge 
-                  variant="outline" 
-                  className="text-xs px-1.5 py-0 h-5 shrink-0 border"
-                  style={{ 
-                    backgroundColor: `${request.leave_type.color}10`,
-                    color: request.leave_type.color,
-                    borderColor: `${request.leave_type.color}40`
-                  }}
-                >
-                  {request.leave_type.name}
-                </Badge>
-              )}
+        {/* Header Row - Avatar, Name, Status/Actions */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={request.member?.avatar_url || undefined} alt={getMemberName(request)} />
+              <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                {getMemberInitials(request)}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="font-medium text-sm">{getMemberName(request)}</div>
+              <div className="text-xs text-muted-foreground">{request.member?.email}</div>
             </div>
-            {request.remarks && (
-              <p className="text-xs text-muted-foreground truncate mt-0.5 max-w-xs">
-                {request.remarks}
-              </p>
+          </div>
+
+          {showActions && isPending ? (
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-8 px-3 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 gap-1.5"
+                onClick={() => handleApprove(request)}
+                disabled={isProcessing}
+              >
+                <Check className="h-4 w-4" />
+                Approve
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-8 px-3 text-red-600 hover:text-red-700 hover:bg-red-50 gap-1.5"
+                onClick={() => handleRejectClick(request)}
+                disabled={isProcessing}
+              >
+                <X className="h-4 w-4" />
+                Reject
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon" variant="ghost" className="h-8 w-8" disabled={isProcessing}>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleReassignClick(request)}>
+                    <UserCheck className="h-4 w-4 mr-2" />
+                    Reassign Approver
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <Badge 
+              variant="outline" 
+              className={cn("text-xs px-2.5 py-1 gap-1.5 font-medium", statusConfig.className)}
+            >
+              <StatusIcon className="w-3.5 h-3.5" />
+              {statusConfig.label}
+            </Badge>
+          )}
+        </div>
+
+        {/* Content Grid - Inset Boxes */}
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          {/* Leave Type Box */}
+          <div className="p-2.5 rounded-lg bg-muted/40 text-center">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Type</div>
+            {request.leave_type && (
+              <div className="flex items-center justify-center gap-1.5">
+                <div 
+                  className="h-2 w-2 rounded-full shrink-0"
+                  style={{ backgroundColor: request.leave_type.color }}
+                />
+                <span className="text-xs font-medium">{request.leave_type.name}</span>
+              </div>
             )}
           </div>
 
-          {/* Date & Duration */}
-          <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
-            <span className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
+          {/* Dates Box */}
+          <div className="p-2.5 rounded-lg bg-muted/40 text-center">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Dates</div>
+            <div className="flex items-center justify-center gap-1 text-xs font-medium">
+              <Calendar className="h-3 w-3 text-muted-foreground" />
               {formatDateRange(request.start_date, request.end_date)}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {getDurationLabel(request.duration_type)} · {request.total_hours}h
-            </span>
+            </div>
+          </div>
+
+          {/* Duration Box */}
+          <div className="p-2.5 rounded-lg bg-muted/40 text-center">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Hours</div>
+            <div className="flex items-center justify-center gap-1 text-xs font-medium">
+              <Clock className="h-3 w-3 text-muted-foreground" />
+              {request.total_hours}h · {getDurationLabel(request.duration_type)}
+            </div>
           </div>
         </div>
 
-        {/* Attachment indicator */}
-        {request.attachment_url && (
-          <a 
-            href={request.attachment_url} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="shrink-0 text-muted-foreground hover:text-primary"
-          >
-            <FileText className="h-4 w-4" />
-          </a>
-        )}
-
-        {/* Status or Actions */}
-        {showActions && isPending ? (
-          <div className="flex items-center gap-1 shrink-0">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-              onClick={() => handleApprove(request)}
-              disabled={isProcessing}
-            >
-              <Check className="h-4 w-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={() => handleRejectClick(request)}
-              disabled={isProcessing}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8"
-                  disabled={isProcessing}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleReassignClick(request)}>
-                  <UserCheck className="h-4 w-4 mr-2" />
-                  Reassign Approver
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {/* Remarks */}
+        {request.remarks && (
+          <div className="p-2.5 rounded-lg bg-muted/40 mb-3">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5 text-center">Notes</div>
+            <p className="text-xs text-muted-foreground text-center">{request.remarks}</p>
           </div>
-        ) : (
-          <Badge 
-            variant="outline" 
-            className={cn("text-xs px-2 py-0.5 h-6 shrink-0 border gap-1", statusConfig.className)}
-          >
-            <StatusIcon className="w-3 h-3" />
-            {statusConfig.label}
-          </Badge>
         )}
 
-        {/* Rejection reason (for rejected) */}
-        {request.status === 'rejected' && request.rejection_reason && (
-          <span 
-            className="hidden xl:block text-xs text-red-600 max-w-32 truncate" 
-            title={request.rejection_reason}
-          >
-            {request.rejection_reason}
-          </span>
-        )}
+        {/* Footer Row - Attachment & Extra Info */}
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          {request.attachment_url && (
+            <a 
+              href={request.attachment_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 hover:text-primary transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Attachment
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          )}
 
-        {/* Approved by (for approved) */}
-        {request.status === 'approved' && request.approver && (
-          <span className="hidden xl:block text-xs text-muted-foreground">
-            by {request.approver.first_name}
-          </span>
-        )}
+          {request.status === 'rejected' && request.rejection_reason && (
+            <div className="flex items-center gap-1 text-red-600">
+              <XCircle className="h-3.5 w-3.5" />
+              <span className="truncate max-w-48">{request.rejection_reason}</span>
+            </div>
+          )}
+
+          {request.status === 'approved' && request.approver && (
+            <div className="flex items-center gap-1">
+              <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+              Approved by {request.approver.first_name}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -373,7 +380,7 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
             </Card>
           ) : (
             <div className="space-y-2">
-              {pendingApprovals.map((request) => renderCompactCard(request, true))}
+              {pendingApprovals.map((request) => renderApprovalCard(request, true))}
             </div>
           )}
         </TabsContent>
@@ -388,7 +395,7 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
             </Card>
           ) : (
             <div className="space-y-2">
-              {allRequests.map((request) => renderCompactCard(request, request.status === 'pending'))}
+              {allRequests.map((request) => renderApprovalCard(request, request.status === 'pending'))}
             </div>
           )}
         </TabsContent>

@@ -46,9 +46,9 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
 
   const getDurationLabel = () => {
     switch (request.duration_type) {
-      case 'full_day': return 'Full';
-      case 'half_day_am': return 'AM';
-      case 'half_day_pm': return 'PM';
+      case 'full_day': return 'Full Day';
+      case 'half_day_am': return 'Half Day (AM)';
+      case 'half_day_pm': return 'Half Day (PM)';
       default: return request.duration_type;
     }
   };
@@ -57,126 +57,127 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
     const start = new Date(request.start_date);
     const end = new Date(request.end_date);
     if (request.start_date === request.end_date) {
-      return format(start, 'MMM d, yyyy');
+      return format(start, 'EEE, MMM d');
     }
-    return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
+    return `${format(start, 'MMM d')} → ${format(end, 'MMM d')}`;
   };
 
   return (
-    <div className="group flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
-      {/* Left: Avatar or Leave Type Color */}
-      {showMember && request.member ? (
-        <Avatar className="h-9 w-9 shrink-0">
-          <AvatarImage src={request.member.avatar_url || undefined} alt={getMemberName()} />
-          <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-            {getMemberInitials()}
-          </AvatarFallback>
-        </Avatar>
-      ) : (
-        <div 
-          className="h-9 w-9 rounded-full shrink-0 flex items-center justify-center"
-          style={{ backgroundColor: `${request.leave_type?.color}15` }}
+    <div className="group rounded-xl border bg-card p-4 hover:shadow-md transition-all duration-200">
+      {/* Header Row - Status + Actions */}
+      <div className="flex items-center justify-between mb-3">
+        <Badge 
+          variant="outline" 
+          className={cn("text-xs px-2.5 py-1 gap-1.5 font-medium", status.color)}
         >
-          <div 
-            className="h-3 w-3 rounded-full"
-            style={{ backgroundColor: request.leave_type?.color }}
-          />
-        </div>
-      )}
+          <StatusIcon className="w-3.5 h-3.5" />
+          {status.label}
+        </Badge>
 
-      {/* Main Content */}
-      <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
-        {/* Primary Info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            {showMember && (
-              <span className="font-medium text-sm truncate">{getMemberName()}</span>
-            )}
-            {request.leave_type && (
-              <Badge 
-                variant="outline" 
-                className="text-xs px-1.5 py-0 h-5 shrink-0 border"
-                style={{ 
-                  backgroundColor: `${request.leave_type.color}10`,
-                  color: request.leave_type.color,
-                  borderColor: `${request.leave_type.color}40`
-                }}
+        {request.status === 'pending' && (onEdit || onCancel) && (
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs gap-1"
+                onClick={() => onEdit(request)}
+                disabled={isLoading}
               >
-                {request.leave_type.name}
-              </Badge>
+                <Pencil className="h-3 w-3" />
+                Edit
+              </Button>
+            )}
+            {onCancel && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs gap-1 text-destructive hover:text-destructive"
+                onClick={() => onCancel(request.id)}
+                disabled={isLoading}
+              >
+                <X className="h-3 w-3" />
+                Cancel
+              </Button>
             )}
           </div>
-          {request.remarks && (
-            <p className="text-xs text-muted-foreground truncate mt-0.5">
-              {request.remarks}
-            </p>
-          )}
-        </div>
-
-        {/* Date & Duration */}
-        <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
-          <span className="flex items-center gap-1">
-            <Calendar className="h-3 w-3" />
-            {formatDateRange()}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {getDurationLabel()} · {request.total_hours}h
-          </span>
-        </div>
+        )}
       </div>
 
-      {/* Status Badge */}
-      <Badge 
-        variant="outline" 
-        className={cn("text-xs px-2 py-0.5 h-6 shrink-0 border gap-1", status.color)}
-      >
-        <StatusIcon className="w-3 h-3" />
-        {status.label}
-      </Badge>
+      {/* Main Content - Centered with Inset Boxes */}
+      <div className="space-y-3">
+        {/* Member Info (if shown) */}
+        {showMember && request.member && (
+          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={request.member.avatar_url || undefined} alt={getMemberName()} />
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+                {getMemberInitials()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="font-medium text-sm">{getMemberName()}</span>
+          </div>
+        )}
 
-      {/* Actions */}
-      {request.status === 'pending' && (onEdit || onCancel) && (
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {onEdit && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => onEdit(request)}
-              disabled={isLoading}
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </Button>
-          )}
-          {onCancel && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
-              onClick={() => onCancel(request.id)}
-              disabled={isLoading}
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
-          )}
+        {/* Leave Type & Duration Row */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Leave Type Box */}
+          <div className="p-3 rounded-lg bg-muted/40 text-center">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Type</div>
+            {request.leave_type && (
+              <div className="flex items-center justify-center gap-1.5">
+                <div 
+                  className="h-2.5 w-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: request.leave_type.color }}
+                />
+                <span className="text-sm font-medium">{request.leave_type.name}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Duration Box */}
+          <div className="p-3 rounded-lg bg-muted/40 text-center">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Duration</div>
+            <div className="flex items-center justify-center gap-1.5 text-sm font-medium">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              {request.total_hours}h
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Approval Info (compact) */}
-      {request.status === 'pending' && request.requested_approver && (
-        <span className="hidden lg:flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-          <User className="h-3 w-3" />
-          {request.requested_approver.first_name}
-        </span>
-      )}
+        {/* Date Box */}
+        <div className="p-3 rounded-lg bg-muted/40 text-center">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Dates</div>
+          <div className="flex items-center justify-center gap-2 text-sm font-medium">
+            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+            <span>{formatDateRange()}</span>
+            <span className="text-xs text-muted-foreground">({getDurationLabel()})</span>
+          </div>
+        </div>
 
-      {/* Rejection reason tooltip-style */}
-      {request.status === 'rejected' && request.rejection_reason && (
-        <span className="hidden lg:block text-xs text-red-600 max-w-32 truncate" title={request.rejection_reason}>
-          {request.rejection_reason}
-        </span>
-      )}
+        {/* Remarks (if any) */}
+        {request.remarks && (
+          <div className="p-3 rounded-lg bg-muted/40">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 text-center">Notes</div>
+            <p className="text-xs text-muted-foreground text-center">{request.remarks}</p>
+          </div>
+        )}
+
+        {/* Approver or Rejection Info */}
+        {request.status === 'pending' && request.requested_approver && (
+          <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground pt-1">
+            <User className="h-3 w-3" />
+            <span>Awaiting approval from {request.requested_approver.first_name}</span>
+          </div>
+        )}
+
+        {request.status === 'rejected' && request.rejection_reason && (
+          <div className="p-2.5 rounded-lg bg-red-50 border border-red-100">
+            <div className="text-[10px] uppercase tracking-wider text-red-600 mb-1 text-center">Rejection Reason</div>
+            <p className="text-xs text-red-600 text-center">{request.rejection_reason}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
