@@ -278,11 +278,25 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
             </div>
 
             <div className="text-center">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Hours</div>
-              <div className="mt-1 flex items-center justify-center gap-2 text-sm font-medium">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>{request.total_hours}h</span>
-                <span className="text-xs text-muted-foreground">· {getDurationLabel(request.duration_type)}</span>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Duration</div>
+              <div className="mt-1 flex items-center justify-center gap-1.5">
+                {(() => {
+                  const days = (request.total_hours || 0) / 8;
+                  const fullDays = Math.floor(days);
+                  const hasHalf = days % 1 >= 0.5;
+                  return (
+                    <>
+                      <div className="flex items-center gap-0.5">
+                        {Array.from({ length: Math.min(fullDays, 5) }).map((_, i) => (
+                          <div key={i} className="h-5 w-5 rounded bg-primary/80" />
+                        ))}
+                        {hasHalf && <div className="h-5 w-2.5 rounded-l bg-primary/50" />}
+                        {fullDays > 5 && <span className="text-xs text-muted-foreground ml-1">+{fullDays - 5}</span>}
+                      </div>
+                      <span className="text-sm font-medium ml-1.5">{days % 1 === 0 ? days : days.toFixed(1)}d</span>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>
