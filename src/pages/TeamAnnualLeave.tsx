@@ -10,6 +10,7 @@ import { TeamAnnualLeaveContent } from '@/components/annual-leave/TeamAnnualLeav
 import { LeaveApplicationForm } from '@/components/leave/LeaveApplicationForm';
 import { MyLeaveRequests } from '@/components/leave/MyLeaveRequests';
 import { LeaveApprovalQueue } from '@/components/leave/LeaveApprovalQueue';
+import { SendLeaveCalendarDialog } from '@/components/leave/SendLeaveCalendarDialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, FileText, ClipboardList, CheckSquare } from 'lucide-react';
 import { TimeRange } from '@/components/annual-leave/MonthSelector';
@@ -59,11 +60,14 @@ const TeamAnnualLeave = () => {
 
   return (
     <StandardLayout>
-      <StandardizedPageHeader
-        title="Team Annual Leave"
-        description="Manage and track annual leave allocations for your team members"
-        icon={Calendar}
-      />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <StandardizedPageHeader
+          title="Team Annual Leave"
+          description="Manage and track annual leave allocations for your team members"
+          icon={Calendar}
+        />
+        <SendLeaveCalendarDialog />
+      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-6 mx-auto flex w-fit">
