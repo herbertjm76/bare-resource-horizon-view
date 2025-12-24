@@ -27,7 +27,7 @@ export const FeaturesGrid = () => {
     {
       icon: <Users className="w-8 h-8 text-purple-600" />,
       title: "Team Overview",
-      description: "Monitor team workload, annual leave, and availability at a glance."
+      description: "Monitor team workload, leave, and availability at a glance."
     }
   ];
 

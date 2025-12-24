@@ -154,7 +154,7 @@ export const EnhancedUtilizationPopover: React.FC<EnhancedUtilizationPopoverProp
           <div className="space-y-1 text-xs">
             {annualLeave > 0 && (
               <div className="flex justify-between">
-                <span className="text-green-600">Annual Leave:</span>
+                <span className="text-green-600">Leave:</span>
                 <span className="font-medium">{formatAllocationValue(annualLeave, capacity, displayPreference)}</span>
               </div>
             )}

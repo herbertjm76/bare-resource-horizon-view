@@ -102,8 +102,8 @@ const faqData: FAQItem[] = [
   },
   {
     id: "resource-3",
-    question: "How do I handle annual leave and holidays in resource planning?",
-    answer: "Set up office holidays in Office Settings and individual annual leave in Team Annual Leave. The system will automatically reduce available capacity during these periods and show holiday indicators in the resource views.",
+    question: "How do I handle leave and holidays in resource planning?",
+    answer: "Set up office holidays in Office Settings and individual leave in Team Leave. The system will automatically reduce available capacity during these periods and show holiday indicators in the resource views.",
     category: "Resource Planning",
     tags: ["annual-leave", "holidays", "time-off"]
   },

@@ -48,7 +48,7 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({ weekData }) =>
           <div className="text-xs font-medium text-muted-foreground">Other Time:</div>
           {weekData.annualLeave > 0 && (
             <div className="flex justify-between items-center text-xs">
-              <span className="text-foreground">Annual Leave</span>
+              <span className="text-foreground">Leave</span>
               <span className="text-muted-foreground">{weekData.annualLeave}h</span>
             </div>
           )}
