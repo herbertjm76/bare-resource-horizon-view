@@ -69,7 +69,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     if (title.includes('team') || title.includes('members') || title.includes('size') || title.includes('resources') || title.includes('staff')) return UserSquare2; // Match sidebar "Team Members"
     if (title.includes('resourcing') || title.includes('allocation')) return GanttChartSquare; // Match sidebar "Project Resourcing"
     if (title.includes('workload') || title.includes('overloaded') || title.includes('needs')) return Briefcase; // Match sidebar "Team Workload"
-    if (title.includes('leave') || title.includes('holiday') || title.includes('annual')) return Calendar; // Match sidebar "Team Annual Leave"
+    if (title.includes('leave') || title.includes('holiday') || title.includes('annual')) return Calendar; // Match sidebar "Team Leave"
     if (title.includes('completion') || title.includes('office') || title.includes('location')) return Users; // Generic fallback
     
     // Default icons based on position if no match - prioritize most common metrics

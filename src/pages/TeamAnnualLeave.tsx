@@ -60,13 +60,15 @@ const TeamAnnualLeave = () => {
 
   return (
     <StandardLayout>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div className="relative mb-6">
+        <div className="absolute right-0 top-0 z-10">
+          <SendLeaveCalendarDialog />
+        </div>
         <StandardizedPageHeader
-          title="Team Annual Leave"
-          description="Manage and track annual leave allocations for your team members"
+          title="Team Leave"
+          description="Manage and track leave allocations for your team members"
           icon={Calendar}
         />
-        <SendLeaveCalendarDialog />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
