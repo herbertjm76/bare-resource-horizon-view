@@ -87,7 +87,7 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
         },
         {
           title: "Team Leave",
-          url: `${baseUrl}/team-annual-leave`,
+          url: `${baseUrl}/team-leave`,
           icon: Calendar,
         },
       ],
