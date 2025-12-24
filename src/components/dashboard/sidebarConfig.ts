@@ -86,7 +86,7 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
           icon: GanttChartSquare,
         },
         {
-          title: "Annual Leave",
+          title: "Team Leave",
           url: `${baseUrl}/team-annual-leave`,
           icon: Calendar,
         },
