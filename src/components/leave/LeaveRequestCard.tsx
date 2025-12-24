@@ -15,11 +15,30 @@ interface LeaveRequestCardProps {
   isLoading?: boolean;
 }
 
-const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  pending: { label: 'Pending', color: 'bg-amber-500/10 text-amber-600 border-amber-200', icon: AlertCircle },
-  approved: { label: 'Approved', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-200', icon: CheckCircle },
-  rejected: { label: 'Rejected', color: 'bg-red-500/10 text-red-600 border-red-200', icon: XCircle },
-  cancelled: { label: 'Cancelled', color: 'bg-muted text-muted-foreground border-border', icon: X }
+const statusConfig: Record<
+  string,
+  { label: string; className: string; icon: React.ElementType }
+> = {
+  pending: {
+    label: 'Pending',
+    className: 'bg-muted text-muted-foreground border-border',
+    icon: AlertCircle,
+  },
+  approved: {
+    label: 'Approved',
+    className: 'bg-primary/10 text-primary border-primary/20',
+    icon: CheckCircle,
+  },
+  rejected: {
+    label: 'Rejected',
+    className: 'bg-destructive/10 text-destructive border-destructive/20',
+    icon: XCircle,
+  },
+  cancelled: {
+    label: 'Cancelled',
+    className: 'bg-muted text-muted-foreground border-border',
+    icon: X,
+  },
 };
 
 export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
@@ -63,28 +82,60 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
   };
 
   return (
-    <div className="group rounded-xl border bg-card p-4 hover:shadow-md transition-all duration-200">
-      {/* Header Row - Status + Actions */}
-      <div className="flex items-center justify-between mb-3">
-        <Badge 
-          variant="outline" 
-          className={cn("text-xs px-2.5 py-1 gap-1.5 font-medium", status.color)}
-        >
-          <StatusIcon className="w-3.5 h-3.5" />
-          {status.label}
-        </Badge>
+    <article className="group rounded-xl border bg-card p-4 transition-shadow hover:shadow-md">
+      {/* Header */}
+      <header className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <Badge
+              variant="outline"
+              className={cn(
+                "h-7 px-2.5 text-xs font-medium gap-1.5",
+                status.className
+              )}
+            >
+              <StatusIcon className="h-3.5 w-3.5" />
+              {status.label}
+            </Badge>
+
+            {request.leave_type && (
+              <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: request.leave_type.color || undefined }}
+                  aria-hidden
+                />
+                <span className="truncate">{request.leave_type.name}</span>
+              </div>
+            )}
+          </div>
+
+          {showMember && request.member && (
+            <div className="mt-2 flex items-center gap-2 min-w-0">
+              <Avatar className="h-7 w-7 shrink-0">
+                <AvatarImage src={request.member.avatar_url || undefined} alt={getMemberName()} />
+                <AvatarFallback className="bg-primary/10 text-primary text-[11px] font-medium">
+                  {getMemberInitials()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <div className="text-sm font-medium truncate">{getMemberName()}</div>
+              </div>
+            </div>
+          )}
+        </div>
 
         {request.status === 'pending' && (onEdit || onCancel) && (
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
             {onEdit && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 px-2 text-xs gap-1"
+                className="h-8 px-2 text-xs"
                 onClick={() => onEdit(request)}
                 disabled={isLoading}
               >
-                <Pencil className="h-3 w-3" />
+                <Pencil className="h-3.5 w-3.5 mr-1" />
                 Edit
               </Button>
             )}
@@ -92,92 +143,83 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 px-2 text-xs gap-1 text-destructive hover:text-destructive"
+                className="h-8 px-2 text-xs text-destructive hover:text-destructive"
                 onClick={() => onCancel(request.id)}
                 disabled={isLoading}
               >
-                <X className="h-3 w-3" />
+                <X className="h-3.5 w-3.5 mr-1" />
                 Cancel
               </Button>
             )}
           </div>
         )}
-      </div>
+      </header>
 
-      {/* Main Content - Centered with Inset Boxes */}
-      <div className="space-y-3">
-        {/* Member Info (if shown) */}
-        {showMember && request.member && (
-          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={request.member.avatar_url || undefined} alt={getMemberName()} />
-              <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-                {getMemberInitials()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="font-medium text-sm">{getMemberName()}</span>
-          </div>
-        )}
-
-        {/* Leave Type & Duration Row */}
-        <div className="grid grid-cols-2 gap-2">
-          {/* Leave Type Box */}
-          <div className="p-3 rounded-lg bg-muted/40 text-center">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Type</div>
-            {request.leave_type && (
-              <div className="flex items-center justify-center gap-1.5">
-                <div 
-                  className="h-2.5 w-2.5 rounded-full shrink-0"
-                  style={{ backgroundColor: request.leave_type.color }}
-                />
-                <span className="text-sm font-medium">{request.leave_type.name}</span>
-              </div>
-            )}
+      {/* Inset summary (single, readable block) */}
+      <section className="mt-4 rounded-lg border bg-muted/30 p-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+          <div className="text-center">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Type</div>
+            <div className="mt-1 flex items-center justify-center gap-2 text-sm font-medium">
+              {request.leave_type ? (
+                <>
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: request.leave_type.color || undefined }}
+                    aria-hidden
+                  />
+                  <span className="truncate max-w-[14rem]">{request.leave_type.name}</span>
+                </>
+              ) : (
+                <span className="text-muted-foreground">—</span>
+              )}
+            </div>
           </div>
 
-          {/* Duration Box */}
-          <div className="p-3 rounded-lg bg-muted/40 text-center">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Duration</div>
-            <div className="flex items-center justify-center gap-1.5 text-sm font-medium">
-              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              {request.total_hours}h
+          <div className="text-center">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Dates</div>
+            <div className="mt-1 flex items-center justify-center gap-2 text-sm font-medium">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span>{formatDateRange()}</span>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Hours</div>
+            <div className="mt-1 flex items-center justify-center gap-2 text-sm font-medium">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span>{request.total_hours}h</span>
+              <span className="text-xs text-muted-foreground">· {getDurationLabel()}</span>
             </div>
           </div>
         </div>
 
-        {/* Date Box */}
-        <div className="p-3 rounded-lg bg-muted/40 text-center">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Dates</div>
-          <div className="flex items-center justify-center gap-2 text-sm font-medium">
-            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-            <span>{formatDateRange()}</span>
-            <span className="text-xs text-muted-foreground">({getDurationLabel()})</span>
-          </div>
-        </div>
-
-        {/* Remarks (if any) */}
         {request.remarks && (
-          <div className="p-3 rounded-lg bg-muted/40">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 text-center">Notes</div>
-            <p className="text-xs text-muted-foreground text-center">{request.remarks}</p>
+          <div className="mt-3 pt-3 border-t">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground text-center">Notes</div>
+            <p className="mt-1 text-xs text-muted-foreground text-center break-words">
+              {request.remarks}
+            </p>
           </div>
         )}
+      </section>
 
-        {/* Approver or Rejection Info */}
-        {request.status === 'pending' && request.requested_approver && (
-          <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground pt-1">
-            <User className="h-3 w-3" />
-            <span>Awaiting approval from {request.requested_approver.first_name}</span>
-          </div>
-        )}
+      {/* Footer */}
+      {request.status === 'pending' && request.requested_approver && (
+        <footer className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+          <User className="h-3.5 w-3.5" />
+          <span>Awaiting approval from {request.requested_approver.first_name}</span>
+        </footer>
+      )}
 
-        {request.status === 'rejected' && request.rejection_reason && (
-          <div className="p-2.5 rounded-lg bg-red-50 border border-red-100">
-            <div className="text-[10px] uppercase tracking-wider text-red-600 mb-1 text-center">Rejection Reason</div>
-            <p className="text-xs text-red-600 text-center">{request.rejection_reason}</p>
-          </div>
-        )}
-      </div>
-    </div>
+      {request.status === 'rejected' && request.rejection_reason && (
+        <footer className="mt-3 rounded-lg border border-destructive/20 bg-destructive/10 p-2.5">
+          <div className="text-[10px] uppercase tracking-wider text-destructive text-center">Rejection reason</div>
+          <p className="mt-1 text-xs text-destructive text-center break-words">
+            {request.rejection_reason}
+          </p>
+        </footer>
+      )}
+    </article>
   );
 };
