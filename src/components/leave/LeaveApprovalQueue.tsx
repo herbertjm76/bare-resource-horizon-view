@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -21,19 +21,27 @@ import {
   XCircle,
   Clock,
   Calendar,
-  Users,
   AlertCircle,
   FileText,
   ExternalLink,
   ShieldCheck,
   UserCheck,
   RefreshCw,
+  Check,
+  X,
+  MoreHorizontal,
 } from 'lucide-react';
 import { useLeaveApprovals } from '@/hooks/leave/useLeaveApprovals';
 import { LeaveRequest } from '@/types/leave';
 import { cn } from '@/lib/utils';
 import { ReassignApproverDialog } from './ReassignApproverDialog';
 import { LeaveRequestCardSkeleton } from './LeaveRequestCardSkeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 type LeaveApprovalQueueProps = {
   active?: boolean;
@@ -110,27 +118,30 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
 
   const getDurationLabel = (durationType: string) => {
     switch (durationType) {
-      case 'full_day': return 'Full Day';
-      case 'half_day_am': return 'Half Day (AM)';
-      case 'half_day_pm': return 'Half Day (PM)';
+      case 'full_day': return 'Full';
+      case 'half_day_am': return 'AM';
+      case 'half_day_pm': return 'PM';
       default: return durationType;
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusConfig = (status: string) => {
     const config: Record<string, { label: string; className: string; icon: React.ElementType }> = {
-      pending: { label: 'Pending', className: 'bg-amber-100 text-amber-800', icon: AlertCircle },
-      approved: { label: 'Approved', className: 'bg-green-100 text-green-800', icon: CheckCircle },
-      rejected: { label: 'Rejected', className: 'bg-red-100 text-red-800', icon: XCircle },
-      cancelled: { label: 'Cancelled', className: 'bg-gray-100 text-gray-800', icon: XCircle }
+      pending: { label: 'Pending', className: 'bg-amber-500/10 text-amber-600 border-amber-200', icon: AlertCircle },
+      approved: { label: 'Approved', className: 'bg-emerald-500/10 text-emerald-600 border-emerald-200', icon: CheckCircle },
+      rejected: { label: 'Rejected', className: 'bg-red-500/10 text-red-600 border-red-200', icon: XCircle },
+      cancelled: { label: 'Cancelled', className: 'bg-muted text-muted-foreground border-border', icon: XCircle }
     };
-    const { label, className, icon: Icon } = config[status] || config.pending;
-    return (
-      <Badge className={cn("flex items-center gap-1", className)}>
-        <Icon className="w-3 h-3" />
-        {label}
-      </Badge>
-    );
+    return config[status] || config.pending;
+  };
+
+  const formatDateRange = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (startDate === endDate) {
+      return format(start, 'MMM d');
+    }
+    return `${format(start, 'MMM d')} - ${format(end, 'MMM d')}`;
   };
 
   if (isLoading) {
@@ -143,9 +154,9 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
             <Skeleton className="h-9 w-24" />
           </div>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <LeaveRequestCardSkeleton key={i} showActions />
+            <Skeleton key={i} className="h-16 w-full rounded-lg" />
           ))}
         </div>
       </div>
@@ -168,199 +179,216 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
     );
   }
 
-  const renderRequestCard = (request: LeaveRequest, showActions: boolean = false) => (
-    <Card key={request.id} className="transition-all hover:shadow-md">
-      <CardContent className="p-5">
-        <div className="flex flex-col lg:flex-row lg:items-start gap-4">
-          {/* Member Info */}
-          <div className="flex items-center gap-3 lg:w-1/4">
-            <Avatar className="h-12 w-12">
-              <AvatarImage src={request.member?.avatar_url || undefined} alt={getMemberName(request)} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                {getMemberInitials(request)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <p className="font-medium truncate">{getMemberName(request)}</p>
-              <p className="text-sm text-muted-foreground truncate">{request.member?.email}</p>
-            </div>
-          </div>
+  const renderCompactCard = (request: LeaveRequest, showActions: boolean = false) => {
+    const statusConfig = getStatusConfig(request.status ?? 'pending');
+    const StatusIcon = statusConfig.icon;
+    const isPending = (request.status ?? 'pending') === 'pending';
 
-          {/* Leave Details */}
-          <div className="flex-1 space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
+    return (
+      <div 
+        key={request.id} 
+        className={cn(
+          "group flex items-center gap-3 p-3 rounded-lg border bg-card transition-colors",
+          isPending && "hover:bg-accent/5"
+        )}
+      >
+        {/* Avatar */}
+        <Avatar className="h-9 w-9 shrink-0">
+          <AvatarImage src={request.member?.avatar_url || undefined} alt={getMemberName(request)} />
+          <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+            {getMemberInitials(request)}
+          </AvatarFallback>
+        </Avatar>
+
+        {/* Main Content */}
+        <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+          {/* Name & Leave Type */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-sm truncate">{getMemberName(request)}</span>
               {request.leave_type && (
                 <Badge 
-                  variant="secondary" 
+                  variant="outline" 
+                  className="text-xs px-1.5 py-0 h-5 shrink-0 border"
                   style={{ 
-                    backgroundColor: `${request.leave_type.color}20`,
+                    backgroundColor: `${request.leave_type.color}10`,
                     color: request.leave_type.color,
-                    borderColor: request.leave_type.color
+                    borderColor: `${request.leave_type.color}40`
                   }}
-                  className="border"
                 >
                   {request.leave_type.name}
                 </Badge>
               )}
-              {getStatusBadge(request.status ?? 'pending')}
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="w-4 h-4 shrink-0" />
-                <span>
-                  {format(new Date(request.start_date), 'MMM d')}
-                  {request.start_date !== request.end_date && (
-                    <> - {format(new Date(request.end_date), 'MMM d')}</>
-                  )}
-                  , {format(new Date(request.start_date), 'yyyy')}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="w-4 h-4 shrink-0" />
-                <span>{getDurationLabel(request.duration_type)} ({request.total_hours}h)</span>
-              </div>
-            </div>
-
             {request.remarks && (
-              <p className="text-sm text-muted-foreground bg-muted/50 p-2 rounded">
-                "{request.remarks}"
-              </p>
-            )}
-
-            {request.attachment_url && (
-              <a 
-                href={request.attachment_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-              >
-                <FileText className="w-4 h-4" />
-                View Attachment
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
-
-            {request.status === 'rejected' && request.rejection_reason && (
-              <div className="p-2 bg-red-50 rounded text-sm text-red-700">
-                <strong>Rejection reason:</strong> {request.rejection_reason}
-              </div>
-            )}
-
-            {request.status === 'approved' && request.approver && (
-              <p className="text-xs text-muted-foreground">
-                Approved by {request.approver.first_name} {request.approver.last_name}
-                {request.approved_at && <> on {format(new Date(request.approved_at), 'PPP')}</>}
+              <p className="text-xs text-muted-foreground truncate mt-0.5 max-w-xs">
+                {request.remarks}
               </p>
             )}
           </div>
 
-          {/* Actions */}
-          {showActions && (request.status ?? 'pending') === 'pending' && (
-            <div className="flex lg:flex-col gap-2 lg:w-auto">
-              <Button
-                size="sm"
-                onClick={() => handleApprove(request)}
-                disabled={isProcessing}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <CheckCircle className="w-4 h-4 mr-1" />
-                Approve
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleRejectClick(request)}
-                disabled={isProcessing}
-                className="text-red-600 border-red-200 hover:bg-red-50"
-              >
-                <XCircle className="w-4 h-4 mr-1" />
-                Reject
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleReassignClick(request)}
-                disabled={isProcessing}
-                className="text-blue-600 border-blue-200 hover:bg-blue-50"
-              >
-                <UserCheck className="w-4 h-4 mr-1" />
-                Reassign
-              </Button>
-            </div>
-          )}
+          {/* Date & Duration */}
+          <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+            <span className="flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              {formatDateRange(request.start_date, request.end_date)}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {getDurationLabel(request.duration_type)} · {request.total_hours}h
+            </span>
+          </div>
         </div>
-      </CardContent>
-    </Card>
-  );
+
+        {/* Attachment indicator */}
+        {request.attachment_url && (
+          <a 
+            href={request.attachment_url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="shrink-0 text-muted-foreground hover:text-primary"
+          >
+            <FileText className="h-4 w-4" />
+          </a>
+        )}
+
+        {/* Status or Actions */}
+        {showActions && isPending ? (
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+              onClick={() => handleApprove(request)}
+              disabled={isProcessing}
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+              onClick={() => handleRejectClick(request)}
+              disabled={isProcessing}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8"
+                  disabled={isProcessing}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleReassignClick(request)}>
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  Reassign Approver
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : (
+          <Badge 
+            variant="outline" 
+            className={cn("text-xs px-2 py-0.5 h-6 shrink-0 border gap-1", statusConfig.className)}
+          >
+            <StatusIcon className="w-3 h-3" />
+            {statusConfig.label}
+          </Badge>
+        )}
+
+        {/* Rejection reason (for rejected) */}
+        {request.status === 'rejected' && request.rejection_reason && (
+          <span 
+            className="hidden xl:block text-xs text-red-600 max-w-32 truncate" 
+            title={request.rejection_reason}
+          >
+            {request.rejection_reason}
+          </span>
+        )}
+
+        {/* Approved by (for approved) */}
+        {request.status === 'approved' && request.approver && (
+          <span className="hidden xl:block text-xs text-muted-foreground">
+            by {request.approver.first_name}
+          </span>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
       <Tabs defaultValue="pending" className="w-full">
-        <div className="flex items-center justify-between mb-4">
-          <TabsList>
-            <TabsTrigger value="pending" className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <TabsList className="h-9">
+            <TabsTrigger value="pending" className="text-sm gap-1.5 px-3">
+              <AlertCircle className="w-3.5 h-3.5" />
               Pending
               {pendingApprovals.length > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-800">
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5 bg-amber-100 text-amber-700 text-xs">
                   {pendingApprovals.length}
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="all" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              All Requests
+            <TabsTrigger value="all" className="text-sm gap-1.5 px-3">
+              <FileText className="w-3.5 h-3.5" />
+              All
             </TabsTrigger>
           </TabsList>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {lastUpdated && (
               <span className="text-xs text-muted-foreground">
-                Updated {format(lastUpdated, 'h:mm a')}
+                {format(lastUpdated, 'h:mm a')}
               </span>
             )}
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleRefresh}
               disabled={isLoading}
-              className="gap-1.5"
+              className="h-8 px-2 gap-1.5"
             >
-              <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+              <RefreshCw className={cn("w-3.5 h-3.5", isLoading && "animate-spin")} />
               Refresh
             </Button>
           </div>
         </div>
 
-        <TabsContent value="pending">
+        <TabsContent value="pending" className="mt-0">
           {pendingApprovals.length === 0 ? (
             <Card>
-              <CardContent className="py-12 text-center">
-                <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-500 opacity-50" />
-                <p className="text-muted-foreground">No pending leave requests</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  All caught up! New requests will appear here.
+              <CardContent className="py-10 text-center">
+                <CheckCircle className="w-10 h-10 mx-auto mb-3 text-emerald-500/50" />
+                <p className="text-muted-foreground text-sm">No pending requests</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  All caught up!
                 </p>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
-              {pendingApprovals.map((request) => renderRequestCard(request, true))}
+            <div className="space-y-2">
+              {pendingApprovals.map((request) => renderCompactCard(request, true))}
             </div>
           )}
         </TabsContent>
 
-        <TabsContent value="all">
+        <TabsContent value="all" className="mt-0">
           {allRequests.length === 0 ? (
             <Card>
-              <CardContent className="py-12 text-center">
-                <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <p className="text-muted-foreground">No leave requests found</p>
+              <CardContent className="py-10 text-center">
+                <FileText className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
+                <p className="text-muted-foreground text-sm">No leave requests found</p>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
-              {allRequests.map((request) => renderRequestCard(request, request.status === 'pending'))}
+            <div className="space-y-2">
+              {allRequests.map((request) => renderCompactCard(request, request.status === 'pending'))}
             </div>
           )}
         </TabsContent>
@@ -368,29 +396,28 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
 
       {/* Rejection Dialog */}
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Reject Leave Request</DialogTitle>
+            <DialogTitle>Reject Request</DialogTitle>
             <DialogDescription>
-              Please provide a reason for rejecting this leave request from{' '}
-              <strong>{selectedRequest && getMemberName(selectedRequest)}</strong>.
+              Rejecting request from <strong>{selectedRequest && getMemberName(selectedRequest)}</strong>
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="rejection-reason">Rejection Reason</Label>
-              <Textarea
-                id="rejection-reason"
-                placeholder="Please explain why this request is being rejected..."
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                rows={4}
-              />
-            </div>
+          <div className="py-3">
+            <Label htmlFor="rejection-reason" className="text-sm">Reason</Label>
+            <Textarea
+              id="rejection-reason"
+              placeholder="Please explain why..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              rows={3}
+              className="mt-1.5"
+            />
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setRejectDialogOpen(false)}
               disabled={isProcessing}
             >
@@ -398,10 +425,11 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
             </Button>
             <Button
               variant="destructive"
+              size="sm"
               onClick={handleRejectConfirm}
               disabled={isProcessing || !rejectionReason.trim()}
             >
-              {isProcessing ? 'Rejecting...' : 'Reject Request'}
+              {isProcessing ? 'Rejecting...' : 'Reject'}
             </Button>
           </DialogFooter>
         </DialogContent>
