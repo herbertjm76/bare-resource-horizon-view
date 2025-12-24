@@ -381,7 +381,7 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {pendingApprovals.map((request) => renderApprovalCard(request, true))}
             </div>
           )}
@@ -396,7 +396,7 @@ export const LeaveApprovalQueue: React.FC<LeaveApprovalQueueProps> = ({ active }
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {allRequests.map((request) => renderApprovalCard(request, request.status === 'pending'))}
             </div>
           )}
