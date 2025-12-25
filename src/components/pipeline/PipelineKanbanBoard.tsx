@@ -1,44 +1,44 @@
 import React, { useState, useMemo } from 'react';
 import { useProjects } from '@/hooks/useProjects';
+import { useOfficeStages } from '@/hooks/useOfficeStages';
 import { PipelineColumn } from './PipelineColumn';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
-const STATUS_CONFIG = [
-  { status: 'Planning', title: 'Planning', color: '#3b82f6' },
-  { status: 'Active', title: 'Active', color: '#8b5cf6' },
-  { status: 'On Hold', title: 'On Hold', color: '#f59e0b' },
-  { status: 'Complete', title: 'Complete', color: '#22c55e' },
-];
-
 export const PipelineKanbanBoard: React.FC = () => {
-  const { projects, isLoading } = useProjects();
+  const { projects, isLoading: projectsLoading } = useProjects();
+  const { data: stages, isLoading: stagesLoading } = useOfficeStages();
   const queryClient = useQueryClient();
-  const [dragOverStatus, setDragOverStatus] = useState<string | null>(null);
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [draggingProjectId, setDraggingProjectId] = useState<string | null>(null);
 
-  // Group projects by status
-  const projectsByStatus = useMemo(() => {
+  const isLoading = projectsLoading || stagesLoading;
+
+  // Group projects by current_stage
+  const projectsByStage = useMemo(() => {
     const grouped: Record<string, typeof projects> = {};
     
-    STATUS_CONFIG.forEach(({ status }) => {
-      grouped[status] = [];
+    // Initialize with empty arrays for each stage
+    stages?.forEach((stage) => {
+      grouped[stage.name] = [];
     });
     
+    // Add "Unassigned" for projects without a stage
+    grouped['Unassigned'] = [];
+    
     projects?.forEach((project) => {
-      const status = project.status || 'Planning';
-      if (grouped[status]) {
-        grouped[status].push(project);
+      const stageName = project.current_stage || 'Unassigned';
+      if (grouped[stageName]) {
+        grouped[stageName].push(project);
       } else {
-        // If status doesn't match any known status, put in Planning
-        grouped['Planning'].push(project);
+        grouped['Unassigned'].push(project);
       }
     });
     
     return grouped;
-  }, [projects]);
+  }, [projects, stages]);
 
   const handleDragStart = (e: React.DragEvent, projectId: string) => {
     setDraggingProjectId(projectId);
@@ -51,40 +51,43 @@ export const PipelineKanbanBoard: React.FC = () => {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDragEnter = (status: string) => {
-    setDragOverStatus(status);
+  const handleDragEnter = (stageName: string) => {
+    setDragOverStage(stageName);
   };
 
   const handleDragLeave = () => {
-    setDragOverStatus(null);
+    setDragOverStage(null);
   };
 
-  const handleDrop = async (e: React.DragEvent, newStatus: string) => {
+  const handleDrop = async (e: React.DragEvent, newStage: string) => {
     e.preventDefault();
-    setDragOverStatus(null);
+    setDragOverStage(null);
     
     const projectId = e.dataTransfer.getData('projectId');
     if (!projectId) return;
 
     const project = projects?.find(p => p.id === projectId);
-    if (!project || project.status === newStatus) {
+    if (!project || project.current_stage === newStage) {
       setDraggingProjectId(null);
       return;
     }
 
+    // Handle "Unassigned" as empty string in database
+    const stageValue = newStage === 'Unassigned' ? '' : newStage;
+
     try {
       const { error } = await supabase
         .from('projects')
-        .update({ status: newStatus })
+        .update({ current_stage: stageValue })
         .eq('id', projectId);
 
       if (error) throw error;
 
-      toast.success(`Moved "${project.name}" to ${newStatus}`);
+      toast.success(`Moved "${project.name}" to ${newStage}`);
       queryClient.invalidateQueries({ queryKey: ['projects'] });
     } catch (error) {
-      console.error('Error updating project status:', error);
-      toast.error('Failed to update project status');
+      console.error('Error updating project stage:', error);
+      toast.error('Failed to update project stage');
     } finally {
       setDraggingProjectId(null);
     }
@@ -98,23 +101,29 @@ export const PipelineKanbanBoard: React.FC = () => {
     );
   }
 
+  // Build columns: Unassigned first, then stages in order
+  const columns = [
+    { name: 'Unassigned', color: '#6b7280' },
+    ...(stages?.map(s => ({ name: s.name, color: s.color || '#3b82f6' })) || []),
+  ];
+
   return (
     <div className="flex gap-4 overflow-x-auto pb-4 px-1">
-      {STATUS_CONFIG.map(({ status, title, color }) => (
+      {columns.map(({ name, color }) => (
         <div
-          key={status}
-          onDragEnter={() => handleDragEnter(status)}
+          key={name}
+          onDragEnter={() => handleDragEnter(name)}
           onDragLeave={handleDragLeave}
         >
           <PipelineColumn
-            title={title}
-            status={status}
-            projects={projectsByStatus[status] || []}
+            title={name}
+            status={name}
+            projects={projectsByStage[name] || []}
             color={color}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
-            isDragOver={dragOverStatus === status}
+            isDragOver={dragOverStage === name}
           />
         </div>
       ))}
