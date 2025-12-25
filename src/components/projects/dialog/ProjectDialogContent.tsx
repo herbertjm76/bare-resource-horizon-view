@@ -63,15 +63,21 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
       </TabsContent>
 
       {/* Team Composition Tab */}
-      {projectId && selectedStages.length > 0 && (
+      {projectId && (
         <TabsContent value="team" className="mt-0">
           <ScrollArea className="h-[400px] px-6">
             <div className="py-4">
-              <StageTeamCompositionEditor
-                projectId={projectId}
-                stages={selectedStages}
-                showBudget={true}
-              />
+              {selectedStages.length > 0 ? (
+                <StageTeamCompositionEditor
+                  projectId={projectId}
+                  stages={selectedStages}
+                  showBudget={true}
+                />
+              ) : (
+                <div className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
+                  Select at least one stage in Project Info to start planning your team composition.
+                </div>
+              )}
             </div>
           </ScrollArea>
         </TabsContent>
