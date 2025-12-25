@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CompanyProvider } from "./context/CompanyContext";
 import { ViewAsProvider } from "./hooks/usePermissions";
 import { useTheme } from "./hooks/useTheme";
@@ -95,6 +95,7 @@ function AppWithTheme() {
               <Route path="/:companySlug/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/:companySlug/team-workload" element={<TeamWorkload />} />
               <Route path="/:companySlug/team-leave" element={<TeamAnnualLeave />} />
+              <Route path="/:companySlug/team-annual-leave" element={<Navigate to="team-leave" replace />} />
               
               {/* Protected: Settings (requires view:settings) */}
               <Route path="/:companySlug/office-settings" element={
@@ -192,6 +193,7 @@ function AppWithTheme() {
               <Route path="/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/team-workload" element={<TeamWorkload />} />
               <Route path="/team-leave" element={<TeamAnnualLeave />} />
+              <Route path="/team-annual-leave" element={<Navigate to="/team-leave" replace />} />
               
               {/* Protected: Settings */}
               <Route path="/office-settings" element={
