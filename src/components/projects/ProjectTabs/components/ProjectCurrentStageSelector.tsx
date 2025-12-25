@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface ProjectCurrentStageSelectorProps {
   currentStage: string;
   selectedStages: string[];
-  officeStages: Array<{ id: string; name: string; color?: string }>;
+  officeStages: Array<{ id: string; name: string; color?: string; code?: string }>;
   onChange: (stageId: string) => void;
 }
 
@@ -57,7 +57,7 @@ export const ProjectCurrentStageSelector: React.FC<ProjectCurrentStageSelectorPr
                       className="w-3 h-3 rounded"
                       style={{ backgroundColor: stage.color || '#E5DEFF' }}
                     />
-                    {stage.name}
+                    {stage.code ? `${stage.name} (${stage.code})` : stage.name}
                   </div>
                 </SelectItem>
               ))}

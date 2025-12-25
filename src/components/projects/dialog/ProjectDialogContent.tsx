@@ -37,11 +37,11 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
 }) => {
   // Get stages that are selected for this project
   const selectedStages = officeStages
-    .filter(stage => form.stages?.includes(stage.name))
-    .map(stage => ({
+    .filter((stage) => form.stages?.includes(stage.id))
+    .map((stage) => ({
       id: stage.id,
       name: stage.name,
-      code: stage.code
+      code: stage.code,
     }));
 
   return (
