@@ -7,7 +7,8 @@ import {
   Flag,
   HelpCircle,
   Layers,
-  Activity
+  Activity,
+  TrendingUp
 } from "lucide-react"
 import { Permission } from '@/hooks/usePermissions';
 
@@ -68,6 +69,11 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
           title: "Pipeline",
           url: `${baseUrl}/pipeline`,
           icon: Layers,
+        },
+        {
+          title: "Resource Planning",
+          url: `${baseUrl}/resource-planning`,
+          icon: TrendingUp,
         },
       ],
     },

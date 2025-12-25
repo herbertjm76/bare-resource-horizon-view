@@ -43,6 +43,7 @@ import CompanyLanding from "./pages/CompanyLanding";
 import Timeline from "./pages/Timeline";
 import CapacityPlanning from "./pages/CapacityPlanning";
 import Pipeline from "./pages/Pipeline";
+import ResourcePlanning from "./pages/ResourcePlanning";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,11 @@ function AppWithTheme() {
               <Route path="/:companySlug/pipeline" element={
                 <PermissionGuard requiredPermission="view:projects">
                   <Pipeline />
+                </PermissionGuard>
+              } />
+              <Route path="/:companySlug/resource-planning" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <ResourcePlanning />
                 </PermissionGuard>
               } />
               
@@ -187,6 +193,11 @@ function AppWithTheme() {
               <Route path="/pipeline" element={
                 <PermissionGuard requiredPermission="view:projects">
                   <Pipeline />
+                </PermissionGuard>
+              } />
+              <Route path="/resource-planning" element={
+                <PermissionGuard requiredPermission="view:projects">
+                  <ResourcePlanning />
                 </PermissionGuard>
               } />
               
