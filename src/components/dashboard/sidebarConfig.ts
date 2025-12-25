@@ -46,13 +46,23 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
       ],
     },
     {
-      label: "RESOURCE SCHEDULING",
+      label: "PLANNING",
       requiredPermission: 'view:scheduling',
       items: [
         {
-          title: "Schedule",
+          title: "Resource Scheduling",
           url: `${baseUrl}/resource-scheduling`,
           icon: GanttChartSquare,
+        },
+        {
+          title: "Resource Planning",
+          url: `${baseUrl}/resource-planning`,
+          icon: TrendingUp,
+        },
+        {
+          title: "Capacity Heatmap",
+          url: `${baseUrl}/capacity-heatmap`,
+          icon: Activity,
         },
       ],
     },
@@ -61,7 +71,7 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
       requiredPermission: 'view:projects',
       items: [
         {
-          title: "Projects",
+          title: "All Projects",
           url: `${baseUrl}/projects`,
           icon: FolderKanban,
         },
@@ -69,11 +79,6 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
           title: "Pipeline",
           url: `${baseUrl}/pipeline`,
           icon: Layers,
-        },
-        {
-          title: "Resource Planning",
-          url: `${baseUrl}/resource-planning`,
-          icon: TrendingUp,
         },
       ],
     },
@@ -85,11 +90,6 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
           title: "Team Members",
           url: `${baseUrl}/team-members`,
           icon: UserSquare2,
-        },
-        {
-          title: "Capacity Heatmap",
-          url: `${baseUrl}/capacity-heatmap`,
-          icon: Activity,
         },
         {
           title: "Team Leave",
