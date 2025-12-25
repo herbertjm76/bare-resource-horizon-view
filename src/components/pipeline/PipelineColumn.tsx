@@ -11,6 +11,7 @@ interface Project {
   contract_end_date?: string | null;
   department?: string | null;
   project_manager_id?: string | null;
+  stages?: string[] | null;
 }
 
 interface PipelineColumnProps {
@@ -21,6 +22,7 @@ interface PipelineColumnProps {
   onDragStart: (e: React.DragEvent, projectId: string) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, status: string) => void;
+  onCardClick?: (project: Project) => void;
   isDragOver: boolean;
 }
 
@@ -32,6 +34,7 @@ export const PipelineColumn: React.FC<PipelineColumnProps> = ({
   onDragStart,
   onDragOver,
   onDrop,
+  onCardClick,
   isDragOver,
 }) => {
   return (
@@ -71,6 +74,7 @@ export const PipelineColumn: React.FC<PipelineColumnProps> = ({
               key={project.id}
               project={project}
               onDragStart={onDragStart}
+              onClick={onCardClick}
             />
           ))
         )}

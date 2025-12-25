@@ -2,19 +2,36 @@ import React, { useState, useMemo } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { useOfficeStages } from '@/hooks/useOfficeStages';
 import { PipelineColumn } from './PipelineColumn';
+import { EditProjectDialog } from '@/components/projects/EditProjectDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 
+interface Project {
+  id: string;
+  name: string;
+  code: string;
+  current_stage: string;
+  status: string;
+  contract_end_date?: string | null;
+  department?: string | null;
+  project_manager_id?: string | null;
+  stages?: string[] | null;
+}
+
 export const PipelineKanbanBoard: React.FC = () => {
-  const { projects, isLoading: projectsLoading } = useProjects();
+  const { projects, isLoading: projectsLoading, refetch } = useProjects();
   const { data: stages, isLoading: stagesLoading } = useOfficeStages();
   const queryClient = useQueryClient();
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [draggingProjectId, setDraggingProjectId] = useState<string | null>(null);
   const [hiddenStages, setHiddenStages] = useState<Set<string>>(new Set());
+  
+  // Edit dialog state
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const isLoading = projectsLoading || stagesLoading;
 
@@ -95,6 +112,18 @@ export const PipelineKanbanBoard: React.FC = () => {
     }
   };
 
+  const handleCardClick = (project: Project) => {
+    // Don't open dialog if we're dragging
+    if (draggingProjectId) return;
+    setSelectedProject(project);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsEditDialogOpen(false);
+    setSelectedProject(null);
+  };
+
   const toggleStageVisibility = (stageName: string) => {
     setHiddenStages(prev => {
       const next = new Set(prev);
@@ -124,61 +153,74 @@ export const PipelineKanbanBoard: React.FC = () => {
   const visibleColumns = allColumns.filter(col => !hiddenStages.has(col.name));
 
   return (
-    <div className="space-y-3">
-      {/* Stage Visibility Toggle Row */}
-      <div className="flex flex-wrap justify-center gap-1.5 px-1">
-      {allColumns.map(({ name, code, color }) => {
-          const isHidden = hiddenStages.has(name);
-          const projectCount = (projectsByStage[name] || []).length;
-          const displayLabel = code || name;
-          return (
-            <Toggle
+    <>
+      <div className="space-y-3">
+        {/* Stage Visibility Toggle Row */}
+        <div className="flex flex-wrap justify-center gap-1.5 px-1">
+        {allColumns.map(({ name, code, color }) => {
+            const isHidden = hiddenStages.has(name);
+            const projectCount = (projectsByStage[name] || []).length;
+            const displayLabel = code || name;
+            return (
+              <Toggle
+                key={name}
+                pressed={!isHidden}
+                onPressedChange={() => toggleStageVisibility(name)}
+                size="sm"
+                className="h-7 px-2 gap-1.5 text-xs data-[state=on]:bg-primary/10 data-[state=on]:text-foreground data-[state=off]:bg-muted/50 data-[state=off]:text-muted-foreground"
+                title={name}
+              >
+                <div 
+                  className="w-2 h-2 rounded-full shrink-0" 
+                  style={{ backgroundColor: color, opacity: isHidden ? 0.4 : 1 }}
+                />
+                <span className={isHidden ? 'line-through opacity-60' : ''}>
+                  {displayLabel}
+                </span>
+                <span className="text-[10px] opacity-60">({projectCount})</span>
+                {isHidden ? (
+                  <EyeOff className="h-3 w-3 opacity-50" />
+                ) : (
+                  <Eye className="h-3 w-3 opacity-50" />
+                )}
+              </Toggle>
+            );
+          })}
+        </div>
+
+        {/* Kanban Board */}
+        <div className="flex gap-4 overflow-x-auto pb-4 px-1">
+          {visibleColumns.map(({ name, color }) => (
+            <div
               key={name}
-              pressed={!isHidden}
-              onPressedChange={() => toggleStageVisibility(name)}
-              size="sm"
-              className="h-7 px-2 gap-1.5 text-xs data-[state=on]:bg-primary/10 data-[state=on]:text-foreground data-[state=off]:bg-muted/50 data-[state=off]:text-muted-foreground"
-              title={name}
+              onDragEnter={() => handleDragEnter(name)}
+              onDragLeave={handleDragLeave}
             >
-              <div 
-                className="w-2 h-2 rounded-full shrink-0" 
-                style={{ backgroundColor: color, opacity: isHidden ? 0.4 : 1 }}
+              <PipelineColumn
+                title={name}
+                status={name}
+                projects={projectsByStage[name] || []}
+                color={color}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onCardClick={handleCardClick}
+                isDragOver={dragOverStage === name}
               />
-              <span className={isHidden ? 'line-through opacity-60' : ''}>
-                {displayLabel}
-              </span>
-              <span className="text-[10px] opacity-60">({projectCount})</span>
-              {isHidden ? (
-                <EyeOff className="h-3 w-3 opacity-50" />
-              ) : (
-                <Eye className="h-3 w-3 opacity-50" />
-              )}
-            </Toggle>
-          );
-        })}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Kanban Board */}
-      <div className="flex gap-4 overflow-x-auto pb-4 px-1">
-        {visibleColumns.map(({ name, color }) => (
-          <div
-            key={name}
-            onDragEnter={() => handleDragEnter(name)}
-            onDragLeave={handleDragLeave}
-          >
-            <PipelineColumn
-              title={name}
-              status={name}
-              projects={projectsByStage[name] || []}
-              color={color}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              isDragOver={dragOverStage === name}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
+      {/* Edit Project Dialog */}
+      {selectedProject && (
+        <EditProjectDialog
+          project={selectedProject}
+          isOpen={isEditDialogOpen}
+          onClose={handleCloseDialog}
+          refetch={refetch}
+        />
+      )}
+    </>
   );
 };
