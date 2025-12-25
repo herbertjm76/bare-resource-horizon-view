@@ -33,15 +33,14 @@ export const ProjectDialogActions: React.FC<ProjectDialogActionsProps> = ({
         Cancel
       </Button>
       <Button 
-        type="button" 
+        type="submit" 
         disabled={isLoading}
-        onClick={handleSubmit}
         className="px-6 min-w-[140px]"
       >
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Creating...
+            Saving...
           </>
         ) : (
           submitLabel
