@@ -126,7 +126,7 @@ export const PipelineKanbanBoard: React.FC = () => {
   return (
     <div className="space-y-3">
       {/* Stage Visibility Toggle Row */}
-      <div className="flex flex-wrap gap-1.5 px-1">
+      <div className="flex flex-wrap justify-center gap-1.5 px-1">
       {allColumns.map(({ name, code, color }) => {
           const isHidden = hiddenStages.has(name);
           const projectCount = (projectsByStage[name] || []).length;
