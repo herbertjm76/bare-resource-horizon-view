@@ -117,8 +117,8 @@ export const PipelineKanbanBoard: React.FC = () => {
 
   // Build columns: Unassigned first, then stages in order
   const allColumns = [
-    { name: 'Unassigned', color: '#6b7280' },
-    ...(stages?.map(s => ({ name: s.name, color: s.color || '#3b82f6' })) || []),
+    { name: 'Unassigned', code: null as string | null, color: '#6b7280' },
+    ...(stages?.map(s => ({ name: s.name, code: s.code || null, color: s.color || '#3b82f6' })) || []),
   ];
 
   const visibleColumns = allColumns.filter(col => !hiddenStages.has(col.name));
@@ -127,9 +127,10 @@ export const PipelineKanbanBoard: React.FC = () => {
     <div className="space-y-3">
       {/* Stage Visibility Toggle Row */}
       <div className="flex flex-wrap gap-1.5 px-1">
-        {allColumns.map(({ name, color }) => {
+      {allColumns.map(({ name, code, color }) => {
           const isHidden = hiddenStages.has(name);
           const projectCount = (projectsByStage[name] || []).length;
+          const displayLabel = code ? `${name} (${code})` : name;
           return (
             <Toggle
               key={name}
@@ -143,7 +144,7 @@ export const PipelineKanbanBoard: React.FC = () => {
                 style={{ backgroundColor: color, opacity: isHidden ? 0.4 : 1 }}
               />
               <span className={isHidden ? 'line-through opacity-60' : ''}>
-                {name}
+                {displayLabel}
               </span>
               <span className="text-[10px] opacity-60">({projectCount})</span>
               {isHidden ? (
