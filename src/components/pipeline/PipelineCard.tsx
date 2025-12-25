@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, User, Building2 } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Project {
@@ -24,34 +23,19 @@ export const PipelineCard: React.FC<PipelineCardProps> = ({ project, onDragStart
     <Card
       draggable
       onDragStart={(e) => onDragStart(e, project.id)}
-      className="p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200 bg-card border border-border hover:border-primary/30"
+      className="p-2 cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200 bg-card border border-border hover:border-primary/30"
     >
-      <div className="space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <h4 className="font-medium text-sm text-foreground line-clamp-2">
-            {project.name}
-          </h4>
-          <Badge variant="outline" className="text-xs shrink-0">
-            {project.code}
-          </Badge>
-        </div>
-        
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Building2 className="h-3 w-3" />
-          <span>{project.current_stage}</span>
-        </div>
-        
-        {project.department && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <User className="h-3 w-3" />
-            <span>{project.department}</span>
-          </div>
-        )}
-        
+      <div className="space-y-1">
+        <p className="font-medium text-[11px] text-foreground line-clamp-2 leading-tight">
+          {project.name}
+        </p>
+        <p className="text-[10px] text-muted-foreground font-mono">
+          {project.code}
+        </p>
         {project.contract_end_date && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Calendar className="h-3 w-3" />
-            <span>{format(new Date(project.contract_end_date), 'MMM d, yyyy')}</span>
+          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+            <Calendar className="h-2.5 w-2.5" />
+            <span>{format(new Date(project.contract_end_date), 'MMM d')}</span>
           </div>
         )}
       </div>
