@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { GanttChartSquare, Users, Calendar, TrendingUp } from 'lucide-react';
+import { GanttChartSquare, Users, Calendar } from 'lucide-react';
 import { MemberFilterRow } from '@/components/resources/MemberFilterRow';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
@@ -102,42 +102,32 @@ const ResourceScheduling = () => {
             description="Manage resource allocation across projects and team members"
           />
 
-          {/* Tabs */}
-          <div className="bg-background border-b overflow-hidden">
-            <div className="px-3 sm:px-4 py-2 overflow-x-auto scrollbar-hide">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="w-full mb-2 sm:grid sm:grid-cols-4 gap-1 sm:gap-2 flex flex-nowrap rounded-none bg-transparent p-0 min-w-max sm:min-w-0">
+          {/* Centered Tabs with distinct styling */}
+          <div className="flex justify-center py-4 border-b border-border/50 bg-muted/30">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
+              <TabsList className="inline-flex h-11 items-center justify-center rounded-lg bg-background p-1 shadow-sm border border-border/60">
                 <TabsTrigger
                   value="by-project"
-                  className="flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap px-3 sm:px-4 h-9 sm:h-10 text-xs sm:text-sm"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
                 >
-                  <GanttChartSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="font-medium">By Project</span>
+                  <GanttChartSquare className="h-4 w-4" />
+                  By Project
                 </TabsTrigger>
                 <TabsTrigger
                   value="by-person"
-                  className="flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap px-3 sm:px-4 h-9 sm:h-10 text-xs sm:text-sm"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
                 >
-                  <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="font-medium">By Person</span>
+                  <Users className="h-4 w-4" />
+                  By Person
                 </TabsTrigger>
                 <TabsTrigger
                   value="timeline"
-                  className="flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap px-3 sm:px-4 h-9 sm:h-10 text-xs sm:text-sm"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm opacity-60"
                   disabled
                 >
-                  <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="font-medium">Timeline</span>
-                  <span className="ml-1 text-[10px] sm:text-xs opacity-60 hidden md:inline">(Soon)</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="capacity"
-                  className="flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap px-3 sm:px-4 h-9 sm:h-10 text-xs sm:text-sm"
-                  disabled
-                >
-                  <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="font-medium">Capacity</span>
-                  <span className="ml-1 text-[10px] sm:text-xs opacity-60 hidden md:inline">(Soon)</span>
+                  <Calendar className="h-4 w-4" />
+                  Timeline
+                  <span className="text-xs opacity-70">(Soon)</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -274,22 +264,7 @@ const ResourceScheduling = () => {
               </div>
             </div>
           </TabsContent>
-
-          <TabsContent value="capacity" className="mt-0 py-3">
-            <div className="flex items-center justify-center h-[500px] border-2 border-dashed border-border rounded-xl bg-muted/20">
-              <div className="text-center px-6">
-                <div className="inline-flex p-4 rounded-full bg-emerald-500/10 mb-4">
-                  <TrendingUp className="h-12 w-12 text-emerald-600" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Capacity Planning Coming Soon</h3>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  Future weeks heatmap showing team capacity, availability, and resource constraints
-                </p>
-              </div>
-            </div>
-          </TabsContent>
           </Tabs>
-            </div>
           </div>
         </div>
       </div>
