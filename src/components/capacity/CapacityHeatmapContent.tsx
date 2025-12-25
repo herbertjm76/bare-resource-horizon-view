@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TeamMember } from '@/components/dashboard/types';
 import { useUnifiedWorkloadData } from '@/components/workload/hooks/useUnifiedWorkloadData';
@@ -100,30 +100,35 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
 
       {/* View Mode Tabs */}
       <Card className="border-none shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-semibold">
-            Capacity Analysis ({selectedWeeks} weeks)
-          </CardTitle>
-        </CardHeader>
         <CardContent className="p-0">
           <Tabs 
             value={viewMode} 
             onValueChange={(v) => setViewMode(v as HeatmapViewMode)}
             className="w-full"
           >
-            <div className="px-6 pb-4">
-              <TabsList className="grid w-full max-w-md grid-cols-3">
-                <TabsTrigger value="actual" className="flex items-center gap-2">
+            {/* Centered tabs with distinct styling */}
+            <div className="flex justify-center py-4 border-b border-border/50 bg-muted/30">
+              <TabsList className="inline-flex h-11 items-center justify-center rounded-lg bg-background p-1 shadow-sm border border-border/60">
+                <TabsTrigger 
+                  value="actual" 
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                >
                   <Activity className="h-4 w-4" />
-                  Actual
+                  Actual Workload
                 </TabsTrigger>
-                <TabsTrigger value="projected" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="projected" 
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                >
                   <TrendingUp className="h-4 w-4" />
-                  Projected
+                  Projected Demand
                 </TabsTrigger>
-                <TabsTrigger value="gap" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="gap" 
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                >
                   <Minus className="h-4 w-4" />
-                  Gap
+                  Gap Analysis
                 </TabsTrigger>
               </TabsList>
             </div>
