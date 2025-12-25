@@ -6,7 +6,8 @@ import {
   UserSquare2,
   Flag,
   HelpCircle,
-  Layers
+  Layers,
+  Activity
 } from "lucide-react"
 import { Permission } from '@/hooks/usePermissions';
 
@@ -67,7 +68,6 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
           title: "Pipeline",
           url: `${baseUrl}/pipeline`,
           icon: Layers,
-          comingSoon: true,
         },
       ],
     },
@@ -81,9 +81,9 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
           icon: UserSquare2,
         },
         {
-          title: "Team Workload",
-          url: `${baseUrl}/team-workload`,
-          icon: GanttChartSquare,
+          title: "Capacity Heatmap",
+          url: `${baseUrl}/capacity-heatmap`,
+          icon: Activity,
         },
         {
           title: "Team Leave",
