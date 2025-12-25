@@ -103,8 +103,8 @@ const ResourceScheduling = () => {
           />
 
           {/* Centered Tabs with distinct styling */}
-          <div className="flex justify-center py-4 border-b border-border/50 bg-muted/30">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="flex justify-center py-4 border-b border-border/50 bg-muted/30">
               <TabsList className="inline-flex h-11 items-center justify-center rounded-lg bg-background p-1 shadow-sm border border-border/60">
                 <TabsTrigger
                   value="by-project"
@@ -130,142 +130,142 @@ const ResourceScheduling = () => {
                   <span className="text-xs opacity-70">(Soon)</span>
                 </TabsTrigger>
               </TabsList>
+            </div>
 
-          <TabsContent value="by-project" className="mt-0 py-3">
-            <div className="space-y-4">
-              {/* 1. Available Members Row - always sorted by utilization */}
-              <div className="px-3 sm:px-6">
-                <AvailableMembersRow
-                  weekStartDate={weekStartDate}
-                  threshold={80}
-                  filters={memberFilters}
-                />
-              </div>
-              
-              {/* 2. Combined Controls + Member Filters - grouped in single card */}
-              <div className="px-3 sm:px-6">
-                <div className="bg-card rounded-lg border shadow-sm">
-                  <ProjectResourcingContent
-                    selectedMonth={selectedMonth}
-                    searchTerm={projectSearchTerm}
-                    sortBy={sortBy}
-                    sortDirection={sortDirection}
-                    filters={filters}
-                    displayOptions={displayOptions}
-                    officeOptions={officeOptions}
-                    countryOptions={countryOptions}
-                    managers={managers}
-                    activeFiltersCount={activeFiltersCount}
-                    onMonthChange={handleMonthChange}
-                    onSearchChange={handleProjectSearchChange}
-                    onFilterChange={handleFilterChange}
-                    onPeriodChange={handlePeriodChange}
-                    onSortChange={handleSortChange}
-                    onSortDirectionToggle={handleSortDirectionToggle}
-                    onDisplayOptionChange={handleDisplayOptionChange}
-                    onClearFilters={clearProjectFilters}
-                    showOnlyControls={true}
-                  />
-                  <MemberFilterRow
-                    filters={memberFilters}
-                    onFilterChange={handleMemberFilterChange}
-                    activeFiltersCount={activeMemberFiltersCount}
-                    clearFilters={clearMemberFilters}
-                  />
-                </div>
-              </div>
-              
-              {/* 3. Grid below */}
-              <div className="overflow-x-auto">
+            <TabsContent value="by-project" className="mt-0 py-3">
+              <div className="space-y-4">
+                {/* 1. Available Members Row - always sorted by utilization */}
                 <div className="px-3 sm:px-6">
-                  <ProjectResourcingContent
-                    selectedMonth={selectedMonth}
-                    searchTerm={projectSearchTerm}
-                    sortBy={sortBy}
-                    sortDirection={sortDirection}
-                    filters={filters}
-                    displayOptions={displayOptions}
-                    officeOptions={officeOptions}
-                    countryOptions={countryOptions}
-                    managers={managers}
-                    activeFiltersCount={activeFiltersCount}
-                    onMonthChange={handleMonthChange}
-                    onSearchChange={handleProjectSearchChange}
-                    onFilterChange={handleFilterChange}
-                    onPeriodChange={handlePeriodChange}
-                    onSortChange={handleSortChange}
-                    onSortDirectionToggle={handleSortDirectionToggle}
-                    onDisplayOptionChange={handleDisplayOptionChange}
-                    onClearFilters={clearProjectFilters}
-                    showOnlyGrid={true}
-                  />
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="by-person" className="mt-0 py-3">
-            <div className="space-y-4">
-              {/* 1. Available Members Row - always sorted by utilization */}
-              <div className="px-3 sm:px-6">
-                <AvailableMembersRow
-                  weekStartDate={weekStartDate}
-                  threshold={80}
-                  filters={memberFilters}
-                />
-              </div>
-              
-              {/* 2. Combined Controls + Member Filters - grouped in single card */}
-              <div className="px-3 sm:px-6">
-                <div className="bg-card rounded-lg border shadow-sm">
-                  <PersonResourceView
-                    startDate={selectedMonth}
-                    periodToShow={filters.periodToShow}
-                    displayOptions={displayOptions}
-                    onMonthChange={handleMonthChange}
-                    onPeriodChange={handlePeriodChange}
-                    showOnlyControls={true}
-                  />
-                  <MemberFilterRow
+                  <AvailableMembersRow
+                    weekStartDate={weekStartDate}
+                    threshold={80}
                     filters={memberFilters}
-                    onFilterChange={handleMemberFilterChange}
-                    activeFiltersCount={activeMemberFiltersCount}
-                    clearFilters={clearMemberFilters}
                   />
                 </div>
-              </div>
-              
-              {/* 3. Grid below */}
-              <div className="overflow-x-auto">
+                
+                {/* 2. Combined Controls + Member Filters - grouped in single card */}
                 <div className="px-3 sm:px-6">
-                  <PersonResourceView
-                    startDate={selectedMonth}
-                    periodToShow={filters.periodToShow}
-                    displayOptions={displayOptions}
-                    onMonthChange={handleMonthChange}
-                    onPeriodChange={handlePeriodChange}
-                    showOnlyGrid={true}
+                  <div className="bg-card rounded-lg border shadow-sm">
+                    <ProjectResourcingContent
+                      selectedMonth={selectedMonth}
+                      searchTerm={projectSearchTerm}
+                      sortBy={sortBy}
+                      sortDirection={sortDirection}
+                      filters={filters}
+                      displayOptions={displayOptions}
+                      officeOptions={officeOptions}
+                      countryOptions={countryOptions}
+                      managers={managers}
+                      activeFiltersCount={activeFiltersCount}
+                      onMonthChange={handleMonthChange}
+                      onSearchChange={handleProjectSearchChange}
+                      onFilterChange={handleFilterChange}
+                      onPeriodChange={handlePeriodChange}
+                      onSortChange={handleSortChange}
+                      onSortDirectionToggle={handleSortDirectionToggle}
+                      onDisplayOptionChange={handleDisplayOptionChange}
+                      onClearFilters={clearProjectFilters}
+                      showOnlyControls={true}
+                    />
+                    <MemberFilterRow
+                      filters={memberFilters}
+                      onFilterChange={handleMemberFilterChange}
+                      activeFiltersCount={activeMemberFiltersCount}
+                      clearFilters={clearMemberFilters}
+                    />
+                  </div>
+                </div>
+                
+                {/* 3. Grid below */}
+                <div className="overflow-x-auto">
+                  <div className="px-3 sm:px-6">
+                    <ProjectResourcingContent
+                      selectedMonth={selectedMonth}
+                      searchTerm={projectSearchTerm}
+                      sortBy={sortBy}
+                      sortDirection={sortDirection}
+                      filters={filters}
+                      displayOptions={displayOptions}
+                      officeOptions={officeOptions}
+                      countryOptions={countryOptions}
+                      managers={managers}
+                      activeFiltersCount={activeFiltersCount}
+                      onMonthChange={handleMonthChange}
+                      onSearchChange={handleProjectSearchChange}
+                      onFilterChange={handleFilterChange}
+                      onPeriodChange={handlePeriodChange}
+                      onSortChange={handleSortChange}
+                      onSortDirectionToggle={handleSortDirectionToggle}
+                      onDisplayOptionChange={handleDisplayOptionChange}
+                      onClearFilters={clearProjectFilters}
+                      showOnlyGrid={true}
+                    />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="by-person" className="mt-0 py-3">
+              <div className="space-y-4">
+                {/* 1. Available Members Row - always sorted by utilization */}
+                <div className="px-3 sm:px-6">
+                  <AvailableMembersRow
+                    weekStartDate={weekStartDate}
+                    threshold={80}
+                    filters={memberFilters}
                   />
                 </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="timeline" className="mt-0 py-3">
-            <div className="flex items-center justify-center h-[500px] border-2 border-dashed border-border rounded-xl bg-muted/20">
-              <div className="text-center px-6">
-                <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4">
-                  <Calendar className="h-12 w-12 text-primary" />
+                
+                {/* 2. Combined Controls + Member Filters - grouped in single card */}
+                <div className="px-3 sm:px-6">
+                  <div className="bg-card rounded-lg border shadow-sm">
+                    <PersonResourceView
+                      startDate={selectedMonth}
+                      periodToShow={filters.periodToShow}
+                      displayOptions={displayOptions}
+                      onMonthChange={handleMonthChange}
+                      onPeriodChange={handlePeriodChange}
+                      showOnlyControls={true}
+                    />
+                    <MemberFilterRow
+                      filters={memberFilters}
+                      onFilterChange={handleMemberFilterChange}
+                      activeFiltersCount={activeMemberFiltersCount}
+                      clearFilters={clearMemberFilters}
+                    />
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Visual Timeline Coming Soon</h3>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  Interactive Gantt-style timeline for drag-and-drop resource allocation across multiple weeks
-                </p>
+                
+                {/* 3. Grid below */}
+                <div className="overflow-x-auto">
+                  <div className="px-3 sm:px-6">
+                    <PersonResourceView
+                      startDate={selectedMonth}
+                      periodToShow={filters.periodToShow}
+                      displayOptions={displayOptions}
+                      onMonthChange={handleMonthChange}
+                      onPeriodChange={handlePeriodChange}
+                      showOnlyGrid={true}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </TabsContent>
+            </TabsContent>
+
+            <TabsContent value="timeline" className="mt-0 py-3">
+              <div className="flex items-center justify-center h-[500px] border-2 border-dashed border-border rounded-xl bg-muted/20">
+                <div className="text-center px-6">
+                  <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4">
+                    <Calendar className="h-12 w-12 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Visual Timeline Coming Soon</h3>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    Interactive Gantt-style timeline for drag-and-drop resource allocation across multiple weeks
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
           </Tabs>
-          </div>
         </div>
       </div>
     </StandardLayout>
