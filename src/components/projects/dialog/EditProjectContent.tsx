@@ -78,7 +78,8 @@ export const EditProjectContent: React.FC<EditProjectContentProps> = ({
               <ProjectDialogTabs 
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
-                showTeamComposition={!!projectId && form.stages?.length > 0}
+                // Show Team Composition for any existing project; the tab content handles empty state
+                showTeamComposition={!!projectId}
               />
             </div>
             
