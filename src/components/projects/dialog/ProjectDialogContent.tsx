@@ -1,9 +1,9 @@
-
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TabsContent } from "@/components/ui/tabs";
 import { ProjectInfoTabContent } from "./tabs/ProjectInfoTabContent";
 import { ProjectStageFeesTabContent } from "./tabs/ProjectStageFeesTabContent";
+import { StageTeamCompositionEditor } from "../team-composition";
 import { useProjectFinancialMetrics } from "../hooks/useProjectFinancialMetrics";
 
 interface ProjectDialogContentProps {
@@ -11,7 +11,7 @@ interface ProjectDialogContentProps {
   managers: Array<{ id: string; name: string }>;
   countries: string[];
   offices: Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>;
-  officeStages: Array<{ id: string; name: string; color?: string }>;
+  officeStages: Array<{ id: string; name: string; color?: string; code?: string }>;
   departments: Array<{ id: string; name: string }>;
   updateStageApplicability: (stageId: string, isChecked: boolean) => void;
   updateStageFee: (stageId: string, data: any) => void;
@@ -35,10 +35,14 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
   projectId,
   onSuccess
 }) => {
-  // Fetch financial metrics for existing projects
-  // const { data: financialMetrics, isLoading: isLoadingMetrics } = useProjectFinancialMetrics(
-  //   projectId || ''
-  // );
+  // Get stages that are selected for this project
+  const selectedStages = officeStages
+    .filter(stage => form.stages?.includes(stage.name))
+    .map(stage => ({
+      id: stage.id,
+      name: stage.name,
+      code: stage.code
+    }));
 
   return (
     <div className="flex-1 overflow-hidden">
@@ -57,6 +61,21 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
           />
         </ScrollArea>
       </TabsContent>
+
+      {/* Team Composition Tab */}
+      {projectId && selectedStages.length > 0 && (
+        <TabsContent value="team" className="mt-0">
+          <ScrollArea className="h-[400px] px-6">
+            <div className="py-4">
+              <StageTeamCompositionEditor
+                projectId={projectId}
+                stages={selectedStages}
+                showBudget={true}
+              />
+            </div>
+          </ScrollArea>
+        </TabsContent>
+      )}
 
       {/* Stage Fees tab content hidden for MVP */}
       {/* <TabsContent value="stageFees" className="mt-0">
