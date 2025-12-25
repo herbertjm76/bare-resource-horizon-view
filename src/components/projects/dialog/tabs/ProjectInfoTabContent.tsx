@@ -9,7 +9,7 @@ interface ProjectInfoTabContentProps {
   managers: Array<{ id: string; name: string }>;
   countries: string[];
   offices: Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>;
-  officeStages: Array<{ id: string; name: string; color?: string }>;
+  officeStages: Array<{ id: string; name: string; color?: string; code?: string }>;
   departments: Array<{ id: string; name: string }>;
   updateStageApplicability: (stageId: string, isChecked: boolean) => void;
   handleChange: (key: string, value: any) => void;

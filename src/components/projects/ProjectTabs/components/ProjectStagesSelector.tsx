@@ -5,7 +5,7 @@ import { Toggle } from '@/components/ui/toggle';
 
 interface ProjectStagesSelectorProps {
   stages: string[];
-  officeStages: Array<{ id: string; name: string; color?: string }>;
+  officeStages: Array<{ id: string; name: string; color?: string; code?: string }>;
   onChange: (stages: string[]) => void;
 }
 
@@ -56,7 +56,7 @@ export const ProjectStagesSelector: React.FC<ProjectStagesSelectorProps> = ({
                 borderWidth: '1px'
               }}
             >
-              {stage.name}
+              {stage.code ? `${stage.name} (${stage.code})` : stage.name}
             </Toggle>
           );
         })}

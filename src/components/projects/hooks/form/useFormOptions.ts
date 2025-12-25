@@ -7,7 +7,7 @@ export const useFormOptions = (company: any, isOpen: boolean) => {
   const [managers, setManagers] = useState<Array<{ id: string; name: string }>>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [offices, setOffices] = useState<Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>>([]);
-  const [officeStages, setOfficeStages] = useState<Array<{ id: string; name: string; color?: string }>>([]);
+  const [officeStages, setOfficeStages] = useState<Array<{ id: string; name: string; color?: string; code?: string }>>([]);
 
   useEffect(() => {
     const fetchFormOptions = async () => {
@@ -48,7 +48,7 @@ export const useFormOptions = (company: any, isOpen: boolean) => {
 
         const { data: stages } = await supabase
           .from('office_stages')
-          .select('id, name, color')
+          .select('id, name, color, code')
           .eq('company_id', company.id);
 
         setOfficeStages(Array.isArray(stages) ? stages : []);
