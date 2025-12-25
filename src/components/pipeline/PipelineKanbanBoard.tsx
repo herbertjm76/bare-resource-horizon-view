@@ -130,7 +130,7 @@ export const PipelineKanbanBoard: React.FC = () => {
       {allColumns.map(({ name, code, color }) => {
           const isHidden = hiddenStages.has(name);
           const projectCount = (projectsByStage[name] || []).length;
-          const displayLabel = code ? `${name} (${code})` : name;
+          const displayLabel = code || name;
           return (
             <Toggle
               key={name}
@@ -138,6 +138,7 @@ export const PipelineKanbanBoard: React.FC = () => {
               onPressedChange={() => toggleStageVisibility(name)}
               size="sm"
               className="h-7 px-2 gap-1.5 text-xs data-[state=on]:bg-primary/10 data-[state=on]:text-foreground data-[state=off]:bg-muted/50 data-[state=off]:text-muted-foreground"
+              title={name}
             >
               <div 
                 className="w-2 h-2 rounded-full shrink-0" 
