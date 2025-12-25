@@ -43,6 +43,7 @@ export type PracticeArea = {
 export type ProjectStage = {
   id: string;
   name: string;
+  code?: string;
   order_index: number;
   company_id: string;
   color?: string;
