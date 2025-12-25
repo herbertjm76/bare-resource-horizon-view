@@ -18,6 +18,8 @@ export const StagesTab = () => {
     editingStage,
     newStageName,
     setNewStageName,
+    newStageCode,
+    setNewStageCode,
     newStageColor,
     setNewStageColor,
     editMode,
@@ -86,6 +88,8 @@ export const StagesTab = () => {
             onOpenChange={(open) => !open && handleCancel()}
             newStageName={newStageName}
             setNewStageName={setNewStageName}
+            newStageCode={newStageCode}
+            setNewStageCode={setNewStageCode}
             newStageColor={newStageColor}
             setNewStageColor={setNewStageColor}
             onSubmit={handleSubmit}

@@ -11,6 +11,7 @@ export const useStageOperations = (
 ) => {
   const [editingStage, setEditingStage] = useState<ProjectStage | null>(null);
   const [newStageName, setNewStageName] = useState("");
+  const [newStageCode, setNewStageCode] = useState("");
   const [newStageColor, setNewStageColor] = useState("#E5DEFF");
   const [editMode, setEditMode] = useState(false);
   const [selectedStages, setSelectedStages] = useState<string[]>([]);
@@ -27,6 +28,7 @@ export const useStageOperations = (
           .from('office_stages')
           .update({ 
             name: newStageName.trim(),
+            code: newStageCode.trim() || null,
             color: newStageColor
           })
           .eq('id', editingStage.id)
@@ -44,6 +46,7 @@ export const useStageOperations = (
           .from('office_stages')
           .insert([{
             name: newStageName.trim(),
+            code: newStageCode.trim() || null,
             color: newStageColor,
             company_id: companyId,
             order_index: stages.length
@@ -58,6 +61,7 @@ export const useStageOperations = (
       }
 
       setNewStageName("");
+      setNewStageCode("");
       setNewStageColor("#E5DEFF");
       setEditingStage(null);
       setShowAddForm(false);
@@ -72,6 +76,7 @@ export const useStageOperations = (
   const handleEdit = (stage: ProjectStage) => {
     setEditingStage(stage);
     setNewStageName(stage.name);
+    setNewStageCode(stage.code || "");
     setNewStageColor(stage.color || "#E5DEFF");
     setShowAddForm(true);
   };
@@ -129,6 +134,7 @@ export const useStageOperations = (
   const handleCancel = () => {
     setEditingStage(null);
     setNewStageName("");
+    setNewStageCode("");
     setNewStageColor("#E5DEFF");
     setShowAddForm(false);
   };
@@ -140,6 +146,7 @@ export const useStageOperations = (
       setShowAddForm(false);
       setEditingStage(null);
       setNewStageName("");
+      setNewStageCode("");
       setNewStageColor("#E5DEFF");
     }
   };
@@ -149,6 +156,7 @@ export const useStageOperations = (
     if (!showAddForm) {
       setEditingStage(null);
       setNewStageName("");
+      setNewStageCode("");
       setNewStageColor("#E5DEFF");
     }
   };
@@ -157,6 +165,8 @@ export const useStageOperations = (
     editingStage,
     newStageName,
     setNewStageName,
+    newStageCode,
+    setNewStageCode,
     newStageColor,
     setNewStageColor,
     editMode,

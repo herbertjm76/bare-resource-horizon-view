@@ -12,6 +12,8 @@ interface AddStageDialogProps {
   onOpenChange: (open: boolean) => void;
   newStageName: string;
   setNewStageName: (name: string) => void;
+  newStageCode: string;
+  setNewStageCode: (code: string) => void;
   newStageColor: string;
   setNewStageColor: (color: string) => void;
   onSubmit: () => void;
@@ -25,6 +27,8 @@ export const AddStageDialog: React.FC<AddStageDialogProps> = ({
   onOpenChange,
   newStageName,
   setNewStageName,
+  newStageCode,
+  setNewStageCode,
   newStageColor,
   setNewStageColor,
   onSubmit,
@@ -52,13 +56,26 @@ export const AddStageDialog: React.FC<AddStageDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input
-            placeholder="Enter stage name..."
-            value={newStageName}
-            onChange={(e) => setNewStageName(e.target.value)}
-            onKeyPress={handleKeyPress}
-            autoFocus
-          />
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Name</label>
+            <Input
+              placeholder="Enter stage name..."
+              value={newStageName}
+              onChange={(e) => setNewStageName(e.target.value)}
+              onKeyPress={handleKeyPress}
+              autoFocus
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Code</label>
+            <Input
+              placeholder="e.g. SD, CD, DD..."
+              value={newStageCode}
+              onChange={(e) => setNewStageCode(e.target.value.toUpperCase())}
+              onKeyPress={handleKeyPress}
+              maxLength={10}
+            />
+          </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Color</label>
             <ColorPicker
