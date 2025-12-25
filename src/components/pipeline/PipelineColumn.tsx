@@ -37,33 +37,33 @@ export const PipelineColumn: React.FC<PipelineColumnProps> = ({
   return (
     <div
       className={cn(
-        "flex flex-col min-w-[280px] max-w-[320px] bg-muted/30 rounded-lg border border-border transition-colors",
+        "flex flex-col min-w-[180px] w-[180px] bg-muted/30 rounded-lg border border-border transition-colors",
         isDragOver && "border-primary bg-primary/5"
       )}
       onDragOver={onDragOver}
       onDrop={(e) => onDrop(e, status)}
     >
       {/* Column Header */}
-      <div className="p-3 border-b border-border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <div className="p-2 border-b border-border">
+        <div className="flex items-center justify-between gap-1">
+          <div className="flex items-center gap-1.5 min-w-0">
             <div 
-              className="w-3 h-3 rounded-full" 
+              className="w-2 h-2 rounded-full shrink-0" 
               style={{ backgroundColor: color }}
             />
-            <h3 className="font-semibold text-sm text-foreground">{title}</h3>
+            <h3 className="font-medium text-xs text-foreground truncate">{title}</h3>
           </div>
-          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
             {projects.length}
           </span>
         </div>
       </div>
       
       {/* Cards Container */}
-      <div className="flex-1 p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-280px)]">
+      <div className="flex-1 p-1.5 space-y-1.5 overflow-y-auto max-h-[calc(100vh-280px)]">
         {projects.length === 0 ? (
-          <div className="flex items-center justify-center h-20 text-xs text-muted-foreground border border-dashed border-border rounded-lg">
-            No projects
+          <div className="flex items-center justify-center h-12 text-[10px] text-muted-foreground border border-dashed border-border rounded">
+            Empty
           </div>
         ) : (
           projects.map((project) => (
