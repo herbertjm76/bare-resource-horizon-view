@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 
 const STATUS_CONFIG = [
   { status: 'Planning', title: 'Planning', color: '#3b82f6' },
-  { status: 'In Progress', title: 'In Progress', color: '#8b5cf6' },
+  { status: 'Active', title: 'Active', color: '#8b5cf6' },
   { status: 'On Hold', title: 'On Hold', color: '#f59e0b' },
   { status: 'Complete', title: 'Complete', color: '#22c55e' },
 ];
