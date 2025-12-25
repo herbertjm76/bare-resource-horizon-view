@@ -48,7 +48,12 @@ export const StageList: React.FC<StageListProps> = ({
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: stage.color || "#E5DEFF" }}
               />
-              <span className="font-medium text-sm">{stage.name}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-medium text-sm">{stage.name}</span>
+                {stage.code && (
+                  <span className="text-xs text-muted-foreground">({stage.code})</span>
+                )}
+              </div>
             </div>
             {editMode && (
               <div className="flex gap-1">
