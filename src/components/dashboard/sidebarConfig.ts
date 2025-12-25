@@ -1,14 +1,14 @@
 import { 
   LayoutDashboard,
   Calendar,
-  GanttChartSquare,
+  CalendarClock,
   FolderKanban,
   UserSquare2,
   Flag,
   HelpCircle,
   Layers,
-  Activity,
-  TrendingUp
+  Grid3X3,
+  Target
 } from "lucide-react"
 import { Permission } from '@/hooks/usePermissions';
 
@@ -52,17 +52,17 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
         {
           title: "Resource Scheduling",
           url: `${baseUrl}/resource-scheduling`,
-          icon: GanttChartSquare,
+          icon: CalendarClock,
         },
         {
           title: "Resource Planning",
           url: `${baseUrl}/resource-planning`,
-          icon: TrendingUp,
+          icon: Target,
         },
         {
           title: "Capacity Heatmap",
           url: `${baseUrl}/capacity-heatmap`,
-          icon: Activity,
+          icon: Grid3X3,
         },
       ],
     },
