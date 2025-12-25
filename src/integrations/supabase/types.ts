@@ -700,6 +700,7 @@ export type Database = {
       }
       office_stages: {
         Row: {
+          code: string | null
           color: string | null
           company_id: string | null
           created_at: string
@@ -709,6 +710,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          code?: string | null
           color?: string | null
           company_id?: string | null
           created_at?: string
@@ -718,6 +720,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          code?: string | null
           color?: string | null
           company_id?: string | null
           created_at?: string
