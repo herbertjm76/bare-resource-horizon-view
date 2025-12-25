@@ -17,7 +17,7 @@ import TeamMemberDetail from "./pages/TeamMemberDetail";
 import OfficeSettings from "./pages/OfficeSettings";
 import WeeklyOverview from "./pages/WeeklyOverview";
 import TeamWorkload from "./pages/TeamWorkload";
-import TeamAnnualLeave from "./pages/TeamAnnualLeave";
+import TeamLeave from "./pages/TeamLeave";
 import ProjectResourcing from "./pages/ProjectResourcing";
 import ResourceScheduling from "./pages/ResourceScheduling";
 import HelpCenter from "./pages/HelpCenter";
@@ -94,7 +94,7 @@ function AppWithTheme() {
               <Route path="/:companySlug/team-members" element={<TeamMembers />} />
               <Route path="/:companySlug/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/:companySlug/team-workload" element={<TeamWorkload />} />
-              <Route path="/:companySlug/team-leave" element={<TeamAnnualLeave />} />
+              <Route path="/:companySlug/team-leave" element={<TeamLeave />} />
               <Route path="/:companySlug/team-annual-leave" element={<Navigate to="team-leave" replace />} />
               
               {/* Protected: Settings (requires view:settings) */}
@@ -192,7 +192,7 @@ function AppWithTheme() {
               <Route path="/team-members" element={<TeamMembers />} />
               <Route path="/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/team-workload" element={<TeamWorkload />} />
-              <Route path="/team-leave" element={<TeamAnnualLeave />} />
+              <Route path="/team-leave" element={<TeamLeave />} />
               <Route path="/team-annual-leave" element={<Navigate to="/team-leave" replace />} />
               
               {/* Protected: Settings */}

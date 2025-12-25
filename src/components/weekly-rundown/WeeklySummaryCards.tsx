@@ -6,7 +6,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { HolidaysCard } from './cards/HolidaysCard';
-import { AnnualLeaveCard } from './cards/AnnualLeaveCard';
+import { LeaveCard } from './cards/LeaveCard';
 import { OtherLeaveCard } from './cards/OtherLeaveCard';
 import { NotesCard } from './cards/NotesCard';
 import { CustomRundownCard } from './cards/CustomRundownCard';
@@ -175,7 +175,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     
     allCards.push({ 
       id: 'annualLeave', 
-      component: <AnnualLeaveCard key="annualLeave" leaves={annualLeaves} />,
+      component: <LeaveCard key="annualLeave" leaves={annualLeaves} />,
       isVisible: cardVisibility.annualLeave 
     });
     

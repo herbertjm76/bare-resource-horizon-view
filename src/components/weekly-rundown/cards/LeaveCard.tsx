@@ -14,11 +14,11 @@ interface LeaveEntry {
   hours: number;
 }
 
-interface AnnualLeaveCardProps {
+interface LeaveCardProps {
   leaves: LeaveEntry[];
 }
 
-export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
+export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
   const { displayPreference, workWeekHours } = useAppSettings();
   const capacity = workWeekHours || 40;
 

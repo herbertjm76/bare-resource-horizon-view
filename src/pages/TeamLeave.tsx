@@ -17,7 +17,7 @@ import { TimeRange } from '@/components/annual-leave/MonthSelector';
 import '@/styles/enhanced-tables.css';
 import '@/components/annual-leave/annual-leave.css';
 
-const TeamAnnualLeave = () => {
+const TeamLeave = () => {
   // State for selected month and time range
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
   const [timeRange, setTimeRange] = useState<TimeRange>('month');
@@ -124,4 +124,4 @@ const TeamAnnualLeave = () => {
   );
 };
 
-export default TeamAnnualLeave;
+export default TeamLeave;
