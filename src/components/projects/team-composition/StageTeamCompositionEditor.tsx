@@ -88,11 +88,9 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
     referenceType: 'role' | 'member';
     plannedQuantity: number;
     plannedHoursPerPerson: number;
+    rateSnapshot: number;
   }) => {
-    saveItem({
-      ...data,
-      rateSnapshot: 0 // TODO: Fetch rate from office_rates based on reference
-    });
+    saveItem(data);
   };
 
   const handleContractedWeeksChange = async (stageId: string, weeks: number) => {

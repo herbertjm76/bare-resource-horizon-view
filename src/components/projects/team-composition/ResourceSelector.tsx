@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,9 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, DollarSign } from 'lucide-react';
 import { ResourceTypeToggle } from './ResourceTypeToggle';
 import { useOfficeRoles } from '@/hooks/useOfficeRoles';
+import { useOfficeRates, getRateForReference } from '@/hooks/useOfficeRates';
 import { useResourceOptions } from '@/components/resources/dialogs/useResourceOptions';
 
 interface ResourceSelectorProps {
@@ -20,6 +21,7 @@ interface ResourceSelectorProps {
     referenceType: 'role' | 'member';
     plannedQuantity: number;
     plannedHoursPerPerson: number;
+    rateSnapshot: number;
   }) => void;
   isLoading?: boolean;
 }
@@ -34,7 +36,33 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
   const [hoursPerPerson, setHoursPerPerson] = useState(40);
 
   const { data: roles = [], isLoading: rolesLoading } = useOfficeRoles();
+  const { data: rates = [] } = useOfficeRates();
   const { resourceOptions: members, loading: membersLoading } = useResourceOptions();
+
+  // Get the rate for the selected resource
+  const selectedRate = useMemo(() => {
+    if (!selectedId) return 0;
+    
+    if (resourceType === 'role') {
+      // Direct role rate lookup
+      return getRateForReference(rates, selectedId, 'role');
+    } else {
+      // For members, try to find rate by their location or job title
+      const member = members.find(m => m.id === selectedId);
+      if (member?.location) {
+        // Try to find location-based rate
+        const locationRate = rates.find(r => r.type === 'location');
+        if (locationRate) return locationRate.value;
+      }
+      // Default to first role rate or 0
+      const defaultRate = rates.find(r => r.type === 'role');
+      return defaultRate?.value || 0;
+    }
+  }, [selectedId, resourceType, rates, members]);
+
+  // Calculate totals
+  const totalHours = quantity * hoursPerPerson;
+  const totalBudget = totalHours * selectedRate;
 
   const handleAdd = () => {
     if (!selectedId) return;
@@ -43,7 +71,8 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
       referenceId: selectedId,
       referenceType: resourceType,
       plannedQuantity: quantity,
-      plannedHoursPerPerson: hoursPerPerson
+      plannedHoursPerPerson: hoursPerPerson,
+      rateSnapshot: selectedRate
     });
 
     // Reset form
@@ -81,11 +110,19 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
                 ) : roles.length === 0 ? (
                   <SelectItem value="_empty" disabled>No roles defined</SelectItem>
                 ) : (
-                  roles.map((role) => (
-                    <SelectItem key={role.id} value={role.id}>
-                      {role.name} ({role.code})
-                    </SelectItem>
-                  ))
+                  roles.map((role) => {
+                    const rate = getRateForReference(rates, role.id, 'role');
+                    return (
+                      <SelectItem key={role.id} value={role.id}>
+                        <span className="flex items-center justify-between w-full gap-3">
+                          <span>{role.name} ({role.code})</span>
+                          {rate > 0 && (
+                            <span className="text-xs text-muted-foreground">${rate}/hr</span>
+                          )}
+                        </span>
+                      </SelectItem>
+                    );
+                  })
                 )
               ) : (
                 membersLoading ? (
@@ -150,12 +187,30 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
         </div>
       </div>
 
-      {/* Preview calculation */}
+      {/* Preview calculation with rate */}
       {selectedId && (
-        <div className="text-xs text-muted-foreground text-right">
-          Total: {quantity} × {hoursPerPerson} = <span className="font-medium text-foreground">{quantity * hoursPerPerson} hours</span>
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center gap-1">
+            {selectedRate > 0 ? (
+              <>
+                <DollarSign className="h-3 w-3" />
+                <span>Rate: <span className="font-medium text-foreground">${selectedRate}/hr</span></span>
+              </>
+            ) : (
+              <span className="text-amber-500">No rate configured for this resource</span>
+            )}
+          </div>
+          <div>
+            {quantity} × {hoursPerPerson} hrs = <span className="font-medium text-foreground">{totalHours} hrs</span>
+            {selectedRate > 0 && (
+              <span className="ml-2">
+                (${totalBudget.toLocaleString()})
+              </span>
+            )}
+          </div>
         </div>
       )}
     </div>
   );
 };
+
