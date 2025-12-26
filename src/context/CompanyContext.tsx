@@ -50,7 +50,8 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       'dashboard', 'profile', 'projects', 'team-members', 'office-settings', 'weekly-overview',
       'weekly-rundown', 'team-workload', 'team-leave', 'project-resourcing', 'financial-control',
       'help-center', 'workflow', 'financial-overview', 'project-profit-dashboard', 'project-billing',
-      'aging-invoices', 'resource-scheduling'
+      'aging-invoices', 'resource-scheduling', 'pipeline', 'capacity-heatmap', 'capacity-planning',
+      'timeline', 'resource-planning'
     ];
 
     if (pathParts.length === 0) return null; // Home page
