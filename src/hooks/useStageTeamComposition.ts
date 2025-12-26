@@ -1,4 +1,3 @@
-import { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -10,6 +9,7 @@ export interface TeamCompositionItem {
   referenceName: string;
   referenceType: 'role' | 'member';
   memberType?: 'active' | 'pre_registered';
+  roleName?: string; // Role name when referenceType is 'member'
   plannedQuantity: number;
   plannedHoursPerPerson: number;
   rateSnapshot: number;
@@ -50,44 +50,53 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
       const roleIds = data?.filter(d => d.reference_type === 'role').map(d => d.reference_id) || [];
       const memberIds = data?.filter(d => d.reference_type === 'member').map(d => d.reference_id) || [];
 
-      // Fetch roles
+      // Fetch all roles for lookup
+      const { data: allRoles } = await supabase
+        .from('office_roles')
+        .select('id, name, code');
+      
+      const allRolesMap = Object.fromEntries((allRoles || []).map(r => [r.id, r]));
+
+      // Fetch roles for role-type references
       let rolesMap: Record<string, string> = {};
       if (roleIds.length > 0) {
-        const { data: roles } = await supabase
-          .from('office_roles')
-          .select('id, name, code')
-          .in('id', roleIds);
-        rolesMap = Object.fromEntries((roles || []).map(r => [r.id, `${r.name} (${r.code})`]));
+        roleIds.forEach(id => {
+          const role = allRolesMap[id];
+          if (role) {
+            rolesMap[id] = `${role.name} (${role.code})`;
+          }
+        });
       }
 
       // Fetch active members from profiles
-      let membersMap: Record<string, { name: string; type: 'active' | 'pre_registered' }> = {};
+      let membersMap: Record<string, { name: string; type: 'active' | 'pre_registered'; roleId?: string }> = {};
       if (memberIds.length > 0) {
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('id, first_name, last_name, email')
+          .select('id, first_name, last_name, email, office_role_id')
           .in('id', memberIds);
         
         profiles?.forEach(p => {
           const name = `${p.first_name || ''} ${p.last_name || ''}`.trim() || p.email;
-          membersMap[p.id] = { name, type: 'active' };
+          membersMap[p.id] = { name, type: 'active', roleId: p.office_role_id || undefined };
         });
 
         // Also check invites for pre-registered members
         const { data: invites } = await supabase
           .from('invites')
-          .select('id, first_name, last_name, email')
+          .select('id, first_name, last_name, email, office_role_id')
           .in('id', memberIds);
         
         invites?.forEach(i => {
           const name = `${i.first_name || ''} ${i.last_name || ''}`.trim() || i.email || 'Unknown';
-          membersMap[i.id] = { name, type: 'pre_registered' };
+          membersMap[i.id] = { name, type: 'pre_registered', roleId: i.office_role_id || undefined };
         });
       }
 
       const formattedData: TeamCompositionItem[] = (data || []).map(item => {
         let referenceName = 'Unknown';
         let memberType: 'active' | 'pre_registered' | undefined;
+        let roleName: string | undefined;
 
         if (item.reference_type === 'role') {
           referenceName = rolesMap[item.reference_id] || 'Unknown Role';
@@ -95,6 +104,11 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
           const memberInfo = membersMap[item.reference_id];
           referenceName = memberInfo?.name || 'Unknown Member';
           memberType = memberInfo?.type;
+          // Get the role name for this member
+          if (memberInfo?.roleId) {
+            const role = allRolesMap[memberInfo.roleId];
+            roleName = role ? `${role.name} (${role.code})` : undefined;
+          }
         }
 
         return {
@@ -103,6 +117,7 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
           referenceName,
           referenceType: item.reference_type as 'role' | 'member',
           memberType,
+          roleName,
           plannedQuantity: item.planned_quantity,
           plannedHoursPerPerson: item.planned_hours_per_person,
           rateSnapshot: item.rate_snapshot,
@@ -155,11 +170,11 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: ['project-stages', projectId] });
-      toast.success('Team composition updated');
+      toast.success('Resource added');
     },
     onError: (error) => {
       console.error('Error saving team composition:', error);
-      toast.error('Failed to save team composition');
+      toast.error('Failed to save resource');
     }
   });
 
@@ -182,11 +197,11 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: ['project-stages', projectId] });
-      toast.success('Team composition item removed');
+      toast.success('Resource removed');
     },
     onError: (error) => {
       console.error('Error deleting team composition item:', error);
-      toast.error('Failed to remove team composition item');
+      toast.error('Failed to remove resource');
     }
   });
 
@@ -194,7 +209,7 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
   const stageTotals = {
     totalHours: composition.reduce((sum, item) => sum + item.totalPlannedHours, 0),
     totalBudget: composition.reduce((sum, item) => sum + item.totalBudgetAmount, 0),
-    headcount: composition.reduce((sum, item) => sum + item.plannedQuantity, 0)
+    headcount: composition.length
   };
 
   return {
