@@ -155,11 +155,17 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
                 
                 
                 <div className="flex items-center gap-3 ml-auto">
-                  {/* Timeline Bar - Fixed Width */}
-                  <div className="w-[320px] flex-shrink-0">
+                  {/* Timeline Bar - Fixed Width, Clickable */}
+                  <div 
+                    className="w-[320px] flex-shrink-0 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsOpen(!isOpen);
+                    }}
+                  >
                     {stagesWithData.length > 0 ? (
                       <TooltipProvider>
-                        <div className="flex h-7 rounded-md overflow-hidden bg-muted/30 border">
+                        <div className="flex h-7 rounded-md overflow-hidden bg-muted/30 border hover:ring-2 hover:ring-primary/30 transition-all">
                           {stagesWithData.map((stage) => {
                             const widthPercent = totalContractedWeeks > 0 
                               ? (stage.contractedWeeks / totalContractedWeeks) * 100 
@@ -195,7 +201,7 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
                         </div>
                       </TooltipProvider>
                     ) : (
-                      <div className="h-7 rounded-md bg-muted/30 border flex items-center justify-center">
+                      <div className="h-7 rounded-md bg-muted/30 border flex items-center justify-center hover:ring-2 hover:ring-primary/30 transition-all">
                         <span className="text-xs text-muted-foreground">No stages</span>
                       </div>
                     )}
