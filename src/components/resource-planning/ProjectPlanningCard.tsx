@@ -138,8 +138,8 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild>
             <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors py-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
+              <div className="flex items-center justify-between gap-4 w-full">
+                <div className="flex items-center gap-3 min-w-0">
                   {isOpen ? (
                     <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   ) : (
@@ -153,64 +153,67 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
                   </div>
                 </div>
                 
-                {/* Timeline Bar - Fixed Width */}
-                <div className="w-[320px] flex-shrink-0">
-                  {stagesWithData.length > 0 ? (
-                    <TooltipProvider>
-                      <div className="flex h-7 rounded-md overflow-hidden bg-muted/30 border">
-                        {stagesWithData.map((stage) => {
-                          const widthPercent = totalContractedWeeks > 0 
-                            ? (stage.contractedWeeks / totalContractedWeeks) * 100 
-                            : 100 / stagesWithData.length;
-                          
-                          return (
-                            <Tooltip key={stage.name}>
-                              <TooltipTrigger asChild>
-                                <div
-                                  className="flex items-center justify-center text-xs font-medium text-white truncate px-1 transition-all hover:opacity-80"
-                                  style={{ 
-                                    backgroundColor: stage.color,
-                                    width: `${widthPercent}%`,
-                                    minWidth: '24px'
-                                  }}
-                                >
-                                  {stage.contractedWeeks > 0 && (
-                                    <span className="truncate text-[10px]">
-                                      {stage.code || stage.name.substring(0, 2)} · {stage.contractedWeeks}w
-                                    </span>
-                                  )}
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent side="top">
-                                <p className="font-medium">{stage.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {stage.contractedWeeks} contracted weeks
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          );
-                        })}
+                
+                <div className="flex items-center gap-3 ml-auto">
+                  {/* Timeline Bar - Fixed Width */}
+                  <div className="w-[320px] flex-shrink-0">
+                    {stagesWithData.length > 0 ? (
+                      <TooltipProvider>
+                        <div className="flex h-7 rounded-md overflow-hidden bg-muted/30 border">
+                          {stagesWithData.map((stage) => {
+                            const widthPercent = totalContractedWeeks > 0 
+                              ? (stage.contractedWeeks / totalContractedWeeks) * 100 
+                              : 100 / stagesWithData.length;
+                            
+                            return (
+                              <Tooltip key={stage.name}>
+                                <TooltipTrigger asChild>
+                                  <div
+                                    className="flex items-center justify-center text-xs font-medium text-white truncate px-1 transition-all hover:opacity-80"
+                                    style={{ 
+                                      backgroundColor: stage.color,
+                                      width: `${widthPercent}%`,
+                                      minWidth: '24px'
+                                    }}
+                                  >
+                                    {stage.contractedWeeks > 0 && (
+                                      <span className="truncate text-[10px]">
+                                        {stage.code || stage.name.substring(0, 2)} · {stage.contractedWeeks}w
+                                      </span>
+                                    )}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <p className="font-medium">{stage.name}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {stage.contractedWeeks} contracted weeks
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </div>
+                      </TooltipProvider>
+                    ) : (
+                      <div className="h-7 rounded-md bg-muted/30 border flex items-center justify-center">
+                        <span className="text-xs text-muted-foreground">No stages</span>
                       </div>
-                    </TooltipProvider>
-                  ) : (
-                    <div className="h-7 rounded-md bg-muted/30 border flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground">No stages</span>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
 
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <Badge variant="outline" className={getStatusColor(project.status)}>
-                    {project.status}
-                  </Badge>
-                  <Badge variant="secondary" className="text-xs gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {totalContractedWeeks}w
-                  </Badge>
-                  <Badge variant="secondary" className="text-xs gap-1">
-                    <Users className="h-3 w-3" />
-                    {totalFTE} FTE
-                  </Badge>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Badge variant="outline" className={getStatusColor(project.status)}>
+                      {project.status}
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {totalContractedWeeks}w
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs gap-1">
+                      <Users className="h-3 w-3" />
+                      {totalFTE} FTE
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </CardHeader>
