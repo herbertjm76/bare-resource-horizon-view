@@ -15,7 +15,7 @@ export type HeatmapViewMode = 'actual' | 'projected' | 'gap';
 const CapacityHeatmap: React.FC = () => {
   const { company } = useCompany();
   const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
-  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'member');
+  const { preRegisteredMembers, isLoadingInvites } = useTeamMembersState(company?.id, 'member');
   const [selectedWeek, setSelectedWeek] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
@@ -70,17 +70,6 @@ const CapacityHeatmap: React.FC = () => {
     setSearchQuery('');
   };
 
-  // Extract unique departments and locations
-  const departments = useMemo(() => {
-    const depts = new Set(teamMembers.map(m => m.department).filter(Boolean));
-    return Array.from(depts) as string[];
-  }, [teamMembers]);
-
-  const locations = useMemo(() => {
-    const locs = new Set(teamMembers.map(m => m.location).filter(Boolean));
-    return Array.from(locs) as string[];
-  }, [teamMembers]);
-
   // Combine active and pre-registered members for display
   const allMembers = useMemo(() => {
     const preRegAsTeamMembers: TeamMember[] = preRegisteredMembers.map(invite => ({
@@ -89,12 +78,29 @@ const CapacityHeatmap: React.FC = () => {
       fullName: `${invite.first_name || 'Pre-registered'} ${invite.last_name || 'Member'}`
     }));
     
+    console.log('📊 CAPACITY HEATMAP: Combining members', {
+      activeMembers: teamMembers.length,
+      preRegisteredMembers: preRegisteredMembers.length,
+      total: teamMembers.length + preRegAsTeamMembers.length
+    });
+    
     return [...teamMembers, ...preRegAsTeamMembers];
   }, [teamMembers, preRegisteredMembers]);
 
+  // Extract unique departments and locations from ALL members (including pre-registered)
+  const departments = useMemo(() => {
+    const depts = new Set(allMembers.map(m => m.department).filter(Boolean));
+    return Array.from(depts) as string[];
+  }, [allMembers]);
+
+  const locations = useMemo(() => {
+    const locs = new Set(allMembers.map(m => m.location).filter(Boolean));
+    return Array.from(locs) as string[];
+  }, [allMembers]);
+
   // Filter members based on active filters (for display)
   const filteredMembers = useMemo(() => {
-    return allMembers.filter(member => {
+    const filtered = allMembers.filter(member => {
       // Search filter
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
@@ -115,6 +121,16 @@ const CapacityHeatmap: React.FC = () => {
 
       return true;
     });
+    
+    console.log('📊 CAPACITY HEATMAP: Filtered members', {
+      allMembersCount: allMembers.length,
+      filteredCount: filtered.length,
+      searchQuery,
+      activeFilter,
+      filterValue
+    });
+    
+    return filtered;
   }, [allMembers, searchQuery, activeFilter, filterValue]);
 
   const weekLabel = useMemo(
@@ -136,7 +152,7 @@ const CapacityHeatmap: React.FC = () => {
           onWeekChange={setSelectedWeek}
           selectedWeeks={selectedWeeks}
           onWeeksChange={setSelectedWeeks}
-          isLoading={isLoadingMembers}
+          isLoading={isLoadingMembers || isLoadingInvites}
           filteredMembers={filteredMembers}
           departments={departments}
           locations={locations}

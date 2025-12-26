@@ -10,6 +10,7 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
   const [refreshFlag, setRefreshFlag] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [isLoadingInvites, setIsLoadingInvites] = useState(false);
 
   // Fetch invites effect
   useEffect(() => {
@@ -18,6 +19,7 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
         return;
       }
       
+      setIsLoadingInvites(true);
       console.log('Fetching invites - refresh flag:', refreshFlag);
       const { data: invites, error } = await supabase
         .from('invites')
@@ -29,10 +31,11 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
       if (error) {
         toast.error('Failed to load invites');
         console.error('Error fetching invites:', error);
+        setIsLoadingInvites(false);
         return;
       }
       
-      console.log('Fetched invites:', invites?.length || 0);
+      console.log('Fetched invites:', invites?.length || 0, 'for company:', companyId);
       
       // Process invites into pendingMembers and emailInvites
       const pendingMembers: PendingMember[] = (invites || []).map(invite => ({
@@ -40,8 +43,12 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
         isPending: true
       }));
       
-      setPreRegisteredMembers(pendingMembers.filter(member => member.invitation_type === 'pre_registered'));
+      const preReg = pendingMembers.filter(member => member.invitation_type === 'pre_registered');
+      console.log('Pre-registered members:', preReg.length);
+      
+      setPreRegisteredMembers(preReg);
       setEmailInvites((invites || []).filter(invite => invite.invitation_type === 'email_invite'));
+      setIsLoadingInvites(false);
     };
     
     if (companyId) {
@@ -54,6 +61,7 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
   return {
     preRegisteredMembers,
     emailInvites,
+    isLoadingInvites,
     refreshFlag,
     triggerRefresh,
     editMode,
