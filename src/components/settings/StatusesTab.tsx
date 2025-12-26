@@ -31,6 +31,7 @@ export const StatusesTab = () => {
     handleCancel,
     toggleEditMode,
     handleAddNew,
+    handleInlineUpdate,
   } = useStatusOperations(project_statuses, setProjectStatuses, company?.id);
 
   if (loading) {
@@ -102,6 +103,7 @@ export const StatusesTab = () => {
             onSelectStatus={handleSelectStatus}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onInlineUpdate={handleInlineUpdate}
           />
         </div>
       </CardContent>
