@@ -1,25 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
-import { TrendingUp, BarChart3, List, Filter, Plus, History, Search, Kanban, GanttChart } from 'lucide-react';
+import { TrendingUp, BarChart3, List, GanttChart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProjectPlanningData } from '@/hooks/useProjectPlanningData';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
-import { useProjects } from '@/hooks/useProjects';
 import { ProjectPlanningList } from '@/components/resource-planning/ProjectPlanningList';
 import { PlanningFilterRow } from '@/components/resource-planning/PlanningFilterRow';
 import { DemandCapacityChart } from '@/components/resource-planning/DemandCapacityChart';
 import { ResourcePlanningControls } from '@/components/resource-planning/ResourcePlanningControls';
 import { PlanningAuditLogViewer } from '@/components/resource-planning/PlanningAuditLogViewer';
 import { QuickCreateProjectDialog } from '@/components/resource-planning/QuickCreateProjectDialog';
-import { PipelineKanbanView } from '@/components/resource-planning/PipelineKanbanView';
 import { EnhancedTimelineView } from '@/components/resource-planning/EnhancedTimelineView';
 import { EditProjectDialog } from '@/components/projects/EditProjectDialog';
 import { useDemandProjection } from '@/hooks/useDemandProjection';
@@ -163,13 +154,6 @@ const ResourcePlanning: React.FC = () => {
                 Timeline
               </TabsTrigger>
               <TabsTrigger
-                value="kanban"
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
-              >
-                <Kanban className="h-4 w-4" />
-                Kanban
-              </TabsTrigger>
-              <TabsTrigger
                 value="planning"
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
               >
@@ -187,60 +171,24 @@ const ResourcePlanning: React.FC = () => {
           </div>
 
           {/* Timeline Tab - Now Primary */}
-          <TabsContent value="timeline" className="mt-0 py-6">
+          <TabsContent value="timeline" className="mt-0 py-4">
             <div className="px-6 space-y-4">
-              {/* Controls */}
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search projects..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8 h-9"
-                    />
-                  </div>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <Filter className="h-4 w-4" />
-                        Status
-                        {statusFilter.length > 0 && (
-                          <Badge variant="secondary" className="ml-1">
-                            {statusFilter.length}
-                          </Badge>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent align="start" className="w-48">
-                      <div className="space-y-2">
-                        {statusOptions.map(status => (
-                          <div key={status} className="flex items-center gap-2">
-                            <Checkbox
-                              id={`timeline-${status}`}
-                              checked={statusFilter.includes(status)}
-                              onCheckedChange={() => toggleStatus(status)}
-                            />
-                            <Label htmlFor={`timeline-${status}`} className="text-sm cursor-pointer">
-                              {status}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="flex items-center gap-3">
-                  <p className="text-sm text-muted-foreground whitespace-nowrap">
-                    {filteredProjects.length} projects
-                  </p>
-                  <Button size="sm" className="gap-2" onClick={() => setShowCreateProject(true)}>
-                    <Plus className="h-4 w-4" />
-                    New Project
-                  </Button>
-                </div>
-              </div>
+              {/* Consistent Filter Row */}
+              <PlanningFilterRow
+                departmentFilter={departmentFilter}
+                onDepartmentChange={setDepartmentFilter}
+                departments={departments}
+                statusFilter={statusFilter}
+                onStatusToggle={toggleStatus}
+                statusOptions={statusOptions}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                projectCount={filteredProjects.length}
+                totalProjects={projects.length}
+                onCreateProject={() => setShowCreateProject(true)}
+                showBudget={showBudget}
+                onShowBudgetChange={setShowBudget}
+              />
 
               <Card>
                 <CardContent className="p-4">
@@ -251,71 +199,6 @@ const ResourcePlanning: React.FC = () => {
                   />
                 </CardContent>
               </Card>
-            </div>
-          </TabsContent>
-
-          {/* Kanban Tab */}
-          <TabsContent value="kanban" className="mt-0 py-6">
-            <div className="px-6 space-y-4">
-              {/* Controls */}
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search projects..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8 h-9"
-                    />
-                  </div>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <Filter className="h-4 w-4" />
-                        Status
-                        {statusFilter.length > 0 && (
-                          <Badge variant="secondary" className="ml-1">
-                            {statusFilter.length}
-                          </Badge>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent align="start" className="w-48">
-                      <div className="space-y-2">
-                        {statusOptions.map(status => (
-                          <div key={status} className="flex items-center gap-2">
-                            <Checkbox
-                              id={`kanban-${status}`}
-                              checked={statusFilter.includes(status)}
-                              onCheckedChange={() => toggleStatus(status)}
-                            />
-                            <Label htmlFor={`kanban-${status}`} className="text-sm cursor-pointer">
-                              {status}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="flex items-center gap-3">
-                  <p className="text-sm text-muted-foreground whitespace-nowrap">
-                    {filteredProjects.length} projects
-                  </p>
-                  <Button size="sm" className="gap-2" onClick={() => setShowCreateProject(true)}>
-                    <Plus className="h-4 w-4" />
-                    New Project
-                  </Button>
-                </div>
-              </div>
-
-              <PipelineKanbanView
-                projects={filteredProjects}
-                isLoading={isLoading}
-                onProjectClick={handleProjectClick}
-                onUpdate={refetch}
-              />
             </div>
           </TabsContent>
         <TabsContent value="planning" className="mt-0 py-4">
