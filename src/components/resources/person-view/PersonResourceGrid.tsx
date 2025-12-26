@@ -25,34 +25,37 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
   onRefresh
 }) => {
   const tableWidth = 250 + (weeks.length * 80);
+  // Center align for shorter periods (12 weeks or less)
+  const shouldCenterAlign = weeks.length <= 12;
  
   return (
     <div className="bg-white rounded-lg shadow-sm border">
       <div className="p-4">
-        <div className="workload-resource-grid-container">
+        <div className={`workload-resource-grid-container ${shouldCenterAlign ? 'center-aligned' : ''}`}>
           <div className="workload-resource-table-wrapper">
             <table 
               className="workload-resource-table"
               style={{ 
-                width: `${tableWidth}px`,
-                minWidth: `${tableWidth}px`
+                width: shouldCenterAlign ? `${tableWidth}px` : '100%',
+                minWidth: `${tableWidth}px`,
+                margin: shouldCenterAlign ? '0 auto' : '0'
               }}
             >
               <PersonGridHeader weeks={weeks} />
               
               <tbody>
                 {personData.map((person, index) => (
-              <PersonRow
-                key={person.personId}
-                person={person}
-                weeks={weeks}
-                isExpanded={expandedPeople.includes(person.personId)}
-                onToggleExpand={() => onTogglePersonExpand(person.personId)}
-                isEven={index % 2 === 0}
-                selectedDate={selectedDate}
-                periodToShow={periodToShow}
-                onRefresh={onRefresh}
-              />
+                  <PersonRow
+                    key={person.personId}
+                    person={person}
+                    weeks={weeks}
+                    isExpanded={expandedPeople.includes(person.personId)}
+                    onToggleExpand={() => onTogglePersonExpand(person.personId)}
+                    isEven={index % 2 === 0}
+                    selectedDate={selectedDate}
+                    periodToShow={periodToShow}
+                    onRefresh={onRefresh}
+                  />
                 ))}
               </tbody>
             </table>
