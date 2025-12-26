@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronRight, Clock, Users, CalendarDays, DollarSign, Plus, Settings } from 'lucide-react';
+import { ChevronDown, ChevronRight, CalendarDays, Plus, Settings, Calendar } from 'lucide-react';
 import { StageTeamCompositionEditor } from '@/components/projects/team-composition/StageTeamCompositionEditor';
 import { AddProjectStageDialog } from './AddProjectStageDialog';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useCompany } from '@/context/CompanyContext';
+import { useOfficeStages } from '@/hooks/useOfficeStages';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ProjectStage {
   id: string;
@@ -18,6 +23,7 @@ interface OfficeStage {
   id: string;
   name: string;
   code?: string | null;
+  color?: string | null;
 }
 
 interface ProjectPlanningCardProps {
@@ -44,6 +50,54 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showStageDialog, setShowStageDialog] = useState(false);
+  const { company } = useCompany();
+  const { data: officeStages } = useOfficeStages();
+
+  // Fetch project stages with contracted weeks
+  const { data: projectStagesData } = useQuery({
+    queryKey: ['project-stages', project.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('project_stages')
+        .select('stage_name, contracted_weeks, is_applicable')
+        .eq('project_id', project.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!project.id
+  });
+
+  // Build stage info map
+  const stageInfoMap = useMemo(() => {
+    const map: Record<string, { color: string; orderIndex: number; code?: string }> = {};
+    officeStages?.forEach(s => {
+      map[s.name] = { color: s.color || '#3b82f6', orderIndex: s.order_index, code: s.code || undefined };
+    });
+    return map;
+  }, [officeStages]);
+
+  // Get stages with colors and contracted weeks
+  const stagesWithData = useMemo(() => {
+    if (!project.stages || project.stages.length === 0) return [];
+
+    return project.stages
+      .map(stageName => {
+        const info = stageInfoMap[stageName] || { color: '#6b7280', orderIndex: 999 };
+        const stageData = projectStagesData?.find(ps => ps.stage_name === stageName);
+        return {
+          name: stageName,
+          code: info.code,
+          color: info.color,
+          orderIndex: info.orderIndex,
+          contractedWeeks: stageData?.contracted_weeks || 0
+        };
+      })
+      .sort((a, b) => a.orderIndex - b.orderIndex);
+  }, [project.stages, stageInfoMap, projectStagesData]);
+
+  const totalContractedWeeks = useMemo(() => {
+    return stagesWithData.reduce((sum, s) => sum + s.contractedWeeks, 0);
+  }, [stagesWithData]);
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -65,26 +119,74 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild>
             <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
                   {isOpen ? (
-                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                    <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   ) : (
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   )}
-                  <div>
-                    <CardTitle className="text-base font-medium">
+                  <div className="min-w-0">
+                    <CardTitle className="text-base font-medium truncate">
                       {project.name}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">{project.code}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                
+                {/* Timeline Bar */}
+                <div className="flex-1 min-w-0 px-4">
+                  {stagesWithData.length > 0 ? (
+                    <TooltipProvider>
+                      <div className="flex h-7 rounded-md overflow-hidden bg-muted/30 border">
+                        {stagesWithData.map((stage, index) => {
+                          const widthPercent = totalContractedWeeks > 0 
+                            ? (stage.contractedWeeks / totalContractedWeeks) * 100 
+                            : 100 / stagesWithData.length;
+                          
+                          return (
+                            <Tooltip key={stage.name}>
+                              <TooltipTrigger asChild>
+                                <div
+                                  className="flex items-center justify-center text-xs font-medium text-white truncate px-2 transition-all hover:opacity-80"
+                                  style={{ 
+                                    backgroundColor: stage.color,
+                                    width: `${widthPercent}%`,
+                                    minWidth: stage.contractedWeeks > 0 ? '40px' : '20px'
+                                  }}
+                                >
+                                  {stage.contractedWeeks > 0 && (
+                                    <span className="truncate">
+                                      {stage.code || stage.name.substring(0, 2)} · {stage.contractedWeeks}w
+                                    </span>
+                                  )}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="top">
+                                <p className="font-medium">{stage.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {stage.contractedWeeks} contracted weeks
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          );
+                        })}
+                      </div>
+                    </TooltipProvider>
+                  ) : (
+                    <div className="h-7 rounded-md bg-muted/30 border flex items-center justify-center">
+                      <span className="text-xs text-muted-foreground">No stages</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3 flex-shrink-0">
                   <Badge variant="outline" className={getStatusColor(project.status)}>
                     {project.status}
                   </Badge>
-                  <Badge variant="secondary" className="text-xs">
-                    {stages.length} {stages.length === 1 ? 'stage' : 'stages'}
+                  <Badge variant="secondary" className="text-xs gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {totalContractedWeeks}w
                   </Badge>
                 </div>
               </div>
