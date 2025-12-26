@@ -29,10 +29,10 @@ const TabsTrigger = React.forwardRef<
     className={cn(
       // Default: muted background, gray text
       "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-      // Highlighted when active - purple bg, white text, bold
-      "data-[state=active]:bg-[hsl(var(--theme-primary))] data-[state=active]:text-white data-[state=active]:font-bold data-[state=active]:shadow-sm",
+      // Highlighted when active - theme gradient start bg, white text, bold
+      "data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:font-bold data-[state=active]:shadow-sm",
       // Inactive: muted gray text
-      "data-[state=inactive]:bg-transparent data-[state=inactive]:text-[#8E9196]",
+      "data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground",
       className
     )}
     {...props}
