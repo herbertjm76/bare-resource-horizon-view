@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Clock, Users, DollarSign, CalendarDays } from 'lucide-react';
 import { ResourceSelector } from './ResourceSelector';
 import { TeamCompositionTable } from './TeamCompositionTable';
 import { useStageTeamComposition } from '@/hooks/useStageTeamComposition';
+import { useOfficeStages } from '@/hooks/useOfficeStages';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface Stage {
   id: string;
@@ -32,6 +32,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
   showBudget = false,
   onStageUpdate
 }) => {
+  const { data: officeStages = [] } = useOfficeStages();
   const [selectedStageId, setSelectedStageId] = useState<string>(stages[0]?.id || '');
   const [contractedWeeks, setContractedWeeks] = useState<Record<string, number>>({});
   const [isUpdatingWeeks, setIsUpdatingWeeks] = useState(false);
@@ -82,6 +83,17 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
     ? Math.round(stageTotals.totalHours / currentContractedWeeks * 10) / 10 
     : 0;
 
+  // Calculate total weeks for proportional timeline bar
+  const totalWeeks = useMemo(() => {
+    return stages.reduce((sum, stage) => sum + (contractedWeeks[stage.id] || 0), 0);
+  }, [stages, contractedWeeks]);
+
+  // Get stage color from office_stages
+  const getStageColor = (stageName: string): string => {
+    const officeStage = officeStages.find(os => os.name === stageName);
+    return officeStage?.color || '#6b7280'; // Default to gray if no color
+  };
+
   const handleAddResource = (data: {
     referenceId: string;
     referenceType: 'role' | 'member';
@@ -128,30 +140,47 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
 
   return (
     <div className="space-y-4">
-      {/* Stage Tabs */}
-      <Tabs value={selectedStageId} onValueChange={setSelectedStageId}>
-        <TabsList className="w-full justify-start flex-wrap h-auto gap-1 p-1">
-          {stages.map((stage) => {
-            const stageWeeks = contractedWeeks[stage.id] || 0;
-            return (
-              <TabsTrigger
-                key={stage.id}
-                value={stage.id}
-                className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
+      {/* Stage Timeline Bar - Proportional width based on contracted weeks */}
+      <div className="flex w-full h-10 rounded-lg overflow-hidden border border-border/50 bg-muted/30">
+        {stages.map((stage, index) => {
+          const stageWeeks = contractedWeeks[stage.id] || 0;
+          const widthPercent = totalWeeks > 0 
+            ? (stageWeeks / totalWeeks) * 100 
+            : 100 / stages.length; // Equal width if no weeks set
+          const stageColor = getStageColor(stage.name);
+          const isSelected = stage.id === selectedStageId;
+          
+          return (
+            <button
+              key={stage.id}
+              onClick={() => setSelectedStageId(stage.id)}
+              className={cn(
+                "relative flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer min-w-[60px]",
+                "hover:brightness-110",
+                isSelected && "ring-2 ring-primary ring-offset-1 z-10"
+              )}
+              style={{ 
+                width: `${widthPercent}%`,
+                backgroundColor: stageColor 
+              }}
+            >
+              <span className="text-xs font-medium text-white drop-shadow-sm truncate px-2">
                 {stage.code || stage.name}
-                {stageWeeks > 0 && (
-                  <Badge variant="outline" className="text-xs px-1.5 py-0">
-                    {stageWeeks}w
-                  </Badge>
-                )}
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
+              </span>
+              {stageWeeks > 0 && (
+                <span className="text-[10px] text-white/80 font-medium">
+                  {stageWeeks}w
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
 
-        {stages.map((stage) => (
-          <TabsContent key={stage.id} value={stage.id} className="space-y-4 mt-4">
+      {/* Stage Content */}
+      {stages.map((stage) => (
+        stage.id === selectedStageId && (
+          <div key={stage.id} className="space-y-4">
             {/* Stage Header */}
             <div className="flex items-center justify-between">
               <div>
@@ -245,9 +274,9 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        ))}
-      </Tabs>
+          </div>
+        )
+      ))}
     </div>
   );
 };
