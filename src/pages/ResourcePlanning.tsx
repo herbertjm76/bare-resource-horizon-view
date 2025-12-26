@@ -1,42 +1,67 @@
 import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
-import { TrendingUp, BarChart3, Users } from 'lucide-react';
-import { startOfWeek } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrendingUp, BarChart3, List, Filter } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useDemandProjection } from '@/hooks/useDemandProjection';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { useProjectPlanningData } from '@/hooks/useProjectPlanningData';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
-import { Skeleton } from '@/components/ui/skeleton';
+import { ProjectPlanningList } from '@/components/resource-planning/ProjectPlanningList';
+import { PlanningProjectedSummary } from '@/components/resource-planning/PlanningProjectedSummary';
 import { DemandCapacityChart } from '@/components/resource-planning/DemandCapacityChart';
 import { ResourcePlanningControls } from '@/components/resource-planning/ResourcePlanningControls';
-import { ResourcePlanningMetrics } from '@/components/resource-planning/ResourcePlanningMetrics';
+import { useDemandProjection } from '@/hooks/useDemandProjection';
+import { startOfWeek } from 'date-fns';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const statusOptions = ['Active', 'On Hold', 'Completed', 'Planning'];
 
 const ResourcePlanning: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('forecast');
+  const [activeTab, setActiveTab] = useState<string>('planning');
+  const [statusFilter, setStatusFilter] = useState<string[]>(['Active']);
+  const [showBudget, setShowBudget] = useState(false);
   const [selectedWeeks, setSelectedWeeks] = useState<number>(12);
   const [startDate, setStartDate] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const { weeklyDemand, roleNames, projectDemands, totalProjectedHours, isLoading: isDemandLoading } = useDemandProjection(
+
+  const { 
+    projects, 
+    officeStages, 
+    totals, 
+    isLoading: isPlanningLoading,
+    refetch 
+  } = useProjectPlanningData(statusFilter);
+
+  const { teamMembers, isLoading: isTeamLoading } = useTeamMembersData(true);
+
+  // For forecast tab
+  const { weeklyDemand, roleNames, projectDemands, totalProjectedHours: forecastHours, isLoading: isDemandLoading } = useDemandProjection(
     startDate,
     selectedWeeks
   );
-  
-  const { teamMembers, isLoading: isTeamLoading } = useTeamMembersData(true);
 
-  // Calculate total team capacity
-  const totalTeamCapacity = teamMembers.reduce((sum, member) => {
-    return sum + ((member.weekly_capacity || 40) * selectedWeeks);
-  }, 0);
-
+  // Calculate team capacity
   const weeklyCapacity = teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
+  const totalTeamCapacity = weeklyCapacity * selectedWeeks;
 
-  const isLoading = isDemandLoading || isTeamLoading;
+  const isLoading = isPlanningLoading || isTeamLoading;
+
+  const toggleStatus = (status: string) => {
+    setStatusFilter(prev => 
+      prev.includes(status) 
+        ? prev.filter(s => s !== status)
+        : [...prev, status]
+    );
+  };
 
   return (
     <StandardLayout>
       <StandardizedPageHeader
         title="Resource Planning"
-        description="Forecast resource demand vs capacity based on project team compositions"
+        description="Plan team composition, contracted weeks, and projected hours per project"
         icon={TrendingUp}
       />
       
@@ -45,24 +70,103 @@ const ResourcePlanning: React.FC = () => {
         <div className="flex justify-center py-4 border-b border-border/50 bg-muted/30">
           <TabsList className="inline-flex h-11 items-center justify-center rounded-lg bg-background p-1 shadow-sm border border-border/60">
             <TabsTrigger
+              value="planning"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+            >
+              <List className="h-4 w-4" />
+              Project Planning
+            </TabsTrigger>
+            <TabsTrigger
               value="forecast"
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
             >
-              <TrendingUp className="h-4 w-4" />
+              <BarChart3 className="h-4 w-4" />
               Demand Forecast
-            </TabsTrigger>
-            <TabsTrigger
-              value="by-role"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm opacity-60"
-              disabled
-            >
-              <Users className="h-4 w-4" />
-              By Role
-              <span className="text-xs opacity-70">(Soon)</span>
             </TabsTrigger>
           </TabsList>
         </div>
 
+        {/* Project Planning Tab */}
+        <TabsContent value="planning" className="mt-0 py-6">
+          <div className="px-6 space-y-6">
+            {/* Controls Row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Filter className="h-4 w-4" />
+                      Status
+                      {statusFilter.length > 0 && (
+                        <Badge variant="secondary" className="ml-1">
+                          {statusFilter.length}
+                        </Badge>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-48">
+                    <div className="space-y-2">
+                      {statusOptions.map(status => (
+                        <div key={status} className="flex items-center gap-2">
+                          <Checkbox
+                            id={status}
+                            checked={statusFilter.includes(status)}
+                            onCheckedChange={() => toggleStatus(status)}
+                          />
+                          <Label htmlFor={status} className="text-sm cursor-pointer">
+                            {status}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                <div className="flex items-center gap-2 ml-4">
+                  <Checkbox
+                    id="show-budget"
+                    checked={showBudget}
+                    onCheckedChange={(checked) => setShowBudget(!!checked)}
+                  />
+                  <Label htmlFor="show-budget" className="text-sm cursor-pointer">
+                    Show Budget
+                  </Label>
+                </div>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                {projects.length} projects
+              </p>
+            </div>
+
+            {/* Projected Summary */}
+            <PlanningProjectedSummary
+              totalProjectedHours={totals.totalProjectedHours}
+              totalTeamCapacity={totalTeamCapacity}
+              weeklyCapacity={weeklyCapacity}
+              teamMemberCount={teamMembers.length}
+              projectCount={totals.projectCount}
+              totalBudget={totals.totalBudget}
+              showBudget={showBudget}
+            />
+
+            {/* Project List */}
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Projects
+              </h3>
+              <ProjectPlanningList
+                projects={projects}
+                officeStages={officeStages}
+                isLoading={isLoading}
+                showBudget={showBudget}
+                onUpdate={refetch}
+              />
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Demand Forecast Tab */}
         <TabsContent value="forecast" className="mt-0 py-6">
           <div className="px-6 space-y-6">
             {/* Controls */}
@@ -73,52 +177,19 @@ const ResourcePlanning: React.FC = () => {
               onStartDateChange={setStartDate}
             />
 
-            {isLoading ? (
-              <div className="space-y-6">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-80 w-full" />
-              </div>
-            ) : (
-              <>
-                {/* Metrics Cards */}
-                <ResourcePlanningMetrics
-                  totalProjectedHours={totalProjectedHours}
-                  totalTeamCapacity={totalTeamCapacity}
+            {/* Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Demand vs Capacity Forecast</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DemandCapacityChart
+                  weeklyDemand={weeklyDemand}
+                  roleNames={roleNames}
                   weeklyCapacity={weeklyCapacity}
-                  teamMemberCount={teamMembers.length}
-                  selectedWeeks={selectedWeeks}
-                  projectCount={new Set(projectDemands.map(d => d.projectId)).size}
                 />
-
-                {/* Main Chart */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Demand vs Capacity Forecast</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <DemandCapacityChart
-                      weeklyDemand={weeklyDemand}
-                      roleNames={roleNames}
-                      weeklyCapacity={weeklyCapacity}
-                    />
-                  </CardContent>
-                </Card>
-              </>
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="by-role" className="mt-0 py-6">
-          <div className="flex items-center justify-center h-[500px] border-2 border-dashed border-border rounded-xl bg-muted/20 mx-6">
-            <div className="text-center px-6">
-              <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4">
-                <Users className="h-12 w-12 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Role-Based Planning Coming Soon</h3>
-              <p className="text-sm text-muted-foreground max-w-md">
-                Breakdown of demand by role type with hiring recommendations
-              </p>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>

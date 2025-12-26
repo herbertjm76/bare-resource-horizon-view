@@ -1,0 +1,90 @@
+import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ProjectPlanningCard } from './ProjectPlanningCard';
+import { FolderOpen } from 'lucide-react';
+
+interface Project {
+  id: string;
+  name: string;
+  code: string;
+  status: string;
+  current_stage?: string;
+  stages?: string[];
+}
+
+interface OfficeStage {
+  id: string;
+  name: string;
+  code?: string;
+}
+
+interface ProjectPlanningListProps {
+  projects: Project[];
+  officeStages: OfficeStage[];
+  isLoading?: boolean;
+  showBudget?: boolean;
+  onUpdate?: () => void;
+}
+
+export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
+  projects,
+  officeStages,
+  isLoading,
+  showBudget = false,
+  onUpdate
+}) => {
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map(i => (
+          <Skeleton key={i} className="h-20 w-full" />
+        ))}
+      </div>
+    );
+  }
+
+  if (projects.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="rounded-full bg-muted p-4 mb-4">
+          <FolderOpen className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <h3 className="text-lg font-medium mb-1">No Active Projects</h3>
+        <p className="text-sm text-muted-foreground max-w-md">
+          Create projects and assign stages to start planning your resource allocation.
+        </p>
+      </div>
+    );
+  }
+
+  // Map project stages to office stages
+  const getProjectStages = (project: Project) => {
+    if (!project.stages || !Array.isArray(project.stages)) return [];
+    
+    return project.stages
+      .map(stageName => {
+        const officeStage = officeStages.find(os => os.name === stageName);
+        if (!officeStage) return null;
+        return {
+          id: officeStage.id,
+          name: officeStage.name,
+          code: officeStage.code
+        };
+      })
+      .filter(Boolean) as { id: string; name: string; code?: string }[];
+  };
+
+  return (
+    <div className="space-y-4">
+      {projects.map(project => (
+        <ProjectPlanningCard
+          key={project.id}
+          project={project}
+          stages={getProjectStages(project)}
+          showBudget={showBudget}
+          onUpdate={onUpdate}
+        />
+      ))}
+    </div>
+  );
+};
