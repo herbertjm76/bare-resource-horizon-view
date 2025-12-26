@@ -29,41 +29,54 @@ export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
   weeklyCapacity
 }) => {
   // Check if there's any projected demand data
-  const hasData = weeklyDemand.some(week => week.totalDemand > 0);
+  const hasRealData = weeklyDemand.some(week => week.totalDemand > 0);
 
-  if (!hasData) {
-    return (
-      <div className="space-y-4">
-        <Alert>
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            No projected demand data available. To see demand projections:
-            <ol className="mt-2 ml-4 list-decimal text-sm space-y-1">
-              <li>Go to the <strong>Pipeline</strong> page</li>
-              <li>Click on a project card to open the edit dialog</li>
-              <li>Select stages for your project in the Project Info tab</li>
-              <li>Switch to the <strong>Team Composition</strong> tab</li>
-              <li>Add roles or team members with planned hours</li>
-            </ol>
-          </AlertDescription>
-        </Alert>
-        <div className="h-60 flex items-center justify-center border rounded-lg bg-muted/20">
-          <p className="text-muted-foreground text-sm">Chart will appear once team compositions are added</p>
-        </div>
-      </div>
-    );
-  }
+  // Generate demo data when no real data exists
+  const demoWeeklyDemand: WeeklyDemandData[] = !hasRealData ? Array.from({ length: 12 }, (_, i) => {
+    const weekDate = new Date();
+    weekDate.setDate(weekDate.getDate() + (i * 7));
+    
+    // Create realistic demand patterns
+    const seniorDemand = 15 + Math.sin(i * 0.5) * 8 + Math.random() * 5;
+    const midDemand = 25 + Math.cos(i * 0.4) * 10 + Math.random() * 8;
+    const juniorDemand = 20 + Math.sin(i * 0.3 + 1) * 6 + Math.random() * 6;
+    const specialistDemand = 10 + Math.cos(i * 0.6) * 5 + Math.random() * 4;
+    
+    return {
+      weekKey: format(weekDate, 'yyyy-MM-dd'),
+      weekDate,
+      totalDemand: seniorDemand + midDemand + juniorDemand + specialistDemand,
+      demandByRole: {
+        'senior-consultant': seniorDemand,
+        'consultant': midDemand,
+        'analyst': juniorDemand,
+        'specialist': specialistDemand,
+      },
+      demandByProject: {},
+    };
+  }) : weeklyDemand;
+
+  const demoRoleNames: Record<string, string> = !hasRealData ? {
+    'senior-consultant': 'Senior Consultant',
+    'consultant': 'Consultant',
+    'analyst': 'Analyst',
+    'specialist': 'Specialist',
+  } : roleNames;
+
+  const effectiveWeeklyDemand = hasRealData ? weeklyDemand : demoWeeklyDemand;
+  const effectiveRoleNames = hasRealData ? roleNames : demoRoleNames;
+  const effectiveCapacity = hasRealData ? weeklyCapacity : 80; // Demo capacity
 
   // Get all unique role IDs
-  const allRoleIds = [...new Set(weeklyDemand.flatMap(week => Object.keys(week.demandByRole)))];
+  const allRoleIds = [...new Set(effectiveWeeklyDemand.flatMap(week => Object.keys(week.demandByRole)))];
 
   // Transform data for the chart
-  const chartData = weeklyDemand.map(week => {
+  const chartData = effectiveWeeklyDemand.map(week => {
     const dataPoint: Record<string, any> = {
       week: format(week.weekDate, 'MMM d'),
       weekKey: week.weekKey,
       total: Math.round(week.totalDemand),
-      capacity: weeklyCapacity,
+      capacity: effectiveCapacity,
     };
 
     allRoleIds.forEach(roleId => {
@@ -74,13 +87,23 @@ export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
   });
 
   // Calculate over/under capacity
-  const overCapacityWeeks = weeklyDemand.filter(w => w.totalDemand > weeklyCapacity).length;
-  const utilizationPct = weeklyCapacity > 0 
-    ? Math.round((weeklyDemand.reduce((sum, w) => sum + w.totalDemand, 0) / (weeklyCapacity * weeklyDemand.length)) * 100)
+  const overCapacityWeeks = effectiveWeeklyDemand.filter(w => w.totalDemand > effectiveCapacity).length;
+  const utilizationPct = effectiveCapacity > 0 
+    ? Math.round((effectiveWeeklyDemand.reduce((sum, w) => sum + w.totalDemand, 0) / (effectiveCapacity * effectiveWeeklyDemand.length)) * 100)
     : 0;
 
   return (
     <div className="space-y-4">
+      {/* Demo data indicator */}
+      {!hasRealData && (
+        <Alert className="bg-primary/5 border-primary/20">
+          <Info className="h-4 w-4 text-primary" />
+          <AlertDescription className="text-sm">
+            <span className="font-medium">Demo Data Preview</span> – This chart shows sample data. Add team compositions to your projects to see real demand projections.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Summary Badges */}
       <div className="flex flex-wrap gap-3 text-sm">
         <div className="px-3 py-1.5 rounded-full bg-muted">
@@ -128,20 +151,20 @@ export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
               }}
               formatter={(value: number, name: string) => {
                 if (name === 'capacity') return [`${value} hours`, 'Team Capacity'];
-                return [`${value} hours`, roleNames[name] || name];
+                return [`${value} hours`, effectiveRoleNames[name] || name];
               }}
             />
             <Legend 
               formatter={(value) => {
                 if (value === 'capacity') return 'Team Capacity';
-                return roleNames[value] || value;
+                return effectiveRoleNames[value] || value;
               }}
               wrapperStyle={{ fontSize: '12px' }}
             />
             
             {/* Capacity line */}
             <ReferenceLine 
-              y={weeklyCapacity} 
+              y={effectiveCapacity} 
               stroke="hsl(var(--destructive))" 
               strokeDasharray="5 5"
               strokeWidth={2}
@@ -166,14 +189,14 @@ export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
       {/* Role Legend with totals */}
       <div className="flex flex-wrap gap-4 pt-2 border-t">
         {allRoleIds.map((roleId, index) => {
-          const totalHours = weeklyDemand.reduce((sum, week) => sum + (week.demandByRole[roleId] || 0), 0);
+          const totalHours = effectiveWeeklyDemand.reduce((sum, week) => sum + (week.demandByRole[roleId] || 0), 0);
           return (
             <div key={roleId} className="flex items-center gap-2 text-sm">
               <div 
                 className="w-3 h-3 rounded-sm" 
                 style={{ backgroundColor: ROLE_COLORS[index % ROLE_COLORS.length] }}
               />
-              <span className="text-muted-foreground">{roleNames[roleId] || roleId}:</span>
+              <span className="text-muted-foreground">{effectiveRoleNames[roleId] || roleId}:</span>
               <span className="font-medium">{Math.round(totalHours)}h</span>
             </div>
           );
