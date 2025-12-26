@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronRight, CalendarDays, Plus, Settings, Calendar } from 'lucide-react';
+import { ChevronDown, ChevronRight, CalendarDays, Plus, Settings, Calendar, Users } from 'lucide-react';
 import { StageTeamCompositionEditor } from '@/components/projects/team-composition/StageTeamCompositionEditor';
 import { AddProjectStageDialog } from './AddProjectStageDialog';
 import { useQuery } from '@tanstack/react-query';
@@ -99,6 +99,25 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
     return stagesWithData.reduce((sum, s) => sum + s.contractedWeeks, 0);
   }, [stagesWithData]);
 
+  // Fetch team composition for FTE calculation
+  const { data: teamCompositionData } = useQuery({
+    queryKey: ['project-team-composition-totals', project.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('project_stage_team_composition')
+        .select('planned_quantity, total_planned_hours')
+        .eq('project_id', project.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!project.id
+  });
+
+  const totalFTE = useMemo(() => {
+    if (!teamCompositionData) return 0;
+    return teamCompositionData.reduce((sum, t) => sum + (t.planned_quantity || 0), 0);
+  }, [teamCompositionData]);
+
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'active': return 'bg-green-500/10 text-green-600 border-green-500/30';
@@ -134,12 +153,12 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
                   </div>
                 </div>
                 
-                {/* Timeline Bar */}
-                <div className="flex-1 min-w-0 px-4">
+                {/* Timeline Bar - Fixed Width */}
+                <div className="w-[320px] flex-shrink-0">
                   {stagesWithData.length > 0 ? (
                     <TooltipProvider>
                       <div className="flex h-7 rounded-md overflow-hidden bg-muted/30 border">
-                        {stagesWithData.map((stage, index) => {
+                        {stagesWithData.map((stage) => {
                           const widthPercent = totalContractedWeeks > 0 
                             ? (stage.contractedWeeks / totalContractedWeeks) * 100 
                             : 100 / stagesWithData.length;
@@ -148,15 +167,15 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
                             <Tooltip key={stage.name}>
                               <TooltipTrigger asChild>
                                 <div
-                                  className="flex items-center justify-center text-xs font-medium text-white truncate px-2 transition-all hover:opacity-80"
+                                  className="flex items-center justify-center text-xs font-medium text-white truncate px-1 transition-all hover:opacity-80"
                                   style={{ 
                                     backgroundColor: stage.color,
                                     width: `${widthPercent}%`,
-                                    minWidth: stage.contractedWeeks > 0 ? '40px' : '20px'
+                                    minWidth: '24px'
                                   }}
                                 >
                                   {stage.contractedWeeks > 0 && (
-                                    <span className="truncate">
+                                    <span className="truncate text-[10px]">
                                       {stage.code || stage.name.substring(0, 2)} · {stage.contractedWeeks}w
                                     </span>
                                   )}
@@ -180,13 +199,17 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
                   )}
                 </div>
 
-                <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   <Badge variant="outline" className={getStatusColor(project.status)}>
                     {project.status}
                   </Badge>
                   <Badge variant="secondary" className="text-xs gap-1">
                     <Calendar className="h-3 w-3" />
                     {totalContractedWeeks}w
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs gap-1">
+                    <Users className="h-3 w-3" />
+                    {totalFTE} FTE
                   </Badge>
                 </div>
               </div>
