@@ -56,20 +56,6 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
           <span className="member-name">
             {displayName}
           </span>
-          {'isPending' in member && member.isPending && (
-            <span style={{ 
-              display: 'inline-block',
-              backgroundColor: '#fef3c7',
-              color: '#d97706',
-              fontSize: '10px',
-              fontWeight: '600',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              marginLeft: '8px'
-            }}>
-              Pending
-            </span>
-          )}
         </div>
       </div>
     </td>
