@@ -24,6 +24,7 @@ interface PipelineColumnProps {
   onDrop: (e: React.DragEvent, status: string) => void;
   onCardClick?: (project: Project) => void;
   isDragOver: boolean;
+  draggingProjectId?: string | null;
 }
 
 export const PipelineColumn: React.FC<PipelineColumnProps> = ({
@@ -36,12 +37,13 @@ export const PipelineColumn: React.FC<PipelineColumnProps> = ({
   onDrop,
   onCardClick,
   isDragOver,
+  draggingProjectId,
 }) => {
   return (
     <div
       className={cn(
-        "flex flex-col min-w-[180px] w-[180px] bg-muted/30 rounded-lg border border-border transition-colors",
-        isDragOver && "border-primary bg-primary/5"
+        "flex flex-col min-w-[180px] w-[180px] bg-muted/30 rounded-lg border-2 border-border transition-all duration-300 ease-out",
+        isDragOver && "border-primary bg-primary/10 scale-[1.02] shadow-lg shadow-primary/20"
       )}
       onDragOver={onDragOver}
       onDrop={(e) => onDrop(e, status)}
@@ -65,8 +67,11 @@ export const PipelineColumn: React.FC<PipelineColumnProps> = ({
       {/* Cards Container */}
       <div className="flex-1 p-1.5 space-y-1.5 overflow-y-auto max-h-[calc(100vh-280px)]">
         {projects.length === 0 ? (
-          <div className="flex items-center justify-center h-12 text-[10px] text-muted-foreground border border-dashed border-border rounded">
-            Empty
+          <div className={cn(
+            "flex items-center justify-center h-12 text-[10px] text-muted-foreground border-2 border-dashed rounded transition-all duration-300",
+            isDragOver ? "border-primary bg-primary/5" : "border-border"
+          )}>
+            {isDragOver ? "Drop here" : "Empty"}
           </div>
         ) : (
           projects.map((project) => (
@@ -75,6 +80,7 @@ export const PipelineColumn: React.FC<PipelineColumnProps> = ({
               project={project}
               onDragStart={onDragStart}
               onClick={onCardClick}
+              isDragging={draggingProjectId === project.id}
             />
           ))
         )}

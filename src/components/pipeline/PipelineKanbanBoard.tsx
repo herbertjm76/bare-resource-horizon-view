@@ -195,6 +195,7 @@ export const PipelineKanbanBoard: React.FC = () => {
               key={name}
               onDragEnter={() => handleDragEnter(name)}
               onDragLeave={handleDragLeave}
+              className="transition-transform duration-200"
             >
               <PipelineColumn
                 title={name}
@@ -206,6 +207,7 @@ export const PipelineKanbanBoard: React.FC = () => {
                 onDrop={handleDrop}
                 onCardClick={handleCardClick}
                 isDragOver={dragOverStage === name}
+                draggingProjectId={draggingProjectId}
               />
             </div>
           ))}
