@@ -141,7 +141,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
   return (
     <div className="space-y-4">
       {/* Stage Timeline Bar - Proportional width based on contracted weeks */}
-      <div className="flex w-full h-12 rounded-lg overflow-visible border border-border/50 bg-muted/30 mb-3">
+      <div className="flex w-full h-12 rounded-lg overflow-visible mb-3">
         {stages.map((stage, index) => {
           const stageWeeks = contractedWeeks[stage.id] || 0;
           const widthPercent = totalWeeks > 0 
@@ -149,32 +149,30 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
             : 100 / stages.length; // Equal width if no weeks set
           const stageColor = getStageColor(stage.name);
           const isSelected = stage.id === selectedStageId;
+          const isFirst = index === 0;
+          const isLast = index === stages.length - 1;
           
-            return (
+          return (
             <button
               key={stage.id}
               onClick={() => setSelectedStageId(stage.id)}
               className={cn(
-                "relative overflow-hidden flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer min-w-[60px]",
+                "relative flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer min-w-[60px]",
                 "hover:brightness-110",
-                isSelected
-                  ? "z-10 scale-[1.02] ring-2 ring-foreground/80 ring-offset-2 ring-offset-background shadow-lg"
-                  : [
-                      // Pastel-safe dimming: strong translucent surface overlay instead of relying on opacity alone
-                      "after:content-[''] after:absolute after:inset-0 after:bg-background/70 after:pointer-events-none",
-                      "opacity-80",
-                    ]
+                isFirst && "rounded-l-lg",
+                isLast && "rounded-r-lg",
+                isSelected && "ring-2 ring-foreground ring-offset-2 ring-offset-background z-10"
               )}
               style={{
                 width: `${widthPercent}%`,
                 backgroundColor: stageColor,
               }}
             >
-              <span className="relative z-10 text-sm font-bold text-white drop-shadow-sm truncate px-2">
+              <span className="text-sm font-bold text-white drop-shadow-sm truncate px-2">
                 {stage.code || stage.name}
               </span>
               {stageWeeks > 0 && (
-                <span className="relative z-10 text-sm font-bold text-white/90">
+                <span className="text-sm font-bold text-white/90">
                   {stageWeeks}w
                 </span>
               )}
