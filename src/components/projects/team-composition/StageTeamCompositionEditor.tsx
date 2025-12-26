@@ -164,11 +164,11 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                 backgroundColor: stageColor 
               }}
             >
-              <span className="text-xs font-medium text-white drop-shadow-sm truncate px-2">
+              <span className="text-sm font-bold text-white drop-shadow-sm truncate px-2">
                 {stage.code || stage.name}
               </span>
               {stageWeeks > 0 && (
-                <span className="text-[10px] text-white/80 font-medium">
+                <span className="text-sm font-bold text-white/90">
                   {stageWeeks}w
                 </span>
               )}
