@@ -1,15 +1,31 @@
-
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Settings, HelpCircle } from 'lucide-react';
 import { 
   Sidebar, 
   SidebarContent, 
   SidebarHeader,
-  SidebarFooter 
+  SidebarFooter,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  useSidebar
 } from '@/components/ui/sidebar';
 import { SidebarLogo } from './SidebarLogo';
 import { SidebarNavigation } from './SidebarNavigation';
+import { useCompany } from '@/context/CompanyContext';
+import { usePermissions } from '@/hooks/usePermissions';
+import { cn } from '@/lib/utils';
 
 export const AppSidebar: React.FC = () => {
+  const { state } = useSidebar();
+  const { companySlug } = useCompany();
+  const { hasPermission } = usePermissions();
+  const collapsed = state === "collapsed";
+  const baseUrl = companySlug ? `/${companySlug}` : '';
+  
+  const canViewSettings = hasPermission('view:settings');
+
   return (
     <Sidebar 
       collapsible="icon" 
@@ -21,7 +37,62 @@ export const AppSidebar: React.FC = () => {
       <SidebarContent className="p-0 overflow-y-auto flex-1">
         <SidebarNavigation />
       </SidebarContent>
-      <SidebarFooter className="flex-shrink-0" />
+      <SidebarFooter className="flex-shrink-0 p-2 border-t border-white/10">
+        <SidebarMenu className={cn(
+          collapsed ? "space-y-0 flex flex-col items-center" : "space-y-1"
+        )}>
+          {canViewSettings && (
+            <SidebarMenuItem className={collapsed ? "w-full flex justify-center" : ""}>
+              <SidebarMenuButton
+                asChild
+                tooltip={collapsed ? "Company Settings" : undefined}
+                className={cn(
+                  "flex items-center text-sm rounded-lg transition-all duration-300",
+                  "text-indigo-100 hover:bg-indigo-800/30 hover:text-white",
+                  collapsed 
+                    ? "justify-center p-2 h-10 w-10 mx-auto" 
+                    : "justify-start px-3 py-2 w-full"
+                )}
+              >
+                <Link to={`${baseUrl}/office-settings`} className={cn(
+                  "flex items-center",
+                  collapsed ? "justify-center w-full h-full" : "w-full"
+                )}>
+                  <Settings className={cn(
+                    "h-5 w-5 text-indigo-200 group-hover:text-white",
+                    collapsed ? "mr-0" : "mr-3"
+                  )} />
+                  {!collapsed && <span className="font-medium">Settings</span>}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+          <SidebarMenuItem className={collapsed ? "w-full flex justify-center" : ""}>
+            <SidebarMenuButton
+              asChild
+              tooltip={collapsed ? "Help Center" : undefined}
+              className={cn(
+                "flex items-center text-sm rounded-lg transition-all duration-300",
+                "text-indigo-100 hover:bg-indigo-800/30 hover:text-white",
+                collapsed 
+                  ? "justify-center p-2 h-10 w-10 mx-auto" 
+                  : "justify-start px-3 py-2 w-full"
+              )}
+            >
+              <Link to={`${baseUrl}/help-center`} className={cn(
+                "flex items-center",
+                collapsed ? "justify-center w-full h-full" : "w-full"
+              )}>
+                <HelpCircle className={cn(
+                  "h-5 w-5 text-indigo-200 group-hover:text-white",
+                  collapsed ? "mr-0" : "mr-3"
+                )} />
+                {!collapsed && <span className="font-medium">Help</span>}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 };

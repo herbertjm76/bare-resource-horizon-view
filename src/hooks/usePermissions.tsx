@@ -76,10 +76,8 @@ const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
 // Section to required permission mapping
 export const SECTION_PERMISSIONS: Record<string, Permission> = {
   'OVERVIEW': 'view:overview',
-  'TEAM': 'view:team',
-  'PROJECTS': 'view:projects',
-  'RESOURCE SCHEDULING': 'view:scheduling',
-  'SETTINGS': 'view:settings',
+  'ALLOCATE': 'view:scheduling',
+  'MANAGE': 'view:team',
 };
 
 export function usePermissions() {
