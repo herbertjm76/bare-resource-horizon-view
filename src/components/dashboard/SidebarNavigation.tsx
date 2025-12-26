@@ -48,7 +48,16 @@ export const SidebarNavigation: React.FC = () => {
         return (
           <SidebarGroup key={section.label} className={collapsed ? "space-y-0" : "space-y-1"}>
             {!collapsed && (
-              <SidebarGroupLabel className="px-3 py-2 flex items-center gap-2">
+              <SidebarGroupLabel className="px-3 py-2 flex items-center gap-2 relative">
+                {/* Accent bar on left edge */}
+                <div 
+                  className={cn(
+                    "absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-full",
+                    section.label === 'OVERVIEW' && "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.6)]",
+                    section.label === 'ALLOCATE' && "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]",
+                    section.label === 'MANAGE' && "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"
+                  )}
+                />
                 {SectionIcon && (
                   <SectionIcon className={cn("h-3.5 w-3.5", sectionColor)} />
                 )}
