@@ -14,7 +14,7 @@ import { useProjectPlanningData } from '@/hooks/useProjectPlanningData';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useProjects } from '@/hooks/useProjects';
 import { ProjectPlanningList } from '@/components/resource-planning/ProjectPlanningList';
-import { PlanningProjectedSummary } from '@/components/resource-planning/PlanningProjectedSummary';
+import { PlanningFilterRow } from '@/components/resource-planning/PlanningFilterRow';
 import { DemandCapacityChart } from '@/components/resource-planning/DemandCapacityChart';
 import { ResourcePlanningControls } from '@/components/resource-planning/ResourcePlanningControls';
 import { PlanningAuditLogViewer } from '@/components/resource-planning/PlanningAuditLogViewer';
@@ -313,123 +313,35 @@ const ResourcePlanning: React.FC = () => {
               </Card>
             </div>
           </TabsContent>
-        <TabsContent value="planning" className="mt-0 py-6">
-          <div className="px-6 space-y-6">
-            {/* Controls Row */}
-            <div className="flex flex-col gap-4">
-              {/* Top row: Search + filters + actions */}
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 flex-1">
-                  {/* Search */}
-                  <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search projects..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8 h-9"
-                    />
-                  </div>
-
-                  {/* Status Filter */}
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <Filter className="h-4 w-4" />
-                        Status
-                        {statusFilter.length > 0 && (
-                          <Badge variant="secondary" className="ml-1">
-                            {statusFilter.length}
-                          </Badge>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent align="start" className="w-48">
-                      <div className="space-y-2">
-                        {statusOptions.map(status => (
-                          <div key={status} className="flex items-center gap-2">
-                            <Checkbox
-                              id={status}
-                              checked={statusFilter.includes(status)}
-                              onCheckedChange={() => toggleStatus(status)}
-                            />
-                            <Label htmlFor={status} className="text-sm cursor-pointer">
-                              {status}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-
-                  {/* Department Filter */}
-                  <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                    <SelectTrigger className="w-40 h-9">
-                      <SelectValue placeholder="Department" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Departments</SelectItem>
-                      {departments.map(dept => (
-                        <SelectItem key={dept.id} value={dept.name}>
-                          {dept.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {/* Show Budget Toggle */}
-                  <div className="flex items-center gap-2 ml-2">
-                    <Checkbox
-                      id="show-budget"
-                      checked={showBudget}
-                      onCheckedChange={(checked) => setShowBudget(!!checked)}
-                    />
-                    <Label htmlFor="show-budget" className="text-sm cursor-pointer whitespace-nowrap">
-                      Show Budget
-                    </Label>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <p className="text-sm text-muted-foreground whitespace-nowrap">
-                    {filteredProjects.length} of {projects.length} projects
-                  </p>
-                  <Button 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={() => setShowCreateProject(true)}
-                  >
-                    <Plus className="h-4 w-4" />
-                    New Project
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Projected Summary */}
-            <PlanningProjectedSummary
-              totalProjectedHours={totals.totalProjectedHours}
-              totalTeamCapacity={totalTeamCapacity}
-              weeklyCapacity={weeklyCapacity}
-              teamMemberCount={teamMembers.length}
-              projectCount={totals.projectCount}
-              totalBudget={totals.totalBudget}
+        <TabsContent value="planning" className="mt-0 py-4">
+          <div className="px-6 space-y-4">
+            {/* Filter Row */}
+            <PlanningFilterRow
+              selectedDate={startDate}
+              onDateChange={setStartDate}
+              departmentFilter={departmentFilter}
+              onDepartmentChange={setDepartmentFilter}
+              departments={departments}
+              statusFilter={statusFilter}
+              onStatusToggle={toggleStatus}
+              statusOptions={statusOptions}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              projectCount={filteredProjects.length}
+              totalProjects={projects.length}
+              onCreateProject={() => setShowCreateProject(true)}
               showBudget={showBudget}
+              onShowBudgetChange={setShowBudget}
             />
 
             {/* Project List */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                Projects
-              </h3>
-              <ProjectPlanningList
-                projects={filteredProjects}
-                officeStages={officeStages}
-                isLoading={isLoading}
-                showBudget={showBudget}
-                onUpdate={refetch}
-              />
-            </div>
+            <ProjectPlanningList
+              projects={filteredProjects}
+              officeStages={officeStages}
+              isLoading={isLoading}
+              showBudget={showBudget}
+              onUpdate={refetch}
+            />
           </div>
         </TabsContent>
 
