@@ -7,8 +7,7 @@ import {
   Flag,
   HelpCircle,
   Layers,
-  Grid3X3,
-  Target
+  Grid3X3
 } from "lucide-react"
 import { Permission } from '@/hooks/usePermissions';
 
@@ -55,9 +54,9 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
           icon: CalendarClock,
         },
         {
-          title: "Resource Planning",
+          title: "Project Pipeline",
           url: `${baseUrl}/resource-planning`,
-          icon: Target,
+          icon: Layers,
         },
         {
           title: "Capacity Heatmap",
@@ -74,11 +73,6 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
           title: "All Projects",
           url: `${baseUrl}/projects`,
           icon: FolderKanban,
-        },
-        {
-          title: "Pipeline",
-          url: `${baseUrl}/pipeline`,
-          icon: Layers,
         },
       ],
     },

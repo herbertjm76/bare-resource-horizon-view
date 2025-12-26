@@ -42,7 +42,6 @@ import WeeklyRundown from "./pages/WeeklyRundown";
 import CompanyLanding from "./pages/CompanyLanding";
 import Timeline from "./pages/Timeline";
 import CapacityPlanning from "./pages/CapacityPlanning";
-import Pipeline from "./pages/Pipeline";
 import ResourcePlanning from "./pages/ResourcePlanning";
 
 const queryClient = new QueryClient();
@@ -86,11 +85,8 @@ function AppWithTheme() {
                   <ProjectsOnboarding />
                 </PermissionGuard>
               } />
-              <Route path="/:companySlug/pipeline" element={
-                <PermissionGuard requiredPermission="view:projects">
-                  <Pipeline />
-                </PermissionGuard>
-              } />
+              {/* Redirect old pipeline route to resource-planning */}
+              <Route path="/:companySlug/pipeline" element={<Navigate to="../resource-planning" replace />} />
               <Route path="/:companySlug/resource-planning" element={
                 <PermissionGuard requiredPermission="view:projects">
                   <ResourcePlanning />
@@ -190,11 +186,7 @@ function AppWithTheme() {
                   <ProjectsOnboarding />
                 </PermissionGuard>
               } />
-              <Route path="/pipeline" element={
-                <PermissionGuard requiredPermission="view:projects">
-                  <Pipeline />
-                </PermissionGuard>
-              } />
+              <Route path="/pipeline" element={<Navigate to="/resource-planning" replace />} />
               <Route path="/resource-planning" element={
                 <PermissionGuard requiredPermission="view:projects">
                   <ResourcePlanning />
