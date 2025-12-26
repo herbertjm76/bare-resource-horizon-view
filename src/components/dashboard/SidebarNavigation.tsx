@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -7,6 +6,7 @@ import { useSidebar } from '@/components/ui/sidebar';
 import { useCompany } from '@/context/CompanyContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Badge } from '@/components/ui/badge';
+import { Eye, Workflow, ClipboardList } from 'lucide-react';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -15,6 +15,13 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
+
+// Section icons and colors for visual distinction
+const SECTION_CONFIG: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string }> = {
+  'OVERVIEW': { icon: Eye, color: 'text-sky-300' },
+  'ALLOCATE': { icon: Workflow, color: 'text-emerald-300' },
+  'MANAGE': { icon: ClipboardList, color: 'text-amber-300' },
+};
 
 export const SidebarNavigation: React.FC = () => {
   const location = useLocation();
@@ -33,84 +40,98 @@ export const SidebarNavigation: React.FC = () => {
 
   return (
     <nav className="mt-4 px-2 space-y-1">
-      {visibleSections.map((section) => (
-        <SidebarGroup key={section.label} className={collapsed ? "space-y-0" : "space-y-1"}>
-          {!collapsed && (
-            <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold text-indigo-200 uppercase tracking-wider">
-              {section.label}
-            </SidebarGroupLabel>
-          )}
-          <SidebarGroupContent>
-            <SidebarMenu className={collapsed ? "space-y-0 flex flex-col items-center" : "space-y-1"}>
-              {section.items.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.url;
-                
-                return (
-                  <SidebarMenuItem key={item.url} className={collapsed ? "w-full flex justify-center" : ""}>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={collapsed ? item.title : undefined}
-                      isActive={isActive}
-                      className={cn(
-                        "flex items-center text-sm rounded-lg transition-all duration-300 group relative overflow-hidden",
-                        isActive 
-                          ? "bg-white/10 text-white shadow-lg border border-white/20 backdrop-blur-sm" 
-                          : "text-indigo-100 hover:bg-indigo-800/30 hover:text-white hover:backdrop-blur-sm",
-                        collapsed 
-                          ? "justify-center p-2 h-10 w-10 mx-auto" 
-                          : "justify-start px-3 py-2 w-full"
-                      )}
-                      style={isActive ? {
-                        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-                        boxShadow: '0 8px 32px rgba(100, 101, 240, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
-                        backdropFilter: 'blur(10px)',
-                        WebkitBackdropFilter: 'blur(10px)',
-                      } : {}}
-                    >
-                      <Link to={item.comingSoon ? '#' : item.url} className={cn(
-                        "flex items-center",
-                        collapsed ? "justify-center w-full h-full" : "w-full",
-                        item.comingSoon && "cursor-not-allowed opacity-60"
-                      )} onClick={(e) => item.comingSoon && e.preventDefault()}>
-                        <Icon className={cn(
-                          "h-5 w-5 transition-all duration-300",
-                          isActive ? "text-white drop-shadow-sm" : "text-indigo-200 group-hover:text-white",
-                          collapsed ? "mr-0" : "mr-3"
-                        )} />
-                        {!collapsed && (
-                          <>
-                            <span className={cn(
-                              "font-medium transition-all duration-300",
-                              isActive ? "text-white drop-shadow-sm" : ""
-                            )}>{item.title}</span>
-                            {item.comingSoon && (
-                              <Badge 
-                                variant="secondary" 
-                                className="ml-auto text-[10px] px-1.5 py-0 bg-indigo-400/20 text-indigo-100 border-indigo-300/30"
-                              >
-                                Soon
-                              </Badge>
-                            )}
-                          </>
+      {visibleSections.map((section) => {
+        const sectionConfig = SECTION_CONFIG[section.label];
+        const SectionIcon = sectionConfig?.icon;
+        const sectionColor = sectionConfig?.color || 'text-indigo-200';
+        
+        return (
+          <SidebarGroup key={section.label} className={collapsed ? "space-y-0" : "space-y-1"}>
+            {!collapsed && (
+              <SidebarGroupLabel className="px-3 py-2 flex items-center gap-2">
+                {SectionIcon && (
+                  <SectionIcon className={cn("h-3.5 w-3.5", sectionColor)} />
+                )}
+                <span className={cn(
+                  "text-xs font-semibold uppercase tracking-wider",
+                  sectionColor
+                )}>
+                  {section.label}
+                </span>
+              </SidebarGroupLabel>
+            )}
+            <SidebarGroupContent>
+              <SidebarMenu className={collapsed ? "space-y-0 flex flex-col items-center" : "space-y-1"}>
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.url;
+                  
+                  return (
+                    <SidebarMenuItem key={item.url} className={collapsed ? "w-full flex justify-center" : ""}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={collapsed ? item.title : undefined}
+                        isActive={isActive}
+                        className={cn(
+                          "flex items-center text-sm rounded-lg transition-all duration-300 group relative overflow-hidden",
+                          isActive 
+                            ? "bg-white/10 text-white shadow-lg border border-white/20 backdrop-blur-sm" 
+                            : "text-indigo-100 hover:bg-indigo-800/30 hover:text-white hover:backdrop-blur-sm",
+                          collapsed 
+                            ? "justify-center p-2 h-10 w-10 mx-auto" 
+                            : "justify-start px-3 py-2 w-full"
                         )}
-                        {isActive && !item.comingSoon && (
-                          <div 
-                            className="absolute inset-0 rounded-lg opacity-20 sidebar-shimmer"
-                          />
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-          {!collapsed && section !== visibleSections[visibleSections.length - 1] && (
-            <div className="border-t border-[hsl(var(--theme-border))] my-2 opacity-30" />
-          )}
-        </SidebarGroup>
-      ))}
+                        style={isActive ? {
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
+                          boxShadow: '0 8px 32px rgba(100, 101, 240, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                          backdropFilter: 'blur(10px)',
+                          WebkitBackdropFilter: 'blur(10px)',
+                        } : {}}
+                      >
+                        <Link to={item.comingSoon ? '#' : item.url} className={cn(
+                          "flex items-center",
+                          collapsed ? "justify-center w-full h-full" : "w-full",
+                          item.comingSoon && "cursor-not-allowed opacity-60"
+                        )} onClick={(e) => item.comingSoon && e.preventDefault()}>
+                          <Icon className={cn(
+                            "h-5 w-5 transition-all duration-300",
+                            isActive ? "text-white drop-shadow-sm" : "text-indigo-200 group-hover:text-white",
+                            collapsed ? "mr-0" : "mr-3"
+                          )} />
+                          {!collapsed && (
+                            <>
+                              <span className={cn(
+                                "font-medium transition-all duration-300",
+                                isActive ? "text-white drop-shadow-sm" : ""
+                              )}>{item.title}</span>
+                              {item.comingSoon && (
+                                <Badge 
+                                  variant="secondary" 
+                                  className="ml-auto text-[10px] px-1.5 py-0 bg-indigo-400/20 text-indigo-100 border-indigo-300/30"
+                                >
+                                  Soon
+                                </Badge>
+                              )}
+                            </>
+                          )}
+                          {isActive && !item.comingSoon && (
+                            <div 
+                              className="absolute inset-0 rounded-lg opacity-20 sidebar-shimmer"
+                            />
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            {!collapsed && section !== visibleSections[visibleSections.length - 1] && (
+              <div className="border-t border-white/10 my-3 mx-3" />
+            )}
+          </SidebarGroup>
+        );
+      })}
     </nav>
   );
 };
