@@ -4,10 +4,9 @@ import {
   CalendarClock,
   FolderKanban,
   UserSquare2,
-  Flag,
-  HelpCircle,
-  Layers,
-  Grid3X3
+  Grid3X3,
+  Kanban,
+  Users
 } from "lucide-react"
 import { Permission } from '@/hooks/usePermissions';
 
@@ -45,7 +44,7 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
       ],
     },
     {
-      label: "PLANNING",
+      label: "ALLOCATE",
       requiredPermission: 'view:scheduling',
       items: [
         {
@@ -56,7 +55,7 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
         {
           title: "Project Pipeline",
           url: `${baseUrl}/resource-planning`,
-          icon: Layers,
+          icon: Kanban,
         },
         {
           title: "Capacity Heatmap",
@@ -66,45 +65,23 @@ export const getNavigationItems = (companySlug: string | null): NavigationSectio
       ],
     },
     {
-      label: "PROJECTS",
-      requiredPermission: 'view:projects',
-      items: [
-        {
-          title: "All Projects",
-          url: `${baseUrl}/projects`,
-          icon: FolderKanban,
-        },
-      ],
-    },
-    {
-      label: "TEAM",
+      label: "MANAGE",
       requiredPermission: 'view:team',
       items: [
         {
           title: "Team Members",
           url: `${baseUrl}/team-members`,
-          icon: UserSquare2,
+          icon: Users,
+        },
+        {
+          title: "All Projects",
+          url: `${baseUrl}/projects`,
+          icon: FolderKanban,
         },
         {
           title: "Team Leave",
           url: `${baseUrl}/team-leave`,
           icon: Calendar,
-        },
-      ],
-    },
-    {
-      label: "SETTINGS",
-      requiredPermission: 'view:settings',
-      items: [
-        {
-          title: "Company Settings",
-          url: `${baseUrl}/office-settings`,
-          icon: Flag,
-        },
-        {
-          title: "Help Center",
-          url: `${baseUrl}/help-center`,
-          icon: HelpCircle,
         },
       ],
     },
