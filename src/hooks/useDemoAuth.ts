@@ -44,21 +44,11 @@ const DEMO_PROFILE = {
   weekly_capacity: 40,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
-  address: null,
   avatar_url: null,
   bio: null,
-  city: 'San Francisco',
-  country: 'United States',
-  date_of_birth: null,
-  emergency_contact_name: null,
-  emergency_contact_phone: null,
   manager_id: null,
-  phone: null,
-  postal_code: null,
-  social_linkedin: null,
-  social_twitter: null,
   start_date: null,
-  state: 'California'
+  office_role_id: null
 };
 
 const DEMO_TEAM_MEMBERS = [
@@ -76,21 +66,11 @@ const DEMO_TEAM_MEMBERS = [
     weekly_capacity: 40,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    address: null,
     avatar_url: null,
     bio: null,
-    city: 'San Francisco',
-    country: 'United States',
-    date_of_birth: null,
-    emergency_contact_name: null,
-    emergency_contact_phone: null,
     manager_id: null,
-    phone: null,
-    postal_code: null,
-    social_linkedin: null,
-    social_twitter: null,
     start_date: null,
-    state: 'California'
+    office_role_id: null
   },
   {
     id: '00000000-0000-0000-0000-000000000004',
@@ -106,21 +86,11 @@ const DEMO_TEAM_MEMBERS = [
     weekly_capacity: 40,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    address: null,
     avatar_url: null,
     bio: null,
-    city: 'San Francisco',
-    country: 'United States',
-    date_of_birth: null,
-    emergency_contact_name: null,
-    emergency_contact_phone: null,
     manager_id: null,
-    phone: null,
-    postal_code: null,
-    social_linkedin: null,
-    social_twitter: null,
     start_date: null,
-    state: 'California'
+    office_role_id: null
   },
   {
     id: '00000000-0000-0000-0000-000000000005',
@@ -136,21 +106,11 @@ const DEMO_TEAM_MEMBERS = [
     weekly_capacity: 40,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    address: null,
     avatar_url: null,
     bio: null,
-    city: 'New York',
-    country: 'United States',
-    date_of_birth: null,
-    emergency_contact_name: null,
-    emergency_contact_phone: null,
     manager_id: null,
-    phone: null,
-    postal_code: null,
-    social_linkedin: null,
-    social_twitter: null,
     start_date: null,
-    state: 'New York'
+    office_role_id: null
   }
 ];
 

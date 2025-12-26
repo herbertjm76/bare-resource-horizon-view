@@ -160,6 +160,7 @@ export type Database = {
           job_title: string | null
           last_name: string | null
           location: string | null
+          office_role_id: string | null
           practice_area: string | null
           role: string | null
           status: string
@@ -182,6 +183,7 @@ export type Database = {
           job_title?: string | null
           last_name?: string | null
           location?: string | null
+          office_role_id?: string | null
           practice_area?: string | null
           role?: string | null
           status?: string
@@ -204,6 +206,7 @@ export type Database = {
           job_title?: string | null
           last_name?: string | null
           location?: string | null
+          office_role_id?: string | null
           practice_area?: string | null
           role?: string | null
           status?: string
@@ -216,6 +219,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invites_office_role_id_fkey"
+            columns: ["office_role_id"]
+            isOneToOne: false
+            referencedRelation: "office_roles"
             referencedColumns: ["id"]
           },
         ]
@@ -930,6 +940,7 @@ export type Database = {
           last_name: string | null
           location: string | null
           manager_id: string | null
+          office_role_id: string | null
           practice_area: string | null
           start_date: string | null
           updated_at: string
@@ -948,6 +959,7 @@ export type Database = {
           last_name?: string | null
           location?: string | null
           manager_id?: string | null
+          office_role_id?: string | null
           practice_area?: string | null
           start_date?: string | null
           updated_at?: string
@@ -966,6 +978,7 @@ export type Database = {
           last_name?: string | null
           location?: string | null
           manager_id?: string | null
+          office_role_id?: string | null
           practice_area?: string | null
           start_date?: string | null
           updated_at?: string
@@ -977,6 +990,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_office_role_id_fkey"
+            columns: ["office_role_id"]
+            isOneToOne: false
+            referencedRelation: "office_roles"
             referencedColumns: ["id"]
           },
         ]
