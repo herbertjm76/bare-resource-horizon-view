@@ -161,6 +161,34 @@ export const useStageOperations = (
     }
   };
 
+  const handleInlineUpdate = async (stage: ProjectStage, updates: { name: string; code: string; color: string }) => {
+    try {
+      const { error } = await supabase
+        .from('office_stages')
+        .update({ 
+          name: updates.name,
+          code: updates.code || null,
+          color: updates.color
+        })
+        .eq('id', stage.id);
+
+      if (error) throw error;
+
+      setStages(
+        stages.map((s) =>
+          s.id === stage.id
+            ? { ...s, name: updates.name, code: updates.code || null, color: updates.color }
+            : s
+        )
+      );
+      toast.success('Stage updated');
+    } catch (error) {
+      console.error('Error updating stage:', error);
+      toast.error('Failed to update stage');
+      throw error;
+    }
+  };
+
   return {
     editingStage,
     newStageName,
@@ -180,6 +208,7 @@ export const useStageOperations = (
     handleSelectStage,
     handleCancel,
     toggleEditMode,
-    handleAddNew
+    handleAddNew,
+    handleInlineUpdate
   };
 };

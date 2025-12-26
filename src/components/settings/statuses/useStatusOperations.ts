@@ -155,6 +155,34 @@ export const useStatusOperations = (
     }
   };
 
+  const handleInlineUpdate = async (status: ProjectStatus, updates: { name: string; color: string }) => {
+    try {
+      const { error } = await supabase
+        .from('project_statuses')
+        .update({ 
+          name: updates.name,
+          color: updates.color,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', status.id);
+
+      if (error) throw error;
+
+      setStatuses(
+        statuses.map((s) =>
+          s.id === status.id
+            ? { ...s, name: updates.name, color: updates.color }
+            : s
+        )
+      );
+      toast.success('Status updated');
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Failed to update status');
+      throw error;
+    }
+  };
+
   return {
     editingStatus,
     newStatusName,
@@ -173,5 +201,6 @@ export const useStatusOperations = (
     handleCancel,
     toggleEditMode,
     handleAddNew,
+    handleInlineUpdate,
   };
 };

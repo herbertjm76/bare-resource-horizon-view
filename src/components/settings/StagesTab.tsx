@@ -33,7 +33,8 @@ export const StagesTab = () => {
     handleSelectStage,
     handleCancel,
     toggleEditMode,
-    handleAddNew
+    handleAddNew,
+    handleInlineUpdate
   } = useStageOperations(office_stages, setOfficeStages, company?.id);
 
   if (loading) {
@@ -105,6 +106,7 @@ export const StagesTab = () => {
             onSelectStage={handleSelectStage}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onInlineUpdate={handleInlineUpdate}
           />
         </div>
       </CardContent>
