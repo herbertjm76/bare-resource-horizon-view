@@ -192,7 +192,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
       {/* Stage Content */}
       {stages.map((stage) => (
         stage.id === selectedStageId && (
-          <div key={stage.id} className="space-y-4">
+          <div key={stage.id} className="space-y-4 animate-fade-in">
             {/* Stage Header */}
             <div className="flex items-center justify-between">
               <div>
