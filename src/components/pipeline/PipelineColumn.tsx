@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PipelineCard } from './PipelineCard';
 import { cn } from '@/lib/utils';
 
@@ -74,15 +75,29 @@ export const PipelineColumn: React.FC<PipelineColumnProps> = ({
             {isDragOver ? "Drop here" : "Empty"}
           </div>
         ) : (
-          projects.map((project) => (
-            <PipelineCard
-              key={project.id}
-              project={project}
-              onDragStart={onDragStart}
-              onClick={onCardClick}
-              isDragging={draggingProjectId === project.id}
-            />
-          ))
+          <AnimatePresence mode="popLayout">
+            {projects.map((project) => (
+              <motion.div
+                key={project.id}
+                layout
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{
+                  layout: { type: "spring", stiffness: 350, damping: 25 },
+                  opacity: { duration: 0.2 },
+                  scale: { duration: 0.2 }
+                }}
+              >
+                <PipelineCard
+                  project={project}
+                  onDragStart={onDragStart}
+                  onClick={onCardClick}
+                  isDragging={draggingProjectId === project.id}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         )}
       </div>
     </div>
