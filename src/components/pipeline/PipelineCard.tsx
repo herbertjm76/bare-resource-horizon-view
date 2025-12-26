@@ -18,9 +18,10 @@ interface PipelineCardProps {
   project: Project;
   onDragStart: (e: React.DragEvent, projectId: string) => void;
   onClick?: (project: Project) => void;
+  isDragging?: boolean;
 }
 
-export const PipelineCard: React.FC<PipelineCardProps> = ({ project, onDragStart, onClick }) => {
+export const PipelineCard: React.FC<PipelineCardProps> = ({ project, onDragStart, onClick, isDragging }) => {
   const handleClick = (e: React.MouseEvent) => {
     // Don't trigger click when dragging
     if (e.defaultPrevented) return;
@@ -34,7 +35,9 @@ export const PipelineCard: React.FC<PipelineCardProps> = ({ project, onDragStart
       draggable
       onDragStart={(e) => onDragStart(e, project.id)}
       onClick={handleClick}
-      className="p-2 cursor-pointer active:cursor-grabbing hover:shadow-md transition-all duration-200 bg-card border border-border hover:border-primary/30 group"
+      className={`p-2 cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200 bg-card border border-border hover:border-primary/30 group ${
+        isDragging ? 'opacity-50 scale-95 shadow-lg ring-2 ring-primary/50 rotate-1' : ''
+      }`}
     >
       <div className="space-y-1">
         <div className="flex items-start justify-between gap-1">
