@@ -75,17 +75,13 @@ export const PipelineColumn: React.FC<PipelineColumnProps> = ({
           </div>
         ) : (
           projects.map((project) => (
-            <div
+            <PipelineCard
               key={project.id}
-              className="animate-fade-in transition-all duration-300 ease-out"
-            >
-              <PipelineCard
-                project={project}
-                onDragStart={onDragStart}
-                onClick={onCardClick}
-                isDragging={draggingProjectId === project.id}
-              />
-            </div>
+              project={project}
+              onDragStart={onDragStart}
+              onClick={onCardClick}
+              isDragging={draggingProjectId === project.id}
+            />
           ))
         )}
       </div>
