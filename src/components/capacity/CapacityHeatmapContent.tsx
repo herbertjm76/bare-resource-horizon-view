@@ -66,20 +66,12 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
   );
 
   const activeFiltersCount = [activeFilter !== 'all' ? activeFilter : '', searchQuery].filter(Boolean).length;
-
-  if (isLoading || isLoadingWorkload) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-96 w-full" />
-      </div>
-    );
-  }
+  
+  const showContentLoading = isLoading || isLoadingWorkload;
 
   return (
     <div className="space-y-0">
-      {/* Centered Tabs - Above filter row */}
+      {/* Centered Tabs - Above filter row - Always visible */}
       <Tabs 
         value={viewMode} 
         onValueChange={(v) => setViewMode(v as HeatmapViewMode)}
@@ -131,33 +123,42 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
           />
         </div>
 
-        {/* Tab Content */}
-        <TabsContent value="actual" className="mt-0">
-          <CapacityHeatmapTable
-            members={filteredMembers}
-            weeklyWorkloadData={weeklyWorkloadData}
-            weekStartDates={weekStartDates}
-          />
-        </TabsContent>
+        {/* Tab Content - Show skeleton while loading */}
+        {showContentLoading ? (
+          <div className="px-6 space-y-4">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-64 w-full" />
+          </div>
+        ) : (
+          <>
+            <TabsContent value="actual" className="mt-0">
+              <CapacityHeatmapTable
+                members={filteredMembers}
+                weeklyWorkloadData={weeklyWorkloadData}
+                weekStartDates={weekStartDates}
+              />
+            </TabsContent>
 
-        <TabsContent value="projected" className="mt-0 px-6 pb-6">
-          <ProjectedDemandView
-            weeklyDemand={weeklyDemand}
-            roleNames={roleNames}
-            weekStartDates={weekStartDates}
-            isLoading={isLoadingProjection}
-          />
-        </TabsContent>
+            <TabsContent value="projected" className="mt-0 px-6 pb-6">
+              <ProjectedDemandView
+                weeklyDemand={weeklyDemand}
+                roleNames={roleNames}
+                weekStartDates={weekStartDates}
+                isLoading={isLoadingProjection}
+              />
+            </TabsContent>
 
-        <TabsContent value="gap" className="mt-0 px-6 pb-6">
-          <GapAnalysisView
-            members={filteredMembers}
-            weeklyWorkloadData={weeklyWorkloadData}
-            weeklyDemand={weeklyDemand}
-            weekStartDates={weekStartDates}
-            isLoading={isLoadingProjection}
-          />
-        </TabsContent>
+            <TabsContent value="gap" className="mt-0 px-6 pb-6">
+              <GapAnalysisView
+                members={filteredMembers}
+                weeklyWorkloadData={weeklyWorkloadData}
+                weeklyDemand={weeklyDemand}
+                weekStartDates={weekStartDates}
+                isLoading={isLoadingProjection}
+              />
+            </TabsContent>
+          </>
+        )}
       </Tabs>
     </div>
   );
