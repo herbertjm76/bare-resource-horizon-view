@@ -2,19 +2,14 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { 
-  Search, X, ChevronLeft, ChevronRight, Calendar, Filter, Plus, FolderOpen
+  Search, X, ChevronLeft, ChevronRight, Filter, Plus, FolderOpen
 } from 'lucide-react';
-import { format, addMonths, subMonths, startOfMonth } from 'date-fns';
 
 interface PlanningFilterRowProps {
-  selectedDate: Date;
-  onDateChange: (date: Date) => void;
   departmentFilter: string;
   onDepartmentChange: (value: string) => void;
   departments: Array<{ id: string; name: string }>;
@@ -31,8 +26,6 @@ interface PlanningFilterRowProps {
 }
 
 export const PlanningFilterRow: React.FC<PlanningFilterRowProps> = ({
-  selectedDate,
-  onDateChange,
   departmentFilter,
   onDepartmentChange,
   departments,
@@ -47,21 +40,10 @@ export const PlanningFilterRow: React.FC<PlanningFilterRowProps> = ({
   showBudget,
   onShowBudgetChange
 }) => {
-  const [calendarOpen, setCalendarOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const badgeContainerRef = useRef<HTMLDivElement>(null);
-
-  const monthLabel = format(selectedDate, 'MMM yyyy');
-
-  const handlePreviousMonth = () => {
-    onDateChange(subMonths(selectedDate, 1));
-  };
-
-  const handleNextMonth = () => {
-    onDateChange(addMonths(selectedDate, 1));
-  };
 
   // Check scroll position
   const checkScroll = useCallback(() => {
@@ -108,49 +90,6 @@ export const PlanningFilterRow: React.FC<PlanningFilterRowProps> = ({
 
   return (
     <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg border border-border/50">
-      {/* Month selector with navigation */}
-      <div className="flex items-center bg-background rounded-md border border-border/60 shadow-sm">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handlePreviousMonth} 
-          className="h-8 w-8 p-0"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        
-        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 px-2 h-8">
-              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-sm font-medium min-w-[80px]">{monthLabel}</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
-            <CalendarComponent
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => {
-                if (date) {
-                  onDateChange(startOfMonth(date));
-                  setCalendarOpen(false);
-                }
-              }}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleNextMonth}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-
       {/* Department Icon */}
       <div className="flex items-center justify-center w-8 h-8 rounded-md border border-border/60 bg-background">
         <FolderOpen className="h-4 w-4 text-muted-foreground" />

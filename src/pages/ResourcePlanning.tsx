@@ -317,8 +317,6 @@ const ResourcePlanning: React.FC = () => {
           <div className="px-6 space-y-4">
             {/* Filter Row */}
             <PlanningFilterRow
-              selectedDate={startDate}
-              onDateChange={setStartDate}
               departmentFilter={departmentFilter}
               onDepartmentChange={setDepartmentFilter}
               departments={departments}
