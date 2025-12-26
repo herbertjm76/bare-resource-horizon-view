@@ -150,14 +150,14 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
           const stageColor = getStageColor(stage.name);
           const isSelected = stage.id === selectedStageId;
           
-          return (
+            return (
             <button
               key={stage.id}
               onClick={() => setSelectedStageId(stage.id)}
               className={cn(
                 "relative flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer min-w-[60px]",
-                "hover:brightness-110",
-                isSelected && "ring-2 ring-primary ring-offset-1 z-10"
+                "hover:opacity-100 hover:brightness-110",
+                isSelected ? "z-10" : "opacity-50"
               )}
               style={{ 
                 width: `${widthPercent}%`,
@@ -171,6 +171,13 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                 <span className="text-sm font-bold text-white/90">
                   {stageWeeks}w
                 </span>
+              )}
+              {/* Arrow indicator for selected stage */}
+              {isSelected && (
+                <div 
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px]"
+                  style={{ borderTopColor: stageColor }}
+                />
               )}
             </button>
           );
