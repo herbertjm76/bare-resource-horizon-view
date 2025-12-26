@@ -3,6 +3,7 @@ import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { Layers } from 'lucide-react';
 import { PipelineKanbanBoard } from '@/components/pipeline/PipelineKanbanBoard';
+import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 
 const Pipeline: React.FC = () => {
   return (
@@ -13,9 +14,11 @@ const Pipeline: React.FC = () => {
         icon={Layers}
       />
       
-      <div className="px-6 py-6">
-        <PipelineKanbanBoard />
-      </div>
+      <OfficeSettingsProvider>
+        <div className="px-6 py-6">
+          <PipelineKanbanBoard />
+        </div>
+      </OfficeSettingsProvider>
     </StandardLayout>
   );
 };
