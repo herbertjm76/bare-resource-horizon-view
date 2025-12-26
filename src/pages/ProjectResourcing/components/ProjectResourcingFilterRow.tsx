@@ -208,7 +208,7 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 bg-white border border-gray-200 shadow-lg" align="end">
+          <PopoverContent className="w-80 bg-popover border border-border shadow-lg" align="end">
             <ProjectResourcingFilters
               filters={filters}
               searchTerm={searchTerm}
