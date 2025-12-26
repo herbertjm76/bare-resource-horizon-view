@@ -51,7 +51,7 @@ export const CitySelect: React.FC<CitySelectProps> = ({
       />
 
       {open && country && (
-        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-xl">
+        <div className="absolute z-50 w-full mt-2 bg-popover border border-border rounded-md shadow-xl">
           <Command>
             <CommandInput 
               placeholder="Search or enter city name..." 

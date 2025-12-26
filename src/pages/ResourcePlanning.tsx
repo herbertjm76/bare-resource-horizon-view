@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { TrendingUp, BarChart3, List, GanttChart } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CenteredTabs, CenteredTabItem, TabsContent } from '@/components/ui/centered-tabs';
 import { useProjectPlanningData } from '@/hooks/useProjectPlanningData';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { ProjectPlanningList } from '@/components/resource-planning/ProjectPlanningList';
@@ -142,35 +142,16 @@ const ResourcePlanning: React.FC = () => {
           icon={TrendingUp}
         />
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* Centered Tabs */}
-          <div className="flex justify-center py-4 border-b border-border/50 bg-muted/30">
-            <TabsList className="inline-flex h-11 items-center justify-center rounded-lg bg-background p-1 shadow-sm border border-border/60">
-              <TabsTrigger
-                value="planning"
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
-              >
-                <List className="h-4 w-4" />
-                Planning
-              </TabsTrigger>
-              <TabsTrigger
-                value="timeline"
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
-              >
-                <GanttChart className="h-4 w-4" />
-                Timeline
-              </TabsTrigger>
-              <TabsTrigger
-                value="forecast"
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
-              >
-                <BarChart3 className="h-4 w-4" />
-                Forecast
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          {/* Timeline Tab - Now Primary */}
+        <CenteredTabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          tabs={[
+            { value: 'planning', label: 'Planning', icon: List },
+            { value: 'timeline', label: 'Timeline', icon: GanttChart },
+            { value: 'forecast', label: 'Forecast', icon: BarChart3 },
+          ]}
+        >
+          {/* Timeline Tab */}
           <TabsContent value="timeline" className="mt-0 py-4">
             <div className="px-6 space-y-4">
               {/* Consistent Filter Row */}
@@ -201,70 +182,71 @@ const ResourcePlanning: React.FC = () => {
               </Card>
             </div>
           </TabsContent>
-        <TabsContent value="planning" className="mt-0 py-4">
-          <div className="px-6 space-y-4">
-            {/* Filter Row */}
-            <PlanningFilterRow
-              departmentFilter={departmentFilter}
-              onDepartmentChange={setDepartmentFilter}
-              departments={departments}
-              statusFilter={statusFilter}
-              onStatusToggle={toggleStatus}
-              statusOptions={statusOptions}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              projectCount={filteredProjects.length}
-              totalProjects={projects.length}
-              onCreateProject={() => setShowCreateProject(true)}
-              showBudget={showBudget}
-              onShowBudgetChange={setShowBudget}
-            />
+          
+          <TabsContent value="planning" className="mt-0 py-4">
+            <div className="px-6 space-y-4">
+              {/* Filter Row */}
+              <PlanningFilterRow
+                departmentFilter={departmentFilter}
+                onDepartmentChange={setDepartmentFilter}
+                departments={departments}
+                statusFilter={statusFilter}
+                onStatusToggle={toggleStatus}
+                statusOptions={statusOptions}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                projectCount={filteredProjects.length}
+                totalProjects={projects.length}
+                onCreateProject={() => setShowCreateProject(true)}
+                showBudget={showBudget}
+                onShowBudgetChange={setShowBudget}
+              />
 
-            {/* Project List */}
-            <ProjectPlanningList
-              projects={filteredProjects}
-              officeStages={officeStages}
-              isLoading={isLoading}
-              showBudget={showBudget}
-              onUpdate={refetch}
-            />
-          </div>
-        </TabsContent>
+              {/* Project List */}
+              <ProjectPlanningList
+                projects={filteredProjects}
+                officeStages={officeStages}
+                isLoading={isLoading}
+                showBudget={showBudget}
+                onUpdate={refetch}
+              />
+            </div>
+          </TabsContent>
 
-        {/* Demand Forecast Tab */}
-        <TabsContent value="forecast" className="mt-0 py-6">
-          <div className="px-6 space-y-6">
-            {/* Controls */}
-            <ResourcePlanningControls
-              selectedWeeks={selectedWeeks}
-              onWeeksChange={setSelectedWeeks}
-              startDate={startDate}
-              onStartDateChange={setStartDate}
-            />
+          {/* Demand Forecast Tab */}
+          <TabsContent value="forecast" className="mt-0 py-6">
+            <div className="px-6 space-y-6">
+              {/* Controls */}
+              <ResourcePlanningControls
+                selectedWeeks={selectedWeeks}
+                onWeeksChange={setSelectedWeeks}
+                startDate={startDate}
+                onStartDateChange={setStartDate}
+              />
 
-            {/* Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Demand vs Capacity Forecast</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <DemandCapacityChart
-                  weeklyDemand={weeklyDemand}
-                  roleNames={roleNames}
-                  weeklyCapacity={weeklyCapacity}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+              {/* Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Demand vs Capacity Forecast</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <DemandCapacityChart
+                    weeklyDemand={weeklyDemand}
+                    roleNames={roleNames}
+                    weeklyCapacity={weeklyCapacity}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
-        {/* Activity Log Tab */}
-        <TabsContent value="activity" className="mt-0 py-6">
-          <div className="px-6">
-            <PlanningAuditLogViewer />
-          </div>
-        </TabsContent>
-      </Tabs>
+          {/* Activity Log Tab */}
+          <TabsContent value="activity" className="mt-0 py-6">
+            <div className="px-6">
+              <PlanningAuditLogViewer />
+            </div>
+          </TabsContent>
+        </CenteredTabs>
 
         {/* Quick Create Project Dialog */}
         <QuickCreateProjectDialog

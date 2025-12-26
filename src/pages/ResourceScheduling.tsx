@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CenteredTabs, CenteredTabItem, TabsContent } from '@/components/ui/centered-tabs';
 import { GanttChartSquare, Users, Calendar } from 'lucide-react';
 import { MemberFilterRow } from '@/components/resources/MemberFilterRow';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
@@ -103,35 +103,15 @@ const ResourceScheduling = () => {
           />
 
           {/* Centered Tabs with distinct styling */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="flex justify-center py-4 border-b border-border/50 bg-muted/30">
-              <TabsList className="inline-flex h-11 items-center justify-center rounded-lg bg-background p-1 shadow-sm border border-border/60">
-                <TabsTrigger
-                  value="by-project"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
-                >
-                  <GanttChartSquare className="h-4 w-4" />
-                  By Project
-                </TabsTrigger>
-                <TabsTrigger
-                  value="by-person"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
-                >
-                  <Users className="h-4 w-4" />
-                  By Person
-                </TabsTrigger>
-                <TabsTrigger
-                  value="timeline"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm opacity-60"
-                  disabled
-                >
-                  <Calendar className="h-4 w-4" />
-                  Timeline
-                  <span className="text-xs opacity-70">(Soon)</span>
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
+          <CenteredTabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            tabs={[
+              { value: 'by-project', label: 'By Project', icon: GanttChartSquare },
+              { value: 'by-person', label: 'By Person', icon: Users },
+              { value: 'timeline', label: 'Timeline (Soon)', icon: Calendar, disabled: true },
+            ]}
+          >
             <TabsContent value="by-project" className="mt-0 py-3">
               <div className="space-y-4">
                 {/* 1. Available Members Row - always sorted by utilization */}
@@ -265,7 +245,7 @@ const ResourceScheduling = () => {
                 </div>
               </div>
             </TabsContent>
-          </Tabs>
+          </CenteredTabs>
         </div>
       </div>
     </StandardLayout>

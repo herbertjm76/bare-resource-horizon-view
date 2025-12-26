@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CenteredTabs, CenteredTabItem, TabsContent } from '@/components/ui/centered-tabs';
 import { TeamMember } from '@/components/dashboard/types';
 import { useUnifiedWorkloadData } from '@/components/workload/hooks/useUnifiedWorkloadData';
 import { useDemandProjection } from '@/hooks/useDemandProjection';
@@ -72,37 +72,15 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
   return (
     <div className="space-y-0">
       {/* Centered Tabs - Above filter row - Always visible */}
-      <Tabs 
+      <CenteredTabs 
         value={viewMode} 
         onValueChange={(v) => setViewMode(v as HeatmapViewMode)}
-        className="w-full"
+        tabs={[
+          { value: 'actual', label: 'Actual Workload', icon: Activity },
+          { value: 'projected', label: 'Projected Demand', icon: TrendingUp },
+          { value: 'gap', label: 'Gap Analysis', icon: Minus },
+        ]}
       >
-        <div className="flex justify-center py-4 border-b border-border/50 bg-muted/30">
-          <TabsList className="inline-flex h-11 items-center justify-center rounded-lg bg-background p-1 shadow-sm border border-border/60">
-            <TabsTrigger 
-              value="actual" 
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
-            >
-              <Activity className="h-4 w-4" />
-              Actual Workload
-            </TabsTrigger>
-            <TabsTrigger 
-              value="projected" 
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
-            >
-              <TrendingUp className="h-4 w-4" />
-              Projected Demand
-            </TabsTrigger>
-            <TabsTrigger 
-              value="gap" 
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-gradient-start data-[state=active]:text-white data-[state=active]:shadow-sm"
-            >
-              <Minus className="h-4 w-4" />
-              Gap Analysis
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
         {/* Filter Controls - Below tabs */}
         <div className="py-4">
           <WorkloadHeaderControls
@@ -159,7 +137,7 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
             </TabsContent>
           </>
         )}
-      </Tabs>
+      </CenteredTabs>
     </div>
   );
 };

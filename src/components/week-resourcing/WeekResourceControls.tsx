@@ -349,7 +349,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
                 <ChevronDown className="h-4 w-4 ml-1" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white">
+            <DropdownMenuContent align="end" className="bg-popover">
               <DropdownMenuItem 
                 onClick={handleExportToPDF}
                 disabled={isExporting}
