@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -181,8 +180,12 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
               </div>
             </div>
 
-            {/* Resource Selector */}
-            <ResourceSelector onAdd={handleAddResource} isLoading={isSaving} />
+            {/* Resource Selector - now with contracted weeks for calculation */}
+            <ResourceSelector 
+              onAdd={handleAddResource} 
+              isLoading={isSaving}
+              contractedWeeks={contractedWeeks[stage.id] || 0}
+            />
 
             {/* Team Composition Table */}
             {isLoading ? (
@@ -197,6 +200,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                 onDelete={deleteItem}
                 isDeleting={isDeleting}
                 showBudget={showBudget}
+                contractedWeeks={contractedWeeks[stage.id] || 0}
               />
             )}
 
@@ -207,15 +211,15 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Headcount</p>
-                      <p className="text-lg font-semibold">{stageTotals.headcount}</p>
+                      <p className="text-xs text-muted-foreground">Resources</p>
+                      <p className="text-lg font-semibold">{composition.length}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <p className="text-xs text-muted-foreground">Total Hours</p>
-                      <p className="text-lg font-semibold">{stageTotals.totalHours}</p>
+                      <p className="text-lg font-semibold">{Math.round(stageTotals.totalHours)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
