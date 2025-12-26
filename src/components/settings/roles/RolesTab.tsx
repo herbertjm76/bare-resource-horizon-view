@@ -24,6 +24,7 @@ export const RolesTab = () => {
     showAddForm,
     handleSubmit,
     handleEdit,
+    handleInlineUpdate,
     handleDelete,
     handleBulkDelete,
     handleSelectRole,
@@ -97,6 +98,7 @@ export const RolesTab = () => {
             onSelectRole={handleSelectRole}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onInlineUpdate={handleInlineUpdate}
           />
         </div>
       </CardContent>
