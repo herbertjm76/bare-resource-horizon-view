@@ -155,28 +155,33 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
               key={stage.id}
               onClick={() => setSelectedStageId(stage.id)}
               className={cn(
-                "relative flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer min-w-[60px]",
-                "hover:brightness-110 hover:saturate-100",
-                isSelected 
-                  ? "z-10 ring-2 ring-foreground/50 ring-offset-2 ring-offset-background shadow-lg" 
-                  : "brightness-50 saturate-50 grayscale-[30%]"
+                "relative overflow-hidden flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer min-w-[60px]",
+                "hover:brightness-110",
+                isSelected
+                  ? "z-10 scale-[1.02] ring-2 ring-foreground/80 ring-offset-2 ring-offset-background shadow-lg"
+                  : [
+                      // Pastel-safe dimming: strong translucent surface overlay instead of relying on opacity alone
+                      "after:content-[''] after:absolute after:inset-0 after:bg-background/70 after:pointer-events-none",
+                      "opacity-80",
+                    ]
               )}
-              style={{ 
+              style={{
                 width: `${widthPercent}%`,
-                backgroundColor: stageColor 
+                backgroundColor: stageColor,
               }}
             >
-              <span className="text-sm font-bold text-white drop-shadow-sm truncate px-2">
+              <span className="relative z-10 text-sm font-bold text-white drop-shadow-sm truncate px-2">
                 {stage.code || stage.name}
               </span>
               {stageWeeks > 0 && (
-                <span className="text-sm font-bold text-white/90">
+                <span className="relative z-10 text-sm font-bold text-white/90">
                   {stageWeeks}w
                 </span>
               )}
+
               {/* Arrow indicator for selected stage */}
               {isSelected && (
-                <div 
+                <div
                   className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px]"
                   style={{ borderTopColor: stageColor }}
                 />
