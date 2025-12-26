@@ -32,6 +32,10 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [error, setError] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
   
+  // Ref to prevent duplicate fetches
+  const isFetchingRef = useRef(false);
+  const lastFetchedCompanyIdRef = useRef<string | null>(null);
+  
   const { isDemoMode, profile: demoProfile } = useDemoAuth();
 
   const extractCompanySlugFromPath = () => {
@@ -133,7 +137,22 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return;
     }
     
+    // Prevent duplicate fetches for same company
+    if (isFetchingRef.current && lastFetchedCompanyIdRef.current === profile.company_id) {
+      console.log('CompanyProvider: Already fetching company, skipping duplicate request');
+      return;
+    }
+    
+    // Skip if already have this company loaded
+    if (company?.id === profile.company_id && !error) {
+      console.log('CompanyProvider: Company already loaded, skipping fetch');
+      setLoading(false);
+      return;
+    }
+    
     try {
+      isFetchingRef.current = true;
+      lastFetchedCompanyIdRef.current = profile.company_id;
       console.log('CompanyProvider: fetchCompanyByProfile start - company_id:', profile.company_id);
       setLoading(true);
       setError(null);
@@ -154,25 +173,33 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         });
         setError(`Failed to fetch company data: ${companyError.message}`);
         setCompany(null);
-      } else if (!companyData) {
+        setLoading(false);
+        return;
+      }
+      
+      if (!companyData) {
         console.error('CompanyProvider: No company found for id:', profile.company_id);
         setError(`Company not found for id: ${profile.company_id}`);
         setCompany(null);
-      } else {
-        setCompany(companyData);
-        setError(null);
-        console.log('CompanyProvider: fetchCompanyByProfile success - company:', {
-          id: companyData.id,
-          name: companyData.name
-        });
+        setLoading(false);
+        return;
       }
+      
+      // Successfully fetched company - set state atomically
+      console.log('CompanyProvider: fetchCompanyByProfile success - company:', {
+        id: companyData.id,
+        name: companyData.name
+      });
+      setCompany(companyData);
+      setError(null);
+      setLoading(false);
     } catch (error: any) {
       console.error('CompanyProvider: Exception in fetchCompanyByProfile:', error);
       setCompany(null);
       setError(error.message || 'Failed to fetch company data');
-    } finally {
       setLoading(false);
-      console.log('CompanyProvider: fetchCompanyByProfile end -> loading=false, company=', company?.id || 'null');
+    } finally {
+      isFetchingRef.current = false;
     }
   };
 
