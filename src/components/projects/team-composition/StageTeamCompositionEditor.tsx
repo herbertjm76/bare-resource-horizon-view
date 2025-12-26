@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Clock, Users, DollarSign, CalendarDays } from 'lucide-react';
+import { Clock, Users, DollarSign, CalendarDays, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { ResourceSelector } from './ResourceSelector';
 import { TeamCompositionTable } from './TeamCompositionTable';
 import { useStageTeamComposition } from '@/hooks/useStageTeamComposition';
@@ -35,13 +35,30 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
   const { data: officeStages = [] } = useOfficeStages();
   const [selectedStageId, setSelectedStageId] = useState<string>(stages[0]?.id || '');
   const [contractedWeeks, setContractedWeeks] = useState<Record<string, number>>({});
+  const [projectTotalWeeks, setProjectTotalWeeks] = useState<number>(0);
   const [isUpdatingWeeks, setIsUpdatingWeeks] = useState(false);
 
-  // Fetch initial contracted weeks
+  // Fetch project contract dates and stage contracted weeks
   useEffect(() => {
-    const fetchContractedWeeks = async () => {
+    const fetchData = async () => {
       if (!projectId || stages.length === 0) return;
 
+      // Fetch project contract dates to calculate total weeks
+      const { data: projectData } = await supabase
+        .from('projects')
+        .select('contract_start_date, contract_end_date')
+        .eq('id', projectId)
+        .single();
+
+      if (projectData?.contract_start_date && projectData?.contract_end_date) {
+        const startDate = new Date(projectData.contract_start_date);
+        const endDate = new Date(projectData.contract_end_date);
+        const diffTime = endDate.getTime() - startDate.getTime();
+        const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+        setProjectTotalWeeks(Math.max(0, diffWeeks));
+      }
+
+      // Fetch stage contracted weeks
       const stageNames = stages.map(s => s.name);
       const { data, error } = await supabase
         .from('project_stages')
@@ -64,7 +81,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
       setContractedWeeks(weeksMap);
     };
 
-    fetchContractedWeeks();
+    fetchData();
   }, [projectId, stages]);
 
   const {
@@ -83,10 +100,14 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
     ? Math.round(stageTotals.totalHours / currentContractedWeeks * 10) / 10 
     : 0;
 
-  // Calculate total weeks for proportional timeline bar
-  const totalWeeks = useMemo(() => {
+  // Calculate sum of stage weeks for validation
+  const stageWeeksSum = useMemo(() => {
     return stages.reduce((sum, stage) => sum + (contractedWeeks[stage.id] || 0), 0);
   }, [stages, contractedWeeks]);
+
+  // Check if stage weeks match project total
+  const weeksMatch = projectTotalWeeks > 0 && stageWeeksSum === projectTotalWeeks;
+  const hasWeeksConfigured = stageWeeksSum > 0 || projectTotalWeeks > 0;
 
   // Get stage color from office_stages
   const getStageColor = (stageName: string): string => {
@@ -144,8 +165,8 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
       <div className="flex w-full h-12 rounded-lg overflow-visible mb-3">
         {stages.map((stage, index) => {
           const stageWeeks = contractedWeeks[stage.id] || 0;
-          const widthPercent = totalWeeks > 0 
-            ? (stageWeeks / totalWeeks) * 100 
+          const widthPercent = stageWeeksSum > 0 
+            ? (stageWeeks / stageWeeksSum) * 100 
             : 100 / stages.length; // Equal width if no weeks set
           const stageColor = getStageColor(stage.name);
           const isSelected = stage.id === selectedStageId;
@@ -189,7 +210,26 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
         })}
       </div>
 
-      {/* Stage Content */}
+      {/* Weeks validation indicator */}
+      {hasWeeksConfigured && (
+        <div className={cn(
+          "flex items-center justify-end gap-2 text-sm",
+          weeksMatch ? "text-emerald-600" : "text-amber-600"
+        )}>
+          {weeksMatch ? (
+            <CheckCircle2 className="h-4 w-4" />
+          ) : (
+            <AlertTriangle className="h-4 w-4" />
+          )}
+          <span>
+            Stage total: <span className="font-medium">{stageWeeksSum}w</span>
+            {projectTotalWeeks > 0 && (
+              <> / Project: <span className="font-medium">{projectTotalWeeks}w</span></>
+            )}
+          </span>
+        </div>
+      )}
+
       {stages.map((stage) => (
         stage.id === selectedStageId && (
           <div key={stage.id} className="space-y-4 animate-fade-in">
