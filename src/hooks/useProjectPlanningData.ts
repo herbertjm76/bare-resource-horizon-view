@@ -12,6 +12,7 @@ export interface ProjectPlanningProject {
   stages: string[] | null;
   contract_start_date: string | null;
   contract_end_date: string | null;
+  department: string | null;
 }
 
 export interface OfficeStage {
@@ -48,7 +49,7 @@ export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
 
       let query = supabase
         .from('projects')
-        .select('id, name, code, status, current_stage, stages, contract_start_date, contract_end_date')
+        .select('id, name, code, status, current_stage, stages, contract_start_date, contract_end_date, department')
         .eq('company_id', company.id)
         .order('name');
 
