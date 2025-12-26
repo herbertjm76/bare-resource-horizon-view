@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { UseFormRegister, Controller, Control } from 'react-hook-form';
 import { MemberFormData } from './types';
 import { useOfficeSettings } from '@/context/officeSettings';
+import { useOfficeRates, getRateForReference } from '@/hooks/useOfficeRates';
 import { 
   Select,
   SelectContent,
@@ -20,9 +21,45 @@ interface OrganizationFieldsProps {
 
 const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, control }) => {
   const { locations, departments, roles, loading } = useOfficeSettings();
+  const { data: rates = [] } = useOfficeRates();
 
   return (
     <>
+      <div className="space-y-2">
+        <Label htmlFor="office_role_id">Office Role</Label>
+        <Controller
+          name="office_role_id"
+          control={control}
+          render={({ field }) => (
+            <Select
+              disabled={loading}
+              value={field.value || ''}
+              onValueChange={field.onChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select office role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="not_assigned">Not Assigned</SelectItem>
+                {roles.map((role) => {
+                  const rate = getRateForReference(rates, role.id, 'role');
+                  return (
+                    <SelectItem key={role.id} value={role.id}>
+                      <span className="flex items-center justify-between w-full gap-3">
+                        <span>{role.name}</span>
+                        {rate > 0 && (
+                          <span className="text-xs text-muted-foreground">${rate}/hr</span>
+                        )}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        <p className="text-xs text-muted-foreground">Used for rate lookup in resource planning</p>
+      </div>
       <div className="space-y-2">
         <Label htmlFor="department">Department</Label>
         <Controller
@@ -51,28 +88,11 @@ const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, contr
       </div>
       <div className="space-y-2">
         <Label htmlFor="job_title">Job Title</Label>
-        <Controller
-          name="job_title"
-          control={control}
-          render={({ field }) => (
-            <Select
-              disabled={loading}
-              value={field.value}
-              onValueChange={field.onChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select job title" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="not_assigned">Not Assigned</SelectItem>
-                {roles.map((role) => (
-                  <SelectItem key={role.id} value={role.name}>
-                    {role.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+        <Input 
+          id="job_title"
+          type="text"
+          placeholder="Enter job title"
+          {...register('job_title')}
         />
       </div>
       <div className="space-y-2">

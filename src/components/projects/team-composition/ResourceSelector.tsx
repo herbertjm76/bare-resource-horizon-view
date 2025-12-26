@@ -47,18 +47,24 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
       // Direct role rate lookup
       return getRateForReference(rates, selectedId, 'role');
     } else {
-      // For members, try to find rate by their location or job title
+      // For members, look up rate via their office_role_id
       const member = members.find(m => m.id === selectedId);
-      if (member?.location) {
-        // Try to find location-based rate
-        const locationRate = rates.find(r => r.type === 'location');
-        if (locationRate) return locationRate.value;
+      if (member?.officeRoleId) {
+        return getRateForReference(rates, member.officeRoleId, 'role');
       }
-      // Default to first role rate or 0
-      const defaultRate = rates.find(r => r.type === 'role');
-      return defaultRate?.value || 0;
+      // No office role assigned - return 0
+      return 0;
     }
   }, [selectedId, resourceType, rates, members]);
+
+  // Get the office role name for display
+  const selectedMemberRole = useMemo(() => {
+    if (resourceType !== 'member' || !selectedId) return null;
+    const member = members.find(m => m.id === selectedId);
+    if (!member?.officeRoleId) return null;
+    const role = roles.find(r => r.id === member.officeRoleId);
+    return role?.name || null;
+  }, [selectedId, resourceType, members, roles]);
 
   // Calculate totals
   const totalHours = quantity * hoursPerPerson;
@@ -130,16 +136,32 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
                 ) : members.length === 0 ? (
                   <SelectItem value="_empty" disabled>No team members</SelectItem>
                 ) : (
-                  members.map((member) => (
-                    <SelectItem key={member.id} value={member.id}>
-                      <span className="flex items-center gap-2">
-                        {member.name}
-                        {member.type === 'pre-registered' && (
-                          <span className="text-xs text-muted-foreground">(pending)</span>
-                        )}
-                      </span>
-                    </SelectItem>
-                  ))
+                  members.map((member) => {
+                    const memberRole = member.officeRoleId 
+                      ? roles.find(r => r.id === member.officeRoleId)
+                      : null;
+                    const memberRate = member.officeRoleId 
+                      ? getRateForReference(rates, member.officeRoleId, 'role')
+                      : 0;
+                    return (
+                      <SelectItem key={member.id} value={member.id}>
+                        <span className="flex items-center justify-between w-full gap-3">
+                          <span className="flex items-center gap-2">
+                            {member.name}
+                            {member.type === 'pre-registered' && (
+                              <span className="text-xs text-muted-foreground">(pending)</span>
+                            )}
+                            {memberRole && (
+                              <span className="text-xs text-muted-foreground">• {memberRole.name}</span>
+                            )}
+                          </span>
+                          {memberRate > 0 && (
+                            <span className="text-xs text-muted-foreground">${memberRate}/hr</span>
+                          )}
+                        </span>
+                      </SelectItem>
+                    );
+                  })
                 )
               )}
             </SelectContent>
@@ -194,10 +216,19 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
             {selectedRate > 0 ? (
               <>
                 <DollarSign className="h-3 w-3" />
-                <span>Rate: <span className="font-medium text-foreground">${selectedRate}/hr</span></span>
+                <span>
+                  Rate: <span className="font-medium text-foreground">${selectedRate}/hr</span>
+                  {selectedMemberRole && (
+                    <span className="ml-1">({selectedMemberRole})</span>
+                  )}
+                </span>
               </>
             ) : (
-              <span className="text-amber-500">No rate configured for this resource</span>
+              <span className="text-amber-500">
+                {resourceType === 'member' 
+                  ? 'No office role assigned to this member'
+                  : 'No rate configured for this role'}
+              </span>
             )}
           </div>
           <div>

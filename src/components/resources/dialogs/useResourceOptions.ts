@@ -16,6 +16,7 @@ export type ResourceOption = {
   role?: string;
   department?: string;
   location?: string;
+  officeRoleId?: string | null;
 };
 
 export const useResourceOptions = () => {
@@ -30,7 +31,7 @@ export const useResourceOptions = () => {
       try {
         setLoading(true);
         
-        // Fetch active team members from profiles
+        // Fetch active team members from profiles with office_role_id
         const { data: activeMembers, error: activeError } = await supabase
           .from('profiles')
           .select('*')
@@ -56,9 +57,10 @@ export const useResourceOptions = () => {
             name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || member.email,
             email: member.email,
             type: 'active' as const,
-            role: member.job_title,
-            department: member.department,
-            location: member.location
+            role: member.job_title || undefined,
+            department: member.department || undefined,
+            location: member.location || undefined,
+            officeRoleId: member.office_role_id
           })),
           
           // Pre-registered members
@@ -67,9 +69,10 @@ export const useResourceOptions = () => {
             name: `${invite.first_name || ''} ${invite.last_name || ''}`.trim() || invite.email,
             email: invite.email || '',
             type: 'pre-registered' as const,
-            role: invite.job_title,
-            department: invite.department,
-            location: invite.location
+            role: invite.job_title || undefined,
+            department: invite.department || undefined,
+            location: invite.location || undefined,
+            officeRoleId: invite.office_role_id
           }))
         ];
         
