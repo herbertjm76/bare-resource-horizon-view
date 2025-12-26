@@ -9,13 +9,13 @@ interface Project {
   code: string;
   status: string;
   current_stage?: string;
-  stages?: string[];
+  stages?: string[] | null;
 }
 
 interface OfficeStage {
   id: string;
   name: string;
-  code?: string;
+  code?: string | null;
 }
 
 interface ProjectPlanningListProps {
@@ -49,7 +49,7 @@ export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
         <div className="rounded-full bg-muted p-4 mb-4">
           <FolderOpen className="h-8 w-8 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium mb-1">No Active Projects</h3>
+        <h3 className="text-lg font-medium mb-1">No Projects Found</h3>
         <p className="text-sm text-muted-foreground max-w-md">
           Create projects and assign stages to start planning your resource allocation.
         </p>
@@ -68,7 +68,7 @@ export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
         return {
           id: officeStage.id,
           name: officeStage.name,
-          code: officeStage.code
+          code: officeStage.code || undefined
         };
       })
       .filter(Boolean) as { id: string; name: string; code?: string }[];
@@ -81,6 +81,7 @@ export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
           key={project.id}
           project={project}
           stages={getProjectStages(project)}
+          availableStages={officeStages}
           showBudget={showBudget}
           onUpdate={onUpdate}
         />

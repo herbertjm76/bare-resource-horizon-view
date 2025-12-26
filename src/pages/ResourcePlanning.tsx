@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
-import { TrendingUp, BarChart3, List, Filter } from 'lucide-react';
+import { TrendingUp, BarChart3, List, Filter, Plus, History } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,8 @@ import { ProjectPlanningList } from '@/components/resource-planning/ProjectPlann
 import { PlanningProjectedSummary } from '@/components/resource-planning/PlanningProjectedSummary';
 import { DemandCapacityChart } from '@/components/resource-planning/DemandCapacityChart';
 import { ResourcePlanningControls } from '@/components/resource-planning/ResourcePlanningControls';
+import { PlanningAuditLogViewer } from '@/components/resource-planning/PlanningAuditLogViewer';
+import { QuickCreateProjectDialog } from '@/components/resource-planning/QuickCreateProjectDialog';
 import { useDemandProjection } from '@/hooks/useDemandProjection';
 import { startOfWeek } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,8 +24,10 @@ const statusOptions = ['Active', 'On Hold', 'Completed', 'Planning'];
 
 const ResourcePlanning: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('planning');
-  const [statusFilter, setStatusFilter] = useState<string[]>(['Active']);
+  const [statusFilter, setStatusFilter] = useState<string[]>(['Active', 'Planning']);
   const [showBudget, setShowBudget] = useState(false);
+  const [showAuditLog, setShowAuditLog] = useState(false);
+  const [showCreateProject, setShowCreateProject] = useState(false);
   const [selectedWeeks, setSelectedWeeks] = useState<number>(12);
   const [startDate, setStartDate] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
 
@@ -61,7 +65,7 @@ const ResourcePlanning: React.FC = () => {
     <StandardLayout>
       <StandardizedPageHeader
         title="Resource Planning"
-        description="Plan team composition, contracted weeks, and projected hours per project"
+        description="Plan contracted weeks, team composition, and projected hours per project stage"
         icon={TrendingUp}
       />
       
@@ -82,6 +86,13 @@ const ResourcePlanning: React.FC = () => {
             >
               <BarChart3 className="h-4 w-4" />
               Demand Forecast
+            </TabsTrigger>
+            <TabsTrigger
+              value="activity"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+            >
+              <History className="h-4 w-4" />
+              Activity Log
             </TabsTrigger>
           </TabsList>
         </div>
@@ -134,9 +145,19 @@ const ResourcePlanning: React.FC = () => {
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground">
-                {projects.length} projects
-              </p>
+              <div className="flex items-center gap-3">
+                <p className="text-sm text-muted-foreground">
+                  {projects.length} projects
+                </p>
+                <Button 
+                  size="sm" 
+                  className="gap-2"
+                  onClick={() => setShowCreateProject(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                  New Project
+                </Button>
+              </div>
             </div>
 
             {/* Projected Summary */}
@@ -192,7 +213,21 @@ const ResourcePlanning: React.FC = () => {
             </Card>
           </div>
         </TabsContent>
+
+        {/* Activity Log Tab */}
+        <TabsContent value="activity" className="mt-0 py-6">
+          <div className="px-6">
+            <PlanningAuditLogViewer />
+          </div>
+        </TabsContent>
       </Tabs>
+
+      {/* Quick Create Project Dialog */}
+      <QuickCreateProjectDialog
+        open={showCreateProject}
+        onOpenChange={setShowCreateProject}
+        onSuccess={refetch}
+      />
     </StandardLayout>
   );
 };
