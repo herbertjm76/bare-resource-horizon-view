@@ -73,6 +73,31 @@ export const useRoleOperations = (
     setShowAddForm(true);
   };
 
+  const handleInlineUpdate = async (role: Role, newName: string) => {
+    if (!companyId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('office_roles')
+        .update({ 
+          name: newName,
+          code: generateRoleCode(newName)
+        })
+        .eq('id', role.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setRoles(roles.map(r => r.id === role.id ? data : r));
+      toast.success('Role updated');
+    } catch (error) {
+      console.error('Error updating role:', error);
+      toast.error('Failed to update role');
+      throw error;
+    }
+  };
+
   const handleDelete = async (role: Role) => {
     if (!confirm('Are you sure you want to delete this role?')) return;
 
@@ -157,6 +182,7 @@ export const useRoleOperations = (
     showAddForm,
     handleSubmit,
     handleEdit,
+    handleInlineUpdate,
     handleDelete,
     handleBulkDelete,
     handleSelectRole,
