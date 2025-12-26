@@ -177,10 +177,10 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                 </span>
               )}
 
-              {/* Arrow indicator for selected stage */}
+              {/* Arrow indicator for selected stage - behind the ring */}
               {isSelected && (
                 <div
-                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px]"
+                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] -z-10"
                   style={{ borderTopColor: stageColor }}
                 />
               )}
