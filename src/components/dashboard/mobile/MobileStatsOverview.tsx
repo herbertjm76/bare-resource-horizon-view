@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TrendingUp, Users, Briefcase, Sparkles } from 'lucide-react';
+import { TrendingUp, Users, Briefcase } from 'lucide-react';
 import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface MobileStatsOverviewProps {
@@ -20,61 +20,69 @@ export const MobileStatsOverview: React.FC<MobileStatsOverviewProps> = ({
   currentUtilizationRate,
   utilizationStatus
 }) => {
-  const getUtilizationBadgeStyle = () => {
-    if (currentUtilizationRate >= 90) return { backgroundColor: '#ef4444', color: 'white' };
-    if (currentUtilizationRate >= 75) return { backgroundColor: '#f97316', color: 'white' };
-    if (currentUtilizationRate >= 50) return { backgroundColor: '#22c55e', color: 'white' };
-    return { backgroundColor: '#3b82f6', color: 'white' };
+  const getBadgeVariant = () => {
+    if (currentUtilizationRate >= 90) return 'error' as const;
+    if (currentUtilizationRate >= 75) return 'warning' as const;
+    if (currentUtilizationRate >= 50) return 'success' as const;
+    return 'info' as const;
   };
 
+  const stats = [
+    {
+      title: 'Team Members',
+      value: activeResources,
+      icon: Users
+    },
+    {
+      title: 'Active Projects',
+      value: activeProjects,
+      icon: Briefcase
+    },
+    {
+      title: 'Team Utilization',
+      value: `${currentUtilizationRate}%`,
+      icon: TrendingUp,
+      badge: utilizationStatus.status,
+      badgeVariant: getBadgeVariant()
+    }
+  ];
+
   return (
-    <div className="bg-gradient-to-r from-brand-violet to-purple-600 rounded-2xl p-4 text-white w-full">
-      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <Sparkles className="h-5 w-5 text-white" strokeWidth={1.5} />
-        Dashboard Overview
-      </h2>
-      
-      {/* Stats Grid - Vertical stack on mobile */}
-      <div className="space-y-3 w-full">
-        <div className="flex items-center justify-between p-3 bg-white/10 rounded-xl w-full">
-          <div className="flex items-center gap-2 min-w-0">
-            <Users className="h-5 w-5 text-white" strokeWidth={1.5} />
-            <div className="min-w-0">
-              <p className="text-white/80 text-xs">Team Members</p>
-              <p className="text-xl font-bold">{activeResources}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between p-3 bg-white/10 rounded-xl w-full">
-          <div className="flex items-center gap-2 min-w-0">
-            <Briefcase className="h-5 w-5 text-white" strokeWidth={1.5} />
-            <div className="min-w-0">
-              <p className="text-white/80 text-xs">Active Projects</p>
-              <p className="text-xl font-bold">{activeProjects}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between p-3 bg-white/10 rounded-xl w-full">
-          <div className="flex items-center gap-2 min-w-0">
-            <TrendingUp className="h-5 w-5 text-white" strokeWidth={1.5} />
-            <div className="min-w-0 flex-1">
-              <p className="text-white/80 text-xs">Team Utilization</p>
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-xl font-bold">{currentUtilizationRate}%</p>
-                <StandardizedBadge
-                  variant="status"
-                  style={getUtilizationBadgeStyle()}
-                  className="text-xs whitespace-nowrap"
-                >
-                  {utilizationStatus.status}
-                </StandardizedBadge>
+    <div className="grid grid-cols-3 gap-4 w-full">
+      {stats.map((stat, index) => {
+        const IconComponent = stat.icon;
+        return (
+          <div 
+            key={index} 
+            className="relative overflow-hidden rounded-xl bg-card border glass-card p-4 space-y-3 hover:shadow-lg transition-shadow"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <IconComponent className="h-4 w-4" />
               </div>
             </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-xs font-semibold text-muted-foreground truncate tracking-wide uppercase">
+                {stat.title}
+              </h3>
+              <div className="text-2xl font-bold text-foreground tracking-tight">
+                {stat.value}
+              </div>
+              
+              {stat.badge && (
+                <StandardizedBadge 
+                  variant={stat.badgeVariant}
+                  size="metric"
+                  className="text-xs"
+                >
+                  {stat.badge}
+                </StandardizedBadge>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 };
