@@ -87,7 +87,7 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
   const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalHoursWithLeave / weeklyCapacity) * 100) : 0;
 
   return (
-    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 h-20 border-b`}>
+    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-muted/50' : 'bg-background'} hover:bg-accent/50 transition-colors duration-200 h-20 border-b border-border`}>
       {/* Name Cell */}
       <TableCell className="border-r border-gray-200 px-4 py-3 min-w-[180px]">
         <div className="flex flex-col gap-2">

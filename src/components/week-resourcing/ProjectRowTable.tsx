@@ -185,7 +185,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
           {projects.map((project, index) => (
             <TableRow 
               key={project.id} 
-              className={`${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'} hover:bg-blue-50/80 transition-all duration-150`}
+              className={`${index % 2 === 0 ? 'bg-background' : 'bg-muted/50'} hover:bg-accent/50 transition-all duration-150`}
               style={{ height: 48, minHeight: 48 }}
             >
               <TableCell className="sticky left-0 z-20 border-r border-slate-200 px-3 py-1 shadow-[2px_0_4px_rgba(0,0,0,0.1)]" style={{ background: index % 2 === 0 ? 'white' : 'rgb(248 250 252 / 0.7)' }}>
