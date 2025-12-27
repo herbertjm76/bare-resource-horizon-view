@@ -6,11 +6,14 @@ import { useComprehensiveAllocations } from './useComprehensiveAllocations';
 import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
 import { useWeeklyLeaveDetails } from './useWeeklyLeaveDetails';
 import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
-import { format } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
 
 export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
-  // Convert Date to string format for API calls - make this stable
-  const weekStartDate = useMemo(() => format(selectedWeek, 'yyyy-MM-dd'), [selectedWeek]);
+  // IMPORTANT: selectedWeek can be any day within the week; normalize to week start (Mon)
+  const weekStartDate = useMemo(
+    () => format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
+    [selectedWeek]
+  );
   
   // Fetch team members
   const { members, loadingMembers: isLoadingMembers, membersError } = useWeekResourceTeamMembers();
