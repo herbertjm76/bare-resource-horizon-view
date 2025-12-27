@@ -371,13 +371,13 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   return (
     <div className="mb-0 space-y-0">
-      <div className="relative px-1.5 sm:px-2 sm:pr-10 py-2 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-visible weekly-cards-container transition-all duration-300">
-        {/* Collapse Toggle Button - Top Right */}
+      <div className="relative px-1.5 sm:px-2 py-2 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-visible weekly-cards-container transition-all duration-300">
+        {/* Collapse Toggle Button - Half in/half out on right edge */}
         <Button
           variant="ghost"
           size="sm"
           onClick={toggleCollapse}
-          className="absolute top-1 right-1 z-30 h-7 w-7 p-0 hover:bg-background/80 backdrop-blur-sm bg-background/60"
+          className="absolute top-1/2 -translate-y-1/2 -right-3.5 z-30 h-7 w-7 p-0 bg-background border border-border shadow-sm hover:bg-muted"
           title={isCollapsed ? 'Show summary cards' : 'Hide summary cards'}
         >
           {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
