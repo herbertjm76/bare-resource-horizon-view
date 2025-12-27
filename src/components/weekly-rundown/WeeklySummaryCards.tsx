@@ -18,6 +18,7 @@ import { Settings, Plus } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ManageCustomCardsDialog } from './ManageCustomCardsDialog';
 import { useSwipeable } from 'react-swipeable';
+import { CardDetailDialog } from './CardDetailDialog';
 import './css/weekly-cards-scroll.css';
 
 interface WeeklySummaryCardsProps {
@@ -62,6 +63,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   });
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
   const [dragOverCardId, setDragOverCardId] = useState<string | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedCardType, setSelectedCardType] = useState<string | null>(null);
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekStartString = format(weekStart, 'yyyy-MM-dd');
@@ -390,6 +393,25 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     localStorage.setItem('weekly-summary-collapsed', String(newState));
   };
 
+  // Handle card click to open detail dialog
+  const handleCardClick = (cardId: string) => {
+    // Don't open dialog for weekInfo or custom cards
+    if (cardId === 'weekInfo' || cardId.startsWith('custom_')) return;
+    setSelectedCardType(cardId);
+    setDetailDialogOpen(true);
+  };
+
+  // Get data for detail dialog based on card type
+  const getDetailData = () => {
+    switch (selectedCardType) {
+      case 'holidays': return holidays;
+      case 'annualLeave': return annualLeaves;
+      case 'otherLeave': return otherLeaves;
+      case 'notes': return weeklyNotes;
+      default: return null;
+    }
+  };
+
   // Swipe handlers for mobile carousel
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
@@ -463,7 +485,11 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
           {/* Card Display - Swipeable */}
           <div className="px-12 py-0.5 touch-pan-y">
-            <div className="relative h-[120px] animate-fade-in" key={currentCard?.id}>
+            <div 
+              className={`relative h-[120px] animate-fade-in ${currentCard?.id !== 'weekInfo' && !currentCard?.id?.startsWith('custom_') ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
+              key={currentCard?.id}
+              onClick={() => currentCard && handleCardClick(currentCard.id)}
+            >
               {currentCard?.component}
             </div>
           </div>
@@ -502,7 +528,11 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {cards.map((card) => (
-              <div key={card.id} className={card.id === 'weekInfo' ? 'flex-shrink-0' : 'flex-1 min-w-[180px]'}>
+              <div 
+                key={card.id} 
+                className={`${card.id === 'weekInfo' ? 'flex-shrink-0' : 'flex-1 min-w-[180px]'} ${card.id !== 'weekInfo' && !card.id.startsWith('custom_') ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
+                onClick={() => handleCardClick(card.id)}
+              >
                 {card.component}
               </div>
             ))}
@@ -777,6 +807,15 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         {/* Add Card Button */}
         <ManageCustomCardsDialog iconOnly />
       </div>
+
+      {/* Detail Dialog */}
+      <CardDetailDialog
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        cardType={selectedCardType || ''}
+        cardLabel={getCardLabel(selectedCardType || '')}
+        data={getDetailData()}
+      />
     </div>
   );
 };
