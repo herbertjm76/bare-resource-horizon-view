@@ -1,48 +1,21 @@
 import React, { useState } from 'react';
 import { useCompany } from '@/context/CompanyContext';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Pencil, Save, X, AlertCircle, ExternalLink } from 'lucide-react';
+import { Pencil, Save, X, AlertCircle, ExternalLink, Building2, Copy, Check } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
-interface InfoFieldProps {
-  label: string;
-  value: string | null | undefined;
-  isLink?: boolean;
-  linkHref?: string;
-}
-
-const InfoField: React.FC<InfoFieldProps> = ({ label, value, isLink, linkHref }) => (
-  <div>
-    <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
-    {value ? (
-      isLink && linkHref ? (
-        <a
-          href={linkHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1"
-        >
-          {value}
-          <ExternalLink className="h-3 w-3" />
-        </a>
-      ) : (
-        <p className="text-sm font-medium text-foreground">{value}</p>
-      )
-    ) : (
-      <p className="text-sm text-muted-foreground/50">—</p>
-    )}
-  </div>
-);
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 export const CompanyTab: React.FC = () => {
   const { company, refreshCompany } = useCompany();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [formData, setFormData] = useState({
     name: company?.name || '',
     subdomain: company?.subdomain || '',
@@ -70,6 +43,13 @@ export const CompanyTab: React.FC = () => {
 
   const handleCancel = () => {
     setEditing(false);
+  };
+
+  const handleCopyUrl = async () => {
+    const url = `bareresource.com/join/${company?.subdomain}`;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const validateSubdomain = (subdomain: string): boolean => {
@@ -155,21 +135,28 @@ export const CompanyTab: React.FC = () => {
 
   if (!company) {
     return (
-      <Card className="p-4">
+      <Card className="p-6">
         <p className="text-muted-foreground">No company information available</p>
       </Card>
     );
   }
 
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const locationParts = [company.address, company.city, company.country].filter(Boolean);
+  const locationString = locationParts.length > 0 ? locationParts.join(', ') : null;
+
   if (editing) {
     return (
-      <Card>
-        <CardHeader className="pb-3 pt-4 px-4">
+      <Card className="overflow-hidden">
+        <div className="border-b bg-muted/30 px-6 py-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Edit Company Information</CardTitle>
+            <h3 className="font-semibold">Edit Company Information</h3>
             <div className="flex gap-2">
               <Button onClick={handleCancel} variant="ghost" size="sm" disabled={saving}>
-                <X className="h-4 w-4" />
+                Cancel
               </Button>
               <Button onClick={handleSave} size="sm" disabled={saving}>
                 <Save className="h-4 w-4 mr-1.5" />
@@ -177,148 +164,206 @@ export const CompanyTab: React.FC = () => {
               </Button>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="px-4 pb-4 pt-0 space-y-4">
-          <Alert className="py-2">
+        </div>
+        <div className="p-6 space-y-5">
+          <Alert variant="default" className="bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="text-xs">
-              Changing the URL identifier will affect your company's URL.
+            <AlertDescription>
+              Changing the URL identifier will affect your company's invite links.
             </AlertDescription>
           </Alert>
 
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-xs">Company Name *</Label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="name">Company Name <span className="text-destructive">*</span></Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Enter company name"
-                className="h-9"
+                placeholder="Acme Inc."
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="subdomain" className="text-xs">URL Identifier *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="subdomain">URL Identifier <span className="text-destructive">*</span></Label>
               <Input
                 id="subdomain"
                 value={formData.subdomain}
                 onChange={(e) => setFormData({ ...formData, subdomain: e.target.value.toLowerCase() })}
-                placeholder="yourcompany"
-                className="h-9"
+                placeholder="acme-inc"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="industry" className="text-xs">Industry</Label>
+            <div className="space-y-2">
+              <Label htmlFor="industry">Industry</Label>
               <Input
                 id="industry"
                 value={formData.industry}
                 onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                placeholder="e.g., Architecture"
-                className="h-9"
+                placeholder="Architecture & Design"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="size" className="text-xs">Company Size</Label>
+            <div className="space-y-2">
+              <Label htmlFor="size">Team Size</Label>
               <Input
                 id="size"
                 value={formData.size}
                 onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                placeholder="e.g., 10-50"
-                className="h-9"
+                placeholder="50-100 employees"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="address" className="text-xs">Address</Label>
+            <div className="space-y-2">
+              <Label htmlFor="address">Street Address</Label>
               <Input
                 id="address"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Street address"
-                className="h-9"
+                placeholder="123 Main Street"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="city" className="text-xs">City</Label>
+            <div className="space-y-2">
+              <Label htmlFor="city">City</Label>
               <Input
                 id="city"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                placeholder="City"
-                className="h-9"
+                placeholder="Singapore"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="country" className="text-xs">Country</Label>
+            <div className="space-y-2">
+              <Label htmlFor="country">Country</Label>
               <Input
                 id="country"
                 value={formData.country}
                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                placeholder="Country"
-                className="h-9"
+                placeholder="Singapore"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="website" className="text-xs">Website</Label>
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
               <Input
                 id="website"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                placeholder="https://example.com"
+                placeholder="https://acme.com"
                 type="url"
-                className="h-9"
               />
             </div>
           </div>
-        </CardContent>
+        </div>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3 pt-4 px-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-base">Company Information</CardTitle>
-            <CardDescription className="text-xs">Manage your company details</CardDescription>
+    <Card className="overflow-hidden">
+      {/* Header with gradient accent */}
+      <div className="h-2 bg-gradient-to-r from-primary via-primary/80 to-primary/60" />
+      
+      <div className="p-6">
+        {/* Top section: Logo + Name + Edit */}
+        <div className="flex items-start justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16 rounded-xl border-2 border-border shadow-sm">
+              {company.logo_url ? (
+                <AvatarImage src={company.logo_url} alt={company.name} />
+              ) : null}
+              <AvatarFallback className="rounded-xl bg-primary/10 text-primary text-lg font-bold">
+                {getInitials(company.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h2 className="text-xl font-bold text-foreground">{company.name}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                {company.industry && (
+                  <Badge variant="secondary" className="text-xs font-normal">
+                    {company.industry}
+                  </Badge>
+                )}
+                {company.size && (
+                  <Badge variant="outline" className="text-xs font-normal">
+                    {company.size}
+                  </Badge>
+                )}
+              </div>
+            </div>
           </div>
-          <Button onClick={handleEdit} variant="outline" size="sm" className="h-8">
+          <Button onClick={handleEdit} variant="outline" size="sm">
             <Pencil className="h-3.5 w-3.5 mr-1.5" />
             Edit
           </Button>
         </div>
-      </CardHeader>
-      <CardContent className="px-4 pb-4 pt-0">
-        <div className="grid gap-x-6 gap-y-3 grid-cols-2 md:grid-cols-4">
-          <div>
-            <p className="text-xs text-muted-foreground mb-0.5">Company Name</p>
-            <p className="text-sm font-semibold text-foreground">{company.name}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground mb-0.5">URL</p>
+
+        {/* Info Grid */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {/* URL Card */}
+          <div className="rounded-lg border bg-muted/30 p-4">
+            <div className="flex items-center gap-2 text-muted-foreground mb-2">
+              <Building2 className="h-4 w-4" />
+              <span className="text-xs font-medium uppercase tracking-wide">Company URL</span>
+            </div>
             <a
               href={`https://bareresource.com/${company.subdomain}/dashboard`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1"
+              className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1"
             >
-              /{company.subdomain}
+              bareresource.com/{company.subdomain}
               <ExternalLink className="h-3 w-3" />
             </a>
           </div>
-          <InfoField label="Industry" value={company.industry} />
-          <InfoField label="Size" value={company.size} />
-          <InfoField label="Address" value={company.address} />
-          <InfoField label="City" value={company.city} />
-          <InfoField label="Country" value={company.country} />
-          <InfoField 
-            label="Website" 
-            value={company.website} 
-            isLink={!!company.website}
-            linkHref={company.website || undefined}
-          />
+
+          {/* Invite Link Card */}
+          <div className="rounded-lg border bg-muted/30 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Team Invite Link</span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-2 text-xs"
+                onClick={handleCopyUrl}
+              >
+                {copied ? (
+                  <><Check className="h-3 w-3 mr-1" /> Copied</>
+                ) : (
+                  <><Copy className="h-3 w-3 mr-1" /> Copy</>
+                )}
+              </Button>
+            </div>
+            <p className="text-sm font-medium text-foreground font-mono">
+              /join/{company.subdomain}
+            </p>
+          </div>
+
+          {/* Location Card */}
+          <div className="rounded-lg border bg-muted/30 p-4 sm:col-span-2 lg:col-span-1">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
+              Location
+            </div>
+            {locationString ? (
+              <p className="text-sm font-medium text-foreground">{locationString}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground/60 italic">No location set</p>
+            )}
+          </div>
         </div>
-      </CardContent>
+
+        {/* Website - only show if set */}
+        {company.website && (
+          <div className="mt-4 pt-4 border-t">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Website</span>
+              <a
+                href={company.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+              >
+                {company.website.replace(/^https?:\/\//, '')}
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
     </Card>
   );
 };
