@@ -242,27 +242,6 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         </Popover>
       </TableCell>
       
-      {/* Leave Badge Cells + editable Other - 150px fixed */}
-      <TableCell 
-        className="text-center border-r border-gray-200 px-0.5 py-0.5 bg-gradient-to-r from-yellow-50 to-orange-50 leave-column" 
-        style={{ width: 33, minWidth: 33, maxWidth: 33 }}
-      >
-        <MultiLeaveBadgeCell
-          annualLeave={annualLeave}
-          holidayHours={holidayHours}
-          otherLeave={otherLeave}
-          remarks={remarks}
-          leaveDays={leaveDays}
-          className="px-0.5 py-0.5"
-          editableOther={true}
-          onOtherLeaveChange={async (value: number) => {
-            if (updateOtherLeave) {
-              await updateOtherLeave(member.id, value);
-            }
-          }}
-          compact
-        />
-      </TableCell>
 
       {/* Project Count - 35px fixed */}
       <TableCell 

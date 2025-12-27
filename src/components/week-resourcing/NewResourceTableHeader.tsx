@@ -27,9 +27,6 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           <TableHead className="text-center font-bold text-foreground border-r border-border px-3 py-3">
             Weekly Capacity Utilization
           </TableHead>
-          <TableHead className="text-center font-bold text-foreground border-r border-border px-3 py-3">
-            Leave Status
-          </TableHead>
           {projects.map((project) => (
             <TableHead
               key={project.id}
@@ -84,18 +81,6 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </div>
         </TableHead>
         
-        {/* Leave Status - 33px fixed */}
-        <TableHead 
-          className="text-center font-bold border-r border-border px-1 py-2 leave-column"
-          style={{ width: 33, minWidth: 33, maxWidth: 33, backgroundColor: '#6465F0', color: 'white', height: '100px' }}
-        >
-          <div className="text-xs leading-tight h-full flex items-center justify-center">
-            <div>
-              <div>Leave</div>
-              <div>Status</div>
-            </div>
-          </div>
-        </TableHead>
 
         {/* Project Count - 33px fixed with rotated text */}
         <TableHead 
@@ -112,7 +97,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
               whiteSpace: 'nowrap'
             }}
           >
-            No. of Projects
+            Projects
           </div>
         </TableHead>
         
