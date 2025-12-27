@@ -5,7 +5,6 @@ export interface Resource {
   role: string;
   allocations?: Record<string, number>;
   isPending?: boolean;
-  isRole?: boolean;
   avatar_url?: string;
   first_name?: string;
   last_name?: string;

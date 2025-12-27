@@ -9,7 +9,7 @@ import { formatDateKey } from './utils';
 interface UseDateRangeAllocationsProps {
   projectId: string;
   resourceId: string;
-  resourceType: 'active' | 'pre_registered' | 'role';
+  resourceType: 'active' | 'pre_registered';
   selectedDate: Date; // This could be a month start date or specific date
   periodToShow?: number; // Number of weeks to show, default to month-based
 }

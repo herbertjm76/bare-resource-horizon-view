@@ -1,7 +1,6 @@
 
 import React, { useRef, useCallback, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Briefcase } from 'lucide-react';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
@@ -62,7 +61,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   } = useAllocationInput({
     projectId: project.id,
     resourceId: resource.id,
-    resourceType: resource.isRole ? 'role' : (resource.isPending ? 'pre_registered' : 'active'),
+    resourceType: resource.isPending ? 'pre_registered' : 'active',
     selectedDate,
     periodToShow,
     onAllocationChange: (resourceId, weekKey, hours) => {
@@ -149,18 +148,12 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
       >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
-              {resource.isRole ? (
-                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 border-2 border-primary">
-                  <Briefcase className="h-3 w-3 text-primary" />
-                </div>
-              ) : (
-                <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgb(111, 75, 246)' }}>
-                  <AvatarImage src={resource.avatar_url} alt={displayName} />
-                  <AvatarFallback className="bg-gradient-modern text-white">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              )}
+              <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgb(111, 75, 246)' }}>
+                <AvatarImage src={resource.avatar_url} alt={displayName} />
+                <AvatarFallback className="bg-gradient-modern text-white">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
               <div style={{ flex: '1', minWidth: '0' }}>
                 <span style={{ 
                   fontSize: '13px',

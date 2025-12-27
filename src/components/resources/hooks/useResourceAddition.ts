@@ -13,8 +13,7 @@ export const useResourceAddition = (
     staffId: string; 
     name: string; 
     role?: string; 
-    isPending?: boolean;
-    isRole?: boolean;
+    isPending?: boolean 
   }) => {
     console.log('Adding resource to database:', resource);
     
@@ -24,22 +23,8 @@ export const useResourceAddition = (
     }
 
     try {
-      if (resource.isRole) {
-        // Insert a placeholder allocation for role-based resource
-        // This creates an entry that will be picked up by useFetchResources
-        const { error } = await supabase
-          .from('project_resource_allocations')
-          .insert({
-            project_id: projectId,
-            resource_id: resource.staffId,
-            resource_type: 'role',
-            allocation_date: new Date().toISOString().split('T')[0],
-            hours: 0,
-            company_id: companyId
-          });
-
-        if (error) throw error;
-      } else if (resource.isPending) {
+      // Save to database based on whether it's pending or active
+      if (resource.isPending) {
         // Insert into pending_resources for pre-registered members
         const { error } = await supabase
           .from('pending_resources')
@@ -71,8 +56,7 @@ export const useResourceAddition = (
         name: resource.name,
         role: resource.role || 'Team Member',
         allocations: {},
-        isPending: resource.isPending,
-        isRole: resource.isRole
+        isPending: resource.isPending
       };
       
       setResources([...resources, newResource]);

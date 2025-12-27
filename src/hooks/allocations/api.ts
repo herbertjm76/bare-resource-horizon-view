@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 export const fetchResourceAllocations = async (
   projectId: string,
   resourceId: string, 
-  resourceType: 'active' | 'pre_registered' | 'role',
+  resourceType: 'active' | 'pre_registered',
   companyId: string,
   dateRange?: { startDate: string; endDate: string }
 ): Promise<Record<string, number>> => {
@@ -58,7 +58,7 @@ export const fetchResourceAllocations = async (
 export const saveResourceAllocation = async (
   projectId: string,
   resourceId: string,
-  resourceType: 'active' | 'pre_registered' | 'role',
+  resourceType: 'active' | 'pre_registered',
   weekKey: string,
   hours: number,
   companyId: string
@@ -124,7 +124,7 @@ export const saveResourceAllocation = async (
 export const deleteResourceAllocation = async (
   projectId: string,
   resourceId: string,
-  resourceType: 'active' | 'pre_registered' | 'role',
+  resourceType: 'active' | 'pre_registered',
   weekKey: string,
   companyId: string
 ): Promise<boolean> => {

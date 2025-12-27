@@ -6,7 +6,7 @@ import { useResourceAllocationsDB, useDateRangeAllocations } from '@/hooks/alloc
 interface UseAllocationInputProps {
   projectId: string;
   resourceId: string;
-  resourceType: 'active' | 'pre_registered' | 'role';
+  resourceType: 'active' | 'pre_registered';
   onAllocationChange: (resourceId: string, weekKey: string, hours: number) => void;
   selectedDate?: Date;
   periodToShow?: number;
