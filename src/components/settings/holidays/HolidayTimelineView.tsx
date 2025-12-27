@@ -41,11 +41,11 @@ export const HolidayTimelineView: React.FC<HolidayTimelineViewProps> = ({
     );
   };
 
-  const getOfficeNames = (officeIds: string[]) => {
+  const getOfficeCodes = (officeIds: string[]) => {
     return officeIds
       .map(id => {
         const location = locations.find(loc => loc.id === id);
-        return location ? `${location.emoji} ${location.city}` : id;
+        return location ? location.code : id;
       })
       .join(", ");
   };
@@ -149,7 +149,7 @@ export const HolidayTimelineView: React.FC<HolidayTimelineViewProps> = ({
                             </span>
                             {holiday.offices && holiday.offices.length > 0 && (
                               <div className="text-xs text-muted-foreground truncate mt-1">
-                                {getOfficeNames(holiday.offices)}
+                                {getOfficeCodes(holiday.offices)}
                               </div>
                             )}
                           </div>
