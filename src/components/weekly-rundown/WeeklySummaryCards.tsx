@@ -17,6 +17,7 @@ import { CardVisibility, CardOrder } from '@/hooks/useCardVisibility';
 import { Settings, Plus } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ManageCustomCardsDialog } from './ManageCustomCardsDialog';
+import { useSwipeable } from 'react-swipeable';
 import './css/weekly-cards-scroll.css';
 
 interface WeeklySummaryCardsProps {
@@ -354,6 +355,20 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     localStorage.setItem('weekly-summary-collapsed', String(newState));
   };
 
+  // Swipe handlers for mobile carousel
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (canGoNext) goToNext();
+    },
+    onSwipedRight: () => {
+      if (canGoPrev) goToPrev();
+    },
+    trackMouse: false,
+    trackTouch: true,
+    preventScrollOnSwipe: true,
+    delta: 30,
+  });
+
   return (
     <div className="mb-0 space-y-0">
       <div className="relative px-1.5 sm:px-2 py-2 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-visible weekly-cards-container transition-all duration-300">
@@ -371,53 +386,53 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         {!isCollapsed && (
           <>
         {/* Mobile Carousel - Only on small screens */}
-        <div className="block sm:hidden relative">
-        {/* Card Indicator Dots - Top */}
-        {cards.length > 1 && (
-          <div className="flex justify-center items-center gap-2 mb-3">
-            {cards.map((card, index) => (
-              <button
-                key={card.id}
-                onClick={() => goToCard(index)}
-                className={`rounded-full transition-all duration-300 ${
-                  index === currentCardIndex 
-                    ? 'bg-primary w-3 h-3' 
-                    : 'bg-muted-foreground/30 w-2 h-2 hover:bg-muted-foreground/60'
-                }`}
-                aria-label={`Go to ${getCardLabel(card.id)}`}
-              />
-            ))}
-          </div>
-        )}
+        <div className="block sm:hidden relative" {...swipeHandlers}>
+          {/* Card Indicator Dots - Top */}
+          {cards.length > 1 && (
+            <div className="flex justify-center items-center gap-2 mb-3">
+              {cards.map((card, index) => (
+                <button
+                  key={card.id}
+                  onClick={() => goToCard(index)}
+                  className={`rounded-full transition-all duration-300 ${
+                    index === currentCardIndex 
+                      ? 'bg-primary w-3 h-3' 
+                      : 'bg-muted-foreground/30 w-2 h-2 hover:bg-muted-foreground/60'
+                  }`}
+                  aria-label={`Go to ${getCardLabel(card.id)}`}
+                />
+              ))}
+            </div>
+          )}
 
-        {/* Navigation Arrows */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-background/90 backdrop-blur-sm shadow-lg hover:scale-110 transition-all disabled:opacity-30"
-          onClick={goToPrev}
-          disabled={!canGoPrev}
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-        
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-background/90 backdrop-blur-sm shadow-lg hover:scale-110 transition-all disabled:opacity-30"
-          onClick={goToNext}
-          disabled={!canGoNext}
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
+          {/* Navigation Arrows */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-background/90 backdrop-blur-sm shadow-lg hover:scale-110 transition-all disabled:opacity-30"
+            onClick={goToPrev}
+            disabled={!canGoPrev}
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-background/90 backdrop-blur-sm shadow-lg hover:scale-110 transition-all disabled:opacity-30"
+            onClick={goToNext}
+            disabled={!canGoNext}
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
 
-        {/* Card Display */}
-        <div className="px-12 py-0.5">
-          <div className="relative h-[120px] animate-fade-in" key={currentCard?.id}>
-            {currentCard?.component}
+          {/* Card Display - Swipeable */}
+          <div className="px-12 py-0.5 touch-pan-y">
+            <div className="relative h-[120px] animate-fade-in" key={currentCard?.id}>
+              {currentCard?.component}
+            </div>
           </div>
         </div>
-      </div>
 
         {/* Desktop/Tablet Horizontal Row with Arrow Navigation */}
         <div className="hidden sm:block relative pb-4">
