@@ -76,14 +76,9 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                 Total Utilization (1 week)
               </TableHead>
               
-              {/* Leave Column */}
-              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 150, minWidth: 150, background: 'hsl(var(--gradient-start))' }}>
-                Leave
-              </TableHead>
-              
               {/* Project Count Column */}
               <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 35, minWidth: 35, background: 'hsl(var(--gradient-start))' }}>
-                Count
+                Projects
               </TableHead>
               
               {/* Project Columns with Rotated Text - Only show projects with hours */}
