@@ -1,13 +1,49 @@
 import React, { useState } from 'react';
 import { useCompany } from '@/context/CompanyContext';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Pencil, Save, X, AlertCircle, ExternalLink } from 'lucide-react';
+import { Pencil, Save, X, AlertCircle, ExternalLink, Building2, MapPin, Globe, Users } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
+
+interface InfoFieldProps {
+  label: string;
+  value: string | null | undefined;
+  isLink?: boolean;
+  linkHref?: string;
+  icon?: React.ReactNode;
+}
+
+const InfoField: React.FC<InfoFieldProps> = ({ label, value, isLink, linkHref, icon }) => (
+  <div className="space-y-1.5">
+    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+    {value ? (
+      isLink && linkHref ? (
+        <a
+          href={linkHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1.5"
+        >
+          {icon}
+          {value}
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      ) : (
+        <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
+          {icon}
+          {value}
+        </p>
+      )
+    ) : (
+      <p className="text-sm text-muted-foreground/60 italic">Not set</p>
+    )}
+  </div>
+);
 
 export const CompanyTab: React.FC = () => {
   const { company, refreshCompany } = useCompany();
@@ -75,10 +111,8 @@ export const CompanyTab: React.FC = () => {
     setSaving(true);
 
     try {
-      // Check if subdomain is changing
       const subdomainChanged = formData.subdomain !== company.subdomain;
 
-      // If subdomain is changing, check if it's available
       if (subdomainChanged) {
         const { data: existingCompany } = await supabase
           .from('companies')
@@ -133,22 +167,15 @@ export const CompanyTab: React.FC = () => {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-lg font-semibold">Company Information</h3>
-            <p className="text-sm text-muted-foreground">
-              Manage your company details and URL identifier
-            </p>
-          </div>
-          {!editing ? (
-            <Button onClick={handleEdit} variant="outline" size="sm">
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
-          ) : (
+  if (editing) {
+    return (
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">Edit Company Information</CardTitle>
+              <CardDescription>Update your company details and URL identifier</CardDescription>
+            </div>
             <div className="flex gap-2">
               <Button onClick={handleCancel} variant="outline" size="sm" disabled={saving}>
                 <X className="h-4 w-4 mr-2" />
@@ -156,173 +183,240 @@ export const CompanyTab: React.FC = () => {
               </Button>
               <Button onClick={handleSave} size="sm" disabled={saving}>
                 <Save className="h-4 w-4 mr-2" />
-                {saving ? 'Saving...' : 'Save'}
+                {saving ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>
-          )}
-        </div>
-
-        {editing && (
-          <Alert className="mb-6">
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               Changing the company identifier will affect your company's URL. Make sure to update any bookmarks or shared links.
             </AlertDescription>
           </Alert>
-        )}
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="name">Company Name *</Label>
-            {editing ? (
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Enter company name"
-              />
-            ) : (
-              <p className="text-sm font-medium py-2">{company.name}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="subdomain">Company Identifier (URL Slug) *</Label>
-            {editing ? (
+          {/* Identity Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Building2 className="h-4 w-4" />
+              Identity
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 pl-6">
               <div className="space-y-2">
+                <Label htmlFor="name">Company Name *</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Enter company name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="subdomain">URL Identifier *</Label>
                 <Input
                   id="subdomain"
                   value={formData.subdomain}
                   onChange={(e) => setFormData({ ...formData, subdomain: e.target.value.toLowerCase() })}
                   placeholder="yourcompany"
-                  className="flex-1"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Used in your company URL: bareresource.com/<span className="font-medium">{formData.subdomain || 'yourcompany'}</span>
+                  bareresource.com/<span className="font-medium">{formData.subdomain || 'yourcompany'}</span>
                 </p>
               </div>
-            ) : (
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Business Details Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Users className="h-4 w-4" />
+              Business Details
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 pl-6">
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium py-2">
-                    bareresource.com/{company.subdomain}
-                  </p>
-                  <a
-                    href={`https://bareresource.com/${company.subdomain}/dashboard`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Team members join at: bareresource.com/join/{company.subdomain}
-                </p>
+                <Label htmlFor="industry">Industry</Label>
+                <Input
+                  id="industry"
+                  value={formData.industry}
+                  onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                  placeholder="e.g., Architecture, Engineering"
+                />
               </div>
-            )}
+              <div className="space-y-2">
+                <Label htmlFor="size">Company Size</Label>
+                <Input
+                  id="size"
+                  value={formData.size}
+                  onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                  placeholder="e.g., 10-50, 50-100"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="industry">Industry</Label>
-            {editing ? (
-              <Input
-                id="industry"
-                value={formData.industry}
-                onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                placeholder="e.g., Architecture, Engineering"
-              />
-            ) : (
-              <p className="text-sm py-2">{company.industry || 'Not set'}</p>
-            )}
+          <Separator />
+
+          {/* Location Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <MapPin className="h-4 w-4" />
+              Location
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 pl-6">
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="Enter company address"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  placeholder="Enter city"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                  placeholder="Enter country"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="size">Company Size</Label>
-            {editing ? (
-              <Input
-                id="size"
-                value={formData.size}
-                onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                placeholder="e.g., 10-50, 50-100"
-              />
-            ) : (
-              <p className="text-sm py-2">{company.size || 'Not set'}</p>
-            )}
-          </div>
+          <Separator />
 
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="address">Address</Label>
-            {editing ? (
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Enter company address"
-              />
-            ) : (
-              <p className="text-sm py-2">{company.address || 'Not set'}</p>
-            )}
+          {/* Online Presence Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Globe className="h-4 w-4" />
+              Online Presence
+            </div>
+            <div className="pl-6">
+              <div className="space-y-2 max-w-md">
+                <Label htmlFor="website">Website</Label>
+                <Input
+                  id="website"
+                  value={formData.website}
+                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  placeholder="https://example.com"
+                  type="url"
+                />
+              </div>
+            </div>
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-          <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
-            {editing ? (
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                placeholder="Enter city"
-              />
-            ) : (
-              <p className="text-sm py-2">{company.city || 'Not set'}</p>
-            )}
+  return (
+    <Card>
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg">Company Information</CardTitle>
+            <CardDescription>Your organization's profile and settings</CardDescription>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="country">Country</Label>
-            {editing ? (
-              <Input
-                id="country"
-                value={formData.country}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                placeholder="Enter country"
-              />
-            ) : (
-              <p className="text-sm py-2">{company.country || 'Not set'}</p>
-            )}
+          <Button onClick={handleEdit} variant="outline" size="sm">
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Identity Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Building2 className="h-4 w-4 text-primary" />
+            Identity
           </div>
-
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="website">Website</Label>
-            {editing ? (
-              <Input
-                id="website"
-                value={formData.website}
-                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                placeholder="https://example.com"
-                type="url"
-              />
-            ) : (
-              <p className="text-sm py-2">
-                {company.website ? (
-                  <a
-                    href={company.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    {company.website}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                ) : (
-                  'Not set'
-                )}
+          <div className="grid gap-6 md:grid-cols-2 pl-6 py-3 bg-muted/30 rounded-lg">
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Company Name</p>
+              <p className="text-base font-semibold text-foreground">{company.name}</p>
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Company URL</p>
+              <div className="flex items-center gap-2">
+                <a
+                  href={`https://bareresource.com/${company.subdomain}/dashboard`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1"
+                >
+                  bareresource.com/{company.subdomain}
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Team invite: bareresource.com/join/{company.subdomain}
               </p>
-            )}
+            </div>
           </div>
         </div>
-      </Card>
-    </div>
+
+        <Separator />
+
+        {/* Business Details Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Users className="h-4 w-4 text-primary" />
+            Business Details
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 pl-6">
+            <InfoField label="Industry" value={company.industry} />
+            <InfoField label="Company Size" value={company.size} />
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Location Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <MapPin className="h-4 w-4 text-primary" />
+            Location
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 pl-6">
+            <div className="md:col-span-2">
+              <InfoField label="Address" value={company.address} />
+            </div>
+            <InfoField label="City" value={company.city} />
+            <InfoField label="Country" value={company.country} />
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Online Presence Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Globe className="h-4 w-4 text-primary" />
+            Online Presence
+          </div>
+          <div className="pl-6">
+            <InfoField 
+              label="Website" 
+              value={company.website} 
+              isLink={!!company.website}
+              linkHref={company.website || undefined}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
