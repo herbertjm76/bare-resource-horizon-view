@@ -2,6 +2,10 @@
 import { supabase } from "@/integrations/supabase/client";
 import { HolidayFormValues, Holiday } from "./types";
 import { toast } from "sonner";
+import { format, parseISO } from "date-fns";
+
+const toDbDate = (date: Date) => format(date, "yyyy-MM-dd");
+const fromDbDate = (date: string) => parseISO(date);
 
 export const fetchHolidays = async (companyId: string): Promise<Holiday[]> => {
   if (!companyId) return [];
@@ -19,17 +23,18 @@ export const fetchHolidays = async (companyId: string): Promise<Holiday[]> => {
     }
     
     // Transform the data format
-    const transformedHolidays: Holiday[] = data.map(holiday => ({
+    const transformedHolidays: Holiday[] = data.map((holiday) => ({
       id: holiday.id,
       name: holiday.name,
-      date: new Date(holiday.date),
-      // Safely handle end_date which might not exist in the database schema yet
-      end_date: 'end_date' in holiday && holiday.end_date ? 
-        new Date(String(holiday.end_date)) : undefined,
-      offices: holiday.location_id ? [holiday.location_id] : [], // Handle location_id as offices array
+      date: fromDbDate(String(holiday.date)),
+      end_date:
+        "end_date" in holiday && holiday.end_date
+          ? fromDbDate(String(holiday.end_date))
+          : undefined,
+      offices: holiday.location_id ? [holiday.location_id] : [],
       is_recurring: holiday.is_recurring,
       company_id: holiday.company_id,
-      location_id: holiday.location_id
+      location_id: holiday.location_id,
     }));
     
     console.log("Loaded holidays from database:", transformedHolidays.length);
@@ -46,13 +51,13 @@ export const createHoliday = async (values: HolidayFormValues, companyId: string
     console.log("Creating holiday with values:", values);
     
     // Create a holiday entry for each selected office
-    const holidayInserts = values.offices.map(officeId => ({
+    const holidayInserts = values.offices.map((officeId) => ({
       name: values.name,
-      date: values.date.toISOString().split('T')[0], // Convert Date to YYYY-MM-DD string
-      end_date: values.end_date ? values.end_date.toISOString().split('T')[0] : null, // Include end_date if available
+      date: toDbDate(values.date),
+      end_date: values.end_date ? toDbDate(values.end_date) : null,
       location_id: officeId,
       company_id: companyId,
-      is_recurring: false // Default to non-recurring
+      is_recurring: false, // Default to non-recurring
     }));
     
     const { data, error } = await supabase
@@ -87,57 +92,58 @@ export const createHoliday = async (values: HolidayFormValues, companyId: string
   }
 };
 
-export const updateHoliday = async (id: string, values: HolidayFormValues, originalName: string, originalDate: Date): Promise<boolean> => {
+export const updateHoliday = async (
+  id: string,
+  values: HolidayFormValues,
+  originalName: string,
+  originalDate: Date
+): Promise<boolean> => {
   try {
     console.log("Updating holiday:", id, values, "Original:", originalName, originalDate);
-    
-    // First, get the existing holiday entry to get the company_id
+
     const { data: originalHoliday, error: fetchOriginalError } = await supabase
-      .from('office_holidays')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
+      .from("office_holidays")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
     if (fetchOriginalError) throw fetchOriginalError;
-    
-    // Find all related entries by original name and date (for holidays across multiple offices)
-    const originalDateStr = originalDate.toISOString().split('T')[0];
+    if (!originalHoliday) throw new Error("Holiday not found");
+
+    // Find all related entries by original name + date (for multi-office holidays)
+    const originalDateStr = toDbDate(originalDate);
     const { data: existingHolidays, error: fetchError } = await supabase
-      .from('office_holidays')
-      .select('*')
-      .eq('name', originalName)
-      .eq('date', originalDateStr)
-      .eq('company_id', originalHoliday.company_id);
-    
+      .from("office_holidays")
+      .select("*")
+      .eq("name", originalName)
+      .eq("date", originalDateStr)
+      .eq("company_id", originalHoliday.company_id);
+
     if (fetchError) throw fetchError;
-    
-    // Delete all existing entries for this holiday
-    const existingIds = existingHolidays?.map(h => h.id) || [id];
-    if (existingIds.length > 0) {
-      const { error: deleteError } = await supabase
-        .from('office_holidays')
-        .delete()
-        .in('id', existingIds);
-      
-      if (deleteError) throw deleteError;
-    }
-    
-    // Create new entries for each selected office
-    const holidayInserts = values.offices.map(officeId => ({
+
+    const existingIds = existingHolidays?.map((h) => h.id) || [id];
+    const { error: deleteError } = await supabase
+      .from("office_holidays")
+      .delete()
+      .in("id", existingIds);
+
+    if (deleteError) throw deleteError;
+
+    const holidayInserts = values.offices.map((officeId) => ({
       name: values.name,
-      date: values.date.toISOString().split('T')[0],
-      end_date: values.end_date ? values.end_date.toISOString().split('T')[0] : null,
+      date: toDbDate(values.date),
+      end_date: values.end_date ? toDbDate(values.end_date) : null,
       location_id: officeId,
       company_id: originalHoliday.company_id,
-      is_recurring: false
+      is_recurring: false,
     }));
-    
+
     const { error: insertError } = await supabase
-      .from('office_holidays')
+      .from("office_holidays")
       .insert(holidayInserts);
-      
+
     if (insertError) throw insertError;
-    
+
     toast.success("Holiday updated");
     return true;
   } catch (error) {
