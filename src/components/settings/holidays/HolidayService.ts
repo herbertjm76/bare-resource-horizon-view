@@ -87,22 +87,32 @@ export const createHoliday = async (values: HolidayFormValues, companyId: string
   }
 };
 
-export const updateHoliday = async (id: string, values: HolidayFormValues): Promise<boolean> => {
+export const updateHoliday = async (id: string, values: HolidayFormValues, originalName: string, originalDate: Date): Promise<boolean> => {
   try {
-    console.log("Updating holiday:", id, values);
+    console.log("Updating holiday:", id, values, "Original:", originalName, originalDate);
     
-    // For updates, we need to handle this differently since we're dealing with multiple locations
-    // First, get the existing holiday to find all related entries
+    // First, get the existing holiday entry to get the company_id
+    const { data: originalHoliday, error: fetchOriginalError } = await supabase
+      .from('office_holidays')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (fetchOriginalError) throw fetchOriginalError;
+    
+    // Find all related entries by original name and date (for holidays across multiple offices)
+    const originalDateStr = originalDate.toISOString().split('T')[0];
     const { data: existingHolidays, error: fetchError } = await supabase
       .from('office_holidays')
       .select('*')
-      .eq('name', values.name)
-      .eq('date', values.date.toISOString().split('T')[0]);
+      .eq('name', originalName)
+      .eq('date', originalDateStr)
+      .eq('company_id', originalHoliday.company_id);
     
     if (fetchError) throw fetchError;
     
     // Delete all existing entries for this holiday
-    const existingIds = existingHolidays?.map(h => h.id) || [];
+    const existingIds = existingHolidays?.map(h => h.id) || [id];
     if (existingIds.length > 0) {
       const { error: deleteError } = await supabase
         .from('office_holidays')
@@ -118,7 +128,7 @@ export const updateHoliday = async (id: string, values: HolidayFormValues): Prom
       date: values.date.toISOString().split('T')[0],
       end_date: values.end_date ? values.end_date.toISOString().split('T')[0] : null,
       location_id: officeId,
-      company_id: existingHolidays?.[0]?.company_id,
+      company_id: originalHoliday.company_id,
       is_recurring: false
     }));
     
