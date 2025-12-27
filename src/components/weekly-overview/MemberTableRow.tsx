@@ -71,7 +71,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   });
 
   return (
-    <TableRow className={`${isEven ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}>
+    <TableRow className={`${isEven ? 'bg-background' : 'bg-muted/50'} hover:bg-muted/70`}>
       {/* Member Name */}
       <TableCell className="py-2 px-3">
         <div className="flex items-center gap-2">
@@ -82,8 +82,8 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <span className="text-xs font-medium text-gray-900">{getMemberDisplayName(member)}</span>
-            <span className="text-xs text-gray-500">{getOfficeDisplay(member.location || 'unknown')}</span>
+            <span className="text-xs font-medium text-foreground">{getMemberDisplayName(member)}</span>
+            <span className="text-xs text-muted-foreground">{getOfficeDisplay(member.location || 'unknown')}</span>
           </div>
         </div>
       </TableCell>
@@ -145,7 +145,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
           <span className={`font-medium ${availableHours < 0 ? 'text-red-600 font-bold' : ''}`}>
             {availableHours}h
           </span>
-          <span className="text-gray-500 ml-1">avail</span>
+          <span className="text-muted-foreground ml-1">avail</span>
         </div>
       </TableCell>
 

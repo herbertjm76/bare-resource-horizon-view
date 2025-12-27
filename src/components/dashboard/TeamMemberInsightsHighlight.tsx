@@ -14,7 +14,7 @@ export const TeamMemberInsightsHighlight: React.FC<TeamMemberInsightsHighlightPr
   onSearchChange
 }) => {
   return (
-    <Card className="w-full bg-white border border-gray-200/60 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+    <Card className="w-full bg-card border border-border/60 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
       <CardContent className="p-0">
         <div className="relative">
           {/* Compact Header with gradient background */}
@@ -46,9 +46,9 @@ export const TeamMemberInsightsHighlight: React.FC<TeamMemberInsightsHighlightPr
                 value={searchQuery}
                 onChange={onSearchChange}
                 placeholder="Search by name, department, or role..."
-                className="h-10 text-sm bg-gray-50/80 border-2 border-gray-200/80 focus-within:border-theme-primary focus-within:bg-white focus-within:shadow-md rounded-lg transition-all duration-200"
+                className="h-10 text-sm bg-muted/80 border-2 border-border/80 focus-within:border-theme-primary focus-within:bg-background focus-within:shadow-md rounded-lg transition-all duration-200"
               />
-              <p className="text-xs text-gray-500 mt-2 text-center">
+              <p className="text-xs text-muted-foreground mt-2 text-center">
                 Press Enter to view detailed insights for team members
               </p>
             </div>

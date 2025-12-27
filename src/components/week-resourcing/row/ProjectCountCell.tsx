@@ -11,7 +11,7 @@ export const ProjectCountCell: React.FC<ProjectCountCellProps> = ({ projectCount
     <DisplayPillCell
       value={projectCount}
       label=""
-      pillClassName="bg-gradient-to-br from-gray-100 to-slate-100 border-gray-200 text-gray-700"
+      pillClassName="bg-gradient-to-br from-muted to-slate-100 border-border text-foreground"
     />
   );
 };

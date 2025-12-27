@@ -186,13 +186,13 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
             ) : (
               <div className="space-y-2">
                 {consolidatedAllocationsList.map((allocation, index) => (
-                  <Card key={index} className="hover:bg-gray-50">
+                  <Card key={index} className="hover:bg-muted">
                     <CardContent className="p-3">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <div className="font-medium text-sm">{allocation.projectName}</div>
-                          <div className="text-xs text-gray-500 font-mono">{allocation.projectCode}</div>
-                          <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                          <div className="text-xs text-muted-foreground font-mono">{allocation.projectCode}</div>
+                          <div className="text-xs text-muted-foreground/70 mt-1 flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             Week of {new Date(allocation.weekStartDate).toLocaleDateString()}
                           </div>

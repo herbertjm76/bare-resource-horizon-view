@@ -58,7 +58,7 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
 
   return (
     <div className="space-y-3 max-w-sm">
-      <div className="font-bold text-base text-[#6465F0] border-b border-gray-200 pb-2">
+      <div className="font-bold text-base text-[#6465F0] border-b border-border pb-2">
         {memberName} — Weekly Utilization
       </div>
       
@@ -75,7 +75,7 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
       </div>
 
       {/* Daily Breakdown Header */}
-      <div className="border-t border-gray-200 pt-2">
+      <div className="border-t border-border pt-2">
         <div className="font-semibold text-xs mb-2">Daily Project Hours</div>
         <div className="grid grid-cols-7 gap-1 text-[10px]">
           {weekDays.map((day, index) => {
@@ -83,11 +83,11 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
             const hours = dailyBreakdown.get(date) || 0;
             return (
               <div key={day} className="text-center">
-                <div className="font-medium text-gray-600">{day}</div>
+                <div className="font-medium text-muted-foreground">{day}</div>
                 <div className={`text-center p-1 rounded text-[10px] font-medium ${
                   hours > 0 
                     ? 'bg-blue-100 text-blue-700' 
-                    : 'bg-gray-50 text-gray-400'
+                    : 'bg-muted text-muted-foreground'
                 }`}>
                   {hours > 0 ? formatAllocationValue(hours, capacity, displayPreference) : '—'}
                 </div>
@@ -99,12 +99,12 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
 
       {/* Project Breakdown */}
       {projects.length > 0 && (
-        <div className="border-t border-gray-200 pt-2">
+        <div className="border-t border-border pt-2">
           <div className="font-semibold text-xs mb-2">Project Allocations</div>
           <div className="space-y-1 max-h-32 overflow-y-auto">
             {projects.map(project => (
-              <div key={project.project_id} className="flex justify-between items-center text-xs bg-gray-50 p-1.5 rounded">
-                <span className="text-gray-700 truncate flex-1">
+              <div key={project.project_id} className="flex justify-between items-center text-xs bg-muted p-1.5 rounded">
+                <span className="text-foreground truncate flex-1">
                   {project.project_code}
                 </span>
                 <span className="font-medium text-blue-600 ml-2">
@@ -113,7 +113,7 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
               </div>
             ))}
           </div>
-          <div className="flex justify-between items-center font-medium text-xs mt-2 pt-1 border-t border-gray-200">
+          <div className="flex justify-between items-center font-medium text-xs mt-2 pt-1 border-t border-border">
             <span>Total Projects:</span>
             <span className="text-blue-600">{formatAllocationValue(totalProjectHours, capacity, displayPreference)}</span>
           </div>
@@ -122,7 +122,7 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
 
       {/* Leave Breakdown */}
       {(annualLeave > 0 || holidayHours > 0 || otherLeave > 0) && (
-        <div className="border-t border-gray-200 pt-2">
+        <div className="border-t border-border pt-2">
           <div className="font-semibold text-xs mb-2">Leave Breakdown</div>
           <div className="space-y-1 text-xs">
             {annualLeave > 0 && (
@@ -148,7 +148,7 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
       )}
 
       {/* Strategic Insight */}
-      <div className="border-t border-gray-200 pt-2 text-xs text-gray-600 italic">
+      <div className="border-t border-border pt-2 text-xs text-muted-foreground italic">
         {utilizationPercentage > 100
           ? "⚠️ Overallocation risk! Review project loads or adjust capacity."
           : utilizationPercentage < 60

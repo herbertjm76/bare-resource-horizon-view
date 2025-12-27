@@ -77,7 +77,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   const canEdit = editMode && isAdmin;
 
   return (
-    <tr key={member.id} className={`hover:bg-gray-50 ${canEdit ? 'bg-blue-50/30' : ''}`}>
+    <tr key={member.id} className={`hover:bg-muted ${canEdit ? 'bg-blue-50/30' : ''}`}>
       {canEdit && (
         <td className="px-4 py-3">
           <Checkbox
@@ -136,7 +136,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
               </div>
             ) : (
               <>
-                <div className="font-medium text-gray-900 flex items-center gap-2">
+                <div className="font-medium text-foreground flex items-center gap-2">
                   {`${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed'}
                   {showWarning && (
                     <TooltipProvider>
@@ -151,7 +151,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
                     </TooltipProvider>
                   )}
                 </div>
-                <div className="text-sm text-gray-500 flex items-center gap-1">
+                <div className="text-sm text-muted-foreground flex items-center gap-1">
                   <Mail className="h-3 w-3" />
                   {member.email || <span className="text-amber-600">No email</span>}
                 </div>
