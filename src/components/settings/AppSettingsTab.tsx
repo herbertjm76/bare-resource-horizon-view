@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+
 import { Button } from "@/components/ui/button";
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,7 +17,6 @@ export const AppSettingsTab: React.FC = () => {
     work_week_hours: company?.work_week_hours || 40,
     use_hours_or_percentage: company?.use_hours_or_percentage || 'hours',
     start_of_work_week: company?.start_of_work_week || 'Monday',
-    opt_out_financials: company?.opt_out_financials || false,
     project_display_preference: company?.project_display_preference || 'code',
     allocation_warning_threshold: company?.allocation_warning_threshold || 150,
     allocation_danger_threshold: company?.allocation_danger_threshold || 180,
@@ -31,7 +30,6 @@ export const AppSettingsTab: React.FC = () => {
         work_week_hours: company.work_week_hours || 40,
         use_hours_or_percentage: company.use_hours_or_percentage || 'hours',
         start_of_work_week: company.start_of_work_week || 'Monday',
-        opt_out_financials: company.opt_out_financials || false,
         project_display_preference: company.project_display_preference || 'code',
         allocation_warning_threshold: company.allocation_warning_threshold || 150,
         allocation_danger_threshold: company.allocation_danger_threshold || 180,
@@ -61,7 +59,6 @@ export const AppSettingsTab: React.FC = () => {
           work_week_hours: formData.work_week_hours,
           use_hours_or_percentage: formData.use_hours_or_percentage,
           start_of_work_week: formData.start_of_work_week,
-          opt_out_financials: formData.opt_out_financials,
           project_display_preference: formData.project_display_preference,
           allocation_warning_threshold: formData.allocation_warning_threshold,
           allocation_danger_threshold: formData.allocation_danger_threshold,
@@ -146,21 +143,6 @@ export const AppSettingsTab: React.FC = () => {
           <p className="text-sm text-muted-foreground">
             Select the first day of your work week
           </p>
-        </div>
-
-        {/* Opt Out Financials */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="opt_out_financials">Hide Financial Data</Label>
-            <p className="text-sm text-muted-foreground">
-              Opt out of displaying financial information across the app
-            </p>
-          </div>
-          <Switch
-            id="opt_out_financials"
-            checked={formData.opt_out_financials}
-            onCheckedChange={(checked) => setFormData({ ...formData, opt_out_financials: checked })}
-          />
         </div>
 
         {/* Project Display Preference */}
