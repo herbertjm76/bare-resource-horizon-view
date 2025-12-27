@@ -17,12 +17,19 @@ interface ProjectAllocation {
   hours: number;
 }
 
+interface LeaveAllocation {
+  type: 'leave' | 'holiday';
+  hours: number;
+  label?: string;
+}
+
 interface MemberAvailabilityCardProps {
   avatarUrl?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   allocatedHours: number;
   projectAllocations: ProjectAllocation[];
+  leaveAllocations?: LeaveAllocation[];
   utilization: number;
   threshold?: number;
   memberId: string;
@@ -38,6 +45,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   lastName,
   allocatedHours,
   projectAllocations,
+  leaveAllocations = [],
   utilization,
   threshold = 80,
   memberId,
@@ -51,6 +59,14 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
   
+  // Calculate leave and holiday hours
+  const leaveHours = leaveAllocations
+    .filter(l => l.type === 'leave')
+    .reduce((sum, l) => sum + l.hours, 0);
+  const holidayHours = leaveAllocations
+    .filter(l => l.type === 'holiday')
+    .reduce((sum, l) => sum + l.hours, 0);
+  const projectHours = projectAllocations.reduce((sum, p) => sum + p.hours, 0);
   
   // Calculate progress for the ring based on utilization percentage
   const radius = 20;
@@ -66,8 +82,8 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   };
 
   return (
-    <TooltipProvider>
-      <Tooltip delayDuration={200}>
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
         <TooltipTrigger asChild>
           <div 
             className="flex flex-col items-center transition-all duration-200 hover:scale-105 cursor-pointer"
@@ -117,23 +133,49 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
               {Math.round(utilization)}% utilized • {formatAllocationValue(allocatedHours, effectiveCapacity, displayPreference)} allocated
             </div>
             
-            {projectAllocations.length > 0 ? (
-              <div className="space-y-1.5 pt-1 border-t border-border">
-                <div className="text-xs font-medium text-muted-foreground">Working on:</div>
-                {projectAllocations.map((project) => (
-                  <div key={project.projectId} className="flex justify-between items-center text-xs">
-                    <span className="text-foreground truncate max-w-[140px]">
-                      {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
-                    </span>
-                    <span className="text-muted-foreground font-medium ml-2">{formatAllocationValue(project.hours, effectiveCapacity, displayPreference)}</span>
+            {/* Breakdown section */}
+            <div className="space-y-1.5 pt-1 border-t border-border">
+              {/* Project Hours */}
+              {projectHours > 0 && (
+                <>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-blue-600 font-medium">Projects:</span>
+                    <span className="text-muted-foreground font-medium">{formatAllocationValue(projectHours, effectiveCapacity, displayPreference)}</span>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-xs text-muted-foreground italic pt-1 border-t border-border">
-                No projects assigned this week
-              </div>
-            )}
+                  {projectAllocations.map((project) => (
+                    <div key={project.projectId} className="flex justify-between items-center text-xs pl-2">
+                      <span className="text-foreground truncate max-w-[130px]">
+                        {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
+                      </span>
+                      <span className="text-muted-foreground ml-2">{formatAllocationValue(project.hours, effectiveCapacity, displayPreference)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              
+              {/* Leave Hours */}
+              {leaveHours > 0 && (
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-green-600 font-medium">Leave:</span>
+                  <span className="text-muted-foreground font-medium">{formatAllocationValue(leaveHours, effectiveCapacity, displayPreference)}</span>
+                </div>
+              )}
+              
+              {/* Holiday Hours */}
+              {holidayHours > 0 && (
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-purple-600 font-medium">Holidays:</span>
+                  <span className="text-muted-foreground font-medium">{formatAllocationValue(holidayHours, effectiveCapacity, displayPreference)}</span>
+                </div>
+              )}
+              
+              {/* No allocations message */}
+              {projectHours === 0 && leaveHours === 0 && holidayHours === 0 && (
+                <div className="text-xs text-muted-foreground italic">
+                  No projects assigned this week
+                </div>
+              )}
+            </div>
             
             <div className="text-[10px] text-muted-foreground pt-1 border-t border-border">
               Click to add hours or leave
