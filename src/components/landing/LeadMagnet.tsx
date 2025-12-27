@@ -15,12 +15,12 @@ const LeadMagnet = () => {
                 <FileSpreadsheet className="w-8 h-8 text-white" />
               </div>
               <div className="text-left">
-                <h3 className="text-2xl font-bold text-gray-900">Free Capacity Planner Kit</h3>
-                <p className="text-gray-600">Google Sheet template + 5-step guide</p>
+                <h3 className="text-2xl font-bold text-foreground">Free Capacity Planner Kit</h3>
+                <p className="text-muted-foreground">Google Sheet template + 5-step guide</p>
               </div>
             </div>
             
-            <p className="text-lg text-gray-700 mb-6 max-w-2xl mx-auto">
+            <p className="text-lg text-foreground mb-6 max-w-2xl mx-auto">
               See how the manual way works, then discover how BareResource does it in one click. 
               Auto-email series shows you the faster path.
             </p>

@@ -12,7 +12,7 @@ export const ColumnMappingHeader: React.FC<ColumnMappingHeaderProps> = ({
 }) => {
   return (
     <div className="flex items-center justify-between">
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-muted-foreground">
         Map your Excel columns to project fields. Required fields are marked with an asterisk (*).
       </div>
       <Button

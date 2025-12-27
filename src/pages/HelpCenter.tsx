@@ -105,7 +105,7 @@ const faqData: FAQItem[] = [
 ];
 
 const categories = [
-  { name: "All", icon: Search, color: "bg-gray-100 text-gray-700" },
+  { name: "All", icon: Search, color: "bg-muted text-foreground" },
   { name: "Dashboard & Metrics", icon: BarChart3, color: "bg-blue-100 text-blue-700" },
   { name: "Team Management", icon: Users, color: "bg-green-100 text-green-700" },
   { name: "Resource Planning", icon: Calendar, color: "bg-purple-100 text-purple-700" },
@@ -181,7 +181,7 @@ const HelpCenter = () => {
 
   const getCategoryColor = (categoryName: string) => {
     const category = categories.find(cat => cat.name === categoryName);
-    return category ? category.color : "bg-gray-100 text-gray-700";
+    return category ? category.color : "bg-muted text-foreground";
   };
 
   const supportChannels = [

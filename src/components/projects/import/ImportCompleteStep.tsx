@@ -29,7 +29,7 @@ export const ImportCompleteStep: React.FC<ImportCompleteStepProps> = ({
         }`}>
           Import Complete!
         </div>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Your projects have been processed.
         </p>
         

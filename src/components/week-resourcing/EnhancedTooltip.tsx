@@ -62,7 +62,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
             <div>
               <span className="font-semibold">Annual Leave:</span> {formatAllocationValue(annualLeave, capacity, displayPreference)}, <span className="font-semibold">Holiday:</span> {formatAllocationValue(holidayHours, capacity, displayPreference)}
             </div>
-            <div className="text-gray-500 mt-1">
+            <div className="text-muted-foreground mt-1">
               <span>* Strategic tip:</span> <br />
               {utilizationPercentage && utilizationPercentage > 100
                 ? "Overallocation risk! Review project loads or adjust capacity."
@@ -98,11 +98,11 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
                 <span className="font-semibold">Other Leave:</span> {formatAllocationValue(otherLeaveHours, capacity, displayPreference)}
               </div>
             )}
-            <div className="border-t border-gray-200 pt-1 mt-1">
+            <div className="border-t border-border pt-1 mt-1">
               <span className="font-semibold">Total:</span> {formatAllocationValue(totalUsedHours ?? 0, capacity, displayPreference)}
             </div>
             {!!leaveDays.length && (
-              <div className="mt-2 border-t border-gray-200 pt-2">
+              <div className="mt-2 border-t border-border pt-2">
                 <div className="font-semibold mb-1">Dates Out:</div>
                 {leaveDays.map((day, i) => {
                   const date = new Date(day.date);
@@ -144,7 +144,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
             <div>
               <span className="font-semibold">Status:</span> {projectBreakdown?.isActive ? "Active" : "Inactive"}
             </div>
-            <div className="text-gray-500 mt-1">
+            <div className="text-muted-foreground mt-1">
               <span>* Strategic tip:</span><br />
               {projectBreakdown?.hours && projectBreakdown.hours > 0 && projectBreakdown.isActive
                 ? "Allocation supports active phase delivery."

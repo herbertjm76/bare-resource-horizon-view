@@ -17,9 +17,10 @@ const getStatusIcon = (status: string) => {
     case 'on hold':
       return <AlertCircle className="h-4 w-4 text-orange-500" />;
     case 'planning':
+    case 'planning':
       return <GitBranch className="h-4 w-4 text-purple-500" />;
     default:
-      return <GitBranch className="h-4 w-4 text-gray-500" />;
+      return <GitBranch className="h-4 w-4 text-muted-foreground" />;
   }
 };
 
@@ -34,7 +35,7 @@ const getStatusColor = (status: string) => {
     case 'planning':
       return 'bg-purple-100 text-purple-800 border-purple-200';
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return 'bg-muted text-foreground border-border';
   }
 };
 
@@ -99,12 +100,12 @@ export const ProjectPipelineHealthCard: React.FC<ProjectPipelineHealthCardProps>
 
         <div className="flex-1 space-y-4">
           {/* Health Score */}
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
+          <div className="text-center p-4 bg-muted rounded-lg">
             <div className="text-3xl font-bold mb-1">
               <span className={getHealthColor(healthScore)}>{healthScore}</span>
-              <span className="text-gray-400 text-lg">/100</span>
+              <span className="text-muted-foreground text-lg">/100</span>
             </div>
-            <div className="text-sm text-gray-600">Pipeline Health Score</div>
+            <div className="text-sm text-muted-foreground">Pipeline Health Score</div>
             <div className={`text-xs mt-1 ${getHealthColor(healthScore)}`}>
               {getHealthLabel(healthScore)}
             </div>
@@ -112,11 +113,11 @@ export const ProjectPipelineHealthCard: React.FC<ProjectPipelineHealthCardProps>
 
           {/* Status Distribution */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700">Project Status</h3>
+            <h3 className="text-sm font-semibold text-foreground">Project Status</h3>
             {orderedStatuses.length > 0 ? (
               <div className="space-y-2">
                 {orderedStatuses.map(status => (
-                  <div key={status} className="flex items-center justify-between p-2 bg-white border rounded-lg">
+                  <div key={status} className="flex items-center justify-between p-2 bg-card border rounded-lg">
                     <div className="flex items-center gap-2">
                       {getStatusIcon(status)}
                       <span className="text-sm font-medium">{status}</span>
@@ -131,8 +132,8 @@ export const ProjectPipelineHealthCard: React.FC<ProjectPipelineHealthCardProps>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-4 text-gray-500">
-                <GitBranch className="h-6 w-6 mx-auto mb-2 text-gray-300" />
+              <div className="text-center py-4 text-muted-foreground">
+                <GitBranch className="h-6 w-6 mx-auto mb-2 text-muted-foreground/50" />
                 <p className="text-sm">No projects found</p>
               </div>
             )}
@@ -146,13 +147,13 @@ export const ProjectPipelineHealthCard: React.FC<ProjectPipelineHealthCardProps>
                   <div className="text-lg font-bold text-blue-600">
                     {projectsByStatus['In Progress'] || 0}
                   </div>
-                  <div className="text-xs text-gray-600">Active</div>
+                  <div className="text-xs text-muted-foreground">Active</div>
                 </div>
                 <div className="text-center">
                   <div className="text-lg font-bold text-green-600">
                     {projectsByStatus['Complete'] || 0}
                   </div>
-                  <div className="text-xs text-gray-600">Completed</div>
+                  <div className="text-xs text-muted-foreground">Completed</div>
                 </div>
               </div>
             </div>

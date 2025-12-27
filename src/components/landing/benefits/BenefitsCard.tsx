@@ -32,7 +32,7 @@ export const BenefitsCard = ({
       transformStyle: 'preserve-3d'
     }}
   >
-    <VisualCard className="h-full group-hover:scale-105 group-hover:-rotate-1 p-6 relative overflow-hidden transition-all duration-500 shadow-lg hover:shadow-2xl border border-gray-100 hover:border-purple-200">
+    <VisualCard className="h-full group-hover:scale-105 group-hover:-rotate-1 p-6 relative overflow-hidden transition-all duration-500 shadow-lg hover:shadow-2xl border border-border hover:border-purple-200">
       {/* Background gradient that appears on hover */}
       <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
       
@@ -49,15 +49,15 @@ export const BenefitsCard = ({
           </span>
         </div>
         
-        <h3 className="text-lg font-bold text-gray-900 mb-2 transition-all duration-300 group-hover:text-purple-600">
+        <h3 className="text-lg font-bold text-foreground mb-2 transition-all duration-300 group-hover:text-purple-600">
           {title}
         </h3>
-        <p className="text-gray-600 text-sm mb-4 transition-colors duration-300 group-hover:text-gray-700">
+        <p className="text-muted-foreground text-sm mb-4 transition-colors duration-300 group-hover:text-foreground">
           {description}
         </p>
         
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-3 border-l-2 border-purple-500 transition-all duration-300 group-hover:border-l-4 group-hover:from-purple-100 group-hover:to-blue-100 group-hover:shadow-md">
-          <p className="text-xs font-medium text-gray-700 italic transition-colors duration-300 group-hover:text-gray-800">
+          <p className="text-xs font-medium text-foreground italic transition-colors duration-300 group-hover:text-foreground">
             "{example}"
           </p>
         </div>
