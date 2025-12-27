@@ -75,7 +75,7 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
           >
             {/* Header - fixed height */}
             <div className="flex items-center space-x-3 mb-3">
-              <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+              <div className="p-2 rounded-lg bg-muted text-primary shrink-0">
                 <IconComponent className="h-4 w-4" />
               </div>
               <h3 className="text-xs font-semibold text-muted-foreground truncate tracking-wide uppercase">
