@@ -114,19 +114,21 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
   };
 
   return (
-    <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 min-w-[180px]">
+    <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 min-w-[180px] relative overflow-hidden">
+      {/* Background watermark using emoji or a default icon */}
+      <span className="absolute -right-2 -bottom-2 text-[80px] text-muted-foreground/5 pointer-events-none leading-none">
+        {cardType.icon || '📋'}
+      </span>
+      
       <CardHeader className="flex-shrink-0 pb-2 h-[44px] flex items-start pt-4">
         <CardTitle className="flex items-center justify-between w-full text-xs font-semibold text-foreground uppercase tracking-wide">
-          <span className="flex items-center gap-1.5">
-            {cardType.icon && <span className="text-sm">{cardType.icon}</span>}
-            {cardType.label}
-          </span>
+          <span>{cardType.label}</span>
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
             {entries.length}
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 flex-1 overflow-y-auto scrollbar-grey">
+      <CardContent className="pt-4 flex-1 overflow-y-auto scrollbar-grey relative z-10">
         <div className="flex flex-wrap gap-3">
           {entries.map((entry) => {
             const member = getMemberDetails(entry);
