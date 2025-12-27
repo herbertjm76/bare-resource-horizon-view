@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useCompany } from "@/context/CompanyContext";
 import { HolidayDialog } from "./HolidayDialog";
-import { HolidayYearNavigation } from "./HolidayYearNavigation";
-import { HolidayMonthlyView } from "./HolidayMonthlyView";
+import { HolidayTimelineView } from "./HolidayTimelineView";
 import { fetchHolidays, createHoliday, updateHoliday, deleteHolidays } from "./HolidayService";
 import { Holiday, HolidayFormValues } from "./types";
 
@@ -43,7 +42,6 @@ export const HolidaysTab = () => {
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [currentYear, setCurrentYear] = useState(new Date());
   const { company } = useCompany();
 
   useEffect(() => {
@@ -191,8 +189,8 @@ export const HolidaysTab = () => {
             }}
             disabled={loading || open}
           >
-            <Edit className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:inline">{editMode ? "Done" : "Edit"}</span>
+            <Trash2 className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">{editMode ? "Done" : "Delete"}</span>
           </Button>
           <Button 
             size="sm" 
@@ -207,13 +205,8 @@ export const HolidaysTab = () => {
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
-            Manage office holidays and closures. You can assign holidays to multiple office locations.
+            Manage office holidays and closures. Click on a holiday to edit it.
           </div>
-
-          <HolidayYearNavigation 
-            currentYear={currentYear}
-            onYearChange={setCurrentYear}
-          />
           
           {editMode && selected.length > 0 && (
             <div className="flex items-center gap-2 p-3 bg-muted rounded-lg mb-4">
@@ -232,9 +225,8 @@ export const HolidaysTab = () => {
             </div>
           )}
           
-          <HolidayMonthlyView
+          <HolidayTimelineView
             holidays={consolidatedHolidays}
-            selectedYear={currentYear}
             selected={selected}
             editMode={editMode}
             onEdit={handleEdit}
