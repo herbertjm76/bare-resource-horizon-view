@@ -80,7 +80,7 @@ export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
           <p className="text-sm text-muted-foreground">No leave this week</p>
         ) : (
           <div className="flex flex-wrap gap-3">
-            <TooltipProvider>
+            <TooltipProvider delayDuration={0}>
               {memberIds.map((id) => {
                 const leaveDays = leaveByMember[id];
                 const profile = profiles.find((p: any) => p.id === id);
