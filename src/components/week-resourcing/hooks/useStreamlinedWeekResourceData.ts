@@ -245,8 +245,8 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
     isLoading,
     error,
     allocationMap,
-    getMemberTotal, // Keep original for table
-    getMemberTotalForRundown, // Detailed version for rundown
+    getMemberTotal,
+    getMemberTotalForRundown,
     getProjectCount,
     getWeeklyLeave,
     annualLeaveData,
@@ -269,7 +269,6 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
     otherLeaveData,
     updateOtherLeave
   ]);
-
 
   return result;
 };

@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { startOfWeek, endOfWeek, addDays } from 'date-fns';
+import { addDays, parseISO } from 'date-fns';
 
 interface UseWeekResourceLeaveDataOptions {
   weekStartDate: string;
@@ -24,8 +24,8 @@ export const useWeekResourceLeaveData = ({
         return { annualLeaveData: {}, holidaysData: {} };
       }
 
-      // Calculate week end date
-      const weekStart = new Date(weekStartDate);
+      // Calculate week end date (6 days after start = 7 days total)
+      const weekStart = parseISO(weekStartDate);
       const weekEnd = addDays(weekStart, 6);
       const weekEndString = weekEnd.toISOString().split('T')[0];
 
@@ -42,10 +42,10 @@ export const useWeekResourceLeaveData = ({
         throw annualLeaveError;
       }
 
-      // Fetch office holidays
+      // Fetch ALL office holidays for this week (including location-specific ones)
       const { data: holidaysRaw, error: holidaysError } = await supabase
         .from('office_holidays')
-        .select('date, name, end_date')
+        .select('date, name, end_date, location_id')
         .eq('company_id', company.id)
         .gte('date', weekStartDate)
         .lte('date', weekEndString);
@@ -63,10 +63,19 @@ export const useWeekResourceLeaveData = ({
         annualLeaveData[leave.member_id] += leave.hours || 0;
       });
 
-      // Process holidays data - assuming 8 hours per holiday day for all members
+      // Process holidays data - count unique holiday dates and apply to ALL members
       const holidaysData: Record<string, number> = {};
+      
       if (holidaysRaw && holidaysRaw.length > 0) {
-        const totalHolidayHours = holidaysRaw.length * 8; // 8 hours per holiday
+        // Get unique holiday dates (some holidays might have duplicates)
+        const uniqueHolidayDates = new Set<string>();
+        holidaysRaw.forEach(holiday => {
+          uniqueHolidayDates.add(holiday.date);
+        });
+        
+        const totalHolidayHours = uniqueHolidayDates.size * 8; // 8 hours per unique holiday day
+        
+        // Apply holiday hours to ALL members
         memberIds.forEach(memberId => {
           holidaysData[memberId] = totalHolidayHours;
         });
@@ -78,8 +87,8 @@ export const useWeekResourceLeaveData = ({
       };
     },
     enabled: !!company?.id && memberIds.length > 0 && enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   return {
