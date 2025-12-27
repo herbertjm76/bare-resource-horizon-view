@@ -74,9 +74,18 @@ export const useLocationOperations = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this location?')) return;
+    if (!confirm('Are you sure you want to delete this location? Any associated holidays will also be deleted.')) return;
 
     try {
+      // First delete any associated holidays
+      const { error: holidaysError } = await supabase
+        .from('office_holidays')
+        .delete()
+        .eq('location_id', id);
+
+      if (holidaysError) throw holidaysError;
+
+      // Then delete the location
       const { error } = await supabase
         .from('office_locations')
         .delete()
@@ -94,9 +103,18 @@ export const useLocationOperations = () => {
   const handleBulkDelete = async (selectedLocations: string[]) => {
     if (selectedLocations.length === 0) return;
     
-    if (!confirm(`Are you sure you want to delete ${selectedLocations.length} location(s)?`)) return;
+    if (!confirm(`Are you sure you want to delete ${selectedLocations.length} location(s)? Any associated holidays will also be deleted.`)) return;
 
     try {
+      // First delete any associated holidays
+      const { error: holidaysError } = await supabase
+        .from('office_holidays')
+        .delete()
+        .in('location_id', selectedLocations);
+
+      if (holidaysError) throw holidaysError;
+
+      // Then delete the locations
       const { error } = await supabase
         .from('office_locations')
         .delete()
