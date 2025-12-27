@@ -156,14 +156,28 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
   );
 };
 
-// Memoize with simplified comparison
+// Memoize with comparison that includes the specific member's utilization inputs
 export const ExpandedRowView = memo(ExpandedRowViewComponent, (prevProps, nextProps) => {
-  // Only compare essential props that actually indicate a real change
+  const memberId = nextProps.member.id;
+
+  const membersEqual = prevProps.member.id === nextProps.member.id;
+  const indexEqual = prevProps.memberIndex === nextProps.memberIndex;
+  const projectsEqual = prevProps.projects.length === nextProps.projects.length;
+  const allocationEqual = prevProps.allocationMap.size === nextProps.allocationMap.size;
+  const viewModeEqual = prevProps.viewMode === nextProps.viewMode;
+
+  const annualLeaveEqual = (prevProps.annualLeaveData?.[memberId] || 0) === (nextProps.annualLeaveData?.[memberId] || 0);
+  const holidayEqual = (prevProps.holidaysData?.[memberId] || 0) === (nextProps.holidaysData?.[memberId] || 0);
+  const otherLeaveEqual = (prevProps.otherLeaveData?.[memberId] || 0) === (nextProps.otherLeaveData?.[memberId] || 0);
+
   return (
-    prevProps.member.id === nextProps.member.id &&
-    prevProps.memberIndex === nextProps.memberIndex &&
-    prevProps.projects.length === nextProps.projects.length &&
-    prevProps.allocationMap.size === nextProps.allocationMap.size &&
-    prevProps.viewMode === nextProps.viewMode
+    membersEqual &&
+    indexEqual &&
+    projectsEqual &&
+    allocationEqual &&
+    viewModeEqual &&
+    annualLeaveEqual &&
+    holidayEqual &&
+    otherLeaveEqual
   );
 });
