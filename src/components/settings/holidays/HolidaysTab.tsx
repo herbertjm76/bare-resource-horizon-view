@@ -1,20 +1,21 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useCompany } from "@/context/CompanyContext";
 import { HolidayDialog } from "./HolidayDialog";
 import { HolidayTimelineView } from "./HolidayTimelineView";
 import { fetchHolidays, createHoliday, updateHoliday, deleteHolidays } from "./HolidayService";
 import { Holiday, HolidayFormValues } from "./types";
+import { format } from "date-fns";
 
 // Helper function to consolidate holidays with same name and date
 const consolidateHolidays = (holidays: Holiday[]): Holiday[] => {
   const holidayMap = new Map<string, Holiday>();
   
   holidays.forEach(holiday => {
-    const key = `${holiday.name}-${holiday.date.toISOString().split('T')[0]}`;
+    const key = `${holiday.name}-${format(holiday.date, "yyyy-MM-dd")}`;
     
     if (holidayMap.has(key)) {
       // Merge offices for holidays with same name and date
@@ -74,12 +75,11 @@ export const HolidaysTab = () => {
     // When editing, we need to find all database entries for this holiday
     // and combine their offices into one Holiday object for the form
     const holidayName = holiday.name;
-    const holidayDate = holiday.date.toISOString().split('T')[0];
-    
+    const holidayDate = format(holiday.date, "yyyy-MM-dd");
+
     // Find all holidays with the same name and date (these represent the same holiday across multiple offices)
-    const relatedHolidays = holidays.filter(h => 
-      h.name === holidayName && 
-      h.date.toISOString().split('T')[0] === holidayDate
+    const relatedHolidays = holidays.filter(
+      (h) => h.name === holidayName && format(h.date, "yyyy-MM-dd") === holidayDate
     );
     
     // Combine all office IDs
@@ -100,15 +100,12 @@ export const HolidaysTab = () => {
     if (!selectedHoliday) return;
     
     const holidayName = selectedHoliday.name;
-    const holidayDate = selectedHoliday.date.toISOString().split('T')[0];
-    
+    const holidayDate = format(selectedHoliday.date, "yyyy-MM-dd");
+
     // Find all related holiday IDs in the original holidays array
     const relatedHolidayIds = holidays
-      .filter(h => 
-        h.name === holidayName && 
-        h.date.toISOString().split('T')[0] === holidayDate
-      )
-      .map(h => h.id);
+      .filter((h) => h.name === holidayName && format(h.date, "yyyy-MM-dd") === holidayDate)
+      .map((h) => h.id);
     
     setSelected(prev => {
       const isCurrentlySelected = relatedHolidayIds.every(relatedId => prev.includes(relatedId));
