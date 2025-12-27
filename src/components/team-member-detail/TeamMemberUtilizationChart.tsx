@@ -164,13 +164,13 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
             
             {/* Responsive Sub-stats */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="p-2 sm:p-3 rounded-lg bg-gray-50 border">
-                <div className="text-sm sm:text-lg font-semibold text-gray-800">{days30}%</div>
-                <p className="text-xs text-gray-600">30-Day Avg</p>
+              <div className="p-2 sm:p-3 rounded-lg bg-muted border">
+                <div className="text-sm sm:text-lg font-semibold text-foreground">{days30}%</div>
+                <p className="text-xs text-muted-foreground">30-Day Avg</p>
               </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-gray-50 border">
-                <div className="text-sm sm:text-lg font-semibold text-gray-800">{days90}%</div>
-                <p className="text-xs text-gray-600">90-Day Avg</p>
+              <div className="p-2 sm:p-3 rounded-lg bg-muted border">
+                <div className="text-sm sm:text-lg font-semibold text-foreground">{days90}%</div>
+                <p className="text-xs text-muted-foreground">90-Day Avg</p>
               </div>
             </div>
           </div>

@@ -71,13 +71,13 @@ export const TeamMemberSmartInsights: React.FC<SmartInsightsProps> = ({
         
         <div className="space-y-4 flex-1">
           {[...Array(3)].map((_, index) => (
-            <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
-              <div className="p-1 rounded bg-gray-200 animate-pulse">
+            <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-muted">
+              <div className="p-1 rounded bg-muted-foreground/20 animate-pulse">
                 <div className="h-4 w-4"></div>
               </div>
               <div className="flex-1">
-                <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                <div className="h-4 bg-muted-foreground/20 rounded animate-pulse mb-2"></div>
+                <div className="h-3 bg-muted-foreground/20 rounded animate-pulse w-3/4"></div>
               </div>
             </div>
           ))}
@@ -122,20 +122,20 @@ export const TeamMemberSmartInsights: React.FC<SmartInsightsProps> = ({
             const IconComponent = getInsightIcon(insight.icon, insight.priority);
             
             return (
-              <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
+              <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-muted">
                 <div className={`p-1 rounded ${priorityConfig.bgColor}`}>
                   <IconComponent className="h-4 w-4" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-gray-900">{insight.title}</h4>
+                    <h4 className="font-medium text-foreground">{insight.title}</h4>
                     <Badge className={`${priorityConfig.color} border text-xs`}>
                       {insight.priority}
                     </Badge>
                   </div>
-                  <p className="text-sm text-gray-600">{insight.description}</p>
+                  <p className="text-sm text-muted-foreground">{insight.description}</p>
                   {insight.metric && (
-                    <p className="text-xs text-gray-500 mt-1">{insight.metric}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{insight.metric}</p>
                   )}
                 </div>
               </div>

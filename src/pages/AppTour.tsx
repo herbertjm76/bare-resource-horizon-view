@@ -5,7 +5,7 @@ import Footer from '../components/landing/Footer';
 
 const AppTourPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       <Navbar />
       <div className="py-12">
         <InteractiveAppTour />

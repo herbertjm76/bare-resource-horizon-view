@@ -38,7 +38,7 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
     : resource.name.split(' ').map(n => n.charAt(0)).join('').slice(0, 2);
 
   return (
-    <td className={`project-name-column ${rowBgClass} p-2 group-hover:bg-gray-50`}>
+    <td className={`project-name-column ${rowBgClass} p-2 group-hover:bg-muted`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2 min-w-0 flex-grow">
           <Avatar className="h-6 w-6 flex-shrink-0" style={{ border: '2px solid rgb(111, 75, 246)' }}>
@@ -49,10 +49,10 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
           </Avatar>
           
           <div className="min-w-0 flex-grow">
-            <div className="text-sm font-medium text-gray-900 truncate">
+            <div className="text-sm font-medium text-foreground truncate">
               {displayName}
             </div>
-            <div className="text-xs text-gray-500 truncate">
+            <div className="text-xs text-muted-foreground truncate">
               {resource.role}
               {resource.isPending && <span className="text-amber-600 ml-1">(Pending)</span>}
             </div>

@@ -65,7 +65,7 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
             const role = invite.role;
               
             return (
-              <tr key={invite.id} className="hover:bg-gray-50">
+              <tr key={invite.id} className="hover:bg-muted">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-theme-primary text-white flex items-center justify-center">

@@ -34,40 +34,40 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
   }
 
   return (
-    <TableFooter className="bg-gray-100/80 border-gray-200">
-      <TableRow className="bg-gray-100/80 hover:bg-gray-100 border-gray-200">
+    <TableFooter className="bg-muted/80 border-border">
+      <TableRow className="bg-muted/80 hover:bg-muted border-border">
         {/* Resource Name Column */}
-        <TableCell className="font-medium text-gray-700 bg-gray-100/80 border-r border-gray-200">
+        <TableCell className="font-medium text-foreground bg-muted/80 border-r border-border">
           Total Hours
         </TableCell>
         
         {/* Project Count Column */}
-        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
+        <TableCell className="text-center font-medium text-muted-foreground bg-muted/80 border-r border-border">
           —
         </TableCell>
         
         {/* Capacity Bar Column */}
-        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
+        <TableCell className="text-center font-medium text-muted-foreground bg-muted/80 border-r border-border">
           —
         </TableCell>
         
         {/* Annual Leave Column */}
-        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
+        <TableCell className="text-center font-medium text-muted-foreground bg-muted/80 border-r border-border">
           —
         </TableCell>
         
         {/* Holiday Column */}
-        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
+        <TableCell className="text-center font-medium text-muted-foreground bg-muted/80 border-r border-border">
           —
         </TableCell>
         
         {/* Other Leave Column */}
-        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
+        <TableCell className="text-center font-medium text-muted-foreground bg-muted/80 border-r border-border">
           —
         </TableCell>
         
         {/* Office Location Column */}
-        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
+        <TableCell className="text-center font-medium text-muted-foreground bg-muted/80 border-r border-border">
           —
         </TableCell>
         
@@ -77,7 +77,7 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
             return (
               <TableCell 
                 key={`footer-empty-${project.id}`} 
-                className="text-center font-bold text-lg text-gray-500 bg-gray-100/80 w-[40px] border-r border-gray-200"
+                className="text-center font-bold text-lg text-muted-foreground bg-muted/80 w-[40px] border-r border-border"
               >
                 —
               </TableCell>
@@ -89,7 +89,7 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
           return (
             <TableCell 
               key={`footer-${project.id}`} 
-              className="text-center font-bold text-lg text-gray-700 bg-gray-100/80 w-[40px] border-r border-gray-200"
+              className="text-center font-bold text-lg text-foreground bg-muted/80 w-[40px] border-r border-border"
             >
               {total > 0 ? total : '—'}
             </TableCell>
