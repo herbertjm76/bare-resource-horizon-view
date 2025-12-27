@@ -131,17 +131,6 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
         />
       </TableCell>
       
-      {/* Multiple badge pills per leave type, edit Other */}
-      <MultiLeaveBadgeCell
-        annualLeave={annualLeave}
-        holidayHours={holidayHours}
-        otherLeave={displayedOtherLeave}
-        remarks={remarks}
-        leaveDays={leaveDays}
-        className="px-3 py-3"
-        editableOther={editableOtherLeave}
-        onOtherLeaveChange={handleOtherLeaveChange}
-      />
       
       {/* Project allocation cells */}
       {projects.map((project) => {
