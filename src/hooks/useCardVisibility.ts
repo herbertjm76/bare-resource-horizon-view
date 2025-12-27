@@ -9,6 +9,7 @@ export interface CardVisibility {
   otherLeave: boolean;
   notes: boolean;
   available: boolean;
+  announcements: boolean;
   [key: string]: boolean; // For custom cards: custom_${cardId}
 }
 
@@ -20,6 +21,7 @@ const DEFAULT_VISIBILITY: CardVisibility = {
   otherLeave: true,
   notes: true,
   available: true,
+  announcements: true,
 };
 
 export const useCardVisibility = () => {

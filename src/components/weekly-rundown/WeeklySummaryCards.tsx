@@ -9,6 +9,7 @@ import { HolidaysCard } from './cards/HolidaysCard';
 import { LeaveCard } from './cards/LeaveCard';
 import { OtherLeaveCard } from './cards/OtherLeaveCard';
 import { NotesCard } from './cards/NotesCard';
+import { AnnouncementsCard } from './cards/AnnouncementsCard';
 import { CustomRundownCard } from './cards/CustomRundownCard';
 import { WeekInfoCard } from './cards/WeekInfoCard';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
@@ -168,6 +169,12 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     });
 
     allCards.push({ 
+      id: 'announcements', 
+      component: <AnnouncementsCard key="announcements" weekStartDate={weekStartString} />,
+      isVisible: cardVisibility.announcements !== false // Default to visible
+    });
+
+    allCards.push({ 
       id: 'holidays', 
       component: <HolidaysCard key="holidays" holidays={holidays} />,
       isVisible: cardVisibility.holidays 
@@ -316,6 +323,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   // Get card label for menu
   const getCardLabel = (cardId: string) => {
     if (cardId === 'weekInfo') return 'Week Info';
+    if (cardId === 'announcements') return 'Announcements';
     if (cardId === 'holidays') return 'Holidays';
     if (cardId === 'annualLeave') return 'Annual Leave';
     if (cardId === 'otherLeave') return 'Other Leave';
@@ -477,6 +485,12 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             <DropdownMenuSeparator />
             
             <DropdownMenuCheckboxItem 
+              checked={cardVisibility.announcements !== false} 
+              onCheckedChange={(v) => toggleCard('announcements', v)}
+            >
+              Announcements
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
               checked={cardVisibility.holidays} 
               onCheckedChange={(v) => toggleCard('holidays', v)}
             >
@@ -578,6 +592,12 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             <DropdownMenuLabel>Visible Cards</DropdownMenuLabel>
             <DropdownMenuSeparator />
             
+            <DropdownMenuCheckboxItem 
+              checked={cardVisibility.announcements !== false} 
+              onCheckedChange={(v) => toggleCard('announcements', v)}
+            >
+              Announcements
+            </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem 
               checked={cardVisibility.holidays} 
               onCheckedChange={(v) => toggleCard('holidays', v)}
