@@ -13,7 +13,7 @@ import {
 export function useResourceAllocationsDB(
   projectId: string, 
   resourceId: string, 
-  resourceType: 'active' | 'pre_registered'
+  resourceType: 'active' | 'pre_registered' | 'role'
 ): UseResourceAllocationsReturn {
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);

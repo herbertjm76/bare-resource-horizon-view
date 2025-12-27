@@ -62,6 +62,45 @@ export const useFetchResources = (projectId: string) => {
       console.log('DEBUG useFetchResources - Pre-registered members from pending_resources table:', preRegisteredMembers);
       console.log('DEBUG useFetchResources - Pre-registered members count:', preRegisteredMembers?.length || 0);
       
+      // Fetch role-based allocations for this project
+      const { data: roleAllocations, error: roleError } = await supabase
+        .from('project_resource_allocations')
+        .select('resource_id')
+        .eq('project_id', projectId)
+        .eq('company_id', company.id)
+        .eq('resource_type', 'role');
+
+      if (roleError) {
+        console.error('Error fetching role allocations:', roleError);
+      }
+
+      // Get unique role IDs
+      const roleIds = [...new Set(roleAllocations?.map(a => a.resource_id) || [])];
+      console.log('DEBUG useFetchResources - Role IDs found:', roleIds);
+
+      // Fetch role details from office_roles
+      let roleResources: Resource[] = [];
+      if (roleIds.length > 0) {
+        const { data: roles, error: rolesError } = await supabase
+          .from('office_roles')
+          .select('id, name')
+          .in('id', roleIds);
+
+        if (rolesError) {
+          console.error('Error fetching role details:', rolesError);
+        } else {
+          roleResources = (roles || []).map(role => ({
+            id: role.id,
+            name: role.name,
+            role: role.name,
+            isPending: false,
+            isRole: true
+          }));
+        }
+      }
+
+      console.log('DEBUG useFetchResources - Role resources:', roleResources);
+      
       // Format the results to match our Resource interface
       const activeResources: Resource[] = (activeMembers || []).map(member => {
         const profile = member.profiles as any;
@@ -70,6 +109,7 @@ export const useFetchResources = (projectId: string) => {
           name: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Unnamed',
           role: profile?.job_title || 'Team Member',
           isPending: false,
+          isRole: false,
           avatar_url: profile?.avatar_url,
           first_name: profile?.first_name,
           last_name: profile?.last_name,
@@ -83,12 +123,13 @@ export const useFetchResources = (projectId: string) => {
           name: `${invite?.first_name || ''} ${invite?.last_name || ''}`.trim() || 'Unnamed',
           role: invite?.job_title || 'Team Member',
           isPending: true,
+          isRole: false,
           first_name: invite?.first_name,
           last_name: invite?.last_name,
         };
       });
       
-      // Check for allocations that exist without corresponding resource entries
+      // Check for allocations that exist without corresponding resource entries (excluding roles)
       const { data: orphanedAllocations, error: allocError } = await supabase
         .from('project_resource_allocations')
         .select(`
@@ -97,14 +138,16 @@ export const useFetchResources = (projectId: string) => {
           hours
         `)
         .eq('project_id', projectId)
-        .eq('company_id', company.id);
+        .eq('company_id', company.id)
+        .neq('resource_type', 'role');
 
       console.log('DEBUG useFetchResources - Orphaned allocations:', orphanedAllocations);
 
       // Get unique resource IDs from allocations that aren't in our resource lists
       const existingResourceIds = new Set([
         ...activeResources.map(r => r.id),
-        ...pendingResources.map(r => r.id)
+        ...pendingResources.map(r => r.id),
+        ...roleResources.map(r => r.id)
       ]);
 
       const orphanedResourceIds = new Set();
@@ -131,6 +174,7 @@ export const useFetchResources = (projectId: string) => {
             name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Unnamed',
             role: profile.job_title || 'Team Member',
             isPending: false,
+            isRole: false,
             avatar_url: profile.avatar_url,
             first_name: profile.first_name,
             last_name: profile.last_name,
@@ -154,6 +198,7 @@ export const useFetchResources = (projectId: string) => {
               name: `${invite.first_name || ''} ${invite.last_name || ''}`.trim() || 'Unnamed',
               role: invite.job_title || 'Team Member',
               isPending: true,
+              isRole: false,
               first_name: invite.first_name,
               last_name: invite.last_name,
             });
@@ -164,7 +209,7 @@ export const useFetchResources = (projectId: string) => {
       console.log('DEBUG useFetchResources - Orphaned resources found:', orphanedResources);
 
       // Combine all resources
-      const combinedResources = [...activeResources, ...pendingResources, ...orphanedResources];
+      const combinedResources = [...activeResources, ...pendingResources, ...roleResources, ...orphanedResources];
       
       console.log('DEBUG useFetchResources - Final combined resources for project:', combinedResources);
       console.log('DEBUG useFetchResources - Total resources count:', combinedResources.length);

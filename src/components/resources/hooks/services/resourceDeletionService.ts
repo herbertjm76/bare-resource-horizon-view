@@ -14,18 +14,34 @@ export const deleteResource = async (
     console.log('Deleting resource:', resourceId, 'globalDelete:', globalDelete);
     
     const resourceToDelete = resources.find(r => r.id === resourceId);
-    const resourceType = resourceToDelete?.isPending ? 'pre_registered' : 'active';
+    const isRole = resourceToDelete?.isRole;
+    const resourceType = isRole ? 'role' : (resourceToDelete?.isPending ? 'pre_registered' : 'active');
     
     if (globalDelete) {
       // Global deletion - remove from all projects and clean up all allocations
       console.log('Performing global deletion for resource:', resourceId);
       
-      if (resourceToDelete?.isPending) {
+      if (isRole) {
+        // For roles, just delete all allocations (roles are not stored in separate tables)
+        await supabase
+          .from('project_resource_allocations')
+          .delete()
+          .eq('resource_id', resourceId)
+          .eq('resource_type', 'role')
+          .eq('company_id', companyId);
+      } else if (resourceToDelete?.isPending) {
         // Delete all pre-registered resource entries
         await supabase
           .from('pending_resources')
           .delete()
           .eq('invite_id', resourceId)
+          .eq('company_id', companyId);
+          
+        // Delete ALL allocations for this resource across all projects
+        await supabase
+          .from('project_resource_allocations')
+          .delete()
+          .eq('resource_id', resourceId)
           .eq('company_id', companyId);
       } else {
         // Delete all active resource entries
@@ -34,24 +50,41 @@ export const deleteResource = async (
           .delete()
           .eq('staff_id', resourceId)
           .eq('company_id', companyId);
+          
+        // Delete ALL allocations for this resource across all projects
+        await supabase
+          .from('project_resource_allocations')
+          .delete()
+          .eq('resource_id', resourceId)
+          .eq('company_id', companyId);
       }
-      
-      // Delete ALL allocations for this resource across all projects
-      await supabase
-        .from('project_resource_allocations')
-        .delete()
-        .eq('resource_id', resourceId)
-        .eq('company_id', companyId);
         
       toast.success(`${resourceToDelete?.name} removed from all projects and allocations cleared`);
     } else {
       // Project-specific deletion - only remove from current project
-      if (resourceToDelete?.isPending) {
+      if (isRole) {
+        // For roles, just delete allocations for this project
+        await supabase
+          .from('project_resource_allocations')
+          .delete()
+          .eq('project_id', projectId)
+          .eq('resource_id', resourceId)
+          .eq('resource_type', 'role')
+          .eq('company_id', companyId);
+      } else if (resourceToDelete?.isPending) {
         await supabase
           .from('pending_resources')
           .delete()
           .eq('project_id', projectId)
           .eq('invite_id', resourceId)
+          .eq('company_id', companyId);
+          
+        // Only delete allocations for this specific project
+        await supabase
+          .from('project_resource_allocations')
+          .delete()
+          .eq('project_id', projectId)
+          .eq('resource_id', resourceId)
           .eq('company_id', companyId);
       } else {
         await supabase
@@ -60,15 +93,15 @@ export const deleteResource = async (
           .eq('project_id', projectId)
           .eq('staff_id', resourceId)
           .eq('company_id', companyId);
+          
+        // Only delete allocations for this specific project
+        await supabase
+          .from('project_resource_allocations')
+          .delete()
+          .eq('project_id', projectId)
+          .eq('resource_id', resourceId)
+          .eq('company_id', companyId);
       }
-      
-      // Only delete allocations for this specific project
-      await supabase
-        .from('project_resource_allocations')
-        .delete()
-        .eq('project_id', projectId)
-        .eq('resource_id', resourceId)
-        .eq('company_id', companyId);
         
       toast.success(`${resourceToDelete?.name} removed from this project`);
     }
