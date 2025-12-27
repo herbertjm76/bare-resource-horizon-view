@@ -5,85 +5,135 @@ import { cn } from '@/lib/utils';
 interface CapacityBarProps {
   totalUsedHours: number;
   totalCapacity: number;
+  projectHours?: number;
+  annualLeaveHours?: number;
+  holidayHours?: number;
+  otherLeaveHours?: number;
 }
 
 export const CapacityBar: React.FC<CapacityBarProps> = ({
   totalUsedHours,
-  totalCapacity
+  totalCapacity,
+  projectHours = 0,
+  annualLeaveHours = 0,
+  holidayHours = 0,
+  otherLeaveHours = 0
 }) => {
   // Calculate utilization percentage based on actual used hours vs total capacity
   const utilizationPercentage = totalCapacity > 0 ? (totalUsedHours / totalCapacity) * 100 : 0;
   const utilizationRate = Math.round(utilizationPercentage);
   
-  // Calculate available hours - can be negative if over capacity
-  const availableHours = totalCapacity - totalUsedHours;
-
-  // Get color based on utilization (for bars <= 100%)
-  const getUtilizationColor = () => {
-    if (utilizationRate >= 95) return '#22c55e'; // green - fully utilized
-    if (utilizationRate >= 80) return '#f97316'; // orange - well utilized
-    if (utilizationRate >= 50) return '#3b82f6'; // blue - moderate utilization
-    return '#6b7280'; // gray - low utilization
-  };
-  
-  // For overflow bars (>100%), use green for base and red for overflow
-  const getBaseColorForOverflow = () => '#22c55e'; // green base for full capacity
+  // Calculate segment percentages
+  const projectPercent = totalCapacity > 0 ? (projectHours / totalCapacity) * 100 : 0;
+  const annualLeavePercent = totalCapacity > 0 ? (annualLeaveHours / totalCapacity) * 100 : 0;
+  const holidayPercent = totalCapacity > 0 ? (holidayHours / totalCapacity) * 100 : 0;
+  const otherLeavePercent = totalCapacity > 0 ? (otherLeaveHours / totalCapacity) * 100 : 0;
 
   // Get text color for the percentage based on utilization
   const getPercentageTextColor = () => {
-    if (utilizationRate > 100) return 'text-red-600 font-bold'; // Bold red for over 100%
+    if (utilizationRate > 100) return 'text-red-600 font-bold';
     if (utilizationRate >= 95) return 'text-green-600 font-semibold';
     if (utilizationRate >= 80) return 'text-orange-600 font-semibold';
     if (utilizationRate >= 50) return 'text-blue-600 font-semibold';
-    if (utilizationRate === 0) return 'text-muted-foreground'; // faint for 0%
+    if (utilizationRate === 0) return 'text-muted-foreground';
     return 'text-muted-foreground font-semibold';
   };
 
-  const utilizationColor = getUtilizationColor();
   const percentageTextColor = getPercentageTextColor();
 
-  console.log(`CapacityBar calculation for ${totalCapacity}h weekly capacity:`, {
-    totalCapacity,
-    totalUsedHours,
-    availableHours,
-    utilizationPercentage,
-    utilizationRate
-  });
+  // Colors for each segment
+  const projectColor = '#3b82f6'; // blue for projects
+  const annualLeaveColor = '#f97316'; // orange for annual leave
+  const holidayColor = '#a855f7'; // purple for holidays
+  const otherLeaveColor = '#6b7280'; // gray for other leave
 
   return (
     <div className="flex items-center justify-center w-full">
       <div className="flex-1 flex justify-center items-center gap-1">
-        {/* Horizontal progress bar */}
+        {/* Horizontal progress bar with segments */}
         <div className="relative">
           <div 
-            className="w-12 h-3 rounded border border-border overflow-hidden bg-muted relative"
+            className="w-16 h-3 rounded border border-border overflow-hidden bg-muted relative flex"
           >
             {utilizationPercentage <= 100 ? (
-              /* Single bar for <= 100% */
-              <div 
-                className="h-full transition-all duration-300 rounded"
-                style={{
-                  width: `${utilizationPercentage}%`,
-                  backgroundColor: utilizationColor
-                }} 
-              />
-            ) : (
-              /* Dual-tone bar for > 100%: base (0-100%) + overflow (100%+) in red */
+              /* Segmented bar for <= 100% */
               <>
-                {/* Base capacity bar (0-100%) in green */}
+                {projectPercent > 0 && (
+                  <div 
+                    className="h-full transition-all duration-300"
+                    style={{
+                      width: `${projectPercent}%`,
+                      backgroundColor: projectColor
+                    }} 
+                  />
+                )}
+                {annualLeavePercent > 0 && (
+                  <div 
+                    className="h-full transition-all duration-300"
+                    style={{
+                      width: `${annualLeavePercent}%`,
+                      backgroundColor: annualLeaveColor
+                    }} 
+                  />
+                )}
+                {holidayPercent > 0 && (
+                  <div 
+                    className="h-full transition-all duration-300"
+                    style={{
+                      width: `${holidayPercent}%`,
+                      backgroundColor: holidayColor
+                    }} 
+                  />
+                )}
+                {otherLeavePercent > 0 && (
+                  <div 
+                    className="h-full transition-all duration-300"
+                    style={{
+                      width: `${otherLeavePercent}%`,
+                      backgroundColor: otherLeaveColor
+                    }} 
+                  />
+                )}
+              </>
+            ) : (
+              /* For > 100% - show proportional segments, overflow in red */
+              <>
+                {/* Scale segments to fit in 100% width, then show overflow */}
                 <div 
-                  className="h-full transition-all duration-300 absolute left-0"
+                  className="h-full transition-all duration-300"
                   style={{
-                    width: '100%',
-                    backgroundColor: getBaseColorForOverflow()
+                    width: `${(projectPercent / utilizationPercentage) * 100}%`,
+                    backgroundColor: projectColor
                   }} 
                 />
-                {/* Overflow portion in red */}
                 <div 
-                  className="h-full transition-all duration-300 absolute right-0"
+                  className="h-full transition-all duration-300"
                   style={{
-                    width: `${((utilizationPercentage - 100) / utilizationPercentage) * 100}%`,
-                    backgroundColor: '#ef4444'
+                    width: `${(annualLeavePercent / utilizationPercentage) * 100}%`,
+                    backgroundColor: annualLeaveColor
+                  }} 
+                />
+                <div 
+                  className="h-full transition-all duration-300"
+                  style={{
+                    width: `${(holidayPercent / utilizationPercentage) * 100}%`,
+                    backgroundColor: holidayColor
+                  }} 
+                />
+                <div 
+                  className="h-full transition-all duration-300"
+                  style={{
+                    width: `${(otherLeavePercent / utilizationPercentage) * 100}%`,
+                    backgroundColor: otherLeaveColor
+                  }} 
+                />
+                {/* Red overlay for overflow portion */}
+                <div 
+                  className="h-full transition-all duration-300 absolute right-0 top-0"
+                  style={{
+                    width: `${Math.min(((utilizationPercentage - 100) / utilizationPercentage) * 100, 50)}%`,
+                    backgroundColor: '#ef4444',
+                    opacity: 0.7
                   }} 
                 />
               </>
@@ -91,7 +141,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
           </div>
         </div>
         
-        {/* Percentage text with color coding - smaller size to fit better */}
+        {/* Percentage text with color coding */}
         <span className={cn("text-[9px] font-medium min-w-[20px] text-center", percentageTextColor)}>
           {utilizationRate}%
         </span>

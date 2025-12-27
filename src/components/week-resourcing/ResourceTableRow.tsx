@@ -3,7 +3,6 @@ import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { MemberNameCell } from './row/MemberNameCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
-import { AnnualLeaveCell } from './row/AnnualLeaveCell';
 import { HolidayCell } from './row/HolidayCell';
 import { ManualInputCell } from './row/ManualInputCell';
 import { DisplayPillCell } from './row/DisplayPillCell';
@@ -69,11 +68,10 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       <CapacityBarCell 
         totalUsedHours={totalUsedHours} 
         totalCapacity={weeklyCapacity}
-      />
-      
-      <AnnualLeaveCell 
-        annualLeave={annualLeave}
-        leaveDays={leaveDays}
+        projectHours={totalHours}
+        annualLeaveHours={annualLeave}
+        holidayHours={holidayHours}
+        otherLeaveHours={otherLeave}
       />
       
       <HolidayCell 

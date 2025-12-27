@@ -16,19 +16,46 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
     <TableHeader className="sticky top-0 z-10 bg-[#6465F0] border-b">
       <TableRow className="h-20 bg-[#6465F0] hover:bg-[#6465F0]">
         <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 non-project-column bg-[#6465F0] text-white">Name</TableHead>
-        <TableHead className="w-16 text-center border-r non-project-column bg-[#6465F0] text-white">#</TableHead>
-        
-        <TableHead className="w-32 text-center border-r non-project-column bg-[#6465F0] text-white">Capacity</TableHead>
-        
-        <TableHead className="w-12 text-center border-r non-project-column bg-[#6465F0] text-white">
+        <TableHead className="w-16 text-center border-r non-project-column bg-[#6465F0] text-white">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-pointer">AL</span>
+                <span className="cursor-pointer">Projects</span>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="text-sm font-medium">
-                  Annual Leave hours for this week
+                  Number of projects assigned this week
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </TableHead>
+        
+        <TableHead className="w-36 text-center border-r non-project-column bg-[#6465F0] text-white">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-pointer">Total Utilization</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm space-y-1">
+                  <p className="font-medium">Color Legend:</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#3b82f6' }} />
+                    <span>Project Hours</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#f97316' }} />
+                    <span>Annual Leave</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#a855f7' }} />
+                    <span>Public Holidays</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#6b7280' }} />
+                    <span>Other Leave</span>
+                  </div>
                 </div>
               </TooltipContent>
             </Tooltip>
