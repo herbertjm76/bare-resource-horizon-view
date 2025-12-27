@@ -16,6 +16,21 @@ type OfficeSettings = {
 export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSettings> => {
   console.log("Fetching settings for company:", companyId);
   
+  // Guard against empty/invalid companyId
+  if (!companyId) {
+    console.warn('fetchOfficeSettings called without valid companyId');
+    return {
+      roles: [],
+      locations: [],
+      rates: [],
+      departments: [],
+      practice_areas: [],
+      office_stages: [],
+      project_statuses: [],
+      project_types: []
+    };
+  }
+  
   try {
     // Fetch roles data with timestamps
     const { data: rolesData, error: rolesError } = await supabase
