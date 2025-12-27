@@ -51,7 +51,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
             <TableRow className="bg-muted/30">
               <TableCell 
                 colSpan={5 + projects.length} 
-                className="py-2 px-4 font-medium text-gray-700"
+                className="py-2 px-4 font-medium text-foreground"
               >
                 {getOfficeDisplay(office)} ({officeMembers.length} {officeMembers.length === 1 ? 'member' : 'members'})
               </TableCell>
@@ -72,8 +72,8 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                 return 'bg-red-100 text-red-800 border-red-200';
               };
 
-              return (
-                <TableRow key={member.id} className={`${memberIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50/30 transition-colors`}>
+                return (
+                <TableRow key={member.id} className={`${memberIndex % 2 === 0 ? 'bg-card' : 'bg-muted/50'} hover:bg-blue-50/30 transition-colors`}>
                   {/* Member Name with Avatar */}
                   <TableCell className="sticky left-0 z-10 bg-inherit border-r">
                     <div className="flex items-center gap-2">
@@ -84,10 +84,10 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
-                        <span className="font-medium text-sm text-gray-900">
+                        <span className="font-medium text-sm text-foreground">
                           {member.first_name} {member.last_name}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-muted-foreground">
                           {member.department || 'N/A'}
                         </span>
                       </div>
@@ -107,7 +107,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                           max="40"
                           step="0.5"
                           value={projectHours || ''}
-                          onChange={(e) => {
+                        onChange={(e) => {
                             const newHours = parseFloat(e.target.value) || 0;
                             const updatedProjectAllocations = [...allocation.projectAllocations];
                             const existingIndex = updatedProjectAllocations.findIndex(pa => pa.projectId === project.id);
@@ -128,7 +128,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                             
                             handleInputChange(member.id, 'projectAllocations', updatedProjectAllocations);
                           }}
-                          className="w-full max-w-[60px] px-2 py-1 text-center border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full max-w-[60px] px-2 py-1 text-center border border-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="0"
                         />
                       </TableCell>
@@ -144,7 +144,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
 
                   {/* Capacity */}
                   <TableCell className="text-center p-2">
-                    <div className="inline-flex items-center justify-center px-2 py-1 bg-gray-100 text-gray-700 text-sm font-medium rounded-full min-w-[50px]">
+                    <div className="inline-flex items-center justify-center px-2 py-1 bg-muted text-foreground text-sm font-medium rounded-full min-w-[50px]">
                       {weeklyCapacity}h
                     </div>
                   </TableCell>
@@ -168,7 +168,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                       step="0.5"
                       value={allocation.annualLeave || ''}
                       onChange={(e) => handleInputChange(member.id, 'annualLeave', parseFloat(e.target.value) || 0)}
-                      className="w-full max-w-[60px] px-2 py-1 text-center border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full max-w-[60px] px-2 py-1 text-center border border-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="0"
                     />
                   </TableCell>
@@ -178,7 +178,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                     <textarea
                       value={allocation.remarks || ''}
                       onChange={(e) => handleInputChange(member.id, 'remarks', e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-gray-200 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-2 py-1 text-sm border border-border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Notes..."
                       rows={1}
                     />

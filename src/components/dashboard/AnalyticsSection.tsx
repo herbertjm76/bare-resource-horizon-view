@@ -23,10 +23,10 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
   const hasPMData = mockData.projectsByPM?.length > 0;
   
   const EmptyState = ({ title }: { title: string }) => (
-    <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
+    <div className="flex items-center justify-center h-[140px] text-muted-foreground text-sm">
       <div className="text-center">
-        <div className="w-8 h-8 rounded-full bg-gray-100 mx-auto mb-2 flex items-center justify-center">
-          <span className="text-gray-400 text-xs">📊</span>
+        <div className="w-8 h-8 rounded-full bg-muted mx-auto mb-2 flex items-center justify-center">
+          <span className="text-muted-foreground text-xs">📊</span>
         </div>
         <p>No {title.toLowerCase()} data</p>
       </div>
@@ -48,7 +48,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
       {/* Resource Allocation Distribution Chart */}
       <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-gray-800">Resource Allocation</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Resource Allocation</CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-0">
           {hasResourceData ? (
@@ -67,7 +67,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
       {/* Project Stages Chart */}
       <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-gray-800">Project Stages</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Project Stages</CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-0">
           {hasStageData ? (
@@ -86,7 +86,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
       {/* Project Locations Chart */}
       <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-gray-800">Project Locations</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Project Locations</CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-0">
           {hasLocationData ? (
@@ -105,7 +105,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
       {/* Projects by PM Chart */}
       <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-gray-800">Projects by PM</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Projects by PM</CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-0">
           {hasPMData ? (

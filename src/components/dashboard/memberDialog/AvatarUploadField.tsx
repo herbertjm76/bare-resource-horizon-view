@@ -99,7 +99,7 @@ export const AvatarUploadField: React.FC<AvatarUploadFieldProps> = ({
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-foreground">
         Profile Picture
       </label>
       
@@ -110,7 +110,7 @@ export const AvatarUploadField: React.FC<AvatarUploadFieldProps> = ({
           onClick={triggerFileInput}
           className="relative group cursor-pointer"
         >
-          <Avatar className="h-20 w-20 border-2 border-gray-200 transition-all duration-200 group-hover:border-primary">
+          <Avatar className="h-20 w-20 border-2 border-border transition-all duration-200 group-hover:border-primary">
             <AvatarImage src={previewUrl || undefined} />
             <AvatarFallback className="bg-gradient-modern text-white text-lg font-semibold">
               {getUserInitials()}
@@ -149,7 +149,7 @@ export const AvatarUploadField: React.FC<AvatarUploadFieldProps> = ({
             </Button>
           )}
           
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             JPG, PNG up to 10MB
           </p>
         </div>

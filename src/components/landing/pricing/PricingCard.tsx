@@ -32,7 +32,7 @@ export const PricingCard = ({ plan, index }: PricingCardProps) => (
   >
     {plan.popular && (
       <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2">
+        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-foreground px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2">
           <Star className="w-4 h-4" />
           {plan.badge}
           <Sparkles className="w-4 h-4" />
@@ -52,38 +52,38 @@ export const PricingCard = ({ plan, index }: PricingCardProps) => (
         
         {!plan.popular && (
           <div className="mb-2">
-            <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
+            <span className="inline-block px-2 py-1 bg-muted text-muted-foreground rounded-full text-xs font-semibold">
               {plan.badge}
             </span>
           </div>
         )}
         
         <h3 className={`text-xl font-bold mb-2 ${
-          plan.popular ? 'text-white' : 'text-gray-900'
+          plan.popular ? 'text-white' : 'text-foreground'
         }`}>
           {plan.name}
         </h3>
         
         <div className="mb-3">
           <span className={`text-4xl font-bold ${
-            plan.popular ? 'text-white' : 'text-gray-900'
+            plan.popular ? 'text-white' : 'text-foreground'
           }`}>
             {plan.price}
           </span>
           <span className={`text-lg ml-1 ${
-            plan.popular ? 'text-white/80' : 'text-gray-500'
+            plan.popular ? 'text-white/80' : 'text-muted-foreground'
           }`}>
             /{plan.period}
           </span>
         </div>
         
         <p className={`mb-2 ${
-          plan.popular ? 'text-white/90' : 'text-gray-600'
+          plan.popular ? 'text-white/90' : 'text-muted-foreground'
         }`}>
           {plan.description}
         </p>
         <p className={`text-sm ${
-          plan.popular ? 'text-white/70' : 'text-gray-500'
+          plan.popular ? 'text-white/70' : 'text-muted-foreground'
         }`}>
           {plan.note}
         </p>
@@ -94,7 +94,7 @@ export const PricingCard = ({ plan, index }: PricingCardProps) => (
           <li 
             key={featureIndex} 
             className={`flex items-start gap-3 ${
-              plan.popular ? 'text-white/90' : 'text-gray-600'
+              plan.popular ? 'text-white/90' : 'text-muted-foreground'
             }`}
           >
             <div className={`w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 ${

@@ -61,7 +61,7 @@ export const EnhancedMemberTableRow: React.FC<EnhancedMemberTableRowProps> = ({
     <TableRow className={`member-row ${isEven ? "bg-muted/10" : ""}`}>
       <TableCell className="py-2 px-4 name-column">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-foreground">
             {member.first_name} {member.last_name}
             {member.isPending && <span className="text-muted-foreground text-xs ml-1">(pending)</span>}
           </span>
@@ -119,7 +119,7 @@ export const EnhancedMemberTableRow: React.FC<EnhancedMemberTableRowProps> = ({
       </TableCell>
       
       <TableCell className="py-1 px-1 number-column">
-        <div className="table-cell font-medium text-gray-700">{allocation.publicHoliday}</div>
+        <div className="table-cell font-medium text-foreground">{allocation.publicHoliday}</div>
       </TableCell>
       
       <TableCell className="py-1 px-1 number-column leave-column">
@@ -171,7 +171,7 @@ export const EnhancedMemberTableRow: React.FC<EnhancedMemberTableRowProps> = ({
         <TableCell key={project.id} className="py-1 px-1 project-hours-column">
           <div className="table-cell text-center">
             {projectAllocationsMap[project.id] ? (
-              <span className="font-medium text-gray-800">
+              <span className="font-medium text-foreground">
                 {formatNumber(projectAllocationsMap[project.id])}h
               </span>
             ) : ''}

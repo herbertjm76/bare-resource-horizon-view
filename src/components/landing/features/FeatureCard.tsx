@@ -38,13 +38,13 @@ export const FeatureCard = ({ icon, title, description, highlight, index, isVisi
       </div>
       
       <h3 className={`text-lg font-bold mb-3 transition-all duration-300 ${
-        highlight ? 'text-white' : 'text-gray-900 group-hover:text-purple-600'
+        highlight ? 'text-white' : 'text-foreground group-hover:text-purple-600'
       }`}>
         {title}
       </h3>
       
       <p className={`leading-relaxed text-sm transition-all duration-300 ${
-        highlight ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-700'
+        highlight ? 'text-white/90' : 'text-muted-foreground group-hover:text-foreground'
       }`}>
         {description}
       </p>
