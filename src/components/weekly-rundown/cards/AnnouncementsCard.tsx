@@ -157,10 +157,12 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
   return (
     <>
       <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 relative overflow-hidden">
-        {/* Background watermark icon */}
-        <Megaphone className="absolute -right-4 -bottom-4 h-24 w-24 text-muted-foreground/5 pointer-events-none" />
+        {/* Background watermark icon - left aligned with primary color */}
+        <div className="absolute -left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+          <Megaphone className="h-20 w-20 text-primary/10" />
+        </div>
         
-        <CardHeader className="pb-2 flex-shrink-0 h-[44px] flex items-start pt-3">
+        <CardHeader className="pb-2 flex-shrink-0 h-[44px] flex items-start pt-3 pl-14">
           <div className="flex items-center justify-between w-full">
             <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Announcements</CardTitle>
             <Button
@@ -173,7 +175,7 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10">
+        <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10 pl-14">
           {announcements.length === 0 ? (
             <p className="text-sm text-muted-foreground">No announcements this week</p>
           ) : (
