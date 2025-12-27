@@ -227,14 +227,14 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[80vh]">
+      <DialogContent className="w-[90vw] max-w-[60vw] max-h-[80vh] sm:max-w-[60vw]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {getIcon()}
             {cardLabel}
           </DialogTitle>
         </DialogHeader>
-        <ScrollArea className="max-h-[60vh] pr-4">
+        <ScrollArea className="max-h-[65vh] pr-4">
           {renderContent()}
         </ScrollArea>
       </DialogContent>
