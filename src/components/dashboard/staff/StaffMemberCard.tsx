@@ -33,10 +33,10 @@ export const StaffMemberCard: React.FC<StaffMemberCardProps & { onClick?: () => 
         };
       default:
         return {
-          bg: 'bg-gray-50 hover:bg-gray-100',
-          border: 'border-gray-200',
-          progress: 'bg-gray-500',
-          text: 'text-gray-800'
+          bg: 'bg-muted hover:bg-muted/80',
+          border: 'border-border',
+          progress: 'bg-muted-foreground',
+          text: 'text-foreground'
         };
     }
   };
@@ -69,14 +69,14 @@ export const StaffMemberCard: React.FC<StaffMemberCardProps & { onClick?: () => 
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-center mb-1">
-            <span className="font-medium text-sm text-gray-800 truncate">
+            <span className="font-medium text-sm text-foreground truncate">
               {member.name}
             </span>
             <span className={`text-sm font-semibold ${colors.text}`}>
               {member.availability}%
             </span>
           </div>
-          <div className="w-full h-1.5 bg-gray-200 rounded-full">
+          <div className="w-full h-1.5 bg-muted rounded-full">
             <div 
               className={`h-1.5 rounded-full transition-all duration-300 ${colors.progress}`}
               style={{ width: `${Math.min(member.availability, 100)}%` }}

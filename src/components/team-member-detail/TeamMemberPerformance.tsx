@@ -48,7 +48,7 @@ export const TeamMemberPerformance: React.FC<TeamMemberPerformanceProps> = ({ me
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-muted text-foreground border-border';
     }
   };
 
@@ -74,59 +74,59 @@ export const TeamMemberPerformance: React.FC<TeamMemberPerformanceProps> = ({ me
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-gray-800">Performance Overview</h2>
+      <h2 className="text-2xl font-semibold text-foreground">Performance Overview</h2>
 
       {/* Performance Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="border-2 bg-blue-50 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Overall Rating</CardTitle>
-            <Award className="h-4 w-4 text-gray-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Overall Rating</CardTitle>
+            <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${getRatingColor(performanceData.overallRating)}`}>
               {performanceData.overallRating}/5.0
             </div>
-            <p className="text-xs text-gray-500 mt-1">Current performance level</p>
+            <p className="text-xs text-muted-foreground mt-1">Current performance level</p>
           </CardContent>
         </Card>
 
         <Card className="border-2 bg-green-50 border-green-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">On-Time Delivery</CardTitle>
-            <CheckCircle className="h-4 w-4 text-gray-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">On-Time Delivery</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               {performanceData.onTimeDelivery}%
             </div>
-            <p className="text-xs text-gray-500 mt-1">Project delivery rate</p>
+            <p className="text-xs text-muted-foreground mt-1">Project delivery rate</p>
           </CardContent>
         </Card>
 
         <Card className="border-2 bg-purple-50 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Client Satisfaction</CardTitle>
-            <TrendingUp className="h-4 w-4 text-gray-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Client Satisfaction</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
               {performanceData.clientSatisfaction}/5.0
             </div>
-            <p className="text-xs text-gray-500 mt-1">Average client rating</p>
+            <p className="text-xs text-muted-foreground mt-1">Average client rating</p>
           </CardContent>
         </Card>
 
         <Card className="border-2 bg-yellow-50 border-yellow-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Recent Projects</CardTitle>
-            <Target className="h-4 w-4 text-gray-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Recent Projects</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
               {performanceData.recentProjects}
             </div>
-            <p className="text-xs text-gray-500 mt-1">Projects this quarter</p>
+            <p className="text-xs text-muted-foreground mt-1">Projects this quarter</p>
           </CardContent>
         </Card>
       </div>
@@ -142,12 +142,12 @@ export const TeamMemberPerformance: React.FC<TeamMemberPerformanceProps> = ({ me
         <CardContent className="space-y-4">
           <div className="grid gap-3">
             {performanceData.goals.map((goal, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                 <div className="flex items-center gap-3">
                   {getGoalIcon(goal.status)}
                   <div>
-                    <h4 className="font-medium text-gray-800">{goal.title}</h4>
-                    <p className="text-sm text-gray-600">Due: {new Date(goal.dueDate).toLocaleDateString()}</p>
+                    <h4 className="font-medium text-foreground">{goal.title}</h4>
+                    <p className="text-sm text-muted-foreground">Due: {new Date(goal.dueDate).toLocaleDateString()}</p>
                   </div>
                 </div>
                 <Badge className={`${getGoalStatusColor(goal.status)} border`}>
@@ -173,7 +173,7 @@ export const TeamMemberPerformance: React.FC<TeamMemberPerformanceProps> = ({ me
               {performanceData.strengths.map((strength, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-gray-700">{strength}</span>
+                  <span className="text-sm text-foreground">{strength}</span>
                 </div>
               ))}
             </div>
@@ -192,7 +192,7 @@ export const TeamMemberPerformance: React.FC<TeamMemberPerformanceProps> = ({ me
               {performanceData.areasForImprovement.map((area, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <span className="text-sm text-gray-700">{area}</span>
+                  <span className="text-sm text-foreground">{area}</span>
                 </div>
               ))}
             </div>
@@ -210,12 +210,12 @@ export const TeamMemberPerformance: React.FC<TeamMemberPerformanceProps> = ({ me
         </CardHeader>
         <CardContent className="space-y-4">
           {performanceData.recentFeedback.map((feedback, index) => (
-            <div key={index} className="p-4 bg-gray-50 rounded-lg">
+            <div key={index} className="p-4 bg-muted rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-gray-800">{feedback.source}</span>
-                <span className="text-sm text-gray-500">{new Date(feedback.date).toLocaleDateString()}</span>
+                <span className="font-medium text-foreground">{feedback.source}</span>
+                <span className="text-sm text-muted-foreground">{new Date(feedback.date).toLocaleDateString()}</span>
               </div>
-              <p className="text-gray-700 text-sm italic">"{feedback.feedback}"</p>
+              <p className="text-foreground text-sm italic">"{feedback.feedback}"</p>
             </div>
           ))}
         </CardContent>

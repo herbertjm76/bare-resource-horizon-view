@@ -13,12 +13,12 @@ export const PricingHeader = () => (
         <div className="inline-flex items-center px-3 py-1 bg-green-100 rounded-full text-green-600 font-semibold text-sm mb-1">
           Simple Flat Rate Pricing
         </div>
-        <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
+        <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
           One Price, No Surprises
         </h2>
       </div>
     </div>
-    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
       Predictable pricing that scales with your team. All plans include 14-day free trial.
     </p>
   </AnimatedSection>

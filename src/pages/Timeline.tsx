@@ -22,36 +22,36 @@ const Timeline: React.FC = () => {
             </div>
           </div>
           
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
             Timeline View Coming Soon
           </h2>
           
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             We're building a beautiful visual Gantt chart to help you visualize project timelines, 
             dependencies, and resource allocation across multiple projects at once.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="p-4 bg-card rounded-lg shadow-sm">
               <Calendar className="h-8 w-8 text-indigo-500 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Project Timelines</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-foreground mb-2">Project Timelines</h3>
+              <p className="text-sm text-muted-foreground">
                 Visualize start dates, end dates, and milestones
               </p>
             </div>
             
-            <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="p-4 bg-card rounded-lg shadow-sm">
               <GanttChartSquare className="h-8 w-8 text-indigo-500 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Dependencies</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-foreground mb-2">Dependencies</h3>
+              <p className="text-sm text-muted-foreground">
                 Track task dependencies and critical paths
               </p>
             </div>
             
-            <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="p-4 bg-card rounded-lg shadow-sm">
               <Sparkles className="h-8 w-8 text-indigo-500 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Drag & Drop</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-foreground mb-2">Drag & Drop</h3>
+              <p className="text-sm text-muted-foreground">
                 Easily adjust timelines with intuitive controls
               </p>
             </div>
