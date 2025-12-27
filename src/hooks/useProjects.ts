@@ -11,25 +11,32 @@ type Project = Database['public']['Tables']['projects']['Row'];
 export type ProjectSortBy = 'name' | 'code' | 'status' | 'created';
 
 export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'asc' | 'desc' = 'asc') => {
-  const { company, loading: companyLoading } = useCompany();
+  const { company, loading: companyLoading, error: companyError } = useCompany();
+
+  // Derive a stable company ID - only consider ready when we have both company and ID
+  const companyId = company?.id;
+  const isCompanyReady = !companyLoading && !!companyId && !companyError;
 
   useEffect(() => {
     console.log('useProjects hook effect triggered', { 
       hasCompany: !!company,
       companyLoading,
-      companyId: company?.id 
+      companyId,
+      isCompanyReady,
+      companyError
     });
-  }, [company, companyLoading]);
+  }, [company, companyLoading, companyId, isCompanyReady, companyError]);
   
   const { data: projects, isLoading, error, refetch } = useQuery({
-    queryKey: ['projects', company?.id, sortBy, sortDirection],
+    queryKey: ['projects', companyId, sortBy, sortDirection],
     queryFn: async () => {
-      if (!company) {
-        console.log('No company available, cannot fetch projects');
+      // Double-check we have a valid company ID before querying
+      if (!companyId) {
+        console.log('No company ID available, cannot fetch projects');
         return [];
       }
       
-      console.log('Fetching projects data for company:', company.id);
+      console.log('Fetching projects data for company:', companyId);
       
       try {
         // Select projects with deterministic ordering based on sortBy parameter
@@ -49,7 +56,7 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
             project_manager:profiles(id, first_name, last_name, avatar_url),
             office:offices(id, name, country)
           `)
-          .eq('company_id', company.id);
+          .eq('company_id', companyId);
 
         // Apply sorting based on sortBy parameter
         const ascending = sortDirection === 'asc';
@@ -89,38 +96,44 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
         throw err;
       }
     },
-    enabled: !!company && !companyLoading,
+    // Only enable when we have a valid company ID and context is not loading
+    enabled: isCompanyReady,
     retry: 2,
     retryDelay: 1000,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    // Keep previous data while refetching to prevent flicker
+    placeholderData: (previousData) => previousData,
   });
 
   console.log('useProjects hook state:', { 
     projectsLength: projects?.length || 0, 
     isLoading, 
     hasError: !!error,
-    companyId: company?.id,
-    companyLoading
+    companyId,
+    companyLoading,
+    isCompanyReady
   });
 
   // This is a debug helper to help track if we're stuck in loading
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || companyLoading) {
       const timeout = setTimeout(() => {
         console.log('useProjects still loading after 5 seconds', {
           companyLoading,
           hasCompany: !!company,
-          enabled: !!company && !companyLoading
+          companyId,
+          isCompanyReady
         });
       }, 5000);
       
       return () => clearTimeout(timeout);
     }
-  }, [isLoading, company, companyLoading]);
+  }, [isLoading, company, companyLoading, companyId, isCompanyReady]);
 
   return {
     projects: projects || [],
-    isLoading: isLoading || companyLoading,
+    // Consider loading if either company context is loading OR query is loading OR company not ready yet
+    isLoading: isLoading || companyLoading || !isCompanyReady,
     error,
     refetch
   };
