@@ -161,7 +161,7 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Megaphone className="h-3.5 w-3.5 text-primary" />
-              <CardTitle className="text-xs font-semibold text-foreground">Announcements</CardTitle>
+              <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Announcements</CardTitle>
             </div>
             <Button
               variant="ghost"
