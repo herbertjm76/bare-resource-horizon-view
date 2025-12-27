@@ -222,6 +222,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (loc.code) locationNameToId.set(loc.code.toLowerCase(), loc.id);
     });
     
+    console.log('🏢 Office Locations mapping:', Object.fromEntries(locationNameToId));
+    console.log('🎄 Holidays data:', holidays);
+    
     // Build holiday hours map by location_id
     const holidayHoursByLocationId = new Map<string | null, number>();
     holidays.forEach(holiday => {
@@ -236,7 +239,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const hours = holidayDays * 8;
       const current = holidayHoursByLocationId.get(locationId) || 0;
       holidayHoursByLocationId.set(locationId, current + hours);
+      console.log(`🎄 Holiday "${holiday.name}" (location_id: ${locationId}): ${holidayDays} days = ${hours}h`);
     });
+    
+    console.log('🎄 Holiday hours by location_id:', Object.fromEntries(holidayHoursByLocationId));
     
     allocations.forEach(alloc => {
       const key = alloc.resource_id;
@@ -288,6 +294,20 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const locationHolidayHours = memberLocationId ? (holidayHoursByLocationId.get(memberLocationId) || 0) : 0;
       const globalHolidayHours = holidayHoursByLocationId.get(null) || 0;
       const memberHolidayHours = locationHolidayHours + globalHolidayHours;
+      
+      // Debug first few members
+      if (allMembersFromParent.indexOf(m) < 3) {
+        console.log(`👤 Member ${m.first_name} ${m.last_name}:`, {
+          location: m.location,
+          memberLocationId,
+          locationHolidayHours,
+          globalHolidayHours,
+          memberHolidayHours,
+          projectHours,
+          leaveHours,
+          totalAllocated: projectHours + leaveHours + memberHolidayHours
+        });
+      }
       
       const allocatedHours = projectHours + leaveHours + memberHolidayHours;
       const availableHours = capacity - allocatedHours;
