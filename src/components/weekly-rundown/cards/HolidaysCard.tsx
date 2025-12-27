@@ -38,10 +38,11 @@ export const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays }) => {
         ) : (
           <div className="space-y-2">
             {uniqueHolidays.map((holiday) => (
-              <div key={holiday.id} className="flex items-center gap-2 text-sm">
+              <div key={holiday.id} className="flex flex-col text-sm">
                 <span className="font-medium text-foreground">{holiday.name}</span>
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  ({format(new Date(holiday.date), 'MMM d')}{holiday.end_date && ` - ${format(new Date(holiday.end_date), 'MMM d')}`})
+                <span className="text-xs text-muted-foreground">
+                  {format(new Date(holiday.date), 'MMM d')}
+                  {holiday.end_date && ` - ${format(new Date(holiday.end_date), 'MMM d')}`}
                 </span>
               </div>
             ))}
