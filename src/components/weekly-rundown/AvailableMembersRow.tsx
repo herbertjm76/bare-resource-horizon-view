@@ -44,6 +44,12 @@ interface ProjectAllocation {
   hours: number;
 }
 
+interface LeaveAllocation {
+  type: 'leave' | 'holiday';
+  hours: number;
+  label?: string;
+}
+
 interface AvailableMember {
   id: string;
   type: 'active' | 'pre_registered';
@@ -59,6 +65,7 @@ interface AvailableMember {
   location?: string;
   sectors: string[];
   projectAllocations: ProjectAllocation[];
+  leaveAllocations: LeaveAllocation[];
 }
 
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
@@ -137,11 +144,69 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     staleTime: 60_000
   });
 
+  // Fetch annual leaves for the week
+  const { data: leaves = [] } = useQuery({
+    queryKey: ['available-leaves', weekStartDate],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return [];
+      
+      const weekStart = new Date(weekStartDate);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      const weekEndDate = weekEnd.toISOString().split('T')[0];
+      
+      const { data, error } = await supabase
+        .from('annual_leaves')
+        .select('member_id, hours, date')
+        .gte('date', weekStartDate)
+        .lte('date', weekEndDate);
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 60_000
+  });
+
+  // Fetch office holidays for the week
+  const { data: holidays = [] } = useQuery({
+    queryKey: ['available-holidays', weekStartDate],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return [];
+      
+      const weekStart = new Date(weekStartDate);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      const weekEndDate = weekEnd.toISOString().split('T')[0];
+      
+      const { data, error } = await supabase
+        .from('office_holidays')
+        .select('id, name, date, end_date, location_id')
+        .or(`and(date.gte.${weekStartDate},date.lte.${weekEndDate}),and(end_date.gte.${weekStartDate},end_date.lte.${weekEndDate})`);
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 60_000
+  });
+
   const availableMembers: AvailableMember[] = React.useMemo(() => {
     // Build allocation maps for utilization calculation
     const allocationMap = new Map<string, number>();
     const memberSectorsMap = new Map<string, Set<string>>();
     const memberProjectsMap = new Map<string, Map<string, { name: string; code: string; hours: number }>>();
+    
+    // Build leave hours map by member
+    const memberLeaveMap = new Map<string, number>();
+    leaves.forEach(leave => {
+      const current = memberLeaveMap.get(leave.member_id) || 0;
+      memberLeaveMap.set(leave.member_id, current + Number(leave.hours));
+    });
+    
+    // Calculate holiday hours (applies to all members based on location - simplified: apply to all for now)
+    const totalHolidayHours = holidays.reduce((sum, holiday) => {
+      // Count 8 hours per holiday day (simplified)
+      return sum + 8;
+    }, 0);
     
     allocations.forEach(alloc => {
       const key = alloc.resource_id;
@@ -182,7 +247,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     const available = allMembersFromParent.map(m => {
       const key = m.id;
       const capacity = m.weekly_capacity || 40;
-      const allocatedHours = allocationMap.get(key) || 0;
+      const projectHours = allocationMap.get(key) || 0;
+      const leaveHours = memberLeaveMap.get(key) || 0;
+      const allocatedHours = projectHours + leaveHours + totalHolidayHours;
       const availableHours = capacity - allocatedHours;
       const utilization = capacity > 0 ? (allocatedHours / capacity) * 100 : 0;
       const sectors = Array.from(memberSectorsMap.get(key) || []);
@@ -197,6 +264,15 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
             hours: data.hours
           }))
         : [];
+      
+      // Build leave allocations
+      const leaveAllocations: LeaveAllocation[] = [];
+      if (leaveHours > 0) {
+        leaveAllocations.push({ type: 'leave', hours: leaveHours });
+      }
+      if (totalHolidayHours > 0) {
+        leaveAllocations.push({ type: 'holiday', hours: totalHolidayHours });
+      }
 
       return {
         id: m.id,
@@ -212,7 +288,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         practiceArea: m.practice_area || undefined,
         location: m.location || undefined,
         sectors,
-        projectAllocations
+        projectAllocations,
+        leaveAllocations
       };
     });
     
@@ -229,7 +306,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
       return nameA.localeCompare(nameB);
     });
-  }, [allMembersFromParent, allocations, sortAscending]);
+  }, [allMembersFromParent, allocations, leaves, holidays, sortAscending]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
@@ -346,6 +423,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                         lastName={member.lastName}
                         allocatedHours={member.allocatedHours}
                         projectAllocations={member.projectAllocations}
+                        leaveAllocations={member.leaveAllocations}
                         utilization={member.utilization}
                         threshold={threshold}
                         weekStartDate={weekStartDate}
@@ -382,6 +460,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                       lastName={member.lastName}
                       allocatedHours={member.allocatedHours}
                       projectAllocations={member.projectAllocations}
+                      leaveAllocations={member.leaveAllocations}
                       utilization={member.utilization}
                       threshold={threshold}
                       weekStartDate={weekStartDate}
