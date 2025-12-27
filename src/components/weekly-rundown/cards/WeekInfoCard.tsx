@@ -8,10 +8,11 @@ interface WeekInfoCardProps {
 }
 
 export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek }) => {
-  const dayName = format(selectedWeek, 'EEE');
-  const dayNumber = format(selectedWeek, 'dd');
-  const monthName = format(selectedWeek, 'MMM');
-  const year = format(selectedWeek, 'yyyy');
+  const today = new Date();
+  const dayName = format(today, 'EEE');
+  const dayNumber = format(today, 'dd');
+  const monthName = format(today, 'MMM');
+  const year = format(today, 'yyyy');
 
   return (
     <Card className="h-full min-h-[140px] max-h-[140px] border-2 border-primary/20 shadow-md overflow-hidden w-[140px] flex-shrink-0 bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/15 dark:to-primary/5">
