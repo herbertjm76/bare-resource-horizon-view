@@ -135,14 +135,16 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
   }, [profiles, invites, allocations, threshold]);
 
   return (
-    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-card sm:min-w-[220px] sm:max-w-[280px]">
+    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-card sm:min-w-[220px] sm:max-w-[280px] relative overflow-hidden">
+      {/* Background watermark icon */}
+      <UserCheck className="absolute -right-4 -bottom-4 h-24 w-24 text-muted-foreground/5 pointer-events-none" />
+      
       <CardHeader className="flex-shrink-0 pb-2 h-[44px] flex items-start pt-4">
-        <CardTitle className="flex items-center gap-2 text-xs font-semibold text-foreground uppercase tracking-wide">
-          <UserCheck className="h-3.5 w-3.5 text-muted-foreground" />
+        <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">
           Available This Week
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 flex-1 overflow-x-auto scrollbar-grey">
+      <CardContent className="pt-4 flex-1 overflow-x-auto scrollbar-grey relative z-10">
         {availableMembers.length === 0 ? (
           <p className="text-sm text-muted-foreground">All team members fully allocated</p>
         ) : (

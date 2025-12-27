@@ -65,14 +65,14 @@ export const OtherLeaveCard: React.FC<OtherLeaveCardProps> = ({ leaves }) => {
   });
 
   return (
-    <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 min-w-[180px]">
+    <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 min-w-[180px] relative overflow-hidden">
+      {/* Background watermark icon */}
+      <PartyPopper className="absolute -right-4 -bottom-4 h-24 w-24 text-muted-foreground/5 pointer-events-none" />
+      
       <CardHeader className="pb-2 flex-shrink-0 h-[44px] flex items-start pt-4">
-        <div className="flex items-center gap-2">
-          <PartyPopper className="h-3.5 w-3.5 text-muted-foreground" />
-          <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Other Leave</CardTitle>
-        </div>
+        <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Other Leave</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto scrollbar-grey">
+      <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10">
         {memberIds.length === 0 ? (
           <p className="text-sm text-muted-foreground">No other leave this week</p>
         ) : (
