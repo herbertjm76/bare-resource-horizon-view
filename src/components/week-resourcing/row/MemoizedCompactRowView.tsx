@@ -311,13 +311,28 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   );
 };
 
-// Simplified memo comparison to be less strict
+// Memoize with comparison that includes the specific member's utilization inputs
 export const CompactRowView = memo(CompactRowViewComponent, (prevProps, nextProps) => {
-  // Only compare the most essential props that actually change
+  const memberId = nextProps.member.id;
+
   const membersEqual = prevProps.member.id === nextProps.member.id;
   const indexEqual = prevProps.memberIndex === nextProps.memberIndex;
   const projectsEqual = prevProps.projects.length === nextProps.projects.length;
   const viewModeEqual = prevProps.viewMode === nextProps.viewMode;
-  
-  return membersEqual && indexEqual && projectsEqual && viewModeEqual;
+  const allocationEqual = prevProps.allocationMap.size === nextProps.allocationMap.size;
+
+  const annualLeaveEqual = (prevProps.annualLeaveData?.[memberId] || 0) === (nextProps.annualLeaveData?.[memberId] || 0);
+  const holidayEqual = (prevProps.holidaysData?.[memberId] || 0) === (nextProps.holidaysData?.[memberId] || 0);
+  const otherLeaveEqual = (prevProps.otherLeaveData?.[memberId] || 0) === (nextProps.otherLeaveData?.[memberId] || 0);
+
+  return (
+    membersEqual &&
+    indexEqual &&
+    projectsEqual &&
+    viewModeEqual &&
+    allocationEqual &&
+    annualLeaveEqual &&
+    holidayEqual &&
+    otherLeaveEqual
+  );
 });
