@@ -461,16 +461,16 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
         {/* Controls - Bottom Right - Desktop/Tablet only */}
         <div className="hidden sm:flex absolute bottom-2 right-3 items-center gap-2 z-30">
-          {/* Jump to Card Menu - Subtle dropdown */}
+          {/* Jump to Card Menu - Tablet only (hidden on desktop) */}
           {cards.length > 1 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
+                <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all lg:hidden">
                   Jump to card
                   <ChevronRight className="h-3 w-3 ml-1 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-popover border shadow-lg z-50">
+              <DropdownMenuContent align="end" className="w-48 bg-popover border shadow-lg z-50 lg:hidden">
                 <DropdownMenuLabel>Jump to Card</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {cards.map((card) => (
@@ -486,72 +486,72 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             </DropdownMenu>
           )}
 
-        {/* Settings Dropdown - Icon only */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-popover border shadow-lg z-50">
-            <DropdownMenuLabel>Visible Cards</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            
-            <DropdownMenuCheckboxItem 
-              checked={cardVisibility.announcements !== false} 
-              onCheckedChange={(v) => toggleCard('announcements', v)}
-            >
-              Announcements
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem 
-              checked={cardVisibility.holidays} 
-              onCheckedChange={(v) => toggleCard('holidays', v)}
-            >
-              Holidays
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem 
-              checked={cardVisibility.annualLeave} 
-              onCheckedChange={(v) => toggleCard('annualLeave', v)}
-            >
-              Annual Leave
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem 
-              checked={cardVisibility.otherLeave} 
-              onCheckedChange={(v) => toggleCard('otherLeave', v)}
-            >
-              Other Leave
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem 
-              checked={cardVisibility.notes} 
-              onCheckedChange={(v) => toggleCard('notes', v)}
-            >
-              Notes
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem 
-              checked={cardVisibility.available} 
-              onCheckedChange={(v) => toggleCard('available', v)}
-            >
-              Available This Week
-            </DropdownMenuCheckboxItem>
-            
-            {customCardTypes.length > 0 && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Custom Cards</DropdownMenuLabel>
-                {customCardTypes.map(card => (
-                  <DropdownMenuCheckboxItem 
-                    key={card.id}
-                    checked={cardVisibility[`custom_${card.id}`] !== false}
-                    onCheckedChange={(v) => toggleCard(`custom_${card.id}`, v)}
-                  >
-                    {card.icon && <span className="mr-2">{card.icon}</span>}
-                    {card.label}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          {/* Settings Dropdown - Icon only */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-popover border shadow-lg z-50">
+              <DropdownMenuLabel>Visible Cards</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              
+              <DropdownMenuCheckboxItem 
+                checked={cardVisibility.announcements !== false} 
+                onCheckedChange={(v) => toggleCard('announcements', v)}
+              >
+                Announcements
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem 
+                checked={cardVisibility.holidays} 
+                onCheckedChange={(v) => toggleCard('holidays', v)}
+              >
+                Holidays
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem 
+                checked={cardVisibility.annualLeave} 
+                onCheckedChange={(v) => toggleCard('annualLeave', v)}
+              >
+                Annual Leave
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem 
+                checked={cardVisibility.otherLeave} 
+                onCheckedChange={(v) => toggleCard('otherLeave', v)}
+              >
+                Other Leave
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem 
+                checked={cardVisibility.notes} 
+                onCheckedChange={(v) => toggleCard('notes', v)}
+              >
+                Notes
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem 
+                checked={cardVisibility.available} 
+                onCheckedChange={(v) => toggleCard('available', v)}
+              >
+                Available This Week
+              </DropdownMenuCheckboxItem>
+              
+              {customCardTypes.length > 0 && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Custom Cards</DropdownMenuLabel>
+                  {customCardTypes.map(card => (
+                    <DropdownMenuCheckboxItem 
+                      key={card.id}
+                      checked={cardVisibility[`custom_${card.id}`] !== false}
+                      onCheckedChange={(v) => toggleCard(`custom_${card.id}`, v)}
+                    >
+                      {card.icon && <span className="mr-2">{card.icon}</span>}
+                      {card.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Add Card Button - Icon only */}
           <ManageCustomCardsDialog iconOnly />
