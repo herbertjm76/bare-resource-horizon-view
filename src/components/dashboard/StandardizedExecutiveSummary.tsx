@@ -190,24 +190,36 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
         const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
         const IconComponent = getStandardIcon(metric, index);
         
+        // Check if value is a React element (like Gauge) vs simple value
+        const isComplexValue = React.isValidElement(metric.value);
+        
         return (
-          <div key={index} className="relative overflow-hidden rounded-xl bg-card border glass-card p-4 space-y-3 hover:shadow-lg transition-shadow">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+          <div key={index} className="relative overflow-hidden rounded-xl bg-card border glass-card p-4 flex flex-col hover:shadow-lg transition-shadow">
+            {/* Header - fixed height */}
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
                 <IconComponent className="h-4 w-4" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-xs font-semibold text-muted-foreground truncate tracking-wide uppercase">
-                  {metric.title}
-                </h3>
-              </div>
+              <h3 className="text-xs font-semibold text-muted-foreground truncate tracking-wide uppercase">
+                {metric.title}
+              </h3>
             </div>
             
-            <div className="space-y-2">
-              <div className="text-2xl font-bold text-foreground tracking-tight">
-                {metric.value}
-              </div>
-              
+            {/* Value section - flex grow to push footer down */}
+            <div className="flex-1 flex flex-col justify-center mb-3">
+              {isComplexValue ? (
+                <div className="flex justify-center">
+                  {metric.value}
+                </div>
+              ) : (
+                <div className="text-2xl font-bold text-foreground tracking-tight">
+                  {metric.value}
+                </div>
+              )}
+            </div>
+            
+            {/* Footer - badge and subtitle aligned at bottom */}
+            <div className="mt-auto space-y-1.5">
               <StandardizedBadge 
                 variant={getBadgeVariant(badge.color, metric.isGood)}
                 size="metric"
@@ -216,7 +228,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                 {badge.text}
               </StandardizedBadge>
               
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                 {subtitle}
               </p>
             </div>
