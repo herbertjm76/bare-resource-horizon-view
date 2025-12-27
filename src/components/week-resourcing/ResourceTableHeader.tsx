@@ -61,21 +61,6 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
             </Tooltip>
           </TooltipProvider>
         </TableHead>
-        <TableHead className="w-12 text-center border-r non-project-column bg-[#6465F0] text-white">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="cursor-pointer">HO</span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <div className="text-sm font-medium">
-                  Public Holiday hours for this week
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </TableHead>
-        <TableHead className="w-12 text-center border-r-4 border-gray-400 non-project-column bg-[#6465F0] text-white">OL</TableHead>
         
         {projects.map((project, idx) => {
           return (

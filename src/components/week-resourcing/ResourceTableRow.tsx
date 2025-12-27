@@ -3,8 +3,6 @@ import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { MemberNameCell } from './row/MemberNameCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
-import { HolidayCell } from './row/HolidayCell';
-import { ManualInputCell } from './row/ManualInputCell';
 import { DisplayPillCell } from './row/DisplayPillCell';
 import { ResourceAllocationCell } from './ResourceAllocationCell';
 
@@ -72,22 +70,6 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         annualLeaveHours={annualLeave}
         holidayHours={holidayHours}
         otherLeaveHours={otherLeave}
-      />
-      
-      <HolidayCell 
-        memberId={member.id}
-        memberOffice={member.location}
-        weekStartDate={weekStartDate}
-        holidayHours={holidayHours}
-        onLeaveInputChange={onLeaveInputChange}
-      />
-      
-      <ManualInputCell 
-        memberId={member.id}
-        field="other"
-        value={manualLeaveData[member.id]?.['other'] || ''}
-        onInputChange={onLeaveInputChange}
-        className="border-r-8 border-gray-400"
       />
       
       {/* Project allocation cells */}
