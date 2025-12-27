@@ -29,6 +29,17 @@ export const useLocationOperations = () => {
       return;
     }
 
+    // Check for duplicate code
+    const isDuplicate = locations.some(
+      loc => loc.code.toLowerCase() === formData.code.toLowerCase() && 
+             loc.id !== editingLocation?.id
+    );
+
+    if (isDuplicate) {
+      toast.error(`Location code "${formData.code}" already exists`);
+      return;
+    }
+
     try {
       if (editingLocation) {
         const { error } = await supabase
