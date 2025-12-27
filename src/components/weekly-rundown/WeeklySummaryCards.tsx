@@ -508,61 +508,111 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
                 <Settings className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-popover border shadow-lg z-50">
-              <DropdownMenuLabel>Visible Cards</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-64 bg-popover border shadow-lg z-50">
+              <DropdownMenuLabel>Card Visibility & Order</DropdownMenuLabel>
               <DropdownMenuSeparator />
               
-              <DropdownMenuCheckboxItem 
-                checked={cardVisibility.announcements !== false} 
-                onCheckedChange={(v) => toggleCard('announcements', v)}
-              >
-                Announcements
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem 
-                checked={cardVisibility.holidays} 
-                onCheckedChange={(v) => toggleCard('holidays', v)}
-              >
-                Holidays
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem 
-                checked={cardVisibility.annualLeave} 
-                onCheckedChange={(v) => toggleCard('annualLeave', v)}
-              >
-                Annual Leave
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem 
-                checked={cardVisibility.otherLeave} 
-                onCheckedChange={(v) => toggleCard('otherLeave', v)}
-              >
-                Other Leave
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem 
-                checked={cardVisibility.notes} 
-                onCheckedChange={(v) => toggleCard('notes', v)}
-              >
-                Notes
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem 
-                checked={cardVisibility.available} 
-                onCheckedChange={(v) => toggleCard('available', v)}
-              >
-                Available This Week
-              </DropdownMenuCheckboxItem>
+              {/* Reorderable card items */}
+              {[
+                { id: 'announcements', label: 'Announcements' },
+                { id: 'holidays', label: 'Holidays' },
+                { id: 'annualLeave', label: 'Annual Leave' },
+                { id: 'otherLeave', label: 'Other Leave' },
+                { id: 'notes', label: 'Notes' },
+                { id: 'available', label: 'Available This Week' },
+              ].map((cardItem, idx, arr) => {
+                const isVisible = cardItem.id === 'announcements' 
+                  ? cardVisibility.announcements !== false 
+                  : cardVisibility[cardItem.id];
+                const cardIndex = cards.findIndex(c => c.id === cardItem.id);
+                const canMoveUp = cardIndex > 1; // Can't move before weekInfo (index 0)
+                const canMoveDown = cardIndex !== -1 && cardIndex < cards.length - 1;
+                
+                return (
+                  <div key={cardItem.id} className="flex items-center justify-between px-2 py-1.5 hover:bg-accent/50 rounded-sm">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={isVisible}
+                        onChange={(e) => toggleCard(cardItem.id, e.target.checked)}
+                        className="h-4 w-4 rounded border-border"
+                      />
+                      <span className="text-sm">{cardItem.label}</span>
+                    </div>
+                    {isVisible && (
+                      <div className="flex items-center gap-0.5">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-muted-foreground hover:text-foreground disabled:opacity-30"
+                          onClick={() => handleMove(cardItem.id, 'left')}
+                          disabled={!canMoveUp}
+                        >
+                          <ChevronLeft className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-muted-foreground hover:text-foreground disabled:opacity-30"
+                          onClick={() => handleMove(cardItem.id, 'right')}
+                          disabled={!canMoveDown}
+                        >
+                          <ChevronRight className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
               
               {customCardTypes.length > 0 && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel>Custom Cards</DropdownMenuLabel>
-                  {customCardTypes.map(card => (
-                    <DropdownMenuCheckboxItem 
-                      key={card.id}
-                      checked={cardVisibility[`custom_${card.id}`] !== false}
-                      onCheckedChange={(v) => toggleCard(`custom_${card.id}`, v)}
-                    >
-                      {card.icon && <span className="mr-2">{card.icon}</span>}
-                      {card.label}
-                    </DropdownMenuCheckboxItem>
-                  ))}
+                  {customCardTypes.map(card => {
+                    const cardKey = `custom_${card.id}`;
+                    const isVisible = cardVisibility[cardKey] !== false;
+                    const cardIndex = cards.findIndex(c => c.id === cardKey);
+                    const canMoveUp = cardIndex > 1;
+                    const canMoveDown = cardIndex !== -1 && cardIndex < cards.length - 1;
+                    
+                    return (
+                      <div key={card.id} className="flex items-center justify-between px-2 py-1.5 hover:bg-accent/50 rounded-sm">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={isVisible}
+                            onChange={(e) => toggleCard(cardKey, e.target.checked)}
+                            className="h-4 w-4 rounded border-border"
+                          />
+                          {card.icon && <span className="text-sm">{card.icon}</span>}
+                          <span className="text-sm">{card.label}</span>
+                        </div>
+                        {isVisible && (
+                          <div className="flex items-center gap-0.5">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-muted-foreground hover:text-foreground disabled:opacity-30"
+                              onClick={() => handleMove(cardKey, 'left')}
+                              disabled={!canMoveUp}
+                            >
+                              <ChevronLeft className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-muted-foreground hover:text-foreground disabled:opacity-30"
+                              onClick={() => handleMove(cardKey, 'right')}
+                              disabled={!canMoveDown}
+                            >
+                              <ChevronRight className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </>
               )}
             </DropdownMenuContent>
