@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
 import { HolidaysCard } from './cards/HolidaysCard';
 import { LeaveCard } from './cards/LeaveCard';
 import { OtherLeaveCard } from './cards/OtherLeaveCard';
@@ -60,6 +60,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     const saved = localStorage.getItem('weekly-summary-collapsed');
     return saved === 'true';
   });
+  const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
+  const [dragOverCardId, setDragOverCardId] = useState<string | null>(null);
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekStartString = format(weekStart, 'yyyy-MM-dd');
@@ -315,17 +317,50 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     }
   };
 
-  // Helper: move a card by computing order from currently rendered cards
-  const handleMove = (cardId: string, direction: 'left' | 'right') => {
-    const currentOrder = cards.map(c => c.id);
-    const index = currentOrder.indexOf(cardId);
-    if (index === -1) return;
-    const minIndex = cards[0]?.id === 'weekInfo' ? 1 : 0; // keep WeekInfo pinned first
-    const targetIndex = direction === 'left' ? index - 1 : index + 1;
-    if (targetIndex < minIndex || targetIndex >= currentOrder.length) return;
-    const newOrder = [...currentOrder];
-    [newOrder[index], newOrder[targetIndex]] = [newOrder[targetIndex], newOrder[index]];
-    reorderCards(newOrder);
+  // Drag and drop handlers for settings popup
+  const handleDragStart = (cardId: string) => {
+    setDraggedCardId(cardId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, cardId: string) => {
+    e.preventDefault();
+    if (cardId !== draggedCardId && cardId !== 'weekInfo') {
+      setDragOverCardId(cardId);
+    }
+  };
+
+  const handleDragEnd = () => {
+    if (draggedCardId && dragOverCardId && draggedCardId !== dragOverCardId) {
+      // Get all card IDs in current order
+      const allCardItems = [
+        { id: 'weekInfo' },
+        { id: 'announcements' },
+        { id: 'holidays' },
+        { id: 'annualLeave' },
+        { id: 'otherLeave' },
+        { id: 'notes' },
+        { id: 'available' },
+        ...customCardTypes.map(c => ({ id: `custom_${c.id}` }))
+      ];
+      
+      // Build order from current cards
+      const currentOrder = cards.map(c => c.id);
+      const fromIndex = currentOrder.indexOf(draggedCardId);
+      const toIndex = currentOrder.indexOf(dragOverCardId);
+      
+      if (fromIndex !== -1 && toIndex !== -1 && toIndex !== 0) {
+        const newOrder = [...currentOrder];
+        newOrder.splice(fromIndex, 1);
+        newOrder.splice(toIndex, 0, draggedCardId);
+        reorderCards(newOrder);
+      }
+    }
+    setDraggedCardId(null);
+    setDragOverCardId(null);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverCardId(null);
   };
 
   // Don't return null as we always want to show the WeekInfoCard
@@ -510,9 +545,10 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 bg-popover border shadow-lg z-50">
               <DropdownMenuLabel>Card Visibility & Order</DropdownMenuLabel>
+              <p className="text-xs text-muted-foreground px-2 pb-2">Drag to reorder cards</p>
               <DropdownMenuSeparator />
               
-              {/* Reorderable card items */}
+              {/* Reorderable card items with drag and drop */}
               {[
                 { id: 'announcements', label: 'Announcements' },
                 { id: 'holidays', label: 'Holidays' },
@@ -520,16 +556,27 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
                 { id: 'otherLeave', label: 'Other Leave' },
                 { id: 'notes', label: 'Notes' },
                 { id: 'available', label: 'Available This Week' },
-              ].map((cardItem, idx, arr) => {
+              ].map((cardItem) => {
                 const isVisible = cardItem.id === 'announcements' 
                   ? cardVisibility.announcements !== false 
                   : cardVisibility[cardItem.id];
-                const cardIndex = cards.findIndex(c => c.id === cardItem.id);
-                const canMoveUp = cardIndex > 1; // Can't move before weekInfo (index 0)
-                const canMoveDown = cardIndex !== -1 && cardIndex < cards.length - 1;
+                const isDragging = draggedCardId === cardItem.id;
+                const isDragOver = dragOverCardId === cardItem.id;
                 
                 return (
-                  <div key={cardItem.id} className="flex items-center justify-between px-2 py-1.5 hover:bg-accent/50 rounded-sm">
+                  <div 
+                    key={cardItem.id} 
+                    draggable={isVisible}
+                    onDragStart={() => handleDragStart(cardItem.id)}
+                    onDragOver={(e) => handleDragOver(e, cardItem.id)}
+                    onDragEnd={handleDragEnd}
+                    onDragLeave={handleDragLeave}
+                    className={`flex items-center justify-between px-2 py-1.5 rounded-sm transition-all ${
+                      isDragging ? 'opacity-50 bg-accent' : ''
+                    } ${isDragOver ? 'border-t-2 border-primary' : ''} ${
+                      isVisible ? 'cursor-grab active:cursor-grabbing hover:bg-accent/50' : ''
+                    }`}
+                  >
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -540,26 +587,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
                       <span className="text-sm">{cardItem.label}</span>
                     </div>
                     {isVisible && (
-                      <div className="flex items-center gap-0.5">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-muted-foreground hover:text-foreground disabled:opacity-30"
-                          onClick={() => handleMove(cardItem.id, 'left')}
-                          disabled={!canMoveUp}
-                        >
-                          <ChevronLeft className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-muted-foreground hover:text-foreground disabled:opacity-30"
-                          onClick={() => handleMove(cardItem.id, 'right')}
-                          disabled={!canMoveDown}
-                        >
-                          <ChevronRight className="h-3 w-3" />
-                        </Button>
-                      </div>
+                      <GripVertical className="h-4 w-4 text-muted-foreground" />
                     )}
                   </div>
                 );
@@ -572,12 +600,23 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
                   {customCardTypes.map(card => {
                     const cardKey = `custom_${card.id}`;
                     const isVisible = cardVisibility[cardKey] !== false;
-                    const cardIndex = cards.findIndex(c => c.id === cardKey);
-                    const canMoveUp = cardIndex > 1;
-                    const canMoveDown = cardIndex !== -1 && cardIndex < cards.length - 1;
+                    const isDragging = draggedCardId === cardKey;
+                    const isDragOver = dragOverCardId === cardKey;
                     
                     return (
-                      <div key={card.id} className="flex items-center justify-between px-2 py-1.5 hover:bg-accent/50 rounded-sm">
+                      <div 
+                        key={card.id} 
+                        draggable={isVisible}
+                        onDragStart={() => handleDragStart(cardKey)}
+                        onDragOver={(e) => handleDragOver(e, cardKey)}
+                        onDragEnd={handleDragEnd}
+                        onDragLeave={handleDragLeave}
+                        className={`flex items-center justify-between px-2 py-1.5 rounded-sm transition-all ${
+                          isDragging ? 'opacity-50 bg-accent' : ''
+                        } ${isDragOver ? 'border-t-2 border-primary' : ''} ${
+                          isVisible ? 'cursor-grab active:cursor-grabbing hover:bg-accent/50' : ''
+                        }`}
+                      >
                         <div className="flex items-center gap-2">
                           <input
                             type="checkbox"
@@ -589,26 +628,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
                           <span className="text-sm">{card.label}</span>
                         </div>
                         {isVisible && (
-                          <div className="flex items-center gap-0.5">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 text-muted-foreground hover:text-foreground disabled:opacity-30"
-                              onClick={() => handleMove(cardKey, 'left')}
-                              disabled={!canMoveUp}
-                            >
-                              <ChevronLeft className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 text-muted-foreground hover:text-foreground disabled:opacity-30"
-                              onClick={() => handleMove(cardKey, 'right')}
-                              disabled={!canMoveDown}
-                            >
-                              <ChevronRight className="h-3 w-3" />
-                            </Button>
-                          </div>
+                          <GripVertical className="h-4 w-4 text-muted-foreground" />
                         )}
                       </div>
                     );
