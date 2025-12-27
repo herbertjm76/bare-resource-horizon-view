@@ -301,6 +301,19 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     container.scrollTo({ left: targetScroll, behavior: 'smooth' });
   };
 
+  const scrollToCardById = (cardId: string) => {
+    const container = desktopScrollRef.current;
+    if (!container) return;
+    
+    const cardIndex = cards.findIndex(c => c.id === cardId);
+    if (cardIndex === -1) return;
+    
+    const cardElements = container.children;
+    if (cardElements[cardIndex]) {
+      (cardElements[cardIndex] as HTMLElement).scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  };
+
   // Helper: move a card by computing order from currently rendered cards
   const handleMove = (cardId: string, direction: 'left' | 'right') => {
     const currentOrder = cards.map(c => c.id);
@@ -435,7 +448,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           {/* Scrollable Container */}
           <div 
             ref={desktopScrollRef}
-            className="flex flex-nowrap gap-[3px] overflow-x-auto scrollbar-hide justify-center"
+            className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-hide px-2"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {cards.map((card) => (
@@ -453,25 +466,25 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
-                {getCardLabel(currentCard?.id || '')}
-                <ChevronRight className="h-3 w-3 ml-1 opacity-50" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-popover border shadow-lg z-50">
-              <DropdownMenuLabel>Jump to Card</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {cards.map((card, index) => (
-                <DropdownMenuCheckboxItem
-                  key={card.id}
-                  checked={index === currentCardIndex}
-                  onCheckedChange={() => goToCard(index)}
-                >
-                  {getCardLabel(card.id)}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+                  Jump to card
+                  <ChevronRight className="h-3 w-3 ml-1 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-popover border shadow-lg z-50">
+                <DropdownMenuLabel>Jump to Card</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {cards.map((card) => (
+                  <DropdownMenuCheckboxItem
+                    key={card.id}
+                    checked={false}
+                    onCheckedChange={() => scrollToCardById(card.id)}
+                  >
+                    {getCardLabel(card.id)}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
         {/* Settings Dropdown - Icon only */}
         <DropdownMenu>
