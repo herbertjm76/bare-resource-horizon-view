@@ -71,7 +71,7 @@ const AppTour = () => {
   };
 
   return (
-    <div id="app-tour" className="py-20 bg-white">
+    <div id="app-tour" className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatedSection animation="fadeInUp">
           <div className="text-center mb-16">

@@ -26,7 +26,7 @@ export const StageCard: React.FC<StageCardProps> = ({
   calculateInvoiceAge,
 }) => {
   return (
-    <div className="border rounded-lg overflow-hidden bg-white">
+    <div className="border border-border rounded-lg overflow-hidden bg-card">
       <StageHeader stageName={stageName} stageColor={stageColor} />
       <StageForm
         stageId={stageId}

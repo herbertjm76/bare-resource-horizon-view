@@ -12,10 +12,10 @@ export const ProjectHistoryCard: React.FC<ProjectHistoryCardProps> = ({ userId }
 
   if (isLoading) {
     return (
-      <Card className="bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm">
+      <Card className="bg-card border-2 border-border rounded-xl p-4 shadow-sm">
         <div className="space-y-3">
-          <h3 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Project History</h3>
-          <p className="text-xs text-gray-500">Loading...</p>
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Project History</h3>
+          <p className="text-xs text-muted-foreground">Loading...</p>
         </div>
       </Card>
     );
@@ -25,12 +25,12 @@ export const ProjectHistoryCard: React.FC<ProjectHistoryCardProps> = ({ userId }
   const totalHours = historyProjects.reduce((sum, p) => sum + p.total_hours, 0);
 
   return (
-    <Card className="bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm">
+    <Card className="bg-card border-2 border-border rounded-xl p-4 shadow-sm">
       <div className="space-y-3">
-        <h3 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Project History</h3>
+        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Project History</h3>
         
         {historyProjects.length === 0 ? (
-          <p className="text-xs text-gray-500">No completed projects</p>
+          <p className="text-xs text-muted-foreground">No completed projects</p>
         ) : (
           <div className="space-y-2">
             {historyProjects.slice(0, 3).map((project) => (

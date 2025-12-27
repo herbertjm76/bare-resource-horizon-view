@@ -25,7 +25,7 @@ export const WeekSelector: React.FC<WeekSelectorProps> = ({
       onValueChange={(value) => onWeeksChange(parseInt(value, 10))}
     >
       <SelectTrigger 
-        className="w-[140px] bg-white border-slate-200"
+        className="w-[140px] bg-background border-border"
       >
         <div className="flex items-center">
           <span className="text-xs mr-2 text-muted-foreground">View:</span>

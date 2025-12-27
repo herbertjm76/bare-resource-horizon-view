@@ -32,7 +32,7 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
         value={selectedPeriod.toString()}
         onValueChange={(value) => onPeriodChange(Number(value))}
       >
-        <SelectTrigger className="w-full bg-white">
+        <SelectTrigger className="w-full bg-background">
           <SelectValue placeholder="Select time period" />
         </SelectTrigger>
         <SelectContent>

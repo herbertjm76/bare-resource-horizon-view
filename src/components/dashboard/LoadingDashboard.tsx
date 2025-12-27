@@ -8,7 +8,7 @@ export const LoadingDashboard: React.FC = () => {
       {/* First Row: Dashboard Cards with skeleton loading */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Team Utilization Loading */}
-        <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm">
+        <Card className="rounded-2xl bg-card border border-border shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="h-4 w-4 text-gray-400 animate-pulse" />
@@ -27,7 +27,7 @@ export const LoadingDashboard: React.FC = () => {
         </Card>
 
         {/* Workload Loading */}
-        <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm">
+        <Card className="rounded-2xl bg-card border border-border shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <Clock className="h-4 w-4 text-gray-400 animate-pulse" />
@@ -49,7 +49,7 @@ export const LoadingDashboard: React.FC = () => {
         </Card>
 
         {/* Team Leave Loading */}
-        <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm">
+        <Card className="rounded-2xl bg-card border border-border shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <Calendar className="h-4 w-4 text-gray-400 animate-pulse" />
@@ -65,7 +65,7 @@ export const LoadingDashboard: React.FC = () => {
         </Card>
 
         {/* Project Pipeline Loading */}
-        <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm">
+        <Card className="rounded-2xl bg-card border border-border shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <BarChart3 className="h-4 w-4 text-gray-400 animate-pulse" />
@@ -86,7 +86,7 @@ export const LoadingDashboard: React.FC = () => {
       {/* Second Row: Loading cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {[1, 2, 3].map(i => (
-          <Card key={i} className="rounded-2xl bg-white border border-gray-200 shadow-sm">
+          <Card key={i} className="rounded-2xl bg-card border border-border shadow-sm">
             <CardContent className="p-6">
               <div className="h-4 bg-gray-200 rounded w-32 mb-4 animate-pulse"></div>
               <div className="space-y-3">

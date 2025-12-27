@@ -32,26 +32,26 @@ const CapacityPlanning: React.FC = () => {
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="p-4 bg-card rounded-lg shadow-sm">
               <BarChart3 className="h-8 w-8 text-emerald-500 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Heatmap View</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-foreground mb-2">Heatmap View</h3>
+              <p className="text-sm text-muted-foreground">
                 Color-coded capacity visualization across weeks
               </p>
             </div>
             
-            <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="p-4 bg-card rounded-lg shadow-sm">
               <Calendar className="h-8 w-8 text-emerald-500 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Future Planning</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-foreground mb-2">Future Planning</h3>
+              <p className="text-sm text-muted-foreground">
                 Project resource needs weeks or months ahead
               </p>
             </div>
             
-            <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="p-4 bg-card rounded-lg shadow-sm">
               <TrendingUp className="h-8 w-8 text-emerald-500 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Smart Insights</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-foreground mb-2">Smart Insights</h3>
+              <p className="text-sm text-muted-foreground">
                 AI-powered recommendations for optimal allocation
               </p>
             </div>

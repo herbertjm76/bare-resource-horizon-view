@@ -20,7 +20,7 @@ export const PeriodViewSelector: React.FC<PeriodViewSelectorProps> = ({
   ];
 
   return (
-    <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
+    <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
       {views.map(({ key, label }) => (
         <Button
           key={key}
@@ -29,7 +29,7 @@ export const PeriodViewSelector: React.FC<PeriodViewSelectorProps> = ({
           className={`h-8 px-4 ${
             selectedView === key 
               ? "bg-theme-primary text-white shadow-sm" 
-              : "text-gray-600 hover:text-gray-900 hover:bg-white"
+              : "text-muted-foreground hover:text-foreground hover:bg-background"
           }`}
           onClick={() => onViewChange(key)}
         >
