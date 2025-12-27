@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 
 export const AppSettingsTab: React.FC = () => {
   const { company, refreshCompany } = useCompany();
@@ -23,6 +23,22 @@ export const AppSettingsTab: React.FC = () => {
     allocation_danger_threshold: company?.allocation_danger_threshold || 180,
     allocation_max_limit: (company as any)?.allocation_max_limit || 200
   });
+
+  // Sync form data when company data loads/changes
+  useEffect(() => {
+    if (company) {
+      setFormData({
+        work_week_hours: company.work_week_hours || 40,
+        use_hours_or_percentage: company.use_hours_or_percentage || 'hours',
+        start_of_work_week: company.start_of_work_week || 'Monday',
+        opt_out_financials: company.opt_out_financials || false,
+        project_display_preference: company.project_display_preference || 'code',
+        allocation_warning_threshold: company.allocation_warning_threshold || 150,
+        allocation_danger_threshold: company.allocation_danger_threshold || 180,
+        allocation_max_limit: (company as any)?.allocation_max_limit || 200
+      });
+    }
+  }, [company]);
 
   const handleSave = async () => {
     if (!company?.id) return;
@@ -213,10 +229,12 @@ export const AppSettingsTab: React.FC = () => {
           </p>
         </div>
 
-        <Button onClick={handleSave} disabled={saving}>
-          {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Save Changes
-        </Button>
+        <div className="pt-4 border-t">
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            {saving ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
