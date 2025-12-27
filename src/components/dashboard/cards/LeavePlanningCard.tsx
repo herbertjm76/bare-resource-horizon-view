@@ -16,7 +16,7 @@ const getImpactColor = (impact: string) => {
     case 'high': return 'bg-red-100 text-red-800 border-red-200';
     case 'medium': return 'bg-orange-100 text-orange-800 border-orange-200';
     case 'low': return 'bg-green-100 text-green-800 border-green-200';
-    default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    default: return 'bg-muted text-foreground border-border';
   }
 };
 
@@ -119,7 +119,7 @@ export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data, sele
 
           {/* Upcoming Holidays */}
           <div className="flex-1 overflow-y-auto">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Upcoming Holidays</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">Upcoming Holidays</h3>
             <div className="space-y-2">
               {upcomingHolidays.length > 0 ? (
                 upcomingHolidays
@@ -129,7 +129,7 @@ export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data, sele
                     return (
                       <div
                         key={index}
-                        className="p-3 border rounded-lg bg-white hover:bg-gray-50 transition-colors"
+                        className="p-3 border rounded-lg bg-card hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-sm">{holiday.name}</span>
@@ -137,7 +137,7 @@ export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data, sele
                             {impact} impact
                           </span>
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-gray-600">
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
                           <span>{format(new Date(holiday.date), 'MMM d, yyyy')}</span>
                           {holiday.end_date && (
                             <span>- {format(new Date(holiday.end_date), 'MMM d')}</span>
@@ -147,8 +147,8 @@ export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data, sele
                     );
                   })
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <div className="text-center py-8 text-muted-foreground">
+                  <Calendar className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
                   <p className="text-sm">No upcoming holidays</p>
                 </div>
               )}
@@ -158,7 +158,7 @@ export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data, sele
           {/* Team Impact Summary */}
           {totalLeaveDays > 0 && (
             <div className="pt-3 border-t">
-              <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Users className="h-3 w-3" />
                 <span>
                   Impact calculated based on {data.totalTeamSize} team members

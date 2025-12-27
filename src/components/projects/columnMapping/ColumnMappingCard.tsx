@@ -38,7 +38,7 @@ export const ColumnMappingCard: React.FC<ColumnMappingCardProps> = ({
               {confidence?.[index.toString()] && (
                 <ConfidenceBadge confidence={confidence[index.toString()]} />
               )}
-              <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+              <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </div>
             <Select
               value={mapping[index.toString()] || 'skip'}

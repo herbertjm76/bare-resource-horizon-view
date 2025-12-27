@@ -137,8 +137,8 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
       {/* Progress indicators */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-900">Interactive App Tour</h2>
-          <div className="text-sm text-gray-500">
+          <h2 className="text-2xl font-bold text-foreground">Interactive App Tour</h2>
+          <div className="text-sm text-muted-foreground">
             Step {currentStep + 1} of {tourSteps.length}
           </div>
         </div>
@@ -187,7 +187,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
               "text-xs md:text-sm font-semibold transition-colors",
               index === currentStep 
                 ? "text-purple-600" 
-                : "text-gray-700 group-hover:text-purple-600"
+                : "text-foreground group-hover:text-purple-600"
             )}>
               {step.title}
             </h3>
@@ -251,22 +251,22 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
         {/* Content section */}
         <div className="space-y-6">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-2xl font-bold text-foreground mb-3">
               {currentTourStep.title}
             </h3>
-            <p className="text-gray-600 text-lg leading-relaxed">
+            <p className="text-muted-foreground text-lg leading-relaxed">
               {currentTourStep.description}
             </p>
           </div>
 
           {/* Features list */}
           <div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-3">Key Features:</h4>
+            <h4 className="text-lg font-semibold text-foreground mb-3">Key Features:</h4>
             <ul className="space-y-2">
               {currentTourStep.features.map((feature, index) => (
                 <li key={index} className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                  <span className="text-gray-700">{feature}</span>
+                  <span className="text-foreground">{feature}</span>
                 </li>
               ))}
             </ul>

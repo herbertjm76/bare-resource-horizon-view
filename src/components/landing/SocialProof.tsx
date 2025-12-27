@@ -12,18 +12,18 @@ const SocialProof = () => {
   ];
 
   return (
-    <div className="py-16 bg-white border-b border-gray-100">
+    <div className="py-16 bg-card border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatedSection animation="fadeInUp">
           <div className="text-center mb-8">
-            <p className="text-gray-600 mb-8">Trusted by design studios worldwide</p>
+            <p className="text-muted-foreground mb-8">Trusted by design studios worldwide</p>
             
             {/* Studio logos */}
             <div className="flex justify-center items-center space-x-8 mb-8 opacity-60">
               {studioLogos.map((studio, index) => (
                 <div 
                   key={index}
-                  className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 font-semibold text-sm hover:opacity-100 transition-opacity duration-300"
+                  className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center text-muted-foreground font-semibold text-sm hover:opacity-100 transition-opacity duration-300"
                 >
                   {studio.logo}
                 </div>
@@ -31,7 +31,7 @@ const SocialProof = () => {
             </div>
             
             {/* Testimonial quote */}
-            <blockquote className="text-xl font-medium text-gray-900 max-w-2xl mx-auto">
+            <blockquote className="text-xl font-medium text-foreground max-w-2xl mx-auto">
               "BareResource cut our over-capacity days by 30%."
             </blockquote>
           </div>

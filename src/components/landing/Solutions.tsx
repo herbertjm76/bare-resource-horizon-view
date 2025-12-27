@@ -46,14 +46,14 @@ const Solutions = () => {
   ];
 
   return (
-    <div id="solutions" className="py-20 bg-gray-50">
+    <div id="solutions" className="py-20 bg-muted/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatedSection animation="fadeInUp">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
               Solutions for Every Team
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               From small teams to enterprise organizations, our resource management solutions 
               adapt to your unique needs and scale with your growth.
             </p>
@@ -65,14 +65,14 @@ const Solutions = () => {
             <AnimatedSection key={index} animation="fadeInUp" delay={index * 150}>
               <VisualCard className="h-full p-8 hover:shadow-lg transition-shadow">
                 <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 p-3 bg-gray-100 rounded-lg">
+                  <div className="flex-shrink-0 p-3 bg-muted rounded-lg">
                     {solution.icon}
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    <h3 className="text-xl font-bold text-foreground mb-3">
                       {solution.title}
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-muted-foreground">
                       {solution.description}
                     </p>
                   </div>
@@ -84,7 +84,7 @@ const Solutions = () => {
 
         <AnimatedSection animation="fadeInUp" delay={600}>
           <div className="text-center mb-12">
-            <h3 className="text-2xl font-bold text-gray-900 mb-12">
+            <h3 className="text-2xl font-bold text-foreground mb-12">
               The New Way of Resource Allocation
             </h3>
           </div>
@@ -93,11 +93,11 @@ const Solutions = () => {
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           {quotes.map((quote, index) => (
             <AnimatedSection key={index} animation="fadeInUp" delay={700 + index * 150}>
-              <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-purple-600">
-                <p className="text-gray-700 italic mb-4">"{quote.text}"</p>
+              <div className="bg-card p-6 rounded-lg shadow-sm border-l-4 border-purple-600">
+                <p className="text-foreground italic mb-4">"{quote.text}"</p>
                 <div className="text-sm">
-                  <p className="font-medium text-gray-900">{quote.author}</p>
-                  <p className="text-gray-600">{quote.role}</p>
+                  <p className="font-medium text-foreground">{quote.author}</p>
+                  <p className="text-muted-foreground">{quote.role}</p>
                 </div>
               </div>
             </AnimatedSection>

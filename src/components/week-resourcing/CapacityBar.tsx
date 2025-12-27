@@ -35,8 +35,8 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
     if (utilizationRate >= 95) return 'text-green-600 font-semibold';
     if (utilizationRate >= 80) return 'text-orange-600 font-semibold';
     if (utilizationRate >= 50) return 'text-blue-600 font-semibold';
-    if (utilizationRate === 0) return 'text-gray-400'; // faint for 0%
-    return 'text-gray-600 font-semibold';
+    if (utilizationRate === 0) return 'text-muted-foreground'; // faint for 0%
+    return 'text-muted-foreground font-semibold';
   };
 
   const utilizationColor = getUtilizationColor();
@@ -56,7 +56,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
         {/* Horizontal progress bar */}
         <div className="relative">
           <div 
-            className="w-12 h-3 rounded border border-gray-300 overflow-hidden bg-gray-100 relative"
+            className="w-12 h-3 rounded border border-border overflow-hidden bg-muted relative"
           >
             {utilizationPercentage <= 100 ? (
               /* Single bar for <= 100% */
