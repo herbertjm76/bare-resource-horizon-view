@@ -84,7 +84,7 @@ const NewProjectStep2Details: React.FC<Props> = ({
             <SelectTrigger className="text-base">
               <SelectValue placeholder="Select Office" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
+            <SelectContent className="bg-popover">
               {offices.length > 0 ? (
                 offices.map(o => (
                   <SelectItem key={o.id} value={o.id}>

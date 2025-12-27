@@ -54,7 +54,7 @@ export const HolidayCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="h-[320px] flex flex-col bg-white border-border shadow-sm">
+      <Card className="h-[320px] flex flex-col bg-card border-border shadow-sm">
         <CardHeader className="flex-shrink-0 pb-3">
           <CardTitle className="text-lg flex items-center gap-3">
             <div className="p-2 rounded-lg bg-theme-primary/10">
@@ -77,7 +77,7 @@ export const HolidayCard: React.FC = () => {
 
   if (error || !upcomingHolidays) {
     return (
-      <Card className="h-[320px] flex flex-col bg-white border-border shadow-sm">
+      <Card className="h-[320px] flex flex-col bg-card border-border shadow-sm">
         <CardHeader className="flex-shrink-0 pb-3">
           <CardTitle className="text-lg flex items-center gap-3">
             <div className="p-2 rounded-lg bg-theme-primary/10">
@@ -100,7 +100,7 @@ export const HolidayCard: React.FC = () => {
   }
 
   return (
-    <Card className="h-[320px] flex flex-col bg-white border-border shadow-sm">
+    <Card className="h-[320px] flex flex-col bg-card border-border shadow-sm">
       <CardHeader className="flex-shrink-0 pb-2">
         <CardTitle className="text-lg flex items-center gap-3">
           <div className="p-2 rounded-lg bg-theme-primary/10">

@@ -42,7 +42,7 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
   };
 
   return (
-    <Card className="h-[400px] flex flex-col bg-white border-border shadow-sm">
+    <Card className="h-[400px] flex flex-col bg-card border-border shadow-sm">
       <CardHeader className="flex-shrink-0 pb-4">
         <CardTitle className="text-lg flex items-center gap-3">
           <div className="p-2 rounded-lg bg-theme-primary/10">

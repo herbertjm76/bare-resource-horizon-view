@@ -7,7 +7,7 @@ type BentoGridItem = {
 };
 
 export const BentoGridItem: React.FC<BentoGridItem> = ({ children, className }) => (
-  <div className={`rounded-2xl bg-white shadow-lg p-4 ${className || ""}`}>{children}</div>
+  <div className={`rounded-2xl bg-card shadow-lg p-4 ${className || ""}`}>{children}</div>
 );
 
 export const BentoGrid: React.FC<{ children: React.ReactNode }> = ({ children }) => (

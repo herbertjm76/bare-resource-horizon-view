@@ -19,7 +19,7 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
   const roleLabel = roleValue.charAt(0).toUpperCase() + roleValue.slice(1);
 
   return (
-    <Card className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm lg:col-span-2">
+    <Card className="bg-card border-2 border-border rounded-xl p-6 shadow-sm lg:col-span-2">
       <div className="flex flex-col items-center text-center space-y-4">
         {/* Profile Picture */}
         <AvatarUpload

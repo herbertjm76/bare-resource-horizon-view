@@ -19,7 +19,7 @@ export const OfficeSettingsHeader: React.FC<OfficeSettingsHeaderProps> = ({ onRe
         variant="outline" 
         size="sm" 
         onClick={onRefresh}
-        className="gap-2 h-9 bg-white"
+        className="gap-2 h-9 bg-background"
       >
         <RefreshCw className="h-4 w-4" /> 
         Refresh

@@ -25,7 +25,7 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
       <CardContent className="p-3 sm:p-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           {/* Total Members Card */}
-          <Card className="bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 h-full">
+          <Card className="bg-card/95 backdrop-blur-sm rounded-lg border border-border/20 h-full">
             <CardContent className="p-3 sm:p-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -60,7 +60,7 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
           </Card>
 
           {/* Departments Card */}
-          <Card className="bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 h-full">
+          <Card className="bg-card/95 backdrop-blur-sm rounded-lg border border-border/20 h-full">
             <CardContent className="p-3 sm:p-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
           </Card>
 
           {/* Locations Card */}
-          <Card className="bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 h-full">
+          <Card className="bg-card/95 backdrop-blur-sm rounded-lg border border-border/20 h-full">
             <CardContent className="p-3 sm:p-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">

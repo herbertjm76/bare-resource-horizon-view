@@ -49,7 +49,7 @@ export const WorkloadHeatMapCard: React.FC<WorkloadHeatMapCardProps> = ({ data, 
   const utilizationTrend = data.utilizationTrends.days7 - data.utilizationTrends.days30;
 
   return (
-    <Card className="rounded-2xl border-2 border-zinc-300 bg-white shadow-sm h-[500px]">
+    <Card className="rounded-2xl border-2 border-border bg-card shadow-sm h-[500px]">
       <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2" style={{ color: 'hsl(var(--theme-primary))' }}>
@@ -83,7 +83,7 @@ export const WorkloadHeatMapCard: React.FC<WorkloadHeatMapCardProps> = ({ data, 
             {workloadData.map((member, index) => (
               <div
                 key={index}
-                className="p-3 rounded-lg border bg-white shadow-sm hover:shadow-md transition-shadow"
+                className="p-3 rounded-lg border border-border bg-card shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-sm truncate">{member.name}</span>

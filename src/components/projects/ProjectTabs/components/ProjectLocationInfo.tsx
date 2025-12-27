@@ -49,7 +49,7 @@ export const ProjectLocationInfo: React.FC<ProjectLocationInfoProps> = ({
           <SelectTrigger>
             <SelectValue placeholder="Select an office" />
           </SelectTrigger>
-          <SelectContent className="bg-white">
+          <SelectContent className="bg-popover">
             {offices.length > 0 ? (
               <>
                 <SelectItem value="no_office">Select an office</SelectItem>
