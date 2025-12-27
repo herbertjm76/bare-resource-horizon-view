@@ -6,14 +6,16 @@ import { useDetailedWeeklyAllocations } from './useDetailedWeeklyAllocations';
 import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
 import { useWeeklyLeaveDetails } from './useWeeklyLeaveDetails';
 import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
-import { format } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
 
 type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
 
 export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any, sortOption: SortOption = 'alphabetical') => {
-  // Convert Date to string format for API calls - make this stable
-  const weekStartDate = useMemo(() => format(selectedWeek, 'yyyy-MM-dd'), [selectedWeek]);
-  
+  // IMPORTANT: selectedWeek can be any day within the week; normalize to week start (Mon)
+  const weekStartDate = useMemo(
+    () => format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
+    [selectedWeek]
+  );
   // Fetch team members first - this is the foundation (fetch ALL members, filtering happens in WeekResourceView)
   const { members: allFetchedMembers, loadingMembers, membersError } = useWeekResourceTeamMembers();
   
