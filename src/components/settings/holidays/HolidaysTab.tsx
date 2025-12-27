@@ -147,8 +147,13 @@ export const HolidaysTab = () => {
     setLoading(true);
     
     if (editingHoliday) {
-      // Update existing holiday
-      const success = await updateHoliday(editingHoliday.id, values);
+      // Update existing holiday - pass original name and date
+      const success = await updateHoliday(
+        editingHoliday.id, 
+        values, 
+        editingHoliday.name, 
+        editingHoliday.date
+      );
       
       if (success) {
         // Reload holidays from the database to get the updated data
