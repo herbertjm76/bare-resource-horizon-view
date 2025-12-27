@@ -32,9 +32,15 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   memberIndex,
   projects,
   allocationMap,
+  annualLeaveData,
+  holidaysData,
   selectedWeek = new Date(),
   otherLeaveData = {},
   updateOtherLeave,
+  getMemberTotal,
+  getProjectCount,
+  getWeeklyLeave,
+  onOtherLeaveEdit,
   ...props
 }) => {
   const { projectDisplayPreference, displayPreference } = useAppSettings();
@@ -42,9 +48,12 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   // STANDARDIZED CALCULATIONS - Use the utility functions consistently
   const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
   
+  // Get leave data directly from props for reliability
+  const annualLeave = annualLeaveData?.[member.id] || 0;
+  const holidayHours = holidaysData?.[member.id] || 0;
+  const otherLeave = otherLeaveData?.[member.id] || 0;
+  
   const {
-    annualLeave,
-    holidayHours,
     leaveDays,
     editableOtherLeave,
     displayedOtherLeave,
@@ -53,13 +62,17 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   } = useRowData(member, { 
     projects, 
     allocationMap, 
+    annualLeaveData,
+    holidaysData,
     otherLeaveData,
     updateOtherLeave,
-    ...props 
+    getMemberTotal,
+    getProjectCount,
+    getWeeklyLeave,
+    onOtherLeaveEdit,
   });
 
-  // Get other leave from the new data source
-  const otherLeave = otherLeaveData[member.id] || 0;
+  // Note: otherLeave is already calculated above from otherLeaveData
 
   // Calculate total leave hours for utilization
   const totalLeaveHours = useMemo(() => 

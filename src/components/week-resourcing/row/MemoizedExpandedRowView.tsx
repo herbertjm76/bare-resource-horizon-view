@@ -33,12 +33,16 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
 }) => {
   const { displayPreference } = useAppSettings();
   const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  
+  // Get leave data directly from props for reliability
+  const weeklyCapacity = member?.weekly_capacity || 40;
+  const annualLeave = annualLeaveData?.[member.id] || 0;
+  const holidayHours = holidaysData?.[member.id] || 0;
+  const otherLeave = otherLeaveData?.[member.id] || 0;
+  
   const {
-    weeklyCapacity,
     totalUsedHours,
     projectCount,
-    annualLeave,
-    holidayHours,
     leaveDays,
     editableOtherLeave,
     displayedOtherLeave,
@@ -57,9 +61,6 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
     updateOtherLeave,
     onOtherLeaveEdit,
   });
-
-  // Get other leave from the data source
-  const otherLeave = otherLeaveData[member.id] || 0;
 
   // Calculate total hours including leave for proper utilization display
   const totalLeaveHours = annualLeave + holidayHours + otherLeave;
