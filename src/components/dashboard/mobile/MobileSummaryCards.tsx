@@ -71,24 +71,27 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
         return (
           <div 
             key={index} 
-            className="relative overflow-hidden rounded-xl bg-card border glass-card p-4 space-y-3 hover:shadow-lg transition-shadow"
+            className="relative overflow-hidden rounded-xl bg-card border glass-card p-4 flex flex-col hover:shadow-lg transition-shadow"
           >
-            <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+            {/* Header - fixed height */}
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
                 <IconComponent className="h-4 w-4" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-xs font-semibold text-muted-foreground truncate tracking-wide uppercase">
-                  {card.title}
-                </h3>
-              </div>
+              <h3 className="text-xs font-semibold text-muted-foreground truncate tracking-wide uppercase">
+                {card.title}
+              </h3>
             </div>
             
-            <div className="space-y-2">
+            {/* Value section - flex grow */}
+            <div className="flex-1 flex flex-col justify-center mb-3">
               <div className="text-2xl font-bold text-foreground tracking-tight">
                 {card.value}
               </div>
-              
+            </div>
+            
+            {/* Footer - badge and subtitle aligned at bottom */}
+            <div className="mt-auto space-y-1.5">
               <StandardizedBadge 
                 variant={card.badgeVariant}
                 size="metric"
@@ -97,7 +100,7 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
                 {card.badgeText}
               </StandardizedBadge>
               
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                 {card.subtitle}
               </p>
             </div>
