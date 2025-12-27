@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
@@ -25,6 +26,8 @@ const CompanyContext = createContext<CompanyContextType>({
 export const useCompany = () => useContext(CompanyContext);
 
 export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+
   const [company, setCompany] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [companySlug, setCompanySlug] = useState<string | null>(null);
@@ -58,9 +61,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const first = pathParts[0];
 
+    // Lovable preview can sometimes show route templates like "/:companySlug/...".
+    // Treat any ":param" segment as NOT a real company slug.
+    if (first.startsWith(':')) return null;
+
     // /join/:companySlug
     if (first === 'join' && pathParts.length > 1) {
-      return pathParts[1];
+      const maybeSlug = pathParts[1];
+      return maybeSlug?.startsWith(':') ? null : maybeSlug;
     }
 
     // If first segment is a public route, not a company slug
@@ -284,7 +292,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       initAuth();
     }
-  }, [isDemoMode, demoProfile, window.location.pathname]);
+  }, [isDemoMode, demoProfile, location.pathname]);
 
   // Listen for auth state changes and refetch company
   useEffect(() => {
