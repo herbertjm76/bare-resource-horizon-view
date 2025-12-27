@@ -6,7 +6,8 @@ import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { format } from 'date-fns';
 
 interface LeaveEntry {
   member_id: string;
@@ -19,7 +20,7 @@ interface LeaveCardProps {
 }
 
 export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
-  const { displayPreference, workWeekHours } = useAppSettings();
+  const { workWeekHours } = useAppSettings();
   const capacity = workWeekHours || 40;
 
   // Group by member_id with dates and hours
@@ -40,7 +41,7 @@ export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
       if (memberIds.length === 0) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url')
+        .select('id, first_name, last_name, avatar_url, weekly_capacity')
         .in('id', memberIds);
       
       if (error) throw error;
@@ -56,7 +57,7 @@ export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
       if (memberIds.length === 0) return [];
       const { data, error } = await supabase
         .from('invites')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, weekly_capacity')
         .in('id', memberIds)
         .eq('invitation_type', 'pre_registered');
       
@@ -79,38 +80,53 @@ export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
           <p className="text-sm text-muted-foreground">No leave this week</p>
         ) : (
           <div className="flex flex-wrap gap-3">
-            {memberIds.map((id) => {
-              const leaveDays = leaveByMember[id];
-              const profile = profiles.find((p: any) => p.id === id);
-              const invite = invites.find((i: any) => i.id === id);
-              
-              const firstName = profile?.first_name || invite?.first_name || 'Unknown';
-              const lastName = profile?.last_name || invite?.last_name || 'User';
-              const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
-              const avatarUrl = profile?.avatar_url || '';
-              
-              const getDayInitial = (dateStr: string) => {
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('en-US', { weekday: 'short' })[0];
-              };
-              
-              return (
-                <div key={id} className="flex flex-col items-center gap-1.5">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage src={avatarUrl} />
-                    <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-xs font-medium text-foreground">{firstName}</span>
-                  <div className="flex flex-wrap gap-1 justify-center">
-                    {leaveDays.map((day, idx) => (
-                      <StandardizedBadge key={idx} variant="metric" size="sm">
-                        {getDayInitial(day.date)}-{formatAllocationValue(day.hours, capacity, displayPreference)}
-                      </StandardizedBadge>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+            <TooltipProvider>
+              {memberIds.map((id) => {
+                const leaveDays = leaveByMember[id];
+                const profile = profiles.find((p: any) => p.id === id);
+                const invite = invites.find((i: any) => i.id === id);
+                
+                const firstName = profile?.first_name || invite?.first_name || 'Unknown';
+                const lastName = profile?.last_name || invite?.last_name || 'User';
+                const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
+                const avatarUrl = profile?.avatar_url || '';
+                
+                // Calculate total hours and percentage
+                const totalHours = leaveDays.reduce((sum, day) => sum + day.hours, 0);
+                const memberCapacity = profile?.weekly_capacity || invite?.weekly_capacity || capacity;
+                const percentage = Math.round((totalHours / memberCapacity) * 100);
+                
+                return (
+                  <Tooltip key={id}>
+                    <TooltipTrigger asChild>
+                      <div className="flex flex-col items-center gap-1.5 cursor-pointer">
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={avatarUrl} />
+                          <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
+                        </Avatar>
+                        <span className="text-xs font-medium text-foreground">{firstName}</span>
+                        <StandardizedBadge variant="metric" size="sm">
+                          {percentage}%
+                        </StandardizedBadge>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="p-3">
+                      <div className="space-y-1">
+                        <p className="font-medium text-sm">{firstName} {lastName}</p>
+                        <p className="text-xs text-muted-foreground">{totalHours}h of {memberCapacity}h capacity</p>
+                        <div className="border-t border-border pt-1 mt-1 space-y-0.5">
+                          {leaveDays.map((day, idx) => (
+                            <p key={idx} className="text-xs">
+                              {format(new Date(day.date), 'EEE, MMM d')}: {day.hours}h
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </TooltipProvider>
           </div>
         )}
       </CardContent>
