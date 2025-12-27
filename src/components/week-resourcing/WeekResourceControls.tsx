@@ -168,7 +168,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
       <div className="flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Week navigation - improved design */}
-        <div className="flex items-center bg-white border rounded-lg shadow-sm overflow-hidden">
+        <div className="flex items-center bg-background border border-border rounded-lg shadow-sm overflow-hidden">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -286,7 +286,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
               type="single" 
               value={viewMode} 
               onValueChange={(value) => value && onViewModeChange(value as 'compact' | 'expanded')}
-              className="bg-white border rounded-lg shadow-sm overflow-hidden"
+              className="bg-background border border-border rounded-lg shadow-sm overflow-hidden"
             >
               <ToggleGroupItem 
                 value="compact" 
@@ -312,7 +312,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex items-center gap-2 h-9 px-3 bg-white border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 h-9 px-3 bg-background border-border shadow-sm hover:bg-accent transition-colors"
               >
                 <Filter className="h-4 w-4" />
                 <span className="hidden xs:inline">Filters</span>

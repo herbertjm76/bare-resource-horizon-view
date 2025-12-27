@@ -138,8 +138,8 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   return (
     <TableRow
       className={
-        `resource-table-row-compact ${memberIndex % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'}
-        hover:bg-blue-50/80 transition-all duration-150 h-8 min-h-0`
+        `resource-table-row-compact ${memberIndex % 2 === 0 ? 'bg-background' : 'bg-muted/50'}
+        hover:bg-accent/50 transition-all duration-150 h-8 min-h-0`
       }
       style={{ fontSize: 12, minHeight: 28, height: 28, lineHeight: 1 }}
     >
@@ -222,7 +222,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
             </div>
           </PopoverTrigger>
           <PopoverContent 
-            className="z-[250] max-w-lg px-4 py-3 bg-white border border-gray-200 shadow-xl"
+            className="z-[250] max-w-lg px-4 py-3 bg-popover border border-border shadow-xl"
             side="top"
             align="center"
             sideOffset={5}
@@ -295,7 +295,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
                     </span>
                   </TooltipTrigger>
                   <TooltipContent 
-                    className="z-[250] max-w-xs px-3 py-2 bg-white border border-gray-200 shadow-xl"
+                    className="z-[250] max-w-xs px-3 py-2 bg-popover border border-border shadow-xl"
                     side="top"
                     align="center"
                   >

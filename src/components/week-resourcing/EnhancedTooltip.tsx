@@ -167,7 +167,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
         <TooltipTrigger asChild>
           <div className="cursor-pointer">{children}</div>
         </TooltipTrigger>
-        <TooltipContent className="z-[250] max-w-xs px-3 py-2 bg-white border border-gray-200 shadow-xl">
+        <TooltipContent className="z-[250] max-w-xs px-3 py-2 bg-popover border border-border shadow-xl">
           {content}
         </TooltipContent>
       </Tooltip>

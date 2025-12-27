@@ -134,7 +134,7 @@ export const NameCell: React.FC<NameCellProps> = ({
   }
 
   return (
-    <TableCell className="font-medium border-r bg-white sticky left-0 z-10 min-w-[120px] max-w-[150px]">
+    <TableCell className="font-medium border-r border-border bg-background sticky left-0 z-10 min-w-[120px] max-w-[150px]">
       <MemberVacationPopover
         memberId={member.id}
         memberName={getMemberDisplayName()}

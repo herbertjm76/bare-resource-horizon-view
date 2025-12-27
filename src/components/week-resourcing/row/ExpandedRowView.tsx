@@ -48,7 +48,7 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
   });
 
   return (
-    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 border-b`} style={{ height: '80px' }}>
+    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-muted/50' : 'bg-background'} hover:bg-accent/50 transition-colors duration-200 border-b border-border`} style={{ height: '80px' }}>
       {/* Name Cell */}
       <TableCell className="border-r border-gray-200 px-4 py-4 min-w-[180px]">
         <div className="flex flex-col gap-3">

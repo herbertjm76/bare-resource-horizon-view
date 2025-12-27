@@ -45,7 +45,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   onRemarksUpdate
 }) => {
   const isEvenRow = idx % 2 === 0;
-  const rowBgClass = isEvenRow ? 'bg-white' : 'bg-gray-50/50';
+  const rowBgClass = isEvenRow ? 'bg-background' : 'bg-muted/50';
 
   // Get other leave value
   const otherLeaveValue = manualLeaveData[member.id]?.['other'] || 0;
