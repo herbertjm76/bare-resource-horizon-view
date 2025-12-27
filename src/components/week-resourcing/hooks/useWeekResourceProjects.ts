@@ -9,19 +9,24 @@ interface UseWeekResourceProjectsOptions {
 }
 
 export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekResourceProjectsOptions = {}) => {
-  const { company } = useCompany();
+  const { company, loading: companyLoading, error: companyError } = useCompany();
+
+  // Derive a stable company ID - only consider ready when we have both company and ID
+  const companyId = company?.id;
+  const isCompanyReady = !companyLoading && !!companyId && !companyError;
 
   return useQuery({
-    queryKey: ['week-resource-projects', company?.id, filters],
+    queryKey: ['week-resource-projects', companyId, filters],
     queryFn: async () => {
-      if (!company?.id) {
+      // Double-check we have a valid company ID before querying
+      if (!companyId) {
         return [];
       }
       
       let query = supabase
         .from('projects')
         .select('id, code, name, status, department')
-        .eq('company_id', company.id);
+        .eq('company_id', companyId);
       
       // Apply department filter
       if (filters?.department && filters.department !== 'all') {
@@ -38,8 +43,11 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
 
       return data || [];
     },
-    enabled: !!company?.id && enabled,
+    // Only enable when we have a valid company ID and context is not loading
+    enabled: isCompanyReady && enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
+    // Keep previous data while refetching to prevent flicker
+    placeholderData: (previousData) => previousData,
   });
 };
