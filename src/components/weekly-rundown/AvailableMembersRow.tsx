@@ -202,11 +202,21 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       memberLeaveMap.set(leave.member_id, current + Number(leave.hours));
     });
     
-    // Calculate holiday hours (applies to all members based on location - simplified: apply to all for now)
-    const totalHolidayHours = holidays.reduce((sum, holiday) => {
-      // Count 8 hours per holiday day (simplified)
-      return sum + 8;
-    }, 0);
+    // Build holiday hours map by location_id
+    const holidayHoursByLocation = new Map<string | null, number>();
+    holidays.forEach(holiday => {
+      const locationId = holiday.location_id;
+      // Calculate hours for this holiday (8 hours per day)
+      let holidayDays = 1;
+      if (holiday.end_date && holiday.date) {
+        const start = new Date(holiday.date);
+        const end = new Date(holiday.end_date);
+        holidayDays = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+      }
+      const hours = holidayDays * 8;
+      const current = holidayHoursByLocation.get(locationId) || 0;
+      holidayHoursByLocation.set(locationId, current + hours);
+    });
     
     allocations.forEach(alloc => {
       const key = alloc.resource_id;
@@ -249,7 +259,13 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const capacity = m.weekly_capacity || 40;
       const projectHours = allocationMap.get(key) || 0;
       const leaveHours = memberLeaveMap.get(key) || 0;
-      const allocatedHours = projectHours + leaveHours + totalHolidayHours;
+      
+      // Get holiday hours for this member's location
+      // Check both location-specific holidays and global holidays (null location_id)
+      const memberHolidayHours = (holidayHoursByLocation.get(m.location || null) || 0) + 
+                                  (m.location ? (holidayHoursByLocation.get(null) || 0) : 0);
+      
+      const allocatedHours = projectHours + leaveHours + memberHolidayHours;
       const availableHours = capacity - allocatedHours;
       const utilization = capacity > 0 ? (allocatedHours / capacity) * 100 : 0;
       const sectors = Array.from(memberSectorsMap.get(key) || []);
@@ -270,8 +286,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (leaveHours > 0) {
         leaveAllocations.push({ type: 'leave', hours: leaveHours });
       }
-      if (totalHolidayHours > 0) {
-        leaveAllocations.push({ type: 'holiday', hours: totalHolidayHours });
+      if (memberHolidayHours > 0) {
+        leaveAllocations.push({ type: 'holiday', hours: memberHolidayHours });
       }
 
       return {
