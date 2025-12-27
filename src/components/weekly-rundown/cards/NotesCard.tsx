@@ -131,7 +131,7 @@ export const NotesCard: React.FC<NotesCardProps> = ({ notes, weekStartDate }) =>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-              <CardTitle className="text-xs font-semibold text-foreground">Notes</CardTitle>
+              <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Notes</CardTitle>
             </div>
             <Button
               variant="ghost"
