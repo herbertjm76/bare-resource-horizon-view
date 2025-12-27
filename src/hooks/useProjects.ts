@@ -132,9 +132,10 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
 
   return {
     projects: projects || [],
-    // Consider loading if either company context is loading OR query is loading OR company not ready yet
-    isLoading: isLoading || companyLoading || !isCompanyReady,
-    error,
+    // Only show loading when the context is loading or the query is actively fetching.
+    // If company cannot be resolved, we should not spin forever.
+    isLoading: companyLoading || isLoading,
+    error: error || (companyError ? new Error(companyError) : null),
     refetch
   };
 };
