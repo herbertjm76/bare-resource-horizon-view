@@ -548,91 +548,119 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
               <p className="text-xs text-muted-foreground px-2 pb-2">Drag to reorder cards</p>
               <DropdownMenuSeparator />
               
-              {/* Reorderable card items with drag and drop */}
-              {[
-                { id: 'announcements', label: 'Announcements' },
-                { id: 'holidays', label: 'Holidays' },
-                { id: 'annualLeave', label: 'Annual Leave' },
-                { id: 'otherLeave', label: 'Other Leave' },
-                { id: 'notes', label: 'Notes' },
-                { id: 'available', label: 'Available This Week' },
-              ].map((cardItem) => {
-                const isVisible = cardItem.id === 'announcements' 
-                  ? cardVisibility.announcements !== false 
-                  : cardVisibility[cardItem.id];
-                const isDragging = draggedCardId === cardItem.id;
-                const isDragOver = dragOverCardId === cardItem.id;
+              {/* Reorderable card items with drag and drop - ordered by current card order */}
+              {(() => {
+                // Build ordered list based on current cards array
+                const allCardDefs = [
+                  { id: 'announcements', label: 'Announcements' },
+                  { id: 'holidays', label: 'Holidays' },
+                  { id: 'annualLeave', label: 'Annual Leave' },
+                  { id: 'otherLeave', label: 'Other Leave' },
+                  { id: 'notes', label: 'Notes' },
+                  { id: 'available', label: 'Available This Week' },
+                ];
                 
-                return (
-                  <div 
-                    key={cardItem.id} 
-                    draggable={isVisible}
-                    onDragStart={() => handleDragStart(cardItem.id)}
-                    onDragOver={(e) => handleDragOver(e, cardItem.id)}
-                    onDragEnd={handleDragEnd}
-                    onDragLeave={handleDragLeave}
-                    className={`flex items-center justify-between px-2 py-1.5 rounded-sm transition-all ${
-                      isDragging ? 'opacity-50 bg-accent' : ''
-                    } ${isDragOver ? 'border-t-2 border-primary' : ''} ${
-                      isVisible ? 'cursor-grab active:cursor-grabbing hover:bg-accent/50' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={isVisible}
-                        onChange={(e) => toggleCard(cardItem.id, e.target.checked)}
-                        className="h-4 w-4 rounded border-border"
-                      />
-                      <span className="text-sm">{cardItem.label}</span>
+                // Get visible cards in order, then add hidden cards at the end
+                const visibleCardIds = cards.map(c => c.id).filter(id => id !== 'weekInfo');
+                const orderedDefs = [
+                  ...visibleCardIds
+                    .map(id => allCardDefs.find(d => d.id === id))
+                    .filter(Boolean) as typeof allCardDefs,
+                  ...allCardDefs.filter(d => !visibleCardIds.includes(d.id))
+                ];
+                
+                return orderedDefs.map((cardItem) => {
+                  const isVisible = cardItem.id === 'announcements' 
+                    ? cardVisibility.announcements !== false 
+                    : cardVisibility[cardItem.id];
+                  const isDragging = draggedCardId === cardItem.id;
+                  const isDragOver = dragOverCardId === cardItem.id;
+                  
+                  return (
+                    <div 
+                      key={cardItem.id} 
+                      draggable={isVisible}
+                      onDragStart={() => handleDragStart(cardItem.id)}
+                      onDragOver={(e) => handleDragOver(e, cardItem.id)}
+                      onDragEnd={handleDragEnd}
+                      onDragLeave={handleDragLeave}
+                      className={`flex items-center justify-between px-2 py-1.5 rounded-sm transition-all ${
+                        isDragging ? 'opacity-50 bg-accent' : ''
+                      } ${isDragOver ? 'border-t-2 border-primary' : ''} ${
+                        isVisible ? 'cursor-grab active:cursor-grabbing hover:bg-accent/50' : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={isVisible}
+                          onChange={(e) => toggleCard(cardItem.id, e.target.checked)}
+                          className="h-4 w-4 rounded border-border"
+                        />
+                        <span className="text-sm">{cardItem.label}</span>
+                      </div>
+                      {isVisible && (
+                        <GripVertical className="h-4 w-4 text-muted-foreground" />
+                      )}
                     </div>
-                    {isVisible && (
-                      <GripVertical className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                });
+              })()}
               
               {customCardTypes.length > 0 && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel>Custom Cards</DropdownMenuLabel>
-                  {customCardTypes.map(card => {
-                    const cardKey = `custom_${card.id}`;
-                    const isVisible = cardVisibility[cardKey] !== false;
-                    const isDragging = draggedCardId === cardKey;
-                    const isDragOver = dragOverCardId === cardKey;
+                  {(() => {
+                    // Order custom cards based on current card order
+                    const visibleCustomCardIds = cards
+                      .map(c => c.id)
+                      .filter(id => id.startsWith('custom_'));
+                    const orderedCustomCards = [
+                      ...visibleCustomCardIds
+                        .map(id => customCardTypes.find(c => `custom_${c.id}` === id))
+                        .filter(Boolean),
+                      ...customCardTypes.filter(c => !visibleCustomCardIds.includes(`custom_${c.id}`))
+                    ];
                     
-                    return (
-                      <div 
-                        key={card.id} 
-                        draggable={isVisible}
-                        onDragStart={() => handleDragStart(cardKey)}
-                        onDragOver={(e) => handleDragOver(e, cardKey)}
-                        onDragEnd={handleDragEnd}
-                        onDragLeave={handleDragLeave}
-                        className={`flex items-center justify-between px-2 py-1.5 rounded-sm transition-all ${
-                          isDragging ? 'opacity-50 bg-accent' : ''
-                        } ${isDragOver ? 'border-t-2 border-primary' : ''} ${
-                          isVisible ? 'cursor-grab active:cursor-grabbing hover:bg-accent/50' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={isVisible}
-                            onChange={(e) => toggleCard(cardKey, e.target.checked)}
-                            className="h-4 w-4 rounded border-border"
-                          />
-                          {card.icon && <span className="text-sm">{card.icon}</span>}
-                          <span className="text-sm">{card.label}</span>
+                    return orderedCustomCards.map(card => {
+                      if (!card) return null;
+                      const cardKey = `custom_${card.id}`;
+                      const isVisible = cardVisibility[cardKey] !== false;
+                      const isDragging = draggedCardId === cardKey;
+                      const isDragOver = dragOverCardId === cardKey;
+                      
+                      return (
+                        <div 
+                          key={card.id} 
+                          draggable={isVisible}
+                          onDragStart={() => handleDragStart(cardKey)}
+                          onDragOver={(e) => handleDragOver(e, cardKey)}
+                          onDragEnd={handleDragEnd}
+                          onDragLeave={handleDragLeave}
+                          className={`flex items-center justify-between px-2 py-1.5 rounded-sm transition-all ${
+                            isDragging ? 'opacity-50 bg-accent' : ''
+                          } ${isDragOver ? 'border-t-2 border-primary' : ''} ${
+                            isVisible ? 'cursor-grab active:cursor-grabbing hover:bg-accent/50' : ''
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={isVisible}
+                              onChange={(e) => toggleCard(cardKey, e.target.checked)}
+                              className="h-4 w-4 rounded border-border"
+                            />
+                            {card.icon && <span className="text-sm">{card.icon}</span>}
+                            <span className="text-sm">{card.label}</span>
+                          </div>
+                          {isVisible && (
+                            <GripVertical className="h-4 w-4 text-muted-foreground" />
+                          )}
                         </div>
-                        {isVisible && (
-                          <GripVertical className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
-                    );
-                  })}
+                      );
+                    });
+                  })()}
                 </>
               )}
             </DropdownMenuContent>
