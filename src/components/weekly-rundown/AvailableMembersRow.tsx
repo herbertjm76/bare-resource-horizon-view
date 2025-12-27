@@ -167,6 +167,19 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     staleTime: 60_000
   });
 
+  // Fetch office locations to map location names to IDs
+  const { data: officeLocations = [] } = useQuery({
+    queryKey: ['office-locations-for-holidays'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('office_locations')
+        .select('id, city, code');
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 300_000 // Cache for 5 minutes
+  });
+
   // Fetch office holidays for the week
   const { data: holidays = [] } = useQuery({
     queryKey: ['available-holidays', weekStartDate],
@@ -202,8 +215,15 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       memberLeaveMap.set(leave.member_id, current + Number(leave.hours));
     });
     
+    // Create mapping from location name/code to location_id
+    const locationNameToId = new Map<string, string>();
+    officeLocations.forEach(loc => {
+      if (loc.city) locationNameToId.set(loc.city.toLowerCase(), loc.id);
+      if (loc.code) locationNameToId.set(loc.code.toLowerCase(), loc.id);
+    });
+    
     // Build holiday hours map by location_id
-    const holidayHoursByLocation = new Map<string | null, number>();
+    const holidayHoursByLocationId = new Map<string | null, number>();
     holidays.forEach(holiday => {
       const locationId = holiday.location_id;
       // Calculate hours for this holiday (8 hours per day)
@@ -214,8 +234,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         holidayDays = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
       }
       const hours = holidayDays * 8;
-      const current = holidayHoursByLocation.get(locationId) || 0;
-      holidayHoursByLocation.set(locationId, current + hours);
+      const current = holidayHoursByLocationId.get(locationId) || 0;
+      holidayHoursByLocationId.set(locationId, current + hours);
     });
     
     allocations.forEach(alloc => {
@@ -261,9 +281,13 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const leaveHours = memberLeaveMap.get(key) || 0;
       
       // Get holiday hours for this member's location
-      // Check both location-specific holidays and global holidays (null location_id)
-      const memberHolidayHours = (holidayHoursByLocation.get(m.location || null) || 0) + 
-                                  (m.location ? (holidayHoursByLocation.get(null) || 0) : 0);
+      // First, find the location_id for this member's location string
+      const memberLocationId = m.location ? locationNameToId.get(m.location.toLowerCase()) : null;
+      
+      // Get location-specific holidays + global holidays (null location_id applies to all)
+      const locationHolidayHours = memberLocationId ? (holidayHoursByLocationId.get(memberLocationId) || 0) : 0;
+      const globalHolidayHours = holidayHoursByLocationId.get(null) || 0;
+      const memberHolidayHours = locationHolidayHours + globalHolidayHours;
       
       const allocatedHours = projectHours + leaveHours + memberHolidayHours;
       const availableHours = capacity - allocatedHours;
@@ -322,7 +346,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
       return nameA.localeCompare(nameB);
     });
-  }, [allMembersFromParent, allocations, leaves, holidays, sortAscending]);
+  }, [allMembersFromParent, allocations, leaves, holidays, officeLocations, sortAscending]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
