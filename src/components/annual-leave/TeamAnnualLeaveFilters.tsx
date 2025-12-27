@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useWeeklyFilterOptions } from '@/components/week-resourcing/hooks/useWeeklyFilterOptions';
 import { 
   Search, X, Users, FolderOpen, MapPin, ChevronLeft, ChevronRight
@@ -104,18 +105,21 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
   return (
     <div className="flex gap-2 items-center w-full min-w-0">
       {/* Filter Type Icon Dropdown */}
-      <Select value={activeFilterType} onValueChange={(value: FilterType) => setActiveFilterType(value)}>
-        <SelectTrigger className="w-9 h-9 p-0 border-input bg-background">
-          <div className="flex items-center justify-center w-full">
-            {activeFilterType === 'practiceArea' ? (
-              <FolderOpen className="h-4 w-4" />
-            ) : activeFilterType === 'department' ? (
-              <Users className="h-4 w-4" />
-            ) : (
-              <MapPin className="h-4 w-4" />
-            )}
-          </div>
-        </SelectTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div>
+            <Select value={activeFilterType} onValueChange={(value: FilterType) => setActiveFilterType(value)}>
+              <SelectTrigger className="w-9 h-9 p-0 border-input bg-background">
+                <div className="flex items-center justify-center w-full">
+                  {activeFilterType === 'practiceArea' ? (
+                    <FolderOpen className="h-4 w-4" />
+                  ) : activeFilterType === 'department' ? (
+                    <Users className="h-4 w-4" />
+                  ) : (
+                    <MapPin className="h-4 w-4" />
+                  )}
+                </div>
+              </SelectTrigger>
         <SelectContent className="bg-background z-50">
           <SelectItem value="department">
             <div className="flex items-center gap-2">
@@ -135,8 +139,14 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
               <span>Location</span>
             </div>
           </SelectItem>
-        </SelectContent>
-      </Select>
+            </SelectContent>
+          </Select>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Filter by {activeFilterType === 'practiceArea' ? 'Practice Area' : activeFilterType === 'department' ? 'Department' : 'Location'}</p>
+        </TooltipContent>
+      </Tooltip>
 
       {/* Badges Container */}
       <div 
@@ -178,82 +188,100 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
 
       {/* Badge Scroll Arrows */}
       {canScrollLeft && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9 w-9 p-0 shrink-0"
-          onClick={() => scrollBadges('left')}
-          title="Scroll left"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 w-9 p-0 shrink-0"
+              onClick={() => scrollBadges('left')}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent><p>Scroll left</p></TooltipContent>
+        </Tooltip>
       )}
       {canScrollRight && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9 w-9 p-0 shrink-0"
-          onClick={() => scrollBadges('right')}
-          title="Scroll right"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 w-9 p-0 shrink-0"
+              onClick={() => scrollBadges('right')}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent><p>Scroll right</p></TooltipContent>
+        </Tooltip>
       )}
 
       {/* Clear Filters */}
       {activeFiltersCount > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={clearFilters}
-          className="h-9 w-9 p-0 shrink-0"
-          title="Clear filters"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="h-9 w-9 p-0 shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent><p>Clear filters</p></TooltipContent>
+        </Tooltip>
       )}
 
       {/* Search Icon Button */}
-      <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-        <PopoverTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm"
-            className={`h-9 w-9 p-0 shrink-0 relative ${filters.searchTerm ? 'ring-2 ring-primary' : ''}`}
-            title="Search"
-          >
-            <Search className="h-4 w-4" />
-            {filters.searchTerm && (
-              <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full" />
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80 p-4 bg-background z-50" align="end">
-          <div className="space-y-2">
-            <h4 className="font-medium text-sm">Search Members</h4>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={filters.searchTerm}
-                onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-                placeholder="Search by name..."
-                className="pl-9"
-                autoFocus
-              />
-              {filters.searchTerm && (
-                <Button
-                  variant="ghost"
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div>
+            <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
                   size="sm"
-                  className="absolute right-1 top-1/2 h-7 w-7 p-0 -translate-y-1/2"
-                  onClick={() => onFilterChange('searchTerm', '')}
+                  className={`h-9 w-9 p-0 shrink-0 relative ${filters.searchTerm ? 'ring-2 ring-primary' : ''}`}
                 >
-                  <X className="h-3 w-3" />
+                  <Search className="h-4 w-4" />
+                  {filters.searchTerm && (
+                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full" />
+                  )}
                 </Button>
-              )}
-            </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-4 bg-background z-50" align="end">
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Search Members</h4>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={filters.searchTerm}
+                      onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+                      placeholder="Search by name..."
+                      className="pl-9"
+                      autoFocus
+                    />
+                    {filters.searchTerm && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-1 top-1/2 h-7 w-7 p-0 -translate-y-1/2"
+                        onClick={() => onFilterChange('searchTerm', '')}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
-        </PopoverContent>
-      </Popover>
+        </TooltipTrigger>
+        <TooltipContent><p>Search members</p></TooltipContent>
+      </Tooltip>
     </div>
   );
 };
