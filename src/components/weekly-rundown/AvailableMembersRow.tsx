@@ -287,9 +287,23 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const leaveHours = memberLeaveMap.get(key) || 0;
       
       // Get holiday hours for this member's location
-      // First, find the location_id for this member's location string
-      const memberLocationId = m.location ? locationNameToId.get(m.location.toLowerCase()) : null;
-      
+      // Note: member.location is a free-text field (e.g. "Singapore", "SG", "Singapore (SG)").
+      // Try multiple matching strategies to resolve the correct office_locations.id.
+      const rawMemberLocation = (m.location || '').trim();
+      const memberLocationKey = rawMemberLocation.toLowerCase();
+
+      const directIdMatch = officeLocations.find((loc) => loc.id === rawMemberLocation)?.id;
+      const exactMapMatch = memberLocationKey ? locationNameToId.get(memberLocationKey) : undefined;
+      const partialMatch = memberLocationKey
+        ? officeLocations.find((loc) => {
+            const city = (loc.city || '').toLowerCase();
+            const code = (loc.code || '').toLowerCase();
+            return (city && memberLocationKey.includes(city)) || (code && memberLocationKey.includes(code));
+          })?.id
+        : undefined;
+
+      const memberLocationId = directIdMatch || exactMapMatch || partialMatch || null;
+
       // Get location-specific holidays + global holidays (null location_id applies to all)
       const locationHolidayHours = memberLocationId ? (holidayHoursByLocationId.get(memberLocationId) || 0) : 0;
       const globalHolidayHours = holidayHoursByLocationId.get(null) || 0;
