@@ -448,12 +448,12 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             </Button>
           )}
           
-          {/* Right Arrow - centered but below hide button */}
+          {/* Right Arrow - vertically centered */}
           {canScrollRight && (
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-0 top-[calc(50%+14px)] -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
               onClick={() => scrollDesktop('right')}
             >
               <ChevronRight className="h-4 w-4" />
