@@ -87,7 +87,7 @@ export const LeaveTypeList: React.FC<LeaveTypeListProps> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{type.name}</span>
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs uppercase font-mono">
                     {type.code}
                   </Badge>
                   {type.requires_attachment && (
