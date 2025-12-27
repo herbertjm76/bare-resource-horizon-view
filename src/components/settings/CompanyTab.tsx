@@ -6,9 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Pencil, Save, X, AlertCircle, ExternalLink, Building2, Copy, Check } from 'lucide-react';
+import { Pencil, Save, AlertCircle, ExternalLink, Copy, Check } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
 export const CompanyTab: React.FC = () => {
@@ -19,9 +18,6 @@ export const CompanyTab: React.FC = () => {
   const [formData, setFormData] = useState({
     name: company?.name || '',
     subdomain: company?.subdomain || '',
-    address: company?.address || '',
-    city: company?.city || '',
-    country: company?.country || '',
     website: company?.website || '',
     industry: company?.industry || '',
     size: company?.size || '',
@@ -31,9 +27,6 @@ export const CompanyTab: React.FC = () => {
     setFormData({
       name: company?.name || '',
       subdomain: company?.subdomain || '',
-      address: company?.address || '',
-      city: company?.city || '',
-      country: company?.country || '',
       website: company?.website || '',
       industry: company?.industry || '',
       size: company?.size || '',
@@ -107,9 +100,6 @@ export const CompanyTab: React.FC = () => {
         .update({
           name: formData.name.trim(),
           subdomain: formData.subdomain.trim().toLowerCase(),
-          address: formData.address.trim() || null,
-          city: formData.city.trim() || null,
-          country: formData.country.trim() || null,
           website: formData.website.trim() || null,
           industry: formData.industry.trim() || null,
           size: formData.size.trim() || null,
@@ -140,13 +130,6 @@ export const CompanyTab: React.FC = () => {
       </Card>
     );
   }
-
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  };
-
-  const locationParts = [company.address, company.city, company.country].filter(Boolean);
-  const locationString = locationParts.length > 0 ? locationParts.join(', ') : null;
 
   if (editing) {
     return (
@@ -210,34 +193,7 @@ export const CompanyTab: React.FC = () => {
                 placeholder="50-100 employees"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="address">Street Address</Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="123 Main Street"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                placeholder="Singapore"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                value={formData.country}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                placeholder="Singapore"
-              />
-            </div>
-            <div className="space-y-2">
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="website">Website</Label>
               <Input
                 id="website"
@@ -255,35 +211,25 @@ export const CompanyTab: React.FC = () => {
 
   return (
     <Card className="overflow-hidden">
-      {/* Header with gradient accent */}
-      <div className="h-2 bg-gradient-to-r from-primary via-primary/80 to-primary/60" />
-      
       <div className="p-6">
-        {/* Top section: Logo + Name + Edit */}
-        <div className="flex items-start justify-between gap-4 mb-6">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 rounded-xl border-2 border-border shadow-sm">
-              {company.logo_url ? (
-                <AvatarImage src={company.logo_url} alt={company.name} />
-              ) : null}
-              <AvatarFallback className="rounded-xl bg-primary/10 text-primary text-lg font-bold">
-                {getInitials(company.name)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="text-xl font-bold text-foreground">{company.name}</h2>
-              <div className="flex items-center gap-2 mt-1">
-                {company.industry && (
-                  <Badge variant="secondary" className="text-xs font-normal">
-                    {company.industry}
-                  </Badge>
-                )}
-                {company.size && (
-                  <Badge variant="outline" className="text-xs font-normal">
-                    {company.size}
-                  </Badge>
-                )}
-              </div>
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <div>
+            <h2 className="text-xl font-bold text-foreground">{company.name}</h2>
+            <div className="flex items-center gap-2 mt-1.5">
+              {company.industry && (
+                <Badge variant="secondary" className="text-xs font-normal">
+                  {company.industry}
+                </Badge>
+              )}
+              {company.size && (
+                <Badge variant="outline" className="text-xs font-normal">
+                  {company.size}
+                </Badge>
+              )}
+              {!company.industry && !company.size && (
+                <span className="text-sm text-muted-foreground">No industry or size set</span>
+              )}
             </div>
           </div>
           <Button onClick={handleEdit} variant="outline" size="sm">
@@ -292,19 +238,16 @@ export const CompanyTab: React.FC = () => {
           </Button>
         </div>
 
-        {/* Info Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Info Cards */}
+        <div className="grid gap-3 sm:grid-cols-2">
           {/* URL Card */}
           <div className="rounded-lg border bg-muted/30 p-4">
-            <div className="flex items-center gap-2 text-muted-foreground mb-2">
-              <Building2 className="h-4 w-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">Company URL</span>
-            </div>
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Company URL</span>
             <a
               href={`https://bareresource.com/${company.subdomain}/dashboard`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1"
+              className="mt-1 text-sm font-semibold text-primary hover:underline flex items-center gap-1"
             >
               bareresource.com/{company.subdomain}
               <ExternalLink className="h-3 w-3" />
@@ -313,54 +256,40 @@ export const CompanyTab: React.FC = () => {
 
           {/* Invite Link Card */}
           <div className="rounded-lg border bg-muted/30 p-4">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between">
               <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Team Invite Link</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-6 px-2 text-xs"
+                className="h-6 px-2 text-xs -mr-2 -mt-1"
                 onClick={handleCopyUrl}
               >
                 {copied ? (
-                  <><Check className="h-3 w-3 mr-1" /> Copied</>
+                  <><Check className="h-3 w-3 mr-1 text-green-600" /> Copied</>
                 ) : (
                   <><Copy className="h-3 w-3 mr-1" /> Copy</>
                 )}
               </Button>
             </div>
-            <p className="text-sm font-medium text-foreground font-mono">
+            <p className="mt-1 text-sm font-medium text-foreground font-mono">
               /join/{company.subdomain}
             </p>
           </div>
-
-          {/* Location Card */}
-          <div className="rounded-lg border bg-muted/30 p-4 sm:col-span-2 lg:col-span-1">
-            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
-              Location
-            </div>
-            {locationString ? (
-              <p className="text-sm font-medium text-foreground">{locationString}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground/60 italic">No location set</p>
-            )}
-          </div>
         </div>
 
-        {/* Website - only show if set */}
+        {/* Website */}
         {company.website && (
-          <div className="mt-4 pt-4 border-t">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Website</span>
-              <a
-                href={company.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-              >
-                {company.website.replace(/^https?:\/\//, '')}
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
+          <div className="mt-4 pt-4 border-t flex items-center gap-2">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Website</span>
+            <a
+              href={company.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+            >
+              {company.website.replace(/^https?:\/\//, '')}
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
         )}
       </div>
