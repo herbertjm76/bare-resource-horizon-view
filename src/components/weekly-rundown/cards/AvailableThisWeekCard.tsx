@@ -136,7 +136,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
 
   return (
     <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-card sm:min-w-[220px] sm:max-w-[280px]">
-      <CardHeader className="flex-shrink-0 pb-2">
+      <CardHeader className="flex-shrink-0 pb-2 h-[44px] flex items-start pt-4">
         <CardTitle className="flex items-center gap-2 text-xs font-semibold text-foreground uppercase tracking-wide">
           <UserCheck className="h-3.5 w-3.5 text-muted-foreground" />
           Available This Week

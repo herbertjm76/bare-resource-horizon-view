@@ -157,8 +157,8 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
   return (
     <>
       <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1">
-        <CardHeader className="pb-2 flex-shrink-0">
-          <div className="flex items-center justify-between">
+        <CardHeader className="pb-2 flex-shrink-0 h-[44px] flex items-start pt-3">
+          <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-2">
               <Megaphone className="h-3.5 w-3.5 text-primary" />
               <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Announcements</CardTitle>
@@ -166,10 +166,10 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0"
+              className="h-6 w-6 p-0 -mt-1"
               onClick={handleAdd}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-3.5 w-3.5" />
             </Button>
           </div>
         </CardHeader>
