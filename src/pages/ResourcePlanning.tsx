@@ -7,7 +7,7 @@ import { useProjectPlanningData } from '@/hooks/useProjectPlanningData';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { ProjectPlanningList } from '@/components/resource-planning/ProjectPlanningList';
 import { PlanningFilterRow } from '@/components/resource-planning/PlanningFilterRow';
-import { DemandCapacityChart } from '@/components/resource-planning/DemandCapacityChart';
+import { ForecastTreemap } from '@/components/resource-planning/ForecastTreemap';
 import { ResourcePlanningControls } from '@/components/resource-planning/ResourcePlanningControls';
 import { PlanningAuditLogViewer } from '@/components/resource-planning/PlanningAuditLogViewer';
 import { QuickCreateProjectDialog } from '@/components/resource-planning/QuickCreateProjectDialog';
@@ -21,6 +21,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
+
+type ForecastGrouping = 'department' | 'practice_area';
 
 const statusOptions = ['Active', 'On Hold', 'Completed', 'Planning'];
 
@@ -37,6 +39,7 @@ const ResourcePlanning: React.FC = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [selectedWeeks, setSelectedWeeks] = useState<number>(12);
   const [startDate, setStartDate] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [forecastGrouping, setForecastGrouping] = useState<ForecastGrouping>('department');
   
   // For edit dialog
   const [selectedProject, setSelectedProject] = useState<any>(null);
@@ -226,17 +229,22 @@ const ResourcePlanning: React.FC = () => {
                 onStartDateChange={setStartDate}
               />
 
-              {/* Chart */}
+              {/* Treemap Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Project Demand Forecast</CardTitle>
+                  <CardTitle className="text-lg">Demand Forecast by {forecastGrouping === 'department' ? 'Department' : 'Practice Area'}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <DemandCapacityChart
+                  <ForecastTreemap
                     weeklyDemand={weeklyDemand}
-                    roleNames={roleNames}
-                    weeklyCapacity={weeklyCapacity}
                     projectDemands={projectDemands}
+                    weeklyCapacity={weeklyCapacity}
+                    numberOfWeeks={selectedWeeks}
+                    grouping={forecastGrouping}
+                    onGroupingChange={setForecastGrouping}
+                    projects={projects}
+                    departments={departments}
+                    practiceAreas={practiceAreas}
                   />
                 </CardContent>
               </Card>
