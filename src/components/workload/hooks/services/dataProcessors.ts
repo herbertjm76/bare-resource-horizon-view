@@ -12,7 +12,7 @@ export const processProjectAllocations = (
     sampleAllocations: allocationsData.slice(0, 3).map(a => ({
       resource_id: a.resource_id,
       hours: a.hours,
-      week_start_date: a.week_start_date,
+      allocation_date: a.allocation_date,
       project_id: a.project_id
     }))
   });
@@ -26,7 +26,11 @@ export const processProjectAllocations = (
     const hours = typeof allocation.hours === 'string' ? parseFloat(allocation.hours) || 0 : allocation.hours || 0;
     const projectId = allocation.project_id;
     
-    const allocationDate = parseISO(allocation.week_start_date);
+    // Use allocation_date field (not week_start_date)
+    const dateStr = allocation.allocation_date;
+    if (!dateStr) continue; // Skip if no date
+    
+    const allocationDate = parseISO(dateStr);
     const allocationWeekStart = startOfWeek(allocationDate, { weekStartsOn: 1 });
     const weekKey = format(allocationWeekStart, 'yyyy-MM-dd');
     
