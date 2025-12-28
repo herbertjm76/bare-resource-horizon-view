@@ -29,7 +29,7 @@ export const useFetchResources = (projectId: string) => {
           id, 
           hours,
           staff_id,
-          profiles!project_resources_staff_id_fkey(id, first_name, last_name, job_title, avatar_url)
+          profiles!project_resources_staff_id_fkey(id, first_name, last_name, job_title, avatar_url, department, practice_area, location)
         `)
         .eq('project_id', projectId)
         .eq('company_id', company.id);
@@ -49,7 +49,7 @@ export const useFetchResources = (projectId: string) => {
           id,
           hours,
           invite_id,
-          invites!pending_resources_invite_id_fkey(id, first_name, last_name, job_title)
+          invites!pending_resources_invite_id_fkey(id, first_name, last_name, job_title, department, practice_area, location)
         `)
         .eq('project_id', projectId)
         .eq('company_id', company.id);
@@ -73,6 +73,9 @@ export const useFetchResources = (projectId: string) => {
           avatar_url: profile?.avatar_url,
           first_name: profile?.first_name,
           last_name: profile?.last_name,
+          department: profile?.department,
+          practice_area: profile?.practice_area,
+          location: profile?.location,
         };
       });
       
@@ -85,6 +88,9 @@ export const useFetchResources = (projectId: string) => {
           isPending: true,
           first_name: invite?.first_name,
           last_name: invite?.last_name,
+          department: invite?.department,
+          practice_area: invite?.practice_area,
+          location: invite?.location,
         };
       });
       
@@ -122,7 +128,7 @@ export const useFetchResources = (projectId: string) => {
         // Check if they are active users
         const { data: orphanedProfiles } = await supabase
           .from('profiles')
-          .select('id, first_name, last_name, job_title, avatar_url')
+          .select('id, first_name, last_name, job_title, avatar_url, department, practice_area, location')
           .in('id', Array.from(orphanedResourceIds) as string[]);
 
         orphanedProfiles?.forEach(profile => {
@@ -134,6 +140,9 @@ export const useFetchResources = (projectId: string) => {
             avatar_url: profile.avatar_url,
             first_name: profile.first_name,
             last_name: profile.last_name,
+            department: profile.department,
+            practice_area: profile.practice_area,
+            location: profile.location,
           });
         });
 
@@ -145,7 +154,7 @@ export const useFetchResources = (projectId: string) => {
         if (remainingIds.length > 0) {
           const { data: orphanedInvites } = await supabase
             .from('invites')
-            .select('id, first_name, last_name, job_title')
+            .select('id, first_name, last_name, job_title, department, practice_area, location')
             .in('id', remainingIds as string[]);
 
           orphanedInvites?.forEach(invite => {
@@ -156,6 +165,9 @@ export const useFetchResources = (projectId: string) => {
               isPending: true,
               first_name: invite.first_name,
               last_name: invite.last_name,
+              department: invite.department,
+              practice_area: invite.practice_area,
+              location: invite.location,
             });
           });
         }

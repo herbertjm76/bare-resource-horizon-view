@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PersonResourceGrid } from './PersonResourceGrid';
 import { usePersonResourceData } from '@/hooks/usePersonResourceData';
 import { useGridWeeks } from '../hooks/useGridWeeks';
@@ -14,6 +14,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { MobilePersonControls } from './MobilePersonControls';
 
+interface MemberFilters {
+  practiceArea: string;
+  department: string;
+  location: string;
+  searchTerm: string;
+}
+
 interface PersonResourceViewProps {
   startDate: Date;
   periodToShow: number;
@@ -22,6 +29,7 @@ interface PersonResourceViewProps {
   onPeriodChange: (period: number) => void;
   showOnlyControls?: boolean;
   showOnlyGrid?: boolean;
+  memberFilters?: MemberFilters;
 }
 
 export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
@@ -31,13 +39,36 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   onMonthChange,
   onPeriodChange,
   showOnlyControls = false,
-  showOnlyGrid = false
+  showOnlyGrid = false,
+  memberFilters
 }) => {
   const { personData, isLoading, refetch } = usePersonResourceData(startDate, periodToShow);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
   const [expandedPeople, setExpandedPeople] = useState<string[]>([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const { company } = useCompany();
+
+  // Filter person data based on member filters
+  const filteredPersonData = useMemo(() => {
+    if (!personData || !memberFilters) return personData;
+    
+    return personData.filter(person => {
+      if (memberFilters.practiceArea && memberFilters.practiceArea !== 'all') {
+        if (person.practiceArea !== memberFilters.practiceArea) return false;
+      }
+      if (memberFilters.department && memberFilters.department !== 'all') {
+        if (person.department !== memberFilters.department) return false;
+      }
+      if (memberFilters.location && memberFilters.location !== 'all') {
+        if (person.location !== memberFilters.location) return false;
+      }
+      if (memberFilters.searchTerm) {
+        const searchLower = memberFilters.searchTerm.toLowerCase();
+        if (!person.personName.toLowerCase().includes(searchLower)) return false;
+      }
+      return true;
+    });
+  }, [personData, memberFilters]);
 
   // Setup real-time subscription for allocation changes to update person totals instantly
   useEffect(() => {
@@ -72,8 +103,8 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   };
 
   const expandAll = () => {
-    if (personData) {
-      setExpandedPeople(personData.map(p => p.personId));
+    if (filteredPersonData) {
+      setExpandedPeople(filteredPersonData.map(p => p.personId));
     }
   };
 
@@ -99,7 +130,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
     { value: '16', label: '4 Months' }
   ];
 
-  const totalPeople = personData?.length || 0;
+  const totalPeople = filteredPersonData?.length || 0;
   const allExpanded = expandedPeople.length === totalPeople && totalPeople > 0;
   
   const handleToggleExpand = () => {
@@ -114,7 +145,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
     return <GridLoadingState />;
   }
 
-  if (!personData?.length) {
+  if (!filteredPersonData?.length) {
     return (
       <div className="text-center py-12 border rounded-lg">
         <p className="text-muted-foreground mb-2">No team members found.</p>
@@ -243,7 +274,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
       <div className="w-full flex justify-center">
         <div className="w-full max-w-[1400px] overflow-hidden">
           <PersonResourceGrid
-            personData={personData}
+            personData={filteredPersonData}
             weeks={weeks}
             expandedPeople={expandedPeople}
             onTogglePersonExpand={handleTogglePersonExpand}
@@ -274,7 +305,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
       <div className="w-full flex justify-center">
         <div className="w-full max-w-[1400px] overflow-hidden">
           <PersonResourceGrid
-            personData={personData}
+            personData={filteredPersonData}
             weeks={weeks}
             expandedPeople={expandedPeople}
             onTogglePersonExpand={handleTogglePersonExpand}

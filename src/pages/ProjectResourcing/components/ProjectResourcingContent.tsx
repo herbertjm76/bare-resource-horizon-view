@@ -18,6 +18,13 @@ declare module 'jspdf' {
   }
 }
 
+interface MemberFilters {
+  practiceArea: string;
+  department: string;
+  location: string;
+  searchTerm: string;
+}
+
 interface ProjectResourcingContentProps {
   selectedMonth: Date;
   searchTerm: string;
@@ -49,6 +56,7 @@ interface ProjectResourcingContentProps {
   onClearFilters: () => void;
   showOnlyControls?: boolean;
   showOnlyGrid?: boolean;
+  memberFilters?: MemberFilters;
 }
 
 // Inner component that uses office settings
@@ -72,7 +80,8 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onDisplayOptionChange,
   onClearFilters,
   showOnlyControls = false,
-  showOnlyGrid = false
+  showOnlyGrid = false,
+  memberFilters
 }) => {
   // Fetch projects only for expand all functionality and total count
   const { projects, isLoading } = useProjects(sortBy, sortDirection);
@@ -275,6 +284,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
             expandedProjects={expandedProjects}
             totalProjects={totalProjects}
             onToggleProjectExpand={handleToggleProjectExpand}
+            memberFilters={memberFilters}
           />
         </div>
       </div>

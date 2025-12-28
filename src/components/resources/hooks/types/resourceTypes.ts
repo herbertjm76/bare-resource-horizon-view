@@ -8,6 +8,9 @@ export interface Resource {
   avatar_url?: string;
   first_name?: string;
   last_name?: string;
+  department?: string;
+  practice_area?: string;
+  location?: string;
 }
 
 export interface AllocationRecord {

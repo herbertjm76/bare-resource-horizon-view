@@ -6,6 +6,13 @@ import { WeekInfo } from '../hooks/useGridWeeks';
 import './workload-resource-grid.css';
 import './tablet-optimizations.css';
 
+interface MemberFilters {
+  practiceArea: string;
+  department: string;
+  location: string;
+  searchTerm: string;
+}
+
 interface WorkloadStyleResourceGridProps {
   projects: any[];
   weeks: WeekInfo[];
@@ -13,6 +20,7 @@ interface WorkloadStyleResourceGridProps {
   onToggleProjectExpand: (projectId: string) => void;
   selectedDate?: Date;
   periodToShow?: number;
+  memberFilters?: MemberFilters;
 }
 
 export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps> = ({
@@ -21,7 +29,8 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
   expandedProjects,
   onToggleProjectExpand,
   selectedDate,
-  periodToShow
+  periodToShow,
+  memberFilters
 }) => {
   // Calculate total table width: project column (250px) + week columns (80px each)
   const tableWidth = 250 + weeks.length * 80;
@@ -49,6 +58,7 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
                 isEven={index % 2 === 0}
                 selectedDate={selectedDate}
                 periodToShow={periodToShow}
+                memberFilters={memberFilters}
               />
             ))}
           </tbody>
