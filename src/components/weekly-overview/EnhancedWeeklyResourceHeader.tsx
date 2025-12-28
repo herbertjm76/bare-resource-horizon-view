@@ -2,6 +2,7 @@
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Project } from './types';
+import { useProjectDisplayText } from '@/hooks/useProjectDisplayText';
 
 interface EnhancedWeeklyResourceHeaderProps {
   projects: Project[];
@@ -10,6 +11,8 @@ interface EnhancedWeeklyResourceHeaderProps {
 export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeaderProps> = ({
   projects
 }) => {
+  const getDisplayText = useProjectDisplayText();
+  
   return (
     <TableHeader>
       <TableRow style={{ background: 'hsl(var(--gradient-start))' }}>
@@ -23,7 +26,7 @@ export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeader
           <TableHead key={project.id} style={{ background: 'hsl(var(--gradient-start))' }}>
             <div className="enhanced-project-code-header">
               <span className="text-white font-bold">
-                {project.code}
+                {getDisplayText(project)}
               </span>
             </div>
           </TableHead>

@@ -2,12 +2,15 @@
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Project } from './types';
+import { useProjectDisplayText } from '@/hooks/useProjectDisplayText';
 
 interface CleanWeeklyHeaderProps {
   projects: Project[];
 }
 
 export const CleanWeeklyHeader: React.FC<CleanWeeklyHeaderProps> = ({ projects }) => {
+  const getDisplayText = useProjectDisplayText();
+  
   return (
     <TableHeader>
       <TableRow>
@@ -18,7 +21,7 @@ export const CleanWeeklyHeader: React.FC<CleanWeeklyHeaderProps> = ({ projects }
         {projects.map((project) => (
           <TableHead key={project.id}>
             <div className="weekly-project-header">
-              {project.code}
+              {getDisplayText(project)}
             </div>
           </TableHead>
         ))}
