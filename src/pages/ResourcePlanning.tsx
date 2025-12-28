@@ -229,13 +229,14 @@ const ResourcePlanning: React.FC = () => {
               {/* Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Demand vs Capacity Forecast</CardTitle>
+                  <CardTitle className="text-lg">Project Demand Forecast</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <DemandCapacityChart
                     weeklyDemand={weeklyDemand}
                     roleNames={roleNames}
                     weeklyCapacity={weeklyCapacity}
+                    projectDemands={projectDemands}
                   />
                 </CardContent>
               </Card>

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts';
-import { WeeklyDemandData } from '@/hooks/useDemandProjection';
+import { WeeklyDemandData, ProjectDemand } from '@/hooks/useDemandProjection';
 import { format } from 'date-fns';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Info } from 'lucide-react';
@@ -9,10 +9,11 @@ interface DemandCapacityChartProps {
   weeklyDemand: WeeklyDemandData[];
   roleNames: Record<string, string>;
   weeklyCapacity: number;
+  projectDemands?: ProjectDemand[];
 }
 
-// Color palette for roles
-const ROLE_COLORS = [
+// Color palette for projects
+const PROJECT_COLORS = [
   'hsl(var(--theme-primary))',
   'hsl(217, 91%, 60%)',
   'hsl(142, 76%, 36%)',
@@ -21,54 +22,74 @@ const ROLE_COLORS = [
   'hsl(0, 84%, 60%)',
   'hsl(180, 70%, 45%)',
   'hsl(330, 80%, 60%)',
+  'hsl(200, 80%, 50%)',
+  'hsl(45, 90%, 55%)',
+  'hsl(160, 70%, 40%)',
+  'hsl(300, 70%, 55%)',
 ];
 
 export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
   weeklyDemand,
   roleNames,
-  weeklyCapacity
+  weeklyCapacity,
+  projectDemands = []
 }) => {
   // Check if there's any projected demand data
   const hasRealData = weeklyDemand.some(week => week.totalDemand > 0);
 
-  // Generate demo data when no real data exists
-  const demoWeeklyDemand: WeeklyDemandData[] = !hasRealData ? Array.from({ length: 12 }, (_, i) => {
-    const weekDate = new Date();
-    weekDate.setDate(weekDate.getDate() + (i * 7));
-    
-    // Create realistic demand patterns
-    const seniorDemand = 15 + Math.sin(i * 0.5) * 8 + Math.random() * 5;
-    const midDemand = 25 + Math.cos(i * 0.4) * 10 + Math.random() * 8;
-    const juniorDemand = 20 + Math.sin(i * 0.3 + 1) * 6 + Math.random() * 6;
-    const specialistDemand = 10 + Math.cos(i * 0.6) * 5 + Math.random() * 4;
-    
-    return {
-      weekKey: format(weekDate, 'yyyy-MM-dd'),
-      weekDate,
-      totalDemand: seniorDemand + midDemand + juniorDemand + specialistDemand,
-      demandByRole: {
-        'senior-consultant': seniorDemand,
-        'consultant': midDemand,
-        'analyst': juniorDemand,
-        'specialist': specialistDemand,
-      },
-      demandByProject: {},
-    };
-  }) : weeklyDemand;
+  // Build project names map from projectDemands
+  const projectNames = useMemo(() => {
+    const names: Record<string, string> = {};
+    projectDemands.forEach(pd => {
+      if (!names[pd.projectId]) {
+        names[pd.projectId] = pd.projectCode || pd.projectName;
+      }
+    });
+    return names;
+  }, [projectDemands]);
 
-  const demoRoleNames: Record<string, string> = !hasRealData ? {
-    'senior-consultant': 'Senior Consultant',
-    'consultant': 'Consultant',
-    'analyst': 'Analyst',
-    'specialist': 'Specialist',
-  } : roleNames;
+  // Generate demo data when no real data exists - now by PROJECT
+  const demoWeeklyDemand: WeeklyDemandData[] = useMemo(() => {
+    if (hasRealData) return weeklyDemand;
+    
+    return Array.from({ length: 12 }, (_, i) => {
+      const weekDate = new Date();
+      weekDate.setDate(weekDate.getDate() + (i * 7));
+      
+      // Create realistic demand patterns by project
+      const projectA = 20 + Math.sin(i * 0.5) * 8 + Math.random() * 5;
+      const projectB = 15 + Math.cos(i * 0.4) * 6 + Math.random() * 4;
+      const projectC = 25 + Math.sin(i * 0.3 + 1) * 10 + Math.random() * 6;
+      const projectD = 10 + Math.cos(i * 0.6) * 4 + Math.random() * 3;
+      
+      return {
+        weekKey: format(weekDate, 'yyyy-MM-dd'),
+        weekDate,
+        totalDemand: projectA + projectB + projectC + projectD,
+        demandByRole: {},
+        demandByProject: {
+          'demo-project-a': projectA,
+          'demo-project-b': projectB,
+          'demo-project-c': projectC,
+          'demo-project-d': projectD,
+        },
+      };
+    });
+  }, [hasRealData, weeklyDemand]);
+
+  const demoProjectNames: Record<string, string> = !hasRealData ? {
+    'demo-project-a': 'Office Tower A',
+    'demo-project-b': 'Retail Center',
+    'demo-project-c': 'Hospital Wing',
+    'demo-project-d': 'School Campus',
+  } : projectNames;
 
   const effectiveWeeklyDemand = hasRealData ? weeklyDemand : demoWeeklyDemand;
-  const effectiveRoleNames = hasRealData ? roleNames : demoRoleNames;
-  const effectiveCapacity = hasRealData ? weeklyCapacity : 80; // Demo capacity
+  const effectiveProjectNames = hasRealData ? projectNames : demoProjectNames;
+  const effectiveCapacity = hasRealData ? weeklyCapacity : 80;
 
-  // Get all unique role IDs
-  const allRoleIds = [...new Set(effectiveWeeklyDemand.flatMap(week => Object.keys(week.demandByRole)))];
+  // Get all unique project IDs
+  const allProjectIds = [...new Set(effectiveWeeklyDemand.flatMap(week => Object.keys(week.demandByProject)))];
 
   // Transform data for the chart
   const chartData = effectiveWeeklyDemand.map(week => {
@@ -79,8 +100,8 @@ export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
       capacity: effectiveCapacity,
     };
 
-    allRoleIds.forEach(roleId => {
-      dataPoint[roleId] = Math.round(week.demandByRole[roleId] || 0);
+    allProjectIds.forEach(projectId => {
+      dataPoint[projectId] = Math.round(week.demandByProject[projectId] || 0);
     });
 
     return dataPoint;
@@ -107,6 +128,10 @@ export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
       {/* Summary Badges */}
       <div className="flex flex-wrap gap-3 text-sm">
         <div className="px-3 py-1.5 rounded-full bg-muted">
+          <span className="text-muted-foreground">Projects: </span>
+          <span className="font-medium">{allProjectIds.length}</span>
+        </div>
+        <div className="px-3 py-1.5 rounded-full bg-muted">
           <span className="text-muted-foreground">Avg Utilization: </span>
           <span className={utilizationPct > 100 ? 'text-destructive font-medium' : 'font-medium'}>
             {utilizationPct}%
@@ -125,10 +150,10 @@ export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <defs>
-              {allRoleIds.map((roleId, index) => (
-                <linearGradient key={roleId} id={`gradient-rp-${roleId}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={ROLE_COLORS[index % ROLE_COLORS.length]} stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor={ROLE_COLORS[index % ROLE_COLORS.length]} stopOpacity={0.1}/>
+              {allProjectIds.map((projectId, index) => (
+                <linearGradient key={projectId} id={`gradient-proj-${projectId}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={PROJECT_COLORS[index % PROJECT_COLORS.length]} stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor={PROJECT_COLORS[index % PROJECT_COLORS.length]} stopOpacity={0.1}/>
                 </linearGradient>
               ))}
             </defs>
@@ -151,13 +176,13 @@ export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
               }}
               formatter={(value: number, name: string) => {
                 if (name === 'capacity') return [`${value} hours`, 'Team Capacity'];
-                return [`${value} hours`, effectiveRoleNames[name] || name];
+                return [`${value} hours`, effectiveProjectNames[name] || name];
               }}
             />
             <Legend 
               formatter={(value) => {
                 if (value === 'capacity') return 'Team Capacity';
-                return effectiveRoleNames[value] || value;
+                return effectiveProjectNames[value] || value;
               }}
               wrapperStyle={{ fontSize: '12px' }}
             />
@@ -170,33 +195,33 @@ export const DemandCapacityChart: React.FC<DemandCapacityChartProps> = ({
               strokeWidth={2}
             />
             
-            {/* Stacked areas for each role */}
-            {allRoleIds.map((roleId, index) => (
+            {/* Stacked areas for each project */}
+            {allProjectIds.map((projectId, index) => (
               <Area
-                key={roleId}
+                key={projectId}
                 type="monotone"
-                dataKey={roleId}
+                dataKey={projectId}
                 stackId="1"
-                stroke={ROLE_COLORS[index % ROLE_COLORS.length]}
-                fill={`url(#gradient-rp-${roleId})`}
-                name={roleId}
+                stroke={PROJECT_COLORS[index % PROJECT_COLORS.length]}
+                fill={`url(#gradient-proj-${projectId})`}
+                name={projectId}
               />
             ))}
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Role Legend with totals */}
+      {/* Project Legend with totals */}
       <div className="flex flex-wrap gap-4 pt-2 border-t">
-        {allRoleIds.map((roleId, index) => {
-          const totalHours = effectiveWeeklyDemand.reduce((sum, week) => sum + (week.demandByRole[roleId] || 0), 0);
+        {allProjectIds.map((projectId, index) => {
+          const totalHours = effectiveWeeklyDemand.reduce((sum, week) => sum + (week.demandByProject[projectId] || 0), 0);
           return (
-            <div key={roleId} className="flex items-center gap-2 text-sm">
+            <div key={projectId} className="flex items-center gap-2 text-sm">
               <div 
                 className="w-3 h-3 rounded-sm" 
-                style={{ backgroundColor: ROLE_COLORS[index % ROLE_COLORS.length] }}
+                style={{ backgroundColor: PROJECT_COLORS[index % PROJECT_COLORS.length] }}
               />
-              <span className="text-muted-foreground">{effectiveRoleNames[roleId] || roleId}:</span>
+              <span className="text-muted-foreground">{effectiveProjectNames[projectId] || projectId}:</span>
               <span className="font-medium">{Math.round(totalHours)}h</span>
             </div>
           );
