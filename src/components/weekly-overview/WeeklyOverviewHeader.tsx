@@ -2,6 +2,11 @@
 import React from 'react';
 import { format, startOfWeek } from 'date-fns';
 import { Calendar } from 'lucide-react';
+import { useAppSettings, WeekStartDay } from '@/hooks/useAppSettings';
+
+const getWeekStartsOn = (weekStartDay: WeekStartDay): 0 | 1 | 6 => {
+  return weekStartDay === 'Sunday' ? 0 : weekStartDay === 'Saturday' ? 6 : 1;
+};
 
 interface WeeklyOverviewHeaderProps {
   selectedWeek: Date;
@@ -10,7 +15,8 @@ interface WeeklyOverviewHeaderProps {
 export const WeeklyOverviewHeader: React.FC<WeeklyOverviewHeaderProps> = ({
   selectedWeek
 }) => {
-  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const { startOfWorkWeek } = useAppSettings();
+  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: getWeekStartsOn(startOfWorkWeek) });
   const weekLabel = format(weekStart, 'MMMM d, yyyy');
 
   return (

@@ -13,6 +13,7 @@ import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface CardDetailDialogProps {
   open: boolean;
@@ -29,7 +30,7 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
   cardLabel,
   data
 }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   const capacity = workWeekHours;
 
   const getIcon = () => {
@@ -136,7 +137,7 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
                     </Avatar>
                     <div className="flex-1">
                       <p className="font-medium text-foreground">{firstName} {lastName}</p>
-                      <p className="text-sm text-muted-foreground">{totalHours}h of {memberCapacity}h capacity ({percentage}%)</p>
+                      <p className="text-sm text-muted-foreground">{formatAllocationValue(totalHours, memberCapacity, displayPreference)} of {formatCapacityValue(memberCapacity, displayPreference)} capacity ({percentage}%)</p>
                     </div>
                     <StandardizedBadge variant="metric">{percentage}%</StandardizedBadge>
                   </div>
@@ -144,7 +145,7 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
                     {leaveDays.map((day: any, idx: number) => (
                       <div key={idx} className="text-sm bg-background p-2 rounded">
                         <span className="text-muted-foreground">{format(new Date(day.date), 'EEE, MMM d')}:</span>{' '}
-                        <span className="font-medium">{day.hours}h</span>
+                        <span className="font-medium">{formatAllocationValue(day.hours, memberCapacity, displayPreference)}</span>
                       </div>
                     ))}
                   </div>
@@ -186,7 +187,7 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
                     </Avatar>
                     <div className="flex-1">
                       <p className="font-medium text-foreground">{firstName} {lastName}</p>
-                      <p className="text-sm text-muted-foreground">{leaveData.hours}h</p>
+                      <p className="text-sm text-muted-foreground">{formatAllocationValue(leaveData.hours, capacity, displayPreference)}</p>
                     </div>
                   </div>
                   {leaveData.notes && (
