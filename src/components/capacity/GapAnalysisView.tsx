@@ -3,10 +3,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TeamMember } from '@/components/dashboard/types';
 import { WeeklyWorkloadBreakdown } from '@/components/workload/hooks/types';
 import { WeeklyDemandData } from '@/hooks/useDemandProjection';
-import { format } from 'date-fns';
+import { format, addWeeks, startOfWeek } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle, TrendingDown, TrendingUp, Minus } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getMemberCapacity } from '@/utils/capacityUtils';
@@ -20,14 +19,95 @@ interface GapAnalysisViewProps {
   isLoading: boolean;
 }
 
+// Demo data generator for gap analysis
+const generateDemoGapData = (numberOfWeeks: number = 12) => {
+  const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+  // Using partial TeamMember type for demo - we only need the fields used in calculations
+  const demoMembers = [
+    { id: 'demo-1', email: 'alice@demo.com', weekly_capacity: 40, first_name: 'Alice', last_name: 'Johnson', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+    { id: 'demo-2', email: 'bob@demo.com', weekly_capacity: 40, first_name: 'Bob', last_name: 'Smith', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+    { id: 'demo-3', email: 'carol@demo.com', weekly_capacity: 35, first_name: 'Carol', last_name: 'Davis', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+    { id: 'demo-4', email: 'david@demo.com', weekly_capacity: 40, first_name: 'David', last_name: 'Lee', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+    { id: 'demo-5', email: 'eva@demo.com', weekly_capacity: 40, first_name: 'Eva', last_name: 'Martinez', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  ] as TeamMember[];
+
+  const weekStartDates: Array<{ date: Date; key: string }> = [];
+  const weeklyWorkloadData: Record<string, Record<string, WeeklyWorkloadBreakdown>> = {};
+  const weeklyDemand: WeeklyDemandData[] = [];
+
+  for (let i = 0; i < numberOfWeeks; i++) {
+    const weekDate = addWeeks(startDate, i);
+    const weekKey = format(weekDate, 'yyyy-MM-dd');
+    weekStartDates.push({ date: weekDate, key: weekKey });
+
+    // Generate varying demand pattern
+    const demandMultiplier = 0.7 + Math.sin(i * 0.4) * 0.4;
+    const totalDemand = Math.round(180 * demandMultiplier + Math.random() * 30);
+
+    weeklyDemand.push({
+      weekKey,
+      weekDate,
+      demandByRole: {},
+      demandByProject: {},
+      totalDemand,
+    });
+
+    // Generate actual workload (slightly less than demand for realistic gap)
+    demoMembers.forEach(member => {
+      if (!weeklyWorkloadData[member.id]) {
+        weeklyWorkloadData[member.id] = {};
+      }
+      const capacity = (member as any).weekly_capacity || 40;
+      const utilizationVariance = 0.6 + Math.random() * 0.35;
+      const memberHours = Math.round(capacity * utilizationVariance);
+      
+      weeklyWorkloadData[member.id][weekKey] = {
+        projectHours: memberHours,
+        annualLeave: 0,
+        officeHolidays: 0,
+        otherLeave: 0,
+        total: memberHours,
+        projects: []
+      };
+    });
+  }
+
+  return { demoMembers, weekStartDates, weeklyWorkloadData, weeklyDemand };
+};
+
 export const GapAnalysisView: React.FC<GapAnalysisViewProps> = ({
-  members,
-  weeklyWorkloadData,
-  weeklyDemand,
-  weekStartDates,
+  members: propMembers,
+  weeklyWorkloadData: propWeeklyWorkloadData,
+  weeklyDemand: propWeeklyDemand,
+  weekStartDates: propWeekStartDates,
   isLoading
 }) => {
   const { workWeekHours, displayPreference } = useAppSettings();
+
+  // Check if we have real data
+  const hasRealData = propMembers.length > 0 && 
+    (Object.keys(propWeeklyWorkloadData).length > 0 || propWeeklyDemand.some(d => d.totalDemand > 0));
+
+  // Use real or demo data
+  const { members, weeklyWorkloadData, weeklyDemand, weekStartDates, isDemo } = useMemo(() => {
+    if (hasRealData) {
+      return {
+        members: propMembers,
+        weeklyWorkloadData: propWeeklyWorkloadData,
+        weeklyDemand: propWeeklyDemand,
+        weekStartDates: propWeekStartDates,
+        isDemo: false
+      };
+    }
+    const demo = generateDemoGapData(propWeekStartDates.length || 12);
+    return {
+      members: demo.demoMembers,
+      weeklyWorkloadData: demo.weeklyWorkloadData,
+      weeklyDemand: demo.weeklyDemand,
+      weekStartDates: demo.weekStartDates,
+      isDemo: true
+    };
+  }, [hasRealData, propMembers, propWeeklyWorkloadData, propWeeklyDemand, propWeekStartDates]);
   
   // Calculate team capacity and actual workload per week
   const analysisData = useMemo(() => {
@@ -62,7 +142,7 @@ export const GapAnalysisView: React.FC<GapAnalysisViewProps> = ({
         gap: Math.round(overUnderCapacity),
       };
     });
-  }, [weekStartDates, members, weeklyWorkloadData, weeklyDemand]);
+  }, [weekStartDates, members, weeklyWorkloadData, weeklyDemand, workWeekHours]);
 
   // Calculate summary metrics
   const summary = useMemo(() => {
@@ -88,22 +168,20 @@ export const GapAnalysisView: React.FC<GapAnalysisViewProps> = ({
     return <Skeleton className="h-80 w-full" />;
   }
 
-  // Check if there's any data
-  const hasData = analysisData.some(d => d.actual > 0 || d.projected > 0);
-
-  if (!hasData) {
-    return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          No capacity data available. Allocate resources to projects and add team compositions to see gap analysis.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
   return (
     <div className="space-y-6">
+      {/* Demo indicator */}
+      {isDemo && (
+        <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-300/30 rounded-lg">
+          <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600 border-amber-300">
+            Demo Data
+          </Badge>
+          <span className="text-sm text-amber-700">
+            Showing sample data. Allocate resources to projects and add team compositions to see real gap analysis.
+          </span>
+        </div>
+      )}
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-lg bg-muted/50">
@@ -200,11 +278,11 @@ export const GapAnalysisView: React.FC<GapAnalysisViewProps> = ({
                 }}
               />
               <ReferenceLine 
-                y={members.reduce((sum, m) => sum + getMemberCapacity(m.weekly_capacity, workWeekHours), 0) / weekStartDates.length * weekStartDates.length / analysisData.length} 
+                y={members.reduce((sum, m) => sum + getMemberCapacity(m.weekly_capacity, workWeekHours), 0)} 
                 stroke="hsl(var(--destructive))" 
                 strokeDasharray="5 5"
                 label={{ 
-                  value: 'Avg Capacity', 
+                  value: 'Weekly Capacity', 
                   position: 'insideTopRight',
                   fontSize: 10,
                   fill: 'hsl(var(--destructive))'
