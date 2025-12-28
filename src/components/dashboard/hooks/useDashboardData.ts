@@ -19,15 +19,19 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   refetch: () => Promise<void>;
 } => {
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
-  const { company } = useCompany();
+  const { company, loading: companyLoading } = useCompany();
+
+  // Only pass companyId to queries when company context is fully loaded
+  // This prevents queries from running with undefined companyId
+  const companyId = !companyLoading ? company?.id : undefined;
 
   // Single source of truth: React Query hooks
-  const { data: teamMembers = [], isLoading: isTeamLoading, refetch: refetchTeam } = useDashboardTeamMembers(company?.id);
-  const { data: preRegisteredMembers = [], refetch: refetchPreReg } = useDashboardPreRegistered(company?.id);
-  const { data: projects = [], isLoading: isProjectsLoading, refetch: refetchProjects } = useDashboardProjects(company?.id);
-  const { data: teamComposition = [], isLoading: isTeamCompositionLoading } = useDashboardTeamComposition(company?.id);
-  const { data: holidays = [], isLoading: isHolidaysLoading } = useDashboardHolidays(company?.id);
-  const { data: metrics, isLoading: metricsLoading } = useDashboardMetrics(company?.id, selectedTimeRange);
+  const { data: teamMembers = [], isLoading: isTeamLoading, refetch: refetchTeam } = useDashboardTeamMembers(companyId);
+  const { data: preRegisteredMembers = [], refetch: refetchPreReg } = useDashboardPreRegistered(companyId);
+  const { data: projects = [], isLoading: isProjectsLoading, refetch: refetchProjects } = useDashboardProjects(companyId);
+  const { data: teamComposition = [], isLoading: isTeamCompositionLoading } = useDashboardTeamComposition(companyId);
+  const { data: holidays = [], isLoading: isHolidaysLoading } = useDashboardHolidays(companyId);
+  const { data: metrics, isLoading: metricsLoading } = useDashboardMetrics(companyId, selectedTimeRange);
   
   const timeRangeMetrics = metrics || {
     activeProjects: 0,
@@ -127,8 +131,8 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
 
   const officeOptions = ['All Offices'];
   
-  // Single consolidated loading state
-  const isLoading = isTeamLoading || isProjectsLoading || metricsLoading;
+  // Single consolidated loading state - include company loading
+  const isLoading = companyLoading || isTeamLoading || isProjectsLoading || metricsLoading;
 
   const refetch = async () => {
     await Promise.all([

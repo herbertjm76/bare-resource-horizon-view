@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 
 interface UseWeekResourceProjectsOptions {
-  filters?: any;
+  filters?: { department?: string };
   enabled?: boolean;
 }
 
@@ -12,7 +12,8 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
   const { company, loading: companyLoading, error: companyError } = useCompany();
 
   const companyId = company?.id;
-  const canFetch = !!companyId && !companyLoading && !companyError && enabled;
+  // CRITICAL: Only fetch when company context is fully ready
+  const canFetch = !companyLoading && !!companyId && !companyError && enabled;
 
   return useQuery({
     queryKey: ['week-resource-projects', companyId, filters],
