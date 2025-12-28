@@ -110,6 +110,19 @@ const WeeklyOverview = () => {
     return `Week of ${format(weekStart, 'MMM d, yyyy')}`;
   }, [selectedWeek]);
 
+  // Create unfiltered members list for the avatar row (not affected by filters)
+  const unfilteredMembers = useMemo(() => {
+    const combined = [
+      ...(profiles || []).map(p => ({ ...p, status: 'active' })),
+      ...(invites || []).map(i => ({ ...i, status: 'pre_registered' }))
+    ];
+    return combined.sort((a, b) => {
+      const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase();
+      const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }, [profiles, invites]);
+
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
     await queryClient.invalidateQueries({ queryKey: ['active-team-members'] });
@@ -212,11 +225,11 @@ const WeeklyOverview = () => {
 
             {/* Connected Filter and Content Section */}
             <div className="mt-0">
-              {/* Available Members Row - FIRST (shows availability/utilization) */}
+              {/* Available Members Row - FIRST (shows availability/utilization) - NOT filtered */}
               <AvailableMembersRow
                 weekStartDate={weekStartString}
                 threshold={80}
-                allMembers={allMembers}
+                allMembers={unfilteredMembers}
               />
 
               {/* Unified Controls + Filters Combined */}
