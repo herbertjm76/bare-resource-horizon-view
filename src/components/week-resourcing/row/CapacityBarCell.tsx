@@ -46,20 +46,28 @@ export const CapacityBarCell: React.FC<CapacityBarCellProps> = ({
               <p className="font-medium border-b pb-1 mb-1">Utilization Breakdown</p>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#3b82f6' }} />
-                <span>Projects: {projectHours}h</span>
+                <span>Projects: {displayPreference === 'percentage' 
+                  ? `${Math.round((projectHours / totalCapacity) * 100)}%` 
+                  : `${projectHours}h`}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#f97316' }} />
-                <span>Annual Leave: {annualLeaveHours}h</span>
+                <span>Annual Leave: {displayPreference === 'percentage' 
+                  ? `${Math.round((annualLeaveHours / totalCapacity) * 100)}%` 
+                  : `${annualLeaveHours}h`}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#a855f7' }} />
-                <span>Holidays: {holidayHours}h</span>
+                <span>Holidays: {displayPreference === 'percentage' 
+                  ? `${Math.round((holidayHours / totalCapacity) * 100)}%` 
+                  : `${holidayHours}h`}</span>
               </div>
               {otherLeaveHours > 0 && (
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#6b7280' }} />
-                  <span>Other Leave: {otherLeaveHours}h</span>
+                  <span>Other Leave: {displayPreference === 'percentage' 
+                    ? `${Math.round((otherLeaveHours / totalCapacity) * 100)}%` 
+                    : `${otherLeaveHours}h`}</span>
                 </div>
               )}
               <p className="font-medium border-t pt-1 mt-1">

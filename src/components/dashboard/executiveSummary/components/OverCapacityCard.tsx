@@ -2,16 +2,22 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Clock } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface OverCapacityCardProps {
   overCapacityHours: number;
   timeRange: string;
+  totalCapacity?: number;
 }
 
 export const OverCapacityCard: React.FC<OverCapacityCardProps> = ({
   overCapacityHours,
-  timeRange
+  timeRange,
+  totalCapacity
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
+  const capacity = totalCapacity || workWeekHours;
   return (
     <Card className="rounded-xl glass-card glass-hover border-white/20 h-full">
       <CardContent className="p-3 h-full flex flex-col justify-between">
@@ -24,7 +30,7 @@ export const OverCapacityCard: React.FC<OverCapacityCardProps> = ({
         
         <div className="flex-1 flex flex-col justify-center">
           <div className="text-center">
-            <div className="text-2xl font-bold text-white mb-1">{overCapacityHours}h</div>
+            <div className="text-2xl font-bold text-white mb-1">{formatAllocationValue(overCapacityHours, capacity, displayPreference)}</div>
             <div className="w-16 h-1 bg-white/30 rounded-full mx-auto">
               <div className="w-3/4 h-1 bg-white rounded-full"></div>
             </div>

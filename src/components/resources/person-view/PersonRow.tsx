@@ -7,6 +7,8 @@ import { AddProjectRow } from './AddProjectRow';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { PersonResourceData } from '@/hooks/usePersonResourceData';
 import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface PersonRowProps {
   person: PersonResourceData;
@@ -29,6 +31,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
   periodToShow,
   onRefresh
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
   const [projectAllocations, setProjectAllocations] = useState(person.projects);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -198,7 +201,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
               }}>
                 {weekTotal > 0 ? (
                   <span className="project-total-hours" style={{ fontSize: '13px' }}>
-                    {weekTotal}h
+                    {formatAllocationValue(weekTotal, person.weeklyCapacity || workWeekHours, displayPreference)}
                   </span>
                 ) : (
                   <span style={{ 

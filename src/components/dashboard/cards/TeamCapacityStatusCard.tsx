@@ -6,17 +6,19 @@ import { UnifiedDashboardData } from '../hooks/useDashboardData';
 import { TimeRange } from '../TimeRangeSelector';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useTimeRangeCapacity } from '@/hooks/useTimeRangeCapacity';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface TeamCapacityStatusCardProps {
   data: UnifiedDashboardData;
   selectedTimeRange: TimeRange;
 }
 
-const CapacityGauge: React.FC<{ value: number; max: number; label: string; color: string }> = ({ 
+const CapacityGauge: React.FC<{ value: number; max: number; label: string; color: string; displayPreference: 'hours' | 'percentage' }> = ({ 
   value, 
   max, 
   label, 
-  color 
+  color,
+  displayPreference
 }) => {
   const percentage = Math.min((value / max) * 100, 100);
   
@@ -38,14 +40,14 @@ const CapacityGauge: React.FC<{ value: number; max: number; label: string; color
       </div>
       <div className="space-y-0.5">
         <p className="text-xs font-medium text-gray-700">{label}</p>
-        <p className="text-xs text-gray-500">{Math.round(value)}h</p>
+        <p className="text-xs text-gray-500">{formatAllocationValue(Math.round(value), max, displayPreference)}</p>
       </div>
     </div>
   );
 };
 
 export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ data, selectedTimeRange }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   const { weekMultiplier, label: timeRangeLabel } = useTimeRangeCapacity(selectedTimeRange);
   
   // Calculate total capacity for the time range
@@ -89,7 +91,7 @@ export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ 
 
         <div className="grid grid-cols-3 gap-6">
           {capacityMetrics.map((metric, index) => (
-            <CapacityGauge key={index} {...metric} />
+            <CapacityGauge key={index} {...metric} displayPreference={displayPreference} />
           ))}
         </div>
 

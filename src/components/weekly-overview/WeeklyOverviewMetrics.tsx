@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Users, Clock, TrendingUp, Calendar } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getMemberCapacity } from '@/utils/capacityUtils';
+import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
 
 interface WeeklyOverviewMetricsProps {
   data: {
@@ -33,7 +34,7 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
   data, 
   selectedWeek 
 }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   
   const calculateWeeklyMetrics = () => {
     if (!data.allMembers || data.allMembers.length === 0) {
@@ -106,7 +107,7 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
               </div>
             </div>
             <p className="text-xs text-gray-500 leading-tight">
-              {metrics.totalAllocated}h / {metrics.totalCapacity}h
+              {formatUtilizationSummary(metrics.totalAllocated, metrics.totalCapacity, displayPreference)}
             </p>
           </CardContent>
         </Card>
@@ -121,7 +122,7 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
             </div>
             <div className="flex items-center justify-between mb-1">
               <div className="text-base sm:text-lg font-bold text-gray-900 leading-none">
-                {Math.round(metrics.availableHours)}h
+                {formatAllocationValue(Math.round(metrics.availableHours), metrics.totalCapacity, displayPreference)}
               </div>
               <div className="bg-blue-500 text-white text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 rounded">
                 Available

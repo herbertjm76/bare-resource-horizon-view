@@ -3,6 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { TrendingUp } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface UtilizationTrendAnalysisProps {
   historicalUtilization: number;
@@ -11,6 +13,7 @@ interface UtilizationTrendAnalysisProps {
   underutilizedWeeks: number;
   overallocatedWeeks: number;
   isLoading?: boolean;
+  weeklyCapacity?: number;
 }
 
 const getUtilizationColor = (utilization: number) => {
@@ -26,8 +29,11 @@ export const UtilizationTrendAnalysis: React.FC<UtilizationTrendAnalysisProps> =
   averageFutureUtilization,
   underutilizedWeeks,
   overallocatedWeeks,
-  isLoading = false
+  isLoading = false,
+  weeklyCapacity
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
+  const capacity = weeklyCapacity || workWeekHours;
   if (isLoading) {
     return (
       <Card>
@@ -78,7 +84,7 @@ export const UtilizationTrendAnalysis: React.FC<UtilizationTrendAnalysisProps> =
               <div className="text-xl font-bold text-gray-700">{Math.round(historicalUtilization)}%</div>
               <Progress value={historicalUtilization} className="flex-1 h-2" />
             </div>
-            <p className="text-sm text-gray-600">Average: {Math.round(historicalAverage)}h/week</p>
+            <p className="text-sm text-gray-600">Average: {formatAllocationValue(Math.round(historicalAverage), capacity, displayPreference)}/week</p>
           </div>
           
           <div className="space-y-3">

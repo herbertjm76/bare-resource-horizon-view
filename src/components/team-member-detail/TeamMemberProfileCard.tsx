@@ -6,13 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { Mail, MapPin, Calendar, Briefcase, Clock, UserCheck, Building } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getMemberCapacity } from '@/utils/capacityUtils';
+import { formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface TeamMemberProfileCardProps {
   member: any;
 }
 
 export const TeamMemberProfileCard: React.FC<TeamMemberProfileCardProps> = ({ member }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   const getUserInitials = () => {
     const firstName = member.first_name || '';
     const lastName = member.last_name || '';
@@ -96,7 +97,7 @@ export const TeamMemberProfileCard: React.FC<TeamMemberProfileCardProps> = ({ me
                   )}
                   <div className="flex items-center gap-2 text-white/90">
                     <Clock className="h-4 w-4" />
-                    <span>{getMemberCapacity(member.weekly_capacity, workWeekHours)}h weekly capacity</span>
+                    <span>{formatCapacityValue(getMemberCapacity(member.weekly_capacity, workWeekHours), displayPreference)} weekly capacity</span>
                   </div>
                 </div>
               </div>
