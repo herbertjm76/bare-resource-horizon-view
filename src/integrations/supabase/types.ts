@@ -944,7 +944,7 @@ export type Database = {
           practice_area: string | null
           start_date: string | null
           updated_at: string
-          weekly_capacity: number
+          weekly_capacity: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -963,7 +963,7 @@ export type Database = {
           practice_area?: string | null
           start_date?: string | null
           updated_at?: string
-          weekly_capacity?: number
+          weekly_capacity?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -982,7 +982,7 @@ export type Database = {
           practice_area?: string | null
           start_date?: string | null
           updated_at?: string
-          weekly_capacity?: number
+          weekly_capacity?: number | null
         }
         Relationships: [
           {

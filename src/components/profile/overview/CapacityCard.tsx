@@ -11,6 +11,7 @@ interface CapacityCardProps {
 export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
   const { workWeekHours } = useAppSettings();
   const weeklyCapacity = getMemberCapacity(profile.weekly_capacity, workWeekHours);
+  const isUsingDefault = profile.weekly_capacity === null || profile.weekly_capacity === undefined;
   
   return (
     <Card className="bg-card border-2 border-border rounded-xl p-4 shadow-sm">
@@ -20,7 +21,14 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
         <div className="space-y-2">
           <div>
             <p className="text-xs text-muted-foreground">Weekly Capacity</p>
-            <p className="text-xl font-bold text-foreground">{weeklyCapacity}h</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xl font-bold text-foreground">{weeklyCapacity}h</p>
+              {isUsingDefault && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                  Company Default
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="space-y-1.5">

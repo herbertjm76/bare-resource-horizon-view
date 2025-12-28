@@ -22,6 +22,6 @@ export type Profile = {
   job_title: string | null;
   department: string | null;
   location: string | null;
-  weekly_capacity: number;
+  weekly_capacity: number | null; // null = use company work_week_hours setting
   role?: string | null;
 };

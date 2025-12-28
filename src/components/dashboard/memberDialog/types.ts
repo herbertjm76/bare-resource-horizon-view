@@ -12,6 +12,6 @@ export interface MemberFormData {
   department?: string;
   location?: string;
   job_title?: string;
-  weekly_capacity?: number;
+  weekly_capacity?: number | null; // null = use company default
   office_role_id?: string;
 }
