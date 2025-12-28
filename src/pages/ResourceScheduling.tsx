@@ -114,12 +114,11 @@ const ResourceScheduling = () => {
           >
             <TabsContent value="by-project" className="mt-0 py-3">
               <div className="space-y-4">
-                {/* 1. Available Members Row - always sorted by utilization */}
+                {/* 1. Available Members Row - always sorted by utilization, NOT filtered */}
                 <div className="px-3 sm:px-6">
                   <AvailableMembersRow
                     weekStartDate={weekStartDate}
                     threshold={80}
-                    filters={memberFilters}
                   />
                 </div>
                 
@@ -188,12 +187,11 @@ const ResourceScheduling = () => {
 
             <TabsContent value="by-person" className="mt-0 py-3">
               <div className="space-y-4">
-                {/* 1. Available Members Row - always sorted by utilization */}
+                {/* 1. Available Members Row - always sorted by utilization, NOT filtered */}
                 <div className="px-3 sm:px-6">
                   <AvailableMembersRow
                     weekStartDate={weekStartDate}
                     threshold={80}
-                    filters={memberFilters}
                   />
                 </div>
                 
