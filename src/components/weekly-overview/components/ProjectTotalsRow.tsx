@@ -3,6 +3,8 @@ import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { formatNumber } from '../utils';
 import { Project } from '../types';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectTotalsRowProps {
   projects: Project[];
@@ -13,6 +15,7 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
   projects,
   projectTotals
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
   // Calculate grand total
   const grandTotal = Object.values(projectTotals).reduce((sum, total) => sum + total, 0);
   
@@ -33,13 +36,13 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
       <TableCell className="text-center text-muted-foreground border-r border-border">—</TableCell>
       
       <TableCell className="py-2.5 px-4 text-right font-bold text-foreground border-r border-border">
-        {formatNumber(grandTotal)}h
+        {formatAllocationValue(grandTotal, workWeekHours, displayPreference)}
       </TableCell>
       
       {/* Project total columns */}
       {projects.map(project => (
         <TableCell key={project.id} className="py-2.5 px-1 text-center font-semibold text-foreground border-r border-border">
-          {projectTotals[project.id] ? `${formatNumber(projectTotals[project.id])}h` : '—'}
+          {projectTotals[project.id] ? formatAllocationValue(projectTotals[project.id], workWeekHours, displayPreference) : '—'}
         </TableCell>
       ))}
     </TableRow>

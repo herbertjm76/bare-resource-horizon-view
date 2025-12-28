@@ -5,6 +5,7 @@ import { CapacityBar } from '../CapacityBar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { formatAllocationValue, formatAvailableValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface CapacityCellProps {
   availableHours: number;
@@ -29,7 +30,7 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
   projects = [],
   annualLeaveDates = []
 }) => {
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference } = useAppSettings();
   // Use the weekly total allocated hours that's passed in (this should be the sum for the entire week)
   const weeklyProjectHours = totalAllocatedHours;
   
@@ -69,12 +70,12 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
       <div>
         <p className="font-semibold text-sm mb-2">Weekly Capacity Breakdown:</p>
         <div className="space-y-1">
-          <p>Total Weekly Capacity: {totalCapacity}h</p>
-          <p>Project Hours (Weekly Total): {weeklyProjectHours}h</p>
-          <p>Annual Leave (Weekly Total): {weeklyAnnualLeave}h</p>
-          <p>Holiday: {holidayHours}h</p>
-          <p>Other Leave: {otherLeave}h</p>
-          <p className="border-t pt-1 font-medium">Available: {availableHours}h</p>
+          <p>Total Weekly Capacity: {formatCapacityValue(totalCapacity, displayPreference)}</p>
+          <p>Project Hours (Weekly Total): {formatAllocationValue(weeklyProjectHours, totalCapacity, displayPreference)}</p>
+          <p>Annual Leave (Weekly Total): {formatAllocationValue(weeklyAnnualLeave, totalCapacity, displayPreference)}</p>
+          <p>Holiday: {formatAllocationValue(holidayHours, totalCapacity, displayPreference)}</p>
+          <p>Other Leave: {formatAllocationValue(otherLeave, totalCapacity, displayPreference)}</p>
+          <p className="border-t pt-1 font-medium">Available: {formatAvailableValue(availableHours, totalCapacity, displayPreference)}</p>
           <p>Weekly Utilization: {utilizationPercentage}%</p>
         </div>
       </div>
@@ -88,12 +89,12 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
                 <span className="truncate">
                   {getProjectDisplayName({ code: project.project_code, name: project.name }, projectDisplayPreference)}
                 </span>
-                <span className="font-medium">{project.hours}h</span>
+                <span className="font-medium">{formatAllocationValue(project.hours, totalCapacity, displayPreference)}</span>
               </div>
             ))}
             <div className="border-t pt-1 font-semibold flex justify-between">
               <span>Total Projects:</span>
-              <span>{projects.reduce((sum, p) => sum + p.hours, 0)}h</span>
+              <span>{formatAllocationValue(projects.reduce((sum, p) => sum + p.hours, 0), totalCapacity, displayPreference)}</span>
             </div>
           </div>
         </div>
