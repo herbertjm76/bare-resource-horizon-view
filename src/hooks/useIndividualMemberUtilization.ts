@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { format, startOfWeek, subWeeks, endOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { format, startOfWeek, subWeeks } from 'date-fns';
 
 interface IndividualUtilization {
   days7: number;
@@ -10,7 +11,7 @@ interface IndividualUtilization {
   days90: number;
 }
 
-export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity: number = 40) => {
+export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity?: number) => {
   const [utilization, setUtilization] = useState<IndividualUtilization>({
     days7: 0,
     days30: 0,
@@ -18,6 +19,9 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity:
   });
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
+  const { workWeekHours } = useAppSettings();
+
+  const effectiveWeeklyCapacity = weeklyCapacity ?? workWeekHours;
 
   useEffect(() => {
     const fetchUtilization = async () => {
@@ -35,7 +39,7 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity:
         const twelveWeeksAgo = subWeeks(currentWeekStart, 12);
         
         console.log('Fetching utilization for member:', memberId);
-        console.log('Weekly capacity:', weeklyCapacity);
+        console.log('Weekly capacity:', effectiveWeeklyCapacity);
         
         // Fetch allocations for the past 90 days in one query
         const { data: allocations, error } = await supabase
@@ -64,7 +68,7 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity:
             sum + (allocation.hours || 0), 0
           );
           
-          const totalCapacity = weeklyCapacity * weeksBack;
+          const totalCapacity = effectiveWeeklyCapacity * weeksBack;
           return totalCapacity > 0 ? Math.round((totalHours / totalCapacity) * 100) : 0;
         };
 
@@ -85,7 +89,7 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity:
     };
 
     fetchUtilization();
-  }, [company?.id, memberId, weeklyCapacity]);
+  }, [company?.id, memberId, effectiveWeeklyCapacity, workWeekHours]);
 
   return { utilization, isLoading };
 };

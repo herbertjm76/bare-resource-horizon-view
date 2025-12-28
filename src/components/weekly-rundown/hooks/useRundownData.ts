@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { RundownMode, SortOption } from '../WeeklyRundownView';
 
 interface UseRundownDataProps {
@@ -18,6 +19,8 @@ export const useRundownData = ({
   getMemberTotal,
   getProjectCount
 }: UseRundownDataProps) => {
+  const { workWeekHours } = useAppSettings();
+
   // Memoize the rundown items to prevent flickering
   // Note: allMembers is already sorted by the parent hook (useStreamlinedWeekResourceData)
   const rundownItems = useMemo(() => {
@@ -32,7 +35,7 @@ export const useRundownData = ({
       // Process people data - preserve the sort order from allMembers (already sorted)
       const processedPeople = allMembers.map(member => {
         const memberTotal = getMemberTotal(member.id);
-        const capacity = member.weekly_capacity || 40;
+        const capacity = member.weekly_capacity || workWeekHours;
         const totalHours = memberTotal?.resourcedHours || 0;
         const utilizationPercentage = capacity > 0 ? (totalHours / capacity) * 100 : 0;
 
@@ -106,7 +109,7 @@ export const useRundownData = ({
             const projectAllocation = projectAllocations.find(p => p.projectId === project.id);
             
             if (projectAllocation && projectAllocation.hours > 0) {
-              const capacity = member.weekly_capacity || 40;
+              const capacity = member.weekly_capacity || workWeekHours;
               const capacityPercentage = capacity > 0 ? (projectAllocation.hours / capacity) * 100 : 0;
               
               // Get all projects for this member
@@ -162,7 +165,7 @@ export const useRundownData = ({
 
       return processedProjects;
     }
-  }, [allMembers, projects, rundownMode, sortOption, getMemberTotal, getProjectCount]);
+  }, [allMembers, projects, rundownMode, sortOption, getMemberTotal, getProjectCount, workWeekHours]);
 
   return { rundownItems };
 };

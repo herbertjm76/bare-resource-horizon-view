@@ -1,14 +1,17 @@
 
 import { useMemo } from 'react';
-import { 
+import { useAppSettings } from '@/hooks/useAppSettings';
+import {
   calculateUtilizationRate,
   getUtilizationStatus,
   generateUtilizationTrends
 } from './utils/utilizationCalculations';
 
 export const useUtilizationData = (teamMembers: any[], preRegisteredMembers: any[]) => {
+  const { workWeekHours } = useAppSettings();
+
   return useMemo(() => {
-    const currentUtilizationRate = calculateUtilizationRate(teamMembers, preRegisteredMembers);
+    const currentUtilizationRate = calculateUtilizationRate(teamMembers, preRegisteredMembers, workWeekHours);
     const utilizationStatus = getUtilizationStatus(currentUtilizationRate);
     const utilizationTrends = generateUtilizationTrends(currentUtilizationRate);
 
@@ -17,5 +20,5 @@ export const useUtilizationData = (teamMembers: any[], preRegisteredMembers: any
       utilizationStatus,
       utilizationTrends
     };
-  }, [teamMembers, preRegisteredMembers]);
+  }, [teamMembers, preRegisteredMembers, workWeekHours]);
 };

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { TrendingUp, Clock, Users, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 
 interface WorkloadMetricsCardsProps {
@@ -17,6 +18,8 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
   filteredMembers,
   periodWeeks
 }) => {
+  const { workWeekHours } = useAppSettings();
+
   // Calculate workload metrics based on the selected period
   const calculateWorkloadMetrics = () => {
     if (!weeklyWorkloadData || Object.keys(weeklyWorkloadData).length === 0) {
@@ -37,7 +40,7 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
 
     // Calculate metrics for each member using CONSISTENT logic
     filteredMembers.forEach(member => {
-      const weeklyCapacity = member.weekly_capacity || 40;
+      const weeklyCapacity = member.weekly_capacity || workWeekHours;
       const memberData = weeklyWorkloadData[member.id] || {};
       
       // Calculate total allocated hours for this member across the period

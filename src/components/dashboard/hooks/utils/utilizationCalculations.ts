@@ -2,8 +2,9 @@
 import { UtilizationStatusData } from '../types/dashboardTypes';
 
 export const calculateUtilizationRate = (
-  teamMembers: any[], 
-  preRegisteredMembers: any[]
+  teamMembers: any[],
+  preRegisteredMembers: any[],
+  workWeekHours: number
 ): number => {
   // This function now returns a reasonable fallback since we're using standardized calculations
   // The real utilization should come from useStandardizedUtilization hook
@@ -13,8 +14,8 @@ export const calculateUtilizationRate = (
     member.role && ['owner', 'admin', 'member'].includes(member.role)
   ) || [];
   
-  const totalCapacity = activeMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
-  const preRegisteredCapacity = (preRegisteredMembers || []).reduce((total, member) => total + (member.weekly_capacity || 40), 0);
+  const totalCapacity = activeMembers.reduce((total, member) => total + (member.weekly_capacity || workWeekHours), 0);
+  const preRegisteredCapacity = (preRegisteredMembers || []).reduce((total, member) => total + (member.weekly_capacity || workWeekHours), 0);
   const totalTeamCapacity = totalCapacity + preRegisteredCapacity;
   
   // Return a more realistic fallback - 75% utilization
