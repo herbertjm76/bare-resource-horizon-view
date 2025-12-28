@@ -1,15 +1,17 @@
 import React, { useMemo } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts';
 import { WeeklyDemandData } from '@/hooks/useDemandProjection';
 import { format, addWeeks, startOfWeek } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { AlertCircle } from 'lucide-react';
 
 interface ProjectedDemandViewProps {
   weeklyDemand: WeeklyDemandData[];
   roleNames: Record<string, string>;
   weekStartDates: Array<{ date: Date; key: string }>;
   isLoading: boolean;
+  weeklyCapacity?: number; // Team weekly capacity in hours
 }
 
 // Color palette for roles
@@ -69,7 +71,8 @@ export const ProjectedDemandView: React.FC<ProjectedDemandViewProps> = ({
   weeklyDemand: propWeeklyDemand,
   roleNames: propRoleNames,
   weekStartDates,
-  isLoading
+  isLoading,
+  weeklyCapacity = 0
 }) => {
   // Check if we have real data
   const hasRealData = propWeeklyDemand.some(week => week.totalDemand > 0);
@@ -90,12 +93,16 @@ export const ProjectedDemandView: React.FC<ProjectedDemandViewProps> = ({
   // Get all unique role IDs
   const allRoleIds = [...new Set(weeklyDemand.flatMap(week => Object.keys(week.demandByRole)))];
 
+  // Effective capacity (use demo value if no real capacity and showing demo)
+  const effectiveCapacity = weeklyCapacity > 0 ? weeklyCapacity : (isDemo ? 195 : 0);
+
   // Transform data for the chart
   const chartData = weeklyDemand.map(week => {
     const dataPoint: Record<string, any> = {
       week: format(week.weekDate, 'MMM d'),
       weekKey: week.weekKey,
       total: Math.round(week.totalDemand),
+      capacity: effectiveCapacity,
     };
 
     allRoleIds.forEach(roleId => {
@@ -105,12 +112,20 @@ export const ProjectedDemandView: React.FC<ProjectedDemandViewProps> = ({
     return dataPoint;
   });
 
+  // Calculate capacity metrics
+  const overCapacityWeeks = effectiveCapacity > 0 
+    ? weeklyDemand.filter(w => w.totalDemand > effectiveCapacity).length 
+    : 0;
+  const utilizationPct = effectiveCapacity > 0 
+    ? Math.round((weeklyDemand.reduce((sum, w) => sum + w.totalDemand, 0) / (effectiveCapacity * weeklyDemand.length)) * 100)
+    : 0;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-medium text-muted-foreground">
-            Projected Resource Demand by Role
+            Projected Demand vs Team Capacity
           </h3>
           {isDemo && (
             <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600 border-amber-300">
@@ -122,6 +137,28 @@ export const ProjectedDemandView: React.FC<ProjectedDemandViewProps> = ({
           Total: {Math.round(weeklyDemand.reduce((sum, w) => sum + w.totalDemand, 0))} hours
         </div>
       </div>
+
+      {/* Capacity Summary Badges */}
+      {effectiveCapacity > 0 && (
+        <div className="flex flex-wrap gap-3 text-sm">
+          <div className="px-3 py-1.5 rounded-full bg-muted">
+            <span className="text-muted-foreground">Weekly Capacity: </span>
+            <span className="font-medium">{effectiveCapacity}h</span>
+          </div>
+          <div className="px-3 py-1.5 rounded-full bg-muted">
+            <span className="text-muted-foreground">Avg Utilization: </span>
+            <span className={utilizationPct > 100 ? 'text-destructive font-medium' : 'font-medium'}>
+              {utilizationPct}%
+            </span>
+          </div>
+          {overCapacityWeeks > 0 && (
+            <div className="px-3 py-1.5 rounded-full bg-destructive/10 text-destructive">
+              <AlertCircle className="h-3.5 w-3.5 inline mr-1" />
+              {overCapacityWeeks} weeks over capacity
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
@@ -151,15 +188,29 @@ export const ProjectedDemandView: React.FC<ProjectedDemandViewProps> = ({
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value: number, name: string) => [
-                `${value} hours`,
-                roleNames[name] || name
-              ]}
+              formatter={(value: number, name: string) => {
+                if (name === 'capacity') return [`${value} hours`, 'Team Capacity'];
+                return [`${value} hours`, roleNames[name] || name];
+              }}
             />
             <Legend 
-              formatter={(value) => roleNames[value] || value}
+              formatter={(value) => {
+                if (value === 'capacity') return 'Team Capacity';
+                return roleNames[value] || value;
+              }}
               wrapperStyle={{ fontSize: '12px' }}
             />
+            
+            {/* Capacity reference line */}
+            {effectiveCapacity > 0 && (
+              <ReferenceLine 
+                y={effectiveCapacity} 
+                stroke="hsl(var(--destructive))" 
+                strokeDasharray="5 5"
+                strokeWidth={2}
+              />
+            )}
+            
             {allRoleIds.map((roleId, index) => (
               <Area
                 key={roleId}
