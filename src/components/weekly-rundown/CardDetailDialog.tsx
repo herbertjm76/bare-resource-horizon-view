@@ -30,7 +30,7 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
   data
 }) => {
   const { workWeekHours } = useAppSettings();
-  const capacity = workWeekHours || 40;
+  const capacity = workWeekHours;
 
   const getIcon = () => {
     switch (cardType) {

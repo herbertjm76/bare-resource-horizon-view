@@ -22,7 +22,7 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
   weekStartDate,
   selectedWeek
 }) => {
-  const { displayPreference } = useAppSettings();
+  const { displayPreference, workWeekHours } = useAppSettings();
   
   const {
     teamSummary,
@@ -37,7 +37,7 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
   
   const totalCapacity = teamSummary?.totalCapacity || 
     members.reduce((sum, member) => {
-      const weeklyCapacity = member.weekly_capacity || 40;
+      const weeklyCapacity = member.weekly_capacity || workWeekHours;
       return sum + weeklyCapacity;
     }, 0);
   

@@ -33,9 +33,10 @@ export class UtilizationCalculationService {
     projectHours: number = 0,
     annualLeave: number = 0,
     officeHolidays: number = 0,
-    otherLeave: number = 0
+    otherLeave: number = 0,
+    defaultCapacity: number = 40
   ): MemberUtilizationData {
-    const weeklyCapacity = member.weekly_capacity || 40;
+    const weeklyCapacity = member.weekly_capacity || defaultCapacity;
     const totalAllocatedHours = projectHours + annualLeave + officeHolidays + otherLeave;
     const availableHours = Math.max(0, weeklyCapacity - totalAllocatedHours);
     const utilizationRate = weeklyCapacity > 0 ? Math.round((totalAllocatedHours / weeklyCapacity) * 100) : 0;

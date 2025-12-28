@@ -6,11 +6,13 @@ import { useDetailedWeeklyAllocations } from './useDetailedWeeklyAllocations';
 import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
 import { useWeeklyLeaveDetails } from './useWeeklyLeaveDetails';
 import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { format, startOfWeek } from 'date-fns';
 
 type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
 
 export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any, sortOption: SortOption = 'alphabetical') => {
+  const { workWeekHours } = useAppSettings();
   // IMPORTANT: selectedWeek can be any day within the week; normalize to week start (Mon)
   const weekStartDate = useMemo(
     () => format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
@@ -204,8 +206,8 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
         case 'utilization': {
           const aTotal = totalsMap.get(a.id) || 0;
           const bTotal = totalsMap.get(b.id) || 0;
-          const aCapacity = a.weekly_capacity || 40;
-          const bCapacity = b.weekly_capacity || 40;
+          const aCapacity = a.weekly_capacity || workWeekHours;
+          const bCapacity = b.weekly_capacity || workWeekHours;
           const aUtil = aCapacity > 0 ? (aTotal / aCapacity) * 100 : 0;
           const bUtil = bCapacity > 0 ? (bTotal / bCapacity) * 100 : 0;
           if (bUtil !== aUtil) return bUtil - aUtil;
