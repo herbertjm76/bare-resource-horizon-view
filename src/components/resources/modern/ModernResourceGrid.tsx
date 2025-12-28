@@ -8,6 +8,13 @@ import { useGridWeeks } from '../hooks/useGridWeeks';
 import { GridLoadingState } from '../grid/GridLoadingState';
 import { GridEmptyState } from '../grid/GridEmptyState';
 
+interface MemberFilters {
+  practiceArea: string;
+  department: string;
+  location: string;
+  searchTerm: string;
+}
+
 interface ModernResourceGridProps {
   startDate: Date;
   periodToShow: number;
@@ -20,6 +27,7 @@ interface ModernResourceGridProps {
   expandedProjects: string[];
   totalProjects: number;
   onToggleProjectExpand: (projectId: string) => void;
+  memberFilters?: MemberFilters;
 }
 
 export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
@@ -33,7 +41,8 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   onCollapseAll,
   expandedProjects,
   totalProjects,
-  onToggleProjectExpand
+  onToggleProjectExpand,
+  memberFilters
 }) => {
   const { projects, isLoading: isLoadingProjects } = useProjects(sortBy, sortDirection);
   const filteredProjects = useFilteredProjects(projects, filters);
@@ -80,6 +89,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
       onToggleProjectExpand={onToggleProjectExpand}
       selectedDate={startDate}
       periodToShow={periodToShow}
+      memberFilters={memberFilters}
     />
   );
 };

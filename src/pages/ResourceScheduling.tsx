@@ -179,6 +179,7 @@ const ResourceScheduling = () => {
                       onDisplayOptionChange={handleDisplayOptionChange}
                       onClearFilters={clearProjectFilters}
                       showOnlyGrid={true}
+                      memberFilters={memberFilters}
                     />
                   </div>
                 </div>
@@ -226,6 +227,7 @@ const ResourceScheduling = () => {
                       onMonthChange={handleMonthChange}
                       onPeriodChange={handlePeriodChange}
                       showOnlyGrid={true}
+                      memberFilters={memberFilters}
                     />
                   </div>
                 </div>

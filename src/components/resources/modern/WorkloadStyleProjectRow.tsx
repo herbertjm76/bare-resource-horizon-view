@@ -12,6 +12,13 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { getMemberCapacity } from '@/utils/capacityUtils';
 
+interface MemberFilters {
+  practiceArea: string;
+  department: string;
+  location: string;
+  searchTerm: string;
+}
+
 interface WorkloadStyleProjectRowProps {
   project: any;
   weeks: WeekInfo[];
@@ -20,6 +27,7 @@ interface WorkloadStyleProjectRowProps {
   isEven: boolean;
   selectedDate?: Date;
   periodToShow?: number;
+  memberFilters?: MemberFilters;
 }
 
 export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = React.memo(({
@@ -29,7 +37,8 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   onToggleExpand,
   isEven,
   selectedDate,
-  periodToShow
+  periodToShow,
+  memberFilters
 }) => {
   const { projectDisplayPreference, workWeekHours } = useAppSettings();
   const { 
@@ -47,10 +56,41 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   const [showAddResourceDialog, setShowAddResourceDialog] = useState(false);
   
   const rowBgColor = isEven ? '#ffffff' : '#f9fafb';
+
+  // Filter resources based on member filters
+  const filteredResources = React.useMemo(() => {
+    if (!memberFilters) return resources;
+    
+    return resources.filter(resource => {
+      // Filter by practice area
+      if (memberFilters.practiceArea && memberFilters.practiceArea !== 'all') {
+        if (resource.practice_area !== memberFilters.practiceArea) return false;
+      }
+      
+      // Filter by department
+      if (memberFilters.department && memberFilters.department !== 'all') {
+        if (resource.department !== memberFilters.department) return false;
+      }
+      
+      // Filter by location
+      if (memberFilters.location && memberFilters.location !== 'all') {
+        if (resource.location !== memberFilters.location) return false;
+      }
+      
+      // Filter by search term
+      if (memberFilters.searchTerm) {
+        const searchLower = memberFilters.searchTerm.toLowerCase();
+        const fullName = `${resource.first_name || ''} ${resource.last_name || ''}`.toLowerCase();
+        if (!fullName.includes(searchLower) && !resource.name.toLowerCase().includes(searchLower)) return false;
+      }
+      
+      return true;
+    });
+  }, [resources, memberFilters]);
   
-  // Calculate total hours across all resources for visible weeks (excluding previous week)
+  // Calculate total hours across filtered resources for visible weeks (excluding previous week)
   const totalHours = React.useMemo(() => {
-    return resources.reduce((total, resource) => {
+    return filteredResources.reduce((total, resource) => {
       const resourceHours = weeks
         .filter(week => !week.isPreviousWeek) // Exclude previous week from calculation
         .reduce((sum, week) => {
@@ -61,7 +101,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
         }, 0);
       return total + resourceHours;
     }, 0);
-  }, [resources, weeks, projectAllocations, getAllocationKey]);
+  }, [filteredResources, weeks, projectAllocations, getAllocationKey]);
   
   // Calculate FTE (workWeekHours = 1 FTE per week)
   const visibleWeeksCount = weeks.filter(w => !w.isPreviousWeek).length;
@@ -187,7 +227,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
       </tr>
       
       {/* Resource Rows (when expanded) */}
-      {isExpanded && resources.map((resource, resourceIndex) => (
+      {isExpanded && filteredResources.map((resource, resourceIndex) => (
         <WorkloadStyleResourceRow
           key={resource.id}
           resource={resource}
