@@ -230,6 +230,7 @@ const WeeklyOverview = () => {
                 weekStartDate={weekStartString}
                 threshold={80}
                 allMembers={unfilteredMembers}
+                sortOption={sortOption}
               />
 
               {/* Unified Controls + Filters Combined */}

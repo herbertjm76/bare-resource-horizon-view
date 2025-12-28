@@ -66,12 +66,13 @@ interface AvailableMember {
 export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
-  allMembers: externalMembers
+  allMembers: externalMembers,
+  sortOption = 'alphabetical'
 }) => {
   const membersScrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
-  const [sortAscending, setSortAscending] = React.useState(true); // true = underutilized first
+  const [sortAscending, setSortAscending] = React.useState(true); // true = ascending order
   const { workWeekHours } = useAppSettings();
 
   // Fetch members internally if not provided externally
@@ -338,20 +339,43 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       };
     });
     
-    // Sort by utilization based on sortAscending state
+    // Sort based on sortOption and sortAscending state
     return available.sort((a, b) => {
-      // Sort by utilization
-      if (a.utilization !== b.utilization) {
-        return sortAscending 
-          ? a.utilization - b.utilization  // Ascending: underutilized first
-          : b.utilization - a.utilization; // Descending: overutilized first
+      let comparison = 0;
+      
+      switch (sortOption) {
+        case 'utilization':
+          comparison = a.utilization - b.utilization;
+          break;
+        case 'location':
+          const locA = (a.location || '').toLowerCase();
+          const locB = (b.location || '').toLowerCase();
+          comparison = locA.localeCompare(locB);
+          break;
+        case 'department':
+          const deptA = (a.department || a.practiceArea || '').toLowerCase();
+          const deptB = (b.department || b.practiceArea || '').toLowerCase();
+          comparison = deptA.localeCompare(deptB);
+          break;
+        case 'alphabetical':
+        default:
+          const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+          const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+          comparison = nameA.localeCompare(nameB);
+          break;
       }
+      
+      // Apply sort direction
+      if (comparison !== 0) {
+        return sortAscending ? comparison : -comparison;
+      }
+      
       // Alphabetical fallback for ties
       const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
       const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
       return nameA.localeCompare(nameB);
     });
-  }, [allMembersFromParent, allocations, leaves, holidays, officeLocations, sortAscending]);
+  }, [allMembersFromParent, allocations, leaves, holidays, officeLocations, sortOption, sortAscending]);
 
   // Check scroll position for arrows
   const checkScrollPosition = React.useCallback(() => {
@@ -410,11 +434,11 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="p-2">
                   <div className="text-xs space-y-1">
-                    <p className="font-medium">Sort by utilization</p>
+                    <p className="font-medium">Sort by {sortOption}</p>
                     <p className="text-muted-foreground">
-                      Currently: {sortAscending ? 'Underutilized first' : 'Overutilized first'}
+                      Currently: {sortAscending ? 'Ascending' : 'Descending'}
                     </p>
-                    <p className="text-muted-foreground italic">Click to toggle</p>
+                    <p className="text-muted-foreground italic">Click to toggle direction</p>
                   </div>
                 </TooltipContent>
               </Tooltip>
