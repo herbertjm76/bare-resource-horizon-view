@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 import { startOfWeek, addWeeks, format } from 'date-fns';
 
 export interface ProjectDemand {
@@ -36,12 +36,12 @@ export interface DemandProjectionResult {
 }
 
 export const useDemandProjection = (startDate: Date, numberOfWeeks: number = 12): DemandProjectionResult => {
-  const { company } = useCompany();
+  const { companyId, isReady } = useCompanyId();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['demand-projection', company?.id, startDate.toISOString(), numberOfWeeks],
+    queryKey: ['demand-projection', companyId, startDate.toISOString(), numberOfWeeks],
     queryFn: async () => {
-      if (!company?.id) return null;
+      if (!companyId) return null;
 
       // Fetch all projects with their stages and team compositions
       const { data: projects, error: projectsError } = await supabase
@@ -54,7 +54,7 @@ export const useDemandProjection = (startDate: Date, numberOfWeeks: number = 12)
           contract_end_date,
           status
         `)
-        .eq('company_id', company.id)
+        .eq('company_id', companyId)
         .in('status', ['Active', 'In Progress', 'Confirmed', 'Pre-Award', 'Pre-Contract']);
 
       if (projectsError) throw projectsError;
@@ -107,7 +107,7 @@ export const useDemandProjection = (startDate: Date, numberOfWeeks: number = 12)
 
       return { projects, stages, compositions, roleNames, memberNames };
     },
-    enabled: !!company?.id,
+    enabled: isReady,
   });
 
   // Process data into weekly demand

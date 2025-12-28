@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 import { useMemo } from 'react';
 
 export interface ProjectPlanningProject {
@@ -39,18 +39,18 @@ export interface TeamCompositionSummary {
 }
 
 export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
-  const { company } = useCompany();
+  const { companyId, isReady } = useCompanyId();
 
   // Fetch projects
   const { data: projects = [], isLoading: isLoadingProjects, refetch: refetchProjects } = useQuery({
-    queryKey: ['planning-projects', company?.id, statusFilter],
+    queryKey: ['planning-projects', companyId, statusFilter],
     queryFn: async () => {
-      if (!company?.id) return [];
+      if (!companyId) return [];
 
       let query = supabase
         .from('projects')
         .select('id, name, code, status, current_stage, stages, contract_start_date, contract_end_date, department')
-        .eq('company_id', company.id)
+        .eq('company_id', companyId)
         .order('name');
 
       if (statusFilter.length > 0) {
@@ -61,25 +61,25 @@ export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
       if (error) throw error;
       return data as ProjectPlanningProject[];
     },
-    enabled: !!company?.id
+    enabled: isReady
   });
 
   // Fetch office stages
   const { data: officeStages = [], isLoading: isLoadingStages } = useQuery({
-    queryKey: ['office-stages', company?.id],
+    queryKey: ['office-stages', companyId],
     queryFn: async () => {
-      if (!company?.id) return [];
+      if (!companyId) return [];
 
       const { data, error } = await supabase
         .from('office_stages')
         .select('id, name, code, order_index')
-        .eq('company_id', company.id)
+        .eq('company_id', companyId)
         .order('order_index');
 
       if (error) throw error;
       return data as OfficeStage[];
     },
-    enabled: !!company?.id
+    enabled: isReady
   });
 
   // Fetch project stages data (contracted weeks, etc.)

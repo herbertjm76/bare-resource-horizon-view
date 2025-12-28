@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 
 export interface OfficeRate {
   id: string;
@@ -11,17 +11,17 @@ export interface OfficeRate {
 }
 
 export const useOfficeRates = () => {
-  const { company } = useCompany();
+  const { companyId, isReady } = useCompanyId();
 
   return useQuery({
-    queryKey: ['office-rates', company?.id],
+    queryKey: ['office-rates', companyId],
     queryFn: async () => {
-      if (!company?.id) return [];
+      if (!companyId) return [];
       
       const { data, error } = await supabase
         .from('office_rates')
         .select('id, reference_id, type, value, unit')
-        .eq('company_id', company.id);
+        .eq('company_id', companyId);
 
       if (error) throw error;
       
@@ -33,7 +33,7 @@ export const useOfficeRates = () => {
         unit: r.unit
       })) as OfficeRate[];
     },
-    enabled: !!company?.id,
+    enabled: isReady,
   });
 };
 

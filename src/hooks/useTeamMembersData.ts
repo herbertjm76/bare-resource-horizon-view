@@ -4,29 +4,24 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/components/dashboard/types";
 import { toast } from "sonner";
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 
 export const useTeamMembersData = (includeInactive: boolean = false) => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const { company, loading: companyLoading } = useCompany();
-
-  // Add more detailed logging
-  useEffect(() => {
-    console.log('useTeamMembersData - Company context:', company);
-  }, [company]);
+  const { companyId, isLoading: companyLoading, isReady } = useCompanyId();
 
   // Fetch team members with refetch capability
   const {
     data: teamMembers = [],
-    isLoading,
+    isLoading: queryLoading,
     error,
     refetch: refetchTeamMembers
   } = useQuery({
-    queryKey: ['teamMembers', refreshTrigger, includeInactive, company?.id],
+    queryKey: ['teamMembers', refreshTrigger, includeInactive, companyId],
     queryFn: async () => {
       console.log('Fetching team members, refresh trigger:', refreshTrigger);
       console.log('Include inactive members:', includeInactive);
-      console.log('Company ID from context:', company?.id);
+      console.log('Company ID from context:', companyId);
       
       try {
         // First, get the current user's auth data
@@ -36,11 +31,11 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Get the user's company ID - first try from context
-        let companyId = company?.id;
+        // Get the user's company ID - use from context
+        let resolvedCompanyId = companyId;
         
-        if (!companyId) {
-          // Since we can't use the RPC function directly, query the profiles table
+        if (!resolvedCompanyId) {
+          // Fallback: query the profiles table
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('company_id')
@@ -53,13 +48,13 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
             throw profileError;
           }
           
-          companyId = profileData?.company_id;
+          resolvedCompanyId = profileData?.company_id;
           if (import.meta.env.DEV) {
-            console.log('User company ID from query:', companyId);
+            console.log('User company ID from query:', resolvedCompanyId);
           }
         }
         
-        if (!companyId) {
+        if (!resolvedCompanyId) {
           console.error('Cannot fetch team members: No company ID available');
           toast.error('Company information not available');
           return [];
@@ -69,7 +64,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('*')
-          .eq('company_id', companyId);
+          .eq('company_id', resolvedCompanyId);
 
         if (profilesError) {
           console.error('Failed to load team members:', profilesError);
@@ -91,7 +86,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         const { data: userRoles, error: rolesError } = await supabase
           .from('user_roles')
           .select('user_id, role')
-          .eq('company_id', companyId)
+          .eq('company_id', resolvedCompanyId)
           .in('user_id', userIds);
 
         if (rolesError) {
@@ -123,7 +118,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         throw fetchError;
       }
     },
-    enabled: !companyLoading,
+    enabled: isReady,
     refetchInterval: false,
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -145,7 +140,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
 
   return {
     teamMembers: teamMembers || [],
-    isLoading: isLoading || companyLoading,
+    isLoading: queryLoading || companyLoading,
     error,
     triggerRefresh,
     forceRefresh,

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 import { format, startOfWeek, subWeeks, addDays, eachWeekOfInterval } from 'date-fns';
 
 interface UtilizationData {
@@ -17,10 +17,10 @@ export const useTeamUtilization = (teamMembers: any[]) => {
     days90: 0
   });
   const [isLoading, setIsLoading] = useState(true);
-  const { company } = useCompany();
+  const { companyId } = useCompanyId();
 
   useEffect(() => {
-    if (!company?.id || teamMembers.length === 0) {
+    if (!companyId || teamMembers.length === 0) {
       setIsLoading(false);
       return;
     }
@@ -48,7 +48,7 @@ export const useTeamUtilization = (teamMembers: any[]) => {
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
           .select('resource_id, hours, allocation_date, project_id')
-          .eq('company_id', company.id)
+          .eq('company_id', companyId)
           .eq('resource_type', 'active')
           .in('resource_id', memberIds)
           .gte('allocation_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
@@ -127,7 +127,7 @@ export const useTeamUtilization = (teamMembers: any[]) => {
     };
 
     fetchUtilization();
-  }, [company?.id, teamMembers]);
+  }, [companyId, teamMembers]);
 
   return { utilization, isLoading };
 };

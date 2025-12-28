@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 import { toast } from 'sonner';
 import { LeaveRequest, LeaveFormData } from '@/types/leave';
 import { differenceInBusinessDays, eachDayOfInterval, isWeekend } from 'date-fns';
@@ -9,10 +9,10 @@ export const useLeaveRequests = (memberId?: string) => {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { company } = useCompany();
+  const { companyId } = useCompanyId();
 
   const fetchLeaveRequests = useCallback(async () => {
-    if (!company?.id) return;
+    if (!companyId) return;
 
     setIsLoading(true);
 
@@ -26,7 +26,7 @@ export const useLeaveRequests = (memberId?: string) => {
           approver:profiles!leave_requests_approved_by_fkey(id, first_name, last_name),
           requested_approver:profiles!leave_requests_requested_approver_id_fkey(id, first_name, last_name)
         `)
-        .eq('company_id', company.id)
+        .eq('company_id', companyId)
         .order('created_at', { ascending: false });
 
       if (memberId) {
@@ -51,7 +51,7 @@ export const useLeaveRequests = (memberId?: string) => {
     } finally {
       setIsLoading(false);
     }
-  }, [company?.id, memberId]);
+  }, [companyId, memberId]);
 
   const calculateTotalHours = (
     startDate: Date,
@@ -89,7 +89,7 @@ export const useLeaveRequests = (memberId?: string) => {
   };
 
   const submitLeaveRequest = useCallback(async (formData: LeaveFormData): Promise<boolean> => {
-    if (!company?.id) return false;
+    if (!companyId) return false;
 
     setIsSubmitting(true);
 
@@ -114,7 +114,7 @@ export const useLeaveRequests = (memberId?: string) => {
       const { error } = await supabase
         .from('leave_requests')
         .insert({
-          company_id: company.id,
+          company_id: companyId,
           member_id: user.id,
           leave_type_id: formData.leave_type_id,
           duration_type: formData.duration_type,
@@ -144,7 +144,7 @@ export const useLeaveRequests = (memberId?: string) => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [company?.id, fetchLeaveRequests]);
+  }, [companyId, fetchLeaveRequests]);
 
   const cancelLeaveRequest = useCallback(async (requestId: string): Promise<boolean> => {
     try {
@@ -174,7 +174,7 @@ export const useLeaveRequests = (memberId?: string) => {
     requestId: string,
     formData: Omit<LeaveFormData, 'manager_confirmed'>
   ): Promise<boolean> => {
-    if (!company?.id) return false;
+    if (!companyId) return false;
 
     setIsSubmitting(true);
 
@@ -232,13 +232,13 @@ export const useLeaveRequests = (memberId?: string) => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [company?.id, fetchLeaveRequests]);
+  }, [companyId, fetchLeaveRequests]);
 
   useEffect(() => {
-    if (company?.id) {
+    if (companyId) {
       fetchLeaveRequests();
     }
-  }, [company?.id, fetchLeaveRequests]);
+  }, [companyId, fetchLeaveRequests]);
 
   return {
     leaveRequests,
