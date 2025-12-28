@@ -210,25 +210,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
         })}
       </div>
 
-      {/* Weeks validation indicator */}
-      {hasWeeksConfigured && (
-        <div className={cn(
-          "flex items-center justify-end gap-2 text-sm",
-          weeksMatch ? "text-emerald-600" : "text-amber-600"
-        )}>
-          {weeksMatch ? (
-            <CheckCircle2 className="h-4 w-4" />
-          ) : (
-            <AlertTriangle className="h-4 w-4" />
-          )}
-          <span>
-            Stage total: <span className="font-medium">{stageWeeksSum}w</span>
-            {projectTotalWeeks > 0 && (
-              <> / Project: <span className="font-medium">{projectTotalWeeks}w</span></>
-            )}
-          </span>
-        </div>
-      )}
+      {/* Weeks total indicator - shown at stage input level now */}
 
       {stages.map((stage) => (
         stage.id === selectedStageId && (
@@ -242,7 +224,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                 </p>
               </div>
 
-              {/* Contracted Weeks Input */}
+              {/* Contracted Weeks Input with total indicator */}
               <div className="flex items-center gap-3">
                 <Label htmlFor="contracted-weeks" className="text-sm whitespace-nowrap">
                   <CalendarDays className="h-4 w-4 inline mr-1.5" />
@@ -258,6 +240,14 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                   className="w-20 text-center"
                   placeholder="0"
                 />
+                {hasWeeksConfigured && (
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">
+                    of <span className="font-medium text-foreground">{stageWeeksSum}</span> weeks
+                    {projectTotalWeeks > 0 && projectTotalWeeks !== stageWeeksSum && (
+                      <span className="text-muted-foreground/70"> ({projectTotalWeeks}w total)</span>
+                    )}
+                  </span>
+                )}
               </div>
             </div>
 
