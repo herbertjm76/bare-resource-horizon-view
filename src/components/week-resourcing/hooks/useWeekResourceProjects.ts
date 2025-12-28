@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 
 interface UseWeekResourceProjectsOptions {
   filters?: { department?: string };
@@ -9,11 +9,10 @@ interface UseWeekResourceProjectsOptions {
 }
 
 export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekResourceProjectsOptions = {}) => {
-  const { company, loading: companyLoading, error: companyError } = useCompany();
+  const { companyId, isReady } = useCompanyId();
 
-  const companyId = company?.id;
-  // CRITICAL: Only fetch when company context is fully ready
-  const canFetch = !companyLoading && !!companyId && !companyError && enabled;
+  // CRITICAL: Only fetch when company context is fully ready and externally enabled
+  const canFetch = isReady && enabled;
 
   return useQuery({
     queryKey: ['week-resource-projects', companyId, filters],
