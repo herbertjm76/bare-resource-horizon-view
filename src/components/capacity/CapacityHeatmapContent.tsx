@@ -65,6 +65,9 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
     selectedWeeks
   );
 
+  // Calculate team weekly capacity
+  const weeklyCapacity = filteredMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
+
   const activeFiltersCount = [activeFilter !== 'all' ? activeFilter : '', searchQuery].filter(Boolean).length;
   
   const showContentLoading = isLoading || isLoadingWorkload;
@@ -123,6 +126,7 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
                 roleNames={roleNames}
                 weekStartDates={weekStartDates}
                 isLoading={isLoadingProjection}
+                weeklyCapacity={weeklyCapacity}
               />
             </TabsContent>
 
