@@ -9,6 +9,7 @@ import { AlertCircle, TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface GapAnalysisViewProps {
   members: TeamMember[];
@@ -198,7 +199,7 @@ export const GapAnalysisView: React.FC<GapAnalysisViewProps> = ({
                 }}
               />
               <ReferenceLine 
-                y={members.reduce((sum, m) => sum + (m.weekly_capacity || 40), 0) / weekStartDates.length * weekStartDates.length / analysisData.length} 
+                y={members.reduce((sum, m) => sum + getMemberCapacity(m.weekly_capacity, workWeekHours), 0) / weekStartDates.length * weekStartDates.length / analysisData.length} 
                 stroke="hsl(var(--destructive))" 
                 strokeDasharray="5 5"
                 label={{ 

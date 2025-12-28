@@ -3,6 +3,8 @@ import { useDashboardTeamMembers, useDashboardProjects } from '@/hooks/queries/u
 import { useCompany } from '@/context/CompanyContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface ResourceAllocation {
   name: string;
@@ -12,6 +14,7 @@ interface ResourceAllocation {
 
 export const useResourceAllocationData = () => {
   const { company } = useCompany();
+  const { workWeekHours } = useAppSettings();
   const { data: teamMembers = [] } = useDashboardTeamMembers(company?.id);
   const { data: projects = [] } = useDashboardProjects(company?.id);
 
@@ -46,7 +49,7 @@ export const useResourceAllocationData = () => {
 
     // Calculate total capacity
     const totalCapacity = teamMembers.reduce((sum, member) => 
-      sum + (member.weekly_capacity || 40), 0
+      sum + getMemberCapacity(member.weekly_capacity, workWeekHours), 0
     );
 
     // Group allocations by project status

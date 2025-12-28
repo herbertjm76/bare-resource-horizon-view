@@ -8,6 +8,8 @@ import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/types';
 import { WorkloadTooltip } from './WorkloadTooltip';
 import { Badge } from '@/components/ui/badge';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface WorkloadCalendarProps {
   members: TeamMember[];
@@ -22,6 +24,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
   workloadData,
   periodToShow
 }) => {
+  const { workWeekHours } = useAppSettings();
   // Generate date range for the period
   const dateRange = useMemo(() => {
     const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
@@ -96,7 +99,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
           <TableBody>
             {members.map((member, memberIndex) => {
               const memberWorkloadDays = workloadData[member.id] || {};
-              const weeklyCapacity = member.weekly_capacity || 40;
+              const weeklyCapacity = getMemberCapacity(member.weekly_capacity, workWeekHours);
               const dailyCapacity = weeklyCapacity / 5; // Assuming 5 working days
               
               // Calculate total hours for the period

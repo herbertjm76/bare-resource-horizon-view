@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyId } from '@/hooks/useCompanyId';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 import { format, startOfWeek, subWeeks, addDays, eachWeekOfInterval } from 'date-fns';
 
 interface UtilizationData {
@@ -18,6 +20,7 @@ export const useTeamUtilization = (teamMembers: any[]) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const { companyId } = useCompanyId();
+  const { workWeekHours } = useAppSettings();
 
   useEffect(() => {
     if (!companyId || teamMembers.length === 0) {
@@ -61,7 +64,7 @@ export const useTeamUtilization = (teamMembers: any[]) => {
 
         // Calculate total capacity for each period
         const totalWeeklyCapacity = teamMembers.reduce((sum, member) => 
-          sum + (member.weekly_capacity || 40), 0
+          sum + getMemberCapacity(member.weekly_capacity, workWeekHours), 0
         );
         
         console.log('Total weekly capacity:', totalWeeklyCapacity);

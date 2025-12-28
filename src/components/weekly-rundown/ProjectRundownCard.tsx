@@ -63,7 +63,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
   weekStartDate.setDate(weekStartDate.getDate() + diff);
   const weekStartDateString = weekStartDate.toISOString().split('T')[0];
 
-  const perFteCapacity = workWeekHours || 40;
+  const perFteCapacity = workWeekHours;
   const teamCapacity = perFteCapacity * Math.max(project.teamMembers.length || 0, 1);
   const totalValue = displayPreference === 'percentage'
     ? (teamCapacity > 0 ? (project.totalHours / teamCapacity) * 100 : 0)

@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -6,6 +7,8 @@ import { ResourceTableHeader } from './ResourceTableHeader';
 import { ResourceTableRow } from './row/ResourceTableRow';
 import { useResourceTableData } from '@/hooks/useResourceTableData';
 import { ResourceTableFooter } from './ResourceTableFooter';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 import '@/styles/enhanced-tables.css';
 
 interface ResourceTableProps {
@@ -21,6 +24,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
   allocations,
   weekStartDate
 }) => {
+  const { workWeekHours } = useAppSettings();
   // Use the hook to manage table data
   const {
     membersMap,
@@ -59,7 +63,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
               
               <TableBody>
                 {Array.from(membersMap.values()).map((member: any, idx: number) => {
-                  const weeklyCapacity = member.weekly_capacity || 40;
+                  const weeklyCapacity = getMemberCapacity(member.weekly_capacity, workWeekHours);
                   const totalHours = memberTotals.get(member.id) || 0;
                   const projectCount = projectCountByMember.get(member.id) || 0;
                   const annualLeave = getTotalWeeklyLeaveHours(member.id) || 0;

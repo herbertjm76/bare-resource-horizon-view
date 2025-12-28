@@ -10,6 +10,7 @@ import { RowData, useRowData } from './RowUtilsHooks';
 import { format, startOfWeek } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface ExpandedRowViewProps extends RowData {
   viewMode: 'expanded';
@@ -31,11 +32,11 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
   onOtherLeaveEdit,
   selectedWeek = new Date(),
 }) => {
-  const { displayPreference } = useAppSettings();
+  const { displayPreference, workWeekHours } = useAppSettings();
   const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   
   // Get leave data directly from props for reliability
-  const weeklyCapacity = member?.weekly_capacity || 40;
+  const weeklyCapacity = getMemberCapacity(member?.weekly_capacity, workWeekHours);
   const annualLeave = annualLeaveData?.[member.id] || 0;
   const holidayHours = holidaysData?.[member.id] || 0;
   const otherLeave = otherLeaveData?.[member.id] || 0;

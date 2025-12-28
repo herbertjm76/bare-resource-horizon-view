@@ -5,6 +5,8 @@ import { WeeklyWorkloadBreakdown } from '../hooks/types';
 import { MemberInfoCell } from './MemberInfoCell';
 import { WeekUtilizationCell } from './WeekUtilizationCell';
 import { TotalHoursCell } from './TotalHoursCell';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface WorkloadCalendarRowProps {
   member: TeamMember;
@@ -21,6 +23,7 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
   memberWeeklyData,
   shouldCenterAlign = false
 }) => {
+  const { workWeekHours } = useAppSettings();
   // Calculate total hours across all weeks for this member
   const totalHours = weekStartDates.reduce((total, week) => {
     const weekData = memberWeeklyData[week.key];
@@ -28,7 +31,7 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
   }, 0);
 
   // Calculate total capacity for the period
-  const weeklyCapacity = member.weekly_capacity || 40;
+  const weeklyCapacity = getMemberCapacity(member.weekly_capacity, workWeekHours);
   const periodWeeks = weekStartDates.length;
 
   return (

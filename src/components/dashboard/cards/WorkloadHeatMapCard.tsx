@@ -4,6 +4,8 @@ import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
 import { UnifiedDashboardData } from '../hooks/useDashboardData';
 import { TimeRange } from '../TimeRangeSelector';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface WorkloadHeatMapCardProps {
   data: UnifiedDashboardData;
@@ -25,6 +27,8 @@ const getWorkloadLabel = (utilization: number) => {
 };
 
 export const WorkloadHeatMapCard: React.FC<WorkloadHeatMapCardProps> = ({ data, selectedTimeRange }) => {
+  const { workWeekHours } = useAppSettings();
+  
   const getTimeRangeLabel = () => {
     switch (selectedTimeRange) {
       case 'week': return 'This Week';
@@ -39,7 +43,7 @@ export const WorkloadHeatMapCard: React.FC<WorkloadHeatMapCardProps> = ({ data, 
     name: member.fullName || 'Unknown',
     utilization: member.utilizationPercentage || 0,
     projects: member.activeProjects || 0,
-    capacity: member.weeklyCapacity || 40
+    capacity: getMemberCapacity(member.weeklyCapacity, workWeekHours)
   }));
 
   const averageUtilization = workloadData.length > 0 

@@ -5,6 +5,8 @@ import { StaffMemberCard } from './StaffMemberCard';
 import { StaffAllocationDialog } from './StaffAllocationDialog';
 import { useStaffAllocations } from './useStaffAllocations';
 import { TimeRange } from '../TimeRangeSelector';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 export const StaffSection: React.FC<StaffSectionProps & { selectedTimeRange?: TimeRange }> = ({
   title,
@@ -16,6 +18,7 @@ export const StaffSection: React.FC<StaffSectionProps & { selectedTimeRange?: Ti
   memberUtilizations,
   selectedTimeRange
 }) => {
+  const { workWeekHours } = useAppSettings();
   const [selectedMember, setSelectedMember] = useState<typeof members[0] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   
@@ -78,7 +81,7 @@ export const StaffSection: React.FC<StaffSectionProps & { selectedTimeRange?: Ti
         member={selectedMember}
         allocations={allocations}
         isLoading={isLoading}
-        weeklyCapacity={selectedMember?.weekly_capacity || 40}
+        weeklyCapacity={getMemberCapacity(selectedMember?.weekly_capacity, workWeekHours)}
         utilizationRate={selectedMember?.availability}
         selectedTimeRange={selectedTimeRange}
       />
