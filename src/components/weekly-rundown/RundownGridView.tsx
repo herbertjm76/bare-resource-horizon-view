@@ -63,7 +63,7 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
 };
 
 const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person, selectedWeek }) => {
-  const { startOfWorkWeek, displayPreference, workWeekHours } = useAppSettings();
+  const { startOfWorkWeek, displayPreference, workWeekHours, projectDisplayPreference } = useAppSettings();
   const capacity = person.capacity || workWeekHours;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   
@@ -142,7 +142,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
                       />
                     </TooltipTrigger>
                     <TooltipContent side="top" className="text-xs">
-                      <p className="font-medium">{project.name}</p>
+                      <p className="font-medium">{getProjectDisplayName(project, projectDisplayPreference)}</p>
                       <p>{formatAllocationValue(project.hours, capacity, displayPreference)} ({Math.round(percentage)}%)</p>
                     </TooltipContent>
                   </Tooltip>
@@ -168,7 +168,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
                   style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
                 />
                 <span className="truncate group-hover:text-primary transition-colors">
-                  {project.name}
+                  {getProjectDisplayName(project, projectDisplayPreference)}
                 </span>
               </div>
               <StandardizedBadge variant="metric" size="sm" className="ml-2">{formatAllocationValue(project.hours, capacity, displayPreference)}</StandardizedBadge>

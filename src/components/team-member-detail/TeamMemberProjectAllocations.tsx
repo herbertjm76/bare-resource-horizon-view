@@ -30,8 +30,8 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
   const [projectAllocations, setProjectAllocations] = useState<ProjectAllocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
-  const { displayPreference, workWeekHours } = useAppSettings();
-  const capacity = weeklyCapacity || workWeekHours || 40;
+  const { displayPreference, workWeekHours, projectDisplayPreference } = useAppSettings();
+  const capacity = weeklyCapacity || workWeekHours;
 
   useEffect(() => {
     const fetchProjectAllocations = async () => {
@@ -172,7 +172,7 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
                 <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-white/80 border border-brand-primary/10 hover:bg-white/90 transition-all duration-200">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-gray-900 truncate">{project.name}</h4>
+                      <h4 className="font-medium text-gray-900 truncate">{getProjectDisplayName(project, projectDisplayPreference)}</h4>
                       <Badge className={`${getStatusColor(project.status)} text-xs flex-shrink-0`}>
                         {project.status?.replace('_', ' ') || 'Unknown'}
                       </Badge>

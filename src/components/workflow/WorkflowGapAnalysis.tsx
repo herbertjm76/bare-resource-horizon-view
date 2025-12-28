@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WorkflowProject, WorkflowMember, AllocationGap } from '@/hooks/useWorkflowData';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface WorkflowGapAnalysisProps {
   projectsWithoutFees: WorkflowProject[];
@@ -27,6 +29,7 @@ export const WorkflowGapAnalysis: React.FC<WorkflowGapAnalysisProps> = ({
   underAllocatedMonths
 }) => {
   const navigate = useNavigate();
+  const { projectDisplayPreference } = useAppSettings();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -78,9 +81,9 @@ export const WorkflowGapAnalysis: React.FC<WorkflowGapAnalysisProps> = ({
                 {projectsWithoutFees.slice(0, 3).map((project) => (
                   <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
-                      <h4 className="font-medium">{project.name}</h4>
+                      <h4 className="font-medium">{getProjectDisplayName(project, projectDisplayPreference)}</h4>
                       <p className="text-sm text-muted-foreground">
-                        Code: {project.code} • Status: {project.status}
+                        {getProjectSecondaryText(project, projectDisplayPreference)} • Status: {project.status}
                       </p>
                     </div>
                     <Button 

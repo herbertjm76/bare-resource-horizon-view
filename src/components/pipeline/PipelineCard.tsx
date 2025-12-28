@@ -2,6 +2,8 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Calendar, Users, Edit2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface Project {
   id: string;
@@ -22,6 +24,8 @@ interface PipelineCardProps {
 }
 
 export const PipelineCard: React.FC<PipelineCardProps> = ({ project, onDragStart, onClick, isDragging }) => {
+  const { projectDisplayPreference } = useAppSettings();
+  
   const handleClick = (e: React.MouseEvent) => {
     // Don't trigger click when dragging
     if (e.defaultPrevented) return;
@@ -42,12 +46,12 @@ export const PipelineCard: React.FC<PipelineCardProps> = ({ project, onDragStart
       <div className="space-y-1">
         <div className="flex items-start justify-between gap-1">
           <p className="font-medium text-[11px] text-foreground line-clamp-2 leading-tight flex-1">
-            {project.name}
+            {getProjectDisplayName(project, projectDisplayPreference)}
           </p>
           <Edit2 className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
         </div>
         <p className="text-[10px] text-muted-foreground font-mono">
-          {project.code}
+          {getProjectSecondaryText(project, projectDisplayPreference)}
         </p>
         <div className="flex items-center gap-2">
           {project.contract_end_date && (

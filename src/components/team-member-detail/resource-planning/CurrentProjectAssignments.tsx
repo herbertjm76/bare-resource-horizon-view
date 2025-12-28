@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Calendar, Briefcase } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface Project {
   id: string;
@@ -32,6 +34,8 @@ export const CurrentProjectAssignments: React.FC<CurrentProjectAssignmentsProps>
   activeProjects,
   isLoading = false
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
+  
   if (isLoading) {
     return (
       <Card>
@@ -77,7 +81,7 @@ export const CurrentProjectAssignments: React.FC<CurrentProjectAssignmentsProps>
             <div key={project.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
               <div className="flex items-center gap-3">
                 <div>
-                  <h4 className="font-medium text-foreground">{project.name}</h4>
+                  <h4 className="font-medium text-foreground">{getProjectDisplayName(project, projectDisplayPreference)}</h4>
                   {project.current_stage && (
                     <p className="text-sm text-muted-foreground">Stage: {project.current_stage}</p>
                   )}
