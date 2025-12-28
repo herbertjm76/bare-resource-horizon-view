@@ -5,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/types';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface ResourceStatusCardsProps {
   members: TeamMember[];
@@ -17,9 +18,11 @@ export const ResourceStatusCards: React.FC<ResourceStatusCardsProps> = ({
   workloadData,
   periodToShow
 }) => {
+  const { workWeekHours } = useAppSettings();
+  
   // Calculate which members need resourcing (low utilization) and are overloaded
   const memberStatus = members.map(member => {
-    const weeklyCapacity = member.weekly_capacity || 40;
+    const weeklyCapacity = member.weekly_capacity || workWeekHours;
     const totalCapacity = weeklyCapacity * periodToShow;
     
     const memberData = workloadData[member.id] || {};

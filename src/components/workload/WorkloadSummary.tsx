@@ -5,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/types';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface WorkloadSummaryProps {
   members: TeamMember[];
@@ -19,6 +20,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   selectedWeek,
   periodToShow = 12
 }) => {
+  const { workWeekHours } = useAppSettings();
   // Helper to get user initials
   const getUserInitials = (member: TeamMember): string => {
     const firstName = member.first_name || '';
@@ -45,7 +47,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     
     members.forEach(member => {
       // Calculate total capacity for the period (weeks * weekly capacity)
-      const weeklyCapacity = member.weekly_capacity || 40;
+      const weeklyCapacity = member.weekly_capacity || workWeekHours;
       totalCapacity += weeklyCapacity * periodToShow;
       
       const memberData = workloadData[member.id] || {};
@@ -62,7 +64,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     
     members.forEach(member => {
       // Calculate total capacity for the period
-      const weeklyCapacity = member.weekly_capacity || 40;
+      const weeklyCapacity = member.weekly_capacity || workWeekHours;
       const totalCapacity = weeklyCapacity * periodToShow;
       
       const memberData = workloadData[member.id] || {};
@@ -75,7 +77,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
 
   // Calculate which members need resourcing (low utilization) and are overloaded
   const memberStatus = members.map(member => {
-    const weeklyCapacity = member.weekly_capacity || 40;
+    const weeklyCapacity = member.weekly_capacity || workWeekHours;
     const totalCapacity = weeklyCapacity * periodToShow;
     
     const memberData = workloadData[member.id] || {};

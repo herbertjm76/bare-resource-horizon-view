@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface GapAnalysisViewProps {
   members: TeamMember[];
@@ -24,12 +25,14 @@ export const GapAnalysisView: React.FC<GapAnalysisViewProps> = ({
   weekStartDates,
   isLoading
 }) => {
+  const { workWeekHours } = useAppSettings();
+  
   // Calculate team capacity and actual workload per week
   const analysisData = useMemo(() => {
     return weekStartDates.map(week => {
       // Calculate total team capacity (sum of all members' weekly_capacity)
       const totalCapacity = members.reduce((sum, member) => {
-        return sum + (member.weekly_capacity || 40);
+        return sum + (member.weekly_capacity || workWeekHours);
       }, 0);
 
       // Calculate actual workload for this week

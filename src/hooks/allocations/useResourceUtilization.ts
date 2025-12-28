@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyId } from '@/hooks/useCompanyId';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatDateKey } from './utils';
 
 export interface ResourceUtilization {
@@ -28,9 +29,10 @@ export function useResourceUtilization(
   const [utilizations, setUtilizations] = useState<Record<string, ResourceUtilization>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { companyId } = useCompanyId();
+  const { workWeekHours } = useAppSettings();
   
-  // Standard capacity for resources (40 hours per week)
-  const standardCapacity = 40;
+  // Use company's configured work week hours as standard capacity
+  const standardCapacity = workWeekHours;
 
   // Fetch utilization data for the given resources and weeks
   const fetchUtilization = useCallback(async () => {
@@ -105,7 +107,7 @@ export function useResourceUtilization(
     } finally {
       setIsLoading(false);
     }
-  }, [companyId, resourceIds, weekKeys, resourceType]);
+  }, [companyId, resourceIds, weekKeys, resourceType, standardCapacity]);
   
   // Refresh utilization data when dependencies change
   useEffect(() => {

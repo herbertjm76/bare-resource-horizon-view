@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useIndividualMemberUtilization } from '@/hooks/useIndividualMemberUtilization';
 import { useResourcePlanningData } from './resource-planning/hooks/useResourcePlanningData';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface TeamMemberDetailContentProps {
   memberData: any;
@@ -22,7 +23,8 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
   memberData
 }) => {
   const userId = useUserSession();
-  const weeklyCapacity = memberData.weekly_capacity || 40;
+  const { workWeekHours } = useAppSettings();
+  const weeklyCapacity = memberData.weekly_capacity || workWeekHours;
   
   // Get utilization data for chart
   const { utilization, isLoading: isLoadingUtilization } = useIndividualMemberUtilization(memberData.id, weeklyCapacity);
