@@ -33,7 +33,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
       department: '',
       location: 'Unassigned',
       job_title: '',
-      weekly_capacity: 40
+      weekly_capacity: undefined // null = use company default
     }
   });
 
@@ -50,6 +50,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
       console.log('Populating form with member data:', member, 'isPending:', memberIsPending);
       
       // Pre-fill form with member data if editing
+      // weekly_capacity: null/undefined = use company default, number = exception
       reset({
         first_name: member.first_name || '',
         last_name: member.last_name || '',
@@ -58,10 +59,10 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         department: member.department || '',
         location: member.location || 'Unassigned',
         job_title: member.job_title || '',
-        weekly_capacity: member.weekly_capacity || 40
+        weekly_capacity: member.weekly_capacity ?? undefined
       });
     } else {
-      // Reset form for new member
+      // Reset form for new member - leave capacity empty to use company default
       reset({
         first_name: '',
         last_name: '',
@@ -70,7 +71,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         department: '',
         location: 'Unassigned',
         job_title: '',
-        weekly_capacity: 40
+        weekly_capacity: undefined
       });
     }
   }, [member, reset]);

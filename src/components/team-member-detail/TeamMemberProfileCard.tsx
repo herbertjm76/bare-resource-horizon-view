@@ -97,7 +97,12 @@ export const TeamMemberProfileCard: React.FC<TeamMemberProfileCardProps> = ({ me
                   )}
                   <div className="flex items-center gap-2 text-white/90">
                     <Clock className="h-4 w-4" />
-                    <span>{formatCapacityValue(getMemberCapacity(member.weekly_capacity, workWeekHours), displayPreference)} weekly capacity</span>
+                    <span>
+                      {formatCapacityValue(getMemberCapacity(member.weekly_capacity, workWeekHours), displayPreference)} weekly capacity
+                      {(member.weekly_capacity === null || member.weekly_capacity === undefined) && (
+                        <span className="ml-1 text-white/60 text-xs">(default)</span>
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>

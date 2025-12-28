@@ -6,6 +6,7 @@ import { UseFormRegister, Controller, Control } from 'react-hook-form';
 import { MemberFormData } from './types';
 import { useOfficeSettings } from '@/context/officeSettings';
 import { useOfficeRates, getRateForReference } from '@/hooks/useOfficeRates';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { 
   Select,
   SelectContent,
@@ -22,6 +23,7 @@ interface OrganizationFieldsProps {
 const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, control }) => {
   const { locations, departments, roles, loading } = useOfficeSettings();
   const { data: rates = [] } = useOfficeRates();
+  const { workWeekHours } = useAppSettings();
 
   return (
     <>
@@ -128,12 +130,15 @@ const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, contr
           type="number"
           min="1"
           max="168"
-          placeholder="40"
+          placeholder={`Uses company default (${workWeekHours}h)`}
           {...register('weekly_capacity', { 
-            valueAsNumber: true,
-            validate: value => !value || value > 0 || "Capacity must be greater than 0"
+            setValueAs: (v) => v === '' || v === null || v === undefined ? null : Number(v),
+            validate: value => value === null || value === undefined || value > 0 || "Capacity must be greater than 0"
           })}
         />
+        <p className="text-xs text-muted-foreground">
+          Leave empty to use company default. Only set for part-time or exceptions.
+        </p>
       </div>
     </>
   );
