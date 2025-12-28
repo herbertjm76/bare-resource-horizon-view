@@ -2,12 +2,12 @@
 /**
  * Determine if a resource is overutilized (exceeding standard capacity)
  * @param weeklyHours Hours allocated for a week
- * @param standardCapacity Standard weekly capacity (default: 40 hours)
+ * @param standardCapacity Standard weekly capacity (REQUIRED - use workWeekHours from useAppSettings)
  * @returns Boolean indicating if resource is overutilized
  */
 export const isResourceOverutilized = (
   weeklyHours: number, 
-  standardCapacity: number = 40
+  standardCapacity: number
 ): boolean => {
   return weeklyHours > standardCapacity;
 };
@@ -199,13 +199,13 @@ export const getTotalAllocationWarningStatus = (
  * Calculate appropriate capacity for a resource based on their contract or role
  * @param resourceId Resource ID
  * @param resourceType Type of resource (full-time, part-time, contractor, etc.)
- * @param baseCapacity Base capacity to use (default: 40)
+ * @param baseCapacity Base capacity to use (REQUIRED - use workWeekHours from useAppSettings)
  * @returns Calculated capacity
  */
 export const calculateResourceCapacity = (
   resourceId: string, 
   resourceType: string = 'full-time',
-  baseCapacity: number = 40
+  baseCapacity: number
 ): number => {
   switch(resourceType) {
     case 'part-time':

@@ -20,16 +20,16 @@ export const WorkloadCalendarCell: React.FC<WorkloadCalendarCellProps> = ({
   const weekHours = weekData?.total || 0;
   const weekDateString = format(week.date, 'MMM d, yyyy');
   
-  // Color-coding based on utilization levels
+  // Color-coding based on utilization levels using weeklyCapacity
   const getUtilizationColor = (hours: number) => {
     if (hours === 0) {
       return '#f3f4f6'; // Gray for 0 hours
-    } else if (hours === 40) {
-      return '#22c55e'; // Green for exactly 40 hours (fully utilized)
-    } else if (hours > 40) {
-      return '#ef4444'; // Red for over 40 hours (over capacity)
+    } else if (hours === weeklyCapacity) {
+      return '#22c55e'; // Green for exactly at capacity (fully utilized)
+    } else if (hours > weeklyCapacity) {
+      return '#ef4444'; // Red for over capacity
     } else {
-      return '#eab308'; // Yellow for less than 40 hours (underutilized)
+      return '#eab308'; // Yellow for less than capacity (underutilized)
     }
   };
 
