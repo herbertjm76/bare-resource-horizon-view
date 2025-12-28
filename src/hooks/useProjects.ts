@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
-import { useEffect } from 'react';
 import type { Database } from '@/integrations/supabase/types';
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -13,33 +12,23 @@ export type ProjectSortBy = 'name' | 'code' | 'status' | 'created';
 export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'asc' | 'desc' = 'asc') => {
   const { company, loading: companyLoading, error: companyError } = useCompany();
 
-  // Derive a stable company ID - only consider ready when we have both company and ID
+  // Derive a stable company ID - only enable query when company is fully loaded
   const companyId = company?.id;
-  const isCompanyReady = !companyLoading && !!companyId && !companyError;
-
-  useEffect(() => {
-    console.log('useProjects hook effect triggered', { 
-      hasCompany: !!company,
-      companyLoading,
-      companyId,
-      isCompanyReady,
-      companyError
-    });
-  }, [company, companyLoading, companyId, isCompanyReady, companyError]);
+  // CRITICAL: Query must not run if company context is still loading OR has no ID
+  const canFetch = !companyLoading && !!companyId && !companyError;
   
-  const { data: projects, isLoading, error, refetch } = useQuery({
+  const { data: projects, isLoading: queryLoading, error, refetch } = useQuery({
     queryKey: ['projects', companyId, sortBy, sortDirection],
     queryFn: async () => {
-      // Double-check we have a valid company ID before querying
+      // Safety check - should never happen if enabled is correct
       if (!companyId) {
-        console.log('No company ID available, cannot fetch projects');
+        console.warn('useProjects: queryFn called without companyId');
         return [];
       }
       
-      console.log('Fetching projects data for company:', companyId);
+      console.log('useProjects: Fetching projects for company:', companyId);
       
       try {
-        // Select projects with deterministic ordering based on sortBy parameter
         let query = supabase
           .from('projects')
           .select(`
@@ -83,21 +72,20 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
         const { data, error } = await query;
 
         if (error) {
-          console.error('Error fetching projects:', error);
+          console.error('useProjects: Error fetching projects:', error);
           toast.error('Failed to load projects');
           throw error;
         }
 
-        console.log('Projects data fetched successfully:', data?.length || 0, 'projects found');
-        console.log('Sample project data:', data?.[0] || 'No projects');
+        console.log('useProjects: Fetched', data?.length || 0, 'projects');
         return data || [];
       } catch (err) {
-        console.error('Exception in projects fetch:', err);
+        console.error('useProjects: Exception:', err);
         throw err;
       }
     },
-    // Only enable when we have a valid company ID and context is not loading
-    enabled: isCompanyReady,
+    // CRITICAL: Only enable when company context is fully ready
+    enabled: canFetch,
     retry: 2,
     retryDelay: 1000,
     refetchOnWindowFocus: false,
@@ -105,36 +93,15 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
     placeholderData: (previousData) => previousData,
   });
 
-  console.log('useProjects hook state:', { 
-    projectsLength: projects?.length || 0, 
-    isLoading, 
-    hasError: !!error,
-    companyId,
-    companyLoading,
-    isCompanyReady
-  });
-
-  // This is a debug helper to help track if we're stuck in loading
-  useEffect(() => {
-    if (isLoading || companyLoading) {
-      const timeout = setTimeout(() => {
-        console.log('useProjects still loading after 5 seconds', {
-          companyLoading,
-          hasCompany: !!company,
-          companyId,
-          isCompanyReady
-        });
-      }, 5000);
-      
-      return () => clearTimeout(timeout);
-    }
-  }, [isLoading, company, companyLoading, companyId, isCompanyReady]);
+  // Determine proper loading state:
+  // - If company is loading, we're loading
+  // - If canFetch is true but query is loading, we're loading
+  // - If canFetch is false (no company), we're NOT loading (we're done - nothing to fetch)
+  const isLoading = companyLoading || (canFetch && queryLoading);
 
   return {
     projects: projects || [],
-    // Only show loading when the context is loading or the query is actively fetching.
-    // If company cannot be resolved, we should not spin forever.
-    isLoading: companyLoading || isLoading,
+    isLoading,
     error: error || (companyError ? new Error(companyError) : null),
     refetch
   };

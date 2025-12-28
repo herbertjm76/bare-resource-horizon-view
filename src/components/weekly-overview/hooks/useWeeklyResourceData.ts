@@ -21,8 +21,11 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
   // Track loading state explicitly
   const [isInitializing, setIsInitializing] = useState(true);
   
-  // Get company context
-  const { company } = useCompany();
+  // Get company context - CRITICAL: check both company and loading state
+  const { company, loading: companyLoading } = useCompany();
+  
+  // Only use companyId when company context is fully loaded
+  const companyId = !companyLoading ? company?.id : undefined;
   
   // Get current user ID
   const { data: session, isLoading: isLoadingSession } = useQuery({
@@ -34,16 +37,16 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
     }
   });
   
-  // Fetch all projects for the company
+  // Fetch all projects for the company - only when company is ready
   const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
-    queryKey: ['company-projects', company?.id],
+    queryKey: ['company-projects', companyId],
     queryFn: async () => {
-      if (!company?.id) return [];
+      if (!companyId) return [];
       
       const { data, error } = await supabase
         .from('projects')
         .select('id, code, name')
-        .eq('company_id', company.id)
+        .eq('company_id', companyId)
         .order('code');
       
       if (error) {
@@ -54,22 +57,22 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
       console.log("Fetched projects:", data?.length || 0);
       return data || [];
     },
-    enabled: !!company?.id
+    enabled: !!companyId
   });
   
   // Get team members data - pass true to include inactive members
   const { teamMembers, isLoading: isLoadingMembers, error: teamMembersError } = useTeamMembersData(true);
   
-  // Get pending team members (pre-registered)
+  // Get pending team members (pre-registered) - only when company is ready
   const { data: preRegisteredMembers = [], isLoading: isLoadingPending, error: pendingError } = useQuery({
-    queryKey: ['preRegisteredMembers', session?.user?.id, company?.id],
+    queryKey: ['preRegisteredMembers', session?.user?.id, companyId],
     queryFn: async () => {
-      if (!session?.user?.id || !company?.id) return [];
+      if (!session?.user?.id || !companyId) return [];
       
       const { data, error } = await supabase
         .from('invites')
         .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
-        .eq('company_id', company.id)
+        .eq('company_id', companyId)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
         
@@ -90,7 +93,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
         weekly_capacity: member.weekly_capacity || 40
       }));
     },
-    enabled: !!session?.user?.id && !!company?.id
+    enabled: !!session?.user?.id && !!companyId
   });
 
   // Get all members combined (active + pre-registered)
@@ -154,7 +157,8 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
 
   // Clear initialization state when data is loaded
   useEffect(() => {
-    const dataIsReady = !isLoadingSession && !isLoadingMembers && 
+    // CRITICAL: Include companyLoading in the ready check
+    const dataIsReady = !companyLoading && !isLoadingSession && !isLoadingMembers && 
                         !isLoadingPending && !isLoadingProjects && 
                         !isLoadingAllocations && Array.isArray(allMembers);
                          
@@ -167,6 +171,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
       return () => clearTimeout(timer);
     }
   }, [
+    companyLoading,
     isLoadingSession, 
     isLoadingMembers, 
     isLoadingPending, 
@@ -175,8 +180,8 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
     allMembers
   ]);
 
-  // Determine overall loading state
-  const isLoading = isInitializing || isLoadingSession || isLoadingMembers || 
+  // Determine overall loading state - include company loading
+  const isLoading = companyLoading || isInitializing || isLoadingSession || isLoadingMembers || 
                     isLoadingPending || isLoadingAllocations || isLoadingProjects;
 
   // Determine if there are any errors
