@@ -60,9 +60,8 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
             {/* Office Members */}
             {officeMembers.map((member, memberIndex) => {
               const allocation = getMemberAllocation(member.id);
-              // Calculate total hours from project allocations
               const totalHours = allocation.projectAllocations.reduce((sum, project) => sum + project.hours, 0);
-              const weeklyCapacity = member.weekly_capacity || 40;
+              const weeklyCapacity = member.weekly_capacity || workWeekHours;
               const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / weeklyCapacity) * 100) : 0;
               
               // Determine utilization color

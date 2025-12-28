@@ -31,7 +31,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
   threshold = 80
 }) => {
   const { company } = useCompany();
-  const { displayPreference } = useAppSettings();
+  const { displayPreference, workWeekHours } = useAppSettings();
 
   // Fetch all active members and pre-registered invites
   const { data: profiles = [] } = useQuery({
@@ -88,7 +88,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
         firstName: p.first_name || '',
         lastName: p.last_name || '',
         avatarUrl: p.avatar_url,
-        capacity: p.weekly_capacity || 40,
+        capacity: p.weekly_capacity || workWeekHours,
         type: 'active' as const
       })),
       ...invites.map(i => ({
@@ -96,7 +96,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
         firstName: i.first_name || '',
         lastName: i.last_name || '',
         avatarUrl: i.avatar_url,
-        capacity: i.weekly_capacity || 40,
+        capacity: i.weekly_capacity || workWeekHours,
         type: 'pre_registered' as const
       }))
     ];

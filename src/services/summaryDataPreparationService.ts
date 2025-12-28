@@ -175,7 +175,8 @@ export class SummaryDataPreparationService {
 
   private static calculateWorkloadMetrics(
     workloadData: Record<string, Record<string, WorkloadBreakdown>>,
-    members: any[]
+    members: any[],
+    workWeekHours: number = 40
   ) {
     let totalCapacity = 0;
     let totalAllocated = 0;
@@ -184,7 +185,7 @@ export class SummaryDataPreparationService {
 
     members.forEach(member => {
       const memberWorkload = workloadData[member.id] || {};
-      const weeklyCapacity = member.weekly_capacity || 40;
+      const weeklyCapacity = member.weekly_capacity || workWeekHours;
       const allocated = Object.values(memberWorkload).reduce(
         (sum, week) => sum + (week.total || 0), 0
       );
@@ -207,8 +208,8 @@ export class SummaryDataPreparationService {
     };
   }
 
-  private static calculateWeeklyMetrics(members: any[], allocations: any[]) {
-    const totalCapacity = members.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
+  private static calculateWeeklyMetrics(members: any[], allocations: any[], workWeekHours: number = 40) {
+    const totalCapacity = members.reduce((sum, member) => sum + (member.weekly_capacity || workWeekHours), 0);
     const totalAllocated = allocations.reduce((sum, allocation) => sum + (allocation.hours || 0), 0);
     const utilizationRate = totalCapacity > 0 ? (totalAllocated / totalCapacity) * 100 : 0;
 

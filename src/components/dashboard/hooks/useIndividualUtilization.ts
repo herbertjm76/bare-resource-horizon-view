@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { format, startOfWeek, startOfMonth, subMonths, endOfWeek, endOfMonth } from 'date-fns';
 import { TimeRange } from '../TimeRangeSelector';
 
@@ -17,6 +18,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
   const [memberUtilizations, setMemberUtilizations] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
+  const { workWeekHours } = useAppSettings();
 
   // Calculate date range based on selected time range
   const getDateRange = () => {
@@ -132,7 +134,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
           }
 
           // Calculate utilization percentage based on time range capacity
-          const weeklyCapacity = member.weekly_capacity || 40;
+          const weeklyCapacity = member.weekly_capacity || workWeekHours;
           const totalCapacityForPeriod = getTotalCapacity(weeklyCapacity);
           const utilization = totalCapacityForPeriod > 0 ? (totalAllocatedHours / totalCapacityForPeriod) * 100 : 0;
           

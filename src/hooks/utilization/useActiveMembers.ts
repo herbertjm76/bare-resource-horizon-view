@@ -9,7 +9,8 @@ export const calculateActiveUtilizations = async (
   activeMembers: TeamMember[],
   companyId: string,
   currentWeekStart: Date,
-  ninetyDaysAgo: Date
+  ninetyDaysAgo: Date,
+  workWeekHours: number
 ): Promise<Record<string, IndividualUtilization>> => {
   const utilizationMap: Record<string, IndividualUtilization> = {};
   
@@ -38,7 +39,7 @@ export const calculateActiveUtilizations = async (
 
   // Calculate utilization for active members
   activeMembers.forEach(member => {
-    const memberCapacity = member.weekly_capacity || 40;
+    const memberCapacity = member.weekly_capacity || workWeekHours;
     
     console.log(`--- Active Member ${member.first_name} ${member.last_name} (${member.id}) (Capacity: ${memberCapacity}h/week) ---`);
 

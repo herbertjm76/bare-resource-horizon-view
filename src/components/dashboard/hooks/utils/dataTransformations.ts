@@ -1,5 +1,9 @@
 
-export const transformPreRegisteredMembers = (preRegisteredMembers: any[], memberUtilizations?: any[]) => {
+export const transformPreRegisteredMembers = (
+  preRegisteredMembers: any[],
+  memberUtilizations?: any[],
+  workWeekHours: number = 40
+) => {
   return preRegisteredMembers.map(member => {
     // Find real utilization data for this pending member
     const utilizationData = memberUtilizations?.find(util => util.memberId === member.id);
@@ -22,12 +26,16 @@ export const transformPreRegisteredMembers = (preRegisteredMembers: any[], membe
       department: member.department,
       location: member.location,
       isPending: true,
-      weekly_capacity: member.weekly_capacity || 40
+      weekly_capacity: member.weekly_capacity || workWeekHours
     };
   });
 };
 
-export const transformActiveMembers = (teamMembers: any[], memberUtilizations?: any[]) => {
+export const transformActiveMembers = (
+  teamMembers: any[],
+  memberUtilizations?: any[],
+  workWeekHours: number = 40
+) => {
   return teamMembers.map(member => {
     // Find real utilization data for this member
     const utilizationData = memberUtilizations?.find(util => util.memberId === member.id);
@@ -45,7 +53,7 @@ export const transformActiveMembers = (teamMembers: any[], memberUtilizations?: 
       fullName: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unknown',
       availability: realUtilization, // Use REAL utilization instead of mock data
       utilization: realUtilization, // Also add as utilization for consistency
-      weekly_capacity: member.weekly_capacity || 40,
+      weekly_capacity: member.weekly_capacity || workWeekHours,
       first_name: member.first_name,
       last_name: member.last_name,
       role: member.role || 'member',
@@ -56,9 +64,14 @@ export const transformActiveMembers = (teamMembers: any[], memberUtilizations?: 
   });
 };
 
-export const combineStaffData = (activeMembers: any[], preRegisteredMembers: any[], memberUtilizations?: any[]) => {
-  const transformedActiveMembers = transformActiveMembers(activeMembers, memberUtilizations);
-  const transformedPreRegistered = transformPreRegisteredMembers(preRegisteredMembers, memberUtilizations);
+export const combineStaffData = (
+  activeMembers: any[],
+  preRegisteredMembers: any[],
+  memberUtilizations?: any[],
+  workWeekHours: number = 40
+) => {
+  const transformedActiveMembers = transformActiveMembers(activeMembers, memberUtilizations, workWeekHours);
+  const transformedPreRegistered = transformPreRegisteredMembers(preRegisteredMembers, memberUtilizations, workWeekHours);
   
   console.log('🔄 COMBINE STAFF DATA:', {
     activeMembers: transformedActiveMembers.length,

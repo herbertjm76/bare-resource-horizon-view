@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { format, startOfWeek, subWeeks } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { IndividualUtilization } from './utilization/types';
@@ -12,6 +13,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
   const [individualUtilizations, setIndividualUtilizations] = useState<Record<string, IndividualUtilization>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
+  const { workWeekHours } = useAppSettings();
 
   // Separate active and pre-registered members
   const { activeMembers, preRegisteredMembers } = useMemo(() => {
@@ -52,7 +54,8 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
           activeMembers,
           company.id,
           currentWeekStart,
-          ninetyDaysAgo
+          ninetyDaysAgo,
+          workWeekHours
         );
 
         // Calculate utilizations for pre-registered members
@@ -60,7 +63,8 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
           preRegisteredMembers,
           company.id,
           currentWeekStart,
-          ninetyDaysAgo
+          ninetyDaysAgo,
+          workWeekHours
         );
 
         // Merge all utilizations
@@ -85,7 +89,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
     };
 
     fetchIndividualUtilizations();
-  }, [company?.id, activeMembers, preRegisteredMembers, teamMembers]);
+  }, [company?.id, activeMembers, preRegisteredMembers, teamMembers, workWeekHours]);
 
   const getIndividualUtilization = (memberId: string): IndividualUtilization => {
     return individualUtilizations[memberId] || { memberId, days7: 0, days30: 0, days90: 0 };

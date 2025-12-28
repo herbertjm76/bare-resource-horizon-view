@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { toast } from 'sonner';
 
 export interface PersonProject {
@@ -24,6 +25,7 @@ export interface PersonResourceData {
 
 export const usePersonResourceData = (startDate: Date, periodToShow: number) => {
   const { company } = useCompany();
+  const { workWeekHours } = useAppSettings();
 
   const { data: personData = [], isLoading, error, refetch } = useQuery({
     queryKey: ['person-resource-data', company?.id, startDate.toISOString(), periodToShow],
@@ -117,7 +119,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             avatarUrl: member.avatar_url || undefined,
             location: member.location || undefined,
             jobTitle: member.job_title || undefined,
-            weeklyCapacity: member.weekly_capacity || 40,
+            weeklyCapacity: member.weekly_capacity || workWeekHours,
             resourceType: member.resourceType,
             projects: []
           });
