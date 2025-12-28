@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Project, MemberAllocation } from './types';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface EnhancedTeamMemberRowsProps {
   filteredOffices: string[];
@@ -22,6 +24,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
   handleInputChange,
   projects
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
   // Helper to get user initials
   const getUserInitials = (member: any): string => {
     const firstName = member.first_name || '';
@@ -137,14 +140,14 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                   {/* Total Hours - Enhanced styling */}
                   <TableCell className="text-center total-hours-column">
                     <div className="enhanced-hours-pill">
-                      {totalHours}h
+                      {formatAllocationValue(totalHours, weeklyCapacity, displayPreference)}
                     </div>
                   </TableCell>
 
                   {/* Capacity - Enhanced styling with better spacing */}
                   <TableCell className="text-center capacity-column">
                     <div className="enhanced-capacity-pill">
-                      {weeklyCapacity}h
+                      {formatCapacityValue(weeklyCapacity, displayPreference)}
                     </div>
                   </TableCell>
 

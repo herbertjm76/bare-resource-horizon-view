@@ -2,6 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, Users, CalendarDays, TrendingUp, DollarSign, AlertTriangle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue, formatCapacityValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
 
 interface PlanningProjectedSummaryProps {
   totalProjectedHours: number;
@@ -22,6 +24,7 @@ export const PlanningProjectedSummary: React.FC<PlanningProjectedSummaryProps> =
   totalBudget = 0,
   showBudget = false
 }) => {
+  const { displayPreference } = useAppSettings();
   const utilizationRate = totalTeamCapacity > 0 
     ? Math.round((totalProjectedHours / totalTeamCapacity) * 100) 
     : 0;
@@ -70,7 +73,7 @@ export const PlanningProjectedSummary: React.FC<PlanningProjectedSummaryProps> =
               <div>
                 <p className="text-xs text-muted-foreground">Team Capacity</p>
                 <p className="text-xl font-bold">{totalTeamCapacity.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">{weeklyCapacity}h/week</p>
+                <p className="text-xs text-muted-foreground">{formatCapacityValue(weeklyCapacity, displayPreference)}/week</p>
               </div>
             </div>
           </CardContent>
@@ -116,7 +119,7 @@ export const PlanningProjectedSummary: React.FC<PlanningProjectedSummaryProps> =
             {isOverCapacity && (
               <span className="flex items-center gap-1 text-destructive text-xs font-normal">
                 <AlertTriangle className="h-3 w-3" />
-                Over capacity by {totalProjectedHours - totalTeamCapacity}h
+                Over capacity by {formatAllocationValue(totalProjectedHours - totalTeamCapacity, totalTeamCapacity, displayPreference)}
               </span>
             )}
           </CardTitle>
@@ -139,8 +142,8 @@ export const PlanningProjectedSummary: React.FC<PlanningProjectedSummaryProps> =
               )}
             </div>
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>0h</span>
-              <span>{totalTeamCapacity.toLocaleString()}h capacity</span>
+              <span>{displayPreference === 'percentage' ? '0%' : '0h'}</span>
+              <span>{formatAllocationValue(totalTeamCapacity, totalTeamCapacity, displayPreference)} capacity</span>
             </div>
           </div>
         </CardContent>

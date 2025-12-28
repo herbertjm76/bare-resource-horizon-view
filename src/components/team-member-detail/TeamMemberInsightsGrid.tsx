@@ -3,6 +3,9 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Briefcase, TrendingUp, Target } from 'lucide-react';
 import { useResourcePlanningData } from './resource-planning/hooks/useResourcePlanningData';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatCapacityValue } from '@/utils/allocationDisplay';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface TeamMemberInsightsGridProps {
   memberId: string;
@@ -10,8 +13,9 @@ interface TeamMemberInsightsGridProps {
 
 export const TeamMemberInsightsGrid: React.FC<TeamMemberInsightsGridProps> = ({ memberId }) => {
   const { memberProfile, historicalData, activeProjects, isLoading } = useResourcePlanningData(memberId);
+  const { displayPreference, workWeekHours } = useAppSettings();
   
-  const weeklyCapacity = memberProfile?.weekly_capacity || 40;
+  const weeklyCapacity = getMemberCapacity(memberProfile?.weekly_capacity, workWeekHours);
   
   // Calculate quick metrics - historicalData now uses allocation_date
   const currentWeekUtilization = historicalData[0]?.hours 
@@ -55,7 +59,7 @@ export const TeamMemberInsightsGrid: React.FC<TeamMemberInsightsGridProps> = ({ 
             <Clock className="h-5 w-5" />
             <h3 className="font-medium">Weekly Capacity</h3>
           </div>
-          <div className="text-3xl font-bold text-blue-700 mb-1">{weeklyCapacity}h</div>
+          <div className="text-3xl font-bold text-blue-700 mb-1">{formatCapacityValue(weeklyCapacity, displayPreference)}</div>
           <p className="text-sm text-blue-600">Standard allocation</p>
         </CardContent>
       </Card>

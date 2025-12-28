@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface NewResourceSummaryRowProps {
   projects: any[];
@@ -13,6 +15,7 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
   allocationMap,
   members
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
   // Calculate total hours across all projects
   let totalHours = 0;
   allocationMap.forEach((hours) => {
@@ -54,7 +57,7 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
       
       {/* Project Count Column */}
       <TableCell className="text-center text-sm font-semibold">
-        {totalHours}h
+        {formatAllocationValue(totalHours, workWeekHours, displayPreference)}
       </TableCell>
       
       {/* Project Columns */}
@@ -64,7 +67,7 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         
         return (
           <TableCell key={project.id} className="text-center text-sm font-semibold">
-            {hours > 0 ? `${hours}h` : '—'}
+            {hours > 0 ? formatAllocationValue(hours, workWeekHours, displayPreference) : '—'}
           </TableCell>
         );
       })}

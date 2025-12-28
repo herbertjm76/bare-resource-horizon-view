@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getMemberCapacity } from '@/utils/capacityUtils';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface GapAnalysisViewProps {
   members: TeamMember[];
@@ -26,7 +27,7 @@ export const GapAnalysisView: React.FC<GapAnalysisViewProps> = ({
   weekStartDates,
   isLoading
 }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   
   // Calculate team capacity and actual workload per week
   const analysisData = useMemo(() => {
@@ -127,17 +128,17 @@ export const GapAnalysisView: React.FC<GapAnalysisViewProps> = ({
             {summary.totalUnscheduled > 0 ? (
               <>
                 <TrendingUp className="h-5 w-5 text-amber-500" />
-                {summary.totalUnscheduled}h
+                {formatAllocationValue(summary.totalUnscheduled, summary.totalCapacity, displayPreference)}
               </>
             ) : summary.totalUnscheduled < 0 ? (
               <>
                 <TrendingDown className="h-5 w-5 text-green-500" />
-                {Math.abs(summary.totalUnscheduled)}h ahead
+                {formatAllocationValue(Math.abs(summary.totalUnscheduled), summary.totalCapacity, displayPreference)} ahead
               </>
             ) : (
               <>
                 <Minus className="h-5 w-5 text-muted-foreground" />
-                0h
+                {displayPreference === 'percentage' ? '0%' : '0h'}
               </>
             )}
           </div>
@@ -148,7 +149,7 @@ export const GapAnalysisView: React.FC<GapAnalysisViewProps> = ({
 
         <div className="p-4 rounded-lg bg-muted/50">
           <div className="text-sm text-muted-foreground">Team Capacity</div>
-          <div className="text-2xl font-bold">{summary.totalCapacity}h</div>
+          <div className="text-2xl font-bold">{formatAllocationValue(summary.totalCapacity, summary.totalCapacity, displayPreference)}</div>
           <div className="text-xs text-muted-foreground">
             {members.length} members × {weekStartDates.length} weeks
           </div>
