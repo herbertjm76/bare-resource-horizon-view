@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 import { toast } from 'sonner';
 import { LeaveType } from '@/types/leave';
 
 export const useLeaveTypes = () => {
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { company } = useCompany();
+  const { companyId } = useCompanyId();
 
   const fetchLeaveTypes = useCallback(async () => {
-    if (!company?.id) return;
+    if (!companyId) return;
 
     setIsLoading(true);
 
@@ -18,7 +18,7 @@ export const useLeaveTypes = () => {
       const { data, error } = await supabase
         .from('leave_types')
         .select('*')
-        .eq('company_id', company.id)
+        .eq('company_id', companyId)
         .eq('is_active', true)
         .order('order_index', { ascending: true });
 
@@ -35,14 +35,14 @@ export const useLeaveTypes = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [company?.id]);
+  }, [companyId]);
 
   const seedDefaultLeaveTypes = useCallback(async () => {
-    if (!company?.id) return;
+    if (!companyId) return;
 
     try {
       const { error } = await supabase.rpc('seed_default_leave_types', {
-        p_company_id: company.id
+        p_company_id: companyId
       });
 
       if (error) {
@@ -54,20 +54,20 @@ export const useLeaveTypes = () => {
     } catch (error) {
       console.error('Error seeding leave types:', error);
     }
-  }, [company?.id, fetchLeaveTypes]);
+  }, [companyId, fetchLeaveTypes]);
 
   useEffect(() => {
-    if (company?.id) {
+    if (companyId) {
       fetchLeaveTypes();
     }
-  }, [company?.id, fetchLeaveTypes]);
+  }, [companyId, fetchLeaveTypes]);
 
   // Auto-seed if no leave types exist
   useEffect(() => {
-    if (!isLoading && leaveTypes.length === 0 && company?.id) {
+    if (!isLoading && leaveTypes.length === 0 && companyId) {
       seedDefaultLeaveTypes();
     }
-  }, [isLoading, leaveTypes.length, company?.id, seedDefaultLeaveTypes]);
+  }, [isLoading, leaveTypes.length, companyId, seedDefaultLeaveTypes]);
 
   return {
     leaveTypes,

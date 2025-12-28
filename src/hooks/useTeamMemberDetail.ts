@@ -1,22 +1,22 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 import { toast } from 'sonner';
 
 export const useTeamMemberDetail = (memberId: string | undefined) => {
   const [memberData, setMemberData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { company } = useCompany();
+  const { companyId } = useCompanyId();
 
   useEffect(() => {
     const fetchMemberDetail = async () => {
       console.log('useTeamMemberDetail - memberId received:', memberId);
-      console.log('useTeamMemberDetail - company:', company?.id);
+      console.log('useTeamMemberDetail - company:', companyId);
       
-      if (!memberId || !company?.id) {
-        console.log('Missing memberId or company.id, stopping fetch');
+      if (!memberId || !companyId) {
+        console.log('Missing memberId or companyId, stopping fetch');
         setIsLoading(false);
         return;
       }
@@ -41,7 +41,7 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
           .from('profiles')
           .select('*')
           .eq('id', memberId)
-          .eq('company_id', company.id)
+          .eq('company_id', companyId)
           .maybeSingle();
 
         if (profileError) {
@@ -62,7 +62,7 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
           .from('invites')
           .select('*')
           .eq('id', memberId)
-          .eq('company_id', company.id)
+          .eq('company_id', companyId)
           .eq('invitation_type', 'pre_registered')
           .maybeSingle();
 
@@ -92,7 +92,7 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
     };
 
     fetchMemberDetail();
-  }, [memberId, company?.id]);
+  }, [memberId, companyId]);
 
   return {
     memberData,

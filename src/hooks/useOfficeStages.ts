@@ -1,24 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 
 export const useOfficeStages = () => {
-  const { company } = useCompany();
+  const { companyId, isReady } = useCompanyId();
 
   return useQuery({
-    queryKey: ['office-stages', company?.id],
+    queryKey: ['office-stages', companyId],
     queryFn: async () => {
-      if (!company?.id) return [];
+      if (!companyId) return [];
       
       const { data, error } = await supabase
         .from('office_stages')
         .select('*')
-        .eq('company_id', company.id)
+        .eq('company_id', companyId)
         .order('order_index', { ascending: true });
 
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
+    enabled: isReady,
   });
 };
