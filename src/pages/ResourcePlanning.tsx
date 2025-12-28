@@ -1,45 +1,30 @@
 import React, { useState, useMemo } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
-import { TrendingUp, BarChart3, List, GanttChart } from 'lucide-react';
-import { CenteredTabs, CenteredTabItem, TabsContent } from '@/components/ui/centered-tabs';
+import { TrendingUp, List, GanttChart } from 'lucide-react';
+import { CenteredTabs, TabsContent } from '@/components/ui/centered-tabs';
 import { useProjectPlanningData } from '@/hooks/useProjectPlanningData';
-import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { ProjectPlanningList } from '@/components/resource-planning/ProjectPlanningList';
 import { PlanningFilterRow } from '@/components/resource-planning/PlanningFilterRow';
-import { ForecastGantt } from '@/components/resource-planning/ForecastGantt';
-import { ResourcePlanningControls } from '@/components/resource-planning/ResourcePlanningControls';
-import { PlanningAuditLogViewer } from '@/components/resource-planning/PlanningAuditLogViewer';
 import { QuickCreateProjectDialog } from '@/components/resource-planning/QuickCreateProjectDialog';
-import { EnhancedTimelineView } from '@/components/resource-planning/EnhancedTimelineView';
+import { PipelineTimelineView } from '@/components/resource-planning/PipelineTimelineView';
 import { EditProjectDialog } from '@/components/projects/EditProjectDialog';
-import { useDemandProjection } from '@/hooks/useDemandProjection';
-import { startOfWeek } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
-import { useAppSettings } from '@/hooks/useAppSettings';
-
-type ForecastGrouping = 'department' | 'practice_area';
 
 const statusOptions = ['Active', 'On Hold', 'Completed', 'Planning'];
 
 const ResourcePlanning: React.FC = () => {
   const { company } = useCompany();
-  const { workWeekHours } = useAppSettings();
   const [activeTab, setActiveTab] = useState<string>('planning');
   const [statusFilter, setStatusFilter] = useState<string[]>(['Active', 'Planning']);
   const [showBudget, setShowBudget] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
-  const [practiceAreaFilter, setPracticeAreaFilter] = useState<string>('all');
-  const [showAuditLog, setShowAuditLog] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
-  const [selectedWeeks, setSelectedWeeks] = useState<number>(12);
-  const [startDate, setStartDate] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const [forecastGrouping, setForecastGrouping] = useState<ForecastGrouping>('department');
   
   // For edit dialog
   const [selectedProject, setSelectedProject] = useState<any>(null);
@@ -48,12 +33,9 @@ const ResourcePlanning: React.FC = () => {
   const { 
     projects, 
     officeStages, 
-    totals, 
-    isLoading: isPlanningLoading,
+    isLoading,
     refetch 
   } = useProjectPlanningData(statusFilter);
-
-  const { teamMembers, isLoading: isTeamLoading } = useTeamMembersData(true);
 
   // Fetch departments
   const { data: departments = [] } = useQuery({
@@ -86,18 +68,6 @@ const ResourcePlanning: React.FC = () => {
     },
     enabled: !!company?.id
   });
-
-  // For forecast tab
-  const { weeklyDemand, roleNames, projectDemands, totalProjectedHours: forecastHours, isLoading: isDemandLoading } = useDemandProjection(
-    startDate,
-    selectedWeeks
-  );
-
-  // Calculate team capacity
-  const weeklyCapacity = teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || workWeekHours), 0);
-  const totalTeamCapacity = weeklyCapacity * selectedWeeks;
-
-  const isLoading = isPlanningLoading || isTeamLoading;
 
   // Filter projects by search, department, and practice area
   const filteredProjects = useMemo(() => {
@@ -143,7 +113,7 @@ const ResourcePlanning: React.FC = () => {
       <OfficeSettingsProvider>
         <StandardizedPageHeader
           title="Project Pipeline"
-          description="Track project stages, plan team composition, and forecast resource demand"
+          description="Track project stages, plan team composition, and manage timelines"
           icon={TrendingUp}
         />
         
@@ -153,41 +123,8 @@ const ResourcePlanning: React.FC = () => {
           tabs={[
             { value: 'planning', label: 'Planning', icon: List },
             { value: 'timeline', label: 'Timeline', icon: GanttChart },
-            { value: 'forecast', label: 'Forecast', icon: BarChart3 },
           ]}
         >
-          {/* Timeline Tab */}
-          <TabsContent value="timeline" className="mt-0 py-4">
-            <div className="px-6 space-y-4">
-              {/* Consistent Filter Row */}
-              <PlanningFilterRow
-                departmentFilter={departmentFilter}
-                onDepartmentChange={setDepartmentFilter}
-                departments={departments}
-                statusFilter={statusFilter}
-                onStatusToggle={toggleStatus}
-                statusOptions={statusOptions}
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                projectCount={filteredProjects.length}
-                totalProjects={projects.length}
-                onCreateProject={() => setShowCreateProject(true)}
-                showBudget={showBudget}
-                onShowBudgetChange={setShowBudget}
-              />
-
-              <Card>
-                <CardContent className="p-4">
-                  <EnhancedTimelineView
-                    projects={filteredProjects}
-                    isLoading={isLoading}
-                    onProjectClick={handleProjectClick}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
           <TabsContent value="planning" className="mt-0 py-4">
             <div className="px-6 space-y-4">
               {/* Filter Row */}
@@ -218,44 +155,37 @@ const ResourcePlanning: React.FC = () => {
             </div>
           </TabsContent>
 
-          {/* Demand Forecast Tab */}
-          <TabsContent value="forecast" className="mt-0 py-6">
-            <div className="px-6 space-y-6">
-              {/* Controls */}
-              <ResourcePlanningControls
-                selectedWeeks={selectedWeeks}
-                onWeeksChange={setSelectedWeeks}
-                startDate={startDate}
-                onStartDateChange={setStartDate}
+          {/* Timeline Tab */}
+          <TabsContent value="timeline" className="mt-0 py-4">
+            <div className="px-6 space-y-4">
+              {/* Consistent Filter Row */}
+              <PlanningFilterRow
+                departmentFilter={departmentFilter}
+                onDepartmentChange={setDepartmentFilter}
+                departments={departments}
+                statusFilter={statusFilter}
+                onStatusToggle={toggleStatus}
+                statusOptions={statusOptions}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                projectCount={filteredProjects.length}
+                totalProjects={projects.length}
+                onCreateProject={() => setShowCreateProject(true)}
+                showBudget={showBudget}
+                onShowBudgetChange={setShowBudget}
               />
 
-              {/* Gantt Timeline Chart */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Project Timeline by {forecastGrouping === 'department' ? 'Department' : 'Practice Area'}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ForecastGantt
-                    weeklyDemand={weeklyDemand}
-                    projectDemands={projectDemands}
-                    weeklyCapacity={weeklyCapacity}
-                    numberOfWeeks={selectedWeeks}
-                    startDate={startDate}
-                    grouping={forecastGrouping}
-                    onGroupingChange={setForecastGrouping}
-                    projects={projects}
+                <CardContent className="p-4">
+                  <PipelineTimelineView
+                    projects={filteredProjects}
+                    isLoading={isLoading}
+                    onProjectClick={handleProjectClick}
                     departments={departments}
                     practiceAreas={practiceAreas}
                   />
                 </CardContent>
               </Card>
-            </div>
-          </TabsContent>
-
-          {/* Activity Log Tab */}
-          <TabsContent value="activity" className="mt-0 py-6">
-            <div className="px-6">
-              <PlanningAuditLogViewer />
             </div>
           </TabsContent>
         </CenteredTabs>
