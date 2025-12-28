@@ -2,6 +2,8 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { useUserProjects } from './hooks/useUserProjects';
 import { format } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface ProjectHistoryCardProps {
   userId?: string;
@@ -9,6 +11,7 @@ interface ProjectHistoryCardProps {
 
 export const ProjectHistoryCard: React.FC<ProjectHistoryCardProps> = ({ userId }) => {
   const { data, isLoading } = useUserProjects(userId);
+  const { projectDisplayPreference } = useAppSettings();
 
   if (isLoading) {
     return (
@@ -36,7 +39,7 @@ export const ProjectHistoryCard: React.FC<ProjectHistoryCardProps> = ({ userId }
             {historyProjects.slice(0, 3).map((project) => (
               <div key={project.id} className="flex items-center justify-between p-1.5 bg-gray-50 rounded-lg">
                 <div className="min-w-0">
-                  <h4 className="text-xs font-medium text-gray-900 truncate">{project.name}</h4>
+                  <h4 className="text-xs font-medium text-gray-900 truncate">{getProjectDisplayName(project, projectDisplayPreference)}</h4>
                   <p className="text-xs text-gray-600">
                     {project.contract_end_date 
                       ? format(new Date(project.contract_end_date), 'MMM yyyy')

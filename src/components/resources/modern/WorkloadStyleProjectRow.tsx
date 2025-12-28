@@ -8,6 +8,8 @@ import { AddResourceRow } from '../components/AddResourceRow';
 import { AddResourceDialog } from '../dialogs/AddResourceDialog';
 import { useProjectResources } from '../hooks/useProjectResources';
 import { WeekInfo } from '../hooks/useGridWeeks';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface WorkloadStyleProjectRowProps {
   project: any;
@@ -28,6 +30,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   selectedDate,
   periodToShow
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
   const { 
     resources, 
     isLoading, 
@@ -104,7 +107,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
             
             <div className="flex-1 min-w-0">
               <h3 className="text-[15px] font-semibold text-foreground m-0 leading-tight overflow-hidden text-ellipsis whitespace-nowrap">
-                {project.name}
+                {getProjectDisplayName(project, projectDisplayPreference)}
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <Badge 
@@ -118,9 +121,9 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                   <Users className="w-3 h-3" />
                   {totalFTE.toFixed(1)} FTE
                 </Badge>
-                {project.code && (
+                {getProjectSecondaryText(project, projectDisplayPreference) && (
                   <span className="bg-muted text-muted-foreground px-1.5 py-0.5 rounded text-[11px] font-medium project-code-badge">
-                    {project.code}
+                    {getProjectSecondaryText(project, projectDisplayPreference)}
                   </span>
                 )}
               </div>

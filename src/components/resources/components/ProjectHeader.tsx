@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { StageSelector } from './StageSelector';
 import { StageProgressBar } from './StageProgressBar';
 import { useProjectStageProgress } from '@/hooks/useProjectStageProgress';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface ProjectHeaderProps {
   project: any;
@@ -23,6 +25,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   headerBgClass,
   totalHours = 0
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
   const [currentStage, setCurrentStage] = useState(project.current_stage || (project.stages?.[0] || ''));
   
   const { stageProgress, isLoading } = useProjectStageProgress(project.id, currentStage);
@@ -55,7 +58,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
           <div className="truncate-text flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <div className="font-medium text-white text-sm truncate">
-                {project.name}
+                {getProjectDisplayName(project, projectDisplayPreference)}
               </div>
               <StageSelector
                 projectId={project.id}

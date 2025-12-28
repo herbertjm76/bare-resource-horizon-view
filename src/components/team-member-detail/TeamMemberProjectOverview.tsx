@@ -197,9 +197,9 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <CardTitle className="text-lg">
-                      {allocation.project.name}
+                      {getProjectDisplayName(allocation.project, projectDisplayPreference)}
                     </CardTitle>
-                    <p className="text-sm text-gray-600">{allocation.project.code}</p>
+                    <p className="text-sm text-gray-600">{getProjectSecondaryText(allocation.project, projectDisplayPreference)}</p>
                   </div>
                   <Badge className={`${getStatusColor(allocation.project.status)} border`}>
                     {allocation.project.status?.replace('_', ' ') || 'Unknown'}

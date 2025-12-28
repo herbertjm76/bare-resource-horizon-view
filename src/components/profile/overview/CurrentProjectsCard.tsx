@@ -3,6 +3,8 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useUserProjects } from './hooks/useUserProjects';
 import { format } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface CurrentProjectsCardProps {
   userId?: string;
@@ -23,6 +25,7 @@ const getStatusColor = (status: string) => {
 
 export const CurrentProjectsCard: React.FC<CurrentProjectsCardProps> = ({ userId }) => {
   const { data, isLoading } = useUserProjects(userId);
+  const { projectDisplayPreference } = useAppSettings();
 
   if (isLoading) {
     return (
@@ -52,7 +55,7 @@ export const CurrentProjectsCard: React.FC<CurrentProjectsCardProps> = ({ userId
               return (
                 <div key={project.id} className={`p-2 ${colors.bg} rounded-lg border ${colors.border}`}>
                   <div className="flex items-center justify-between mb-1">
-                    <h4 className="text-xs font-medium text-gray-900 truncate">{project.name}</h4>
+                    <h4 className="text-xs font-medium text-gray-900 truncate">{getProjectDisplayName(project, projectDisplayPreference)}</h4>
                     <Badge variant="outline" className={`text-xs py-0 px-1 ${colors.text}`}>
                       {project.status}
                     </Badge>

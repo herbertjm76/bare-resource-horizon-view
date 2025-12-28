@@ -29,6 +29,7 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
   projects = [],
   annualLeaveDates = []
 }) => {
+  const { projectDisplayPreference } = useAppSettings();
   // Use the weekly total allocated hours that's passed in (this should be the sum for the entire week)
   const weeklyProjectHours = totalAllocatedHours;
   
@@ -85,7 +86,7 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
             {projects.map((project, idx) => (
               <div key={idx} className="flex justify-between gap-2">
                 <span className="truncate">
-                  {project.project_code ? `${project.project_code}: ` : ''}{project.name}
+                  {getProjectDisplayName({ code: project.project_code, name: project.name }, projectDisplayPreference)}
                 </span>
                 <span className="font-medium">{project.hours}h</span>
               </div>

@@ -11,6 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useOfficeStages } from '@/hooks/useOfficeStages';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 
 interface ProjectStage {
   id: string;
@@ -52,6 +54,7 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
   const [showStageDialog, setShowStageDialog] = useState(false);
   const { company } = useCompany();
   const { data: officeStages } = useOfficeStages();
+  const { projectDisplayPreference } = useAppSettings();
 
   // Fetch project stages with contracted weeks
   const { data: projectStagesData } = useQuery({
@@ -147,9 +150,9 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
                   )}
                   <div className="min-w-0">
                     <CardTitle className="text-base font-medium truncate">
-                      {project.name}
+                      {getProjectDisplayName(project, projectDisplayPreference)}
                     </CardTitle>
-                    <p className="text-sm text-muted-foreground">{project.code}</p>
+                    <p className="text-sm text-muted-foreground">{getProjectSecondaryText(project, projectDisplayPreference)}</p>
                   </div>
                 </div>
                 
