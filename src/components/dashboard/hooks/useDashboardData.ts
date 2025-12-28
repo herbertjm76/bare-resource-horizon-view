@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 import { TimeRange } from '../TimeRangeSelector';
 import { getUtilizationStatus, generateUtilizationTrends } from './utils/utilizationCalculations';
 import { useAggregatedData } from './useAggregatedData';
@@ -19,13 +19,10 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   refetch: () => Promise<void>;
 } => {
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
-  const { company, loading: companyLoading } = useCompany();
-
-  // Only pass companyId to queries when company context is fully loaded
-  // This prevents queries from running with undefined companyId
-  const companyId = !companyLoading ? company?.id : undefined;
+  const { companyId, isLoading: companyLoading } = useCompanyId();
 
   // Single source of truth: React Query hooks
+  // companyId from useCompanyId is only defined when ready, so queries won't run prematurely
   const { data: teamMembers = [], isLoading: isTeamLoading, refetch: refetchTeam } = useDashboardTeamMembers(companyId);
   const { data: preRegisteredMembers = [], refetch: refetchPreReg } = useDashboardPreRegistered(companyId);
   const { data: projects = [], isLoading: isProjectsLoading, refetch: refetchProjects } = useDashboardProjects(companyId);

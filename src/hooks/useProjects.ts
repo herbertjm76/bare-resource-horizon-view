@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useCompany } from '@/context/CompanyContext';
+import { useCompanyId } from '@/hooks/useCompanyId';
 import type { Database } from '@/integrations/supabase/types';
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -10,12 +10,7 @@ type Project = Database['public']['Tables']['projects']['Row'];
 export type ProjectSortBy = 'name' | 'code' | 'status' | 'created';
 
 export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'asc' | 'desc' = 'asc') => {
-  const { company, loading: companyLoading, error: companyError } = useCompany();
-
-  // Derive a stable company ID - only enable query when company is fully loaded
-  const companyId = company?.id;
-  // CRITICAL: Query must not run if company context is still loading OR has no ID
-  const canFetch = !companyLoading && !!companyId && !companyError;
+  const { companyId, isReady, isLoading: companyLoading, error: companyError } = useCompanyId();
   
   const { data: projects, isLoading: queryLoading, error, refetch } = useQuery({
     queryKey: ['projects', companyId, sortBy, sortDirection],
@@ -85,7 +80,7 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
       }
     },
     // CRITICAL: Only enable when company context is fully ready
-    enabled: canFetch,
+    enabled: isReady,
     retry: 2,
     retryDelay: 1000,
     refetchOnWindowFocus: false,
@@ -95,9 +90,9 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
 
   // Determine proper loading state:
   // - If company is loading, we're loading
-  // - If canFetch is true but query is loading, we're loading
-  // - If canFetch is false (no company), we're NOT loading (we're done - nothing to fetch)
-  const isLoading = companyLoading || (canFetch && queryLoading);
+  // - If isReady is true but query is loading, we're loading
+  // - If isReady is false (no company), we're NOT loading (we're done - nothing to fetch)
+  const isLoading = companyLoading || (isReady && queryLoading);
 
   return {
     projects: projects || [],

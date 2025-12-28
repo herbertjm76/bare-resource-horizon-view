@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useTeamMembersData } from "@/hooks/useTeamMembersData";
-import { useCompany } from "@/context/CompanyContext";
+import { useCompanyId } from "@/hooks/useCompanyId";
 import { useResourceAllocations } from './useResourceAllocations';
 import { useOfficeMembers } from './useOfficeMembers';
 import { useOfficeDisplay } from './useOfficeDisplay';
@@ -21,11 +21,8 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
   // Track loading state explicitly
   const [isInitializing, setIsInitializing] = useState(true);
   
-  // Get company context - CRITICAL: check both company and loading state
-  const { company, loading: companyLoading } = useCompany();
-  
-  // Only use companyId when company context is fully loaded
-  const companyId = !companyLoading ? company?.id : undefined;
+  // Get company context using centralized hook
+  const { companyId, isLoading: companyLoading } = useCompanyId();
   
   // Get current user ID
   const { data: session, isLoading: isLoadingSession } = useQuery({
@@ -37,7 +34,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
     }
   });
   
-  // Fetch all projects for the company - only when company is ready
+  // Fetch all projects for the company - companyId is only defined when ready
   const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
     queryKey: ['company-projects', companyId],
     queryFn: async () => {
