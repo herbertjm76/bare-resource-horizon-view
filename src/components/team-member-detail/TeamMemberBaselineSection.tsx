@@ -2,6 +2,8 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Briefcase, Calendar, MapPin, User } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface TeamMemberBaselineSectionProps {
   member: any;
@@ -12,6 +14,8 @@ export const TeamMemberBaselineSection: React.FC<TeamMemberBaselineSectionProps>
   member, 
   activeProjectsCount 
 }) => {
+  const { workWeekHours } = useAppSettings();
+  const weeklyCapacity = getMemberCapacity(member.weekly_capacity, workWeekHours);
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-foreground">Member Baseline</h2>
@@ -24,7 +28,7 @@ export const TeamMemberBaselineSection: React.FC<TeamMemberBaselineSectionProps>
               <Clock className="h-5 w-5 text-blue-600" />
             </div>
             <div className="text-2xl font-bold text-blue-700">
-              {member.weekly_capacity || 40}h
+              {weeklyCapacity}h
             </div>
             <p className="text-sm text-blue-600">Weekly Capacity</p>
           </CardContent>

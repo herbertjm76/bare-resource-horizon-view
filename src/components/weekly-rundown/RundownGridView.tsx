@@ -216,7 +216,7 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
   
-  const perFteCapacity = workWeekHours || 40;
+  const perFteCapacity = workWeekHours;
   const teamCapacity = perFteCapacity * Math.max(project.teamMembers?.length || 1, 1);
   const totalHours = project.totalHours || 0;
   const totalFte = perFteCapacity > 0 ? totalHours / perFteCapacity : 0;

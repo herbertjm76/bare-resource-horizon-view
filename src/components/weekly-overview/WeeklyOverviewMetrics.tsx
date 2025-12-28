@@ -2,6 +2,8 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Clock, TrendingUp, Calendar } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface WeeklyOverviewMetricsProps {
   data: {
@@ -31,6 +33,8 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
   data, 
   selectedWeek 
 }) => {
+  const { workWeekHours } = useAppSettings();
+  
   const calculateWeeklyMetrics = () => {
     if (!data.allMembers || data.allMembers.length === 0) {
       return {
@@ -49,7 +53,7 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
     let underUtilizedMembers = 0;
 
     data.allMembers.forEach(member => {
-      const weeklyCapacity = member.weekly_capacity || 40;
+      const weeklyCapacity = getMemberCapacity(member.weekly_capacity, workWeekHours);
       totalCapacity += weeklyCapacity;
 
       const memberTotal = data.getMemberTotal(member.id);

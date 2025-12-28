@@ -24,7 +24,7 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
   const [hours, setHours] = useState<Record<string, number>>({});
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const { displayPreference, workWeekHours } = useAppSettings();
-  const capacity = workWeekHours || 40;
+  const capacity = workWeekHours;
 
   const handleSave = async (memberId: string, memberName: string) => {
     try {
