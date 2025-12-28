@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 import { useWeekResourceTeamMembers } from '@/components/week-resourcing/hooks/useWeekResourceTeamMembers';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { useDragScroll } from '@/hooks/useDragScroll';
 import {
   Tooltip,
   TooltipContent,
@@ -69,9 +70,15 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   allMembers: externalMembers,
   sortOption = 'alphabetical'
 }) => {
-  const membersScrollRef = React.useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
-  const [canScrollRight, setCanScrollRight] = React.useState(false);
+  const {
+    scrollRef: membersScrollRef,
+    canScrollLeft,
+    canScrollRight,
+    scroll: scrollMembers,
+    dragHandlers,
+    containerStyle,
+    shouldPreventClick
+  } = useDragScroll();
   const [sortAscending, setSortAscending] = React.useState(true); // true = ascending order
   const { workWeekHours } = useAppSettings();
 
@@ -377,41 +384,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     });
   }, [allMembersFromParent, allocations, leaves, holidays, officeLocations, sortOption, sortAscending]);
 
-  // Check scroll position for arrows
-  const checkScrollPosition = React.useCallback(() => {
-    const container = membersScrollRef.current;
-    if (!container) return;
-    
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    setCanScrollLeft(scrollLeft > 0);
-    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
-  }, []);
-
-  React.useEffect(() => {
-    const container = membersScrollRef.current;
-    if (!container) return;
-
-    checkScrollPosition();
-    container.addEventListener('scroll', checkScrollPosition);
-    window.addEventListener('resize', checkScrollPosition);
-
-    return () => {
-      container.removeEventListener('scroll', checkScrollPosition);
-      window.removeEventListener('resize', checkScrollPosition);
-    };
-  }, [checkScrollPosition, availableMembers]);
-
-  const scrollMembers = (direction: 'left' | 'right') => {
-    const container = membersScrollRef.current;
-    if (!container) return;
-    
-    const scrollAmount = 200;
-    const targetScroll = direction === 'left' 
-      ? container.scrollLeft - scrollAmount 
-      : container.scrollLeft + scrollAmount;
-    
-    container.scrollTo({ left: targetScroll, behavior: 'smooth' });
-  };
+  // Note: Scroll position checking and scroll functions are now handled by useDragScroll hook
 
   return (
     <div className="w-full">
@@ -472,8 +445,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               
               <div 
                 ref={membersScrollRef}
-                className="overflow-x-auto overflow-y-hidden px-4 scrollbar-hide"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                className="overflow-x-auto overflow-y-hidden px-4 scrollbar-hide select-none"
+                style={containerStyle}
+                {...dragHandlers}
               >
                 <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[40px]">
                 {availableMembers.map((member, index) => (
