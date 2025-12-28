@@ -2,18 +2,24 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface CapacityCardProps {
   capacityHours: number;
   isOverCapacity: boolean;
   timeRangeText: string;
+  totalCapacity?: number;
 }
 
 export const CapacityCard: React.FC<CapacityCardProps> = ({
   capacityHours,
   isOverCapacity,
-  timeRangeText
+  timeRangeText,
+  totalCapacity = 40
 }) => {
+  const { displayPreference } = useAppSettings();
+  
   return (
     <Card className="rounded-2xl glass-card glass-hover border-white/20">
       <CardContent className="p-4">
@@ -23,7 +29,7 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({
               {isOverCapacity ? 'Over Capacity' : 'Available'}
             </p>
             <p className={`text-3xl font-bold mb-1 tracking-tight ${isOverCapacity ? 'text-red-300' : 'text-white'}`}>
-              {Math.abs(capacityHours).toLocaleString()}h
+              {formatAllocationValue(Math.abs(capacityHours), totalCapacity, displayPreference)}
             </p>
             <p className="text-sm font-medium text-white/80">{timeRangeText}</p>
           </div>

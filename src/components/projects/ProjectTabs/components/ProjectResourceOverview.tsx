@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectResourceOverviewProps {
   projectId: string;
@@ -21,6 +23,7 @@ export const ProjectResourceOverview: React.FC<ProjectResourceOverviewProps> = (
   resourceAllocations,
   isLoading
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
   // Function to handle moving to previous week
   const handlePreviousWeek = () => {
     onWeekChange(subWeeks(selectedWeek, 1));
@@ -110,7 +113,7 @@ export const ProjectResourceOverview: React.FC<ProjectResourceOverviewProps> = (
                         </td>
                         <td className="py-2 px-3 text-right font-medium">
                           <StandardizedBadge variant="metric" size="sm">
-                            {allocation.hours}h
+                            {formatAllocationValue(allocation.hours, workWeekHours, displayPreference)}
                           </StandardizedBadge>
                         </td>
                       </tr>
@@ -122,7 +125,7 @@ export const ProjectResourceOverview: React.FC<ProjectResourceOverviewProps> = (
                     <td className="py-2 px-3 font-medium">Total</td>
                     <td className="py-2 px-3 text-right font-medium">
                       <StandardizedBadge variant="metric" size="sm">
-                        {totalHours}h
+                        {formatAllocationValue(totalHours, workWeekHours, displayPreference)}
                       </StandardizedBadge>
                     </td>
                   </tr>

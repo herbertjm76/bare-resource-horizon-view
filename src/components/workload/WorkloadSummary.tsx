@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/types';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface WorkloadSummaryProps {
   members: TeamMember[];
@@ -20,7 +21,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   selectedWeek,
   periodToShow = 12
 }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   // Helper to get user initials
   const getUserInitials = (member: TeamMember): string => {
     const firstName = member.first_name || '';
@@ -124,6 +125,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   // Calculate metrics
   const overallUtilization = calculateOverallUtilization();
   const availableCapacity = calculateAvailableCapacity();
+  const totalTeamCapacity = members.reduce((sum, m) => sum + ((m.weekly_capacity || workWeekHours) * periodToShow), 0);
 
   const metrics = [
     {
@@ -137,8 +139,8 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
                  overallUtilization > 90 ? 'red' : 'green'
     },
     {
-      title: "Available Hours",
-      value: `${availableCapacity}h`,
+      title: "Available Capacity",
+      value: formatAllocationValue(availableCapacity, totalTeamCapacity, displayPreference),
       subtitle: `Next ${periodToShow} weeks total capacity`,
       badgeText: "Plan Ahead",
       badgeColor: "blue"

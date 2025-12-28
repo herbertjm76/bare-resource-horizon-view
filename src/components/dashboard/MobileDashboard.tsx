@@ -10,6 +10,7 @@ import { TimeRange } from './TimeRangeSelector';
 import { Users, Briefcase, TrendingUp, AlertCircle } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useTimeRangeCapacity } from '@/hooks/useTimeRangeCapacity';
+import { formatCapacityValue, formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface MobileDashboardProps {
   selectedTimeRange: TimeRange;
@@ -19,7 +20,7 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   selectedTimeRange
 }) => {
   const data = useUnifiedDashboardData();
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   const { weekMultiplier, getTotalCapacity, label: timeRangeLabel } = useTimeRangeCapacity(selectedTimeRange);
 
   // Calculate metrics
@@ -113,8 +114,8 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
 
         <SparklineMetricCard
           title={`${timeRangeLabel} Capacity`}
-          value={`${Math.round(totalTeamCapacityForRange)}h`}
-          subtitle={`${teamSize} × ${workWeekHours}h × ${weekMultiplier}w`}
+          value={formatCapacityValue(Math.round(totalTeamCapacityForRange), displayPreference)}
+          subtitle={`${teamSize} × ${formatCapacityValue(workWeekHours, displayPreference)} × ${weekMultiplier}w`}
           icon={Users}
           status={overloadedCount > 0 ? 'danger' : 'good'}
           badge={overloadedCount > 0 ? `${overloadedCount} overbooked` : 'Balanced'}
