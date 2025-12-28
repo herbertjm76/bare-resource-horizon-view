@@ -7,7 +7,7 @@ import { useProjectPlanningData } from '@/hooks/useProjectPlanningData';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { ProjectPlanningList } from '@/components/resource-planning/ProjectPlanningList';
 import { PlanningFilterRow } from '@/components/resource-planning/PlanningFilterRow';
-import { ForecastTreemap } from '@/components/resource-planning/ForecastTreemap';
+import { ForecastGantt } from '@/components/resource-planning/ForecastGantt';
 import { ResourcePlanningControls } from '@/components/resource-planning/ResourcePlanningControls';
 import { PlanningAuditLogViewer } from '@/components/resource-planning/PlanningAuditLogViewer';
 import { QuickCreateProjectDialog } from '@/components/resource-planning/QuickCreateProjectDialog';
@@ -229,17 +229,18 @@ const ResourcePlanning: React.FC = () => {
                 onStartDateChange={setStartDate}
               />
 
-              {/* Treemap Chart */}
+              {/* Gantt Timeline Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Demand Forecast by {forecastGrouping === 'department' ? 'Department' : 'Practice Area'}</CardTitle>
+                  <CardTitle className="text-lg">Project Timeline by {forecastGrouping === 'department' ? 'Department' : 'Practice Area'}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ForecastTreemap
+                  <ForecastGantt
                     weeklyDemand={weeklyDemand}
                     projectDemands={projectDemands}
                     weeklyCapacity={weeklyCapacity}
                     numberOfWeeks={selectedWeeks}
+                    startDate={startDate}
                     grouping={forecastGrouping}
                     onGroupingChange={setForecastGrouping}
                     projects={projects}
