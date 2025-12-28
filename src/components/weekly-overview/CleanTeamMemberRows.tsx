@@ -4,6 +4,7 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Project, MemberAllocation } from './types';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface CleanTeamMemberRowsProps {
   filteredOffices: string[];
@@ -22,6 +23,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
   handleInputChange,
   projects
 }) => {
+  const { workWeekHours } = useAppSettings();
   // Helper to get user initials
   const getUserInitials = (member: any): string => {
     const firstName = member.first_name || '';
@@ -62,7 +64,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
               const allocation = getMemberAllocation(member.id);
               // Calculate total hours from project allocations
               const totalHours = allocation.projectAllocations.reduce((sum, project) => sum + project.hours, 0);
-              const weeklyCapacity = member.weekly_capacity || 40;
+              const weeklyCapacity = member.weekly_capacity || workWeekHours;
               const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / weeklyCapacity) * 100) : 0;
               
               // Determine utilization color

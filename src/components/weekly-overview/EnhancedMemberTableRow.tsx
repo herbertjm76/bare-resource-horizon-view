@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/tooltip";
 import { formatNumber, calculateUtilization } from './utils';
 import { MemberAllocation, Project } from './types';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface EnhancedMemberTableRowProps {
   member: {
@@ -35,8 +36,10 @@ export const EnhancedMemberTableRow: React.FC<EnhancedMemberTableRowProps> = ({
   onInputChange,
   projects
 }) => {
-  // Get member's weekly capacity (default to 40 if not set)
-  const weeklyCapacity = member.weekly_capacity || 40;
+  const { workWeekHours } = useAppSettings();
+  
+  // Get member's weekly capacity (default to company's workWeekHours if not set)
+  const weeklyCapacity = member.weekly_capacity || workWeekHours;
   
   // Calculate utilization based on member's specific capacity
   const utilization = calculateUtilization(allocation.resourcedHours, weeklyCapacity);

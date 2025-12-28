@@ -63,9 +63,9 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
 };
 
 const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person, selectedWeek }) => {
-  const capacity = person.capacity || 40;
+  const { startOfWorkWeek, displayPreference, workWeekHours } = useAppSettings();
+  const capacity = person.capacity || workWeekHours;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const { startOfWorkWeek, displayPreference } = useAppSettings();
   
   // Calculate week start date string for MemberVacationPopover
   const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');

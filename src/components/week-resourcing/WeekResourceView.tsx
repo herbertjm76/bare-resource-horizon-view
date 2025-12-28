@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { calculateMemberProjectHours, calculateUtilizationPercentage } from './utils/utilizationCalculations';
 import { format, startOfWeek } from 'date-fns';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface WeekResourceViewProps {
   selectedWeek: Date;
@@ -48,8 +49,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
 }) => {
   // View mode state for expand/collapse functionality
   const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
-
-  // Filter members by search term only - allMembers is already sorted from parent
+  const { workWeekHours } = useAppSettings();
   const filteredMembers = useMemo(() => {
     if (!allMembers || allMembers.length === 0) {
       return [];
@@ -88,7 +88,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     let underUtilizedMembers = 0;
 
     filteredMembers.forEach(member => {
-      const weeklyCapacity = member.weekly_capacity || 40;
+      const weeklyCapacity = member.weekly_capacity || workWeekHours;
       totalCapacity += weeklyCapacity;
 
       const memberProjectHours = calculateMemberProjectHours(member.id, allocationMap);

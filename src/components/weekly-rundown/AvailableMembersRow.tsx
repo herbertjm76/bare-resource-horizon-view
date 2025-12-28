@@ -6,6 +6,7 @@ import { MemberVacationPopover } from './MemberVacationPopover';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 import { useWeekResourceTeamMembers } from '@/components/week-resourcing/hooks/useWeekResourceTeamMembers';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import {
   Tooltip,
   TooltipContent,
@@ -78,6 +79,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
   const [sortAscending, setSortAscending] = React.useState(true); // true = underutilized first
+  const { workWeekHours } = useAppSettings();
 
   // Fetch members internally if not provided externally
   const { members: fetchedMembers } = useWeekResourceTeamMembers();
@@ -282,7 +284,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     // Parent provides filtered members, but we apply our own utilization sorting
     const available = allMembersFromParent.map(m => {
       const key = m.id;
-      const capacity = m.weekly_capacity || 40;
+      const capacity = m.weekly_capacity || workWeekHours;
       const projectHours = allocationMap.get(key) || 0;
       const leaveHours = memberLeaveMap.get(key) || 0;
       

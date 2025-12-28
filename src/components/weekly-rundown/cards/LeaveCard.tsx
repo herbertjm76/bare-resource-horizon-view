@@ -21,7 +21,7 @@ interface LeaveCardProps {
 
 export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
   const { workWeekHours } = useAppSettings();
-  const capacity = workWeekHours || 40;
+  const capacity = workWeekHours;
 
   // Group by member_id with dates and hours
   const leaveByMember = leaves.reduce((acc, leave) => {

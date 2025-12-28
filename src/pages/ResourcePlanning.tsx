@@ -20,11 +20,13 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 const statusOptions = ['Active', 'On Hold', 'Completed', 'Planning'];
 
 const ResourcePlanning: React.FC = () => {
   const { company } = useCompany();
+  const { workWeekHours } = useAppSettings();
   const [activeTab, setActiveTab] = useState<string>('planning');
   const [statusFilter, setStatusFilter] = useState<string[]>(['Active', 'Planning']);
   const [showBudget, setShowBudget] = useState(false);
@@ -89,7 +91,7 @@ const ResourcePlanning: React.FC = () => {
   );
 
   // Calculate team capacity
-  const weeklyCapacity = teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
+  const weeklyCapacity = teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || workWeekHours), 0);
   const totalTeamCapacity = weeklyCapacity * selectedWeeks;
 
   const isLoading = isPlanningLoading || isTeamLoading;

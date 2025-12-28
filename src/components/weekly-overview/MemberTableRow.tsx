@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Project, MemberAllocation } from './types';
 import { CapacityBar } from '@/components/week-resourcing/CapacityBar';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface MemberTableRowProps {
   member: any;
@@ -30,6 +31,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   getProjectCount,
   allocationMap
 }) => {
+  const { workWeekHours } = useAppSettings();
   // Helper to get user initials
   const getUserInitials = (member: any): string => {
     const firstName = member.first_name || '';
@@ -48,7 +50,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   };
 
   // Use comprehensive data if available, otherwise fall back to legacy allocation
-  const weeklyCapacity = member.weekly_capacity || 40;
+  const weeklyCapacity = member.weekly_capacity || workWeekHours;
   const totalWeeklyAllocatedHours = getMemberTotal ? getMemberTotal(member.id) : 
     (allocation.projectAllocations?.reduce((sum, proj) => sum + proj.hours, 0) || 0);
   const projectCount = getProjectCount ? getProjectCount(member.id) : 
