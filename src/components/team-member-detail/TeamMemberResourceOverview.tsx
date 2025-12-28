@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, TrendingUp, Target, CheckCircle } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { useResourcePlanningData } from './resource-planning/hooks/useResourcePlanningData';
 import { calculatePlanningMetrics, calculateHistoricalMetrics } from './resource-planning/utils/resourcePlanningCalculations';
 import { ResourcePlanningMetrics } from './resource-planning/ResourcePlanningMetrics';
@@ -62,7 +63,8 @@ export const TeamMemberResourceOverview: React.FC<TeamMemberResourceOverviewProp
     );
   }
 
-  const weeklyCapacity = memberProfile?.weekly_capacity || 40;
+  const { workWeekHours } = useAppSettings();
+  const weeklyCapacity = memberProfile?.weekly_capacity || workWeekHours;
 
   // Calculate planning metrics - only when we have allocation data
   const { averageFutureUtilization, overallocatedWeeks, underutilizedWeeks } = 

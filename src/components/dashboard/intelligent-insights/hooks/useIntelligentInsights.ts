@@ -1,5 +1,6 @@
 
 import { useMemo } from 'react';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { generateCapacityInsights } from '../utils/insightGenerators';
 import { generateUtilizationInsights } from '../utils/insightGenerators';
 import { generateProjectLoadInsights } from '../utils/insightGenerators';
@@ -24,10 +25,12 @@ export const useIntelligentInsights = ({
   activeProjects,
   utilizationRate
 }: UseIntelligentInsightsProps) => {
+  const { workWeekHours } = useAppSettings();
+
   const insights = useMemo(() => {
     const allInsights = [
       ...generateUtilizationInsights(utilizationRate, teamMembers.length),
-      ...generateCapacityInsights(teamMembers, utilizationRate),
+      ...generateCapacityInsights(teamMembers, utilizationRate, workWeekHours),
       ...generateProjectLoadInsights(activeProjects, teamMembers.length, utilizationRate),
       ...generateTeamScalingInsights(teamMembers.length, utilizationRate, activeProjects)
     ];
@@ -38,7 +41,7 @@ export const useIntelligentInsights = ({
     return allInsights
       .sort((a, b) => (priorityOrder[b.severity as keyof typeof priorityOrder] || 0) - (priorityOrder[a.severity as keyof typeof priorityOrder] || 0))
       .slice(0, 6); // Limit to 6 most important insights
-  }, [teamMembers, activeProjects, utilizationRate]);
+  }, [teamMembers, activeProjects, utilizationRate, workWeekHours]);
 
   return { insights };
 };

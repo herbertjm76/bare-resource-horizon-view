@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { TimeRange } from '@/components/dashboard/TimeRangeSelector';
 import { startOfWeek, startOfMonth, subMonths, format } from 'date-fns';
 
@@ -146,6 +147,7 @@ const getDateRangeForTimeRange = (timeRange: TimeRange) => {
 };
 
 export const useDashboardMetrics = (companyId?: string, timeRange: TimeRange = 'month') => {
+  const { workWeekHours } = useAppSettings();
   const dateRange = getDateRangeForTimeRange(timeRange);
   
   return useQuery({
@@ -201,7 +203,7 @@ export const useDashboardMetrics = (companyId?: string, timeRange: TimeRange = '
       // Calculate utilization
       const totalHours = allocations.reduce((sum, alloc) => sum + (alloc.hours || 0), 0);
       const uniqueResources = new Set(allocations.map(alloc => alloc.resource_id)).size;
-      const avgUtilization = uniqueResources > 0 ? Math.min((totalHours / (uniqueResources * 40)) * 100, 100) : 0;
+      const avgUtilization = uniqueResources > 0 ? Math.min((totalHours / (uniqueResources * workWeekHours)) * 100, 100) : 0;
       
       // Group by status
       const statusGroups = projects.reduce((acc, p) => {
@@ -268,6 +270,6 @@ export const useDashboardMetrics = (companyId?: string, timeRange: TimeRange = '
       };
     },
     enabled: !!companyId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
   });
 };

@@ -1,5 +1,6 @@
 
 import { useMemo, useState, useCallback } from 'react';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 export interface RowData {
   member: any;
@@ -18,11 +19,12 @@ export interface RowData {
 }
 
 export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberIndex'>) => {
+  const { workWeekHours } = useAppSettings();
   const [editableOtherLeave, setEditableOtherLeave] = useState(0);
   
   // Memoize basic values to prevent recalculation - make these more stable
   const memberId = useMemo(() => member?.id || '', [member?.id]);
-  const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
+  const weeklyCapacity = useMemo(() => member?.weekly_capacity || workWeekHours, [member?.weekly_capacity, workWeekHours]);
   
   // Use the callback functions directly from props instead of recalculating
   const totalUsedHours = useMemo(() => props.getMemberTotal(memberId), [props.getMemberTotal, memberId]);

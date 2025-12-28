@@ -62,12 +62,16 @@ export const generateUtilizationInsights = (utilizationRate: number, teamSize: n
   return insights;
 };
 
-export const generateCapacityInsights = (teamMembers: TeamMember[], utilizationRate: number): Insight[] => {
+export const generateCapacityInsights = (
+  teamMembers: TeamMember[],
+  utilizationRate: number,
+  workWeekHours: number
+): Insight[] => {
   const insights: Insight[] = [];
-  const totalCapacity = teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
+  const totalCapacity = teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || workWeekHours), 0);
   const availableHours = totalCapacity * (1 - utilizationRate / 100);
 
-  if (availableHours < 40 && teamMembers.length > 0) {
+  if (availableHours < workWeekHours && teamMembers.length > 0) {
     insights.push({
       title: 'Limited Available Capacity',
       description: `Only ${Math.round(availableHours)} hours of available capacity remaining this week. New project requests may require resource reallocation or timeline adjustments.`,

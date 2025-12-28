@@ -1,9 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { UnifiedInsightsService, UnifiedMemberInsights } from '@/services/unifiedInsightsService';
 
-export const useUnifiedMemberInsights = (memberId: string, weeklyCapacity: number = 40) => {
+export const useUnifiedMemberInsights = (memberId: string, weeklyCapacity?: number) => {
   const [insights, setInsights] = useState<UnifiedMemberInsights>({
     utilizationInsights: [],
     projectLoadInsights: [],
@@ -13,6 +14,9 @@ export const useUnifiedMemberInsights = (memberId: string, weeklyCapacity: numbe
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { company } = useCompany();
+  const { workWeekHours } = useAppSettings();
+
+  const effectiveWeeklyCapacity = weeklyCapacity ?? workWeekHours;
 
   useEffect(() => {
     const fetchInsights = async () => {
@@ -28,7 +32,7 @@ export const useUnifiedMemberInsights = (memberId: string, weeklyCapacity: numbe
         const memberInsights = await UnifiedInsightsService.generateMemberInsights(
           memberId,
           company.id,
-          weeklyCapacity
+          effectiveWeeklyCapacity
         );
         
         setInsights(memberInsights);
@@ -41,7 +45,7 @@ export const useUnifiedMemberInsights = (memberId: string, weeklyCapacity: numbe
     };
 
     fetchInsights();
-  }, [company?.id, memberId, weeklyCapacity]);
+  }, [company?.id, memberId, effectiveWeeklyCapacity, workWeekHours]);
 
   return {
     insights,
@@ -50,7 +54,7 @@ export const useUnifiedMemberInsights = (memberId: string, weeklyCapacity: numbe
     refetch: () => {
       if (company?.id && memberId) {
         setIsLoading(true);
-        UnifiedInsightsService.generateMemberInsights(memberId, company.id, weeklyCapacity)
+        UnifiedInsightsService.generateMemberInsights(memberId, company.id, effectiveWeeklyCapacity)
           .then(setInsights)
           .catch(setError)
           .finally(() => setIsLoading(false));
