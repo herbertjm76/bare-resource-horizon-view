@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
+import { useProjectDisplayText } from '@/hooks/useProjectDisplayText';
 import './css/test-purple-table.css';
 
 interface TestPurpleTableProps {
@@ -8,6 +9,7 @@ interface TestPurpleTableProps {
 }
 
 export const TestPurpleTable: React.FC<TestPurpleTableProps> = ({ projects }) => {
+  const getDisplayText = useProjectDisplayText();
   console.log("TestPurpleTable - Rendering with projects:", projects);
   
   return (
@@ -28,7 +30,7 @@ export const TestPurpleTable: React.FC<TestPurpleTableProps> = ({ projects }) =>
             {projects.map((project) => (
               <TableHead key={project.id} className="test-purple-project-cell">
                 <div className="test-purple-project-code">
-                  {project.code}
+                  {getDisplayText(project)}
                 </div>
               </TableHead>
             ))}

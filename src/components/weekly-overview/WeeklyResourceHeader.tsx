@@ -3,6 +3,7 @@ import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { Project } from './types';
+import { useProjectDisplayText } from '@/hooks/useProjectDisplayText';
 
 interface WeeklyResourceHeaderProps {
   projects: Project[];
@@ -11,6 +12,8 @@ interface WeeklyResourceHeaderProps {
 export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
   projects
 }) => {
+  const getDisplayText = useProjectDisplayText();
+  
   return (
     <TableHeader>
       <TableRow className="bg-[#6465F0] hover:bg-[#6465F0]">
@@ -97,12 +100,13 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
                       color: 'white'
                     }}
                   >
-                    {project.code}
+                    {getDisplayText(project)}
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <div className="text-sm font-medium">
                     {project.name}
+                    <span className="text-muted-foreground ml-2">({project.code})</span>
                   </div>
                 </TooltipContent>
               </Tooltip>
