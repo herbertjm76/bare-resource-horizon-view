@@ -10,6 +10,7 @@ import { useProjectResources } from '../hooks/useProjectResources';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface WorkloadStyleProjectRowProps {
   project: any;
@@ -30,7 +31,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   selectedDate,
   periodToShow
 }) => {
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, workWeekHours } = useAppSettings();
   const { 
     resources, 
     isLoading, 
@@ -62,9 +63,9 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
     }, 0);
   }, [resources, weeks, projectAllocations, getAllocationKey]);
   
-  // Calculate FTE (40 hours = 1 FTE per week)
+  // Calculate FTE (workWeekHours = 1 FTE per week)
   const visibleWeeksCount = weeks.filter(w => !w.isPreviousWeek).length;
-  const totalFTE = visibleWeeksCount > 0 ? totalHours / (40 * visibleWeeksCount) : 0;
+  const totalFTE = visibleWeeksCount > 0 ? totalHours / (workWeekHours * visibleWeeksCount) : 0;
   
   return (
     <>

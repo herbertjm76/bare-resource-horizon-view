@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { toast } from 'sonner';
 
 export interface WorkflowProject {
@@ -55,6 +56,7 @@ export interface WorkflowData {
 
 export const useWorkflowData = (): WorkflowData => {
   const { company } = useCompany();
+  const { workWeekHours } = useAppSettings();
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState<WorkflowProject[]>([]);
   const [members, setMembers] = useState<WorkflowMember[]>([]);
@@ -63,7 +65,7 @@ export const useWorkflowData = (): WorkflowData => {
   useEffect(() => {
     if (!company?.id) return;
     fetchWorkflowData();
-  }, [company?.id]);
+  }, [company?.id, workWeekHours]);
 
   const fetchWorkflowData = async () => {
     if (!company?.id) return;
@@ -154,10 +156,11 @@ export const useWorkflowData = (): WorkflowData => {
         const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         
         // Simulate allocation data (in real implementation, fetch from project_resource_allocations)
-        const totalHours = transformedActiveMembers.length * 160; // ~40 hours/week * 4 weeks
+        // Use workWeekHours from settings for capacity calculation
+        const totalHours = transformedActiveMembers.length * (workWeekHours * 4); // workWeekHours/week * 4 weeks
         const allocatedHours = Math.floor(totalHours * (0.6 + Math.random() * 0.3)); // 60-90% allocated
         const availableHours = totalHours - allocatedHours;
-        const utilizationRate = (allocatedHours / totalHours) * 100;
+        const utilizationRate = totalHours > 0 ? (allocatedHours / totalHours) * 100 : 0;
         
         months.push({
           month: monthName,

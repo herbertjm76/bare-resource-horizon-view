@@ -40,13 +40,13 @@ export const calculateMemberProjectHours = (
  * Calculate utilization percentage (PROJECT hours + LEAVE hours)
  * This is the ONLY function that should be used to calculate utilization percentage
  * @param projectHours - Total project hours for the week
- * @param weeklyCapacity - Weekly capacity (default 40 hours)
+ * @param weeklyCapacity - Weekly capacity (REQUIRED - use workWeekHours from useAppSettings)
  * @param leaveHours - Optional total leave hours (annual + holiday + other)
  * @returns Utilization percentage (0-100+)
  */
 export const calculateUtilizationPercentage = (
   projectHours: number,
-  weeklyCapacity: number = 40,
+  weeklyCapacity: number,
   leaveHours: number = 0
 ): number => {
   if (weeklyCapacity <= 0) return 0;
@@ -97,11 +97,15 @@ export const calculateMemberProjectCount = (
  * STANDARDIZED calculation for capacity display
  * Returns both project hours and capacity for consistent display
  * Now includes leave hours in utilization calculation
+ * @param memberId - The member's ID
+ * @param allocationMap - Map of allocations
+ * @param weeklyCapacity - Weekly capacity (REQUIRED - use workWeekHours from useAppSettings)
+ * @param leaveHours - Total leave hours
  */
 export const calculateCapacityDisplay = (
   memberId: string,
   allocationMap: Map<string, number>,
-  weeklyCapacity: number = 40,
+  weeklyCapacity: number,
   leaveHours: number = 0
 ): { projectHours: number; capacity: number; utilizationPercentage: number; totalHours: number } => {
   const projectHours = calculateMemberProjectHours(memberId, allocationMap);

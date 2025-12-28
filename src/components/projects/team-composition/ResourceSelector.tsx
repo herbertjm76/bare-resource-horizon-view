@@ -13,6 +13,7 @@ import { PlusCircle, DollarSign, Percent } from 'lucide-react';
 import { useOfficeRoles } from '@/hooks/useOfficeRoles';
 import { useOfficeRates, getRateForReference } from '@/hooks/useOfficeRates';
 import { useResourceOptions } from '@/components/resources/dialogs/useResourceOptions';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface ResourceSelectorProps {
   onAdd: (data: {
@@ -32,6 +33,7 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
   isLoading = false,
   contractedWeeks = 0
 }) => {
+  const { workWeekHours } = useAppSettings();
   const [selectedRoleId, setSelectedRoleId] = useState('');
   const [assignedMemberId, setAssignedMemberId] = useState('');
   const [allocationPercent, setAllocationPercent] = useState(100);
@@ -53,8 +55,8 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
   }, [selectedRoleId, members]);
 
   // Calculate hours based on allocation percentage and contracted weeks
-  // Assume 40 hours/week as base
-  const weeklyHours = (allocationPercent / 100) * 40;
+  // Use workWeekHours from settings as base
+  const weeklyHours = (allocationPercent / 100) * workWeekHours;
   const totalHours = contractedWeeks > 0 ? weeklyHours * contractedWeeks : weeklyHours;
   const totalBudget = totalHours * selectedRate;
 
