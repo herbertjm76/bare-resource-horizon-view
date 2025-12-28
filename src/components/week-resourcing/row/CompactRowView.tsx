@@ -2,6 +2,7 @@
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
@@ -52,8 +53,10 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
+  const { workWeekHours } = useAppSettings();
+
   // STANDARDIZED CALCULATIONS - Use the utility functions ONLY
-  const weeklyCapacity = member.weekly_capacity || 40;
+  const weeklyCapacity = member.weekly_capacity || workWeekHours;
   const capacityDisplay = calculateCapacityDisplay(member.id, allocationMap, weeklyCapacity);
   const projectCount = getProjectCount(member.id);
 

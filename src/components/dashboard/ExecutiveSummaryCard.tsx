@@ -36,7 +36,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
 
   const utilizationStatus = getUtilizationStatus(utilizationRate);
   const timeRangeText = getTimeRangeText(selectedTimeRange);
-  const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData);
+  const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData, workWeekHours);
   const isOverCapacity = capacityHours < 0;
   const totalCapacity = activeResources * workWeekHours;
 

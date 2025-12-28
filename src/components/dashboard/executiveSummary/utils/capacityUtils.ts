@@ -3,7 +3,8 @@ export const calculateCapacityHours = (
   selectedTimeRange: string,
   activeResources: number,
   utilizationRate: number,
-  staffData: Array<{ weekly_capacity?: number }>
+  staffData: Array<{ weekly_capacity?: number }>,
+  workWeekHours: number = 40
 ) => {
   const multiplier = (() => {
     switch (selectedTimeRange) {
@@ -22,11 +23,11 @@ export const calculateCapacityHours = (
   if (staffData.length > 0) {
     // Calculate based on actual staff data
     totalCapacity = staffData.reduce((sum, member) => {
-      return sum + (member.weekly_capacity || 40) * multiplier;
+      return sum + (member.weekly_capacity || workWeekHours) * multiplier;
     }, 0);
   } else {
     // Fallback to basic calculation
-    totalCapacity = activeResources * 40 * multiplier;
+    totalCapacity = activeResources * workWeekHours * multiplier;
   }
 
   const totalAllocated = totalCapacity * (utilizationRate / 100);

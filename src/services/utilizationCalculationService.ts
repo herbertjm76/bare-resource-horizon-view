@@ -129,14 +129,15 @@ export class UtilizationCalculationService {
   static calculateAnnualLeaveUtilization(
     teamMembers: any[],
     selectedMonth: Date,
-    leaveData: Record<string, Record<string, number>>
+    leaveData: Record<string, Record<string, number>>,
+    workWeekHours: number = 40
   ): TeamUtilizationSummary {
     const memberUtilizations: MemberUtilizationData[] = teamMembers.map(member => {
       const memberLeaveData = leaveData[member.id] || {};
       const totalLeaveHours = Object.values(memberLeaveData).reduce((sum, hours) => sum + hours, 0);
       
       // For annual leave, we calculate based on working days in the month
-      const weeklyCapacity = member.weekly_capacity || 40;
+      const weeklyCapacity = member.weekly_capacity || workWeekHours;
       const monthlyCapacity = weeklyCapacity * 4; // Approximate monthly capacity
       
       return this.calculateMemberUtilization(

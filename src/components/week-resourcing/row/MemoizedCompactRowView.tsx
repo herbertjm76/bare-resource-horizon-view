@@ -43,10 +43,10 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   onOtherLeaveEdit,
   ...props
 }) => {
-  const { projectDisplayPreference, displayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
   
   // STANDARDIZED CALCULATIONS - Use the utility functions consistently
-  const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
+  const weeklyCapacity = useMemo(() => member?.weekly_capacity || workWeekHours, [member?.weekly_capacity, workWeekHours]);
   
   // Get leave data directly from props for reliability
   const annualLeave = annualLeaveData?.[member.id] || 0;

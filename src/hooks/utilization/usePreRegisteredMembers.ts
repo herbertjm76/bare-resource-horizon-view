@@ -9,7 +9,8 @@ export const calculatePreRegisteredUtilizations = async (
   preRegisteredMembers: TeamMember[],
   companyId: string,
   currentWeekStart: Date,
-  ninetyDaysAgo: Date
+  ninetyDaysAgo: Date,
+  workWeekHours: number
 ): Promise<Record<string, IndividualUtilization>> => {
   const utilizationMap: Record<string, IndividualUtilization> = {};
   
@@ -37,7 +38,7 @@ export const calculatePreRegisteredUtilizations = async (
 
   // Calculate utilization for pre-registered members
   preRegisteredMembers.forEach(member => {
-    const memberCapacity = member.weekly_capacity || 40;
+    const memberCapacity = member.weekly_capacity || workWeekHours;
     
     console.log(`--- Pre-registered Member ${member.first_name} ${member.last_name} (${member.id}) (Capacity: ${memberCapacity}h/week) ---`);
 
