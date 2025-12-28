@@ -19,6 +19,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMe
 import { ManageCustomCardsDialog } from './ManageCustomCardsDialog';
 import { useSwipeable } from 'react-swipeable';
 import { CardDetailDialog } from './CardDetailDialog';
+import { useDragScroll } from '@/hooks/useDragScroll';
 import './css/weekly-cards-scroll.css';
 
 interface WeeklySummaryCardsProps {
@@ -53,10 +54,16 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 }) => {
   const { company } = useCompany();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const desktopScrollRef = useRef<HTMLDivElement>(null);
+  const {
+    scrollRef: desktopScrollRef,
+    canScrollLeft,
+    canScrollRight,
+    scroll: scrollDesktop,
+    dragHandlers,
+    containerStyle,
+    shouldPreventClick
+  } = useDragScroll({ speed: 1.2 });
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem('weekly-summary-collapsed');
     return saved === 'true';
@@ -271,41 +278,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     }
   }, [cards.length, currentCardIndex]);
 
-  // Check scroll position for desktop/tablet arrows
-  const checkScrollPosition = useCallback(() => {
-    const container = desktopScrollRef.current;
-    if (!container) return;
-    
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    setCanScrollLeft(scrollLeft > 0);
-    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
-  }, []);
-
-  useEffect(() => {
-    const container = desktopScrollRef.current;
-    if (!container) return;
-
-    checkScrollPosition();
-    container.addEventListener('scroll', checkScrollPosition);
-    window.addEventListener('resize', checkScrollPosition);
-
-    return () => {
-      container.removeEventListener('scroll', checkScrollPosition);
-      window.removeEventListener('resize', checkScrollPosition);
-    };
-  }, [checkScrollPosition, cards]);
-
-  const scrollDesktop = (direction: 'left' | 'right') => {
-    const container = desktopScrollRef.current;
-    if (!container) return;
-    
-    const scrollAmount = 300;
-    const targetScroll = direction === 'left' 
-      ? container.scrollLeft - scrollAmount 
-      : container.scrollLeft + scrollAmount;
-    
-    container.scrollTo({ left: targetScroll, behavior: 'smooth' });
-  };
+  // Note: Scroll position checking and scroll functions are now handled by useDragScroll hook
 
   const scrollToCardById = (cardId: string) => {
     const container = desktopScrollRef.current;
@@ -524,14 +497,22 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           {/* Scrollable Container */}
           <div 
             ref={desktopScrollRef}
-            className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-hide px-2"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-hide px-2 select-none"
+            style={containerStyle}
+            {...dragHandlers}
           >
             {cards.map((card) => (
               <div 
                 key={card.id} 
                 className={`${card.id === 'weekInfo' ? 'flex-shrink-0' : 'flex-1 min-w-[180px]'} ${card.id !== 'weekInfo' && !card.id.startsWith('custom_') ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
-                onClick={() => handleCardClick(card.id)}
+                onClick={(e) => {
+                  if (shouldPreventClick()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                  }
+                  handleCardClick(card.id);
+                }}
               >
                 {card.component}
               </div>
