@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Project, MemberAllocation } from './types';
 import { CapacityBar } from '@/components/week-resourcing/CapacityBar';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAvailableValue } from '@/utils/allocationDisplay';
 
 interface MemberTableRowProps {
   member: any;
@@ -31,7 +32,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   getProjectCount,
   allocationMap
 }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   // Helper to get user initials
   const getUserInitials = (member: any): string => {
     const firstName = member.first_name || '';
@@ -145,7 +146,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       <TableCell className="text-center py-2 px-2">
         <div className="text-xs">
           <span className={`font-medium ${availableHours < 0 ? 'text-red-600 font-bold' : ''}`}>
-            {availableHours}h
+            {formatAvailableValue(availableHours, weeklyCapacity, displayPreference)}
           </span>
           <span className="text-muted-foreground ml-1">avail</span>
         </div>

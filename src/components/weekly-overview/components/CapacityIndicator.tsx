@@ -2,6 +2,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAvailableValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface CapacityIndicatorProps {
   availableHours: number;
@@ -12,6 +14,7 @@ export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
   availableHours,
   totalCapacity
 }) => {
+  const { displayPreference } = useAppSettings();
   // Calculate the percentage of capacity that is USED (not available)
   const utilizationPercentage = Math.min(100, Math.max(0, (totalCapacity - availableHours) / totalCapacity * 100));
 
@@ -92,7 +95,7 @@ export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
                       Total Utilization: {utilizationPercentage.toFixed(1)}%
                     </p>
                     <p className="text-gray-500">
-                      Available: {availableHours}h / {totalCapacity}h
+                      Available: {formatAvailableValue(availableHours, totalCapacity, displayPreference)} / {formatCapacityValue(totalCapacity, displayPreference)}
                     </p>
                   </TooltipContent>
                 </Tooltip>

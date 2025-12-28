@@ -5,6 +5,8 @@ import { getUtilizationStatus, getTimeRangeText } from './executiveSummary/utils
 import { calculateCapacityHours } from './executiveSummary/utils/capacityUtils';
 import { ExecutiveSummaryProps } from './executiveSummary/types';
 import { Gauge } from './Gauge';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   activeProjects,
@@ -16,6 +18,8 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   staffData = [],
   standardizedUtilizationRate
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
+  
   // Use standardized utilization rate if provided, otherwise fall back to legacy calculation
   const utilizationRate = standardizedUtilizationRate !== undefined 
     ? standardizedUtilizationRate 
@@ -34,6 +38,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   const timeRangeText = getTimeRangeText(selectedTimeRange);
   const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData);
   const isOverCapacity = capacityHours < 0;
+  const totalCapacity = activeResources * workWeekHours;
 
   // Simplified metrics without AI
   const metrics = [
@@ -59,7 +64,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
     },
     {
       title: isOverCapacity ? "Over Capacity" : "Available Capacity",
-      value: `${Math.abs(capacityHours).toLocaleString()}h`,
+      value: formatAllocationValue(Math.abs(capacityHours), totalCapacity, displayPreference),
       subtitle: timeRangeText,
       badgeText: isOverCapacity ? "Over Capacity" : undefined,
       badgeColor: isOverCapacity ? "red" : undefined

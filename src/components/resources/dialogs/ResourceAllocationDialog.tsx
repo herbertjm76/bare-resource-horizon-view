@@ -19,6 +19,7 @@ import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ResourceAllocationDialogProps {
   open: boolean;
@@ -43,7 +44,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
 }) => {
   const { company } = useCompany();
   const { toast } = useToast();
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
   const [searchTerm, setSearchTerm] = useState('');
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [saving, setSaving] = useState(false);
@@ -217,7 +218,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
             </div>
             <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 bg-muted rounded-md">
               <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-sm font-semibold">{totalHours}h</span>
+              <span className="text-sm font-semibold">{formatAllocationValue(totalHours, workWeekHours, displayPreference)}</span>
             </div>
           </DialogTitle>
         </DialogHeader>

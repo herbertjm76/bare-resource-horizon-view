@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { WorkflowProject, WorkflowMember, AllocationGap } from '@/hooks/useWorkflowData';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+import { formatAllocationValue, formatAvailableValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface WorkflowGapAnalysisProps {
   projectsWithoutFees: WorkflowProject[];
@@ -29,7 +30,7 @@ export const WorkflowGapAnalysis: React.FC<WorkflowGapAnalysisProps> = ({
   underAllocatedMonths
 }) => {
   const navigate = useNavigate();
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -211,7 +212,7 @@ export const WorkflowGapAnalysis: React.FC<WorkflowGapAnalysisProps> = ({
                     <div>
                       <h4 className="font-medium">{month.month}</h4>
                       <p className="text-sm text-muted-foreground">
-                        {month.allocatedHours}h allocated of {month.totalHours}h available
+                        {formatAllocationValue(month.allocatedHours, month.totalHours, displayPreference)} allocated of {formatCapacityValue(month.totalHours, displayPreference)} available
                       </p>
                     </div>
                     <div className="text-right">
@@ -219,7 +220,7 @@ export const WorkflowGapAnalysis: React.FC<WorkflowGapAnalysisProps> = ({
                         {Math.round(month.utilizationRate)}%
                       </div>
                       <Badge variant="outline">
-                        {month.availableHours}h available
+                        {formatAvailableValue(month.availableHours, month.totalHours, displayPreference)} available
                       </Badge>
                     </div>
                   </div>

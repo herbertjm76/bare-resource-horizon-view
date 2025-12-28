@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { getWeekKey } from '../utils/milestoneUtils';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectTotalsRowProps {
   weeklyProjectHours: Record<string, number>;
@@ -17,6 +19,7 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
   weeks,
   isEven = false
 }) => {
+  const { displayPreference, workWeekHours } = useAppSettings();
   // Calculate total hours across all weeks
   const totalHours = Object.values(weeklyProjectHours).reduce((sum, hours) => sum + hours, 0);
   
@@ -39,7 +42,7 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
               Project Totals
             </div>
             <div className="text-xs text-gray-600">
-              Total Hours: {totalHours}
+              Total: {formatAllocationValue(totalHours, workWeekHours * weeks.length, displayPreference)}
             </div>
           </div>
         </div>
@@ -54,7 +57,7 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
           <td key={weekKey} className="p-0 text-center border-r border-gray-200" style={{ width: '10px', minWidth: '10px' }}>
             <div className="py-2 px-0">
               <span className="text-lg font-bold text-gray-700">
-                {totalHoursForWeek > 0 ? `${totalHoursForWeek}h` : '0h'}
+                {formatAllocationValue(totalHoursForWeek, workWeekHours, displayPreference)}
               </span>
             </div>
           </td>

@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
+import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface LeaveEntry {
   member_id: string;
@@ -20,7 +21,7 @@ interface LeaveCardProps {
 }
 
 export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   const capacity = workWeekHours;
 
   // Group by member_id with dates and hours
@@ -113,11 +114,11 @@ export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
                     <TooltipContent side="bottom" className="p-3">
                       <div className="space-y-1">
                         <p className="font-medium text-sm">{firstName} {lastName}</p>
-                        <p className="text-xs text-muted-foreground">{totalHours}h of {memberCapacity}h capacity</p>
+                        <p className="text-xs text-muted-foreground">{formatAllocationValue(totalHours, memberCapacity, displayPreference)} of {formatCapacityValue(memberCapacity, displayPreference)} capacity</p>
                         <div className="border-t border-border pt-1 mt-1 space-y-0.5">
                           {leaveDays.map((day, idx) => (
                             <p key={idx} className="text-xs">
-                              {format(new Date(day.date), 'EEE, MMM d')}: {day.hours}h
+                              {format(new Date(day.date), 'EEE, MMM d')}: {formatAllocationValue(day.hours, memberCapacity, displayPreference)}
                             </p>
                           ))}
                         </div>

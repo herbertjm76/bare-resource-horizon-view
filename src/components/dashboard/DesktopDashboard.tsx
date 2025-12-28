@@ -11,6 +11,7 @@ import { TimeRange } from './TimeRangeSelector';
 import { Users, Briefcase, TrendingUp, AlertCircle } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useTimeRangeCapacity, getTimeRangeLabel } from '@/hooks/useTimeRangeCapacity';
+import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface DesktopDashboardProps {
   selectedTimeRange: TimeRange;
@@ -20,7 +21,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   selectedTimeRange
 }) => {
   const data = useDashboardData(selectedTimeRange);
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   const { weekMultiplier, getTotalCapacity, label: timeRangeLabel, shortLabel } = useTimeRangeCapacity(selectedTimeRange);
 
   if (data.isLoading) {
@@ -164,15 +165,17 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         />
         <SparklineMetricCard
           title={`${timeRangeLabel} Capacity`}
-          value={`${Math.round(totalTeamCapacityForRange)}h`}
-          subtitle={`${teamSize} resources × ${workWeekHours}h × ${weekMultiplier}w`}
+          value={formatCapacityValue(Math.round(totalTeamCapacityForRange), displayPreference)}
+          subtitle={`${teamSize} resources × ${formatCapacityValue(workWeekHours, displayPreference)} × ${weekMultiplier}w`}
           icon={Users}
           status={overloadedCount > 0 ? 'danger' : 'good'}
           badge={overloadedCount > 0 ? `${overloadedCount} overbooked` : 'Balanced'}
         />
         <SparklineMetricCard
           title="Capacity Gap"
-          value={hasCapacityGap ? `${Math.round(capacityGapHours)}h over` : `${Math.round(remainingCapacity)}h free`}
+          value={hasCapacityGap 
+            ? `${formatAllocationValue(Math.round(capacityGapHours), totalTeamCapacityForRange, displayPreference)} over` 
+            : `${formatAllocationValue(Math.round(remainingCapacity), totalTeamCapacityForRange, displayPreference)} free`}
           subtitle={`${timeRangeLabel} ${hasCapacityGap ? 'overbooked' : 'available'}`}
           icon={AlertCircle}
           status={hasCapacityGap ? 'danger' : remainingCapacity < totalTeamCapacityForRange * 0.1 ? 'warning' : 'good'}
