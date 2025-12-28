@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { WeeklyDemandData } from '@/hooks/useDemandProjection';
-import { format } from 'date-fns';
+import { format, addWeeks, startOfWeek } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 interface ProjectedDemandViewProps {
   weeklyDemand: WeeklyDemandData[];
@@ -25,28 +24,67 @@ const ROLE_COLORS = [
   'hsl(330, 80%, 60%)',
 ];
 
+// Demo data generator
+const generateDemoData = (numberOfWeeks: number = 12): { 
+  weeklyDemand: WeeklyDemandData[]; 
+  roleNames: Record<string, string>;
+} => {
+  const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const demoRoles = {
+    'role-1': 'Senior Architect',
+    'role-2': 'Project Manager',
+    'role-3': 'Designer',
+    'role-4': 'Engineer',
+    'role-5': 'Analyst',
+  };
+
+  const weeklyDemand: WeeklyDemandData[] = [];
+  
+  for (let i = 0; i < numberOfWeeks; i++) {
+    const weekDate = addWeeks(startDate, i);
+    const baseMultiplier = 1 + Math.sin(i * 0.5) * 0.3; // Creates wave pattern
+    
+    weeklyDemand.push({
+      weekKey: format(weekDate, 'yyyy-MM-dd'),
+      weekDate,
+      demandByRole: {
+        'role-1': Math.round(40 * baseMultiplier + Math.random() * 10),
+        'role-2': Math.round(30 * baseMultiplier + Math.random() * 8),
+        'role-3': Math.round(50 * baseMultiplier + Math.random() * 12),
+        'role-4': Math.round(80 * baseMultiplier + Math.random() * 15),
+        'role-5': Math.round(25 * baseMultiplier + Math.random() * 6),
+      },
+      demandByProject: {},
+      totalDemand: 0,
+    });
+    
+    // Calculate total
+    weeklyDemand[i].totalDemand = Object.values(weeklyDemand[i].demandByRole).reduce((a, b) => a + b, 0);
+  }
+
+  return { weeklyDemand, roleNames: demoRoles };
+};
+
 export const ProjectedDemandView: React.FC<ProjectedDemandViewProps> = ({
-  weeklyDemand,
-  roleNames,
+  weeklyDemand: propWeeklyDemand,
+  roleNames: propRoleNames,
   weekStartDates,
   isLoading
 }) => {
+  // Check if we have real data
+  const hasRealData = propWeeklyDemand.some(week => week.totalDemand > 0);
+  
+  // Generate or use demo data
+  const { weeklyDemand, roleNames, isDemo } = useMemo(() => {
+    if (hasRealData) {
+      return { weeklyDemand: propWeeklyDemand, roleNames: propRoleNames, isDemo: false };
+    }
+    const demo = generateDemoData(weekStartDates.length || 12);
+    return { ...demo, isDemo: true };
+  }, [hasRealData, propWeeklyDemand, propRoleNames, weekStartDates.length]);
+
   if (isLoading) {
     return <Skeleton className="h-80 w-full" />;
-  }
-
-  // Check if there's any projected demand data
-  const hasData = weeklyDemand.some(week => week.totalDemand > 0);
-
-  if (!hasData) {
-    return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          No projected demand data available. Add team compositions to your project stages to see projected resource demand.
-        </AlertDescription>
-      </Alert>
-    );
   }
 
   // Get all unique role IDs
@@ -70,9 +108,16 @@ export const ProjectedDemandView: React.FC<ProjectedDemandViewProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-muted-foreground">
-          Projected Resource Demand by Role
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Projected Resource Demand by Role
+          </h3>
+          {isDemo && (
+            <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600 border-amber-300">
+              Demo Data
+            </Badge>
+          )}
+        </div>
         <div className="text-sm text-muted-foreground">
           Total: {Math.round(weeklyDemand.reduce((sum, w) => sum + w.totalDemand, 0))} hours
         </div>
@@ -146,6 +191,12 @@ export const ProjectedDemandView: React.FC<ProjectedDemandViewProps> = ({
           );
         })}
       </div>
+      
+      {isDemo && (
+        <div className="text-xs text-muted-foreground text-center pt-2 border-t">
+          Add team compositions to your project stages to see real projected demand data.
+        </div>
+      )}
     </div>
   );
 };
