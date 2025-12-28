@@ -64,7 +64,8 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
       }
       if (memberFilters.searchTerm) {
         const searchLower = memberFilters.searchTerm.toLowerCase();
-        if (!person.personName.toLowerCase().includes(searchLower)) return false;
+        const fullName = `${person.firstName} ${person.lastName}`.toLowerCase();
+        if (!fullName.includes(searchLower)) return false;
       }
       return true;
     });

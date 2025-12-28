@@ -18,6 +18,8 @@ export interface PersonResourceData {
   avatarUrl?: string;
   location?: string;
   jobTitle?: string;
+  department?: string;
+  practiceArea?: string;
   weeklyCapacity: number;
   resourceType: 'active' | 'pre_registered';
   projects: PersonProject[];
@@ -41,7 +43,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         // Fetch all active team members (profiles)
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, first_name, last_name, avatar_url, location, job_title, weekly_capacity')
+          .select('id, first_name, last_name, avatar_url, location, job_title, weekly_capacity, department, practice_area')
           .eq('company_id', company.id)
           .order('first_name', { ascending: true });
 
@@ -54,7 +56,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         // Fetch pre-registered members (pending invites)
         const { data: invites, error: invitesError } = await supabase
           .from('invites')
-          .select('id, first_name, last_name, avatar_url, location, job_title, weekly_capacity')
+          .select('id, first_name, last_name, avatar_url, location, job_title, weekly_capacity, department, practice_area')
           .eq('company_id', company.id)
           .eq('invitation_type', 'pre_registered')
           .eq('status', 'pending')
@@ -119,6 +121,8 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             avatarUrl: member.avatar_url || undefined,
             location: member.location || undefined,
             jobTitle: member.job_title || undefined,
+            department: (member as any).department || undefined,
+            practiceArea: (member as any).practice_area || undefined,
             weeklyCapacity: member.weekly_capacity || workWeekHours,
             resourceType: member.resourceType,
             projects: []
