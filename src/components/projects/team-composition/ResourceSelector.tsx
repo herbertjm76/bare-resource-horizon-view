@@ -130,19 +130,11 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
                       <SelectItem value="_roles_header" disabled className="py-1">
                         <span className="text-xs font-medium text-muted-foreground">— Roles (unassigned) —</span>
                       </SelectItem>
-                      {roles.map((role) => {
-                        const rate = getRateForReference(rates, role.id, 'role');
-                        return (
-                          <SelectItem key={`role:${role.id}`} value={`role:${role.id}`}>
-                            <span className="flex items-center justify-between w-full gap-3">
-                              <span>{role.name} ({role.code})</span>
-                              {rate > 0 && (
-                                <span className="text-xs text-muted-foreground">${rate}/hr</span>
-                              )}
-                            </span>
-                          </SelectItem>
-                        );
-                      })}
+                      {roles.map((role) => (
+                        <SelectItem key={`role:${role.id}`} value={`role:${role.id}`}>
+                          {role.name}
+                        </SelectItem>
+                      ))}
                     </>
                   )}
                   
@@ -152,24 +144,11 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
                       <SelectItem value="_members_header" disabled className="py-1">
                         <span className="text-xs font-medium text-muted-foreground">— Team Members —</span>
                       </SelectItem>
-                      {members.map((member) => {
-                        const memberRole = member.officeRoleId 
-                          ? roles.find(r => r.id === member.officeRoleId)
-                          : null;
-                        return (
-                          <SelectItem key={`member:${member.id}`} value={`member:${member.id}`}>
-                            <span className="flex items-center gap-2">
-                              {member.name}
-                              {memberRole && (
-                                <span className="text-xs text-muted-foreground">• {memberRole.name}</span>
-                              )}
-                              {member.type === 'pre-registered' && (
-                                <span className="text-xs text-muted-foreground">(pending)</span>
-                              )}
-                            </span>
-                          </SelectItem>
-                        );
-                      })}
+                      {members.map((member) => (
+                        <SelectItem key={`member:${member.id}`} value={`member:${member.id}`}>
+                          {member.name}
+                        </SelectItem>
+                      ))}
                     </>
                   )}
                   
