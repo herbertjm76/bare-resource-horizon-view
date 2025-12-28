@@ -34,13 +34,34 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
   contractedWeeks = 0
 }) => {
   const { workWeekHours } = useAppSettings();
-  const [selectedRoleId, setSelectedRoleId] = useState('');
-  const [assignedMemberId, setAssignedMemberId] = useState('');
+  const [selectedValue, setSelectedValue] = useState('');
   const [allocationPercent, setAllocationPercent] = useState(100);
 
   const { data: roles = [], isLoading: rolesLoading } = useOfficeRoles();
   const { data: rates = [] } = useOfficeRates();
   const { resourceOptions: members, loading: membersLoading } = useResourceOptions();
+
+  // Parse selected value to determine if it's a role or member
+  const selectionType = useMemo(() => {
+    if (!selectedValue) return null;
+    if (selectedValue.startsWith('role:')) return 'role';
+    if (selectedValue.startsWith('member:')) return 'member';
+    return null;
+  }, [selectedValue]);
+
+  const selectedId = selectedValue.split(':')[1] || '';
+
+  // Get the selected role (either directly or from member)
+  const selectedRoleId = useMemo(() => {
+    if (selectionType === 'role') return selectedId;
+    if (selectionType === 'member') {
+      const member = members.find(m => m.id === selectedId);
+      return member?.officeRoleId || '';
+    }
+    return '';
+  }, [selectionType, selectedId, members]);
+
+  const selectedRole = roles.find(r => r.id === selectedRoleId);
 
   // Get rate for selected role
   const selectedRate = useMemo(() => {
@@ -48,35 +69,27 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
     return getRateForReference(rates, selectedRoleId, 'role');
   }, [selectedRoleId, rates]);
 
-  // Filter members that match the selected role
-  const eligibleMembers = useMemo(() => {
-    if (!selectedRoleId) return [];
-    return members.filter(m => m.officeRoleId === selectedRoleId);
-  }, [selectedRoleId, members]);
-
   // Calculate hours based on allocation percentage and contracted weeks
-  // Use workWeekHours from settings as base
   const weeklyHours = (allocationPercent / 100) * workWeekHours;
   const totalHours = contractedWeeks > 0 ? weeklyHours * contractedWeeks : weeklyHours;
   const totalBudget = totalHours * selectedRate;
 
   const handleAdd = () => {
-    if (!selectedRoleId) return;
+    if (!selectedValue || !selectionType) return;
 
-    // If a member is assigned, use member as the reference
-    if (assignedMemberId) {
+    if (selectionType === 'member') {
       onAdd({
-        referenceId: assignedMemberId,
+        referenceId: selectedId,
         referenceType: 'member',
         plannedQuantity: 1,
         plannedHoursPerPerson: totalHours,
         rateSnapshot: selectedRate,
-        assignedMemberId
+        assignedMemberId: selectedId
       });
     } else {
       // Just a role placeholder
       onAdd({
-        referenceId: selectedRoleId,
+        referenceId: selectedId,
         referenceType: 'role',
         plannedQuantity: 1,
         plannedHoursPerPerson: totalHours,
@@ -85,111 +98,84 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
     }
 
     // Reset form
-    setSelectedRoleId('');
-    setAssignedMemberId('');
+    setSelectedValue('');
     setAllocationPercent(100);
   };
 
-  const selectedRole = roles.find(r => r.id === selectedRoleId);
-  const isDisabled = !selectedRoleId || isLoading;
+  const isDisabled = !selectedValue || isLoading;
+  const isLoaderActive = rolesLoading || membersLoading;
 
   return (
     <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
       <Label className="text-sm font-medium">Add Resource</Label>
 
       <div className="grid grid-cols-12 gap-3 items-end">
-        {/* Role selector (required) */}
-        <div className="col-span-4">
+        {/* Unified Role/Person selector */}
+        <div className="col-span-8">
           <Label className="text-xs text-muted-foreground mb-1.5 block">
-            Role <span className="text-destructive">*</span>
+            Role or Person <span className="text-destructive">*</span>
           </Label>
-          <Select value={selectedRoleId} onValueChange={(v) => {
-            setSelectedRoleId(v);
-            setAssignedMemberId(''); // Reset member when role changes
-          }}>
+          <Select value={selectedValue} onValueChange={setSelectedValue}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a role" />
+              <SelectValue placeholder="Select a role or person" />
             </SelectTrigger>
             <SelectContent>
-              {rolesLoading ? (
+              {isLoaderActive ? (
                 <SelectItem value="_loading" disabled>Loading...</SelectItem>
-              ) : roles.length === 0 ? (
-                <SelectItem value="_empty" disabled>No roles defined</SelectItem>
               ) : (
-                roles.map((role) => {
-                  const rate = getRateForReference(rates, role.id, 'role');
-                  return (
-                    <SelectItem key={role.id} value={role.id}>
-                      <span className="flex items-center justify-between w-full gap-3">
-                        <span>{role.name} ({role.code})</span>
-                        {rate > 0 && (
-                          <span className="text-xs text-muted-foreground">${rate}/hr</span>
-                        )}
-                      </span>
-                    </SelectItem>
-                  );
-                })
-              )}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Member placeholder (optional) */}
-        <div className="col-span-4">
-          <Label className="text-xs text-muted-foreground mb-1.5 block">
-            Assign Person <span className="text-muted-foreground">(optional)</span>
-          </Label>
-          <Select 
-            value={assignedMemberId} 
-            onValueChange={setAssignedMemberId}
-            disabled={!selectedRoleId}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={selectedRoleId ? "Select person or leave empty" : "Select role first"} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="_unassigned">
-                <span className="text-muted-foreground italic">Unassigned ({selectedRole?.name || 'Role'})</span>
-              </SelectItem>
-              {membersLoading ? (
-                <SelectItem value="_loading" disabled>Loading...</SelectItem>
-              ) : eligibleMembers.length === 0 ? (
-                <SelectItem value="_no_match" disabled>
-                  No team members with this role
-                </SelectItem>
-              ) : (
-                eligibleMembers.map((member) => (
-                  <SelectItem key={member.id} value={member.id}>
-                    <span className="flex items-center gap-2">
-                      {member.name}
-                      {member.type === 'pre-registered' && (
-                        <span className="text-xs text-muted-foreground">(pending)</span>
-                      )}
-                    </span>
-                  </SelectItem>
-                ))
-              )}
-              {/* Also show all members option */}
-              {selectedRoleId && members.filter(m => m.officeRoleId !== selectedRoleId).length > 0 && (
                 <>
-                  <SelectItem value="_divider" disabled className="py-1">
-                    <span className="text-xs text-muted-foreground">— Other team members —</span>
-                  </SelectItem>
-                  {members.filter(m => m.officeRoleId !== selectedRoleId).map((member) => {
-                    const memberRole = member.officeRoleId 
-                      ? roles.find(r => r.id === member.officeRoleId)
-                      : null;
-                    return (
-                      <SelectItem key={member.id} value={member.id}>
-                        <span className="flex items-center gap-2">
-                          {member.name}
-                          {memberRole && (
-                            <span className="text-xs text-muted-foreground">• {memberRole.name}</span>
-                          )}
-                        </span>
+                  {/* Roles section */}
+                  {roles.length > 0 && (
+                    <>
+                      <SelectItem value="_roles_header" disabled className="py-1">
+                        <span className="text-xs font-medium text-muted-foreground">— Roles (unassigned) —</span>
                       </SelectItem>
-                    );
-                  })}
+                      {roles.map((role) => {
+                        const rate = getRateForReference(rates, role.id, 'role');
+                        return (
+                          <SelectItem key={`role:${role.id}`} value={`role:${role.id}`}>
+                            <span className="flex items-center justify-between w-full gap-3">
+                              <span>{role.name} ({role.code})</span>
+                              {rate > 0 && (
+                                <span className="text-xs text-muted-foreground">${rate}/hr</span>
+                              )}
+                            </span>
+                          </SelectItem>
+                        );
+                      })}
+                    </>
+                  )}
+                  
+                  {/* People section */}
+                  {members.length > 0 && (
+                    <>
+                      <SelectItem value="_members_header" disabled className="py-1">
+                        <span className="text-xs font-medium text-muted-foreground">— Team Members —</span>
+                      </SelectItem>
+                      {members.map((member) => {
+                        const memberRole = member.officeRoleId 
+                          ? roles.find(r => r.id === member.officeRoleId)
+                          : null;
+                        return (
+                          <SelectItem key={`member:${member.id}`} value={`member:${member.id}`}>
+                            <span className="flex items-center gap-2">
+                              {member.name}
+                              {memberRole && (
+                                <span className="text-xs text-muted-foreground">• {memberRole.name}</span>
+                              )}
+                              {member.type === 'pre-registered' && (
+                                <span className="text-xs text-muted-foreground">(pending)</span>
+                              )}
+                            </span>
+                          </SelectItem>
+                        );
+                      })}
+                    </>
+                  )}
+                  
+                  {roles.length === 0 && members.length === 0 && (
+                    <SelectItem value="_empty" disabled>No roles or members available</SelectItem>
+                  )}
                 </>
               )}
             </SelectContent>
@@ -232,7 +218,7 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
       </div>
 
       {/* Preview calculation */}
-      {selectedRoleId && (
+      {selectedValue && (
         <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/50">
           <div className="flex items-center gap-1">
             {selectedRate > 0 ? (
@@ -240,7 +226,7 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
                 <DollarSign className="h-3 w-3" />
                 <span>
                   Rate: <span className="font-medium text-foreground">${selectedRate}/hr</span>
-                  <span className="ml-1">({selectedRole?.name})</span>
+                  {selectedRole && <span className="ml-1">({selectedRole.name})</span>}
                 </span>
               </>
             ) : (
