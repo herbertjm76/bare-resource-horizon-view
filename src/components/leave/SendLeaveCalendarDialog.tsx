@@ -170,15 +170,34 @@ export const SendLeaveCalendarDialog: React.FC = () => {
 
           const { data } = await query;
 
-          const previews: HolidayPreview[] = (data || []).map((h: any) => ({
-            id: h.id,
-            name: h.name,
-            date: h.date,
-            endDate: h.end_date,
-            location: h.office_location?.code || null,
-          }));
+          // Consolidate holidays with same name and date
+          const holidayMap = new Map<string, HolidayPreview>();
+          (data || []).forEach((h: any) => {
+            const key = `${h.name}-${h.date}`;
+            const existing = holidayMap.get(key);
+            const locationCode = h.office_location?.code || null;
+            
+            if (existing) {
+              // Append location code if not already present
+              if (locationCode && existing.location) {
+                if (!existing.location.includes(locationCode)) {
+                  existing.location = `${existing.location}, ${locationCode}`;
+                }
+              } else if (locationCode && !existing.location) {
+                existing.location = locationCode;
+              }
+            } else {
+              holidayMap.set(key, {
+                id: h.id,
+                name: h.name,
+                date: h.date,
+                endDate: h.end_date,
+                location: locationCode,
+              });
+            }
+          });
 
-          setHolidayPreview(previews);
+          setHolidayPreview(Array.from(holidayMap.values()));
         } else {
           setHolidayPreview([]);
         }
