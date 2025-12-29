@@ -1848,11 +1848,66 @@ export type Database = {
           },
         ]
       }
+      weekly_custom_card_files: {
+        Row: {
+          card_type_id: string
+          company_id: string
+          created_at: string
+          file_name: string
+          file_size: number | null
+          file_type: string
+          file_url: string
+          id: string
+          updated_at: string
+          week_start_date: string
+        }
+        Insert: {
+          card_type_id: string
+          company_id: string
+          created_at?: string
+          file_name: string
+          file_size?: number | null
+          file_type: string
+          file_url: string
+          id?: string
+          updated_at?: string
+          week_start_date: string
+        }
+        Update: {
+          card_type_id?: string
+          company_id?: string
+          created_at?: string
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          file_url?: string
+          id?: string
+          updated_at?: string
+          week_start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_custom_card_files_card_type_id_fkey"
+            columns: ["card_type_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_custom_card_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_custom_card_files_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weekly_custom_card_types: {
         Row: {
           color: string | null
           company_id: string
           created_at: string
+          display_type: string
           icon: string | null
           id: string
           is_active: boolean | null
@@ -1864,6 +1919,7 @@ export type Database = {
           color?: string | null
           company_id: string
           created_at?: string
+          display_type?: string
           icon?: string | null
           id?: string
           is_active?: boolean | null
@@ -1875,6 +1931,7 @@ export type Database = {
           color?: string | null
           company_id?: string
           created_at?: string
+          display_type?: string
           icon?: string | null
           id?: string
           is_active?: boolean | null

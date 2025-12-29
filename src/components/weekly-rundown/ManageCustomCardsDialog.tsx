@@ -3,7 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Trash2, ArrowUp, ArrowDown, List, Image, FileText } from 'lucide-react';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,13 +15,16 @@ interface ManageCustomCardsDialogProps {
   iconOnly?: boolean;
 }
 
+type DisplayType = 'list' | 'gallery' | 'pdf';
+
 export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = ({ iconOnly = false }) => {
   const { company } = useCompany();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     label: '',
-    icon: ''
+    icon: '',
+    display_type: 'list' as DisplayType
   });
 
   const { data: customCardTypes = [] } = useCustomCardTypes();
@@ -34,6 +38,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
           company_id: company.id,
           label: formData.label,
           icon: formData.icon || null,
+          display_type: formData.display_type,
           order_index: customCardTypes.length
         })
         .select()
@@ -44,7 +49,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['custom-card-types'] });
       toast.success('Card type created');
-      setFormData({ label: '', icon: '' });
+      setFormData({ label: '', icon: '', display_type: 'list' });
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to create card type');
@@ -100,7 +105,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
           {/* Create new card type */}
           <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
             <h3 className="font-semibold">Create New Card Type</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="label">Label *</Label>
                 <Input
@@ -121,7 +126,43 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                   maxLength={2}
                 />
               </div>
-              {/* Color removed for transparent cards */}
+            </div>
+            <div className="space-y-2">
+              <Label>Card Type</Label>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  type="button"
+                  variant={formData.display_type === 'list' ? 'default' : 'outline'}
+                  className="flex flex-col items-center gap-1 h-auto py-3"
+                  onClick={() => setFormData({ ...formData, display_type: 'list' })}
+                >
+                  <List className="h-5 w-5" />
+                  <span className="text-xs">List</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={formData.display_type === 'gallery' ? 'default' : 'outline'}
+                  className="flex flex-col items-center gap-1 h-auto py-3"
+                  onClick={() => setFormData({ ...formData, display_type: 'gallery' })}
+                >
+                  <Image className="h-5 w-5" />
+                  <span className="text-xs">Gallery</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={formData.display_type === 'pdf' ? 'default' : 'outline'}
+                  className="flex flex-col items-center gap-1 h-auto py-3"
+                  onClick={() => setFormData({ ...formData, display_type: 'pdf' })}
+                >
+                  <FileText className="h-5 w-5" />
+                  <span className="text-xs">PDF</span>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {formData.display_type === 'list' && 'Add team members to this card each week'}
+                {formData.display_type === 'gallery' && 'Upload images to display in a gallery'}
+                {formData.display_type === 'pdf' && 'Upload and preview PDF documents'}
+              </p>
             </div>
             <Button type="submit" disabled={createMutation.isPending}>
               {createMutation.isPending ? 'Creating...' : 'Create Card Type'}
@@ -144,7 +185,12 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                       <div className="w-8 h-8 rounded border flex items-center justify-center text-sm">
                         {cardType.icon || '📋'}
                       </div>
-                      <span className="font-medium">{cardType.label}</span>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{cardType.label}</span>
+                        <span className="text-xs text-muted-foreground capitalize">
+                          {(cardType as any).display_type || 'list'}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button
