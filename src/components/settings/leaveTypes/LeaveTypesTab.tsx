@@ -29,7 +29,8 @@ export const LeaveTypesTab: React.FC = () => {
     handleSelectType,
     handleSubmit,
     handleDelete,
-    handleBulkDelete
+    handleBulkDelete,
+    handleReorder
   } = useLeaveTypeOperations(leaveTypes, setLeaveTypes, company?.id);
 
   useEffect(() => {
@@ -150,6 +151,7 @@ export const LeaveTypesTab: React.FC = () => {
             onSelectType={handleSelectType}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onReorder={handleReorder}
           />
         </div>
       </CardContent>

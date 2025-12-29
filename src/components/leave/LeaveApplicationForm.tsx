@@ -8,7 +8,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, isBefore, startOfDay, isWeekend, addDays } from 'date-fns';
-import { CalendarIcon, Send, Clock, Search } from 'lucide-react';
+import { CalendarIcon, Send, Clock, Search, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LeaveAttachmentUpload } from './LeaveAttachmentUpload';
 import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
@@ -16,6 +16,7 @@ import { useLeaveRequests } from '@/hooks/leave/useLeaveRequests';
 import { useProjectManagers } from '@/hooks/leave/useProjectManagers';
 import { LeaveFormData } from '@/types/leave';
 import { Card } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface LeaveApplicationFormProps {
   onSuccess?: () => void;
@@ -220,7 +221,13 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
         </Select>
         {errors.requested_approver_id && <p className="text-sm text-destructive">{errors.requested_approver_id}</p>}
         {projectManagers.length === 0 && !isLoadingPMs && (
-          <p className="text-sm text-muted-foreground">No approvers available</p>
+          <Alert variant="destructive" className="mt-2">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>No Approvers Available</AlertTitle>
+            <AlertDescription>
+              There are no active managers who can approve leave requests. Please contact your administrator to add approvers with owner, admin, or project manager roles.
+            </AlertDescription>
+          </Alert>
         )}
       </div>
 

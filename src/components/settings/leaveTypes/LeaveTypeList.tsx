@@ -2,7 +2,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Edit2, Trash2, Paperclip } from 'lucide-react';
+import { Edit2, Trash2, Paperclip, GripVertical } from 'lucide-react';
 import { LeaveType } from '@/types/leave';
 import { 
   Palmtree, 
@@ -25,6 +25,7 @@ interface LeaveTypeListProps {
   onSelectType: (id: string) => void;
   onEdit: (type: LeaveType) => void;
   onDelete: (id: string) => void;
+  onReorder?: (fromIndex: number, toIndex: number) => void;
 }
 
 const iconMap: Record<string, LucideIcon> = {
@@ -46,11 +47,44 @@ export const LeaveTypeList: React.FC<LeaveTypeListProps> = ({
   selectedTypes,
   onSelectType,
   onEdit,
-  onDelete
+  onDelete,
+  onReorder
 }) => {
+  const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = React.useState<number | null>(null);
+
   const getIcon = (iconName: string | null): LucideIcon => {
     if (!iconName) return FileText;
     return iconMap[iconName] || FileText;
+  };
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, toIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex !== null && draggedIndex !== toIndex && onReorder) {
+      onReorder(draggedIndex, toIndex);
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   };
 
   if (leaveTypes.length === 0) {
@@ -63,20 +97,33 @@ export const LeaveTypeList: React.FC<LeaveTypeListProps> = ({
 
   return (
     <div className="space-y-2">
-      {leaveTypes.map((type) => {
+      {leaveTypes.map((type, index) => {
         const Icon = getIcon(type.icon);
+        const isDragging = draggedIndex === index;
+        const isDragOver = dragOverIndex === index;
         
         return (
           <div
             key={type.id}
-            className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
+            draggable={editMode}
+            onDragStart={(e) => handleDragStart(e, index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
+            className={`flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-all ${
+              isDragging ? 'opacity-50 scale-95' : ''
+            } ${isDragOver ? 'border-primary border-2' : ''}`}
           >
             <div className="flex items-center gap-3">
               {editMode && (
-                <Checkbox
-                  checked={selectedTypes.includes(type.id)}
-                  onCheckedChange={() => onSelectType(type.id)}
-                />
+                <>
+                  <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab active:cursor-grabbing" />
+                  <Checkbox
+                    checked={selectedTypes.includes(type.id)}
+                    onCheckedChange={() => onSelectType(type.id)}
+                  />
+                </>
               )}
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center"
