@@ -81,14 +81,26 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
   const renderContent = () => {
     switch (cardType) {
       case 'holidays':
-        const holidays = data || [];
-        if (holidays.length === 0) {
+        const rawHolidays = data || [];
+        if (rawHolidays.length === 0) {
           return <p className="text-muted-foreground">No holidays this week</p>;
         }
+        // Consolidate holidays by name and date (combine offices into one entry)
+        const consolidatedHolidays = rawHolidays.reduce((acc: any[], holiday: any) => {
+          const key = `${holiday.date}-${holiday.end_date || ''}-${holiday.name}`;
+          if (!acc.find((h: any) => `${h.date}-${h.end_date || ''}-${h.name}` === key)) {
+            acc.push(holiday);
+          }
+          return acc;
+        }, []);
+        // Sort by date
+        const sortedHolidays = consolidatedHolidays.sort((a: any, b: any) => 
+          new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
         return (
           <div className="space-y-3">
-            {holidays.map((holiday: any) => (
-              <div key={holiday.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+            {sortedHolidays.map((holiday: any, index: number) => (
+              <div key={`${holiday.id}-${index}`} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                 <Calendar className="h-5 w-5 text-primary mt-0.5" />
                 <div>
                   <p className="font-medium text-foreground">{holiday.name}</p>
