@@ -61,6 +61,7 @@ export const SendLeaveCalendarDialog: React.FC = () => {
   // Form state
   const [recipientEmail, setRecipientEmail] = useState('');
   const [sendMode, setSendMode] = useState<'new_only' | 'all'>('new_only');
+  const [deliveryMode, setDeliveryMode] = useState<'bulk' | 'individual'>('bulk');
   const [includeLeaves, setIncludeLeaves] = useState(true);
   const [includeHolidays, setIncludeHolidays] = useState(true);
   const [locationFilter, setLocationFilter] = useState<string>('all');
@@ -209,6 +210,7 @@ export const SendLeaveCalendarDialog: React.FC = () => {
         body: {
           recipientEmail,
           sendMode,
+          deliveryMode,
           includeLeaves,
           includeHolidays,
           locationFilter: locationFilter !== 'all' ? locationFilter : undefined,
@@ -261,8 +263,8 @@ export const SendLeaveCalendarDialog: React.FC = () => {
             Send Leave Calendar
           </DialogTitle>
           <DialogDescription>
-            Generate and send an ICS calendar file with approved leaves and holidays.
-            Recipients can import it into Outlook, Google Calendar, or Apple Calendar.
+            Send calendar invites with approved leaves and holidays.
+            Events will auto-add to Outlook, Google Calendar, or Apple Calendar.
           </DialogDescription>
         </DialogHeader>
 
@@ -333,6 +335,26 @@ export const SendLeaveCalendarDialog: React.FC = () => {
                   </RadioGroup>
                 </div>
               )}
+
+              <div className="pt-2">
+                <Label className="text-sm font-medium mb-2 block">Delivery Mode</Label>
+                <RadioGroup value={deliveryMode} onValueChange={(v) => setDeliveryMode(v as 'bulk' | 'individual')}>
+                  <div className="flex items-center space-x-2 rounded-lg border p-3">
+                    <RadioGroupItem value="bulk" id="bulk" />
+                    <Label htmlFor="bulk" className="flex-1 cursor-pointer text-sm">
+                      Single Calendar
+                      <span className="text-muted-foreground ml-1 text-xs block">All events in one invite</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 rounded-lg border p-3 mt-2">
+                    <RadioGroupItem value="individual" id="individual" />
+                    <Label htmlFor="individual" className="flex-1 cursor-pointer text-sm">
+                      Individual Invites
+                      <span className="text-muted-foreground ml-1 text-xs block">Separate email per event</span>
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
             </div>
           </div>
 

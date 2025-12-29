@@ -12,6 +12,7 @@ const corsHeaders = {
 interface SendCalendarRequest {
   recipientEmail: string;
   sendMode: 'new_only' | 'all';
+  deliveryMode?: 'bulk' | 'individual';
   includeLeaves: boolean;
   includeHolidays: boolean;
   locationFilter?: string;
@@ -78,6 +79,100 @@ function generateHolidayUID(holiday: Holiday, companyId: string): string {
 // Generate UID for leave requests
 function generateLeaveUID(leaveRequest: LeaveRequest): string {
   return `${leaveRequest.calendar_uid}@staffin.app`;
+}
+
+// Generate ICS for a single leave request
+function generateSingleLeaveICS(
+  leave: LeaveRequest,
+  companyName: string,
+  recipientEmail: string,
+  organizerEmail: string
+): string {
+  const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const memberName = `${leave.member.first_name || ''} ${leave.member.last_name || ''}`.trim() || leave.member.email;
+  const uid = generateLeaveUID(leave);
+  const summary = `${memberName} - ${leave.leave_type.name}`;
+  const description = leave.remarks ? `Remarks: ${leave.remarks}` : '';
+  const organizerLine = `ORGANIZER;CN=StaffIn:mailto:${organizerEmail}`;
+  const attendeeLine = `ATTENDEE;RSVP=FALSE;PARTSTAT=ACCEPTED;CN=${recipientEmail}:mailto:${recipientEmail}`;
+  
+  let eventContent: string;
+  
+  if (leave.duration_type === 'full_day') {
+    const startDate = formatICSDate(leave.start_date);
+    const endDate = formatICSDate(addOneDay(leave.end_date));
+    eventContent = `DTSTART;VALUE=DATE:${startDate}
+DTEND;VALUE=DATE:${endDate}
+SUMMARY:${summary}`;
+  } else {
+    const date = formatICSDate(leave.start_date);
+    const startTime = leave.duration_type === 'half_day_am' ? '080000' : '130000';
+    const endTime = leave.duration_type === 'half_day_am' ? '120000' : '170000';
+    eventContent = `DTSTART:${date}T${startTime}
+DTEND:${date}T${endTime}
+SUMMARY:${summary} (${leave.duration_type === 'half_day_am' ? 'AM' : 'PM'})`;
+  }
+  
+  return `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//StaffIn//Leave Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+X-WR-CALNAME:${companyName} Leave
+X-WR-TIMEZONE:UTC
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${now}
+${eventContent}
+DESCRIPTION:${description}
+${organizerLine}
+${attendeeLine}
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR`;
+}
+
+// Generate ICS for a single holiday
+function generateSingleHolidayICS(
+  holiday: Holiday,
+  companyId: string,
+  companyName: string,
+  recipientEmail: string,
+  organizerEmail: string
+): string {
+  const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const uid = generateHolidayUID(holiday, companyId);
+  const locationSuffix = holiday.office_location ? ` (${holiday.office_location.code})` : '';
+  const summary = `🎉 ${holiday.name}${locationSuffix}`;
+  const startDate = formatICSDate(holiday.date);
+  const endDateStr = holiday.end_date || holiday.date;
+  const endDate = formatICSDate(addOneDay(endDateStr));
+  const organizerLine = `ORGANIZER;CN=StaffIn:mailto:${organizerEmail}`;
+  const attendeeLine = `ATTENDEE;RSVP=FALSE;PARTSTAT=ACCEPTED;CN=${recipientEmail}:mailto:${recipientEmail}`;
+  
+  return `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//StaffIn//Leave Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+X-WR-CALNAME:${companyName} Holiday
+X-WR-TIMEZONE:UTC
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${now}
+DTSTART;VALUE=DATE:${startDate}
+DTEND;VALUE=DATE:${endDate}
+SUMMARY:${summary}
+DESCRIPTION:Office Holiday
+${organizerLine}
+${attendeeLine}
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR`;
 }
 
 function generateICSFile(
@@ -240,9 +335,9 @@ const handler = async (req: Request): Promise<Response> => {
     const companyName = company?.name || 'Company';
 
     const body: SendCalendarRequest = await req.json();
-    const { recipientEmail, sendMode, includeLeaves, includeHolidays, locationFilter, downloadOnly } = body;
+    const { recipientEmail, sendMode, deliveryMode = 'bulk', includeLeaves, includeHolidays, locationFilter, downloadOnly } = body;
 
-    console.log('Processing calendar request:', { sendMode, includeLeaves, includeHolidays, locationFilter, downloadOnly });
+    console.log('Processing calendar request:', { sendMode, deliveryMode, includeLeaves, includeHolidays, locationFilter, downloadOnly });
 
     let leaveRequests: LeaveRequest[] = [];
     let holidays: Holiday[] = [];
@@ -357,6 +452,118 @@ const handler = async (req: Request): Promise<Response> => {
     const holidayCount = holidays.length;
     const totalEvents = leaveCount + holidayCount;
 
+    // Handle individual delivery mode - send separate emails for each event
+    if (deliveryMode === 'individual') {
+      console.log(`Sending ${totalEvents} individual calendar invites`);
+      let sentCount = 0;
+      const errors: string[] = [];
+
+      // Send individual leave invites
+      for (const leave of leaveRequests) {
+        const memberName = `${leave.member.first_name || ''} ${leave.member.last_name || ''}`.trim() || 'Team member';
+        const icsContent = generateSingleLeaveICS(leave, companyName, recipientEmail, organizerEmail);
+        const dateStr = leave.start_date === leave.end_date 
+          ? new Date(leave.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+          : `${new Date(leave.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(leave.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">📅 Leave: ${memberName}</h2>
+            <p><strong>${leave.leave_type.name}</strong></p>
+            <p>📆 ${dateStr}</p>
+            ${leave.remarks ? `<p style="color: #666;">Remarks: ${leave.remarks}</p>` : ''}
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+            <p style="color: #999; font-size: 12px;">Sent from StaffIn</p>
+          </div>
+        `;
+
+        try {
+          const { error } = await resend.emails.send({
+            from: "StaffIn <invites@bareresource.com>",
+            to: [recipientEmail],
+            subject: `Leave: ${memberName} - ${leave.leave_type.name} (${dateStr})`,
+            html: emailHtml,
+            attachments: [{
+              filename: 'invite.ics',
+              content: base64Encode(new TextEncoder().encode(icsContent)),
+              content_type: 'text/calendar; charset=utf-8; method=REQUEST',
+            }],
+            headers: { 'Content-Class': 'urn:content-classes:calendarmessage' },
+          });
+          if (error) throw error;
+          sentCount++;
+        } catch (e: any) {
+          console.error(`Failed to send leave invite for ${leave.id}:`, e.message);
+          errors.push(`Leave ${memberName}: ${e.message}`);
+        }
+      }
+
+      // Send individual holiday invites
+      for (const holiday of holidays) {
+        const icsContent = generateSingleHolidayICS(holiday, companyId, companyName, recipientEmail, organizerEmail);
+        const dateStr = holiday.end_date && holiday.end_date !== holiday.date
+          ? `${new Date(holiday.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(holiday.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+          : new Date(holiday.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const locationSuffix = holiday.office_location ? ` (${holiday.office_location.code})` : '';
+        
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">🎉 Office Holiday</h2>
+            <p><strong>${holiday.name}${locationSuffix}</strong></p>
+            <p>📆 ${dateStr}</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+            <p style="color: #999; font-size: 12px;">Sent from StaffIn</p>
+          </div>
+        `;
+
+        try {
+          const { error } = await resend.emails.send({
+            from: "StaffIn <invites@bareresource.com>",
+            to: [recipientEmail],
+            subject: `🎉 Holiday: ${holiday.name}${locationSuffix} (${dateStr})`,
+            html: emailHtml,
+            attachments: [{
+              filename: 'invite.ics',
+              content: base64Encode(new TextEncoder().encode(icsContent)),
+              content_type: 'text/calendar; charset=utf-8; method=REQUEST',
+            }],
+            headers: { 'Content-Class': 'urn:content-classes:calendarmessage' },
+          });
+          if (error) throw error;
+          sentCount++;
+        } catch (e: any) {
+          console.error(`Failed to send holiday invite for ${holiday.id}:`, e.message);
+          errors.push(`Holiday ${holiday.name}: ${e.message}`);
+        }
+      }
+
+      // Update sent_to_calendar_at for leave requests
+      if (leaveRequests.length > 0) {
+        const leaveIds = leaveRequests.map(lr => lr.id);
+        await supabaseAdmin
+          .from('leave_requests')
+          .update({ sent_to_calendar_at: new Date().toISOString() })
+          .in('id', leaveIds);
+      }
+
+      console.log(`Sent ${sentCount}/${totalEvents} individual invites`);
+
+      return new Response(JSON.stringify({ 
+        success: true,
+        message: errors.length > 0 
+          ? `Sent ${sentCount}/${totalEvents} invites. Some failed: ${errors.join(', ')}`
+          : `Sent ${sentCount} calendar invites to ${recipientEmail}`,
+        leaveCount,
+        holidayCount,
+        totalEvents,
+        sentCount,
+        errors: errors.length > 0 ? errors : undefined
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Bulk mode - send all events in one email
     // Create email body
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
