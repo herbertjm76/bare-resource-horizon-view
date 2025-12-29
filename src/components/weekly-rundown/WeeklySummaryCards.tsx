@@ -463,54 +463,64 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         </div>
 
         {/* Desktop/Tablet Horizontal Row with Arrow Navigation */}
-        <div className="hidden sm:block relative pb-4">
-          {/* Left Arrow */}
-          {canScrollLeft && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
-              onClick={() => scrollDesktop('left')}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
+        <div className="hidden sm:flex relative pb-4 gap-2">
+          {/* Fixed Week Info Card */}
+          {cards.find(c => c.id === 'weekInfo') && (
+            <div className="flex-shrink-0">
+              {cards.find(c => c.id === 'weekInfo')?.component}
+            </div>
           )}
           
-          {/* Right Arrow - vertically centered */}
-          {canScrollRight && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
-              onClick={() => scrollDesktop('right')}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          )}
-          
-          {/* Scrollable Container */}
-          <div 
-            ref={desktopScrollRef}
-            className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-hide px-2 select-none"
-            style={containerStyle}
-            {...dragHandlers}
-          >
-            {cards.map((card) => (
-              <div 
-                key={card.id} 
-                className={`${card.id === 'weekInfo' ? 'flex-shrink-0' : 'flex-1 min-w-[180px]'} ${card.id !== 'weekInfo' ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
-                onClick={(e) => {
-                  if (shouldPreventClick()) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return;
-                  }
-                  handleCardClick(card.id);
-                }}
+          {/* Scrollable Cards Container */}
+          <div className="relative flex-1 min-w-0">
+            {/* Left Arrow */}
+            {canScrollLeft && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+                onClick={() => scrollDesktop('left')}
               >
-                {card.component}
-              </div>
-            ))}
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {/* Right Arrow */}
+            {canScrollRight && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-all"
+                onClick={() => scrollDesktop('right')}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {/* Scrollable Container */}
+            <div 
+              ref={desktopScrollRef}
+              className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-hide px-1 select-none"
+              style={containerStyle}
+              {...dragHandlers}
+            >
+              {cards.filter(c => c.id !== 'weekInfo').map((card) => (
+                <div 
+                  key={card.id} 
+                  className={`flex-1 min-w-[180px] cursor-pointer hover:scale-[1.02] transition-transform`}
+                  onClick={(e) => {
+                    if (shouldPreventClick()) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      return;
+                    }
+                    handleCardClick(card.id);
+                  }}
+                >
+                  {card.component}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
