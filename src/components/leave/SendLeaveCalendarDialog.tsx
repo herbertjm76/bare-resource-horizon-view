@@ -254,7 +254,7 @@ export const SendLeaveCalendarDialog: React.FC = () => {
           Send Calendar
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CalendarCheck className="h-5 w-5 text-primary" />
@@ -266,7 +266,7 @@ export const SendLeaveCalendarDialog: React.FC = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-hidden flex flex-col gap-6 py-4">
+        <div className="flex flex-col gap-6 py-4">
           {/* Filters */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-3">
@@ -346,7 +346,7 @@ export const SendLeaveCalendarDialog: React.FC = () => {
                 </span>
               )}
             </div>
-            <ScrollArea className="h-[200px] rounded-lg border p-3">
+            <ScrollArea className="h-[150px] rounded-lg border p-3">
               {isLoading ? (
                 <div className="space-y-2">
                   {[1, 2, 3].map((i) => (
