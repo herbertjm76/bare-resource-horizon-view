@@ -16,6 +16,7 @@ import { GalleryRundownCard } from './GalleryRundownCard';
 import { PdfRundownCard } from './PdfRundownCard';
 import { TimelineRundownCard } from './TimelineRundownCard';
 import { SurveyRundownCard } from './SurveyRundownCard';
+import { TextRundownCard } from './TextRundownCard';
 
 interface CustomRundownCardProps {
   cardType: {
@@ -23,7 +24,7 @@ interface CustomRundownCardProps {
     label: string;
     icon?: string;
     color?: string;
-    display_type?: 'list' | 'gallery' | 'pdf' | 'timeline' | 'survey';
+    display_type?: 'list' | 'gallery' | 'pdf' | 'dates' | 'timeline' | 'survey' | 'text';
     survey_type?: 'multiple_choice' | 'poll' | 'rating';
   };
   weekStartDate: string;
@@ -42,12 +43,16 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
     return <PdfRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
   }
 
-  if (cardType.display_type === 'timeline') {
+  if (cardType.display_type === 'dates' || cardType.display_type === 'timeline') {
     return <TimelineRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
   }
 
   if (cardType.display_type === 'survey') {
     return <SurveyRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
+  }
+
+  if (cardType.display_type === 'text') {
+    return <TextRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
   }
 
   // Default: List card (original behavior)

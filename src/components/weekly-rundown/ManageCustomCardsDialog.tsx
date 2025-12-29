@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, ArrowUp, ArrowDown, List, Image, FileText, Calendar, BarChart3 } from 'lucide-react';
+import { Plus, Trash2, ArrowUp, ArrowDown, List, Image, FileText, Calendar, BarChart3, Type } from 'lucide-react';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +15,7 @@ interface ManageCustomCardsDialogProps {
   iconOnly?: boolean;
 }
 
-type DisplayType = 'list' | 'gallery' | 'pdf' | 'timeline' | 'survey';
+type DisplayType = 'list' | 'gallery' | 'pdf' | 'dates' | 'survey' | 'text';
 type SurveyType = 'multiple_choice' | 'poll' | 'rating';
 
 export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = ({ iconOnly = false }) => {
@@ -119,7 +119,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
             </div>
             <div className="space-y-2">
               <Label>Card Type</Label>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-6 gap-2">
                 <Button
                   type="button"
                   variant={formData.display_type === 'list' ? 'default' : 'outline'}
@@ -128,6 +128,24 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                 >
                   <List className="h-5 w-5" />
                   <span className="text-xs">List</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={formData.display_type === 'text' ? 'default' : 'outline'}
+                  className="flex flex-col items-center gap-1 h-auto py-3"
+                  onClick={() => setFormData({ ...formData, display_type: 'text' })}
+                >
+                  <Type className="h-5 w-5" />
+                  <span className="text-xs">Text</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={formData.display_type === 'dates' ? 'default' : 'outline'}
+                  className="flex flex-col items-center gap-1 h-auto py-3"
+                  onClick={() => setFormData({ ...formData, display_type: 'dates' })}
+                >
+                  <Calendar className="h-5 w-5" />
+                  <span className="text-xs">Dates</span>
                 </Button>
                 <Button
                   type="button"
@@ -146,15 +164,6 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                 >
                   <FileText className="h-5 w-5" />
                   <span className="text-xs">PDF</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant={formData.display_type === 'timeline' ? 'default' : 'outline'}
-                  className="flex flex-col items-center gap-1 h-auto py-3"
-                  onClick={() => setFormData({ ...formData, display_type: 'timeline' })}
-                >
-                  <Calendar className="h-5 w-5" />
-                  <span className="text-xs">Timeline</span>
                 </Button>
                 <Button
                   type="button"
