@@ -357,7 +357,9 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const { error: emailError } = await resend.emails.send({
-      from: "StaffIn <onboarding@resend.dev>",
+      // IMPORTANT: Resend will only send to non-owned recipients when the sender domain is verified.
+      // Use your verified domain here (see https://resend.com/domains).
+      from: "StaffIn <invites@bareresource.com>",
       to: [recipientEmail],
       subject: `${companyName} Leave Calendar - ${totalEvents} Event${totalEvents !== 1 ? 's' : ''}`,
       html: emailHtml,
@@ -371,7 +373,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (emailError) {
       console.error('Error sending email:', emailError);
-      throw new Error(`Failed to send email: ${emailError.message}`);
+      const message = (emailError as any)?.message || 'Unknown email error';
+      const statusCode = (emailError as any)?.statusCode;
+      // Surface Resend's "testing emails" limitation clearly to the UI
+      throw new Error(statusCode ? `Failed to send email (${statusCode}): ${message}` : `Failed to send email: ${message}`);
     }
 
     console.log('Email sent successfully to:', recipientEmail);
