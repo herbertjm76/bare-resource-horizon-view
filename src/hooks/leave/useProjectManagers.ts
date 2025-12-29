@@ -9,7 +9,6 @@ interface Approver {
   email: string | null;
   avatar_url: string | null;
   role: string;
-  isPending?: boolean;
 }
 
 export const useProjectManagers = () => {
@@ -24,62 +23,20 @@ export const useProjectManagers = () => {
       setIsLoading(true);
 
       try {
-        // Fetch active users with owner, admin, or project_manager roles
-        // Only active profiles can be approvers (not pending invites)
-        const { data: roleData, error: roleError } = await supabase
-          .from('user_roles')
-          .select('user_id, role')
-          .eq('company_id', company.id)
-          .in('role', ['owner', 'admin', 'project_manager']);
-
-        if (roleError) {
-          console.error('Error fetching approver roles:', roleError);
-        }
-
-        const approvers: Approver[] = [];
-
-        // Process active users only (pending invites cannot approve leaves)
-        if (roleData && roleData.length > 0) {
-          // Get unique user IDs (a user might have multiple roles)
-          const userRoleMap = new Map<string, string>();
-          roleData.forEach(r => {
-            const existingRole = userRoleMap.get(r.user_id);
-            if (!existingRole || getRolePriority(r.role) > getRolePriority(existingRole)) {
-              userRoleMap.set(r.user_id, r.role);
-            }
-          });
-
-          const approverIds = Array.from(userRoleMap.keys());
-
-          // Fetch profiles for these users
-          const { data: profiles, error: profileError } = await supabase
-            .from('profiles')
-            .select('id, first_name, last_name, email, avatar_url')
-            .in('id', approverIds);
-
-          if (profileError) {
-            console.error('Error fetching approver profiles:', profileError);
-          } else if (profiles) {
-            profiles.forEach(profile => {
-              approvers.push({
-                ...profile,
-                role: userRoleMap.get(profile.id) || 'project_manager',
-                isPending: false
-              });
-            });
-          }
-        }
-
-        // Sort alphabetically by name
-        approvers.sort((a, b) => {
-          const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase().trim();
-          const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase().trim();
-          return nameA.localeCompare(nameB);
+        // Use server-side function that only returns actual users (excludes pending invites)
+        const { data, error } = await supabase.rpc('get_company_leave_approvers', {
+          p_company_id: company.id
         });
 
-        setProjectManagers(approvers);
+        if (error) {
+          console.error('Error fetching approvers:', error);
+          setProjectManagers([]);
+        } else {
+          setProjectManagers(data || []);
+        }
       } catch (error) {
         console.error('Error in fetchApprovers:', error);
+        setProjectManagers([]);
       } finally {
         setIsLoading(false);
       }
@@ -90,13 +47,3 @@ export const useProjectManagers = () => {
 
   return { projectManagers, isLoading };
 };
-
-// Helper to determine role priority
-function getRolePriority(role: string): number {
-  switch (role) {
-    case 'owner': return 3;
-    case 'admin': return 2;
-    case 'project_manager': return 1;
-    default: return 0;
-  }
-}
