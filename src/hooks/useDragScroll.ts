@@ -126,7 +126,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
     };
   }, [handleMouseMove, handleMouseUp]);
 
-  // Setup scroll position checking
+  // Setup scroll position checking with ResizeObserver for content changes
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -135,9 +135,22 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
     container.addEventListener('scroll', checkScrollPosition);
     window.addEventListener('resize', checkScrollPosition);
 
+    // Use ResizeObserver to detect when container content changes size
+    const resizeObserver = new ResizeObserver(() => {
+      checkScrollPosition();
+    });
+    resizeObserver.observe(container);
+
+    // Also check after a short delay for async content loading
+    const timer = setTimeout(checkScrollPosition, 100);
+    const timer2 = setTimeout(checkScrollPosition, 500);
+
     return () => {
       container.removeEventListener('scroll', checkScrollPosition);
       window.removeEventListener('resize', checkScrollPosition);
+      resizeObserver.disconnect();
+      clearTimeout(timer);
+      clearTimeout(timer2);
     };
   }, [checkScrollPosition]);
 
