@@ -1,7 +1,7 @@
 import React from 'react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export type TimeRange = 'week' | 'month' | 'next-month';
+export type TimeRange = 'week' | 'month' | 'quarter' | 'year';
 
 interface MonthSelectorProps {
   timeRange: TimeRange;
@@ -33,10 +33,16 @@ export const MonthSelector: React.FC<MonthSelectorProps> = ({
           This Month
         </ToggleGroupItem>
         <ToggleGroupItem 
-          value="next-month" 
+          value="quarter" 
           className="text-xs px-3 py-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
         >
-          Next Month
+          This Quarter
+        </ToggleGroupItem>
+        <ToggleGroupItem 
+          value="year" 
+          className="text-xs px-3 py-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
+        >
+          This Year
         </ToggleGroupItem>
       </ToggleGroup>
     </div>
