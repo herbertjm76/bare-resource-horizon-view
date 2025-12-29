@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useCustomCardEntries, useAddCardEntry, useRemoveCardEntry } from '@/hooks/useCustomCards';
 import { toast } from 'sonner';
+import { GalleryRundownCard } from './GalleryRundownCard';
+import { PdfRundownCard } from './PdfRundownCard';
 
 interface CustomRundownCardProps {
   cardType: {
@@ -19,11 +21,30 @@ interface CustomRundownCardProps {
     label: string;
     icon?: string;
     color?: string;
+    display_type?: 'list' | 'gallery' | 'pdf';
   };
   weekStartDate: string;
 }
 
 export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
+  cardType,
+  weekStartDate
+}) => {
+  // Switch between card types based on display_type
+  if (cardType.display_type === 'gallery') {
+    return <GalleryRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
+  }
+  
+  if (cardType.display_type === 'pdf') {
+    return <PdfRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
+  }
+
+  // Default: List card (original behavior)
+  return <ListRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
+};
+
+// Original list card component
+const ListRundownCard: React.FC<CustomRundownCardProps> = ({
   cardType,
   weekStartDate
 }) => {
