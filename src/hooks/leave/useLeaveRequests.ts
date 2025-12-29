@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompanyId } from '@/hooks/useCompanyId';
 import { toast } from 'sonner';
 import { LeaveRequest, LeaveFormData } from '@/types/leave';
-import { differenceInBusinessDays, eachDayOfInterval, isWeekend } from 'date-fns';
+import { differenceInBusinessDays, eachDayOfInterval, isWeekend, format } from 'date-fns';
 
 export const useLeaveRequests = (memberId?: string) => {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
@@ -134,8 +134,8 @@ export const useLeaveRequests = (memberId?: string) => {
           member_id: user.id,
           leave_type_id: formData.leave_type_id,
           duration_type: formData.duration_type,
-          start_date: formData.start_date.toISOString().split('T')[0],
-          end_date: formData.end_date.toISOString().split('T')[0],
+          start_date: format(formData.start_date, 'yyyy-MM-dd'),
+          end_date: format(formData.end_date, 'yyyy-MM-dd'),
           total_hours: totalHours,
           remarks: formData.remarks,
           manager_confirmed: formData.manager_confirmed,
@@ -229,8 +229,8 @@ export const useLeaveRequests = (memberId?: string) => {
       const updateData: Record<string, any> = {
         leave_type_id: formData.leave_type_id,
         duration_type: formData.duration_type,
-        start_date: formData.start_date.toISOString().split('T')[0],
-        end_date: formData.end_date.toISOString().split('T')[0],
+        start_date: format(formData.start_date, 'yyyy-MM-dd'),
+        end_date: format(formData.end_date, 'yyyy-MM-dd'),
         total_hours: totalHours,
         remarks: formData.remarks,
         requested_approver_id: validApproverId
