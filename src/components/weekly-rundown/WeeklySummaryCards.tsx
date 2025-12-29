@@ -104,12 +104,15 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     queryFn: async () => {
       if (!company?.id) return [];
 
+      // Fetch holidays where:
+      // 1. date falls within the week, OR
+      // 2. end_date falls within the week, OR
+      // 3. holiday spans the entire week (date before week start, end_date after week end)
       const { data, error } = await supabase
         .from('office_holidays')
         .select('id, date, name, end_date')
         .eq('company_id', company.id)
-        .gte('date', weekStartString)
-        .lte('date', weekEndString);
+        .or(`and(date.gte.${weekStartString},date.lte.${weekEndString}),and(end_date.gte.${weekStartString},end_date.lte.${weekEndString}),and(date.lte.${weekStartString},end_date.gte.${weekEndString})`);
       
       if (error) throw error;
       return data || [];
