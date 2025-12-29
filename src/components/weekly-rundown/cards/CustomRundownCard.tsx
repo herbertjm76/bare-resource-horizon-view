@@ -144,8 +144,8 @@ const ListRundownCard: React.FC<CustomRundownCardProps> = ({
               key={entry.id} 
               className="flex items-start gap-2 group"
             >
-              <span className="text-primary mt-0.5 text-[11px]">•</span>
-              <span className="flex-1 text-[11px] leading-relaxed text-foreground">{entry.description}</span>
+              <span className="text-primary mt-0.5 text-sm">•</span>
+              <span className="flex-1 text-sm leading-relaxed text-foreground">{entry.description}</span>
               <Button
                 variant="ghost"
                 size="icon"

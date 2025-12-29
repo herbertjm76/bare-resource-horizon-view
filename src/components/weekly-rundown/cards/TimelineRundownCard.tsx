@@ -109,10 +109,10 @@ export const TimelineRundownCard: React.FC<TimelineRundownCardProps> = ({
               className="flex items-center justify-between gap-2 py-1 px-2 rounded bg-muted/50 group"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <span className="text-[10px] font-medium text-primary whitespace-nowrap">
+                <span className="text-xs font-medium text-primary whitespace-nowrap">
                   {format(parseISO(entry.event_date), 'MMM d')}
                 </span>
-                <span className="text-[11px] leading-relaxed text-foreground truncate">{entry.title}</span>
+                <span className="text-sm leading-relaxed text-foreground truncate">{entry.title}</span>
               </div>
               <Button
                 variant="ghost"
