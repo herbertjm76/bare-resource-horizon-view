@@ -13,7 +13,7 @@ export const LeaveLegend: React.FC = () => {
             className="w-3.5 h-3.5 rounded" 
             style={{ backgroundColor: type.color || '#3B82F6' }} 
           />
-          <span className="text-muted-foreground">{type.name}</span>
+          <span className="text-muted-foreground">{type.code}</span>
         </div>
       ))}
       
