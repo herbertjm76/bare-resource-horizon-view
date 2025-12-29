@@ -192,7 +192,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
     allCards.push({ 
       id: 'holidays', 
-      component: <HolidaysCard key="holidays" holidays={holidays} />,
+      component: <HolidaysCard key="holidays" holidays={holidays} selectedWeek={selectedWeek} />,
       isVisible: cardVisibility.holidays 
     });
     
@@ -799,6 +799,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         cardType={selectedCardType || ''}
         cardLabel={getCardLabel(selectedCardType || '')}
         data={getDetailData()}
+        selectedWeek={selectedWeek}
       />
     </div>
   );
