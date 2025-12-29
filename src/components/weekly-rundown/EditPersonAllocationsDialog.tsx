@@ -182,15 +182,21 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   };
 
   const handleAddAllocation = () => {
-    const allocationHours = parseFloat(newAllocationHours);
+    const inputValue = parseFloat(newAllocationHours);
     if (!selectedNewProjectId) {
       toast.error('Please select a project');
       return;
     }
-    if (isNaN(allocationHours) || allocationHours <= 0) {
-      toast.error('Please enter valid hours');
+    if (isNaN(inputValue) || inputValue <= 0) {
+      toast.error(`Please enter a valid ${displayPreference === 'percentage' ? 'percentage' : 'hours'}`);
       return;
     }
+    
+    // Convert percentage to hours if needed
+    const allocationHours = displayPreference === 'percentage' 
+      ? (inputValue / 100) * capacity 
+      : inputValue;
+    
     addAllocationMutation.mutate({ projectId: selectedNewProjectId, allocationHours });
   };
 
@@ -404,15 +410,18 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                   <Separator />
 
                   <div className="space-y-2">
-                    <Label htmlFor="hours">Hours</Label>
+                    <Label htmlFor="hours">
+                      {displayPreference === 'percentage' ? 'Percentage' : 'Hours'}
+                    </Label>
                     <Input
                       id="hours"
                       type="number"
                       value={newAllocationHours}
                       onChange={(e) => setNewAllocationHours(e.target.value)}
-                      placeholder="Enter hours"
-                      step="0.5"
+                      placeholder={displayPreference === 'percentage' ? 'Enter percentage (e.g. 50)' : 'Enter hours'}
+                      step={displayPreference === 'percentage' ? '5' : '0.5'}
                       min="0"
+                      max={displayPreference === 'percentage' ? '100' : undefined}
                     />
                   </div>
 
