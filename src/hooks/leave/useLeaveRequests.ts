@@ -100,6 +100,22 @@ export const useLeaveRequests = (memberId?: string) => {
         return false;
       }
 
+      // Validate that the requested approver exists in profiles (not a pending invite)
+      let validApproverId: string | null = null;
+      if (formData.requested_approver_id) {
+        const { data: approverProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', formData.requested_approver_id)
+          .maybeSingle();
+        
+        if (approverProfile) {
+          validApproverId = approverProfile.id;
+        } else {
+          console.warn('Selected approver is not a valid profile, submitting without approver');
+        }
+      }
+
       let attachmentUrl: string | null = null;
       if (formData.attachment) {
         attachmentUrl = await uploadAttachment(formData.attachment, user.id);
@@ -123,7 +139,7 @@ export const useLeaveRequests = (memberId?: string) => {
           total_hours: totalHours,
           remarks: formData.remarks,
           manager_confirmed: formData.manager_confirmed,
-          requested_approver_id: formData.requested_approver_id || null,
+          requested_approver_id: validApproverId,
           attachment_url: attachmentUrl,
           status: 'pending'
         });
@@ -196,6 +212,20 @@ export const useLeaveRequests = (memberId?: string) => {
         formData.duration_type
       );
 
+      // Validate that the requested approver exists in profiles
+      let validApproverId: string | null = null;
+      if (formData.requested_approver_id) {
+        const { data: approverProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', formData.requested_approver_id)
+          .maybeSingle();
+        
+        if (approverProfile) {
+          validApproverId = approverProfile.id;
+        }
+      }
+
       const updateData: Record<string, any> = {
         leave_type_id: formData.leave_type_id,
         duration_type: formData.duration_type,
@@ -203,7 +233,7 @@ export const useLeaveRequests = (memberId?: string) => {
         end_date: formData.end_date.toISOString().split('T')[0],
         total_hours: totalHours,
         remarks: formData.remarks,
-        requested_approver_id: formData.requested_approver_id || null
+        requested_approver_id: validApproverId
       };
 
       if (attachmentUrl) {
