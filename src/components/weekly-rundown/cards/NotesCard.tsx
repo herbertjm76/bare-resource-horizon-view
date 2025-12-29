@@ -130,14 +130,14 @@ export const NotesCard: React.FC<NotesCardProps> = ({ notes, weekStartDate }) =>
         {/* Background watermark icon */}
         <FileText className="absolute -right-4 -bottom-4 h-24 w-24 text-muted-foreground/5 pointer-events-none" />
         
-        <CardHeader className="pb-2 flex-shrink-0 h-[44px] flex items-start pt-3">
+        <CardHeader className="pb-1 flex-shrink-0 h-[40px] flex items-start pt-3">
           <div className="flex items-center justify-between w-full">
             <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Notes</CardTitle>
             <Button
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0 -mt-1"
-              onClick={handleAdd}
+              onClick={(e) => { e.stopPropagation(); handleAdd(); }}
             >
               <Plus className="h-3.5 w-3.5" />
             </Button>

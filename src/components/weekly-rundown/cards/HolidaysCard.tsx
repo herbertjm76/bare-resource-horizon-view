@@ -71,7 +71,7 @@ export const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, selectedWe
       {/* Background watermark icon - use strokeWidth to fix overlapping lines */}
       <Calendar className="absolute -right-4 -bottom-4 h-24 w-24 text-muted-foreground/5 pointer-events-none" strokeWidth={1} />
       
-      <CardHeader className="pb-2 flex-shrink-0 h-[44px] flex items-start pt-4">
+      <CardHeader className="pb-1 flex-shrink-0 h-[40px] flex items-start pt-3">
         <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Holidays</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10 pr-2">
