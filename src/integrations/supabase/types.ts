@@ -932,6 +932,7 @@ export type Database = {
           bio: string | null
           company_id: string | null
           created_at: string
+          date_of_birth: string | null
           department: string | null
           email: string
           first_name: string | null
@@ -951,6 +952,7 @@ export type Database = {
           bio?: string | null
           company_id?: string | null
           created_at?: string
+          date_of_birth?: string | null
           department?: string | null
           email: string
           first_name?: string | null
@@ -970,6 +972,7 @@ export type Database = {
           bio?: string | null
           company_id?: string | null
           created_at?: string
+          date_of_birth?: string | null
           department?: string | null
           email?: string
           first_name?: string | null
@@ -1913,6 +1916,7 @@ export type Database = {
           is_active: boolean | null
           label: string
           order_index: number
+          survey_type: string | null
           updated_at: string
         }
         Insert: {
@@ -1925,6 +1929,7 @@ export type Database = {
           is_active?: boolean | null
           label: string
           order_index?: number
+          survey_type?: string | null
           updated_at?: string
         }
         Update: {
@@ -1937,6 +1942,7 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           order_index?: number
+          survey_type?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2017,6 +2023,153 @@ export type Database = {
           week_start_date?: string
         }
         Relationships: []
+      }
+      weekly_survey_options: {
+        Row: {
+          card_type_id: string
+          company_id: string | null
+          created_at: string | null
+          id: string
+          label: string
+          order_index: number | null
+          week_start_date: string
+        }
+        Insert: {
+          card_type_id: string
+          company_id?: string | null
+          created_at?: string | null
+          id?: string
+          label: string
+          order_index?: number | null
+          week_start_date: string
+        }
+        Update: {
+          card_type_id?: string
+          company_id?: string | null
+          created_at?: string | null
+          id?: string
+          label?: string
+          order_index?: number | null
+          week_start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_survey_options_card_type_id_fkey"
+            columns: ["card_type_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_custom_card_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_survey_options_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weekly_survey_responses: {
+        Row: {
+          card_type_id: string
+          company_id: string | null
+          created_at: string | null
+          id: string
+          member_id: string
+          member_type: string
+          option_id: string
+          rating_value: number | null
+          week_start_date: string
+        }
+        Insert: {
+          card_type_id: string
+          company_id?: string | null
+          created_at?: string | null
+          id?: string
+          member_id: string
+          member_type?: string
+          option_id: string
+          rating_value?: number | null
+          week_start_date: string
+        }
+        Update: {
+          card_type_id?: string
+          company_id?: string | null
+          created_at?: string | null
+          id?: string
+          member_id?: string
+          member_type?: string
+          option_id?: string
+          rating_value?: number | null
+          week_start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_survey_responses_card_type_id_fkey"
+            columns: ["card_type_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_custom_card_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_survey_responses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weekly_timeline_entries: {
+        Row: {
+          card_type_id: string
+          company_id: string | null
+          created_at: string | null
+          description: string | null
+          event_date: string
+          id: string
+          title: string
+          updated_at: string | null
+          week_start_date: string
+        }
+        Insert: {
+          card_type_id: string
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_date: string
+          id?: string
+          title: string
+          updated_at?: string | null
+          week_start_date: string
+        }
+        Update: {
+          card_type_id?: string
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_date?: string
+          id?: string
+          title?: string
+          updated_at?: string | null
+          week_start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_timeline_entries_card_type_id_fkey"
+            columns: ["card_type_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_custom_card_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_timeline_entries_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
