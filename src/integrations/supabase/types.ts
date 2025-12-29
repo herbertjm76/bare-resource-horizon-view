@@ -2018,6 +2018,17 @@ export type Database = {
           total_spent: number
         }[]
       }
+      get_company_leave_approvers: {
+        Args: { p_company_id: string }
+        Returns: {
+          avatar_url: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          role: string
+        }[]
+      }
       get_current_user_company_id: { Args: never; Returns: string }
       get_user_company_id: { Args: { user_id: string }; Returns: string }
       get_user_company_id_safe: { Args: never; Returns: string }
