@@ -17,7 +17,7 @@ export type ViewType = 'carousel' | 'grid';
 export const WeeklyRundownView: React.FC = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
   const [rundownMode, setRundownMode] = useState<RundownMode>('people');
-  const [sortOption, setSortOption] = useState<SortOption>('alphabetical');
+  const [sortOption, setSortOption] = useState<SortOption>('utilization');
   const [viewType, setViewType] = useState<ViewType>('carousel');
   const [isAutoAdvance, setIsAutoAdvance] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);

@@ -26,7 +26,7 @@ export const useWeeklyOverviewState = () => {
 
   // Grid/Carousel-specific state
   const [rundownMode, setRundownMode] = useState<RundownMode>('people');
-  const [sortOption, setSortOption] = useState<SortOption>('alphabetical');
+  const [sortOption, setSortOption] = useState<SortOption>('utilization');
   const [isAutoAdvance, setIsAutoAdvance] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
