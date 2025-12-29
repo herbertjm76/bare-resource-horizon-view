@@ -137,15 +137,15 @@ const ListRundownCard: React.FC<CustomRundownCardProps> = ({
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10">
+      <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10 pb-6">
         <ul className="space-y-1">
           {entries.map((entry) => (
             <li 
               key={entry.id} 
-              className="flex items-start gap-2 group text-xs"
+              className="flex items-start gap-2 group"
             >
-              <span className="text-primary mt-0.5">•</span>
-              <span className="flex-1 text-foreground">{entry.description}</span>
+              <span className="text-primary mt-0.5 text-[11px]">•</span>
+              <span className="flex-1 text-[11px] leading-relaxed text-foreground">{entry.description}</span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -157,36 +157,40 @@ const ListRundownCard: React.FC<CustomRundownCardProps> = ({
             </li>
           ))}
         </ul>
-        
-        {/* Add Item Button */}
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="sm" className="w-full h-6 text-xs mt-1">
-              <Plus className="h-3 w-3 mr-1" /> Add Item
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add Item to {cardType.label}</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <Textarea
-                value={newItem}
-                onChange={(e) => setNewItem(e.target.value)}
-                placeholder="Enter your item..."
-                rows={3}
-              />
-              <Button 
-                onClick={addItem} 
-                className="w-full"
-                disabled={!newItem.trim()}
-              >
-                Add Item
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </CardContent>
+      
+      {/* Small plus button in lower right */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-muted/50 hover:bg-muted z-20"
+          >
+            <Plus className="h-2.5 w-2.5" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Item to {cardType.label}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <Textarea
+              value={newItem}
+              onChange={(e) => setNewItem(e.target.value)}
+              placeholder="Enter your item..."
+              rows={3}
+            />
+            <Button 
+              onClick={addItem} 
+              className="w-full"
+              disabled={!newItem.trim()}
+            >
+              Add Item
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
