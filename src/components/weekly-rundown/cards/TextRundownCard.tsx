@@ -116,11 +116,11 @@ export const TextRundownCard: React.FC<TextRundownCardProps> = ({
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10 pb-6">
           {hasContent ? (
-            <p className="text-[11px] leading-relaxed text-foreground whitespace-pre-wrap line-clamp-4">
+            <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap line-clamp-4">
               {displayText}
             </p>
           ) : (
-            <p className="text-[11px] text-muted-foreground italic">
+            <p className="text-sm text-muted-foreground italic">
               Click to add text...
             </p>
           )}
