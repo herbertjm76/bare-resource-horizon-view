@@ -101,7 +101,7 @@ export const TimelineRundownCard: React.FC<TimelineRundownCardProps> = ({
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10">
+      <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10 pb-6">
         <div className="space-y-1">
           {entries.map((entry) => (
             <div 
@@ -112,7 +112,7 @@ export const TimelineRundownCard: React.FC<TimelineRundownCardProps> = ({
                 <span className="text-[10px] font-medium text-primary whitespace-nowrap">
                   {format(parseISO(entry.event_date), 'MMM d')}
                 </span>
-                <span className="text-xs text-foreground truncate">{entry.title}</span>
+                <span className="text-[11px] leading-relaxed text-foreground truncate">{entry.title}</span>
               </div>
               <Button
                 variant="ghost"
@@ -124,47 +124,51 @@ export const TimelineRundownCard: React.FC<TimelineRundownCardProps> = ({
               </Button>
             </div>
           ))}
-          
-          {/* Add Button */}
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="w-full h-6 text-xs mt-1">
-                <Plus className="h-3 w-3 mr-1" /> Add Date
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add Date to {cardType.label}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label>Title *</Label>
-                  <Input
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="e.g., Team Meeting"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Date *</Label>
-                  <Input
-                    type="date"
-                    value={formData.event_date}
-                    onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-                  />
-                </div>
-                <Button 
-                  onClick={() => addEntry.mutate()} 
-                  className="w-full"
-                  disabled={!formData.title || !formData.event_date}
-                >
-                  Add Date
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
         </div>
       </CardContent>
+      
+      {/* Small plus button in lower right */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-muted/50 hover:bg-muted z-20"
+          >
+            <Plus className="h-2.5 w-2.5" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Date to {cardType.label}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label>Title *</Label>
+              <Input
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="e.g., Team Meeting"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Date *</Label>
+              <Input
+                type="date"
+                value={formData.event_date}
+                onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+              />
+            </div>
+            <Button 
+              onClick={() => addEntry.mutate()} 
+              className="w-full"
+              disabled={!formData.title || !formData.event_date}
+            >
+              Add Date
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

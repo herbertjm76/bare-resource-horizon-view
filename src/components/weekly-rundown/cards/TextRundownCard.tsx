@@ -114,17 +114,31 @@ export const TextRundownCard: React.FC<TextRundownCardProps> = ({
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10">
+        <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10 pb-6">
           {hasContent ? (
-            <p className="text-xs text-foreground whitespace-pre-wrap line-clamp-4">
+            <p className="text-[11px] leading-relaxed text-foreground whitespace-pre-wrap line-clamp-4">
               {displayText}
             </p>
           ) : (
-            <p className="text-xs text-muted-foreground italic">
+            <p className="text-[11px] text-muted-foreground italic">
               Click to add text...
             </p>
           )}
         </CardContent>
+        
+        {/* Small plus button in lower right */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-muted/50 hover:bg-muted z-20"
+          onClick={(e) => {
+            e.stopPropagation();
+            setTextContent(displayText);
+            setIsDialogOpen(true);
+          }}
+        >
+          <Pencil className="h-2.5 w-2.5" />
+        </Button>
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
