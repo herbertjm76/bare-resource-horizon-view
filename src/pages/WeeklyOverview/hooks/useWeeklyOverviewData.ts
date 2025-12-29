@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
-import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addDays } from 'date-fns';
 
 type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
 
@@ -120,9 +120,11 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
     staleTime: 2 * 60 * 1000,
   });
 
-  // Fetch holidays for summary cards
+  // Fetch holidays for summary cards - this week + upcoming (next 30 days)
+  const upcomingEndDate = format(addDays(weekEnd, 30), 'yyyy-MM-dd');
+  
   const { data: holidays = [] } = useQuery({
-    queryKey: ['weekly-summary-holidays', weekStartString, weekEndString, company?.id],
+    queryKey: ['weekly-summary-holidays', weekStartString, upcomingEndDate, company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
 
@@ -131,7 +133,8 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
         .select('id, date, name, end_date')
         .eq('company_id', company.id)
         .gte('date', weekStartString)
-        .lte('date', weekEndString);
+        .lte('date', upcomingEndDate)
+        .order('date');
       
       if (error) throw error;
       return data || [];

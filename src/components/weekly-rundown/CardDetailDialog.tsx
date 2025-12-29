@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Calendar, Umbrella, PartyPopper, FileText, Megaphone } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, startOfWeek, endOfWeek, isWithinInterval, parseISO } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useQuery } from '@tanstack/react-query';
@@ -21,6 +21,7 @@ interface CardDetailDialogProps {
   cardType: string;
   cardLabel: string;
   data: any;
+  selectedWeek?: Date;
 }
 
 export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
@@ -28,7 +29,8 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
   onOpenChange,
   cardType,
   cardLabel,
-  data
+  data,
+  selectedWeek = new Date()
 }) => {
   const { workWeekHours, displayPreference } = useAppSettings();
   const capacity = workWeekHours;
@@ -83,8 +85,12 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
       case 'holidays':
         const rawHolidays = data || [];
         if (rawHolidays.length === 0) {
-          return <p className="text-muted-foreground">No holidays this week</p>;
+          return <p className="text-muted-foreground">No holidays</p>;
         }
+        
+        const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+        const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
+        
         // Consolidate holidays by name and date (combine offices into one entry)
         const consolidatedHolidays = rawHolidays.reduce((acc: any[], holiday: any) => {
           const key = `${holiday.date}-${holiday.end_date || ''}-${holiday.name}`;
@@ -97,20 +103,49 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
         const sortedHolidays = consolidatedHolidays.sort((a: any, b: any) => 
           new Date(a.date).getTime() - new Date(b.date).getTime()
         );
+        
+        // Split into this week and upcoming
+        const thisWeekHolidays = sortedHolidays.filter((holiday: any) => {
+          const holidayDate = parseISO(holiday.date);
+          return isWithinInterval(holidayDate, { start: weekStart, end: weekEnd });
+        });
+
+        const upcomingHolidays = sortedHolidays.filter((holiday: any) => {
+          const holidayDate = parseISO(holiday.date);
+          return !isWithinInterval(holidayDate, { start: weekStart, end: weekEnd });
+        });
+
+        const renderHolidayItem = (holiday: any, index: number) => (
+          <div key={`${holiday.id}-${index}`} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+            <Calendar className="h-5 w-5 text-primary mt-0.5" />
+            <div>
+              <p className="font-medium text-foreground">{holiday.name}</p>
+              <p className="text-sm text-muted-foreground">
+                {format(new Date(holiday.date), 'EEEE, MMMM d, yyyy')}
+                {holiday.end_date && ` - ${format(new Date(holiday.end_date), 'EEEE, MMMM d, yyyy')}`}
+              </p>
+            </div>
+          </div>
+        );
+
         return (
-          <div className="space-y-3">
-            {sortedHolidays.map((holiday: any, index: number) => (
-              <div key={`${holiday.id}-${index}`} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                <Calendar className="h-5 w-5 text-primary mt-0.5" />
-                <div>
-                  <p className="font-medium text-foreground">{holiday.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {format(new Date(holiday.date), 'EEEE, MMMM d, yyyy')}
-                    {holiday.end_date && ` - ${format(new Date(holiday.end_date), 'EEEE, MMMM d, yyyy')}`}
-                  </p>
+          <div className="space-y-4">
+            {thisWeekHolidays.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">This Week</h4>
+                <div className="space-y-2">
+                  {thisWeekHolidays.map(renderHolidayItem)}
                 </div>
               </div>
-            ))}
+            )}
+            {upcomingHolidays.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Upcoming</h4>
+                <div className="space-y-2">
+                  {upcomingHolidays.map(renderHolidayItem)}
+                </div>
+              </div>
+            )}
           </div>
         );
 
