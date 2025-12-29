@@ -23,17 +23,48 @@ export const useProjectManagers = () => {
       setIsLoading(true);
 
       try {
-        // Use server-side function that only returns actual users (excludes pending invites)
-        const { data, error } = await supabase.rpc('get_company_leave_approvers', {
+        // Fetch actual users via RPC
+        const { data: activeUsers, error: activeError } = await supabase.rpc('get_company_leave_approvers', {
           p_company_id: company.id
         });
 
-        if (error) {
-          console.error('Error fetching approvers:', error);
-          setProjectManagers([]);
-        } else {
-          setProjectManagers(data || []);
+        if (activeError) {
+          console.error('Error fetching active approvers:', activeError);
         }
+
+        // Fetch pending invites with approver roles
+        const { data: pendingInvites, error: pendingError } = await supabase
+          .from('invites')
+          .select('id, first_name, last_name, email, avatar_url, role')
+          .eq('company_id', company.id)
+          .eq('status', 'pending')
+          .in('role', ['owner', 'admin', 'project_manager']);
+
+        if (pendingError) {
+          console.error('Error fetching pending invites:', pendingError);
+        }
+
+        // Combine both lists
+        const allApprovers: Approver[] = [
+          ...(activeUsers || []),
+          ...(pendingInvites || []).map(invite => ({
+            id: invite.id,
+            first_name: invite.first_name,
+            last_name: invite.last_name,
+            email: invite.email,
+            avatar_url: invite.avatar_url,
+            role: invite.role || 'project_manager'
+          }))
+        ];
+
+        // Sort alphabetically by name
+        allApprovers.sort((a, b) => {
+          const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase().trim();
+          const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase().trim();
+          return nameA.localeCompare(nameB);
+        });
+
+        setProjectManagers(allApprovers);
       } catch (error) {
         console.error('Error in fetchApprovers:', error);
         setProjectManagers([]);
