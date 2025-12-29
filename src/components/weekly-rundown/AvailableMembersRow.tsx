@@ -68,7 +68,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   weekStartDate,
   threshold = 80,
   allMembers: externalMembers,
-  sortOption = 'alphabetical'
+  sortOption = 'utilization'
 }) => {
   const {
     scrollRef: membersScrollRef,
