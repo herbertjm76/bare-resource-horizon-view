@@ -25,24 +25,37 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   timeRange
 }) => {
   // Calculate date range based on time range selection
-  // Always start from one week before today
   const today = new Date();
-  const startDate = subWeeks(today, 1);
   
-  const getEndDate = () => {
+  const getDateRange = () => {
     switch (timeRange) {
       case 'week':
-        return endOfWeek(today, { weekStartsOn: 1 }); // End of current week
+        // Show just the current week (Monday to Sunday)
+        return {
+          start: startOfWeek(today, { weekStartsOn: 1 }),
+          end: endOfWeek(today, { weekStartsOn: 1 })
+        };
       case 'month':
-        return endOfMonth(selectedMonth);
+        // Show the entire selected month
+        return {
+          start: startOfMonth(selectedMonth),
+          end: endOfMonth(selectedMonth)
+        };
       case 'next-month':
-        return endOfMonth(addMonths(today, 1));
+        // Show current month through end of next month
+        return {
+          start: startOfMonth(today),
+          end: endOfMonth(addMonths(today, 1))
+        };
       default:
-        return endOfMonth(selectedMonth);
+        return {
+          start: startOfMonth(selectedMonth),
+          end: endOfMonth(selectedMonth)
+        };
     }
   };
   
-  const endDate = getEndDate();
+  const { start: startDate, end: endDate } = getDateRange();
   
   // Generate all days in the range
   const days = eachDayOfInterval({ start: startDate, end: endDate }).map(date => {
