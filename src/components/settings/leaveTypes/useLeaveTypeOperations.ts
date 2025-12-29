@@ -146,6 +146,39 @@ export const useLeaveTypeOperations = (
     }
   }, [selectedTypes, setLeaveTypes]);
 
+  const handleReorder = useCallback(async (fromIndex: number, toIndex: number) => {
+    // Reorder locally first for immediate feedback
+    const reordered = [...leaveTypes];
+    const [movedItem] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, movedItem);
+    
+    // Update order_index for all items
+    const updatedTypes = reordered.map((type, index) => ({
+      ...type,
+      order_index: index + 1
+    }));
+    
+    setLeaveTypes(updatedTypes);
+
+    // Persist to database
+    try {
+      const updates = updatedTypes.map(type => 
+        supabase
+          .from('leave_types')
+          .update({ order_index: type.order_index })
+          .eq('id', type.id)
+      );
+
+      await Promise.all(updates);
+      toast.success('Order updated');
+    } catch (error) {
+      console.error('Error reordering leave types:', error);
+      toast.error('Failed to save order');
+      // Revert on error
+      setLeaveTypes(leaveTypes);
+    }
+  }, [leaveTypes, setLeaveTypes]);
+
   return {
     editingType,
     isSubmitting,
@@ -160,6 +193,7 @@ export const useLeaveTypeOperations = (
     handleSelectType,
     handleSubmit,
     handleDelete,
-    handleBulkDelete
+    handleBulkDelete,
+    handleReorder
   };
 };
