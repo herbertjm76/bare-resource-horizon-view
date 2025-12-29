@@ -47,7 +47,8 @@ const DEMO_PROFILE = {
   avatar_url: null,
   bio: null,
   manager_id: null,
-  start_date: null,
+  start_date: '2020-03-15',
+  date_of_birth: '1985-06-15',
   office_role_id: null
 };
 
@@ -69,7 +70,8 @@ const DEMO_TEAM_MEMBERS = [
     avatar_url: null,
     bio: null,
     manager_id: null,
-    start_date: null,
+    start_date: '2021-01-10',
+    date_of_birth: '1988-12-20',
     office_role_id: null
   },
   {
@@ -89,7 +91,8 @@ const DEMO_TEAM_MEMBERS = [
     avatar_url: null,
     bio: null,
     manager_id: null,
-    start_date: null,
+    start_date: '2022-06-01',
+    date_of_birth: '1992-03-08',
     office_role_id: null
   },
   {
@@ -109,7 +112,8 @@ const DEMO_TEAM_MEMBERS = [
     avatar_url: null,
     bio: null,
     manager_id: null,
-    start_date: null,
+    start_date: '2023-02-15',
+    date_of_birth: '1990-07-22',
     office_role_id: null
   }
 ];

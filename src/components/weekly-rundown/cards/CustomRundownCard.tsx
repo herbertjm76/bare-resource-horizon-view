@@ -14,6 +14,8 @@ import { useCustomCardEntries, useAddCardEntry, useRemoveCardEntry } from '@/hoo
 import { toast } from 'sonner';
 import { GalleryRundownCard } from './GalleryRundownCard';
 import { PdfRundownCard } from './PdfRundownCard';
+import { TimelineRundownCard } from './TimelineRundownCard';
+import { SurveyRundownCard } from './SurveyRundownCard';
 
 interface CustomRundownCardProps {
   cardType: {
@@ -21,7 +23,8 @@ interface CustomRundownCardProps {
     label: string;
     icon?: string;
     color?: string;
-    display_type?: 'list' | 'gallery' | 'pdf';
+    display_type?: 'list' | 'gallery' | 'pdf' | 'timeline' | 'survey';
+    survey_type?: 'multiple_choice' | 'poll' | 'rating';
   };
   weekStartDate: string;
 }
@@ -37,6 +40,14 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
   
   if (cardType.display_type === 'pdf') {
     return <PdfRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
+  }
+
+  if (cardType.display_type === 'timeline') {
+    return <TimelineRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
+  }
+
+  if (cardType.display_type === 'survey') {
+    return <SurveyRundownCard cardType={cardType} weekStartDate={weekStartDate} />;
   }
 
   // Default: List card (original behavior)

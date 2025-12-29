@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, ArrowUp, ArrowDown, List, Image, FileText } from 'lucide-react';
+import { Plus, Trash2, ArrowUp, ArrowDown, List, Image, FileText, Calendar, BarChart3 } from 'lucide-react';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +15,8 @@ interface ManageCustomCardsDialogProps {
   iconOnly?: boolean;
 }
 
-type DisplayType = 'list' | 'gallery' | 'pdf';
+type DisplayType = 'list' | 'gallery' | 'pdf' | 'timeline' | 'survey';
+type SurveyType = 'multiple_choice' | 'poll' | 'rating';
 
 export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = ({ iconOnly = false }) => {
   const { company } = useCompany();
@@ -24,7 +25,8 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
   const [formData, setFormData] = useState({
     label: '',
     icon: '',
-    display_type: 'list' as DisplayType
+    display_type: 'list' as DisplayType,
+    survey_type: 'poll' as SurveyType
   });
 
   const { data: customCardTypes = [] } = useCustomCardTypes();
@@ -39,6 +41,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
           label: formData.label,
           icon: formData.icon || null,
           display_type: formData.display_type,
+          survey_type: formData.display_type === 'survey' ? formData.survey_type : null,
           order_index: customCardTypes.length
         })
         .select()
@@ -49,7 +52,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['custom-card-types'] });
       toast.success('Card type created');
-      setFormData({ label: '', icon: '', display_type: 'list' });
+      setFormData({ label: '', icon: '', display_type: 'list', survey_type: 'poll' });
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to create card type');
@@ -129,7 +132,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
             </div>
             <div className="space-y-2">
               <Label>Card Type</Label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-5 gap-2">
                 <Button
                   type="button"
                   variant={formData.display_type === 'list' ? 'default' : 'outline'}
@@ -157,13 +160,53 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                   <FileText className="h-5 w-5" />
                   <span className="text-xs">PDF</span>
                 </Button>
+                <Button
+                  type="button"
+                  variant={formData.display_type === 'timeline' ? 'default' : 'outline'}
+                  className="flex flex-col items-center gap-1 h-auto py-3"
+                  onClick={() => setFormData({ ...formData, display_type: 'timeline' })}
+                >
+                  <Calendar className="h-5 w-5" />
+                  <span className="text-xs">Timeline</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={formData.display_type === 'survey' ? 'default' : 'outline'}
+                  className="flex flex-col items-center gap-1 h-auto py-3"
+                  onClick={() => setFormData({ ...formData, display_type: 'survey' })}
+                >
+                  <BarChart3 className="h-5 w-5" />
+                  <span className="text-xs">Survey</span>
+                </Button>
               </div>
               <p className="text-xs text-muted-foreground">
                 {formData.display_type === 'list' && 'Add team members to this card each week'}
                 {formData.display_type === 'gallery' && 'Upload images to display in a gallery'}
                 {formData.display_type === 'pdf' && 'Upload and preview PDF documents'}
+                {formData.display_type === 'timeline' && 'Add important dates and events in a timeline view'}
+                {formData.display_type === 'survey' && 'Create polls, multiple choice, or rating surveys'}
               </p>
             </div>
+            
+            {/* Survey Type Selection */}
+            {formData.display_type === 'survey' && (
+              <div className="space-y-2">
+                <Label>Survey Type</Label>
+                <Select 
+                  value={formData.survey_type} 
+                  onValueChange={(v: SurveyType) => setFormData({ ...formData, survey_type: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="multiple_choice">Multiple Choice (single answer)</SelectItem>
+                    <SelectItem value="poll">Poll (with live results)</SelectItem>
+                    <SelectItem value="rating">Rating Scale (1-5 stars)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <Button type="submit" disabled={createMutation.isPending}>
               {createMutation.isPending ? 'Creating...' : 'Create Card Type'}
             </Button>

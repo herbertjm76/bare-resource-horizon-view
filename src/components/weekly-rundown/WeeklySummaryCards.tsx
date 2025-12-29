@@ -10,6 +10,7 @@ import { LeaveCard } from './cards/LeaveCard';
 import { AnnouncementsCard } from './cards/AnnouncementsCard';
 import { CustomRundownCard } from './cards/CustomRundownCard';
 import { WeekInfoCard } from './cards/WeekInfoCard';
+import { BirthdaysAnniversariesCard } from './cards/BirthdaysAnniversariesCard';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { CardVisibility, CardOrder } from '@/hooks/useCardVisibility';
 import { Settings, Plus } from 'lucide-react';
@@ -200,6 +201,13 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       isVisible: cardVisibility.annualLeave 
     });
 
+    // Add Birthdays & Anniversaries card (built-in)
+    allCards.push({
+      id: 'celebrations',
+      component: <BirthdaysAnniversariesCard key="celebrations" selectedWeek={selectedWeek} />,
+      isVisible: cardVisibility.celebrations !== false
+    });
+
     // Add custom cards
     customCardTypes.forEach(cardType => {
       const cardKey = `custom_${cardType.id}`;
@@ -340,6 +348,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     if (cardId === 'announcements') return 'Announcements';
     if (cardId === 'holidays') return 'Holidays';
     if (cardId === 'annualLeave') return 'Annual Leave';
+    if (cardId === 'celebrations') return 'Birthdays & Anniversaries';
     if (cardId.startsWith('custom_')) {
       const customCard = customCardTypes.find(c => `custom_${c.id}` === cardId);
       return customCard?.label || 'Custom Card';
