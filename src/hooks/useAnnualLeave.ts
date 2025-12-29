@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, subDays, addDays, eachMonthOfInterval } from 'date-fns';
 
 export interface LeaveEntry {
   id?: string;
@@ -27,11 +27,45 @@ export interface LeaveDataByDate {
   entries: LeaveDetail[];
 }
 
-export const useAnnualLeave = (month: Date) => {
+export type TimeRangeType = 'week' | 'month' | 'quarter' | 'year';
+
+export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') => {
   const [leaveData, setLeaveData] = useState<Record<string, Record<string, number>>>({});
   const [leaveDetails, setLeaveDetails] = useState<Record<string, Record<string, LeaveDataByDate>>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
+
+  // Calculate date range based on time range selection
+  const getDateRange = useCallback(() => {
+    const today = new Date();
+    switch (timeRange) {
+      case 'week':
+        return {
+          start: subDays(startOfWeek(today, { weekStartsOn: 1 }), 3),
+          end: addDays(endOfWeek(today, { weekStartsOn: 1 }), 3)
+        };
+      case 'month':
+        return {
+          start: subDays(startOfMonth(today), 3),
+          end: addDays(endOfMonth(today), 3)
+        };
+      case 'quarter':
+        return {
+          start: startOfQuarter(today),
+          end: endOfQuarter(today)
+        };
+      case 'year':
+        return {
+          start: startOfYear(today),
+          end: endOfYear(today)
+        };
+      default:
+        return {
+          start: startOfMonth(month),
+          end: endOfMonth(month)
+        };
+    }
+  }, [timeRange, month]);
 
   // Function to fetch annual leave data
   const fetchLeaveData = useCallback(async () => {
@@ -43,50 +77,59 @@ export const useAnnualLeave = (month: Date) => {
     setIsLoading(true);
 
     try {
-      const monthStr = format(month, 'yyyy-MM');
+      const { start, end } = getDateRange();
+      
+      // Get all months that need to be fetched
+      const monthsToFetch = eachMonthOfInterval({ start, end });
+      
+      // Fetch data for all months in parallel
+      const fetchPromises = monthsToFetch.map(async (monthDate) => {
+        const monthStr = format(monthDate, 'yyyy-MM');
+        
+        const { data, error } = await supabase.functions.invoke('get_annual_leaves', {
+          body: { 
+            company_id_param: company.id,
+            month_param: monthStr
+          }
+        });
 
-      const { data, error } = await supabase.functions.invoke('get_annual_leaves', {
-        body: { 
-          company_id_param: company.id,
-          month_param: monthStr
+        if (error) {
+          console.error('Error fetching leave data for month:', monthStr, error);
+          return [];
         }
+        
+        return data || [];
       });
 
-      if (error) {
-        console.error('Error fetching leave data:', error);
-        toast.error('Failed to load annual leave data');
-        setIsLoading(false);
-        return;
-      }
+      const allResults = await Promise.all(fetchPromises);
+      const allData = allResults.flat();
 
       // Transform data into nested structure by member_id and date
       const formattedData: Record<string, Record<string, number>> = {};
       const detailedData: Record<string, Record<string, LeaveDataByDate>> = {};
       
-      if (data) {
-        data.forEach((leave: any) => {
-          // Simple hours data (existing format)
-          if (!formattedData[leave.member_id]) {
-            formattedData[leave.member_id] = {};
-          }
-          formattedData[leave.member_id][leave.date] = 
-            (formattedData[leave.member_id][leave.date] || 0) + leave.hours;
-          
-          // Detailed data with leave type info
-          if (!detailedData[leave.member_id]) {
-            detailedData[leave.member_id] = {};
-          }
-          if (!detailedData[leave.member_id][leave.date]) {
-            detailedData[leave.member_id][leave.date] = { totalHours: 0, entries: [] };
-          }
-          detailedData[leave.member_id][leave.date].totalHours += leave.hours;
-          detailedData[leave.member_id][leave.date].entries.push({
-            hours: leave.hours,
-            leave_type_name: leave.leave_type_name || 'Leave',
-            leave_type_color: leave.leave_type_color || '#3B82F6'
-          });
+      allData.forEach((leave: any) => {
+        // Simple hours data (existing format)
+        if (!formattedData[leave.member_id]) {
+          formattedData[leave.member_id] = {};
+        }
+        formattedData[leave.member_id][leave.date] = 
+          (formattedData[leave.member_id][leave.date] || 0) + leave.hours;
+        
+        // Detailed data with leave type info
+        if (!detailedData[leave.member_id]) {
+          detailedData[leave.member_id] = {};
+        }
+        if (!detailedData[leave.member_id][leave.date]) {
+          detailedData[leave.member_id][leave.date] = { totalHours: 0, entries: [] };
+        }
+        detailedData[leave.member_id][leave.date].totalHours += leave.hours;
+        detailedData[leave.member_id][leave.date].entries.push({
+          hours: leave.hours,
+          leave_type_name: leave.leave_type_name || 'Leave',
+          leave_type_color: leave.leave_type_color || '#3B82F6'
         });
-      }
+      });
 
       setLeaveData(formattedData);
       setLeaveDetails(detailedData);
@@ -96,7 +139,7 @@ export const useAnnualLeave = (month: Date) => {
     } finally {
       setIsLoading(false);
     }
-  }, [company?.id, month]);
+  }, [company?.id, getDateRange]);
 
   // Update or create leave entries
   const updateLeaveHours = useCallback(async (
@@ -176,7 +219,7 @@ export const useAnnualLeave = (month: Date) => {
     if (company?.id) {
       fetchLeaveData();
     }
-  }, [company?.id, month, fetchLeaveData]);
+  }, [company?.id, timeRange, fetchLeaveData]);
 
   useEffect(() => {
     if (!company?.id) return;

@@ -98,6 +98,15 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
 
   const isFullDay = (hours: number): boolean => hours >= 8;
 
+  // Get the primary leave type color for a day (use the first entry's color)
+  const getLeaveTypeColor = (memberId: string, date: string): string => {
+    const details = leaveDetails?.[memberId]?.[date];
+    if (details?.entries && details.entries.length > 0) {
+      return details.entries[0].leave_type_color;
+    }
+    return '#3B82F6'; // Default primary blue
+  };
+
   const getMemberTotalHours = (memberId: string): number => {
     const memberLeave = leaveData[memberId] || {};
     // Only count hours within the visible date range
@@ -194,19 +203,16 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                           ${day.isNewMonth && idx > 0 ? 'border-l-2 border-primary/30' : ''}
                         `}
                       >
-                        {hasLeave ? (
+                      {hasLeave ? (
                           <HoverCard openDelay={100} closeDelay={50}>
                             <HoverCardTrigger asChild>
                               <div 
-                                className={`
-                                  w-7 h-6 mx-auto rounded flex items-center justify-center
-                                  text-sm font-bold cursor-default transition-transform leading-none
-                                  hover:scale-110 hover:shadow-md
-                                  ${fullDay 
-                                    ? 'bg-primary text-primary-foreground' 
-                                    : 'bg-primary/50 text-primary-foreground'
-                                  }
-                                `}
+                                className="w-7 h-6 mx-auto rounded flex items-center justify-center text-sm font-bold cursor-default transition-transform leading-none hover:scale-110 hover:shadow-md"
+                                style={{ 
+                                  backgroundColor: getLeaveTypeColor(member.id, day.date),
+                                  opacity: fullDay ? 1 : 0.5,
+                                  color: 'white'
+                                }}
                               >
                                 {hours}
                               </div>
@@ -218,8 +224,11 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                               sideOffset={8}
                               style={{ zIndex: 9999 }}
                             >
-                              <div className="bg-primary p-2.5">
-                                <div className="flex items-center gap-2 text-primary-foreground">
+                              <div 
+                                className="p-2.5"
+                                style={{ backgroundColor: getLeaveTypeColor(member.id, day.date) }}
+                              >
+                                <div className="flex items-center gap-2 text-white">
                                   <Calendar className="h-4 w-4" />
                                   <span className="font-semibold text-sm">{day.formattedDate}</span>
                                 </div>
@@ -304,14 +313,14 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
       </div>
       
       {/* Legend */}
-      <div className="flex items-center justify-center gap-4 mt-3 px-2 text-xs">
+      <div className="flex items-center justify-center gap-4 mt-3 px-2 text-xs flex-wrap">
         <div className="flex items-center gap-1.5">
-          <div className="w-3.5 h-3.5 rounded bg-primary" />
-          <span className="text-muted-foreground">Full Day (8h)</span>
+          <div className="w-3.5 h-3.5 rounded" style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6, #10B981)' }} />
+          <span className="text-muted-foreground">Full Day (Leave Type Color)</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3.5 h-3.5 rounded bg-primary/50" />
-          <span className="text-muted-foreground">Half Day (4h)</span>
+          <div className="w-3.5 h-3.5 rounded opacity-50" style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6, #10B981)' }} />
+          <span className="text-muted-foreground">Half Day (50% opacity)</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3.5 h-3.5 rounded bg-muted/50 border border-border" />
