@@ -44,11 +44,24 @@ export const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, selectedWe
     return !isWithinInterval(holidayDate, { start: weekStart, end: weekEnd });
   });
 
+  const formatDateRange = (startDate: string, endDate?: string) => {
+    const start = new Date(startDate);
+    if (!endDate) return format(start, 'MMM d');
+    
+    const end = new Date(endDate);
+    const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
+    
+    if (sameMonth) {
+      return `${format(start, 'MMM d')}-${format(end, 'd')}`;
+    }
+    return `${format(start, 'MMM d')} - ${format(end, 'MMM d')}`;
+  };
+
   const renderHoliday = (holiday: Holiday, index: number) => (
     <div key={`${holiday.id}-${index}`} className="flex items-center gap-1.5 text-sm">
       <span className="font-medium text-foreground truncate">{holiday.name}</span>
       <span className="text-xs text-muted-foreground whitespace-nowrap">
-        ({format(new Date(holiday.date), 'MMM d')}{holiday.end_date && ` - ${format(new Date(holiday.end_date), 'MMM d')}`})
+        ({formatDateRange(holiday.date, holiday.end_date)})
       </span>
     </div>
   );
