@@ -106,29 +106,16 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
         
         <div className="space-y-6">
           {/* Create new card type */}
-          <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
-            <h3 className="font-semibold">Create New Card Type</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="label">Label *</Label>
-                <Input
-                  id="label"
-                  value={formData.label}
-                  onChange={(e) => setFormData({ ...formData, label: e.target.value })}
-                  placeholder="e.g., WFH This Week"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="icon">Icon (emoji)</Label>
-                <Input
-                  id="icon"
-                  value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  placeholder="e.g., 🏠"
-                  maxLength={2}
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="label">Label *</Label>
+              <Input
+                id="label"
+                value={formData.label}
+                onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                placeholder="e.g., WFH This Week"
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label>Card Type</Label>
@@ -179,13 +166,6 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                   <span className="text-xs">Survey</span>
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {formData.display_type === 'list' && 'Add team members to this card each week'}
-                {formData.display_type === 'gallery' && 'Upload images to display in a gallery'}
-                {formData.display_type === 'pdf' && 'Upload and preview PDF documents'}
-                {formData.display_type === 'timeline' && 'Add important dates and events in a timeline view'}
-                {formData.display_type === 'survey' && 'Create polls, multiple choice, or rating surveys'}
-              </p>
             </div>
             
             {/* Survey Type Selection */}
@@ -208,16 +188,14 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
               </div>
             )}
             <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? 'Creating...' : 'Create Card Type'}
+              {createMutation.isPending ? 'Creating...' : 'Create Card'}
             </Button>
           </form>
 
-          {/* Existing card types */}
-          <div className="space-y-2">
-            <h3 className="font-semibold">Existing Card Types</h3>
-            {customCardTypes.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No custom card types yet</p>
-            ) : (
+          {/* Existing card types - only show if there are cards */}
+          {customCardTypes.length > 0 && (
+            <div className="space-y-2 pt-4 border-t">
+              <h3 className="font-semibold text-sm text-muted-foreground">Your Cards</h3>
               <div className="space-y-2">
                 {customCardTypes.map((cardType) => (
                   <div
@@ -297,8 +275,8 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                   </div>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
