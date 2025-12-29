@@ -1,7 +1,7 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TeamMember } from '@/components/dashboard/types';
-import { format, subWeeks, addWeeks, addMonths, eachDayOfInterval, getDay, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
+import { format, addDays, subDays, addMonths, eachDayOfInterval, getDay, startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from 'date-fns';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from 'lucide-react';
@@ -30,22 +30,28 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   const getDateRange = () => {
     switch (timeRange) {
       case 'week':
-        // Show just the current week (Monday to Sunday)
+        // Show current week with +3 and -3 days buffer
         return {
-          start: startOfWeek(today, { weekStartsOn: 1 }),
-          end: endOfWeek(today, { weekStartsOn: 1 })
+          start: subDays(startOfWeek(today, { weekStartsOn: 1 }), 3),
+          end: addDays(endOfWeek(today, { weekStartsOn: 1 }), 3)
         };
       case 'month':
-        // Show the entire selected month
+        // Show the entire current month with +3 and -3 days buffer
         return {
-          start: startOfMonth(selectedMonth),
-          end: endOfMonth(selectedMonth)
+          start: subDays(startOfMonth(today), 3),
+          end: addDays(endOfMonth(today), 3)
         };
-      case 'next-month':
-        // Show current month through end of next month
+      case 'quarter':
+        // Show the entire current quarter
         return {
-          start: startOfMonth(today),
-          end: endOfMonth(addMonths(today, 1))
+          start: startOfQuarter(today),
+          end: endOfQuarter(today)
+        };
+      case 'year':
+        // Show the entire current year
+        return {
+          start: startOfYear(today),
+          end: endOfYear(today)
         };
       default:
         return {
