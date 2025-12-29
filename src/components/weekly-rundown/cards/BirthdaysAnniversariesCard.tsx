@@ -112,7 +112,7 @@ export const BirthdaysAnniversariesCard: React.FC<BirthdaysAnniversariesCardProp
         🎉
       </span>
       
-      <CardHeader className="flex-shrink-0 pb-2 h-[44px] flex items-start pt-4">
+      <CardHeader className="flex-shrink-0 pb-1 h-[40px] flex items-start pt-3">
         <CardTitle className="flex items-center justify-between w-full text-xs font-semibold text-foreground uppercase tracking-wide">
           <span>Celebrations</span>
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
@@ -120,7 +120,7 @@ export const BirthdaysAnniversariesCard: React.FC<BirthdaysAnniversariesCardProp
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 flex-1 overflow-y-auto scrollbar-grey relative z-10">
+      <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10">
         {celebrations.length === 0 ? (
           <p className="text-sm text-muted-foreground">No celebrations this week</p>
         ) : (

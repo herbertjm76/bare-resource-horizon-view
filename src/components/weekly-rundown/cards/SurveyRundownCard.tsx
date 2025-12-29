@@ -168,7 +168,7 @@ export const SurveyRundownCard: React.FC<SurveyRundownCardProps> = ({
         {cardType.icon || '📊'}
       </span>
       
-      <CardHeader className="flex-shrink-0 pb-2 h-[44px] flex items-start pt-4">
+      <CardHeader className="flex-shrink-0 pb-1 h-[40px] flex items-start pt-3">
         <CardTitle className="flex items-center justify-between w-full text-xs font-semibold text-foreground uppercase tracking-wide">
           <span>{cardType.label}</span>
           <div className="flex items-center gap-1">
@@ -177,7 +177,7 @@ export const SurveyRundownCard: React.FC<SurveyRundownCardProps> = ({
             </Badge>
             <Dialog open={isSetupOpen} onOpenChange={setIsSetupOpen}>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-5 w-5">
+                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={(e) => e.stopPropagation()}>
                   <Settings className="h-3 w-3" />
                 </Button>
               </DialogTrigger>
@@ -221,7 +221,7 @@ export const SurveyRundownCard: React.FC<SurveyRundownCardProps> = ({
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-2 flex-1 overflow-y-auto scrollbar-grey relative z-10">
+      <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10">
         {surveyType === 'rating' ? (
           <div className="space-y-2">
             <div className="flex items-center gap-1 justify-center">

@@ -139,12 +139,12 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
       {/* Background watermark icon */}
       <UserCheck className="absolute -right-4 -bottom-4 h-24 w-24 text-muted-foreground/5 pointer-events-none" />
       
-      <CardHeader className="flex-shrink-0 pb-2 h-[44px] flex items-start pt-4">
+      <CardHeader className="flex-shrink-0 pb-1 h-[40px] flex items-start pt-3">
         <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">
           Available This Week
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 flex-1 overflow-x-auto scrollbar-grey relative z-10">
+      <CardContent className="flex-1 overflow-x-auto scrollbar-grey relative z-10">
         {availableMembers.length === 0 ? (
           <p className="text-sm text-muted-foreground">All team members fully allocated</p>
         ) : (
