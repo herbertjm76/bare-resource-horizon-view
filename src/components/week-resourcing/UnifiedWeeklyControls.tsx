@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
 import { useWeeklyFilterOptions } from '@/components/week-resourcing/hooks/useWeeklyFilterOptions';
 import { 
@@ -194,95 +195,140 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
         <div className="flex gap-2 items-center ml-auto overflow-x-auto">
           {/* View Type Toggle */}
           <div className="flex rounded-lg border p-1 bg-muted">
-            <Button
-              variant={viewType === 'table' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onViewTypeChange('table')}
-              className={`flex items-center h-7 px-2 ${viewType === 'table' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-            >
-              <TableIcon className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant={viewType === 'grid' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onViewTypeChange('grid')}
-              className={`flex items-center h-7 px-2 ${viewType === 'grid' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-            >
-              <LayoutGrid className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant={viewType === 'carousel' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onViewTypeChange('carousel')}
-              className={`flex items-center h-7 px-2 ${viewType === 'carousel' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-            >
-              <Presentation className="h-3.5 w-3.5" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={viewType === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => onViewTypeChange('table')}
+                  className={`flex items-center h-7 px-2 ${viewType === 'table' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                >
+                  <TableIcon className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Table View</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={viewType === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => onViewTypeChange('grid')}
+                  className={`flex items-center h-7 px-2 ${viewType === 'grid' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                >
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Grid View</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={viewType === 'carousel' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => onViewTypeChange('carousel')}
+                  className={`flex items-center h-7 px-2 ${viewType === 'carousel' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                >
+                  <Presentation className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Carousel View</TooltipContent>
+            </Tooltip>
           </div>
 
           {/* People/Projects Toggle - Grid & Carousel only */}
           {showPeopleProjectToggle && rundownMode && onModeChange && (
             <div className="flex rounded-lg border p-1 bg-muted">
-              <Button
-                variant={rundownMode === 'people' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onModeChange('people')}
-                className={`flex items-center h-7 px-2 ${rundownMode === 'people' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-              >
-                <Users className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant={rundownMode === 'projects' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onModeChange('projects')}
-                className={`flex items-center h-7 px-2 ${rundownMode === 'projects' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-              >
-                <FolderOpen className="h-3.5 w-3.5" />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={rundownMode === 'people' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onModeChange('people')}
+                    className={`flex items-center h-7 px-2 ${rundownMode === 'people' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                  >
+                    <Users className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>View by People</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={rundownMode === 'projects' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onModeChange('projects')}
+                    className={`flex items-center h-7 px-2 ${rundownMode === 'projects' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                  >
+                    <FolderOpen className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>View by Projects</TooltipContent>
+              </Tooltip>
             </div>
           )}
 
           {/* Table Orientation Toggle - Only for table view */}
           {showTableOrientation && onTableOrientationChange && tableOrientation && (
             <div className="flex rounded-lg border p-1 bg-muted">
-              <Button
-                variant={tableOrientation === 'per-person' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onTableOrientationChange('per-person')}
-                className={`flex items-center h-7 px-2 ${tableOrientation === 'per-person' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-              >
-                <Users className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant={tableOrientation === 'per-project' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onTableOrientationChange('per-project')}
-                className={`flex items-center h-7 px-2 ${tableOrientation === 'per-project' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-              >
-                <FolderOpen className="h-3.5 w-3.5" />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={tableOrientation === 'per-person' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onTableOrientationChange('per-person')}
+                    className={`flex items-center h-7 px-2 ${tableOrientation === 'per-person' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                  >
+                    <Users className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Group by Person</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={tableOrientation === 'per-project' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onTableOrientationChange('per-project')}
+                    className={`flex items-center h-7 px-2 ${tableOrientation === 'per-project' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                  >
+                    <FolderOpen className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Group by Project</TooltipContent>
+              </Tooltip>
             </div>
           )}
 
           {/* Compact/Expanded Toggle - Table only */}
           {showCompactExpanded && viewMode && onViewModeChange && (
             <div className="flex rounded-lg border p-1 bg-muted">
-              <Button
-                variant={viewMode === 'compact' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onViewModeChange('compact')}
-                className={`flex items-center h-7 px-2 ${viewMode === 'compact' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-              >
-                <Minimize2 className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant={viewMode === 'expanded' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onViewModeChange('expanded')}
-                className={`flex items-center h-7 px-2 ${viewMode === 'expanded' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
-              >
-                <Expand className="h-3.5 w-3.5" />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={viewMode === 'compact' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onViewModeChange('compact')}
+                    className={`flex items-center h-7 px-2 ${viewMode === 'compact' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                  >
+                    <Minimize2 className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Compact View</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={viewMode === 'expanded' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onViewModeChange('expanded')}
+                    className={`flex items-center h-7 px-2 ${viewMode === 'expanded' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
+                  >
+                    <Expand className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Expanded View</TooltipContent>
+              </Tooltip>
             </div>
           )}
 
@@ -303,18 +349,23 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
 
           {/* Auto-advance - Carousel only */}
           {showAutoAdvance && isAutoAdvance !== undefined && onAutoAdvanceToggle && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onAutoAdvanceToggle}
-              className="h-7 px-2"
-            >
-              {isAutoAdvance ? (
-                <PauseCircle className="h-3.5 w-3.5" />
-              ) : (
-                <PlayCircle className="h-3.5 w-3.5" />
-              )}
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onAutoAdvanceToggle}
+                  className="h-7 px-2"
+                >
+                  {isAutoAdvance ? (
+                    <PauseCircle className="h-3.5 w-3.5" />
+                  ) : (
+                    <PlayCircle className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{isAutoAdvance ? 'Pause Auto-Advance' : 'Start Auto-Advance'}</TooltipContent>
+            </Tooltip>
           )}
 
           {/* Fullscreen - Hidden on mobile */}
@@ -322,18 +373,23 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
             window.innerWidth >= 768 &&
             isFullscreen !== undefined &&
             onFullscreenToggle && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onFullscreenToggle}
-                className="h-7 px-2"
-              >
-                {isFullscreen ? (
-                  <Minimize className="h-3.5 w-3.5" />
-                ) : (
-                  <Maximize className="h-3.5 w-3.5" />
-                )}
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onFullscreenToggle}
+                    className="h-7 px-2"
+                  >
+                    {isFullscreen ? (
+                      <Minimize className="h-3.5 w-3.5" />
+                    ) : (
+                      <Maximize className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}</TooltipContent>
+              </Tooltip>
             )}
         </div>
         </div>
@@ -440,30 +496,40 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
 
         {/* Clear Filters */}
         {activeFiltersCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearFilters}
-            className="h-8 w-8 p-0 shrink-0"
-          >
-            <X className="h-3.5 w-3.5" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="h-8 w-8 p-0 shrink-0"
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Clear Filters</TooltipContent>
+          </Tooltip>
         )}
 
         {/* Search Icon Button */}
         <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-          <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className={`h-8 w-8 p-0 shrink-0 relative ${filters.searchTerm ? 'ring-2 ring-primary' : ''}`}
-            >
-              <Search className="h-3.5 w-3.5" />
-              {filters.searchTerm && (
-                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 bg-primary rounded-full" />
-              )}
-            </Button>
-          </PopoverTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className={`h-8 w-8 p-0 shrink-0 relative ${filters.searchTerm ? 'ring-2 ring-primary' : ''}`}
+                >
+                  <Search className="h-3.5 w-3.5" />
+                  {filters.searchTerm && (
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 bg-primary rounded-full" />
+                  )}
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>Search</TooltipContent>
+          </Tooltip>
           <PopoverContent className="w-80 p-4 bg-background z-50" align="end">
             <div className="space-y-2">
               <h4 className="font-medium text-sm">Search Members</h4>
