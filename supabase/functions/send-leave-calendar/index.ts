@@ -84,15 +84,18 @@ function generateICSFile(
   leaveRequests: LeaveRequest[],
   holidays: Holiday[],
   companyId: string,
-  companyName: string
+  companyName: string,
+  recipientEmail: string,
+  organizerEmail: string
 ): string {
   const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
   
+  // Use METHOD:REQUEST for native calendar invite behavior
   let icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//StaffIn//Leave Calendar//EN
 CALSCALE:GREGORIAN
-METHOD:PUBLISH
+METHOD:REQUEST
 X-WR-CALNAME:${companyName} Leave Calendar
 X-WR-TIMEZONE:UTC
 `;
@@ -103,6 +106,10 @@ X-WR-TIMEZONE:UTC
     const uid = generateLeaveUID(leave);
     const summary = `${memberName} - ${leave.leave_type.name}`;
     const description = leave.remarks ? `Remarks: ${leave.remarks}` : '';
+    
+    // Common organizer/attendee lines for calendar invite behavior
+    const organizerLine = `ORGANIZER;CN=StaffIn:mailto:${organizerEmail}`;
+    const attendeeLine = `ATTENDEE;RSVP=FALSE;PARTSTAT=ACCEPTED;CN=${recipientEmail}:mailto:${recipientEmail}`;
     
     if (leave.duration_type === 'full_day') {
       // All-day event(s)
@@ -116,8 +123,11 @@ DTSTART;VALUE=DATE:${startDate}
 DTEND;VALUE=DATE:${endDate}
 SUMMARY:${summary}
 DESCRIPTION:${description}
+${organizerLine}
+${attendeeLine}
 STATUS:CONFIRMED
 TRANSP:OPAQUE
+SEQUENCE:0
 END:VEVENT
 `;
     } else {
@@ -133,8 +143,11 @@ DTSTART:${date}T${startTime}
 DTEND:${date}T${endTime}
 SUMMARY:${summary} (${leave.duration_type === 'half_day_am' ? 'AM' : 'PM'})
 DESCRIPTION:${description}
+${organizerLine}
+${attendeeLine}
 STATUS:CONFIRMED
 TRANSP:OPAQUE
+SEQUENCE:0
 END:VEVENT
 `;
     }
@@ -150,6 +163,10 @@ END:VEVENT
     const endDateStr = holiday.end_date || holiday.date;
     const endDate = formatICSDate(addOneDay(endDateStr));
     
+    // Common organizer/attendee lines for calendar invite behavior
+    const organizerLine = `ORGANIZER;CN=StaffIn:mailto:${organizerEmail}`;
+    const attendeeLine = `ATTENDEE;RSVP=FALSE;PARTSTAT=ACCEPTED;CN=${recipientEmail}:mailto:${recipientEmail}`;
+    
     icsContent += `BEGIN:VEVENT
 UID:${uid}
 DTSTAMP:${now}
@@ -157,8 +174,11 @@ DTSTART;VALUE=DATE:${startDate}
 DTEND;VALUE=DATE:${endDate}
 SUMMARY:${summary}
 DESCRIPTION:Office Holiday
+${organizerLine}
+${attendeeLine}
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
+SEQUENCE:0
 END:VEVENT
 `;
   }
@@ -308,8 +328,11 @@ const handler = async (req: Request): Promise<Response> => {
       console.log(`Found ${holidays.length} holidays`);
     }
 
-    // Generate ICS file
-    const icsContent = generateICSFile(leaveRequests, holidays, companyId, companyName);
+    // Organizer email for calendar invites
+    const organizerEmail = 'invites@bareresource.com';
+    
+    // Generate ICS file with METHOD:REQUEST for native calendar invite behavior
+    const icsContent = generateICSFile(leaveRequests, holidays, companyId, companyName, recipientEmail, organizerEmail);
 
     // If download only, return the ICS content
     if (downloadOnly) {
@@ -338,7 +361,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">📅 ${companyName} Leave Calendar</h2>
-        <p>Attached is the calendar file containing:</p>
+        <p>This calendar invite contains:</p>
         <ul>
           ${includeLeaves ? `<li><strong>${leaveCount}</strong> approved leave request${leaveCount !== 1 ? 's' : ''}</li>` : ''}
           ${includeHolidays ? `<li><strong>${holidayCount}</strong> office holiday${holidayCount !== 1 ? 's' : ''}</li>` : ''}
@@ -346,29 +369,33 @@ const handler = async (req: Request): Promise<Response> => {
         <p><strong>Total events:</strong> ${totalEvents}</p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
         <p style="color: #666; font-size: 14px;">
-          To add these events to your calendar, download the attached .ics file and open it with your calendar application (Outlook, Google Calendar, Apple Calendar, etc.).
+          These events should automatically appear in your calendar. If not, you can also open the attached .ics file.
         </p>
         <p style="color: #666; font-size: 14px;">
-          If you've imported previous calendar files, the events will be updated (not duplicated) thanks to unique event IDs.
+          Events are uniquely identified, so updates won't create duplicates.
         </p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
         <p style="color: #999; font-size: 12px;">Sent from StaffIn</p>
       </div>
     `;
 
+    // Send as calendar invite using text/calendar content type for native calendar behavior
     const { error: emailError } = await resend.emails.send({
-      // IMPORTANT: Resend will only send to non-owned recipients when the sender domain is verified.
-      // Use your verified domain here (see https://resend.com/domains).
       from: "StaffIn <invites@bareresource.com>",
       to: [recipientEmail],
       subject: `${companyName} Leave Calendar - ${totalEvents} Event${totalEvents !== 1 ? 's' : ''}`,
       html: emailHtml,
       attachments: [
         {
+          // Use text/calendar content type with method=REQUEST for native calendar invite
           filename: `${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_leave_calendar.ics`,
           content: base64Encode(new TextEncoder().encode(icsContent)),
+          content_type: 'text/calendar; charset=utf-8; method=REQUEST',
         },
       ],
+      headers: {
+        'Content-Class': 'urn:content-classes:calendarmessage',
+      },
     });
 
     if (emailError) {
