@@ -85,7 +85,7 @@ export const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, selectedWe
               </div>
             )}
             {thisWeekHolidays.length > 0 && upcomingHolidays.length > 0 && (
-              <div className="border-t border-border/50 my-1" />
+              <div className="border-t border-foreground/20 my-1" />
             )}
             {upcomingHolidays.length > 0 && (
               <div>
