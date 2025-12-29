@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, X, FileText, Loader2, ExternalLink } from 'lucide-react';
+import { Plus, X, FileText, Loader2, ExternalLink, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -26,7 +26,8 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [previewPdf, setPreviewPdf] = useState<{ url: string; name: string } | null>(null);
+  const [isManageOpen, setIsManageOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const { data: files = [], refetch } = useQuery({
     queryKey: ['custom-card-files', cardType.id, weekStartDate],
@@ -44,6 +45,13 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
     },
     enabled: !!company?.id
   });
+
+  // Reset index when files change
+  useEffect(() => {
+    if (currentIndex >= files.length) {
+      setCurrentIndex(Math.max(0, files.length - 1));
+    }
+  }, [files.length, currentIndex]);
 
   const deleteMutation = useMutation({
     mutationFn: async (fileId: string) => {
@@ -119,77 +127,90 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
     }
   };
 
-  const firstPdf = files[0];
+  const currentPdf = files[currentIndex];
+
+  const goToPrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev === 0 ? files.length - 1 : prev - 1));
+  };
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev === files.length - 1 ? 0 : prev + 1));
+  };
 
   return (
     <>
-      <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 min-w-[180px] relative overflow-hidden">
-        {/* If there's a PDF, show it as full card with icon */}
-        {firstPdf ? (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5">
-            {/* PDF icon background */}
-            <FileText className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-16 w-16 text-primary/20" />
+      <Card 
+        className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 min-w-[180px] relative overflow-hidden cursor-pointer group"
+        onClick={() => setIsManageOpen(true)}
+      >
+        {currentPdf ? (
+          // Full bleed PDF preview using iframe
+          <div className="absolute inset-0">
+            <iframe 
+              src={`${currentPdf.file_url}#page=1&view=FitH&toolbar=0&navpanes=0`}
+              className="w-full h-full pointer-events-none"
+              title={currentPdf.file_name}
+              style={{ border: 'none' }}
+            />
             
-            {/* Overlay with label and count */}
-            <div className="absolute inset-0 flex flex-col">
-              <div className="flex items-center justify-between p-2">
-                <span className="text-xs font-semibold text-foreground uppercase tracking-wide">{cardType.label}</span>
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-                  {files.length}
-                </Badge>
-              </div>
-              
-              {/* PDF filename - centered */}
-              <div className="flex-1 flex items-center justify-center px-3">
-                <p className="text-sm font-medium text-foreground text-center truncate max-w-full">
-                  {firstPdf.file_name}
-                </p>
-              </div>
-              
-              {/* Action buttons */}
-              <div className="flex items-center justify-end gap-1 p-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="application/pdf"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    fileInputRef.current?.click();
-                  }}
-                  disabled={isUploading}
-                >
-                  {isUploading ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Plus className="h-3 w-3" />
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteMutation.mutate(firstPdf.id);
-                  }}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
+            {/* Overlay gradient for readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
+            
+            {/* Label at top */}
+            <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-2">
+              <span className="text-xs font-semibold text-white uppercase tracking-wide drop-shadow-lg">
+                {cardType.label}
+              </span>
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-white/20 text-white border-0">
+                {files.length}
+              </Badge>
             </div>
+            
+            {/* Navigation arrows */}
+            {files.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-1 top-1/2 -translate-y-1/2 h-6 w-6 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={goToPrev}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={goToNext}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+            
+            {/* Dots indicator */}
+            {files.length > 1 && (
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                {files.map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                      idx === currentIndex ? 'bg-white' : 'bg-white/40'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         ) : (
-          // Empty state - no PDFs yet
+          // Empty state
           <div className="flex flex-col items-center justify-center h-full p-4">
             <FileText className="h-8 w-8 text-muted-foreground/30 mb-2" />
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{cardType.label}</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              {cardType.label}
+            </span>
             <input
               ref={fileInputRef}
               type="file"
@@ -218,29 +239,74 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
         )}
       </Card>
 
-      {/* PDF Preview Dialog */}
-      <Dialog open={!!previewPdf} onOpenChange={() => setPreviewPdf(null)}>
-        <DialogContent className="max-w-4xl h-[85vh]">
+      {/* Manage PDFs Dialog */}
+      <Dialog open={isManageOpen} onOpenChange={setIsManageOpen}>
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
-              <span className="truncate pr-4">{previewPdf?.name}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open(previewPdf?.url, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4 mr-1" />
-                Open
-              </Button>
+              <span>Manage {cardType.label}</span>
+              <div className="flex items-center gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                  ) : (
+                    <Plus className="h-4 w-4 mr-1" />
+                  )}
+                  Add PDF
+                </Button>
+              </div>
             </DialogTitle>
           </DialogHeader>
-          {previewPdf && (
-            <iframe 
-              src={previewPdf.url}
-              className="w-full flex-1 rounded-lg border"
-              title={previewPdf.name}
-            />
-          )}
+          
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+            {files.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No PDFs uploaded yet</p>
+            ) : (
+              files.map((file) => (
+                <div 
+                  key={file.id} 
+                  className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50"
+                >
+                  <FileText className="h-8 w-8 text-primary flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{file.file_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {file.file_size ? `${(file.file_size / 1024).toFixed(1)} KB` : 'Unknown size'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(file.file_url, '_blank')}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
+                      onClick={() => deleteMutation.mutate(file.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </>
