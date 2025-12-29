@@ -364,8 +364,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   // Handle card click to open detail dialog
   const handleCardClick = (cardId: string) => {
-    // Don't open dialog for weekInfo
-    if (cardId === 'weekInfo') return;
+    // Don't open dialog for weekInfo or custom cards (they have their own dialogs)
+    if (cardId === 'weekInfo' || cardId.startsWith('custom_')) return;
     setSelectedCardType(cardId);
     setDetailDialogOpen(true);
   };
