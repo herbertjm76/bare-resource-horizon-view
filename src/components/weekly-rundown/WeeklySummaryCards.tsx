@@ -364,8 +364,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   // Handle card click to open detail dialog
   const handleCardClick = (cardId: string) => {
-    // Don't open dialog for weekInfo or custom cards
-    if (cardId === 'weekInfo' || cardId.startsWith('custom_')) return;
+    // Don't open dialog for weekInfo
+    if (cardId === 'weekInfo') return;
     setSelectedCardType(cardId);
     setDetailDialogOpen(true);
   };
@@ -453,7 +453,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           {/* Card Display - Swipeable */}
           <div className="px-12 py-0.5 touch-pan-y">
             <div 
-              className={`relative h-[120px] animate-fade-in ${currentCard?.id !== 'weekInfo' && !currentCard?.id?.startsWith('custom_') ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
+              className={`relative h-[120px] animate-fade-in ${currentCard?.id !== 'weekInfo' ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
               key={currentCard?.id}
               onClick={() => currentCard && handleCardClick(currentCard.id)}
             >
@@ -498,7 +498,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
             {cards.map((card) => (
               <div 
                 key={card.id} 
-                className={`${card.id === 'weekInfo' ? 'flex-shrink-0' : 'flex-1 min-w-[180px]'} ${card.id !== 'weekInfo' && !card.id.startsWith('custom_') ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
+                className={`${card.id === 'weekInfo' ? 'flex-shrink-0' : 'flex-1 min-w-[180px]'} ${card.id !== 'weekInfo' ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
                 onClick={(e) => {
                   if (shouldPreventClick()) {
                     e.preventDefault();

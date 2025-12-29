@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -121,53 +121,71 @@ export const GalleryRundownCard: React.FC<GalleryRundownCardProps> = ({
     }
   };
 
+  const firstImage = files[0];
+
   return (
     <>
       <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 min-w-[180px] relative overflow-hidden">
-        <span className="absolute -right-2 -bottom-2 text-[80px] text-muted-foreground/5 pointer-events-none leading-none">
-          {cardType.icon || '🖼️'}
-        </span>
-        
-        <CardHeader className="flex-shrink-0 pb-2 h-[44px] flex items-start pt-4">
-          <CardTitle className="flex items-center justify-between w-full text-xs font-semibold text-foreground uppercase tracking-wide">
-            <span>{cardType.label}</span>
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-              {files.length}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-4 flex-1 overflow-y-auto scrollbar-grey relative z-10">
-          <div className="flex flex-wrap gap-2">
-            {files.slice(0, 4).map((file) => (
-              <div 
-                key={file.id} 
-                className="relative w-10 h-10 rounded overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all"
-                onClick={() => setPreviewImage(file.file_url)}
-              >
-                <img 
-                  src={file.file_url} 
-                  alt={file.file_name}
-                  className="w-full h-full object-cover"
+        {/* If there's an image, show it full card */}
+        {firstImage ? (
+          <div className="absolute inset-0">
+            <img 
+              src={firstImage.file_url} 
+              alt={firstImage.file_name}
+              className="w-full h-full object-cover"
+            />
+            {/* Overlay with label and count */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30">
+              <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
+                <span className="text-xs font-semibold text-white uppercase tracking-wide drop-shadow-md">{cardType.label}</span>
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-white/20 text-white border-0">
+                  {files.length}
+                </Badge>
+              </div>
+              {/* Action buttons */}
+              <div className="absolute bottom-2 right-2 flex gap-1">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
                 />
                 <Button
-                  variant="ghost"
+                  variant="secondary"
                   size="icon"
-                  className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="h-7 w-7 bg-white/20 hover:bg-white/40 text-white border-0"
                   onClick={(e) => {
                     e.stopPropagation();
-                    deleteMutation.mutate(file.id);
+                    fileInputRef.current?.click();
+                  }}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Plus className="h-3 w-3" />
+                  )}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-7 w-7 bg-white/20 hover:bg-destructive text-white border-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteMutation.mutate(firstImage.id);
                   }}
                 >
                   <X className="h-3 w-3" />
                 </Button>
               </div>
-            ))}
-            {files.length > 4 && (
-              <div className="w-10 h-10 rounded bg-muted flex items-center justify-center text-xs font-medium">
-                +{files.length - 4}
-              </div>
-            )}
-            
+            </div>
+          </div>
+        ) : (
+          // Empty state - no images yet
+          <div className="flex flex-col items-center justify-center h-full p-4">
+            <ImageIcon className="h-8 w-8 text-muted-foreground/30 mb-2" />
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{cardType.label}</span>
             <input
               ref={fileInputRef}
               type="file"
@@ -178,18 +196,22 @@ export const GalleryRundownCard: React.FC<GalleryRundownCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              className="h-10 w-10 rounded flex items-center justify-center"
-              onClick={() => fileInputRef.current?.click()}
+              className="h-7 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
               disabled={isUploading}
             >
               {isUploading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-3 w-3 animate-spin mr-1" />
               ) : (
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3 w-3 mr-1" />
               )}
+              Add Image
             </Button>
           </div>
-        </CardContent>
+        )}
       </Card>
 
       {/* Image Preview Dialog */}

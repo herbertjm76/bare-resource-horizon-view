@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -119,55 +119,77 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
     }
   };
 
-  const formatFileSize = (bytes: number | null) => {
-    if (!bytes) return '';
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
+  const firstPdf = files[0];
 
   return (
     <>
       <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 min-w-[180px] relative overflow-hidden">
-        <span className="absolute -right-2 -bottom-2 text-[80px] text-muted-foreground/5 pointer-events-none leading-none">
-          {cardType.icon || '📄'}
-        </span>
-        
-        <CardHeader className="flex-shrink-0 pb-2 h-[44px] flex items-start pt-4">
-          <CardTitle className="flex items-center justify-between w-full text-xs font-semibold text-foreground uppercase tracking-wide">
-            <span>{cardType.label}</span>
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-              {files.length}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-4 flex-1 overflow-y-auto scrollbar-grey relative z-10">
-          <div className="space-y-1">
-            {files.slice(0, 2).map((file) => (
-              <div 
-                key={file.id} 
-                className="flex items-center gap-2 p-1.5 rounded bg-muted/50 hover:bg-muted cursor-pointer transition-colors group"
-                onClick={() => setPreviewPdf({ url: file.file_url, name: file.file_name })}
-              >
-                <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="text-xs truncate flex-1">{file.file_name}</span>
+        {/* If there's a PDF, show it as full card with icon */}
+        {firstPdf ? (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5">
+            {/* PDF icon background */}
+            <FileText className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-16 w-16 text-primary/20" />
+            
+            {/* Overlay with label and count */}
+            <div className="absolute inset-0 flex flex-col">
+              <div className="flex items-center justify-between p-2">
+                <span className="text-xs font-semibold text-foreground uppercase tracking-wide">{cardType.label}</span>
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                  {files.length}
+                </Badge>
+              </div>
+              
+              {/* PDF filename - centered */}
+              <div className="flex-1 flex items-center justify-center px-3">
+                <p className="text-sm font-medium text-foreground text-center truncate max-w-full">
+                  {firstPdf.file_name}
+                </p>
+              </div>
+              
+              {/* Action buttons */}
+              <div className="flex items-center justify-end gap-1 p-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
-                  className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-7 w-7"
                   onClick={(e) => {
                     e.stopPropagation();
-                    deleteMutation.mutate(file.id);
+                    fileInputRef.current?.click();
+                  }}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Plus className="h-3 w-3" />
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteMutation.mutate(firstPdf.id);
                   }}
                 >
                   <X className="h-3 w-3" />
                 </Button>
               </div>
-            ))}
-            {files.length > 2 && (
-              <p className="text-xs text-muted-foreground">+{files.length - 2} more</p>
-            )}
-            
+            </div>
+          </div>
+        ) : (
+          // Empty state - no PDFs yet
+          <div className="flex flex-col items-center justify-center h-full p-4">
+            <FileText className="h-8 w-8 text-muted-foreground/30 mb-2" />
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{cardType.label}</span>
             <input
               ref={fileInputRef}
               type="file"
@@ -178,8 +200,11 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 w-full text-xs"
-              onClick={() => fileInputRef.current?.click()}
+              className="h-7 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
               disabled={isUploading}
             >
               {isUploading ? (
@@ -190,7 +215,7 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
               Add PDF
             </Button>
           </div>
-        </CardContent>
+        )}
       </Card>
 
       {/* PDF Preview Dialog */}
