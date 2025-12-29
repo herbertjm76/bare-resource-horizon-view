@@ -2,6 +2,7 @@ import React from 'react';
 import { MonthSelector, TimeRange } from './MonthSelector';
 import { TeamAnnualLeaveFilters } from './TeamAnnualLeaveFilters';
 import { LeaveCalendar } from './LeaveCalendar';
+import { LeaveLegend } from './LeaveLegend';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 import { LeaveDataByDate } from '@/hooks/useAnnualLeave';
@@ -53,6 +54,8 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
           clearFilters={clearFilters}
         />
       </div>
+
+      <LeaveLegend />
       
       <div className="border rounded-lg bg-card shadow-sm">
         {filteredMembers.length === 0 && isLoading ? (
