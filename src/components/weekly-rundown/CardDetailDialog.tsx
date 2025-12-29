@@ -132,10 +132,7 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
           <div className="space-y-4">
             {thisWeekHolidays.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">This Week</h4>
-                <div className="space-y-2">
-                  {thisWeekHolidays.map(renderHolidayItem)}
-                </div>
+                {thisWeekHolidays.map(renderHolidayItem)}
               </div>
             )}
             {upcomingHolidays.length > 0 && (

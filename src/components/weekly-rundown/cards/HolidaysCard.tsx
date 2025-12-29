@@ -68,7 +68,6 @@ export const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, selectedWe
           <div className="space-y-2">
             {thisWeekHolidays.length > 0 && (
               <div className="space-y-0.5">
-                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">This Week</span>
                 {thisWeekHolidays.map(renderHoliday)}
               </div>
             )}

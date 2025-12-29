@@ -120,8 +120,8 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
     staleTime: 2 * 60 * 1000,
   });
 
-  // Fetch holidays for summary cards - this week + upcoming (next 30 days)
-  const upcomingEndDate = format(addDays(weekEnd, 30), 'yyyy-MM-dd');
+  // Fetch holidays for summary cards - this week + upcoming (next 3 months)
+  const upcomingEndDate = format(addDays(weekEnd, 90), 'yyyy-MM-dd');
   
   const { data: holidays = [] } = useQuery({
     queryKey: ['weekly-summary-holidays', weekStartString, upcomingEndDate, company?.id],
