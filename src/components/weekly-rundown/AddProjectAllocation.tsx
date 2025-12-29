@@ -63,7 +63,7 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
   const [newProjectCountry, setNewProjectCountry] = useState('');
   const { company } = useCompany();
   const queryClient = useQueryClient();
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
 
   // Fetch available projects
   const { data: projects = [] } = useQuery({
@@ -185,15 +185,22 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
   };
 
   const handleAdd = () => {
-    const allocationHours = parseFloat(hours);
+    const inputValue = parseFloat(hours);
     if (!selectedProjectId) {
       toast.error('Please select a project');
       return;
     }
-    if (isNaN(allocationHours) || allocationHours <= 0) {
-      toast.error('Please enter valid hours');
+    if (isNaN(inputValue) || inputValue <= 0) {
+      toast.error(`Please enter a valid ${displayPreference === 'percentage' ? 'percentage' : 'hours'}`);
       return;
     }
+    
+    // Convert percentage to hours if needed
+    const capacity = workWeekHours || 40;
+    const allocationHours = displayPreference === 'percentage' 
+      ? (inputValue / 100) * capacity 
+      : inputValue;
+    
     addMutation.mutate({ projectId: selectedProjectId, allocationHours });
   };
 
@@ -283,15 +290,18 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
                 <Separator />
 
                 <div className="space-y-2">
-                  <Label htmlFor="hours">Hours</Label>
+                  <Label htmlFor="hours">
+                    {displayPreference === 'percentage' ? 'Percentage' : 'Hours'}
+                  </Label>
                   <Input
                     id="hours"
                     type="number"
                     value={hours}
                     onChange={(e) => setHours(e.target.value)}
-                    placeholder="Enter hours"
-                    step="0.5"
+                    placeholder={displayPreference === 'percentage' ? 'Enter percentage (e.g. 50)' : 'Enter hours'}
+                    step={displayPreference === 'percentage' ? '5' : '0.5'}
                     min="0"
+                    max={displayPreference === 'percentage' ? '100' : undefined}
                   />
                 </div>
               </>
