@@ -7,8 +7,6 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
 import { HolidaysCard } from './cards/HolidaysCard';
 import { LeaveCard } from './cards/LeaveCard';
-import { OtherLeaveCard } from './cards/OtherLeaveCard';
-import { NotesCard } from './cards/NotesCard';
 import { AnnouncementsCard } from './cards/AnnouncementsCard';
 import { CustomRundownCard } from './cards/CustomRundownCard';
 import { WeekInfoCard } from './cards/WeekInfoCard';
@@ -201,18 +199,6 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       component: <LeaveCard key="annualLeave" leaves={annualLeaves} />,
       isVisible: cardVisibility.annualLeave 
     });
-    
-    allCards.push({ 
-      id: 'otherLeave', 
-      component: <OtherLeaveCard key="otherLeave" leaves={otherLeaves} />,
-      isVisible: cardVisibility.otherLeave 
-    });
-    
-    allCards.push({ 
-      id: 'notes', 
-      component: <NotesCard key="notes" notes={weeklyNotes} weekStartDate={weekStartString} />,
-      isVisible: cardVisibility.notes 
-    });
 
     // Add custom cards
     customCardTypes.forEach(cardType => {
@@ -354,8 +340,6 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     if (cardId === 'announcements') return 'Announcements';
     if (cardId === 'holidays') return 'Holidays';
     if (cardId === 'annualLeave') return 'Annual Leave';
-    if (cardId === 'otherLeave') return 'Other Leave';
-    if (cardId === 'notes') return 'Notes';
     if (cardId.startsWith('custom_')) {
       const customCard = customCardTypes.find(c => `custom_${c.id}` === cardId);
       return customCard?.label || 'Custom Card';
@@ -382,8 +366,6 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     switch (selectedCardType) {
       case 'holidays': return holidays;
       case 'annualLeave': return annualLeaves;
-      case 'otherLeave': return otherLeaves;
-      case 'notes': return weeklyNotes;
       default: return null;
     }
   };
