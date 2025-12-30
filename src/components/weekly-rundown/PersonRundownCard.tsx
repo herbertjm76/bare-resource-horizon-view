@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MapPin, Clock, AlertTriangle, CheckCircle, Calendar, TrendingUp } from 'lucide-react';
+import { MapPin, Clock, AlertTriangle, CheckCircle, Calendar, TrendingUp, Pencil } from 'lucide-react';
 import { EditableProjectAllocation } from './EditableProjectAllocation';
 import { AddProjectAllocation } from './AddProjectAllocation';
 import { OtherLeaveSection } from './OtherLeaveSection';
+import { EditPersonAllocationsDialog } from './EditPersonAllocationsDialog';
 import { format } from 'date-fns';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
@@ -55,6 +57,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
   onDataChange
 }) => {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { projectDisplayPreference, displayPreference, startOfWorkWeek } = useAppSettings();
   
   const getUtilizationStatus = (percentage: number) => {
@@ -251,7 +254,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
             )}
           
             {/* Action Buttons - Lower Right */}
-            <div className="mt-3 flex justify-end gap-1.5">
+            <div className="mt-3 flex justify-end gap-1">
               <AddProjectAllocation
                 memberId={person.id}
                 weekStartDate={weekStartDate}
@@ -265,11 +268,26 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                 onUpdate={handleDataChange}
                 variant="compact"
               />
+              <Button 
+                size="icon"
+                variant="ghost"
+                onClick={() => setEditDialogOpen(true)}
+                className="h-7 w-7"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
             </div>
           </div>
         </div>
 
       </div>
+      
+      <EditPersonAllocationsDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        person={person}
+        selectedWeek={selectedWeek}
+      />
     </TooltipProvider>
   );
 }, (prevProps, nextProps) => {

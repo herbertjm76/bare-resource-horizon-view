@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
-import { MapPin, Users, Clock, Activity, Briefcase, Building, Palette, Code, Sparkles, Rocket, Target, Zap, TrendingUp, Circle } from 'lucide-react';
+import { MapPin, Users, Clock, Activity, Briefcase, Building, Palette, Code, Sparkles, Rocket, Target, Zap, TrendingUp, Circle, Pencil } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { TeamMemberAvatar } from './TeamMemberAvatar';
 import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
+import { EditProjectAllocationsDialog } from './EditProjectAllocationsDialog';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
 import * as LucideIcons from 'lucide-react';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
@@ -42,6 +44,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
   selectedWeek,
   onDataChange
 }) => {
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
   const { projectDisplayPreference, startOfWorkWeek, workWeekHours, displayPreference } = useAppSettings();
   const sortedMembers = [...project.teamMembers].sort((a, b) => b.hours - a.hours);
@@ -185,14 +188,23 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                 ))}
               </div>
             </div>
-            {/* Add button bottom right */}
-            <div className="flex justify-end mt-4">
+            {/* Action buttons bottom right */}
+            <div className="flex justify-end mt-4 gap-1">
               <AddTeamMemberAllocation
                 projectId={project.id}
                 weekStartDate={weekStartDateString}
                 existingMemberIds={project.teamMembers.map(m => m.id)}
                 onAdd={onDataChange}
+                variant="compact"
               />
+              <Button 
+                size="icon"
+                variant="ghost"
+                onClick={() => setEditDialogOpen(true)}
+                className="h-7 w-7"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
             </div>
           </div>
         ) : (
@@ -205,17 +217,33 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                 <p className="text-muted-foreground text-sm">No team members allocated this week</p>
               </div>
             </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-4 gap-1">
               <AddTeamMemberAllocation
                 projectId={project.id}
                 weekStartDate={weekStartDateString}
                 existingMemberIds={[]}
                 onAdd={onDataChange}
+                variant="compact"
               />
+              <Button 
+                size="icon"
+                variant="ghost"
+                onClick={() => setEditDialogOpen(true)}
+                className="h-7 w-7"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
             </div>
           </div>
         )}
       </div>
+      
+      <EditProjectAllocationsDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        project={project}
+        selectedWeek={selectedWeek}
+      />
     </div>
   );
 };

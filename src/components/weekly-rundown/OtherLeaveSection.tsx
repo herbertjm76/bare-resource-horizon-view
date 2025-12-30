@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
+import { Plus, Palmtree } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -133,7 +133,7 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
           size="icon"
           className="h-7 w-7 rounded-full border border-dashed border-muted-foreground/50 hover:border-primary hover:bg-primary/10"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Palmtree className="h-3.5 w-3.5" />
         </Button>
       ) : (
         <Button
