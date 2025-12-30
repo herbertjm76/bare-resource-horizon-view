@@ -32,7 +32,14 @@ export function PdfViewer({ url, className, isFullscreen, onToggleFullscreen }: 
     async function loadPdf() {
       setStatus("loading");
       try {
-        const loadingTask = getDocument({ url, withCredentials: false });
+        // Fetch the PDF as an ArrayBuffer to avoid CORS issues with pdfjs
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch PDF: ${response.status}`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        
+        const loadingTask = getDocument({ data: arrayBuffer });
         const pdfDoc = await loadingTask.promise;
         if (!cancelled) {
           setPdf(pdfDoc);
@@ -40,6 +47,7 @@ export function PdfViewer({ url, className, isFullscreen, onToggleFullscreen }: 
           setCurrentPage(1);
         }
       } catch (e) {
+        console.error("PDF load error:", e);
         if (!cancelled) setStatus("error");
       }
     }
