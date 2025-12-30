@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, ZoomIn, ZoomOut, Loader2 } from "lucide-react";
 
 import { GlobalWorkerOptions, getDocument, PDFDocumentProxy } from "pdfjs-dist";
-// eslint-disable-next-line import/no-unresolved
-import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker?url";
 
-GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.mjs",
+  import.meta.url
+).toString();
 
 interface PdfViewerProps {
   url: string;
