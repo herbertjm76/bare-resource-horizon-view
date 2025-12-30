@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Clock, Users, Calendar, Building, Pencil, Circle } from 'lucide-react';
+import { MapPin, Clock, Users, Calendar, Building, Pencil, Circle, Palmtree } from 'lucide-react';
 import { RundownMode } from './WeeklyRundownView';
 import { AvatarWithHourDial } from './AvatarWithHourDial';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
@@ -13,6 +13,7 @@ import { EditPersonAllocationsDialog } from './EditPersonAllocationsDialog';
 import { EditProjectAllocationsDialog } from './EditProjectAllocationsDialog';
 import { MemberVacationPopover } from './MemberVacationPopover';
 import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
+import { AddProjectAllocation } from './AddProjectAllocation';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
@@ -67,10 +68,20 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
   const { startOfWorkWeek, displayPreference, workWeekHours, projectDisplayPreference } = useAppSettings();
   const capacity = person.capacity || workWeekHours;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   
   // Calculate week start date string for MemberVacationPopover
   const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
   const personName = `${person.first_name || ''} ${person.last_name || ''}`.trim() || person.name || 'Unknown';
+  
+  // Calculate total leave hours
+  const totalLeaveHours = person.leave 
+    ? (person.leave.annualLeave || 0) + (person.leave.vacationLeave || 0) + (person.leave.medicalLeave || 0) + (person.leave.publicHoliday || 0)
+    : 0;
+  
+  const handleDataChange = () => {
+    setRefreshKey(prev => prev + 1);
+  };
   
   return (
     <>
@@ -106,30 +117,50 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
             <span className="truncate">{person.department || 'No Department'}</span>
           </div>
         </div>
-        <StandardizedBadge 
-          variant={
-            person.utilization >= 100 ? "metric" : 
-            person.utilization >= 70 ? "warning" : 
-            "error"
-          }
-          size="sm"
-        >
-          {Math.round(person.utilization || 0)}%
-        </StandardizedBadge>
+        <div className="flex flex-col items-end gap-1">
+          <StandardizedBadge 
+            variant={
+              person.utilization >= 100 ? "metric" : 
+              person.utilization >= 70 ? "warning" : 
+              "error"
+            }
+            size="sm"
+          >
+            {Math.round(person.utilization || 0)}%
+          </StandardizedBadge>
+          {/* Leave indicator */}
+          {totalLeaveHours > 0 && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Palmtree className="h-3 w-3" />
+                  <span>{formatAllocationValue(totalLeaveHours, capacity, displayPreference)}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                <p className="font-medium">Leave this week</p>
+                {person.leave?.annualLeave > 0 && <p>Annual: {person.leave.annualLeave}h</p>}
+                {person.leave?.vacationLeave > 0 && <p>Vacation: {person.leave.vacationLeave}h</p>}
+                {person.leave?.medicalLeave > 0 && <p>Medical: {person.leave.medicalLeave}h</p>}
+                {person.leave?.publicHoliday > 0 && <p>Public Holiday: {person.leave.publicHoliday}h</p>}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
       </div>
 
       {/* Stacked Bar Graph */}
       <div className="mb-3">
         <div className="w-full h-6 bg-muted/30 rounded-lg overflow-hidden flex relative">
-          {person.projects && person.projects.length > 0 ? (
+          {/* Project segments */}
+          {person.projects && person.projects.length > 0 && (
             (() => {
               let cumulative = 0;
               return person.projects.map((project: any, idx: number) => {
                 const percentage = (project.hours / capacity) * 100;
                 const startPercent = cumulative;
                 cumulative += percentage;
-                const isOverflow = startPercent >= 100; // This segment starts after 100%
-                const isPartialOverflow = startPercent < 100 && cumulative > 100; // This segment crosses 100%
+                const isOverflow = startPercent >= 100;
                 
                 return (
                   <Tooltip key={idx}>
@@ -150,7 +181,29 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
                 );
               });
             })()
-          ) : (
+          )}
+          {/* Leave segment */}
+          {totalLeaveHours > 0 && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div
+                  className="h-full transition-all hover:opacity-80 cursor-pointer flex items-center justify-center"
+                  style={{
+                    width: `${(totalLeaveHours / capacity) * 100}%`,
+                    backgroundColor: 'hsl(var(--primary) / 0.15)',
+                  }}
+                >
+                  <Palmtree className="h-3 w-3 text-primary/70" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                <p className="font-medium">Leave</p>
+                <p>{formatAllocationValue(totalLeaveHours, capacity, displayPreference)}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {/* Empty state */}
+          {(!person.projects || person.projects.length === 0) && totalLeaveHours === 0 && (
             <div className="w-full h-full bg-muted/50 flex items-center justify-center">
               <span className="text-xs text-muted-foreground">No projects</span>
             </div>
@@ -183,8 +236,14 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
         </div>
       )}
 
-      {/* Edit Button */}
-      <div className="flex justify-end mt-2">
+      {/* Action Buttons */}
+      <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
+        <AddProjectAllocation
+          memberId={person.id}
+          weekStartDate={weekStartDate}
+          existingProjectIds={person.projects?.map((p: any) => p.id) || []}
+          onAdd={handleDataChange}
+        />
         <Button 
           size="icon"
           variant="ghost"
@@ -200,7 +259,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
       open={editDialogOpen}
       onOpenChange={setEditDialogOpen}
       person={person}
-      selectedWeek={new Date()}
+      selectedWeek={selectedWeek}
     />
     </>
   );
