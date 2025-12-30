@@ -36,15 +36,17 @@ interface TeamMemberOption {
 interface AddTeamMemberAllocationProps {
   projectId: string;
   weekStartDate: string;
-  existingMemberIds: string[];
-  onAdd: () => void;
+  existingMemberIds?: string[];
+  onAdd?: () => void;
+  variant?: 'default' | 'compact';
 }
 
 export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = ({
   projectId,
   weekStartDate,
-  existingMemberIds,
-  onAdd
+  existingMemberIds = [],
+  onAdd,
+  variant = 'default'
 }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState<string>('');
@@ -141,7 +143,7 @@ export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = (
       setIsAdding(false);
       setSelectedMemberId('');
       setInputValue('');
-      onAdd();
+      onAdd?.();
     },
     onError: (error) => {
       toast.error('Failed to add team member');
@@ -271,6 +273,20 @@ export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = (
           </Button>
         </div>
       </div>
+    );
+  }
+
+  if (variant === 'compact') {
+    return (
+      <button
+        onClick={() => setIsAdding(true)}
+        className="flex flex-col items-center gap-1 group"
+      >
+        <div className="w-12 h-12 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center bg-muted/20 hover:bg-muted/40 hover:border-primary/50 transition-all group-hover:scale-105">
+          <Plus className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+        </div>
+        <span className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors">Add</span>
+      </button>
     );
   }
 
