@@ -109,7 +109,7 @@ export const TimelineRundownCard: React.FC<TimelineRundownCardProps> = ({
               className="flex items-center justify-between gap-2 py-1 group"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 shrink-0">
+                <Badge className="text-[10px] px-1.5 py-0 h-5 shrink-0 bg-primary text-primary-foreground">
                   {format(parseISO(entry.event_date), 'MMM d')}
                 </Badge>
                 <span className="text-sm leading-relaxed text-foreground truncate">{entry.title}</span>
