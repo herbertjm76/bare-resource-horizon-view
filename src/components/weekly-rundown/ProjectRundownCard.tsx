@@ -8,7 +8,7 @@ import * as LucideIcons from 'lucide-react';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
-import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { formatDualAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectRundownCardProps {
   project: {
@@ -138,7 +138,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                 <StandardizedBadge variant="metric" size="sm" className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {formatAllocationValue(project.totalHours, teamCapacity, displayPreference)}
+                  {formatDualAllocationValue(project.totalHours, teamCapacity, displayPreference)}
                 </StandardizedBadge>
                 {project.office && (
                   <StandardizedBadge variant="secondary" size="sm">
@@ -161,16 +161,6 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                   <CountUpNumber end={project.teamMembers.length} duration={1500} />
                 </span>
                 <span className="text-xs text-muted-foreground">team</span>
-              </div>
-              
-              <div className="h-8 w-px bg-border" />
-              
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-primary" />
-                <span className="text-2xl font-bold text-foreground">
-                  <CountUpNumber end={totalValue} duration={1500} />{totalUnit}
-                </span>
-                <span className="text-xs text-muted-foreground">total</span>
               </div>
             </div>
           </div>

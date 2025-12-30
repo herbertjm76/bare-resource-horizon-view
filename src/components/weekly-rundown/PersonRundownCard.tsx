@@ -12,7 +12,7 @@ import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
-import { formatAllocationValue, formatCapacityValue, formatAvailableValue } from '@/utils/allocationDisplay';
+import { formatAllocationValue, formatDualAllocationValue, formatAvailableValue } from '@/utils/allocationDisplay';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 interface PersonRundownCardProps {
@@ -131,30 +131,6 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                   </span>
                   <span className="text-xs text-muted-foreground">utilization</span>
                 </div>
-                
-                <div className="h-8 w-px bg-border" />
-                
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-primary" />
-                  <span className="text-2xl font-bold text-foreground">
-                    <CountUpNumber
-                      end={
-                        displayPreference === 'percentage'
-                          ? person.capacity
-                            ? Math.round((person.totalHours / person.capacity) * 100)
-                            : 0
-                          : person.totalHours
-                      }
-                      duration={1500}
-                    />
-                    {displayPreference === 'percentage' ? '%' : 'h'}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {displayPreference === 'percentage'
-                      ? 'of 100%'
-                      : `/ ${person.capacity}h`}
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -232,7 +208,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                     }}
                   >
                     <span>
-                      Available {formatAvailableValue(availableHours, person.capacity, displayPreference)}
+                      Available {formatDualAllocationValue(availableHours, person.capacity, displayPreference)}
                     </span>
                   </div>
                 </TooltipTrigger>
@@ -261,7 +237,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                       <span className="font-semibold text-foreground mr-2 project-code" data-project-code>{primaryDisplay}</span>
                       {secondaryDisplay && <span className="text-muted-foreground mr-2 truncate max-w-[200px] project-name">{secondaryDisplay}</span>}
                       <StandardizedBadge variant="metric" size="sm" className="project-hours-badge">
-                        {formatAllocationValue(project.hours, person.capacity, displayPreference)}
+                        {formatDualAllocationValue(project.hours, person.capacity, displayPreference)}
                       </StandardizedBadge>
                     </div>
                   );
