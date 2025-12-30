@@ -239,9 +239,21 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
 
   const error = membersError || null;
 
+  // Unsorted members for avatar row (alphabetical order by default)
+  const unsortedMembers = useMemo(() => {
+    if (!filteredMembers || filteredMembers.length === 0) return [];
+    
+    return [...filteredMembers].sort((a, b) => {
+      const nameA = `${a.first_name || ''} ${a.last_name || ''}`.trim().toLowerCase();
+      const nameB = `${b.first_name || ''} ${b.last_name || ''}`.trim().toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }, [filteredMembers]);
+
   // Return stable object with all computed values
   const result = useMemo(() => ({
     allMembers: members || [],
+    unsortedMembers: unsortedMembers || [], // Always alphabetical for avatar row
     projects: projects || [],
     allocations: detailedAllocations ? Object.values(detailedAllocations).flatMap(m => m.daily_allocations) : [],
     isLoading,
@@ -257,6 +269,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
     updateOtherLeave
   }), [
     members,
+    unsortedMembers,
     projects,
     detailedAllocations,
     isLoading,
