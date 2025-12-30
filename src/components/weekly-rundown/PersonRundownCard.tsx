@@ -257,6 +257,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                 weekStartDate={weekStartDate}
                 existingProjectIds={person.projects.map(p => p.id)}
                 onAdd={handleDataChange}
+                variant="compact"
               />
               <OtherLeaveSection
                 memberId={person.id}

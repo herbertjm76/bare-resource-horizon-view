@@ -45,13 +45,15 @@ interface AddProjectAllocationProps {
   weekStartDate: string;
   existingProjectIds: string[];
   onAdd: () => void;
+  variant?: 'default' | 'compact';
 }
 
 export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
   memberId,
   weekStartDate,
   existingProjectIds,
-  onAdd
+  onAdd,
+  variant = 'default'
 }) => {
   const [open, setOpen] = useState(false);
   const [comboboxOpen, setComboboxOpen] = useState(false);
@@ -208,15 +210,26 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
 
   return (
     <>
-      <Button
-        onClick={() => setOpen(true)}
-        variant="outline"
-        size="sm"
-        className="glass hover:glass-elevated"
-      >
-        <Plus className="h-3 w-3 mr-1.5" />
-        Add Project
-      </Button>
+      {variant === 'compact' ? (
+        <Button
+          onClick={() => setOpen(true)}
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 rounded-full border border-dashed border-muted-foreground/50 hover:border-primary hover:bg-primary/10"
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </Button>
+      ) : (
+        <Button
+          onClick={() => setOpen(true)}
+          variant="outline"
+          size="sm"
+          className="glass hover:glass-elevated"
+        >
+          <Plus className="h-3 w-3 mr-1.5" />
+          Add Project
+        </Button>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
