@@ -168,20 +168,25 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       </div>
 
       {/* Team Members Avatars */}
-      <div className="px-6 py-8 relative z-10 flex items-center justify-center flex-1">
+      <div className="px-6 py-8 relative z-10 flex-1 flex flex-col">
         {project.teamMembers.length > 0 ? (
-          <div className="flex flex-col items-center justify-center w-full gap-4">
-            <div className="flex flex-wrap gap-4 justify-center items-end">
-              {sortedMembers.map((member) => (
-                <TeamMemberAvatar
-                  key={member.id}
-                  member={member}
-                  projectId={project.id}
-                  weekStartDate={weekStartDateString}
-                  onUpdate={onDataChange}
-                />
-              ))}
-              {/* Add member button inline with avatars */}
+          <div className="flex flex-col h-full">
+            {/* Centered team members */}
+            <div className="flex-1 flex items-center justify-center">
+              <div className="flex flex-wrap gap-4 justify-center items-end">
+                {sortedMembers.map((member) => (
+                  <TeamMemberAvatar
+                    key={member.id}
+                    member={member}
+                    projectId={project.id}
+                    weekStartDate={weekStartDateString}
+                    onUpdate={onDataChange}
+                  />
+                ))}
+              </div>
+            </div>
+            {/* Add button bottom right */}
+            <div className="flex justify-end mt-4">
               <AddTeamMemberAllocation
                 projectId={project.id}
                 weekStartDate={weekStartDateString}
@@ -191,17 +196,23 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
             </div>
           </div>
         ) : (
-          <div className="text-center py-6 bg-muted/20 rounded-xl border border-border/30">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted/30 mb-2">
-              <Users className="h-7 w-7 text-muted-foreground" />
+          <div className="flex flex-col h-full">
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center py-6 bg-muted/20 rounded-xl border border-border/30">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted/30 mb-2">
+                  <Users className="h-7 w-7 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground text-sm">No team members allocated this week</p>
+              </div>
             </div>
-            <p className="text-muted-foreground text-sm mb-3">No team members allocated this week</p>
-            <AddTeamMemberAllocation
-              projectId={project.id}
-              weekStartDate={weekStartDateString}
-              existingMemberIds={[]}
-              onAdd={onDataChange}
-            />
+            <div className="flex justify-end mt-4">
+              <AddTeamMemberAllocation
+                projectId={project.id}
+                weekStartDate={weekStartDateString}
+                existingMemberIds={[]}
+                onAdd={onDataChange}
+              />
+            </div>
           </div>
         )}
       </div>
