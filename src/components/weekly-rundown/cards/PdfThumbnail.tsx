@@ -2,12 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 // PDF.js
-import { GlobalWorkerOptions, getDocument } from "pdfjs-dist";
-// Vite-friendly worker URL
-// eslint-disable-next-line import/no-unresolved
-import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker?url";
+import { getDocument } from "pdfjs-dist";
+import { ensurePdfJsWorker } from "@/lib/pdfjs";
 
-GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+ensurePdfJsWorker();
 
 type PdfThumbnailProps = {
   url: string;

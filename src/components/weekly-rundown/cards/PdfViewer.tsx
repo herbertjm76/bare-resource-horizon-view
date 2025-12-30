@@ -3,12 +3,10 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, ZoomIn, ZoomOut, Loader2 } from "lucide-react";
 
-import { GlobalWorkerOptions, getDocument, PDFDocumentProxy } from "pdfjs-dist";
+import { getDocument, PDFDocumentProxy } from "pdfjs-dist";
+import { ensurePdfJsWorker } from "@/lib/pdfjs";
 
-GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.mjs",
-  import.meta.url
-).toString();
+ensurePdfJsWorker();
 
 interface PdfViewerProps {
   url: string;
