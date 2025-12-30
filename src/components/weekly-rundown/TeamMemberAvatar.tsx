@@ -221,8 +221,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="font-semibold">{member.name}</p>
-                  <p className="text-xs text-muted-foreground">{formatAllocationValue(member.hours, capacity, displayPreference)} this week</p>
-                  <p className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-1">Click to add hours or leave</p>
+                  <p className="text-xs text-muted-foreground/70">Click to add hours or leave</p>
                 </TooltipContent>
               </Tooltip>
             </div>
