@@ -72,14 +72,24 @@ export function PdfViewer({ url, className, isFullscreen, onToggleFullscreen }: 
       if (!context) throw new Error("No canvas context");
 
       // Calculate scale to fit container width while respecting zoom
-      const containerWidth = container.clientWidth - 32; // padding
-      const containerHeight = container.clientHeight - 80; // controls + padding
+      const containerWidth = Math.max(container.clientWidth - 32, 1); // padding
+      const containerHeight = Math.max(container.clientHeight - 80, 1); // controls + padding
+
+      // If the dialog/container hasn't measured yet, defer rendering
+      if (container.clientWidth === 0 || container.clientHeight === 0) {
+        requestAnimationFrame(() => {
+          // Avoid throwing if unmounted
+          if (containerRef.current) renderPage();
+        });
+        return;
+      }
+
       const unscaledViewport = page.getViewport({ scale: 1 });
-      
+
       const widthScale = containerWidth / unscaledViewport.width;
       const heightScale = containerHeight / unscaledViewport.height;
       const fitScale = Math.min(widthScale, heightScale, 2); // cap at 2x
-      
+
       const viewport = page.getViewport({ scale: fitScale * scale });
 
       canvas.width = Math.floor(viewport.width);
@@ -88,6 +98,7 @@ export function PdfViewer({ url, className, isFullscreen, onToggleFullscreen }: 
       await page.render({ canvasContext: context, viewport, canvas }).promise;
       setStatus("ready");
     } catch (e) {
+      console.error("PDF render error:", e);
       setStatus("error");
     }
   }, [pdf, currentPage, scale]);
