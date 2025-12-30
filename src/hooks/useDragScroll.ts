@@ -126,7 +126,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
     };
   }, [handleMouseMove, handleMouseUp]);
 
-  // Setup scroll position checking with ResizeObserver for content changes
+  // Setup scroll position checking with ResizeObserver and MutationObserver for content changes
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -140,17 +140,33 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
       checkScrollPosition();
     });
     resizeObserver.observe(container);
+    
+    // Observe all children for size changes
+    Array.from(container.children).forEach(child => {
+      resizeObserver.observe(child);
+    });
 
-    // Also check after a short delay for async content loading
-    const timer = setTimeout(checkScrollPosition, 100);
-    const timer2 = setTimeout(checkScrollPosition, 500);
+    // Use MutationObserver to detect when children are added/removed
+    const mutationObserver = new MutationObserver(() => {
+      checkScrollPosition();
+      // Re-observe new children
+      Array.from(container.children).forEach(child => {
+        resizeObserver.observe(child);
+      });
+    });
+    mutationObserver.observe(container, { childList: true, subtree: true });
+
+    // Check multiple times for async content loading
+    const timers = [100, 300, 500, 1000, 2000].map(delay => 
+      setTimeout(checkScrollPosition, delay)
+    );
 
     return () => {
       container.removeEventListener('scroll', checkScrollPosition);
       window.removeEventListener('resize', checkScrollPosition);
       resizeObserver.disconnect();
-      clearTimeout(timer);
-      clearTimeout(timer2);
+      mutationObserver.disconnect();
+      timers.forEach(clearTimeout);
     };
   }, [checkScrollPosition]);
 
