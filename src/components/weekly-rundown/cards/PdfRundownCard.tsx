@@ -3,12 +3,13 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, FileText, Loader2, ExternalLink, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { Plus, FileText, Loader2, ExternalLink, ChevronLeft, ChevronRight, Trash2, X } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { PdfThumbnail } from './PdfThumbnail';
+import { PdfViewer } from './PdfViewer';
 
 interface PdfRundownCardProps {
   cardType: {
@@ -28,6 +29,9 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false);
+  const [viewingPdfUrl, setViewingPdfUrl] = useState<string | null>(null);
+  const [viewingPdfName, setViewingPdfName] = useState<string>('');
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const { data: files = [], refetch } = useQuery({
@@ -236,73 +240,121 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
       </Card>
 
       {/* Manage PDFs Dialog */}
-      <Dialog open={isManageOpen} onOpenChange={setIsManageOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span>Manage {cardType.label}</span>
-              <div className="flex items-center gap-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="application/pdf"
-                  onChange={handleFileSelect}
-                  className="hidden"
+      <Dialog open={isManageOpen} onOpenChange={(open) => {
+        setIsManageOpen(open);
+        if (!open) {
+          setViewingPdfUrl(null);
+          setIsFullscreen(false);
+        }
+      }}>
+        <DialogContent className={
+          isFullscreen 
+            ? "max-w-[100vw] w-[100vw] h-[100vh] max-h-[100vh] p-0 rounded-none" 
+            : viewingPdfUrl 
+              ? "max-w-5xl h-[85vh]" 
+              : "max-w-4xl"
+        }>
+          {viewingPdfUrl ? (
+            // PDF Viewer mode
+            <div className="flex flex-col h-full">
+              <DialogHeader className="p-4 border-b shrink-0">
+                <DialogTitle className="flex items-center justify-between">
+                  <span className="truncate pr-4">{viewingPdfName}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={() => {
+                      setViewingPdfUrl(null);
+                      setIsFullscreen(false);
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </DialogTitle>
+              </DialogHeader>
+              <div className="flex-1 min-h-0">
+                <PdfViewer 
+                  url={viewingPdfUrl} 
+                  isFullscreen={isFullscreen}
+                  onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                >
-                  {isUploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-1" />
-                  ) : (
-                    <Plus className="h-4 w-4 mr-1" />
-                  )}
-                  Add PDF
-                </Button>
               </div>
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
-            {files.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No PDFs uploaded yet</p>
-            ) : (
-              files.map((file) => (
-                <div 
-                  key={file.id} 
-                  className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50"
-                >
-                  <FileText className="h-8 w-8 text-primary flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{file.file_name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {file.file_size ? `${(file.file_size / 1024).toFixed(1)} KB` : 'Unknown size'}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1">
+            </div>
+          ) : (
+            // File list mode
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center justify-between">
+                  <span>Manage {cardType.label}</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => window.open(file.file_url, '_blank')}
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
                     >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
-                      onClick={() => deleteMutation.mutate(file.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
+                      {isUploading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                      ) : (
+                        <Plus className="h-4 w-4 mr-1" />
+                      )}
+                      Add PDF
                     </Button>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+                {files.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No PDFs uploaded yet</p>
+                ) : (
+                  files.map((file) => (
+                    <div 
+                      key={file.id} 
+                      className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                      onClick={() => {
+                        setViewingPdfUrl(file.file_url);
+                        setViewingPdfName(file.file_name);
+                      }}
+                    >
+                      <FileText className="h-8 w-8 text-primary flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{file.file_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {file.file_size ? `${(file.file_size / 1024).toFixed(1)} KB` : 'Unknown size'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(file.file_url, '_blank')}
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
+                          onClick={() => deleteMutation.mutate(file.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>
