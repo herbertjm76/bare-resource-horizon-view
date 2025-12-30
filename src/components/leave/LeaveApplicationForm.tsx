@@ -8,15 +8,20 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, isBefore, startOfDay, isWeekend, addDays } from 'date-fns';
-import { CalendarIcon, Send, Clock, Search, AlertTriangle } from 'lucide-react';
+import { CalendarIcon, Send, Clock, Search, AlertTriangle, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LeaveAttachmentUpload } from './LeaveAttachmentUpload';
 import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
 import { useLeaveRequests } from '@/hooks/leave/useLeaveRequests';
 import { useProjectManagers } from '@/hooks/leave/useProjectManagers';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useCompanyId } from '@/hooks/useCompanyId';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { LeaveFormData } from '@/types/leave';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface LeaveApplicationFormProps {
   onSuccess?: () => void;
@@ -26,6 +31,24 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
   const { leaveTypes, isLoading: isLoadingTypes } = useLeaveTypes();
   const { submitLeaveRequest, isSubmitting } = useLeaveRequests();
   const { projectManagers, isLoading: isLoadingPMs } = useProjectManagers();
+  const { isAdmin } = usePermissions();
+  const { companyId } = useCompanyId();
+
+  // Fetch team members for "on behalf of" selector (admin only)
+  const { data: teamMembers = [] } = useQuery({
+    queryKey: ['teamMembers', companyId],
+    queryFn: async () => {
+      if (!companyId) return [];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email, avatar_url')
+        .eq('company_id', companyId)
+        .order('first_name');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!companyId && isAdmin
+  });
 
   const [formData, setFormData] = useState<Partial<LeaveFormData>>({
     leave_type_id: '',
@@ -39,6 +62,8 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
   const [attachment, setAttachment] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [approverSearch, setApproverSearch] = useState('');
+  const [onBehalfOfId, setOnBehalfOfId] = useState<string>('');
+  const [memberSearch, setMemberSearch] = useState('');
 
   const selectedLeaveType = useMemo(() => {
     return leaveTypes.find(lt => lt.id === formData.leave_type_id);
@@ -117,16 +142,19 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
     e.preventDefault();
     if (!validateForm()) return;
 
-    const success = await submitLeaveRequest({
-      leave_type_id: formData.leave_type_id!,
-      duration_type: formData.duration_type!,
-      start_date: startDate!,
-      end_date: endDate!,
-      remarks: formData.remarks!,
-      manager_confirmed: formData.manager_confirmed!,
-      requested_approver_id: formData.requested_approver_id || undefined,
-      attachment: attachment || undefined
-    });
+    const success = await submitLeaveRequest(
+      {
+        leave_type_id: formData.leave_type_id!,
+        duration_type: formData.duration_type!,
+        start_date: startDate!,
+        end_date: endDate!,
+        remarks: formData.remarks!,
+        manager_confirmed: formData.manager_confirmed!,
+        requested_approver_id: formData.requested_approver_id || undefined,
+        attachment: attachment || undefined
+      },
+      onBehalfOfId || undefined
+    );
 
     if (success) {
       setFormData({
@@ -140,12 +168,74 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
       setEndDate(undefined);
       setAttachment(null);
       setErrors({});
+      setOnBehalfOfId('');
       onSuccess?.();
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5 w-full max-w-md mx-auto">
+      {/* Admin: Apply on behalf of */}
+      {isAdmin && (
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            Apply on behalf of (optional)
+          </Label>
+          <Select
+            value={onBehalfOfId}
+            onValueChange={(value) => {
+              setOnBehalfOfId(value);
+              setMemberSearch('');
+            }}
+            disabled={isSubmitting}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Myself (default)" />
+            </SelectTrigger>
+            <SelectContent>
+              <div className="p-2">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search team member..."
+                    value={memberSearch}
+                    onChange={(e) => setMemberSearch(e.target.value)}
+                    className="pl-8"
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                </div>
+              </div>
+              <SelectItem value="">Myself (default)</SelectItem>
+              {teamMembers
+                .filter((member) => {
+                  const fullName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
+                  return fullName.includes(memberSearch.toLowerCase()) || 
+                         member.email.toLowerCase().includes(memberSearch.toLowerCase());
+                })
+                .map((member) => (
+                  <SelectItem key={member.id} value={member.id}>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-5 w-5">
+                        <AvatarImage src={member.avatar_url || undefined} />
+                        <AvatarFallback className="text-[10px]">
+                          {(member.first_name?.charAt(0) || '') + (member.last_name?.charAt(0) || '')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{member.first_name} {member.last_name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+          {onBehalfOfId && (
+            <p className="text-xs text-muted-foreground">
+              This leave request will be submitted for the selected team member.
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Leave Type */}
       <div className="space-y-2">
         <Label>Leave Type</Label>
