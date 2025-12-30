@@ -180,6 +180,94 @@ export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = (
   };
 
   if (isAdding) {
+    // Compact variant for grid view - stacked layout
+    if (variant === 'compact') {
+      return (
+        <div className="flex flex-col items-center gap-2 p-2 bg-background/90 backdrop-blur-sm rounded-lg border border-border min-w-[120px]">
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                size="sm"
+                className="w-full justify-between text-xs h-8"
+              >
+                {selectedMember ? (
+                  <span className="truncate">{getDisplayName(selectedMember).split(' ')[0]}</span>
+                ) : (
+                  <span className="truncate">team member...</span>
+                )}
+                <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[250px] p-0" align="center">
+              <Command>
+                <CommandInput placeholder="Search team members..." />
+                <CommandList>
+                  <CommandEmpty>No team member found.</CommandEmpty>
+                  <CommandGroup>
+                    {availableMembers.map((member) => (
+                      <CommandItem
+                        key={member.id}
+                        value={`${member.first_name || ''} ${member.last_name || ''} ${member.id}`}
+                        onSelect={() => {
+                          setSelectedMemberId(member.id);
+                          setOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-2 flex-1">
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={member.avatar_url || ''} />
+                            <AvatarFallback className="text-xs">
+                              {getInitials(member.first_name, member.last_name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm">{getDisplayName(member)}</span>
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          
+          <Input
+            type="number"
+            placeholder={displayPreference === 'percentage' ? '%' : 'Hours'}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="w-full h-8 text-center text-xs"
+            step={displayPreference === 'percentage' ? '5' : '0.5'}
+            min="0"
+            max={displayPreference === 'percentage' ? '100' : undefined}
+          />
+          
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleSave}
+              disabled={addMutation.isPending}
+              className="h-6 w-6 p-0"
+            >
+              <Check className="h-3 w-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleCancel}
+              className="h-6 w-6 p-0"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // Default variant - horizontal layout
     return (
       <div className="glass rounded-xl p-4">
         <div className="flex items-center gap-2">
