@@ -21,12 +21,14 @@ interface OtherLeaveSectionProps {
   memberId: string;
   weekStartDate: string;
   onUpdate?: () => void;
+  variant?: 'default' | 'compact';
 }
 
 export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
   memberId,
   weekStartDate,
-  onUpdate
+  onUpdate,
+  variant = 'default'
 }) => {
   const { company } = useCompany();
   const queryClient = useQueryClient();
@@ -124,15 +126,26 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
 
   return (
     <>
-      <Button
-        onClick={() => setOpen(true)}
-        variant="outline"
-        size="sm"
-        className="glass hover:glass-elevated"
-      >
-        <Plus className="h-3 w-3 mr-1.5" />
-        Add Other Leave
-      </Button>
+      {variant === 'compact' ? (
+        <Button
+          onClick={() => setOpen(true)}
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 rounded-full border border-dashed border-muted-foreground/50 hover:border-primary hover:bg-primary/10"
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </Button>
+      ) : (
+        <Button
+          onClick={() => setOpen(true)}
+          variant="outline"
+          size="sm"
+          className="glass hover:glass-elevated"
+        >
+          <Plus className="h-3 w-3 mr-1.5" />
+          Add Other Leave
+        </Button>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
