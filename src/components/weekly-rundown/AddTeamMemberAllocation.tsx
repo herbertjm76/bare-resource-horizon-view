@@ -230,12 +230,7 @@ export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = (
                               {getInitials(member.first_name, member.last_name)}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="flex flex-col">
-                            <span className="text-sm">{getDisplayName(member)}</span>
-                            {member.type === 'pre_registered' && (
-                              <span className="text-xs text-muted-foreground">Pre-registered</span>
-                            )}
-                          </div>
+                          <span className="text-sm">{getDisplayName(member)}</span>
                         </div>
                       </CommandItem>
                     ))}
