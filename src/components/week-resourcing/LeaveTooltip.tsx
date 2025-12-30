@@ -38,16 +38,8 @@ export const LeaveTooltip: React.FC<LeaveTooltipProps> = ({
             {children}
           </div>
         </TooltipTrigger>
-        <TooltipContent>
-          <div className="text-sm max-w-xs">
-            <p className="font-semibold mb-2">{leaveType} Details</p>
-            {leaveDays.map((day, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <span>{format(new Date(day.date), 'MMM dd')}</span>
-                <span className="ml-2 font-medium">{formatAllocationValue(day.hours, effectiveCapacity, displayPreference)}</span>
-              </div>
-            ))}
-          </div>
+        <TooltipContent className="text-xs">
+          {leaveType}: {formatAllocationValue(leaveDays.reduce((sum, day) => sum + day.hours, 0), effectiveCapacity, displayPreference)}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
