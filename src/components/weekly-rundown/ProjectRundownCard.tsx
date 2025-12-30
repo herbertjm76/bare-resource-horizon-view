@@ -181,7 +181,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       <div className="px-6 py-8 relative z-10 flex items-center justify-center flex-1">
         {project.teamMembers.length > 0 ? (
           <div className="flex flex-col items-center justify-center w-full gap-4">
-            <div className="flex flex-wrap gap-4 justify-center">
+            <div className="flex flex-wrap gap-4 justify-center items-end">
               {sortedMembers.map((member) => (
                 <TeamMemberAvatar
                   key={member.id}
@@ -191,9 +191,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                   onUpdate={onDataChange}
                 />
               ))}
-            </div>
-            
-            <div className="flex justify-center">
+              {/* Add member button inline with avatars */}
               <AddTeamMemberAllocation
                 projectId={project.id}
                 weekStartDate={weekStartDateString}
