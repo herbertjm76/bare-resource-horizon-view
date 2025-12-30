@@ -88,7 +88,10 @@ export const useLeaveRequests = (memberId?: string) => {
     return data.publicUrl;
   };
 
-  const submitLeaveRequest = useCallback(async (formData: LeaveFormData): Promise<boolean> => {
+  const submitLeaveRequest = useCallback(async (
+    formData: LeaveFormData,
+    onBehalfOfMemberId?: string
+  ): Promise<boolean> => {
     if (!companyId) return false;
 
     setIsSubmitting(true);
@@ -99,6 +102,9 @@ export const useLeaveRequests = (memberId?: string) => {
         toast.error('You must be logged in to submit a leave request');
         return false;
       }
+
+      // Use the provided member ID if admin is applying on behalf, otherwise use current user
+      const targetMemberId = onBehalfOfMemberId || user.id;
 
       // Validate that the requested approver exists in profiles (not a pending invite)
       let validApproverId: string | null = null;
@@ -118,7 +124,7 @@ export const useLeaveRequests = (memberId?: string) => {
 
       let attachmentUrl: string | null = null;
       if (formData.attachment) {
-        attachmentUrl = await uploadAttachment(formData.attachment, user.id);
+        attachmentUrl = await uploadAttachment(formData.attachment, targetMemberId);
       }
 
       const totalHours = calculateTotalHours(
@@ -131,7 +137,7 @@ export const useLeaveRequests = (memberId?: string) => {
         .from('leave_requests')
         .insert({
           company_id: companyId,
-          member_id: user.id,
+          member_id: targetMemberId,
           leave_type_id: formData.leave_type_id,
           duration_type: formData.duration_type,
           start_date: format(formData.start_date, 'yyyy-MM-dd'),
@@ -150,7 +156,10 @@ export const useLeaveRequests = (memberId?: string) => {
         return false;
       }
 
-      toast.success('Leave request submitted successfully');
+      const successMessage = onBehalfOfMemberId 
+        ? 'Leave request submitted on behalf of team member'
+        : 'Leave request submitted successfully';
+      toast.success(successMessage);
       await fetchLeaveRequests();
       return true;
     } catch (error) {
@@ -188,7 +197,8 @@ export const useLeaveRequests = (memberId?: string) => {
 
   const updateLeaveRequest = useCallback(async (
     requestId: string,
-    formData: Omit<LeaveFormData, 'manager_confirmed'>
+    formData: Omit<LeaveFormData, 'manager_confirmed'>,
+    isAdminEdit: boolean = false
   ): Promise<boolean> => {
     if (!companyId) return false;
 
@@ -240,11 +250,17 @@ export const useLeaveRequests = (memberId?: string) => {
         updateData.attachment_url = attachmentUrl;
       }
 
-      const { error } = await supabase
+      // Admin can edit any request, regular users only pending
+      let query = supabase
         .from('leave_requests')
         .update(updateData)
-        .eq('id', requestId)
-        .eq('status', 'pending'); // Only allow updating pending requests
+        .eq('id', requestId);
+      
+      if (!isAdminEdit) {
+        query = query.eq('status', 'pending');
+      }
+
+      const { error } = await query;
 
       if (error) {
         console.error('Error updating leave request:', error);

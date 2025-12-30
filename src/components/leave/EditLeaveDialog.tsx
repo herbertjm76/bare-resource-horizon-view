@@ -27,13 +27,15 @@ interface EditLeaveDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  isAdmin?: boolean;
 }
 
 export const EditLeaveDialog: React.FC<EditLeaveDialogProps> = ({
   request,
   open,
   onOpenChange,
-  onSuccess
+  onSuccess,
+  isAdmin = false
 }) => {
   const { leaveTypes, isLoading: isLoadingTypes } = useLeaveTypes();
   const { updateLeaveRequest, isSubmitting } = useLeaveRequests();
@@ -119,15 +121,19 @@ export const EditLeaveDialog: React.FC<EditLeaveDialogProps> = ({
     e.preventDefault();
     if (!validateForm() || !request) return;
 
-    const success = await updateLeaveRequest(request.id, {
-      leave_type_id: leaveTypeId,
-      duration_type: durationType,
-      start_date: startDate!,
-      end_date: endDate!,
-      remarks: remarks,
-      requested_approver_id: requestedApproverId || undefined,
-      attachment: attachment || undefined
-    });
+    const success = await updateLeaveRequest(
+      request.id,
+      {
+        leave_type_id: leaveTypeId,
+        duration_type: durationType,
+        start_date: startDate!,
+        end_date: endDate!,
+        remarks: remarks,
+        requested_approver_id: requestedApproverId || undefined,
+        attachment: attachment || undefined
+      },
+      isAdmin
+    );
 
     if (success) {
       onOpenChange(false);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useLeaveRequests } from '@/hooks/leave/useLeaveRequests';
+import { usePermissions } from '@/hooks/usePermissions';
 import { LeaveRequestCard } from './LeaveRequestCard';
 import { EditLeaveDialog } from './EditLeaveDialog';
 import { FileText } from 'lucide-react';
@@ -13,6 +14,7 @@ interface MyLeaveRequestsProps {
 
 export const MyLeaveRequests: React.FC<MyLeaveRequestsProps> = ({ memberId }) => {
   const { leaveRequests, isLoading, cancelLeaveRequest, refreshLeaveRequests } = useLeaveRequests(memberId);
+  const { isAdmin } = usePermissions();
   const [editingRequest, setEditingRequest] = useState<LeaveRequest | null>(null);
 
   const handleEdit = (request: LeaveRequest) => {
@@ -61,6 +63,7 @@ export const MyLeaveRequests: React.FC<MyLeaveRequestsProps> = ({ memberId }) =>
                   request={request}
                   onCancel={cancelLeaveRequest}
                   onEdit={handleEdit}
+                  isAdmin={isAdmin}
                 />
               ))}
             </div>
@@ -73,6 +76,7 @@ export const MyLeaveRequests: React.FC<MyLeaveRequestsProps> = ({ memberId }) =>
         open={!!editingRequest}
         onOpenChange={(open) => !open && setEditingRequest(null)}
         onSuccess={refreshLeaveRequests}
+        isAdmin={isAdmin}
       />
     </>
   );

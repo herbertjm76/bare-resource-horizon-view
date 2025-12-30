@@ -13,6 +13,7 @@ interface LeaveRequestCardProps {
   onCancel?: (id: string) => void;
   onEdit?: (request: LeaveRequest) => void;
   isLoading?: boolean;
+  isAdmin?: boolean;
 }
 
 const statusConfig: Record<
@@ -46,7 +47,8 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
   showMember = false,
   onCancel,
   onEdit,
-  isLoading = false
+  isLoading = false,
+  isAdmin = false
 }) => {
   const status = statusConfig[request.status] || statusConfig.pending;
   const StatusIcon = status.icon;
@@ -125,7 +127,8 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
           )}
         </div>
 
-        {request.status === 'pending' && (onEdit || onCancel) && (
+        {/* Show edit/cancel for pending requests OR for admin on any status */}
+        {(request.status === 'pending' || (isAdmin && request.status !== 'cancelled')) && (onEdit || onCancel) && (
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
             {onEdit && (
               <Button
@@ -139,7 +142,7 @@ export const LeaveRequestCard: React.FC<LeaveRequestCardProps> = ({
                 Edit
               </Button>
             )}
-            {onCancel && (
+            {onCancel && request.status === 'pending' && (
               <Button
                 variant="ghost"
                 size="sm"
