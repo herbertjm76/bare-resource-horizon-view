@@ -275,13 +275,14 @@ export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = (
   }
 
   return (
-    <Button
-      variant="outline"
+    <button
       onClick={() => setIsAdding(true)}
-      className="w-full glass hover:glass-elevated"
+      className="flex flex-col items-center gap-1 group"
     >
-      <Plus className="h-4 w-4 mr-2" />
-      Add Team Member
-    </Button>
+      <div className="w-16 h-16 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center bg-muted/20 hover:bg-muted/40 hover:border-primary/50 transition-all group-hover:scale-105">
+        <Plus className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
+      </div>
+      <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">Add</span>
+    </button>
   );
 };
