@@ -14,7 +14,7 @@ import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacatio
 import { format, startOfWeek } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
-import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { formatAllocationValue, formatDualAllocationValue } from '@/utils/allocationDisplay';
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
@@ -124,7 +124,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     <div className="space-y-2">
       <div className="font-semibold text-sm text-foreground">{memberData.displayName}</div>
       <div className="text-xs text-muted-foreground">
-        {Math.round(capacityDisplay.utilizationPercentage)}% utilized • {formatAllocationValue(capacityDisplay.totalHours, weeklyCapacity, displayPreference)} allocated
+        {Math.round(capacityDisplay.utilizationPercentage)}% utilized • {formatDualAllocationValue(capacityDisplay.totalHours, weeklyCapacity, displayPreference)} allocated
       </div>
       
       {memberProjectAllocations.length > 0 ? (
@@ -135,7 +135,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
               <span className="text-foreground truncate max-w-[140px]">
                 {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
               </span>
-              <span className="text-muted-foreground font-medium ml-2">{formatAllocationValue(project.hours, weeklyCapacity, displayPreference)}</span>
+              <span className="text-muted-foreground font-medium ml-2">{formatDualAllocationValue(project.hours, weeklyCapacity, displayPreference)}</span>
             </div>
           ))}
         </div>

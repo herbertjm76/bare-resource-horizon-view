@@ -18,7 +18,7 @@ import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
-import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { formatAllocationValue, formatDualAllocationValue } from '@/utils/allocationDisplay';
 import * as LucideIcons from 'lucide-react';
 
 interface RundownGridViewProps {
@@ -138,7 +138,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
                 </div>
               </TooltipTrigger>
               <TooltipContent side="top" className="text-xs">
-                Leave: {formatAllocationValue(totalLeaveHours, capacity, displayPreference)}
+                Leave: {formatDualAllocationValue(totalLeaveHours, capacity, displayPreference)}
               </TooltipContent>
             </Tooltip>
           )}
@@ -168,14 +168,14 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
                           backgroundColor: isOverflow ? '#ef4444' : generateMonochromaticShades(idx, person.projects.length),
                         }}
                       />
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="text-xs">
-                      <p className="font-medium">{getProjectDisplayName(project, projectDisplayPreference)}</p>
-                      <p>{formatAllocationValue(project.hours, capacity, displayPreference)} ({Math.round(percentage)}%)</p>
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              });
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-xs">
+                        <p className="font-medium">{getProjectDisplayName(project, projectDisplayPreference)}</p>
+                        <p>{formatDualAllocationValue(project.hours, capacity, displayPreference)}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                });
             })()
           )}
           {/* Leave segment */}
@@ -194,7 +194,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
               </TooltipTrigger>
               <TooltipContent side="top" className="text-xs">
                 <p className="font-medium">Leave</p>
-                <p>{formatAllocationValue(totalLeaveHours, capacity, displayPreference)}</p>
+                <p>{formatDualAllocationValue(totalLeaveHours, capacity, displayPreference)}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -221,7 +221,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
                   {getProjectDisplayName(project, projectDisplayPreference)}
                 </span>
               </div>
-              <StandardizedBadge variant="metric" size="sm" className="ml-2">{formatAllocationValue(project.hours, capacity, displayPreference)}</StandardizedBadge>
+              <StandardizedBadge variant="metric" size="sm" className="ml-2">{formatDualAllocationValue(project.hours, capacity, displayPreference)}</StandardizedBadge>
             </div>
           ))}
           {person.projects.length > 5 && (
@@ -357,9 +357,7 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
                           <div className="flex flex-col items-center gap-0.5">
                             <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
                             <StandardizedBadge variant="metric" size="sm">
-                              {displayPreference === 'percentage'
-                                ? `${Math.round(member.capacityPercentage || 0)}%`
-                                : `${Math.round(member.hours || 0)}h`}
+                              {formatDualAllocationValue(member.hours || 0, workWeekHours, displayPreference)}
                             </StandardizedBadge>
                           </div>
                         </div>
@@ -372,37 +370,24 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
                           {member.allProjects && member.allProjects.length > 0 ? (
                             <div className="space-y-1">
                               <div className="text-xs font-medium text-muted-foreground mb-1">Projects this week:</div>
-                              {member.allProjects.map((proj: any, pIdx: number) => {
-                                const projPercent = member.totalHours > 0 
-                                  ? (proj.hours / member.totalHours) * (member.capacityPercentage || 0)
-                                  : 0;
-                                return (
-                                  <div key={pIdx} className="flex justify-between items-center text-xs">
-                                    <span className="text-foreground truncate max-w-[140px]">
-                                      {getProjectDisplayName(proj, projectDisplayPreference)}
-                                    </span>
-                                    <span className="text-muted-foreground font-medium ml-2">
-                                      {displayPreference === 'percentage' 
-                                        ? `${Math.round(projPercent)}%` 
-                                        : `${proj.hours}h`}
-                                    </span>
-                                  </div>
-                                );
-                              })}
+                              {member.allProjects.map((proj: any, pIdx: number) => (
+                                <div key={pIdx} className="flex justify-between items-center text-xs">
+                                  <span className="text-foreground truncate max-w-[140px]">
+                                    {getProjectDisplayName(proj, projectDisplayPreference)}
+                                  </span>
+                                  <span className="text-muted-foreground font-medium ml-2">
+                                    {formatDualAllocationValue(proj.hours, workWeekHours, displayPreference)}
+                                  </span>
+                                </div>
+                              ))}
                               <div className="border-t border-border pt-1 mt-2 flex justify-between font-semibold text-xs text-foreground">
                                 <span>Total:</span>
-                                <span>
-                                  {displayPreference === 'percentage'
-                                    ? `${Math.round(member.capacityPercentage || 0)}% capacity`
-                                    : `${member.totalHours || member.hours}h (${Math.round(member.capacityPercentage || 0)}% capacity)`}
-                                </span>
+                                <span>{formatDualAllocationValue(member.totalHours || member.hours || 0, workWeekHours, displayPreference)}</span>
                               </div>
                             </div>
                           ) : (
                             <div className="text-xs text-muted-foreground">
-                              {displayPreference === 'percentage'
-                                ? `${Math.round(member.capacityPercentage || 0)}% capacity on this project`
-                                : `${member.hours}h on this project (${Math.round(member.capacityPercentage || 0)}% capacity)`}
+                              {formatDualAllocationValue(member.hours || 0, workWeekHours, displayPreference)} on this project
                             </div>
                           )}
                           <div className="text-[10px] text-muted-foreground pt-1 border-t border-border">

@@ -28,6 +28,85 @@ export const formatAllocationValue = (
 };
 
 /**
+ * Format allocation value showing both primary and secondary format
+ * Primary is based on displayPreference, secondary is shown in parenthesis
+ * e.g., "50% (20h)" or "20h (50%)"
+ * 
+ * @param hours The number of hours allocated
+ * @param capacity The weekly capacity (for percentage calculation)
+ * @param displayPreference The company's display preference ('hours' or 'percentage')
+ * @returns Formatted string with both formats
+ */
+export const formatDualAllocationValue = (
+  hours: number,
+  capacity: number,
+  displayPreference: DisplayPreference
+): string => {
+  if (capacity <= 0) return displayPreference === 'percentage' ? '0% (0h)' : '0h (0%)';
+  
+  const percentage = (hours / capacity) * 100;
+  const formattedPercentage = percentage % 1 === 0 ? percentage.toString() : percentage.toFixed(1);
+  const formattedHours = hours % 1 === 0 ? hours.toString() : hours.toFixed(1);
+  
+  if (displayPreference === 'percentage') {
+    return `${formattedPercentage}% (${formattedHours}h)`;
+  }
+  
+  return `${formattedHours}h (${formattedPercentage}%)`;
+};
+
+/**
+ * Get input configuration based on display preference
+ * Returns step, min, max, and unit label for inputs
+ */
+export const getInputConfig = (displayPreference: DisplayPreference) => {
+  if (displayPreference === 'percentage') {
+    return {
+      step: 5,
+      min: 0,
+      max: 200, // Allow over 100% for overtime
+      unit: '%',
+      placeholder: '0'
+    };
+  }
+  return {
+    step: 0.5,
+    min: 0,
+    max: 168, // Max hours in a week
+    unit: 'h',
+    placeholder: '0'
+  };
+};
+
+/**
+ * Convert input value to hours based on display preference
+ */
+export const convertInputToHours = (
+  inputValue: number,
+  capacity: number,
+  displayPreference: DisplayPreference
+): number => {
+  if (displayPreference === 'percentage') {
+    return (inputValue / 100) * capacity;
+  }
+  return inputValue;
+};
+
+/**
+ * Convert hours to input value based on display preference
+ */
+export const convertHoursToInputValue = (
+  hours: number,
+  capacity: number,
+  displayPreference: DisplayPreference
+): number => {
+  if (displayPreference === 'percentage') {
+    return capacity > 0 ? (hours / capacity) * 100 : 0;
+  }
+  return hours;
+};
+
+/**
  * Format capacity value based on display preference
  * 
  * @param capacity The capacity in hours
