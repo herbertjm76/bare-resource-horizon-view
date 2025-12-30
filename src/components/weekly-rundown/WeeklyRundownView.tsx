@@ -31,12 +31,13 @@ export const WeeklyRundownView: React.FC = () => {
   // Get raw data
   const { 
     allMembers, 
+    unsortedMembers,
     projects, 
     isLoading, 
     error,
     getMemberTotalForRundown,
     getProjectCount 
-  } = useStreamlinedWeekResourceData(selectedWeek, stableFilters);
+  } = useStreamlinedWeekResourceData(selectedWeek, stableFilters, sortOption);
 
   // Process data for rundown
   const { rundownItems } = useRundownData({
@@ -144,7 +145,7 @@ export const WeeklyRundownView: React.FC = () => {
         <AvailableMembersRow 
           weekStartDate={weekStartString}
           threshold={80}
-          allMembers={allMembers}
+          allMembers={unsortedMembers}
         />
       )}
 
