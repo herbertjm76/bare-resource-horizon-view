@@ -49,29 +49,6 @@ export const ProjectCellTooltip: React.FC<ProjectCellTooltipProps> = ({
         <div><strong>Total:</strong> {formatValue(totalHours)} this week</div>
       </div>
 
-      {dailyBreakdown.length > 0 && (
-        <div>
-          <div className="font-semibold text-xs mb-2">Daily Breakdown</div>
-          <div className="grid grid-cols-7 gap-1">
-            {weekDays.map((day, index) => {
-              const date = format(addDays(weekStart, index), 'yyyy-MM-dd');
-              const hours = dailyHours.get(date) || 0;
-              return (
-                <div key={day} className="text-center">
-                  <div className="font-medium text-[10px] text-gray-600">{day}</div>
-                  <div className={`text-center p-1 rounded text-[10px] font-medium ${
-                    hours > 0 
-                      ? 'bg-emerald-100 text-emerald-700' 
-                      : 'bg-gray-50 text-gray-400'
-                  }`}>
-                    {hours > 0 ? formatValue(hours) : '—'}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       <div className="text-[10px] text-gray-500 italic">
         Week of {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')}

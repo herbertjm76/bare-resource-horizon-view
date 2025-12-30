@@ -74,28 +74,6 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
         </div>
       </div>
 
-      {/* Daily Breakdown Header */}
-      <div className="border-t border-border pt-2">
-        <div className="font-semibold text-xs mb-2">Daily Project Hours</div>
-        <div className="grid grid-cols-7 gap-1 text-[10px]">
-          {weekDays.map((day, index) => {
-            const date = format(addDays(weekStart, index), 'yyyy-MM-dd');
-            const hours = dailyBreakdown.get(date) || 0;
-            return (
-              <div key={day} className="text-center">
-                <div className="font-medium text-muted-foreground">{day}</div>
-                <div className={`text-center p-1 rounded text-[10px] font-medium ${
-                  hours > 0 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'bg-muted text-muted-foreground'
-                }`}>
-                  {hours > 0 ? formatAllocationValue(hours, capacity, displayPreference) : '—'}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
       {/* Project Breakdown */}
       {projects.length > 0 && (

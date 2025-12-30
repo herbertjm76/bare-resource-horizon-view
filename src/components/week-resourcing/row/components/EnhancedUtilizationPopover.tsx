@@ -80,63 +80,20 @@ export const EnhancedUtilizationPopover: React.FC<EnhancedUtilizationPopoverProp
         </div>
       </div>
 
-      {/* Daily Project Hours Breakdown */}
-      <div className="border-t border-gray-200 pt-3">
-        <div className="font-semibold text-xs mb-2">Daily Project Hours</div>
-        <div className="grid grid-cols-7 gap-1 text-[10px]">
-          {weekDays.map((day, index) => {
-            const date = format(addDays(weekStart, index), 'yyyy-MM-dd');
-            const hours = dailyBreakdown.get(date) || 0;
-            return (
-              <div key={day} className="text-center">
-                <div className="font-medium text-gray-600">{day}</div>
-                <div className={`text-center py-1 px-0.5 rounded text-[10px] font-medium ${
-                  hours > 0 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'bg-gray-50 text-gray-400'
-                }`}>
-                  {hours > 0 ? formatAllocationValue(hours, capacity, displayPreference) : '—'}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
-      {/* Project Breakdown with Daily Hours */}
+      {/* Project Breakdown */}
       {projects.length > 0 && (
         <div className="border-t border-gray-200 pt-3">
           <div className="font-semibold text-xs mb-2">Projects This Week</div>
-          <div className="space-y-2 max-h-40 overflow-y-auto">
+          <div className="space-y-1 max-h-40 overflow-y-auto">
             {projects.map(project => (
-              <div key={project.project_id} className="bg-gray-50 p-2 rounded">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs font-medium text-gray-700 truncate flex-1">
-                    {project.project_code}
-                  </span>
-                  <span className="font-medium text-blue-600 text-xs ml-2">
-                    {formatAllocationValue(project.total_hours, capacity, displayPreference)}
-                  </span>
-                </div>
-                {/* Daily breakdown for this project */}
-                <div className="grid grid-cols-7 gap-1 mt-1">
-                  {weekDays.map((day, index) => {
-                    const date = format(addDays(weekStart, index), 'yyyy-MM-dd');
-                    const dayData = project.daily_breakdown.find(d => d.date === date);
-                    const hours = dayData?.hours || 0;
-                    return (
-                      <div key={`${project.project_id}-${day}`} className="text-center">
-                        <div className={`text-[9px] py-0.5 px-0.5 rounded ${
-                          hours > 0 
-                            ? 'bg-emerald-100 text-emerald-700 font-medium' 
-                            : 'bg-gray-100 text-gray-400'
-                        }`}>
-                          {hours > 0 ? formatAllocationValue(hours, capacity, displayPreference) : '—'}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+              <div key={project.project_id} className="flex justify-between items-center text-xs bg-gray-50 p-1.5 rounded">
+                <span className="text-gray-700 truncate flex-1">
+                  {project.project_code}
+                </span>
+                <span className="font-medium text-blue-600 ml-2">
+                  {formatAllocationValue(project.total_hours, capacity, displayPreference)}
+                </span>
               </div>
             ))}
           </div>
