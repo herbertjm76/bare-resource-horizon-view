@@ -68,17 +68,6 @@ export const EnhancedUtilizationPopover: React.FC<EnhancedUtilizationPopoverProp
         {memberName} — Weekly Utilization
       </div>
       
-      {/* Summary Stats */}
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        <div className="bg-blue-50 p-2 rounded">
-          <div className="font-semibold text-blue-700">Utilization</div>
-          <div className="text-blue-600">{utilizationPercentage}%</div>
-        </div>
-        <div className="bg-green-50 p-2 rounded">
-          <div className="font-semibold text-green-700">Capacity</div>
-          <div className="text-green-600">{formatUtilizationSummary(totalUsedHours, capacity, displayPreference)}</div>
-        </div>
-      </div>
 
 
       {/* Project Breakdown */}
@@ -131,14 +120,6 @@ export const EnhancedUtilizationPopover: React.FC<EnhancedUtilizationPopoverProp
         </div>
       )}
 
-      {/* Strategic Insight */}
-      <div className="border-t border-gray-200 pt-2 text-xs text-gray-600 italic">
-        {utilizationPercentage > 100
-          ? "⚠️ Overallocation risk! Review project loads or adjust capacity."
-          : utilizationPercentage < 60
-          ? "📈 Low utilization. Consider re-assigning or rebalancing workload."
-          : "✅ Healthy workload distribution this week."}
-      </div>
     </div>
   );
 };
