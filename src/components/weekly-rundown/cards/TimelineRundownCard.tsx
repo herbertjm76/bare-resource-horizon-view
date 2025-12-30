@@ -106,12 +106,12 @@ export const TimelineRundownCard: React.FC<TimelineRundownCardProps> = ({
           {entries.map((entry) => (
             <div 
               key={entry.id} 
-              className="flex items-center justify-between gap-2 py-1 px-2 rounded bg-muted/50 group"
+              className="flex items-center justify-between gap-2 py-1 group"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <span className="text-xs font-medium text-primary whitespace-nowrap">
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 shrink-0">
                   {format(parseISO(entry.event_date), 'MMM d')}
-                </span>
+                </Badge>
                 <span className="text-sm leading-relaxed text-foreground truncate">{entry.title}</span>
               </div>
               <Button
