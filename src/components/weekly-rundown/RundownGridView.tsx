@@ -138,11 +138,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
                 </div>
               </TooltipTrigger>
               <TooltipContent side="top" className="text-xs">
-                <p className="font-medium">Leave this week</p>
-                {person.leave?.annualLeave > 0 && <p>Annual: {person.leave.annualLeave}h</p>}
-                {person.leave?.vacationLeave > 0 && <p>Vacation: {person.leave.vacationLeave}h</p>}
-                {person.leave?.medicalLeave > 0 && <p>Medical: {person.leave.medicalLeave}h</p>}
-                {person.leave?.publicHoliday > 0 && <p>Public Holiday: {person.leave.publicHoliday}h</p>}
+                Leave: {formatAllocationValue(totalLeaveHours, capacity, displayPreference)}
               </TooltipContent>
             </Tooltip>
           )}
