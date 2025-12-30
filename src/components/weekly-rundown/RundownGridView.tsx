@@ -404,42 +404,41 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
                   +{project.teamMembers.length - 8}
                 </div>
               )}
-              {/* Add member button */}
+            </div>
+          </div>
+
+          {/* Footer Row - Stats on left, Add + Edit on right */}
+          <div className="flex items-center justify-between pt-2 mt-2 border-t border-border/50">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold">{project.teamMembers?.length || 0}</span>
+                <span className="text-[10px] text-muted-foreground">team</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold">{formatAllocationValue(totalHours, teamCapacity, displayPreference)}</span>
+                <span className="text-[10px] text-muted-foreground">total</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
               <AddTeamMemberAllocation
                 projectId={project.id}
                 weekStartDate={weekStartDate}
                 variant="compact"
               />
+              <Button 
+                size="icon"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditDialogOpen(true);
+                }}
+                className="h-7 w-7"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
             </div>
-          </div>
-
-          {/* Stats Row */}
-          <div className="flex items-center justify-between pt-2 mt-2 border-t border-border/50">
-            <div className="flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs font-semibold">{project.teamMembers?.length || 0}</span>
-              <span className="text-[10px] text-muted-foreground">team</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs font-semibold">{formatAllocationValue(totalHours, teamCapacity, displayPreference)}</span>
-              <span className="text-[10px] text-muted-foreground">total</span>
-            </div>
-          </div>
-
-          {/* Edit Button */}
-          <div className="flex justify-end mt-2">
-            <Button 
-              size="icon"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                setEditDialogOpen(true);
-              }}
-              className="h-7 w-7"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </Button>
           </div>
         </div>
       </div>
