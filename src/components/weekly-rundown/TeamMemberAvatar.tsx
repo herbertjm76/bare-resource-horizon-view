@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { MemberVacationPopover } from './MemberVacationPopover';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { formatDualAllocationValue } from '@/utils/allocationDisplay';
 
 interface TeamMemberAvatarProps {
   member: {
@@ -214,7 +214,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
                     <div className="flex flex-col items-center gap-1">
                       <p className="font-semibold text-sm text-foreground">{firstName}</p>
                       <StandardizedBadge variant="metric" size="sm">
-                        {formatAllocationValue(member.hours, capacity, displayPreference)}
+                        {formatDualAllocationValue(member.hours, capacity, displayPreference)}
                       </StandardizedBadge>
                     </div>
                   </div>
@@ -234,7 +234,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Remove team member?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove {member.name}'s allocation of {formatAllocationValue(member.hours, capacity, displayPreference)} from this project for this week.
+              This will remove {member.name}'s allocation of {formatDualAllocationValue(member.hours, capacity, displayPreference)} from this project for this week.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
