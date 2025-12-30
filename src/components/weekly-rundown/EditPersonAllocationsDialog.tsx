@@ -246,13 +246,19 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
     }
   });
 
-  const handleSave = (allocationId: string, projectName: string) => {
-    const hoursValue = hours[allocationId];
-    if (!hoursValue || hoursValue <= 0) {
-      toast.error('Please enter valid hours');
+  const handleSave = (allocationId: string, projectName: string, currentHours: number) => {
+    const inputValue = hours[allocationId];
+    if (inputValue === undefined || inputValue <= 0) {
+      toast.error(`Please enter valid ${displayPreference === 'percentage' ? 'percentage' : 'hours'}`);
       return;
     }
-    updateAllocationMutation.mutate({ allocationId, newHours: hoursValue });
+    
+    // Convert percentage to hours if needed
+    const newHours = displayPreference === 'percentage' 
+      ? (inputValue / 100) * capacity 
+      : inputValue;
+    
+    updateAllocationMutation.mutate({ allocationId, newHours });
   };
 
   const handleDelete = (allocationId: string, projectName: string) => {
@@ -287,16 +293,21 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                         <Input
                           type="number"
                           min="0"
-                          max="168"
-                          placeholder={project.hours.toString()}
+                          max={displayPreference === 'percentage' ? '100' : '168'}
+                          placeholder={displayPreference === 'percentage' 
+                            ? Math.round((project.hours / capacity) * 100).toString()
+                            : project.hours.toString()}
                           value={hours[project.allocationId || project.id] || ''}
                           onChange={(e) => setHours({ ...hours, [project.allocationId || project.id]: parseFloat(e.target.value) || 0 })}
                           className="w-20"
+                          step={displayPreference === 'percentage' ? '5' : '0.5'}
                         />
-                        <span className="text-sm text-muted-foreground">hours</span>
+                        <span className="text-sm text-muted-foreground">
+                          {displayPreference === 'percentage' ? '%' : 'hours'}
+                        </span>
                         <Button 
                           size="sm" 
-                          onClick={() => handleSave(project.allocationId || project.id, project.name)}
+                          onClick={() => handleSave(project.allocationId || project.id, project.name, project.hours)}
                           disabled={!hours[project.allocationId || project.id] || updateAllocationMutation.isPending}
                           className="bg-gradient-start hover:bg-gradient-mid text-white"
                         >
