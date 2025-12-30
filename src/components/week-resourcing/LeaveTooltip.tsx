@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { format } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { formatDualAllocationValue } from '@/utils/allocationDisplay';
 
 interface LeaveDay {
   date: string;
@@ -39,7 +38,7 @@ export const LeaveTooltip: React.FC<LeaveTooltipProps> = ({
           </div>
         </TooltipTrigger>
         <TooltipContent className="text-xs">
-          {leaveType}: {formatAllocationValue(leaveDays.reduce((sum, day) => sum + day.hours, 0), effectiveCapacity, displayPreference)}
+          {leaveType}: {formatDualAllocationValue(leaveDays.reduce((sum, day) => sum + day.hours, 0), effectiveCapacity, displayPreference)}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

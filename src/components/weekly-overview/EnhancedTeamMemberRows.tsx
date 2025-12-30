@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Project, MemberAllocation } from './types';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
+import { formatAllocationValue, formatCapacityValue, formatDualAllocationValue, getInputConfig, convertInputToHours, convertHoursToInputValue } from '@/utils/allocationDisplay';
 
 interface EnhancedTeamMemberRowsProps {
   filteredOffices: string[];
@@ -98,17 +98,20 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                     // Find allocation for this project
                     const projectAllocation = allocation.projectAllocations.find(pa => pa.projectId === project.id);
                     const projectHours = projectAllocation?.hours || 0;
+                    const inputConfig = getInputConfig(displayPreference);
+                    const displayValue = convertHoursToInputValue(projectHours, weeklyCapacity, displayPreference);
                     
                     return (
                       <TableCell key={project.id} className="text-center">
                         <input
                           type="number"
-                          min="0"
-                          max="40"
-                          step="0.5"
-                          value={projectHours || ''}
+                          min={inputConfig.min}
+                          max={inputConfig.max}
+                          step={inputConfig.step}
+                          value={displayValue || ''}
                           onChange={(e) => {
-                            const newHours = parseFloat(e.target.value) || 0;
+                            const inputValue = parseFloat(e.target.value) || 0;
+                            const newHours = convertInputToHours(inputValue, weeklyCapacity, displayPreference);
                             // Update the project allocations array
                             const updatedProjectAllocations = [...allocation.projectAllocations];
                             const existingIndex = updatedProjectAllocations.findIndex(pa => pa.projectId === project.id);
@@ -130,7 +133,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                             handleInputChange(member.id, 'projectAllocations', updatedProjectAllocations);
                           }}
                           className="enhanced-input"
-                          placeholder="0"
+                          placeholder={inputConfig.placeholder}
                         />
                       </TableCell>
                     );
@@ -139,7 +142,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                   {/* Total Hours - Enhanced styling */}
                   <TableCell className="text-center total-hours-column">
                     <div className="enhanced-hours-pill">
-                      {formatAllocationValue(totalHours, weeklyCapacity, displayPreference)}
+                      {formatDualAllocationValue(totalHours, weeklyCapacity, displayPreference)}
                     </div>
                   </TableCell>
 
@@ -162,8 +165,8 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
 
                   {/* Annual Leave - READ-ONLY display with gray styling */}
                   <TableCell className="text-center">
-                    <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-medium rounded-lg bg-muted text-muted-foreground border border-border cursor-default">
-                      {allocation.annualLeave || 0}h
+                    <div className="inline-flex items-center justify-center w-auto px-2 h-6 text-xs font-medium rounded-lg bg-muted text-muted-foreground border border-border cursor-default">
+                      {formatDualAllocationValue(allocation.annualLeave || 0, weeklyCapacity, displayPreference)}
                     </div>
                   </TableCell>
 
