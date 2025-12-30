@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Building2, Check, ChevronsUpDown } from 'lucide-react';
+import { Plus, Check, ChevronsUpDown } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import {
@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -275,19 +275,15 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
                       </Command>
                     </PopoverContent>
                   </Popover>
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateNew(true)}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                  >
+                    <Plus className="h-3 w-3" />
+                    or create a new project
+                  </button>
                 </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setShowCreateNew(true)}
-                >
-                  <Building2 className="h-4 w-4 mr-2" />
-                  Create New Project
-                </Button>
-
-                <Separator />
 
                 <div className="space-y-2">
                   <Label htmlFor="hours">
@@ -367,18 +363,19 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
                   </Button>
                 </div>
 
-                <Separator />
-
-                <div className="space-y-2">
-                  <Label htmlFor="hours">Hours</Label>
+                <div className="border-t pt-4 space-y-2">
+                  <Label htmlFor="hours">
+                    {displayPreference === 'percentage' ? 'Percentage' : 'Hours'}
+                  </Label>
                   <Input
                     id="hours"
                     type="number"
                     value={hours}
                     onChange={(e) => setHours(e.target.value)}
-                    placeholder="Enter hours"
-                    step="0.5"
+                    placeholder={displayPreference === 'percentage' ? 'Enter percentage (e.g. 50)' : 'Enter hours'}
+                    step={displayPreference === 'percentage' ? '5' : '0.5'}
                     min="0"
+                    max={displayPreference === 'percentage' ? '100' : undefined}
                   />
                 </div>
               </>
