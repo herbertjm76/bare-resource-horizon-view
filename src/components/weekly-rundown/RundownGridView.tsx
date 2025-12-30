@@ -14,6 +14,7 @@ import { EditProjectAllocationsDialog } from './EditProjectAllocationsDialog';
 import { MemberVacationPopover } from './MemberVacationPopover';
 import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
 import { AddProjectAllocation } from './AddProjectAllocation';
+import { OtherLeaveSection } from './OtherLeaveSection';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
@@ -232,22 +233,34 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
         </div>
       )}
 
-      {/* Action Buttons */}
+      {/* Footer Row - Stats on left, Action buttons on right */}
       <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
-        <AddProjectAllocation
-          memberId={person.id}
-          weekStartDate={weekStartDate}
-          existingProjectIds={person.projects?.map((p: any) => p.id) || []}
-          onAdd={handleDataChange}
-        />
-        <Button 
-          size="icon"
-          variant="ghost"
-          onClick={() => setEditDialogOpen(true)}
-          className="h-7 w-7"
-        >
-          <Pencil className="h-3.5 w-3.5" />
-        </Button>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>{person.projects?.length || 0} projects</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <AddProjectAllocation
+            memberId={person.id}
+            weekStartDate={weekStartDate}
+            existingProjectIds={person.projects?.map((p: any) => p.id) || []}
+            onAdd={handleDataChange}
+            variant="compact"
+          />
+          <OtherLeaveSection
+            memberId={person.id}
+            weekStartDate={weekStartDate}
+            onUpdate={handleDataChange}
+            variant="compact"
+          />
+          <Button 
+            size="icon"
+            variant="ghost"
+            onClick={() => setEditDialogOpen(true)}
+            className="h-7 w-7"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
     </div>
 

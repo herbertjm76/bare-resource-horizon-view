@@ -250,8 +250,8 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
               </div>
             )}
           
-            {/* Add Project and Other Leave Buttons */}
-            <div className="mt-3 flex gap-1.5">
+            {/* Action Buttons - Lower Right */}
+            <div className="mt-3 flex justify-end gap-1.5">
               <AddProjectAllocation
                 memberId={person.id}
                 weekStartDate={weekStartDate}
@@ -263,6 +263,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                 memberId={person.id}
                 weekStartDate={weekStartDate}
                 onUpdate={handleDataChange}
+                variant="compact"
               />
             </div>
           </div>
