@@ -3,11 +3,12 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, X, FileText, Loader2, ExternalLink, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { Plus, FileText, Loader2, ExternalLink, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
+import { PdfThumbnail } from './PdfThumbnail';
 
 interface PdfRundownCardProps {
   cardType: {
@@ -146,45 +147,30 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
         onClick={() => setIsManageOpen(true)}
       >
         {currentPdf ? (
-          // Full bleed PDF preview - using object tag for better PDF rendering
+          // Render first page via PDF.js -> consistent cross-browser preview
           <div className="absolute inset-0 bg-muted">
-            <object 
-              data={`${currentPdf.file_url}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
-              type="application/pdf"
-              className="w-full h-full"
-              style={{ border: 'none' }}
-            >
-              {/* Fallback if PDF can't be embedded */}
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/30 dark:to-red-900/20">
-                <div className="text-center">
-                  <FileText className="h-12 w-12 text-red-500 mx-auto mb-1" />
-                  <p className="text-xs font-medium text-foreground truncate max-w-[150px] px-2">
-                    {currentPdf.file_name}
-                  </p>
-                </div>
-              </div>
-            </object>
-            
+            <PdfThumbnail url={currentPdf.file_url} className="absolute inset-0" />
+
             {/* Overlay gradient for readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
-            
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/40 pointer-events-none" />
+
             {/* Label at top */}
             <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-2 pointer-events-none">
-              <span className="text-xs font-semibold text-white uppercase tracking-wide drop-shadow-lg">
+              <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
                 {cardType.label}
               </span>
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-white/20 text-white border-0">
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
                 {files.length}
               </Badge>
             </div>
-            
+
             {/* Navigation arrows */}
             {files.length > 1 && (
               <>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute left-1 top-1/2 -translate-y-1/2 h-6 w-6 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute left-1 top-1/2 -translate-y-1/2 h-6 w-6 bg-background/60 hover:bg-background/80 text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={goToPrev}
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -192,14 +178,14 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 bg-background/60 hover:bg-background/80 text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={goToNext}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </>
             )}
-            
+
             {/* Dots indicator */}
             {files.length > 1 && (
               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none">
@@ -207,7 +193,7 @@ export const PdfRundownCard: React.FC<PdfRundownCardProps> = ({
                   <div
                     key={idx}
                     className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                      idx === currentIndex ? 'bg-white' : 'bg-white/40'
+                      idx === currentIndex ? 'bg-foreground' : 'bg-foreground/40'
                     }`}
                   />
                 ))}
