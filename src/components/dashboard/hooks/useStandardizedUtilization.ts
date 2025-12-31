@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useIndividualUtilization } from './useIndividualUtilization';
 import { TeamMember, PendingMember } from '../types';
 import { TimeRange } from '../TimeRangeSelector';
+import { logger } from '@/utils/logger';
 
 interface UtilizationResult {
   utilizationRate: number;
@@ -36,7 +37,7 @@ export const useStandardizedUtilization = (
 
     const averageUtilization = totalUtilization / teamMembers.length;
     
-    console.log('📊 STANDARDIZED utilization calculation INCLUDING PENDING:', {
+    logger.log('📊 STANDARDIZED utilization calculation INCLUDING PENDING:', {
       selectedTimeRange,
       totalMembers: teamMembers.length,
       activeMembers: teamMembers.filter(m => !isPendingMember(m)).length,

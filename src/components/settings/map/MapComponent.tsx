@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
+import { logger } from '@/utils/logger';
 
 interface Location {
   id: string;
@@ -48,7 +49,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations, company }) => {
 
         // If we have locations, center the map on them
         if (locations && locations.length > 0) {
-          console.log('Office locations to map:', locations);
+          logger.log('Office locations to map:', locations);
           
           // Calculate center point of all locations
           const bounds = L.latLngBounds([]);
@@ -56,7 +57,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations, company }) => {
           // Get coordinates for each office location
           const locationCoords = locations.map(location => {
             const coords = getCoordinatesForLocation(location.city, location.country);
-            console.log(`Mapping ${location.city}, ${location.country} to coordinates:`, coords);
+            logger.log(`Mapping ${location.city}, ${location.country} to coordinates:`, coords);
             return { ...location, lat: coords.lat, lng: coords.lng };
           });
 
@@ -120,7 +121,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations, company }) => {
 
         mapInstanceRef.current = map;
       } catch (error) {
-        console.error('Error initializing map:', error);
+        logger.error('Error initializing map:', error);
       }
     };
 
@@ -150,7 +151,7 @@ const getCoordinatesForLocation = (city: string, country: string) => {
   const cityOnly = city.toLowerCase();
   const countryOnly = country.toLowerCase();
 
-  console.log(`Looking up coordinates for: "${cityKey}" (city: "${cityOnly}", country: "${countryOnly}")`);
+  logger.log(`Looking up coordinates for: "${cityKey}" (city: "${cityOnly}", country: "${countryOnly}")`);
 
   // Comprehensive city coordinates mapping
   const cityCoords: { [key: string]: { lat: number; lng: number } } = {
@@ -285,13 +286,13 @@ const getCoordinatesForLocation = (city: string, country: string) => {
 
   // Try exact match first (city, country)
   if (cityCoords[cityKey]) {
-    console.log(`Found exact match for "${cityKey}":`, cityCoords[cityKey]);
+    logger.log(`Found exact match for "${cityKey}":`, cityCoords[cityKey]);
     return cityCoords[cityKey];
   }
 
   // Try city-only match
   if (cityCoords[cityOnly]) {
-    console.log(`Found city-only match for "${cityOnly}":`, cityCoords[cityOnly]);
+    logger.log(`Found city-only match for "${cityOnly}":`, cityCoords[cityOnly]);
     return cityCoords[cityOnly];
   }
 
@@ -351,12 +352,12 @@ const getCoordinatesForLocation = (city: string, country: string) => {
 
   // Use country fallback
   if (countryCoords[countryOnly]) {
-    console.log(`Found country fallback for "${countryOnly}":`, countryCoords[countryOnly]);
+    logger.log(`Found country fallback for "${countryOnly}":`, countryCoords[countryOnly]);
     return countryCoords[countryOnly];
   }
 
   // Ultimate fallback - return a default location (London)
-  console.warn(`No coordinates found for "${city}, ${country}". Using default location (London).`);
+  logger.warn(`No coordinates found for "${city}, ${country}". Using default location (London).`);
   return { lat: 51.5074, lng: -0.1278 };
 };
 

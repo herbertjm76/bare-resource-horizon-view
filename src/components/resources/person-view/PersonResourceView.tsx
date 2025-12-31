@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { MobilePersonControls } from './MobilePersonControls';
+import { logger } from '@/utils/logger';
 
 interface MemberFilters {
   practiceArea: string;
@@ -75,7 +76,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   useEffect(() => {
     if (!company?.id) return;
 
-    console.log('🔔 Setting up real-time subscription for person totals');
+    logger.log('🔔 Setting up real-time subscription for person totals');
     
     const channel = supabase
       .channel('person-allocations-updates')
@@ -85,7 +86,7 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
         table: 'project_resource_allocations',
         filter: `company_id=eq.${company.id}`
       }, (payload) => {
-        console.log('🔔 Allocation changed, refreshing person totals:', payload);
+        logger.log('🔔 Allocation changed, refreshing person totals:', payload);
         refetch();
       })
       .subscribe();
