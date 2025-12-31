@@ -3,18 +3,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Profile } from '@/components/dashboard/types';
 import { Database } from '@/integrations/supabase/types';
+import { logger } from '@/utils/logger';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
 export const useActiveMemberService = (companyId: string | undefined) => {
   const updateActiveMember = async (memberData: Partial<Profile>): Promise<boolean> => {
     if (!companyId || !memberData.id) {
-      console.error('Company ID and member ID are required');
+      logger.error('Company ID and member ID are required');
       return false;
     }
 
     try {
-      console.log('Updating active member:', memberData.id, memberData);
+      logger.log('Updating active member:', memberData.id, memberData);
 
       // Update the profiles table
       const { error } = await supabase
@@ -34,13 +35,13 @@ export const useActiveMemberService = (companyId: string | undefined) => {
         .eq('company_id', companyId);
 
       if (error) {
-        console.error('Error updating active member:', error);
+        logger.error('Error updating active member:', error);
         throw error;
       }
 
       // Update role in user_roles table if role is provided
       if (memberData.role) {
-        console.log('Updating user role to:', memberData.role);
+        logger.log('Updating user role to:', memberData.role);
         
         // First, delete existing roles for this user in this company
         await supabase
@@ -59,7 +60,7 @@ export const useActiveMemberService = (companyId: string | undefined) => {
           });
 
         if (roleError) {
-          console.error('Error updating user role:', roleError);
+          logger.error('Error updating user role:', roleError);
           // Don't throw, just log - profile update was successful
         }
       }
@@ -67,7 +68,7 @@ export const useActiveMemberService = (companyId: string | undefined) => {
       toast.success('Team member updated successfully');
       return true;
     } catch (error: any) {
-      console.error('Error in updateActiveMember:', error);
+      logger.error('Error in updateActiveMember:', error);
       toast.error(error.message || 'Failed to update team member');
       return false;
     }
@@ -75,7 +76,7 @@ export const useActiveMemberService = (companyId: string | undefined) => {
 
   const deleteActiveMember = async (memberId: string): Promise<boolean> => {
     if (!companyId) {
-      console.error('Company ID is required');
+      logger.error('Company ID is required');
       return false;
     }
 
@@ -95,13 +96,13 @@ export const useActiveMemberService = (companyId: string | undefined) => {
         .eq('company_id', companyId);
 
       if (error) {
-        console.error('Error deleting active member:', error);
+        logger.error('Error deleting active member:', error);
         throw error;
       }
 
       return true;
     } catch (error: any) {
-      console.error('Error in deleteActiveMember:', error);
+      logger.error('Error in deleteActiveMember:', error);
       throw error;
     }
   };

@@ -2,6 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { MemberAllocation } from '@/components/weekly-overview/types';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook to manage the state of resource allocations
@@ -19,7 +20,7 @@ export function useResourceAllocationState() {
     // If loading takes more than 8 seconds, force it to complete
     const safetyTimer = setTimeout(() => {
       if (isLoading) {
-        console.log('Allocation state loading safety timeout reached, forcing completion');
+        logger.log('Allocation state loading safety timeout reached, forcing completion');
         toast.info("Some data may still be loading", { duration: 3000 });
         setIsLoading(false);
       }
@@ -58,7 +59,7 @@ export function useResourceAllocationState() {
   
   // Function to handle input changes (e.g., hours, remarks)
   const handleInputChange = useCallback((memberId: string, field: string, value: any) => {
-    console.log(`Updating ${field} for member ${memberId} to:`, value);
+    logger.log(`Updating ${field} for member ${memberId} to:`, value);
     
     setMemberAllocations(prev => {
       const allocation = getMemberAllocation(memberId);

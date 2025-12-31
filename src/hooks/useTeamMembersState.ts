@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Profile, PendingMember, Invite, TeamMember } from '@/components/dashboard/types';
+import { logger } from '@/utils/logger';
 
 export const useTeamMembersState = (companyId: string | undefined, userRole: string) => {
   const [preRegisteredMembers, setPreRegisteredMembers] = useState<PendingMember[]>([]);
@@ -20,7 +21,7 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
       }
       
       setIsLoadingInvites(true);
-      console.log('Fetching invites - refresh flag:', refreshFlag);
+      logger.log('Fetching invites - refresh flag:', refreshFlag);
       const { data: invites, error } = await supabase
         .from('invites')
         .select('*')
@@ -30,12 +31,12 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
         
       if (error) {
         toast.error('Failed to load invites');
-        console.error('Error fetching invites:', error);
+        logger.error('Error fetching invites:', error);
         setIsLoadingInvites(false);
         return;
       }
       
-      console.log('Fetched invites:', invites?.length || 0, 'for company:', companyId);
+      logger.log('Fetched invites:', invites?.length || 0, 'for company:', companyId);
       
       // Process invites into pendingMembers and emailInvites
       const pendingMembers: PendingMember[] = (invites || []).map(invite => ({
@@ -44,7 +45,7 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
       }));
       
       const preReg = pendingMembers.filter(member => member.invitation_type === 'pre_registered');
-      console.log('Pre-registered members:', preReg.length);
+      logger.log('Pre-registered members:', preReg.length);
       
       setPreRegisteredMembers(preReg);
       setEmailInvites((invites || []).filter(invite => invite.invitation_type === 'email_invite'));

@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { calculatePeriodUtilization, getUtilizationPeriods } from './utils';
 import { IndividualUtilization } from './types';
+import { logger } from '@/utils/logger';
 
 export const calculateActiveUtilizations = async (
   activeMembers: TeamMember[],
@@ -20,7 +21,7 @@ export const calculateActiveUtilizations = async (
 
   const activeMemberIds = activeMembers.map(member => member.id);
   
-  console.log('Fetching allocations for active member IDs:', activeMemberIds);
+  logger.log('Fetching allocations for active member IDs:', activeMemberIds);
   
   // Fetch allocations for active members
   const { data: activeAllocations, error: activeError } = await supabase
@@ -34,22 +35,22 @@ export const calculateActiveUtilizations = async (
 
   if (activeError) throw activeError;
 
-  console.log('Active allocations fetched:', activeAllocations?.length || 0);
-  console.log('Active allocations data:', activeAllocations);
+  logger.log('Active allocations fetched:', activeAllocations?.length || 0);
+  logger.log('Active allocations data:', activeAllocations);
 
   // Calculate utilization for active members
   activeMembers.forEach(member => {
     const memberCapacity = member.weekly_capacity || workWeekHours;
     
-    console.log(`--- Active Member ${member.first_name} ${member.last_name} (${member.id}) (Capacity: ${memberCapacity}h/week) ---`);
+    logger.log(`--- Active Member ${member.first_name} ${member.last_name} (${member.id}) (Capacity: ${memberCapacity}h/week) ---`);
 
     // Get allocations for this specific member
     const memberAllocations = activeAllocations?.filter(allocation => 
       allocation.resource_id === member.id
     ) || [];
     
-    console.log(`Member allocations found: ${memberAllocations.length}`);
-    console.log(`Member allocations data:`, memberAllocations);
+    logger.log(`Member allocations found: ${memberAllocations.length}`);
+    logger.log(`Member allocations data:`, memberAllocations);
 
     const periods = getUtilizationPeriods(currentWeekStart);
     

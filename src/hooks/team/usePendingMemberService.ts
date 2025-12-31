@@ -2,16 +2,17 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { PendingMember } from '@/components/dashboard/types';
+import { logger } from '@/utils/logger';
 
 export const usePendingMemberService = (companyId: string | undefined) => {
   const updatePendingMember = async (memberData: Partial<PendingMember>): Promise<boolean> => {
     if (!companyId || !memberData.id) {
-      console.error('Company ID and member ID are required');
+      logger.error('Company ID and member ID are required');
       return false;
     }
 
     try {
-      console.log('Updating pending member:', memberData.id, memberData);
+      logger.log('Updating pending member:', memberData.id, memberData);
 
       // Only update the invites table, never touch auth.users
       const { error } = await supabase
@@ -32,14 +33,14 @@ export const usePendingMemberService = (companyId: string | undefined) => {
         .eq('company_id', companyId);
 
       if (error) {
-        console.error('Error updating pending member:', error);
+        logger.error('Error updating pending member:', error);
         throw error;
       }
 
       toast.success('Pre-registered member updated successfully');
       return true;
     } catch (error: any) {
-      console.error('Error in updatePendingMember:', error);
+      logger.error('Error in updatePendingMember:', error);
       toast.error(error.message || 'Failed to update pre-registered member');
       return false;
     }
@@ -47,18 +48,18 @@ export const usePendingMemberService = (companyId: string | undefined) => {
 
   const createPendingMember = async (memberData: Partial<PendingMember>): Promise<boolean> => {
     if (!companyId) {
-      console.error('Company ID is required');
+      logger.error('Company ID is required');
       return false;
     }
 
     try {
-      console.log('Creating pending member:', memberData);
+      logger.log('Creating pending member:', memberData);
 
       // Get current user session to get the user ID
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !sessionData?.session?.user) {
-        console.error('Error getting current user session:', sessionError);
+        logger.error('Error getting current user session:', sessionError);
         toast.error('Authentication required to create pre-registered member');
         return false;
       }
@@ -86,14 +87,14 @@ export const usePendingMemberService = (companyId: string | undefined) => {
         });
 
       if (error) {
-        console.error('Error creating pending member:', error);
+        logger.error('Error creating pending member:', error);
         throw error;
       }
 
       toast.success('Pre-registered member created successfully');
       return true;
     } catch (error: any) {
-      console.error('Error in createPendingMember:', error);
+      logger.error('Error in createPendingMember:', error);
       toast.error(error.message || 'Failed to create pre-registered member');
       return false;
     }
@@ -101,7 +102,7 @@ export const usePendingMemberService = (companyId: string | undefined) => {
 
   const deletePendingMember = async (memberId: string): Promise<boolean> => {
     if (!companyId) {
-      console.error('Company ID is required');
+      logger.error('Company ID is required');
       return false;
     }
 
@@ -113,13 +114,13 @@ export const usePendingMemberService = (companyId: string | undefined) => {
         .eq('company_id', companyId);
 
       if (error) {
-        console.error('Error deleting pending member:', error);
+        logger.error('Error deleting pending member:', error);
         throw error;
       }
 
       return true;
     } catch (error: any) {
-      console.error('Error in deletePendingMember:', error);
+      logger.error('Error in deletePendingMember:', error);
       throw error;
     }
   };

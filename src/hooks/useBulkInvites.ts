@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { logger } from "@/utils/logger";
 
 export const useBulkInvites = () => {
   const { toast } = useToast();
@@ -19,18 +20,18 @@ export const useBulkInvites = () => {
     setIsSending(true);
 
     try {
-      console.log("Sending bulk invites for:", inviteIds);
+      logger.log("Sending bulk invites for:", inviteIds);
 
       const { data, error } = await supabase.functions.invoke("send-bulk-invites", {
         body: { inviteIds },
       });
 
       if (error) {
-        console.error("Error sending bulk invites:", error);
+        logger.error("Error sending bulk invites:", error);
         throw error;
       }
 
-      console.log("Bulk invite results:", data);
+      logger.log("Bulk invite results:", data);
 
       if (data?.results) {
         const { successful, failed, errors } = data.results;
@@ -47,7 +48,7 @@ export const useBulkInvites = () => {
             variant: "destructive",
           });
         } else if (failed > 0) {
-          console.error("Failed invites:", errors);
+          logger.error("Failed invites:", errors);
           const errorMessage = errors?.[0] || `${failed} invite(s) could not be sent.`;
           const needsEmail = errorMessage.includes("no email address");
           
@@ -63,7 +64,7 @@ export const useBulkInvites = () => {
 
       return true;
     } catch (error: any) {
-      console.error("Failed to send bulk invites:", error);
+      logger.error("Failed to send bulk invites:", error);
       toast({
         title: "Failed to send invites",
         description: error.message || "An error occurred while sending invite emails.",

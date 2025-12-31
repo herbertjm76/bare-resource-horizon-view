@@ -3,6 +3,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { format, startOfWeek } from 'date-fns';
 import { UtilizationCalculationService, MemberUtilizationData, TeamUtilizationSummary } from '@/services/utilizationCalculationService';
+import { logger } from '@/utils/logger';
 
 interface UseStandardizedUtilizationDataProps {
   selectedWeek: Date;
@@ -85,7 +86,7 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers, time
         const endTime = timeRange ? timeRange.endDate.getTime() : new Date(queryEndDate).getTime();
         const numberOfWeeks = Math.max(1, Math.ceil((endTime - startTime) / millisecondsInWeek));
         
-        console.log('📊 UTILIZATION CALCULATION:', {
+        logger.log('UTILIZATION CALCULATION:', {
           queryStartDate,
           queryEndDate,
           numberOfWeeks,
@@ -134,7 +135,7 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers, time
           // Calculate average other leave hours per week
           const otherLeaveHours = totalOtherLeaveHours / numberOfWeeks;
           
-          console.log(`📊 ${member.first_name} ${member.last_name}:`, {
+          logger.log(`${member.first_name} ${member.last_name}:`, {
             totalProjectHours,
             numberOfWeeks,
             averageProjectHours: projectHours,
@@ -155,7 +156,7 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers, time
         setMemberUtilizations(memberUtilizationData);
         setTeamSummary(teamSummaryData);
       } catch (err) {
-        console.error('Error fetching utilization data:', err);
+        logger.error('Error fetching utilization data:', err);
         setError(err instanceof Error ? err : new Error('Failed to fetch utilization data'));
         // Don't show loading indefinitely on error
         setIsLoading(false);
