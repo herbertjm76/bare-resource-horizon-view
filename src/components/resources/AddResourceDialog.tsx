@@ -31,6 +31,7 @@ import type { Database } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/utils/logger';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Invite = Database['public']['Tables']['invites']['Row'];
@@ -175,7 +176,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
       const resource = resourceOptions.find(r => r.id === selectedResource);
       if (!resource) throw new Error('Resource not found');
       
-      console.log('Adding resource:', { 
+      logger.debug('Adding resource:', { 
         resource,
         projectId,
         companyId: company.id,
@@ -199,7 +200,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
           throw error;
         }
         
-        console.log('Added pending resource:', data);
+        logger.debug('Added pending resource:', data);
       } else {
         // Add active resource - explicitly include company_id
         const { data, error } = await supabase
@@ -217,7 +218,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
           throw error;
         }
         
-        console.log('Added active resource:', data);
+        logger.debug('Added active resource:', data);
       }
       
       // Call the onAdd callback with the resource details

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 export const useProjectFields = (project: any, refetch: () => void) => {
   const [editableFields, setEditableFields] = useState<Record<string, any>>({});
@@ -113,7 +114,7 @@ export const useProjectFields = (project: any, refetch: () => void) => {
       const updateData = getPendingUpdates(projectId);
       if (Object.keys(updateData).length === 0) return false;
 
-      console.log(`Saving project ${projectId} with updates:`, updateData);
+      logger.debug(`Saving project ${projectId} with updates:`, updateData);
 
       const { error } = await supabase
         .from('projects')
@@ -134,7 +135,7 @@ export const useProjectFields = (project: any, refetch: () => void) => {
         [projectId]: { ...editableFields[projectId] }
       }));
 
-      console.log(`Successfully saved project ${projectId}`);
+      logger.debug(`Successfully saved project ${projectId}`);
       return true;
     } catch (err: any) {
       console.error(`Error flushing updates for project ${projectId}:`, err);

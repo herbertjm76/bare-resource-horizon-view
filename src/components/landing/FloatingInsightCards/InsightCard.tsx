@@ -2,6 +2,7 @@
 import React from "react";
 import { InsightData, CardPosition } from "./types";
 import { insightStyles } from "./styles";
+import { logger } from '@/utils/logger';
 
 interface InsightCardProps {
   insight: InsightData;
@@ -20,7 +21,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
   const styles = insightStyles[insight.color as keyof typeof insightStyles] || insightStyles.blue;
   const cardScale = position.scale * scale;
 
-  console.log("InsightCard rendering:", {
+  logger.debug("InsightCard rendering:", {
     title: insight.title,
     color: insight.color,
     stylesFound: !!styles,

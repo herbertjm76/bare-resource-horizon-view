@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { HolidayFormValues, Holiday } from "./types";
 import { toast } from "sonner";
 import { format, parseISO } from "date-fns";
+import { logger } from '@/utils/logger';
 
 const toDbDate = (date: Date) => format(date, "yyyy-MM-dd");
 const fromDbDate = (date: string) => parseISO(date);
@@ -10,7 +11,7 @@ const fromDbDate = (date: string) => parseISO(date);
 export const fetchHolidays = async (companyId: string): Promise<Holiday[]> => {
   if (!companyId) return [];
   
-  console.log("Fetching holidays for company:", companyId);
+  logger.debug("Fetching holidays for company:", companyId);
   
   try {
     const { data, error } = await supabase
@@ -37,7 +38,7 @@ export const fetchHolidays = async (companyId: string): Promise<Holiday[]> => {
       location_id: holiday.location_id,
     }));
     
-    console.log("Loaded holidays from database:", transformedHolidays.length);
+    logger.debug("Loaded holidays from database:", transformedHolidays.length);
     return transformedHolidays;
   } catch (error) {
     console.error("Error fetching holidays:", error);
@@ -48,7 +49,7 @@ export const fetchHolidays = async (companyId: string): Promise<Holiday[]> => {
 
 export const createHoliday = async (values: HolidayFormValues, companyId: string): Promise<Holiday | null> => {
   try {
-    console.log("Creating holiday with values:", values);
+    logger.debug("Creating holiday with values:", values);
     
     // Create a holiday entry for each selected office
     const holidayInserts = values.offices.map((officeId) => ({
@@ -70,7 +71,7 @@ export const createHoliday = async (values: HolidayFormValues, companyId: string
       throw error;
     }
     
-    console.log("Holiday created successfully:", data);
+    logger.debug("Holiday created successfully:", data);
     
     const newHoliday: Holiday = { 
       id: data[0].id, 
@@ -99,7 +100,7 @@ export const updateHoliday = async (
   originalDate: Date
 ): Promise<boolean> => {
   try {
-    console.log("Updating holiday:", id, values, "Original:", originalName, originalDate);
+    logger.debug("Updating holiday:", id, values, "Original:", originalName, originalDate);
 
     const { data: originalHoliday, error: fetchOriginalError } = await supabase
       .from("office_holidays")

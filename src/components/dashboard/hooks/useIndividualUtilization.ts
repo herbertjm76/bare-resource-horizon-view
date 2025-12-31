@@ -5,6 +5,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { format, startOfWeek, startOfMonth, subMonths, endOfWeek, endOfMonth } from 'date-fns';
 import { TimeRange } from '../TimeRangeSelector';
+import { logger } from '@/utils/logger';
 
 interface TeamMember {
   id: string;
@@ -67,33 +68,33 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
   useEffect(() => {
     const calculateUtilizations = async () => {
       if (!company?.id || !teamMembers?.length) {
-        console.log('No company or team members available for utilization calculation');
+        logger.debug('No company or team members available for utilization calculation');
         setIsLoading(false);
         return;
       }
 
-      console.log('=== INDIVIDUAL UTILIZATION CALCULATION ===');
-      console.log('Company ID:', company.id);
-      console.log('Team members to calculate utilization for:', teamMembers.length);
-      console.log('Selected time range:', selectedTimeRange);
+      logger.debug('=== INDIVIDUAL UTILIZATION CALCULATION ===');
+      logger.debug('Company ID:', company.id);
+      logger.debug('Team members to calculate utilization for:', teamMembers.length);
+      logger.debug('Selected time range:', selectedTimeRange);
 
       try {
         const utilizations: Record<string, number> = {};
         const { startDate, endDate } = getDateRange();
         
-        console.log('Calculating utilization for period:', startDate, 'to', endDate);
+        logger.debug('Calculating utilization for period:', startDate, 'to', endDate);
 
         for (const member of teamMembers) {
           const memberName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
-          console.log(`\n--- Processing member: ${memberName} (ID: ${member.id}) ---`);
-          console.log('Is pending:', member.isPending);
-          console.log('Selected time range:', selectedTimeRange);
+          logger.debug(`\n--- Processing member: ${memberName} (ID: ${member.id}) ---`);
+          logger.debug('Is pending:', member.isPending);
+          logger.debug('Selected time range:', selectedTimeRange);
           
           let totalAllocatedHours = 0;
           
           if (member.isPending) {
             // For pre-registered members, check pending_resources and their allocations
-            console.log('Checking pending resources allocations...');
+            logger.debug('Checking pending resources allocations...');
             
             const { data: allocations, error } = await supabase
               .from('project_resource_allocations')
@@ -108,12 +109,12 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
               console.error(`Error fetching allocations for pending member ${memberName}:`, error);
             } else {
               totalAllocatedHours = allocations?.reduce((sum, allocation) => sum + (allocation.hours || 0), 0) || 0;
-              console.log(`Pending member ${memberName} allocations:`, allocations);
-              console.log(`Total allocated hours for period: ${totalAllocatedHours}`);
+              logger.debug(`Pending member ${memberName} allocations:`, allocations);
+              logger.debug(`Total allocated hours for period: ${totalAllocatedHours}`);
             }
           } else {
             // For active members, check project_resources and their allocations
-            console.log('Checking active member allocations...');
+            logger.debug('Checking active member allocations...');
             
             const { data: allocations, error } = await supabase
               .from('project_resource_allocations')
@@ -128,8 +129,8 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
               console.error(`Error fetching allocations for active member ${memberName}:`, error);
             } else {
               totalAllocatedHours = allocations?.reduce((sum, allocation) => sum + (allocation.hours || 0), 0) || 0;
-              console.log(`Active member ${memberName} allocations:`, allocations);
-              console.log(`Total allocated hours for period: ${totalAllocatedHours}`);
+              logger.debug(`Active member ${memberName} allocations:`, allocations);
+              logger.debug(`Total allocated hours for period: ${totalAllocatedHours}`);
             }
           }
 
@@ -138,11 +139,11 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
           const totalCapacityForPeriod = getTotalCapacity(weeklyCapacity);
           const utilization = totalCapacityForPeriod > 0 ? (totalAllocatedHours / totalCapacityForPeriod) * 100 : 0;
           
-          console.log(`Member ${memberName} (${selectedTimeRange}):`);
-          console.log(`- Weekly capacity: ${weeklyCapacity} hours`);
-          console.log(`- Total capacity for period: ${totalCapacityForPeriod} hours`);
-          console.log(`- Total allocated: ${totalAllocatedHours} hours`);
-          console.log(`- Utilization: ${utilization.toFixed(1)}%`);
+          logger.debug(`Member ${memberName} (${selectedTimeRange}):`);
+          logger.debug(`- Weekly capacity: ${weeklyCapacity} hours`);
+          logger.debug(`- Total capacity for period: ${totalCapacityForPeriod} hours`);
+          logger.debug(`- Total allocated: ${totalAllocatedHours} hours`);
+          logger.debug(`- Utilization: ${utilization.toFixed(1)}%`);
           
           utilizations[member.id] = Math.round(utilization);
         }

@@ -7,6 +7,7 @@ import { Camera, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ImageCropDialog } from '@/components/dashboard/memberDialog/ImageCropDialog';
+import { logger } from '@/utils/logger';
 
 interface AvatarUploadProps {
   currentAvatarUrl?: string | null;
@@ -79,16 +80,14 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   const uploadAvatar = async (file: File) => {
     try {
       setUploading(true);
-      if (import.meta.env.DEV) {
-        console.log('Starting avatar upload for user:', userId);
-      }
+      logger.debug('Starting avatar upload for user:', userId);
 
       // Create a unique file name with timestamp to avoid caching issues
       const fileExt = file.name.split('.').pop();
       const timestamp = Date.now();
       const fileName = `${userId}/avatar-${timestamp}.${fileExt}`;
 
-      console.log('Uploading file to path:', fileName);
+      logger.debug('Uploading file to path:', fileName);
 
       // Delete existing avatar if it exists
       if (currentAvatarUrl) {
@@ -98,7 +97,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
           const bucketIndex = urlParts.findIndex(part => part === 'avatars');
           if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
             const filePath = urlParts.slice(bucketIndex + 1).join('/');
-            console.log('Attempting to remove old avatar:', filePath);
+            logger.debug('Attempting to remove old avatar:', filePath);
             
             const { error: deleteError } = await supabase.storage
               .from('avatars')
@@ -128,7 +127,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         throw new Error(`Upload failed: ${uploadError.message}`);
       }
 
-      console.log('Upload successful:', data);
+      logger.debug('Upload successful:', data);
 
       // Get the public URL
       const { data: urlData } = supabase.storage
@@ -136,7 +135,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         .getPublicUrl(fileName);
 
       const newAvatarUrl = urlData.publicUrl;
-      console.log('New avatar URL:', newAvatarUrl);
+      logger.debug('New avatar URL:', newAvatarUrl);
 
       // Update the profile in the database
       const { error: updateError } = await supabase
@@ -149,9 +148,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         throw new Error(`Failed to update profile: ${updateError.message}`);
       }
 
-      if (import.meta.env.DEV) {
-        console.log('Profile updated successfully');
-      }
+      logger.debug('Profile updated successfully');
       setPreviewUrl(newAvatarUrl);
       onAvatarUpdate(newAvatarUrl);
       toast.success('Avatar updated successfully!');

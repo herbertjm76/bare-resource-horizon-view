@@ -1,5 +1,6 @@
 import { format, startOfWeek, parseISO } from 'date-fns';
 import { UnifiedWorkloadResult } from './types';
+import { logger } from '@/utils/logger';
 
 export const processProjectAllocations = (
   allocationsData: any[],
@@ -7,7 +8,7 @@ export const processProjectAllocations = (
 ) => {
   if (!allocationsData || allocationsData.length === 0) return;
 
-  console.log('🔍 PROCESSING PROJECT ALLOCATIONS:', {
+  logger.debug('🔍 PROCESSING PROJECT ALLOCATIONS:', {
     totalAllocations: allocationsData.length,
     sampleAllocations: allocationsData.slice(0, 3).map(a => ({
       resource_id: a.resource_id,
@@ -77,7 +78,7 @@ export const processProjectAllocations = (
 
   // Log debug info for tracked members
   if (debugProcessedRecords.length > 0) {
-    console.log('🔍 ALLOCATION PROCESSING DEBUG:', {
+    logger.debug('🔍 ALLOCATION PROCESSING DEBUG:', {
       totalRecords: debugProcessedRecords.length,
       records: debugProcessedRecords,
       paulJuliusWeeklyTotals: Array.from(memberWeekHours.get('b06b0c9d-70c5-49cd-aae9-fcf9016ebe82')?.entries() || []),
@@ -96,7 +97,7 @@ export const processProjectAllocations = (
         
         // Debug tracked members' week updates  
         if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e' || memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82') {
-          console.log('🔍 UPDATING MEMBER WEEK:', {
+          logger.debug('🔍 UPDATING MEMBER WEEK:', {
             memberName: memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' ? 'Paul Julius' : 'Rob Night',
             weekKey,
             totalHours,
@@ -107,7 +108,7 @@ export const processProjectAllocations = (
       } else {
         // Debug weeks that fall outside the requested date range
         if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e' || memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82') {
-          console.log('🔍 MEMBER WEEK OUTSIDE DATE RANGE (FILTERED OUT):', {
+          logger.debug('🔍 MEMBER WEEK OUTSIDE DATE RANGE (FILTERED OUT):', {
             memberName: memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' ? 'Paul Julius' : 'Rob Night',
             weekKey,
             totalHours,
@@ -188,7 +189,7 @@ export const processOtherLeaves = (
 };
 
 export const calculateTotals = (result: UnifiedWorkloadResult) => {
-  console.log('🔍 CALCULATE TOTALS: Starting calculation');
+  logger.debug('🔍 CALCULATE TOTALS: Starting calculation');
   let updatedCount = 0;
   
   Object.keys(result).forEach(memberId => {
@@ -199,7 +200,7 @@ export const calculateTotals = (result: UnifiedWorkloadResult) => {
       
       // Debug for Paul Julius on specific weeks
       if (memberId === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' && breakdown.total > 0) {
-        console.log('🔍 CALCULATE TOTALS - Paul Julius:', {
+        logger.debug('🔍 CALCULATE TOTALS - Paul Julius:', {
           weekKey,
           projectHours: breakdown.projectHours,
           annualLeave: breakdown.annualLeave,
@@ -211,7 +212,7 @@ export const calculateTotals = (result: UnifiedWorkloadResult) => {
     });
   });
   
-  console.log('🔍 CALCULATE TOTALS: Complete', { 
+  logger.debug('🔍 CALCULATE TOTALS: Complete', { 
     totalMembers: Object.keys(result).length,
     paulJuliusWeeksUpdated: updatedCount
   });

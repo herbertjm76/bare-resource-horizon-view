@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 export interface PersonProject {
   projectId: string;
@@ -33,11 +34,11 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
     queryKey: ['person-resource-data', company?.id, startDate.toISOString(), periodToShow],
     queryFn: async () => {
       if (!company) {
-        console.log('No company available, cannot fetch person resource data');
+        logger.debug('No company available, cannot fetch person resource data');
         return [];
       }
 
-      console.log('Fetching person resource data for company:', company.id);
+      logger.debug('Fetching person resource data for company:', company.id);
 
       try {
         // Fetch all active team members (profiles)
@@ -73,7 +74,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         ];
 
         if (allMembers.length === 0) {
-          console.log('No team members found');
+          logger.debug('No team members found');
           return [];
         }
 
@@ -160,7 +161,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         });
 
         const result = Array.from(personMap.values());
-        console.log('Processed person resource data:', result.length, 'people');
+        logger.debug('Processed person resource data:', result.length, 'people');
         return result;
 
       } catch (err) {
