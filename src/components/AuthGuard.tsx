@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { RefreshCw } from 'lucide-react';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { logger } from '@/utils/logger';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -21,20 +22,18 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
   // Function to check authentication and authorization
   const checkAuth = async () => {
     if (!authChecked.current) {
-      console.log("AuthGuard: Checking authorization...");
+      logger.log("AuthGuard: Checking authorization...");
       
       // Handle demo mode
       if (isDemoMode && demoUser && demoProfile) {
-        console.log("AuthGuard: Demo mode active, checking demo authorization");
+        logger.log("AuthGuard: Demo mode active, checking demo authorization");
         
         if (requiredRole) {
           const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
           const hasRequiredRole = roles.includes(demoProfile.role);
           
           if (!hasRequiredRole) {
-      if (import.meta.env.DEV) {
-        console.log("AuthGuard: Demo user doesn't have required role", demoProfile.role, "needs", requiredRole);
-      }
+            logger.log("AuthGuard: Demo user doesn't have required role", demoProfile.role, "needs", requiredRole);
             toast.error("You don't have permission to access this page");
             setIsLoading(false);
             setIsAuthorized(false);
@@ -43,9 +42,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
           }
         }
         
-        if (import.meta.env.DEV) {
-          console.log("AuthGuard: Demo user is authorized");
-        }
+        logger.log("AuthGuard: Demo user is authorized");
         setIsAuthorized(true);
         setIsLoading(false);
         setAuthError(null);
@@ -59,7 +56,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error("AuthGuard: Error getting session:", sessionError);
+          logger.error("AuthGuard: Error getting session:", sessionError);
           setAuthError("Failed to verify your session");
           setIsLoading(false);
           setIsAuthorized(false);
@@ -69,9 +66,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         }
         
         if (!sessionData.session) {
-          if (import.meta.env.DEV) {
-            console.log("AuthGuard: No active session, redirecting to auth page");
-          }
+          logger.log("AuthGuard: No active session, redirecting to auth page");
           setIsLoading(false);
           setIsAuthorized(false);
           navigate('/auth');
@@ -79,19 +74,17 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         }
 
         const user = sessionData.session.user;
-        if (import.meta.env.DEV) {
-          console.log("AuthGuard: User authenticated", user.id);
-        }
+        logger.log("AuthGuard: User authenticated", user.id);
 
         // If role check is required
         if (requiredRole) {
-          console.log("AuthGuard: Checking role requirement:", requiredRole);
+          logger.log("AuthGuard: Checking role requirement:", requiredRole);
           
           // Get user role using secure RPC
           const { data: userRole, error: roleError } = await supabase.rpc('get_user_role_secure');
 
           if (roleError) {
-            console.error("AuthGuard: Error fetching user role:", roleError);
+            logger.error("AuthGuard: Error fetching user role:", roleError);
             toast.error("Error verifying your account permissions");
             setIsLoading(false);
             setIsAuthorized(false);
@@ -100,7 +93,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
           }
 
           if (!userRole) {
-            console.error("AuthGuard: Role not found for user");
+            logger.error("AuthGuard: Role not found for user");
             toast.error("User role not found");
             setIsLoading(false);
             setIsAuthorized(false);
@@ -112,14 +105,10 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
           const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
           const hasRequiredRole = roles.includes(userRole);
 
-          if (import.meta.env.DEV) {
-            console.log("AuthGuard: User role:", userRole, "Required roles:", roles, "Has required role:", hasRequiredRole);
-          }
+          logger.log("AuthGuard: User role:", userRole, "Required roles:", roles, "Has required role:", hasRequiredRole);
 
           if (!hasRequiredRole) {
-            if (import.meta.env.DEV) {
-              console.log("AuthGuard: User doesn't have required role", userRole, "needs", requiredRole);
-            }
+            logger.log("AuthGuard: User doesn't have required role", userRole, "needs", requiredRole);
             toast.error("You don't have permission to access this page");
             setIsLoading(false);
             setIsAuthorized(false);
@@ -127,20 +116,16 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
             return;
           }
           
-          if (import.meta.env.DEV) {
-            console.log("AuthGuard: User has required role:", userRole);
-          }
+          logger.log("AuthGuard: User has required role:", userRole);
         }
 
-        if (import.meta.env.DEV) {
-          console.log("AuthGuard: User is authorized, rendering protected content");
-        }
+        logger.log("AuthGuard: User is authorized, rendering protected content");
         setIsAuthorized(true);
         setIsLoading(false);
         setAuthError(null);
         authChecked.current = true;
       } catch (error) {
-        console.error("AuthGuard error:", error);
+        logger.error("AuthGuard error:", error);
         toast.error("Authentication error");
         setIsLoading(false);
         setIsAuthorized(false);
@@ -151,7 +136,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
 
   // Manual refresh handler
   const handleRefresh = () => {
-    console.log("AuthGuard: Manual refresh triggered");
+    logger.log("AuthGuard: Manual refresh triggered");
     setIsLoading(true);
     setAuthError(null);
     authChecked.current = false;
@@ -160,14 +145,14 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
 
   // Handle authentication state
   useEffect(() => {
-    console.log("AuthGuard: Component mounted");
+    logger.log("AuthGuard: Component mounted");
     let isMounted = true;
     let authTimeout: NodeJS.Timeout | null = null;
     
     // Set a safety timeout to prevent getting stuck in loading
     authTimeout = setTimeout(() => {
       if (isMounted && isLoading) {
-        console.error("AuthGuard: Safety timeout triggered after 5 seconds");
+        logger.error("AuthGuard: Safety timeout triggered after 5 seconds");
         setIsLoading(false);
         setAuthError("Verification timed out. Please try refreshing.");
       }
@@ -178,9 +163,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     
       if (!isDemoMode) {
         const { data } = supabase.auth.onAuthStateChange((event, session) => {
-          if (import.meta.env.DEV) {
-            console.log("AuthGuard: Auth state changed:", event);
-          }
+          logger.log("AuthGuard: Auth state changed:", event);
         
         if (!isMounted) return;
         
@@ -209,7 +192,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     
     // Clean up
     return () => {
-      console.log("AuthGuard: Component unmounted");
+      logger.log("AuthGuard: Component unmounted");
       isMounted = false;
       
       if (authTimeout) {

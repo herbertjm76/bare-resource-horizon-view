@@ -1,6 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { logger } from '@/utils/logger';
 
 interface AllocationData {
   resourceId: string;
@@ -155,8 +156,8 @@ export function debugAllocationData(
 ) {
   console.group('🔍 ALLOCATION DEBUG: Data Comparison');
   
-  console.log('Project Resources Data:', projectResourcesData);
-  console.log('Team Workload Data:', teamWorkloadData);
+  logger.log('Project Resources Data:', projectResourcesData);
+  logger.log('Team Workload Data:', teamWorkloadData);
   
   const allResourceIds = [...new Set([
     ...projectResourcesData.map(d => d.resourceId),
@@ -170,7 +171,7 @@ export function debugAllocationData(
     const projectTotal = projectData.reduce((sum, d) => sum + d.hours, 0);
     const workloadTotal = workloadData.reduce((sum, d) => sum + d.hours, 0);
     
-    console.log(`Resource ${resourceId}:`, {
+    logger.log(`Resource ${resourceId}:`, {
       projectTotal,
       workloadTotal,
       difference: Math.abs(projectTotal - workloadTotal),
