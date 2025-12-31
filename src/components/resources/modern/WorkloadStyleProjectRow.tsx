@@ -277,6 +277,10 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
     prevProps.project.id === nextProps.project.id &&
     prevProps.isExpanded === nextProps.isExpanded &&
     prevProps.isEven === nextProps.isEven &&
-    prevProps.weeks.length === nextProps.weeks.length
+    prevProps.weeks.length === nextProps.weeks.length &&
+    prevProps.memberFilters?.practiceArea === nextProps.memberFilters?.practiceArea &&
+    prevProps.memberFilters?.department === nextProps.memberFilters?.department &&
+    prevProps.memberFilters?.location === nextProps.memberFilters?.location &&
+    prevProps.memberFilters?.searchTerm === nextProps.memberFilters?.searchTerm
   );
 });
