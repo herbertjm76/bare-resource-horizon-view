@@ -11,6 +11,7 @@ import AddressField from "./CompanyRegistrationForm/AddressField";
 import CityField from "./CompanyRegistrationForm/CityField";
 import SizeField from "./CompanyRegistrationForm/SizeField";
 import WebsiteField from "./CompanyRegistrationForm/WebsiteField";
+import { logger } from '@/utils/logger';
 
 export interface CompanyFormData {
   name: string;
@@ -53,7 +54,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
       if (error) throw error;
       return count === 0;
     } catch (error) {
-      console.error('Error checking subdomain:', error);
+      logger.error('Error checking subdomain:', error);
       return false;
     } finally {
       setIsCheckingSubdomain(false);
@@ -72,7 +73,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         return;
       }
 
-      console.log("Submitting company with data:", data);
+      logger.debug("Submitting company with data:", data);
 
       const { data: company, error: companyError } = await supabase
         .from('companies')

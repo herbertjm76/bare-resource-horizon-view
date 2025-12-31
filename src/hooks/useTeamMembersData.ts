@@ -1,10 +1,11 @@
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/components/dashboard/types";
 import { toast } from "sonner";
 import { useCompanyId } from '@/hooks/useCompanyId';
+import { logger } from '@/utils/logger';
 
 export const useTeamMembersData = (includeInactive: boolean = false) => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -19,15 +20,15 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
   } = useQuery({
     queryKey: ['teamMembers', refreshTrigger, includeInactive, companyId],
     queryFn: async () => {
-      console.log('Fetching team members, refresh trigger:', refreshTrigger);
-      console.log('Include inactive members:', includeInactive);
-      console.log('Company ID from context:', companyId);
+      logger.debug('Fetching team members, refresh trigger:', refreshTrigger);
+      logger.debug('Include inactive members:', includeInactive);
+      logger.debug('Company ID from context:', companyId);
       
       try {
         // First, get the current user's auth data
         const { data: authData } = await supabase.auth.getUser();
         if (!authData.user) {
-          console.error('No authenticated user found');
+          logger.error('No authenticated user found');
           return [];
         }
         
@@ -43,19 +44,19 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
             .single();
             
           if (profileError) {
-            console.error('Failed to get user company ID:', profileError);
+            logger.error('Failed to get user company ID:', profileError);
             toast.error('Failed to get company information');
             throw profileError;
           }
           
           resolvedCompanyId = profileData?.company_id;
           if (import.meta.env.DEV) {
-            console.log('User company ID from query:', resolvedCompanyId);
+            logger.debug('User company ID from query:', resolvedCompanyId);
           }
         }
         
         if (!resolvedCompanyId) {
-          console.error('Cannot fetch team members: No company ID available');
+          logger.error('Cannot fetch team members: No company ID available');
           toast.error('Company information not available');
           return [];
         }
@@ -67,18 +68,18 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           .eq('company_id', resolvedCompanyId);
 
         if (profilesError) {
-          console.error('Failed to load team members:', profilesError);
+          logger.error('Failed to load team members:', profilesError);
           toast.error('Failed to load team members');
           throw profilesError;
         }
 
         if (!profiles) {
-          console.warn('No team members found');
+          logger.warn('No team members found');
           return [];
         }
 
         if (import.meta.env.DEV) {
-          console.log('Fetched profiles:', profiles.length || 0);
+          logger.debug('Fetched profiles:', profiles.length || 0);
         }
         
         // Fetch roles from user_roles table for all profiles
@@ -90,7 +91,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           .in('user_id', userIds);
 
         if (rolesError) {
-          console.error('Failed to fetch user roles:', rolesError);
+          logger.error('Failed to fetch user roles:', rolesError);
         }
 
         // Create a map of user_id to role
@@ -113,7 +114,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         
         return profilesWithRoles as Profile[];
       } catch (fetchError) {
-        console.error('Error in team members fetch function:', fetchError);
+        logger.error('Error in team members fetch function:', fetchError);
         toast.error('Error loading team members');
         throw fetchError;
       }
@@ -126,13 +127,13 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
 
   // Force refresh function - useful for debugging
   const forceRefresh = useCallback(() => {
-    console.log('Force refresh triggered');
+    logger.debug('Force refresh triggered');
     setRefreshTrigger(prev => prev + 1);
   }, []);
 
   // Manual refresh function that can be called from children
   const triggerRefresh = useCallback(() => {
-    console.log('Manual refresh triggered');
+    logger.debug('Manual refresh triggered');
     setRefreshTrigger(prev => prev + 1);
     // Force immediate refetch
     refetchTeamMembers();
