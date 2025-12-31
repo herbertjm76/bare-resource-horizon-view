@@ -288,41 +288,6 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     }
   };
 
-  // Drag handlers for stage bars
-  const handleDragStart = useCallback((
-    e: React.MouseEvent,
-    project: Project,
-    stage: StageWithDates
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (!stage.startDate) return;
-    
-    const position = getStageTimelinePosition(stage);
-    if (!position) return;
-    
-    setDragState({
-      stageId: stage.id,
-      startX: e.clientX,
-      originalStartWeek: position.startWeek,
-      currentOffset: 0,
-      stage,
-      project
-    });
-  }, []);
-
-  const handleDragMove = useCallback((e: React.MouseEvent) => {
-    if (!dragState) return;
-    
-    const deltaX = e.clientX - dragState.startX;
-    const weekOffset = Math.round(deltaX / WEEK_WIDTH);
-    
-    if (weekOffset !== dragState.currentOffset) {
-      setDragState(prev => prev ? { ...prev, currentOffset: weekOffset } : null);
-    }
-  }, [dragState]);
-
   // Check if a stage position would overlap with other stages
   const checkOverlap = useCallback((
     projectId: string,
@@ -354,6 +319,53 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     
     return { overlaps: false, adjustedStartWeek: newStartWeek };
   }, [projects, getStageTimelinePosition]);
+
+  // Drag handlers for stage bars
+  const handleDragStart = useCallback((
+    e: React.MouseEvent,
+    project: Project,
+    stage: StageWithDates
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!stage.startDate) return;
+    
+    const position = getStageTimelinePosition(stage);
+    if (!position) return;
+    
+    setDragState({
+      stageId: stage.id,
+      startX: e.clientX,
+      originalStartWeek: position.startWeek,
+      currentOffset: 0,
+      stage,
+      project
+    });
+  }, []);
+
+  const handleDragMove = useCallback((e: React.MouseEvent) => {
+    if (!dragState) return;
+    
+    const deltaX = e.clientX - dragState.startX;
+    const weekOffset = Math.round(deltaX / WEEK_WIDTH);
+    
+    if (weekOffset !== dragState.currentOffset) {
+      // Calculate target position and check for collision
+      const targetStartWeek = Math.max(0, dragState.originalStartWeek + weekOffset);
+      const { overlaps } = checkOverlap(
+        dragState.project.id,
+        dragState.stageId,
+        targetStartWeek,
+        dragState.stage.contractedWeeks
+      );
+      
+      // Only update offset if it doesn't cause overlap
+      if (!overlaps) {
+        setDragState(prev => prev ? { ...prev, currentOffset: weekOffset } : null);
+      }
+    }
+  }, [dragState, checkOverlap]);
 
   // Find nearest non-overlapping position
   const findNearestValidPosition = useCallback((
@@ -464,7 +476,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     setDragState(null);
   }, [dragState, startDate, updateStageMutation, findNearestValidPosition]);
 
-  // Handle stage click
+  // Handle stage click - for scheduled stages, open dialog; for unscheduled, auto-schedule
   const handleStageClick = (
     e: React.MouseEvent, 
     project: Project, 
@@ -474,6 +486,25 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     // Don't open dialog if we just finished dragging
     if (dragState) return;
     
+    // For unscheduled stages, auto-schedule to next available position
+    if (!stage.startDate) {
+      const validStartWeek = findNearestValidPosition(
+        project.id,
+        stage.id,
+        0, // Start from beginning of timeline
+        stage.contractedWeeks
+      );
+      const newStartDate = addWeeks(startDate, validStartWeek);
+      
+      updateStageMutation.mutate({
+        stageId: stage.id,
+        startDate: newStartDate,
+        contractedWeeks: stage.contractedWeeks
+      });
+      return;
+    }
+    
+    // For scheduled stages, open the dialog for editing
     setSelectedStage({
       projectId: project.id,
       projectName: project.name,
