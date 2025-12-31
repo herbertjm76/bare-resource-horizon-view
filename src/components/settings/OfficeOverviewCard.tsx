@@ -12,7 +12,7 @@ export const OfficeOverviewCard = () => {
   const { locations } = useOfficeSettings();
 
   return (
-    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl shadow-sm p-6">
+    <Card className="bg-gradient-to-r from-card-gradient-start to-card-gradient-end border-[3px] border-card-gradient-border rounded-xl shadow-sm p-6">
       <div className="grid grid-cols-4 gap-4 h-64">
         {/* Logo and Company Info Section - 1/4 width */}
         <div className="col-span-1 flex flex-col justify-center space-y-3">

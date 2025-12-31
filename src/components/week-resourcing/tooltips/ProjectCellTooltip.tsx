@@ -40,7 +40,7 @@ export const ProjectCellTooltip: React.FC<ProjectCellTooltipProps> = ({
 
   return (
     <div className="space-y-3 max-w-xs">
-      <div className="font-bold text-sm text-[#6465F0] border-b border-gray-200 pb-2">
+      <div className="font-bold text-sm text-brand-secondary border-b border-gray-200 pb-2">
         {projectCode || projectName}
       </div>
       

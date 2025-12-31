@@ -33,7 +33,7 @@ const NewProjectStep2Details: React.FC<Props> = ({
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-medium text-[#6E59A5]">Project Details</h3>
+      <h3 className="text-lg font-medium text-brand-accent">Project Details</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">

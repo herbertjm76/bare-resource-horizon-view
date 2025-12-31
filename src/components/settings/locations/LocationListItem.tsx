@@ -32,7 +32,7 @@ export const LocationListItem: React.FC<LocationListItemProps> = ({
   return (
     <div
       className={`group flex items-center justify-between p-4 border rounded-lg transition-all duration-200 ${
-        editMode ? 'hover:bg-accent/30' : 'hover:border-[#6E59A5]/20 hover:bg-[#6E59A5]/5'
+        editMode ? 'hover:bg-accent/30' : 'hover:border-brand-accent/20 hover:bg-brand-accent/5'
       }`}
     >
       <div className="flex items-center gap-3">

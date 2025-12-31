@@ -53,8 +53,8 @@ export const AddRateDialog = ({ roles, locations, onCancel, onSubmit, editingRat
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <Card className="p-6 max-w-lg w-full mx-auto relative z-50 shadow-xl">
         <div className="flex items-center gap-3 mb-6">
-          <Calculator className="w-5 h-5 text-[#6E59A5]" />
-          <h2 className="text-lg font-semibold text-[#6E59A5]">
+          <Calculator className="w-5 h-5 text-brand-accent" />
+          <h2 className="text-lg font-semibold text-brand-accent">
             {editingRate ? 'Edit Rate' : 'Set Rate'}
           </h2>
         </div>

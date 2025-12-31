@@ -49,7 +49,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
     case 'utilization':
       content = (
         <div className="space-y-2">
-          <div className="font-bold mb-2 text-[#6465F0]">
+          <div className="font-bold mb-2 text-brand-secondary">
             {member?.first_name} — Utilization
           </div>
           <div className="flex flex-col gap-1 text-xs">
@@ -79,7 +79,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
       const otherLeaveHours = (totalUsedHours ?? 0) - annualLeave - holidayHours;
       content = (
         <div className="space-y-2">
-          <div className="font-bold mb-2 text-[#6465F0]">
+          <div className="font-bold mb-2 text-brand-secondary">
             Leave Summary
           </div>
           <div className="text-xs space-y-1">
@@ -125,7 +125,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
     case 'project':
       content = (
         <div className="space-y-2">
-          <div className="font-bold mb-2 text-[#6465F0]">
+          <div className="font-bold mb-2 text-brand-secondary">
             Project: {projectBreakdown?.projectName ?? '-'}
           </div>
           <div className="text-xs space-y-1">

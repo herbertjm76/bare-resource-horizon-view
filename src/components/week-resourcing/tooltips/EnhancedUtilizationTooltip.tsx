@@ -58,7 +58,7 @@ export const EnhancedUtilizationTooltip: React.FC<EnhancedUtilizationTooltipProp
 
   return (
     <div className="space-y-3 max-w-sm">
-      <div className="font-bold text-base text-[#6465F0] border-b border-border pb-2">
+      <div className="font-bold text-base text-brand-secondary border-b border-border pb-2">
         {memberName} — Weekly Utilization
       </div>
       
