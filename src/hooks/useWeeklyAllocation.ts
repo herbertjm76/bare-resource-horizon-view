@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { logger } from '@/utils/logger';
 
 interface WeeklyAllocation {
   memberId: string;
@@ -50,7 +51,7 @@ export const useWeeklyAllocation = (selectedWeek: Date, memberId?: string) => {
         }, 300);
         
       } catch (error) {
-        console.error('Error fetching weekly allocation:', error);
+        logger.error('Error fetching weekly allocation:', error);
         setIsLoading(false);
       }
     };

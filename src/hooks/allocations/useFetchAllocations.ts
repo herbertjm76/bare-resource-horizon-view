@@ -9,6 +9,7 @@ import {
   fetchRecentAllocations
 } from './utils/fetchUtils';
 import { processMemberAllocations } from './utils/processingUtils';
+import { logger } from '@/utils/logger';
 
 interface TeamMember {
   id: string;
@@ -33,7 +34,7 @@ export function useFetchAllocations() {
     setError: (error: string | Error | null) => void
   ) => {
     if (!teamMembers || teamMembers.length === 0) {
-      console.log('No team members to fetch allocations for');
+      logger.log('No team members to fetch allocations for');
       setIsLoading(false);
       setMemberAllocations({});
       return;
@@ -43,11 +44,11 @@ export function useFetchAllocations() {
     setError(null);
     
     try {
-      console.log('Selected week JS date:', selectedWeek);
+      logger.log('Selected week JS date:', selectedWeek);
       
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
-      console.log('Fetching allocations for members:', memberIds.length);
+      logger.log('Fetching allocations for members:', memberIds.length);
       
       // Try different fetching strategies in sequence until we get data
       let projectAllocations = [];
@@ -65,15 +66,15 @@ export function useFetchAllocations() {
         projectAllocations = await fetchRecentAllocations(memberIds, companyId);
       }
       
-      console.log('Project allocations before processing:', projectAllocations);
+      logger.log('Project allocations before processing:', projectAllocations);
       
       // Process the allocations into the expected format
       const initialAllocations = processMemberAllocations(teamMembers, projectAllocations);
       
-      console.log('Processed allocations:', initialAllocations);
+      logger.log('Processed allocations:', initialAllocations);
       setMemberAllocations(initialAllocations);
     } catch (err) {
-      console.error('Error fetching allocations:', err);
+      logger.error('Error fetching allocations:', err);
       const error = err instanceof Error ? err : new Error('Failed to fetch resource allocations');
       setError(error);
       toast.error('Failed to fetch resource allocations');

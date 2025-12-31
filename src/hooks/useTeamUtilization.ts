@@ -5,6 +5,7 @@ import { useCompanyId } from '@/hooks/useCompanyId';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getMemberCapacity } from '@/utils/capacityUtils';
 import { format, startOfWeek, subWeeks, addDays, eachWeekOfInterval } from 'date-fns';
+import { logger } from '@/utils/logger';
 
 interface UtilizationData {
   days7: number;
@@ -39,12 +40,12 @@ export const useTeamUtilization = (teamMembers: any[]) => {
         
         const memberIds = teamMembers.map(member => member.id);
         
-        console.log('=== UTILIZATION CALCULATION DEBUG ===');
-        console.log('Current date:', format(now, 'yyyy-MM-dd'));
-        console.log('Current week start (Monday):', format(currentWeekStart, 'yyyy-MM-dd'));
-        console.log('30 days ago week start:', format(thirtyDaysAgo, 'yyyy-MM-dd'));
-        console.log('90 days ago week start:', format(ninetyDaysAgo, 'yyyy-MM-dd'));
-        console.log('Team member IDs:', memberIds);
+        logger.log('=== UTILIZATION CALCULATION DEBUG ===');
+        logger.log('Current date:', format(now, 'yyyy-MM-dd'));
+        logger.log('Current week start (Monday):', format(currentWeekStart, 'yyyy-MM-dd'));
+        logger.log('30 days ago week start:', format(thirtyDaysAgo, 'yyyy-MM-dd'));
+        logger.log('90 days ago week start:', format(ninetyDaysAgo, 'yyyy-MM-dd'));
+        logger.log('Team member IDs:', memberIds);
         
         // Fetch allocations for the past 90 days - we need to get from project_resource_allocations
         // which stores weekly allocations, not daily ones
@@ -59,15 +60,15 @@ export const useTeamUtilization = (teamMembers: any[]) => {
 
         if (error) throw error;
 
-        console.log('Raw allocations fetched:', allocations?.length || 0);
-        console.log('Allocations data:', allocations);
+        logger.log('Raw allocations fetched:', allocations?.length || 0);
+        logger.log('Allocations data:', allocations);
 
         // Calculate total capacity for each period
         const totalWeeklyCapacity = teamMembers.reduce((sum, member) => 
           sum + getMemberCapacity(member.weekly_capacity, workWeekHours), 0
         );
         
-        console.log('Total weekly capacity:', totalWeeklyCapacity);
+        logger.log('Total weekly capacity:', totalWeeklyCapacity);
 
         // Calculate utilization for different periods
         const calculatePeriodUtilization = (startDate: Date, periodName: string) => {
@@ -77,10 +78,10 @@ export const useTeamUtilization = (teamMembers: any[]) => {
             { weekStartsOn: 1 }
           );
           
-          console.log(`--- ${periodName} Period ---`);
-          console.log(`Period start: ${format(startDate, 'yyyy-MM-dd')}`);
-          console.log(`Period end: ${format(currentWeekStart, 'yyyy-MM-dd')}`);
-          console.log(`Weeks in period: ${weeks.length}`);
+          logger.log(`--- ${periodName} Period ---`);
+          logger.log(`Period start: ${format(startDate, 'yyyy-MM-dd')}`);
+          logger.log(`Period end: ${format(currentWeekStart, 'yyyy-MM-dd')}`);
+          logger.log(`Weeks in period: ${weeks.length}`);
           
           let totalAllocatedHours = 0;
           
@@ -92,21 +93,21 @@ export const useTeamUtilization = (teamMembers: any[]) => {
             ) || [];
             
             const weekHours = weekAllocations.reduce((sum, allocation) => {
-              console.log(`Week ${weekKey}: ${allocation.resource_id} - ${allocation.hours}h (project: ${allocation.project_id})`);
+              logger.log(`Week ${weekKey}: ${allocation.resource_id} - ${allocation.hours}h (project: ${allocation.project_id})`);
               return sum + (allocation.hours || 0);
             }, 0);
             
             totalAllocatedHours += weekHours;
-            console.log(`Week ${weekKey} total hours: ${weekHours}`);
+            logger.log(`Week ${weekKey} total hours: ${weekHours}`);
           });
           
           const totalCapacity = totalWeeklyCapacity * weeks.length;
           
-          console.log(`Total allocated hours in period: ${totalAllocatedHours}`);
-          console.log(`Total capacity in period: ${totalCapacity}`);
+          logger.log(`Total allocated hours in period: ${totalAllocatedHours}`);
+          logger.log(`Total capacity in period: ${totalCapacity}`);
           
           const utilizationPercentage = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
-          console.log(`${periodName} utilization: ${utilizationPercentage}%`);
+          logger.log(`${periodName} utilization: ${utilizationPercentage}%`);
           
           return utilizationPercentage;
         };
@@ -117,12 +118,12 @@ export const useTeamUtilization = (teamMembers: any[]) => {
           days90: calculatePeriodUtilization(ninetyDaysAgo, '90-day')
         };
 
-        console.log('Final calculated utilization:', utilizationData);
-        console.log('=== END DEBUG ===');
+        logger.log('Final calculated utilization:', utilizationData);
+        logger.log('=== END DEBUG ===');
         
         setUtilization(utilizationData);
       } catch (error) {
-        console.error('Error calculating team utilization:', error);
+        logger.error('Error calculating team utilization:', error);
         setUtilization({ days7: 0, days30: 0, days90: 0 });
       } finally {
         setIsLoading(false);

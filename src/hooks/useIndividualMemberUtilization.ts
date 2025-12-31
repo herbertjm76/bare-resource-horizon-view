@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { format, startOfWeek, subWeeks } from 'date-fns';
+import { logger } from '@/utils/logger';
 
 interface IndividualUtilization {
   days7: number;
@@ -38,8 +39,8 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity?
         const fourWeeksAgo = subWeeks(currentWeekStart, 4);
         const twelveWeeksAgo = subWeeks(currentWeekStart, 12);
         
-        console.log('Fetching utilization for member:', memberId);
-        console.log('Weekly capacity:', effectiveWeeklyCapacity);
+        logger.log('Fetching utilization for member:', memberId);
+        logger.log('Weekly capacity:', effectiveWeeklyCapacity);
         
         // Fetch allocations for the past 90 days in one query
         const { data: allocations, error } = await supabase
@@ -51,11 +52,11 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity?
           .lte('allocation_date', format(currentWeekStart, 'yyyy-MM-dd'));
 
         if (error) {
-          console.error('Error fetching allocations:', error);
+          logger.error('Error fetching allocations:', error);
           throw error;
         }
 
-        console.log('Allocations fetched:', allocations?.length || 0);
+        logger.log('Allocations fetched:', allocations?.length || 0);
 
         // Calculate utilization for different periods
         const calculatePeriodUtilization = (weeksBack: number) => {
@@ -78,10 +79,10 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity?
           days90: calculatePeriodUtilization(12) // Last 12 weeks
         };
 
-        console.log('Calculated utilization:', utilizationData);
+        logger.log('Calculated utilization:', utilizationData);
         setUtilization(utilizationData);
       } catch (error) {
-        console.error('Error calculating utilization:', error);
+        logger.error('Error calculating utilization:', error);
         setUtilization({ days7: 0, days30: 0, days90: 0 });
       } finally {
         setIsLoading(false);

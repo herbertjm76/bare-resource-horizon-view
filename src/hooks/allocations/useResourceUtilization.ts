@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompanyId } from '@/hooks/useCompanyId';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatDateKey } from './utils';
+import { logger } from '@/utils/logger';
 
 export interface ResourceUtilization {
   resourceId: string;
@@ -103,7 +104,7 @@ export function useResourceUtilization(
       
       setUtilizations(utilizationMap);
     } catch (error) {
-      console.error('Error fetching resource utilization:', error);
+      logger.error('Error fetching resource utilization:', error);
     } finally {
       setIsLoading(false);
     }
