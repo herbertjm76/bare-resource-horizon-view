@@ -33,8 +33,6 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   cardOpacity = 0.9,
   badgePosition = 'title'
 }) => {
-  console.log('StandardizedExecutiveSummary render (unified desktop/mobile format)');
-
   const getIconColor = () => {
     // Always use theme-primary for consistency across all executive summary cards
     return 'text-theme-primary bg-theme-primary/10';
@@ -183,7 +181,6 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     }
   };
 
-  console.log('Rendering 4 separate executive summary cards');
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {metrics.map((metric, index) => {

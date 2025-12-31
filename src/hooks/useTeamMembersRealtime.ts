@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 export const useTeamMembersRealtime = (
   companyId: string | undefined,
@@ -10,14 +11,14 @@ export const useTeamMembersRealtime = (
 ) => {
   useEffect(() => {
     if (!companyId) {
-      console.log('No company ID provided for realtime subscription');
+      logger.debug('No company ID provided for realtime subscription');
       
       // If no companyId is provided, try to get it from the current user's profile
       const fetchCompanyId = async () => {
         try {
           const { data } = await supabase.auth.getUser();
           if (!data || !data.user) {
-            console.error('No authenticated user found for realtime subscriptions');
+            logger.error('No authenticated user found for realtime subscriptions');
             return;
           }
           
@@ -29,18 +30,18 @@ export const useTeamMembersRealtime = (
             .single();
             
           if (profileError) {
-            console.error('Error fetching user company ID for realtime:', profileError);
+            logger.error('Error fetching user company ID for realtime:', profileError);
             return;
           }
           
           if (profileData?.company_id) {
-            console.log('Setting up realtime subscriptions for company from profile query:', profileData.company_id);
+            logger.debug('Setting up realtime subscriptions for company from profile query:', profileData.company_id);
             setupSubscriptions(profileData.company_id);
           } else {
-            console.error('User has no company ID for realtime subscriptions');
+            logger.error('User has no company ID for realtime subscriptions');
           }
         } catch (error) {
-          console.error('Error in fetchCompanyId for realtime:', error);
+          logger.error('Error in fetchCompanyId for realtime:', error);
         }
       };
       
@@ -48,7 +49,7 @@ export const useTeamMembersRealtime = (
       return;
     }
     
-    console.log('Setting up realtime subscriptions for company:', companyId);
+    logger.debug('Setting up realtime subscriptions for company:', companyId);
     return setupSubscriptions(companyId);
     
     function setupSubscriptions(companyId: string) {
@@ -65,19 +66,19 @@ export const useTeamMembersRealtime = (
               filter: `company_id=eq.${companyId}` 
             }, 
             (payload) => {
-              console.log('Profiles change detected:', payload);
+              logger.debug('Profiles change detected:', payload);
               onRefresh();
             }
           )
           .subscribe((status) => {
-            console.log('Profiles subscription status:', status);
+            logger.debug('Profiles subscription status:', status);
             if (status === 'SUBSCRIBED') {
-              console.log('Successfully subscribed to profiles changes');
+              logger.debug('Successfully subscribed to profiles changes');
             } else if (status === 'TIMED_OUT') {
-              console.warn('Profiles subscription timed out, retrying...');
+              logger.warn('Profiles subscription timed out, retrying...');
               // Don't show error toast for timeout - it's expected in some cases
             } else if (status === 'CHANNEL_ERROR') {
-              console.error('Error subscribing to profiles changes:', status);
+              logger.error('Error subscribing to profiles changes:', status);
               // Only show error for actual channel errors, not timeouts
             }
           });
@@ -94,31 +95,31 @@ export const useTeamMembersRealtime = (
               filter: `company_id=eq.${companyId}` 
             }, 
             (payload) => {
-              console.log('Invites change detected:', payload);
+              logger.debug('Invites change detected:', payload);
               onRefresh();
             }
           )
           .subscribe((status) => {
-            console.log('Invites subscription status:', status);
+            logger.debug('Invites subscription status:', status);
             if (status === 'SUBSCRIBED') {
-              console.log('Successfully subscribed to invites changes');
+              logger.debug('Successfully subscribed to invites changes');
             } else if (status === 'TIMED_OUT') {
-              console.warn('Invites subscription timed out, retrying...');
+              logger.warn('Invites subscription timed out, retrying...');
               // Don't show error toast for timeout - it's expected in some cases
             } else if (status === 'CHANNEL_ERROR') {
-              console.error('Error subscribing to invites changes:', status);
+              logger.error('Error subscribing to invites changes:', status);
               // Only show error for actual channel errors, not timeouts
             }
           });
     
         // Cleanup
         return () => {
-          console.log('Removing realtime subscriptions');
+          logger.debug('Removing realtime subscriptions');
           supabase.removeChannel(profilesSubscription);
           supabase.removeChannel(invitesSubscription);
         };
       } catch (error) {
-        console.error('Error setting up realtime subscriptions:', error);
+        logger.error('Error setting up realtime subscriptions:', error);
         toast.error('Failed to set up realtime updates');
         return () => {}; // Return empty cleanup function
       }
