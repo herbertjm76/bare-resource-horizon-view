@@ -13,6 +13,7 @@ import {
   useDashboardHolidays,
   useDashboardMetrics 
 } from '@/hooks/queries/useDashboardQueries';
+import { logger } from '@/utils/logger';
 
 export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboardData & {
   setSelectedOffice: (office: string) => void;
@@ -114,7 +115,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     memberUtilizations // Pass real utilization data
   );
 
-  console.log('🔄 DASHBOARD DATA FLOW:', {
+  logger.debug('🔄 DASHBOARD DATA FLOW:', {
     teamMembers: teamMembers.length,
     preRegisteredMembers: preRegisteredMembers.length,
     combinedTeamMembers: combinedTeamMembers.length,
@@ -148,7 +149,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   );
   
   if (paulMemberUtilization || paulTransformedStaff) {
-    console.log('🔍 PAUL JULIUS DATA CONSISTENCY CHECK:', {
+    logger.debug('🔍 PAUL JULIUS DATA CONSISTENCY CHECK:', {
       timeRange: selectedTimeRange,
       memberUtilizations_Paul: paulMemberUtilization,
       transformedStaffData_Paul: paulTransformedStaff,

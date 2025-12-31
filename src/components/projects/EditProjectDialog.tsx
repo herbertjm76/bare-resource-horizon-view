@@ -8,6 +8,7 @@ import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { EditProjectContent } from "./dialog/EditProjectContent";
+import { logger } from '@/utils/logger';
 
 interface EditProjectDialogProps {
   project: any;
@@ -37,7 +38,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
       const fetchCompleteProject = async () => {
         try {
           setIsLoading(true);
-          console.log('Fetching complete project data for:', project.id);
+          logger.debug('Fetching complete project data for:', project.id);
           
           const { data: projectData, error } = await supabase
             .from('projects')
@@ -57,7 +58,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
           }
           
           if (projectData) {
-            console.log('Complete project data loaded:', projectData);
+            logger.debug('Complete project data loaded:', projectData);
             setLoadedProject(projectData);
           }
         } catch (err) {
