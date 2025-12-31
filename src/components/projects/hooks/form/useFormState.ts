@@ -52,6 +52,7 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
     stages: initialStages,
     stageFees: {},
     stageApplicability: initialStageSelections,
+    department: project?.department || "",
   });
 
   // When refetchSignal or project.id changes, reload the form state to initial values
@@ -75,6 +76,7 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
             return acc;
           }, {})
         : {}),
+      department: project?.department || "",
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project?.id, refetchSignal]);
