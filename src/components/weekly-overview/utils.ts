@@ -1,6 +1,6 @@
-
 import { format, startOfWeek, endOfWeek, parseISO, isValid } from 'date-fns';
 import type { WeekStartDay } from '@/hooks/useAppSettings';
+import { logger } from '@/utils/logger';
 
 /**
  * Format a number to 1 decimal place
@@ -34,7 +34,7 @@ export const formatWeekKey = (date: Date, weekStartDay: WeekStartDay = 'Monday')
   const weekStartsOn = weekStartDay === 'Sunday' ? 0 : weekStartDay === 'Saturday' ? 6 : 1;
   const weekStart = startOfWeek(date, { weekStartsOn });
   const formattedDate = format(weekStart, 'yyyy-MM-dd');
-  console.log(`formatWeekKey: Input date ${date.toISOString()}, ${weekStartDay} date: ${weekStart.toISOString()}, formatted: ${formattedDate}`);
+  logger.debug(`formatWeekKey: Input date ${date.toISOString()}, ${weekStartDay} date: ${weekStart.toISOString()}, formatted: ${formattedDate}`);
   return formattedDate;
 };
 

@@ -1,6 +1,6 @@
-
 import { useMemo } from 'react';
 import { format, addWeeks, startOfWeek, eachWeekOfInterval, endOfWeek } from 'date-fns';
+import { logger } from '@/utils/logger';
 
 export interface WeekInfo {
   weekStartDate: Date;
@@ -47,7 +47,7 @@ export const useGridWeeks = (
       { weekStartsOn }
     );
     
-    console.log('Grid weeks debug:', {
+    logger.debug('Grid weeks debug:', {
       weekStartsOnSunday: displayOptions.weekStartsOnSunday,
       originalStartDate: startDate,
       adjustedStartDate,

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { StandardizedExecutiveSummary } from './StandardizedExecutiveSummary';
 import { getUtilizationStatus, getTimeRangeText } from './executiveSummary/utils/utilizationUtils';
@@ -7,6 +6,7 @@ import { ExecutiveSummaryProps } from './executiveSummary/types';
 import { Gauge } from './Gauge';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { logger } from '@/utils/logger';
 
 export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   activeProjects,
@@ -85,7 +85,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
     }
   ];
 
-  console.log('Executive Summary Card - Final State:', {
+  logger.debug('Executive Summary Card - Final State:', {
     selectedTimeRange,
     activeProjects,
     activeResources,

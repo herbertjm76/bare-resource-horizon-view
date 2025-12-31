@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 
 export const transformPreRegisteredMembers = (
   preRegisteredMembers: any[],
@@ -9,7 +10,7 @@ export const transformPreRegisteredMembers = (
     const utilizationData = memberUtilizations?.find(util => util.memberId === member.id);
     const realUtilization = utilizationData?.utilization || 0;
     
-    console.log(`🔍 TRANSFORM PENDING - ${member.first_name} ${member.last_name}:`, {
+    logger.debug(`TRANSFORM PENDING - ${member.first_name} ${member.last_name}:`, {
       memberId: member.id,
       realUtilization,
       utilizationData
@@ -41,7 +42,7 @@ export const transformActiveMembers = (
     const utilizationData = memberUtilizations?.find(util => util.memberId === member.id);
     const realUtilization = utilizationData?.utilization || 0;
     
-    console.log(`🔍 TRANSFORM - ${member.first_name} ${member.last_name}:`, {
+    logger.debug(`TRANSFORM - ${member.first_name} ${member.last_name}:`, {
       memberId: member.id,
       realUtilization,
       utilizationData
@@ -73,7 +74,7 @@ export const combineStaffData = (
   const transformedActiveMembers = transformActiveMembers(activeMembers, memberUtilizations, workWeekHours);
   const transformedPreRegistered = transformPreRegisteredMembers(preRegisteredMembers, memberUtilizations, workWeekHours);
   
-  console.log('🔄 COMBINE STAFF DATA:', {
+  logger.debug('COMBINE STAFF DATA:', {
     activeMembers: transformedActiveMembers.length,
     preRegisteredMembers: transformedPreRegistered.length,
     totalCombined: transformedActiveMembers.length + transformedPreRegistered.length,
