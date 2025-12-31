@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 const OfficeDebugger = () => {
   const [offices, setOffices] = useState<any[]>([]);
@@ -17,7 +18,7 @@ const OfficeDebugger = () => {
       
       if (error) throw error;
       
-      console.log("Offices fetched:", data);
+      logger.debug("Offices fetched:", data);
       setOffices(data || []);
       
       if (data && data.length === 0) {
@@ -26,7 +27,7 @@ const OfficeDebugger = () => {
         toast.success(`Found ${data?.length || 0} offices`);
       }
     } catch (error) {
-      console.error("Error fetching offices:", error);
+      logger.error("Error fetching offices:", error);
       toast.error("Failed to fetch offices data");
     } finally {
       setLoading(false);
