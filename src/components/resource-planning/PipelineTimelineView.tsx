@@ -549,8 +549,8 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                   return (
                                     <Tooltip key={stage.stageName}>
                                       <TooltipTrigger asChild>
-                                        <button
-                                          className="absolute top-1 h-4 px-2 rounded text-[8px] font-medium text-white/80 border border-dashed border-white/30 bg-muted/50 hover:bg-muted transition-colors"
+                                      <button
+                                          className="absolute top-1 h-4 px-2 rounded text-[8px] font-medium text-foreground border border-dashed border-border bg-muted hover:bg-muted/80 transition-colors"
                                           style={{
                                             left: `${stages.indexOf(stage) * 52 + 4}px`,
                                           }}
@@ -689,7 +689,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                 <Tooltip key={stage.stageName}>
                                   <TooltipTrigger asChild>
                                     <button
-                                      className="absolute top-1 h-4 px-2 rounded text-[8px] font-medium text-white/80 border border-dashed border-white/30 bg-muted/50 hover:bg-muted transition-colors"
+                                      className="absolute top-1 h-4 px-2 rounded text-[8px] font-medium text-foreground border border-dashed border-border bg-muted hover:bg-muted/80 transition-colors"
                                       style={{
                                         left: `${stages.indexOf(stage) * 52 + 4}px`,
                                       }}
