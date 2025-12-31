@@ -197,15 +197,15 @@ const WeeklyOverview = () => {
         >
           <div className={`space-y-0 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
             {/* Page Header */}
-            {!isFullscreen && (
               <div className="mb-1.5">
                 <StandardizedPageHeader
                   title="Weekly Overview"
                   description="Switch between table, grid, and carousel views to manage your team's weekly resource allocation"
                   icon={Calendar}
+                  isFullscreen={isFullscreen}
+                  onFullscreenToggle={handleFullscreenToggle}
                 />
               </div>
-            )}
 
             {/* Summary Cards */}
             <WeeklySummaryCards

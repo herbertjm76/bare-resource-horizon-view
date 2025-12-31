@@ -1,8 +1,10 @@
 
 import React from 'react';
 import { format, startOfWeek } from 'date-fns';
-import { Calendar } from 'lucide-react';
+import { Calendar, Maximize, Minimize } from 'lucide-react';
 import { useAppSettings, WeekStartDay } from '@/hooks/useAppSettings';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const getWeekStartsOn = (weekStartDay: WeekStartDay): 0 | 1 | 6 => {
   return weekStartDay === 'Sunday' ? 0 : weekStartDay === 'Saturday' ? 6 : 1;
@@ -10,10 +12,14 @@ const getWeekStartsOn = (weekStartDay: WeekStartDay): 0 | 1 | 6 => {
 
 interface WeeklyOverviewHeaderProps {
   selectedWeek: Date;
+  isFullscreen?: boolean;
+  onFullscreenToggle?: () => void;
 }
 
 export const WeeklyOverviewHeader: React.FC<WeeklyOverviewHeaderProps> = ({
-  selectedWeek
+  selectedWeek,
+  isFullscreen,
+  onFullscreenToggle
 }) => {
   const { startOfWorkWeek } = useAppSettings();
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: getWeekStartsOn(startOfWorkWeek) });
@@ -33,6 +39,23 @@ export const WeeklyOverviewHeader: React.FC<WeeklyOverviewHeaderProps> = ({
               Resource allocation for the week of {weekLabel}
             </p>
           </div>
+          
+          {/* Fullscreen toggle in header */}
+          {typeof window !== 'undefined' && window.innerWidth >= 768 && onFullscreenToggle && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onFullscreenToggle}
+                  className="h-9 w-9 p-0 self-start sm:self-center"
+                >
+                  {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}</TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </div>
     </div>

@@ -161,8 +161,6 @@ export const WeeklyRundownView: React.FC = () => {
         onViewTypeChange={setViewType}
         isAutoAdvance={isAutoAdvance}
         onAutoAdvanceToggle={handleAutoAdvanceToggle}
-        isFullscreen={isFullscreen}
-        onFullscreenToggle={handleFullscreenToggle}
         currentIndex={currentIndex}
         totalItems={rundownItems.length}
       />

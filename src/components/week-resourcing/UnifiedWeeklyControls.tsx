@@ -9,7 +9,7 @@ import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
 import { useWeeklyFilterOptions } from '@/components/week-resourcing/hooks/useWeeklyFilterOptions';
 import { 
   Expand, Minimize2, Calendar, 
-  PlayCircle, PauseCircle, Maximize, Minimize,
+  PlayCircle, PauseCircle,
   Users, FolderOpen, LayoutGrid, Presentation, Table as TableIcon,
   MapPin, Search, X, ChevronLeft, ChevronRight
 } from 'lucide-react';
@@ -368,29 +368,6 @@ export const UnifiedWeeklyControls: React.FC<UnifiedWeeklyControlsProps> = ({
             </Tooltip>
           )}
 
-          {/* Fullscreen - Hidden on mobile */}
-          {typeof window !== 'undefined' &&
-            window.innerWidth >= 768 &&
-            isFullscreen !== undefined &&
-            onFullscreenToggle && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onFullscreenToggle}
-                    className="h-7 px-2"
-                  >
-                    {isFullscreen ? (
-                      <Minimize className="h-3.5 w-3.5" />
-                    ) : (
-                      <Maximize className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}</TooltipContent>
-              </Tooltip>
-            )}
         </div>
         </div>
 
