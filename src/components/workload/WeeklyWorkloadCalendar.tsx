@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { WeeklyBreakdown } from './hooks/services/types';
 import { WorkloadCalendarTable } from './components/WorkloadCalendarTable';
+import { logger } from '@/utils/logger';
 import './workload-grid.css';
 
 interface WeeklyWorkloadCalendarProps {
@@ -19,7 +20,7 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
   weekStartDates
 }) => {
   // Debug logging for workload calculation
-  console.log('WeeklyWorkloadCalendar - Data Summary:', {
+  logger.debug('WeeklyWorkloadCalendar - Data Summary', {
     membersCount: members.length,
     weeksCount: weekStartDates.length,
     sampleMemberData: Object.keys(weeklyWorkloadData).slice(0, 3),

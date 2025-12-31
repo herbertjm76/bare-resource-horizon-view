@@ -1,13 +1,14 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { ProjectUpdateData } from "./types";
+import { logger } from '@/utils/logger';
 
 export const useProjectUpdate = () => {
   const updateProject = async (projectId: string, projectUpdate: ProjectUpdateData) => {
     // Keep current_stage as-is (empty string is valid, database doesn't allow null)
     const currentStage = projectUpdate.current_stage ?? '';
     
-    console.log('Updating project with current_stage:', currentStage);
+    logger.debug('Updating project', { projectId, currentStage });
     
     const { error: projectError } = await supabase
       .from('projects')
