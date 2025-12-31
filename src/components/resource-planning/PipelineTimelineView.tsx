@@ -1,8 +1,19 @@
-import React, { useMemo, useState } from 'react';
-import { format, addWeeks, startOfWeek, differenceInWeeks } from 'date-fns';
+import React, { useMemo, useState, useRef } from 'react';
+import { format, addWeeks, startOfWeek, differenceInWeeks, parseISO, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Calendar } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useCompany } from '@/context/CompanyContext';
+import { toast } from 'sonner';
 
 interface Project {
   id: string;
@@ -25,6 +36,15 @@ interface Department {
 interface PracticeArea {
   id: string;
   name: string;
+}
+
+interface StageWithDates {
+  id: string;
+  stageName: string;
+  startDate: Date | null;
+  contractedWeeks: number;
+  color: string;
+  orderIndex: number;
 }
 
 type GroupBy = 'department' | 'practice_area';
@@ -56,12 +76,110 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   projects,
   isLoading,
   onProjectClick,
-  weeksToShow = 16,
+  weeksToShow = 24,
   departments = [],
   practiceAreas = [],
 }) => {
+  const { company } = useCompany();
+  const queryClient = useQueryClient();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
   const [groupBy, setGroupBy] = useState<GroupBy>('department');
+  const [selectedStage, setSelectedStage] = useState<{
+    projectId: string;
+    projectName: string;
+    stageId: string;
+    stageName: string;
+    startDate: Date | null;
+    contractedWeeks: number;
+  } | null>(null);
+  const [editDate, setEditDate] = useState<Date | undefined>(undefined);
+  const [editWeeks, setEditWeeks] = useState<number>(4);
+  
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+
+  // Fetch office stages for colors
+  const { data: officeStages = [] } = useQuery({
+    queryKey: ['office-stages', company?.id],
+    queryFn: async () => {
+      if (!company?.id) return [];
+      const { data, error } = await supabase
+        .from('office_stages')
+        .select('id, name, color, order_index')
+        .eq('company_id', company.id)
+        .order('order_index');
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!company?.id
+  });
+
+  // Fetch project stages with start dates
+  const { data: projectStagesData = [] } = useQuery({
+    queryKey: ['project-stages-timeline', company?.id, projects.map(p => p.id)],
+    queryFn: async () => {
+      if (!company?.id || projects.length === 0) return [];
+      const { data, error } = await supabase
+        .from('project_stages')
+        .select('id, project_id, stage_name, start_date, contracted_weeks, is_applicable')
+        .eq('company_id', company.id)
+        .in('project_id', projects.map(p => p.id));
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!company?.id && projects.length > 0
+  });
+
+  // Mutation to update stage start date and contracted weeks
+  const updateStageMutation = useMutation({
+    mutationFn: async ({ stageId, startDate, contractedWeeks }: { stageId: string; startDate: Date | null; contractedWeeks: number }) => {
+      const { error } = await supabase
+        .from('project_stages')
+        .update({
+          start_date: startDate ? format(startDate, 'yyyy-MM-dd') : null,
+          contracted_weeks: contractedWeeks
+        })
+        .eq('id', stageId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Stage timeline updated');
+      queryClient.invalidateQueries({ queryKey: ['project-stages-timeline'] });
+      setSelectedStage(null);
+    },
+    onError: () => {
+      toast.error('Failed to update stage');
+    }
+  });
+
+  // Build stage info map
+  const stageInfoMap = useMemo(() => {
+    const map: Record<string, { color: string; orderIndex: number; id: string }> = {};
+    officeStages?.forEach(s => {
+      map[s.name] = { color: s.color || '#3b82f6', orderIndex: s.order_index, id: s.id };
+    });
+    return map;
+  }, [officeStages]);
+
+  // Build project stages map with start dates
+  const projectStagesMap = useMemo(() => {
+    const map: Record<string, Record<string, { 
+      id: string; 
+      startDate: string | null; 
+      contractedWeeks: number;
+    }>> = {};
+    projectStagesData?.forEach(ps => {
+      if (!map[ps.project_id]) {
+        map[ps.project_id] = {};
+      }
+      map[ps.project_id][ps.stage_name] = {
+        id: ps.id,
+        startDate: ps.start_date,
+        contractedWeeks: ps.contracted_weeks || 4
+      };
+    });
+    return map;
+  }, [projectStagesData]);
 
   // Generate weeks for the timeline
   const weeks = useMemo(() => {
@@ -106,26 +224,85 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     return grouped;
   }, [projects, orderedGroups, groupBy]);
 
-  // Calculate project position on timeline
-  const getProjectTimelinePosition = (project: Project) => {
-    if (!project.contract_start_date || !project.contract_end_date) {
-      return null;
-    }
+  // Get stages for a project with their timeline positions
+  const getProjectStagesWithPositions = (project: Project): StageWithDates[] => {
+    if (!project.stages || project.stages.length === 0) return [];
+    
+    return project.stages
+      .map(stageName => {
+        const info = stageInfoMap[stageName] || { color: '#6b7280', orderIndex: 999, id: '' };
+        const stageData = projectStagesMap[project.id]?.[stageName];
+        
+        return {
+          id: stageData?.id || '',
+          stageName,
+          startDate: stageData?.startDate ? parseISO(stageData.startDate) : null,
+          contractedWeeks: stageData?.contractedWeeks || 4,
+          color: info.color,
+          orderIndex: info.orderIndex
+        };
+      })
+      .sort((a, b) => a.orderIndex - b.orderIndex);
+  };
 
-    const projectStart = new Date(project.contract_start_date);
-    const projectEnd = new Date(project.contract_end_date);
+  // Calculate stage position on timeline
+  const getStageTimelinePosition = (stage: StageWithDates) => {
+    if (!stage.startDate) return null;
+    
+    const stageStart = stage.startDate;
+    const stageEnd = addDays(stageStart, stage.contractedWeeks * 7);
     const timelineEnd = addWeeks(startDate, weeksToShow);
 
-    // Check if project overlaps with timeline
-    if (projectEnd < startDate || projectStart > timelineEnd) {
+    // Check if stage overlaps with timeline
+    if (stageEnd < startDate || stageStart > timelineEnd) {
       return null;
     }
 
-    const startWeek = Math.max(0, differenceInWeeks(projectStart, startDate));
-    const endWeek = Math.min(weeksToShow, differenceInWeeks(projectEnd, startDate) + 1);
+    const startWeek = Math.max(0, differenceInWeeks(stageStart, startDate));
+    const endWeek = Math.min(weeksToShow, differenceInWeeks(stageEnd, startDate));
     const width = Math.max(1, endWeek - startWeek);
 
     return { startWeek, width };
+  };
+
+  // Scroll controls
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 320; // 5 weeks worth
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Handle stage click
+  const handleStageClick = (
+    e: React.MouseEvent, 
+    project: Project, 
+    stage: StageWithDates
+  ) => {
+    e.stopPropagation();
+    setSelectedStage({
+      projectId: project.id,
+      projectName: project.name,
+      stageId: stage.id,
+      stageName: stage.stageName,
+      startDate: stage.startDate,
+      contractedWeeks: stage.contractedWeeks
+    });
+    setEditDate(stage.startDate || undefined);
+    setEditWeeks(stage.contractedWeeks);
+  };
+
+  // Handle save
+  const handleSaveStage = () => {
+    if (!selectedStage) return;
+    updateStageMutation.mutate({
+      stageId: selectedStage.stageId,
+      startDate: editDate || null,
+      contractedWeeks: editWeeks
+    });
   };
 
   if (isLoading) {
@@ -137,187 +314,389 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      {/* Grouping Toggle */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing {projects.length} project{projects.length !== 1 ? 's' : ''}
-        </div>
-        <ToggleGroup
-          type="single"
-          value={groupBy}
-          onValueChange={(value) => value && setGroupBy(value as GroupBy)}
-          className="bg-muted/50 p-1 rounded-lg"
-        >
-          <ToggleGroupItem
-            value="department"
-            className="text-xs px-3 py-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
-          >
-            Department
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="practice_area"
-            className="text-xs px-3 py-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
-          >
-            Practice Area
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
-
-      <div className="overflow-x-auto">
-        <div className="min-w-max">
-          {/* Header */}
-          <div className="flex border-b border-border">
-            {/* Group column header */}
-            <div className="w-48 shrink-0 p-2 font-medium text-xs text-muted-foreground border-r border-border bg-muted/30">
-              {groupBy === 'department' ? 'Department' : 'Practice Area'} / Project
-            </div>
-            {/* Week headers */}
-            <div className="flex">
-              {weeks.map((week, i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    "w-16 shrink-0 p-2 text-center text-[10px] font-medium border-r border-border/50",
-                    i === 0 && "bg-primary/10"
-                  )}
-                >
-                  <div className="text-muted-foreground">{format(week, 'MMM d')}</div>
-                </div>
-              ))}
-            </div>
+    <TooltipProvider>
+      <div className="space-y-4">
+        {/* Header Controls */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Showing {projects.length} project{projects.length !== 1 ? 's' : ''}
           </div>
+          <div className="flex items-center gap-4">
+            {/* Scroll Controls */}
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => scroll('left')}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => scroll('right')}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
 
-          {/* Group rows */}
-          {orderedGroups.map(groupName => {
-            const groupProjects = projectsByGroup[groupName] || [];
-            if (groupProjects.length === 0) return null;
+            <ToggleGroup
+              type="single"
+              value={groupBy}
+              onValueChange={(value) => value && setGroupBy(value as GroupBy)}
+              className="bg-muted/50 p-1 rounded-lg"
+            >
+              <ToggleGroupItem
+                value="department"
+                className="text-xs px-3 py-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
+              >
+                Department
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="practice_area"
+                className="text-xs px-3 py-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
+              >
+                Practice Area
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+        </div>
 
-            return (
-              <div key={groupName} className="border-b border-border/50">
-                {/* Group header */}
-                <div className="flex items-center bg-muted/20">
-                  <div className="w-48 shrink-0 p-2 border-r border-border flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full shrink-0"
-                      style={{ backgroundColor: groupColorMap[groupName] || '#3b82f6' }}
-                    />
-                    <span className="font-medium text-xs truncate">{groupName}</span>
-                    <span className="text-[10px] text-muted-foreground">({groupProjects.length})</span>
-                  </div>
-                  <div className="flex flex-1">
-                    {weeks.map((_, i) => (
-                      <div key={i} className="w-16 shrink-0 h-8 border-r border-border/30" />
-                    ))}
-                  </div>
+        <div className="relative">
+          <div 
+            ref={scrollContainerRef}
+            className="overflow-x-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+            style={{ scrollBehavior: 'smooth' }}
+          >
+            <div className="min-w-max">
+              {/* Header */}
+              <div className="flex border-b border-border sticky top-0 bg-background z-10">
+                {/* Group column header */}
+                <div className="w-48 shrink-0 p-2 font-medium text-xs text-muted-foreground border-r border-border bg-muted/30">
+                  {groupBy === 'department' ? 'Department' : 'Practice Area'} / Project
                 </div>
-
-                {/* Project rows */}
-                {groupProjects.map(project => {
-                  const position = getProjectTimelinePosition(project);
-                  
-                  return (
+                {/* Week headers */}
+                <div className="flex">
+                  {weeks.map((week, i) => (
                     <div
-                      key={project.id}
-                      className="flex items-center hover:bg-muted/30 cursor-pointer group"
-                      onClick={() => onProjectClick?.(project)}
+                      key={i}
+                      className={cn(
+                        "w-16 shrink-0 p-2 text-center text-[10px] font-medium border-r border-border/50",
+                        i === 0 && "bg-primary/10"
+                      )}
                     >
-                      {/* Project name */}
-                      <div className="w-48 shrink-0 p-2 border-r border-border">
-                        <div className="text-xs font-medium truncate group-hover:text-primary">
-                          {project.name}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground font-mono">
-                          {project.code}
-                        </div>
-                      </div>
-
-                      {/* Timeline bar */}
-                      <div className="flex relative h-10">
-                        {weeks.map((_, i) => (
-                          <div key={i} className="w-16 shrink-0 border-r border-border/30" />
-                        ))}
-                        
-                        {position && (
-                          <div
-                            className="absolute top-1/2 -translate-y-1/2 h-6 rounded-md flex items-center px-2 text-[10px] font-medium text-white shadow-sm transition-all"
-                            style={{
-                              left: `${position.startWeek * 64}px`,
-                              width: `${position.width * 64 - 4}px`,
-                              backgroundColor: groupColorMap[groupBy === 'department' ? (project.department || 'Unassigned') : (project.practice_area || 'Unassigned')] || '#3b82f6',
-                            }}
-                          >
-                            <span className="truncate">{project.code}</span>
-                          </div>
-                        )}
-                      </div>
+                      <div className="text-muted-foreground">{format(week, 'MMM d')}</div>
                     </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-
-          {/* Unassigned projects */}
-          {projectsByGroup['Unassigned']?.length > 0 && (
-            <div className="border-b border-border/50">
-              <div className="flex items-center bg-muted/20">
-                <div className="w-48 shrink-0 p-2 border-r border-border flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full shrink-0 bg-gray-500" />
-                  <span className="font-medium text-xs">Unassigned</span>
-                  <span className="text-[10px] text-muted-foreground">
-                    ({projectsByGroup['Unassigned'].length})
-                  </span>
-                </div>
-                <div className="flex flex-1">
-                  {weeks.map((_, i) => (
-                    <div key={i} className="w-16 shrink-0 h-8 border-r border-border/30" />
                   ))}
                 </div>
               </div>
 
-              {projectsByGroup['Unassigned'].map(project => {
-                const position = getProjectTimelinePosition(project);
-                
+              {/* Group rows */}
+              {orderedGroups.map(groupName => {
+                const groupProjects = projectsByGroup[groupName] || [];
+                if (groupProjects.length === 0) return null;
+
                 return (
-                  <div
-                    key={project.id}
-                    className="flex items-center hover:bg-muted/30 cursor-pointer group"
-                    onClick={() => onProjectClick?.(project)}
-                  >
-                    <div className="w-48 shrink-0 p-2 border-r border-border">
-                      <div className="text-xs font-medium truncate group-hover:text-primary">
-                        {project.name}
+                  <div key={groupName} className="border-b border-border/50">
+                    {/* Group header */}
+                    <div className="flex items-center bg-muted/20">
+                      <div className="w-48 shrink-0 p-2 border-r border-border flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full shrink-0"
+                          style={{ backgroundColor: groupColorMap[groupName] || '#3b82f6' }}
+                        />
+                        <span className="font-medium text-xs truncate">{groupName}</span>
+                        <span className="text-[10px] text-muted-foreground">({groupProjects.length})</span>
                       </div>
-                      <div className="text-[10px] text-muted-foreground font-mono">
-                        {project.code}
+                      <div className="flex flex-1">
+                        {weeks.map((_, i) => (
+                          <div key={i} className="w-16 shrink-0 h-8 border-r border-border/30" />
+                        ))}
                       </div>
                     </div>
 
-                    <div className="flex relative h-10">
-                      {weeks.map((_, i) => (
-                        <div key={i} className="w-16 shrink-0 border-r border-border/30" />
-                      ))}
+                    {/* Project rows */}
+                    {groupProjects.map(project => {
+                      const stages = getProjectStagesWithPositions(project);
+                      const hasNoStagesWithDates = stages.every(s => !s.startDate);
                       
-                      {position && (
+                      return (
                         <div
-                          className="absolute top-1/2 -translate-y-1/2 h-6 rounded-md flex items-center px-2 text-[10px] font-medium text-white shadow-sm bg-gray-500"
-                          style={{
-                            left: `${position.startWeek * 64}px`,
-                            width: `${position.width * 64 - 4}px`,
-                          }}
+                          key={project.id}
+                          className="flex items-center hover:bg-muted/30 cursor-pointer group"
+                          onClick={() => onProjectClick?.(project)}
                         >
-                          <span className="truncate">{project.code}</span>
+                          {/* Project name */}
+                          <div className="w-48 shrink-0 p-2 border-r border-border">
+                            <div className="text-xs font-medium truncate group-hover:text-primary">
+                              {project.name}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground font-mono">
+                              {project.code}
+                            </div>
+                          </div>
+
+                          {/* Timeline bar */}
+                          <div className="flex relative h-12">
+                            {weeks.map((_, i) => (
+                              <div key={i} className="w-16 shrink-0 border-r border-border/30" />
+                            ))}
+                            
+                            {/* Stage bars */}
+                            {stages.map((stage) => {
+                              const position = getStageTimelinePosition(stage);
+                              
+                              if (!position) {
+                                // Stage without start date - show as chip that can be clicked
+                                if (!stage.startDate) {
+                                  return (
+                                    <Tooltip key={stage.stageName}>
+                                      <TooltipTrigger asChild>
+                                        <button
+                                          className="absolute top-1 h-4 px-2 rounded text-[8px] font-medium text-white/80 border border-dashed border-white/30 bg-muted/50 hover:bg-muted transition-colors"
+                                          style={{
+                                            left: `${stages.indexOf(stage) * 52 + 4}px`,
+                                          }}
+                                          onClick={(e) => handleStageClick(e, project, stage)}
+                                        >
+                                          {stage.stageName.slice(0, 8)}
+                                        </button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p className="text-xs">Click to set start date for {stage.stageName}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  );
+                                }
+                                return null;
+                              }
+                              
+                              return (
+                                <Tooltip key={stage.stageName}>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      className="absolute top-1/2 -translate-y-1/2 h-6 rounded-md flex items-center px-2 text-[10px] font-medium text-white shadow-sm transition-all hover:ring-2 hover:ring-primary hover:ring-offset-1"
+                                      style={{
+                                        left: `${position.startWeek * 64}px`,
+                                        width: `${Math.max(position.width * 64 - 4, 48)}px`,
+                                        backgroundColor: stage.color,
+                                      }}
+                                      onClick={(e) => handleStageClick(e, project, stage)}
+                                    >
+                                      <span className="truncate">{stage.stageName}</span>
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <div className="text-xs">
+                                      <p className="font-medium">{stage.stageName}</p>
+                                      <p className="text-muted-foreground">
+                                        {stage.startDate ? format(stage.startDate, 'MMM d, yyyy') : 'No start date'} 
+                                        {' • '}{stage.contractedWeeks} weeks
+                                      </p>
+                                      <p className="text-primary mt-1">Click to edit</p>
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
+                              );
+                            })}
+                            
+                            {/* Show message if no stages have dates */}
+                            {hasNoStagesWithDates && stages.length > 0 && (
+                              <div className="absolute inset-0 flex items-center pl-2">
+                                <span className="text-[10px] text-muted-foreground italic">
+                                  Click stage chips above to set dates
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
+                      );
+                    })}
                   </div>
                 );
               })}
+
+              {/* Unassigned projects */}
+              {projectsByGroup['Unassigned']?.length > 0 && (
+                <div className="border-b border-border/50">
+                  <div className="flex items-center bg-muted/20">
+                    <div className="w-48 shrink-0 p-2 border-r border-border flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full shrink-0 bg-gray-500" />
+                      <span className="font-medium text-xs">Unassigned</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        ({projectsByGroup['Unassigned'].length})
+                      </span>
+                    </div>
+                    <div className="flex flex-1">
+                      {weeks.map((_, i) => (
+                        <div key={i} className="w-16 shrink-0 h-8 border-r border-border/30" />
+                      ))}
+                    </div>
+                  </div>
+
+                  {projectsByGroup['Unassigned'].map(project => {
+                    const stages = getProjectStagesWithPositions(project);
+                    
+                    return (
+                      <div
+                        key={project.id}
+                        className="flex items-center hover:bg-muted/30 cursor-pointer group"
+                        onClick={() => onProjectClick?.(project)}
+                      >
+                        <div className="w-48 shrink-0 p-2 border-r border-border">
+                          <div className="text-xs font-medium truncate group-hover:text-primary">
+                            {project.name}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground font-mono">
+                            {project.code}
+                          </div>
+                        </div>
+
+                        <div className="flex relative h-12">
+                          {weeks.map((_, i) => (
+                            <div key={i} className="w-16 shrink-0 border-r border-border/30" />
+                          ))}
+                          
+                          {stages.map((stage) => {
+                            const position = getStageTimelinePosition(stage);
+                            
+                            if (!position && !stage.startDate) {
+                              return (
+                                <Tooltip key={stage.stageName}>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      className="absolute top-1 h-4 px-2 rounded text-[8px] font-medium text-white/80 border border-dashed border-white/30 bg-muted/50 hover:bg-muted transition-colors"
+                                      style={{
+                                        left: `${stages.indexOf(stage) * 52 + 4}px`,
+                                      }}
+                                      onClick={(e) => handleStageClick(e, project, stage)}
+                                    >
+                                      {stage.stageName.slice(0, 8)}
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-xs">Click to set start date</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              );
+                            }
+                            
+                            if (!position) return null;
+                            
+                            return (
+                              <Tooltip key={stage.stageName}>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    className="absolute top-1/2 -translate-y-1/2 h-6 rounded-md flex items-center px-2 text-[10px] font-medium text-white shadow-sm transition-all hover:ring-2 hover:ring-primary hover:ring-offset-1"
+                                    style={{
+                                      left: `${position.startWeek * 64}px`,
+                                      width: `${Math.max(position.width * 64 - 4, 48)}px`,
+                                      backgroundColor: stage.color,
+                                    }}
+                                    onClick={(e) => handleStageClick(e, project, stage)}
+                                  >
+                                    <span className="truncate">{stage.stageName}</span>
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <div className="text-xs">
+                                    <p className="font-medium">{stage.stageName}</p>
+                                    <p className="text-muted-foreground">
+                                      {format(stage.startDate!, 'MMM d, yyyy')} • {stage.contractedWeeks} weeks
+                                    </p>
+                                    <p className="text-primary mt-1">Click to edit</p>
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
+
+        {/* Edit Stage Dialog */}
+        <Dialog open={!!selectedStage} onOpenChange={() => setSelectedStage(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-lg">
+                Edit Stage Timeline
+              </DialogTitle>
+            </DialogHeader>
+            
+            {selectedStage && (
+              <div className="space-y-4 py-4">
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Project:</span>{' '}
+                  <span className="font-medium">{selectedStage.projectName}</span>
+                </div>
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Stage:</span>{' '}
+                  <span className="font-medium">{selectedStage.stageName}</span>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="start-date">Start Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !editDate && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {editDate ? format(editDate, 'PPP') : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={editDate}
+                        onSelect={setEditDate}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="weeks">Duration (weeks)</Label>
+                  <Input
+                    id="weeks"
+                    type="number"
+                    min={1}
+                    max={52}
+                    value={editWeeks}
+                    onChange={(e) => setEditWeeks(parseInt(e.target.value) || 1)}
+                  />
+                </div>
+              </div>
+            )}
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSelectedStage(null)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSaveStage}
+                disabled={updateStageMutation.isPending}
+              >
+                {updateStageMutation.isPending ? 'Saving...' : 'Save'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
