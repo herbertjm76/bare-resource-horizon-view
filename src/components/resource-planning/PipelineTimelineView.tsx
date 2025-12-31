@@ -232,11 +232,13 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     }
   });
 
-  // Build stage info map
+  // Build stage info map from office_stages
   const stageInfoMap = useMemo(() => {
     const map: Record<string, { color: string; orderIndex: number; id: string; code: string }> = {};
     officeStages?.forEach(s => {
-      map[s.name] = { color: s.color || '#3b82f6', orderIndex: s.order_index, id: s.id, code: s.code || '' };
+      // Use the color from database, fallback to blue only if null/empty
+      const stageColor = s.color && s.color.trim() !== '' ? s.color : '#3b82f6';
+      map[s.name] = { color: stageColor, orderIndex: s.order_index, id: s.id, code: s.code || '' };
     });
     return map;
   }, [officeStages]);
@@ -305,27 +307,30 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   }, [projects, orderedGroups, groupBy]);
 
   // Get stages for a project with their timeline positions
-  const getProjectStagesWithPositions = (project: Project): StageWithDates[] => {
+  const getProjectStagesWithPositions = useCallback((project: Project): StageWithDates[] => {
     if (!project.stages || project.stages.length === 0) return [];
     
     return project.stages
       .map(stageName => {
-        const info = stageInfoMap[stageName] || { color: '#6b7280', orderIndex: 999, id: '', code: '' };
+        const info = stageInfoMap[stageName];
         const stageData = projectStagesMap[project.id]?.[stageName];
+        
+        // Use stage color from office_stages, fallback to default only if not found
+        const stageColor = info?.color || '#6b7280';
         
         return {
           id: stageData?.id || '',
-          officeStageId: info.id,
+          officeStageId: info?.id || '',
           stageName,
-          stageCode: info.code || stageName.substring(0, 3).toUpperCase(),
+          stageCode: info?.code || stageName.substring(0, 3).toUpperCase(),
           startDate: stageData?.startDate ? parseISO(stageData.startDate) : null,
           contractedWeeks: stageData?.contractedWeeks || 4,
-          color: info.color,
-          orderIndex: info.orderIndex
+          color: stageColor,
+          orderIndex: info?.orderIndex ?? 999
         };
       })
       .sort((a, b) => a.orderIndex - b.orderIndex);
-  };
+  }, [stageInfoMap, projectStagesMap]);
 
   // Calculate stage position on timeline
   const getStageTimelinePosition = (stage: StageWithDates) => {
