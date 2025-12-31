@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { CenteredTabs, CenteredTabItem, TabsContent } from '@/components/ui/centered-tabs';
-import { GanttChartSquare, Users, Calendar } from 'lucide-react';
+import { GanttChartSquare, Users } from 'lucide-react';
 import { MemberFilterRow } from '@/components/resources/MemberFilterRow';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
@@ -109,7 +109,6 @@ const ResourceScheduling = () => {
             tabs={[
               { value: 'by-project', label: 'By Project', icon: GanttChartSquare },
               { value: 'by-person', label: 'By Person', icon: Users },
-              { value: 'timeline', label: 'Timeline (Soon)', icon: Calendar, disabled: true },
             ]}
           >
             <TabsContent value="by-project" className="mt-0 py-3">
@@ -232,19 +231,6 @@ const ResourceScheduling = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="timeline" className="mt-0 py-3">
-              <div className="flex items-center justify-center h-[500px] border-2 border-dashed border-border rounded-xl bg-muted/20">
-                <div className="text-center px-6">
-                  <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4">
-                    <Calendar className="h-12 w-12 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Visual Timeline Coming Soon</h3>
-                  <p className="text-sm text-muted-foreground max-w-md">
-                    Interactive Gantt-style timeline for drag-and-drop resource allocation across multiple weeks
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
           </CenteredTabs>
         </div>
       </div>
