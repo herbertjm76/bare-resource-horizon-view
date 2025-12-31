@@ -8,13 +8,14 @@ import { useProjects } from '@/hooks/useProjects';
 import { ProjectSetupWizard } from '@/components/projects/enhanced-wizard/ProjectSetupWizard';
 import { SimpleBreadcrumbs } from '@/components/navigation/SimpleBreadcrumbs';
 import { ProjectsHeader } from '@/components/projects/ProjectsHeader';
+import { logger } from '@/utils/logger';
 
 const Projects = () => {
   const { refetch } = useProjects();
   const [showWizard, setShowWizard] = useState(false);
 
   const handleWizardSubmit = async (data: any) => {
-    console.log('Project wizard data:', data);
+    logger.debug('Project wizard data:', data);
     // TODO: Implement project creation logic
     setShowWizard(false);
     refetch();

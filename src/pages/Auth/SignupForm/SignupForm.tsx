@@ -8,8 +8,11 @@ import { Button } from '@/components/ui/button';
 import OwnerInfoFields from "./OwnerInfoFields";
 import CompanyInfoFields from "./CompanyInfoFields";
 import { emptyCompany, CompanyFormData } from '../companyHelpers';
+import { logger } from '@/utils/logger';
 
 interface SignupFormProps {
+  onSwitchToLogin: () => void;
+}
   onSwitchToLogin: () => void;
 }
 
@@ -112,7 +115,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
 
       if (companyError) throw companyError;
 
-      console.log('Company created:', companyData.id);
+      logger.info('Company created:', companyData.id);
 
       // 2) Sign up the user with company reference in metadata
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -135,7 +138,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         throw signUpError;
       }
 
-      console.log('User signed up:', signUpData.user?.id);
+      logger.info('User signed up:', signUpData.user?.id);
 
       // 3) The trigger will create the profile, but we'll ensure it's linked
       if (signUpData.user) {

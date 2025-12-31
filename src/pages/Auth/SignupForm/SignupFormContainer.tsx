@@ -13,6 +13,7 @@ import { Database } from '@/integrations/supabase/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InfoIcon } from 'lucide-react';
 import { signupSchema } from '@/utils/authValidation';
+import { logger } from '@/utils/logger';
 
 // Define the specific user role type to match Supabase's enum
 type UserRole = Database['public']['Enums']['user_role'];
@@ -133,7 +134,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         throw companyError;
       }
 
-      console.log('Company created successfully with ID:', companyId);
+      logger.info('Company created successfully with ID:', companyId);
 
       // 2. Sign up user with company reference in metadata
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
@@ -161,7 +162,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         throw new Error('Failed to create user account');
       }
 
-      console.log('User created successfully with ID:', authData.user.id);
+      logger.info('User created successfully with ID:', authData.user.id);
 
       // 3. Ensure profile is linked to company (trigger should do this, but we'll make sure)
       await supabase

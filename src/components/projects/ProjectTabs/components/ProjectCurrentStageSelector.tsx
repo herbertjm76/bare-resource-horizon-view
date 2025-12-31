@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { logger } from '@/utils/logger';
 
 interface ProjectCurrentStageSelectorProps {
   currentStage: string;
@@ -19,9 +20,9 @@ export const ProjectCurrentStageSelector: React.FC<ProjectCurrentStageSelectorPr
   // Filter office stages to only show those that are selected for this project
   const availableStages = officeStages.filter(stage => selectedStages.includes(stage.id));
 
-  console.log('ProjectCurrentStageSelector - currentStage:', currentStage);
-  console.log('ProjectCurrentStageSelector - selectedStages:', selectedStages);
-  console.log('ProjectCurrentStageSelector - availableStages:', availableStages);
+  logger.debug('ProjectCurrentStageSelector - currentStage:', currentStage);
+  logger.debug('ProjectCurrentStageSelector - selectedStages:', selectedStages);
+  logger.debug('ProjectCurrentStageSelector - availableStages:', availableStages);
 
   // Handle the onChange to convert "no_current_stage" back to empty string for the database
   const handleStageChange = (value: string) => {

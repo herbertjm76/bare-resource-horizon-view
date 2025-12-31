@@ -4,6 +4,7 @@ import { FloatingInsightCardsProps } from "./types";
 import { predefinedInsights, getRandomPositions, getRandomAnimationDelays } from "./constants";
 import { globalStyles } from "./styles";
 import { InsightCard } from "./InsightCard";
+import { logger } from "@/utils/logger";
 
 export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   utilizationRate,
@@ -12,16 +13,16 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   timeRange,
   scale = 1.0,
 }) => {
-  console.log("FloatingInsightCards rendering with props:", { utilizationRate, teamSize, activeProjects, timeRange, scale });
+  logger.debug("FloatingInsightCards rendering with props:", { utilizationRate, teamSize, activeProjects, timeRange, scale });
   
   const positions = getRandomPositions();
   const animationDelays = getRandomAnimationDelays();
 
-  console.log("Positions generated:", positions.length, "insights available:", predefinedInsights.length);
+  logger.debug("Positions generated:", positions.length, "insights available:", predefinedInsights.length);
 
   // Don't render anything if no positions (mobile)
   if (positions.length === 0) {
-    console.log("No positions available - mobile view detected");
+    logger.debug("No positions available - mobile view detected");
     return null;
   }
 
@@ -32,7 +33,7 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
     <>
       <style>{globalStyles}</style>
       {cardsToShow.map((insight, idx) => {
-        console.log("Rendering insight:", insight.title, "hasSubtitle:", insight.hasSubtitle);
+        logger.debug("Rendering insight:", insight.title, "hasSubtitle:", insight.hasSubtitle);
         return (
           <InsightCard
             key={insight.title + idx}

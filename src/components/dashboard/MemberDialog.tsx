@@ -6,6 +6,7 @@ import { Profile, PendingMember, TeamMember } from './types';
 import MemberForm from './memberDialog/MemberForm';
 import { MemberFormData } from './memberDialog/types';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
+import { logger } from '@/utils/logger';
 
 interface MemberDialogProps {
   isOpen: boolean;
@@ -47,7 +48,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
   useEffect(() => {
     if (member) {
       const memberIsPending = isPendingMember(member);
-      console.log('Populating form with member data:', member, 'isPending:', memberIsPending);
+      logger.debug('Populating form with member data:', member, 'isPending:', memberIsPending);
       
       // Pre-fill form with member data if editing
       // weekly_capacity: null/undefined = use company default, number = exception
@@ -91,11 +92,11 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
     
     // If editing a pending member, ensure the proper flags are set
     if (isPending) {
-      console.log('Submitting form for a pending member, preserving isPending flag');
+      logger.debug('Submitting form for a pending member, preserving isPending flag');
       (formData as Partial<PendingMember>).isPending = true;
       (formData as Partial<PendingMember>).invitation_type = 'pre_registered';
     } else {
-      console.log('Submitting form for an active member or new member');
+      logger.debug('Submitting form for an active member or new member');
     }
     
     const success = await onSave(formData);

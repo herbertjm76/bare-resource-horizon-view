@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
+import { logger } from '@/utils/logger';
 
 interface WorkloadMetricsCardsProps {
   weeklyWorkloadData: Record<string, Record<string, any>>;
@@ -65,7 +66,7 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
     const availableHours = Math.max(0, totalCapacity - totalAllocated);
 
     // Debug logging to expose the calculation discrepancy
-    console.log('🔍 WORKLOAD METRICS COMPREHENSIVE DEBUG:', {
+    logger.debug('🔍 WORKLOAD METRICS COMPREHENSIVE DEBUG:', {
       periodWeeks,
       totalAllocated,
       totalCapacity,
