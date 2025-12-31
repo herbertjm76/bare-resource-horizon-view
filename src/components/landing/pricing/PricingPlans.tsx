@@ -46,7 +46,7 @@ export const PricingPlans = () => {
   ];
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto mb-8 sm:mb-12 px-2 sm:px-0">
       {plans.map((plan, index) => (
         <PricingCard key={index} plan={plan} index={index} />
       ))}

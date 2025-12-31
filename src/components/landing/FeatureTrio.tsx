@@ -30,29 +30,31 @@ const FeatureTrio = () => {
   ];
 
   return (
-    <div className="py-16 bg-white">
+    <div className="py-12 sm:py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           {features.map((feature, index) => (
             <AnimatedSection key={index} animation="fadeInUp" delay={index * 200}>
               <VisualCard className="text-center h-full">
-                <div className="mb-6">
+                <div className="mb-4 sm:mb-6">
                   <img 
                     src={feature.gif} 
                     alt={feature.title}
-                    className="w-full h-40 object-cover rounded-lg mb-4"
+                    className="w-full h-32 sm:h-40 object-cover rounded-lg mb-3 sm:mb-4"
                   />
                 </div>
                 
-                <div className="flex justify-center mb-4">
-                  {feature.icon}
+                <div className="flex justify-center mb-3 sm:mb-4">
+                  {React.cloneElement(feature.icon as React.ReactElement, {
+                    className: 'w-6 h-6 sm:w-8 sm:h-8'
+                  })}
                 </div>
                 
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
                   {feature.title}
                 </h3>
                 
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   {feature.description}
                 </p>
               </VisualCard>
