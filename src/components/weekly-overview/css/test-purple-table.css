@@ -1,12 +1,12 @@
 
-/* Test Purple Table - Force Purple Header */
+/* Test Purple Table - Force Purple Header - Uses Design System CSS Variables */
 
 .test-purple-wrapper {
   width: 100%;
   overflow-x: auto;
   border-radius: 8px;
-  background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: hsl(var(--background));
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.1);
   margin-top: 20px;
 }
 
@@ -14,7 +14,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: white;
+  background: hsl(var(--background));
 }
 
 /* Force purple header with maximum specificity */
@@ -24,46 +24,46 @@
 .test-purple-table .test-purple-first-cell,
 .test-purple-table .test-purple-project-cell,
 .test-purple-table .test-purple-cell {
-  background: #6465F0 !important;
-  color: white !important;
+  background: hsl(var(--gradient-start)) !important;
+  color: hsl(var(--header-foreground)) !important;
 }
 
 /* Header styling */
 .test-purple-header {
-  background: #6465F0 !important;
+  background: hsl(var(--gradient-start)) !important;
 }
 
 .test-purple-header-row {
-  background: #6465F0 !important;
+  background: hsl(var(--gradient-start)) !important;
 }
 
 .test-purple-header th {
-  background: #6465F0 !important;
-  color: white !important;
+  background: hsl(var(--gradient-start)) !important;
+  color: hsl(var(--header-foreground)) !important;
   padding: 12px 8px;
   font-weight: 600;
   font-size: 11px;
   text-align: center;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid hsl(var(--header-foreground) / 0.2);
   border-bottom: none;
 }
 
 /* First column header */
 .test-purple-first-cell {
-  background: #6465F0 !important;
-  color: white !important;
+  background: hsl(var(--gradient-start)) !important;
+  color: hsl(var(--header-foreground)) !important;
   position: sticky;
   left: 0;
   z-index: 15;
   min-width: 150px;
-  border-right: 2px solid rgba(255, 255, 255, 0.3);
+  border-right: 2px solid hsl(var(--header-foreground) / 0.3);
   text-align: center;
 }
 
 /* Project headers */
 .test-purple-project-cell {
-  background: #6465F0 !important;
-  color: white !important;
+  background: hsl(var(--gradient-start)) !important;
+  color: hsl(var(--header-foreground)) !important;
 }
 
 .test-purple-project-code {
@@ -76,44 +76,44 @@
   justify-content: center;
   font-weight: 600;
   font-size: 11px;
-  color: white !important;
+  color: hsl(var(--header-foreground)) !important;
 }
 
 /* Other header cells */
 .test-purple-cell {
-  background: #6465F0 !important;
-  color: white !important;
+  background: hsl(var(--gradient-start)) !important;
+  color: hsl(var(--header-foreground)) !important;
 }
 
 /* Body styling */
 .test-purple-table tbody tr {
-  background: white;
-  border-bottom: 1px solid #f1f5f9;
+  background: hsl(var(--background));
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 .test-purple-table tbody tr:hover {
-  background: #f8fafc;
+  background: hsl(var(--muted));
 }
 
 .test-purple-table tbody td {
   padding: 8px;
   text-align: center;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid hsl(var(--border));
   font-size: 12px;
 }
 
 .test-purple-table tbody td:first-child {
   position: sticky;
   left: 0;
-  background: white;
+  background: hsl(var(--background));
   font-weight: 500;
   z-index: 5;
-  border-right: 2px solid #e2e8f0;
+  border-right: 2px solid hsl(var(--border));
   text-align: left;
 }
 
 .test-purple-table tbody tr:hover td:first-child {
-  background: #f8fafc;
+  background: hsl(var(--muted));
 }
 
 /* Remove last border */

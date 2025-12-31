@@ -1,5 +1,5 @@
 
-/* Base Resource Table Styles */
+/* Base Resource Table Styles - Uses Design System CSS Variables */
 
 .resource-table-compact,
 .resource-table-expanded {
@@ -10,34 +10,34 @@
 .resource-table-compact-container {
   overflow-x: auto;
   width: 100%;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.8) 100%);
   border-radius: 12px;
   padding: 2px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px hsl(var(--foreground) / 0.08);
 }
 
 .resource-table-compact-container table {
   min-width: 100%;
   table-layout: auto;
-  background: white;
+  background: hsl(var(--background));
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.1);
 }
 
 /* Avatar Enhancements */
 .resource-table-expanded .avatar {
   width: 36px;
   height: 36px;
-  border: 2px solid white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 2px solid hsl(var(--background));
+  box-shadow: 0 2px 8px hsl(var(--foreground) / 0.15);
 }
 
 .resource-table-compact .avatar {
   width: 28px;
   height: 28px;
-  border: 2px solid white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid hsl(var(--background));
+  box-shadow: 0 1px 4px hsl(var(--foreground) / 0.1);
 }
 
 /* Enhanced Member Info */
@@ -55,7 +55,7 @@
 
 .resource-table-expanded .allocation-percentage {
   font-size: 11px;
-  color: #64748b;
+  color: hsl(var(--muted-foreground));
   margin-top: 3px;
   font-weight: 500;
 }
