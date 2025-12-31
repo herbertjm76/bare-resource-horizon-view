@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useRef, useCallback } from 'react';
 import { format, addWeeks, startOfWeek, differenceInWeeks, parseISO, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, Loader2, Calendar, GripVertical } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Calendar, GripVertical, Settings2 } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -14,6 +14,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
+import { AddProjectStageDialog } from './AddProjectStageDialog';
 
 interface Project {
   id: string;
@@ -103,6 +104,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     stage: StageWithDates;
     project: Project;
   } | null>(null);
+  const [manageStagesProject, setManageStagesProject] = useState<Project | null>(null);
   
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
   const WEEK_WIDTH = 64; // Width of each week column in pixels
@@ -114,7 +116,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('office_stages')
-        .select('id, name, color, order_index')
+        .select('id, name, color, order_index, code')
         .eq('company_id', company.id)
         .order('order_index');
       if (error) throw error;
@@ -505,8 +507,26 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                         >
                           {/* Project name */}
                           <div className="w-48 shrink-0 p-2 border-r border-border">
-                            <div className="text-xs font-medium truncate group-hover:text-primary">
-                              {project.name}
+                            <div className="flex items-center gap-1">
+                              <div className="text-xs font-medium truncate group-hover:text-primary flex-1">
+                                {project.name}
+                              </div>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-muted transition-opacity"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setManageStagesProject(project);
+                                    }}
+                                  >
+                                    <Settings2 className="h-3 w-3 text-muted-foreground" />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">Manage stages</p>
+                                </TooltipContent>
+                              </Tooltip>
                             </div>
                             <div className="text-[10px] text-muted-foreground font-mono">
                               {project.code}
@@ -630,8 +650,26 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                         onClick={() => onProjectClick?.(project)}
                       >
                         <div className="w-48 shrink-0 p-2 border-r border-border">
-                          <div className="text-xs font-medium truncate group-hover:text-primary">
-                            {project.name}
+                          <div className="flex items-center gap-1">
+                            <div className="text-xs font-medium truncate group-hover:text-primary flex-1">
+                              {project.name}
+                            </div>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-muted transition-opacity"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setManageStagesProject(project);
+                                  }}
+                                >
+                                  <Settings2 className="h-3 w-3 text-muted-foreground" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="text-xs">Manage stages</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                           <div className="text-[10px] text-muted-foreground font-mono">
                             {project.code}
@@ -789,6 +827,22 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Manage Stages Dialog */}
+        {manageStagesProject && (
+          <AddProjectStageDialog
+            open={!!manageStagesProject}
+            onOpenChange={(open) => !open && setManageStagesProject(null)}
+            projectId={manageStagesProject.id}
+            projectName={manageStagesProject.name}
+            currentStages={manageStagesProject.stages || []}
+            availableStages={officeStages.map(s => ({ id: s.id, name: s.name, code: s.code }))}
+            onSuccess={() => {
+              queryClient.invalidateQueries({ queryKey: ['project-stages-timeline'] });
+              setManageStagesProject(null);
+            }}
+          />
+        )}
       </div>
     </TooltipProvider>
   );
