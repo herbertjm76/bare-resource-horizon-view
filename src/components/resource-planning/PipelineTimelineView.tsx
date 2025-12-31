@@ -224,7 +224,6 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Stage timeline updated');
       queryClient.invalidateQueries({ queryKey: ['project-stages-timeline'] });
       setSelectedStage(null);
     },
@@ -518,8 +517,21 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     return Math.max(0, bestPosition);
   }, [projects, getStageTimelinePosition]);
 
+  // Track if we just finished dragging to prevent project click
+  const justDraggedRef = useRef(false);
+  
   const handleDragEnd = useCallback(() => {
-    if (!dragState || dragState.currentOffset === 0) {
+    if (!dragState) {
+      return;
+    }
+    
+    // Mark that we just finished dragging
+    justDraggedRef.current = true;
+    setTimeout(() => {
+      justDraggedRef.current = false;
+    }, 100);
+    
+    if (dragState.currentOffset === 0) {
       setDragState(null);
       return;
     }
@@ -537,7 +549,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     
     const newStartDate = addWeeks(startDate, validStartWeek);
     
-    // Save the new date
+    // Save the new date directly without any popup
     updateStageMutation.mutate({
       stageId: dragState.stageId,
       startDate: newStartDate,
@@ -784,7 +796,11 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                         <div key={project.id} className="border-b border-border/20 last:border-b-0">
                           <div
                             className="flex items-center hover:bg-muted/30 cursor-pointer group"
-                            onClick={() => onProjectClick?.(project)}
+                            onClick={() => {
+                              // Don't open project dialog if we just finished dragging
+                              if (justDraggedRef.current) return;
+                              onProjectClick?.(project);
+                            }}
                           >
                             {/* Project name */}
                             <div className="w-48 shrink-0 p-2 border-r border-border">
