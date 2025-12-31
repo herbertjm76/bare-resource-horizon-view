@@ -5,6 +5,7 @@ import { WeekInfo } from '../hooks/useGridWeeks';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
 import { ResourceActions } from '../components/ResourceActions';
+import { logger } from '@/utils/logger';
 
 interface WorkloadStyleResourceRowProps {
   resource: any;
@@ -67,7 +68,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     onAllocationChange: (resourceId, weekKey, hours) => {
       // Update the parent project's allocation state immediately
       onAllocationChange?.(resourceId, weekKey, hours);
-      console.log(`Resource ${resourceId} allocation changed for week ${weekKey}: ${hours}h`);
+      logger.debug(`Resource ${resourceId} allocation changed for week ${weekKey}: ${hours}h`);
     }
   });
 

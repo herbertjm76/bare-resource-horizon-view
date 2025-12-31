@@ -5,6 +5,7 @@ import { TeamMember } from '@/components/dashboard/types';
 import { fetchUnifiedWorkloadData, UnifiedWorkloadResult } from './services/unifiedDataService';
 import { useAppSettings, WeekStartDay } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { logger } from '@/utils/logger';
 
 // Generate week start dates for the calendar based on company week start preference
 export const generateWeekStartDates = (startDate: Date, numberOfWeeks: number, weekStartDay: WeekStartDay = 'Monday') => {
@@ -30,7 +31,7 @@ export const useUnifiedWorkloadData = (
   const { company } = useCompany();
   const { startOfWorkWeek } = useAppSettings();
 
-  console.log('🔄 UNIFIED HOOK: Called with parameters', {
+  logger.debug('🔄 UNIFIED HOOK: Called with parameters', {
     startDate: format(startDate, 'yyyy-MM-dd'),
     memberCount: members.length,
     numberOfWeeks,
@@ -43,11 +44,11 @@ export const useUnifiedWorkloadData = (
     queryKey: ['unified-workload-data-v2', company?.id, members.map(m => m.id).sort(), format(startDate, 'yyyy-MM-dd'), numberOfWeeks, startOfWorkWeek],
     queryFn: async () => {
       if (!company?.id || members.length === 0) {
-        console.log('🔄 UNIFIED HOOK: Skipping fetch - no company or members');
+        logger.debug('🔄 UNIFIED HOOK: Skipping fetch - no company or members');
         return {};
       }
 
-      console.log('🚨🚨🚨 CRITICAL - QUERY FUNCTION EXECUTING 🚨🚨🚨', {
+      logger.debug('🚨🚨🚨 CRITICAL - QUERY FUNCTION EXECUTING 🚨🚨🚨', {
         companyId: company.id,
         startDate: format(startDate, 'yyyy-MM-dd'),
         numberOfWeeks,
@@ -71,7 +72,7 @@ export const useUnifiedWorkloadData = (
   // Generate week start dates for the calendar using company preference
   const weekStartDates = generateWeekStartDates(startDate, numberOfWeeks, startOfWorkWeek);
 
-  console.log('🔄 UNIFIED HOOK: Returning data', {
+  logger.debug('🔄 UNIFIED HOOK: Returning data', {
     hasData: Object.keys(workloadData).length > 0,
     memberCount: Object.keys(workloadData).length,
     weekCount: weekStartDates.length,

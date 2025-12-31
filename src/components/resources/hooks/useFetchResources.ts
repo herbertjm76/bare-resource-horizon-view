@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { Resource } from './types/resourceTypes';
+import { logger } from '@/utils/logger';
 
 export const useFetchResources = (projectId: string) => {
   const [resources, setResources] = useState<Resource[]>([]);
@@ -13,14 +14,14 @@ export const useFetchResources = (projectId: string) => {
   // Fetch resources for this project
   const fetchResources = useCallback(async () => {
     if (!projectId || !company?.id) {
-      console.log('Missing projectId or company.id');
+      logger.debug('Missing projectId or company.id');
       setIsLoading(false);
       return [];
     }
     
     setIsLoading(true);
     try {
-      console.log('Fetching resources for project:', projectId, 'company:', company.id);
+      logger.debug('Fetching resources for project:', projectId, 'company:', company.id);
       
       // Fetch active members assigned to this project with avatar URLs
       const { data: activeMembers, error: activeError } = await supabase
@@ -35,12 +36,12 @@ export const useFetchResources = (projectId: string) => {
         .eq('company_id', company.id);
       
       if (activeError) {
-        console.error('Error fetching active members:', activeError);
+        logger.error('Error fetching active members:', activeError);
         throw activeError;
       }
       
-      console.log('DEBUG useFetchResources - Active members from project_resources table:', activeMembers);
-      console.log('DEBUG useFetchResources - Active members count:', activeMembers?.length || 0);
+      logger.debug('DEBUG useFetchResources - Active members from project_resources table:', activeMembers);
+      logger.debug('DEBUG useFetchResources - Active members count:', activeMembers?.length || 0);
       
       // Fetch pre-registered members assigned to this project
       const { data: preRegisteredMembers, error: pendingError } = await supabase
@@ -55,12 +56,12 @@ export const useFetchResources = (projectId: string) => {
         .eq('company_id', company.id);
         
       if (pendingError) {
-        console.error('Error fetching pending members:', pendingError);
+        logger.error('Error fetching pending members:', pendingError);
         throw pendingError;
       }
       
-      console.log('DEBUG useFetchResources - Pre-registered members from pending_resources table:', preRegisteredMembers);
-      console.log('DEBUG useFetchResources - Pre-registered members count:', preRegisteredMembers?.length || 0);
+      logger.debug('DEBUG useFetchResources - Pre-registered members from pending_resources table:', preRegisteredMembers);
+      logger.debug('DEBUG useFetchResources - Pre-registered members count:', preRegisteredMembers?.length || 0);
       
       // Format the results to match our Resource interface
       const activeResources: Resource[] = (activeMembers || []).map(member => {
@@ -105,7 +106,7 @@ export const useFetchResources = (projectId: string) => {
         .eq('project_id', projectId)
         .eq('company_id', company.id);
 
-      console.log('DEBUG useFetchResources - Orphaned allocations:', orphanedAllocations);
+      logger.debug('DEBUG useFetchResources - Orphaned allocations:', orphanedAllocations);
 
       // Get unique resource IDs from allocations that aren't in our resource lists
       const existingResourceIds = new Set([
@@ -120,7 +121,7 @@ export const useFetchResources = (projectId: string) => {
         }
       });
 
-      console.log('DEBUG useFetchResources - Orphaned resource IDs:', Array.from(orphanedResourceIds));
+      logger.debug('DEBUG useFetchResources - Orphaned resource IDs:', Array.from(orphanedResourceIds));
 
       // Fetch profile information for orphaned resources
       const orphanedResources: Resource[] = [];
@@ -173,16 +174,16 @@ export const useFetchResources = (projectId: string) => {
         }
       }
 
-      console.log('DEBUG useFetchResources - Orphaned resources found:', orphanedResources);
+      logger.debug('DEBUG useFetchResources - Orphaned resources found:', orphanedResources);
 
       // Combine all resources
       const combinedResources = [...activeResources, ...pendingResources, ...orphanedResources];
       
-      console.log('DEBUG useFetchResources - Final combined resources for project:', combinedResources);
-      console.log('DEBUG useFetchResources - Total resources count:', combinedResources.length);
+      logger.debug('DEBUG useFetchResources - Final combined resources for project:', combinedResources);
+      logger.debug('DEBUG useFetchResources - Total resources count:', combinedResources.length);
       
       if (combinedResources.length === 0) {
-        console.log('DEBUG useFetchResources - No resources found for this project. User needs to add resources first.');
+        logger.debug('DEBUG useFetchResources - No resources found for this project. User needs to add resources first.');
       }
       
       // Update state
@@ -192,7 +193,7 @@ export const useFetchResources = (projectId: string) => {
       return combinedResources;
       
     } catch (error) {
-      console.error('Error fetching project resources:', error);
+      logger.error('Error fetching project resources:', error);
       toast.error('Failed to load project resources');
       setIsLoading(false);
       return [];

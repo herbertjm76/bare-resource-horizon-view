@@ -3,6 +3,7 @@ import React from "react";
 import { StageCard } from "./stage/StageCard";
 import type { StageFee } from "../../../../components/projects/hooks/types/projectTypes";
 import { toast } from "sonner";
+import { logger } from '@/utils/logger';
 
 interface Stage {
   id: string;
@@ -31,8 +32,8 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
   calculateInvoiceAge,
   isDataLoaded
 }) => {
-  console.log("StagesGrid rendering with stages:", selectedStages);
-  console.log("StagesGrid stageFees:", stageFees);
+  logger.debug("StagesGrid rendering with stages:", selectedStages);
+  logger.debug("StagesGrid stageFees:", stageFees);
   
   // Show warning if no stages are selected
   React.useEffect(() => {
@@ -64,7 +65,7 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
           
           const stageColor = getStageColor(stage.id);
           
-          console.log(`Rendering stage ${stage.id} (${stage.name}) with data:`, stageFeeData);
+          logger.debug(`Rendering stage ${stage.id} (${stage.name}) with data:`, stageFeeData);
           
           return (
             <StageCard
