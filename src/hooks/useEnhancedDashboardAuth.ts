@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 import { useDemoAuth } from './useDemoAuth';
+import { logger } from '@/utils/logger';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -20,9 +21,7 @@ export const useEnhancedDashboardAuth = () => {
 
   const fetchProfileData = async (userId: string) => {
     try {
-      if (import.meta.env.DEV) {
-        console.log('Dashboard: Fetching profile data for user', userId);
-      }
+      logger.log('Dashboard: Fetching profile data for user', userId);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -31,13 +30,11 @@ export const useEnhancedDashboardAuth = () => {
         .single();
 
       if (error) {
-        console.error('Dashboard: Error fetching profile:', error);
+        logger.error('Dashboard: Error fetching profile:', error);
         return;
       }
 
-      if (import.meta.env.DEV) {
-        console.log('Dashboard: Profile data fetched:', data);
-      }
+      logger.log('Dashboard: Profile data fetched:', data);
       setProfile(data);
 
       // Check if user is admin using secure RPC
@@ -73,14 +70,14 @@ export const useEnhancedDashboardAuth = () => {
         .eq('company_id', companyId);
 
       if (error) {
-        console.error('Dashboard: Error fetching team members:', error);
+        logger.error('Dashboard: Error fetching team members:', error);
         return;
       }
 
-      console.log('Dashboard: Team members fetched:', data);
+      logger.log('Dashboard: Team members fetched:', data);
       setTeamMembers(data || []);
     } catch (error) {
-      console.error('Dashboard: Error in fetchTeamMembers:', error);
+      logger.error('Dashboard: Error in fetchTeamMembers:', error);
     }
   };
 
@@ -98,23 +95,23 @@ export const useEnhancedDashboardAuth = () => {
           return;
         }
 
-        console.log('Dashboard: Initializing authentication...');
+        logger.log('Dashboard: Initializing authentication...');
         
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, session) => {
-            console.log('Dashboard: Auth state changed:', event, session?.user?.id);
+            logger.log('Dashboard: Auth state changed:', event, session?.user?.id);
             
             setSession(session);
             setUser(session?.user ?? null);
             
             if (event === 'SIGNED_OUT' || !session) {
-              console.log('Dashboard: User signed out, redirecting to auth...');
+              logger.log('Dashboard: User signed out, redirecting to auth...');
               setProfile(null);
               setTeamMembers([]);
               setInviteUrl('');
               navigate('/auth');
             } else if (event === 'SIGNED_IN' && session?.user) {
-              console.log('Dashboard: User signed in, fetching profile...');
+              logger.log('Dashboard: User signed in, fetching profile...');
               await fetchProfileData(session.user.id);
             }
             
@@ -126,23 +123,23 @@ export const useEnhancedDashboardAuth = () => {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         
         if (initialSession) {
-          console.log('Dashboard: Found initial session');
+          logger.log('Dashboard: Found initial session');
           setSession(initialSession);
           setUser(initialSession.user);
           await fetchProfileData(initialSession.user.id);
         } else {
-          console.log('Dashboard: No initial session, redirecting to auth...');
+          logger.log('Dashboard: No initial session, redirecting to auth...');
           navigate('/auth');
         }
         
         setLoading(false);
 
         return () => {
-          console.log('Dashboard: Cleaning up auth subscription');
+          logger.log('Dashboard: Cleaning up auth subscription');
           subscription.unsubscribe();
         };
       } catch (error) {
-        console.error('Dashboard: Error initializing auth:', error);
+        logger.error('Dashboard: Error initializing auth:', error);
         setLoading(false);
       }
     };

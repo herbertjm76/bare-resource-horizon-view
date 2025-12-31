@@ -9,6 +9,7 @@ import {
   saveResourceAllocation, 
   deleteResourceAllocation 
 } from './api';
+import { logger } from '@/utils/logger';
 
 export function useResourceAllocationsDB(
   projectId: string, 
@@ -34,7 +35,7 @@ export function useResourceAllocationsDB(
         // Note: No date range for backward compatibility - fetches all allocations
       );
       
-      console.log('Fetched allocations:', allocationMap);
+      logger.log('Fetched allocations:', allocationMap);
       setAllocations(allocationMap);
     } finally {
       setIsLoading(false);
@@ -47,7 +48,7 @@ export function useResourceAllocationsDB(
     
     setIsSaving(true);
     try {
-      console.log(`Saving allocation: week=${weekKey}, hours=${hours}`);
+      logger.log(`Saving allocation: week=${weekKey}, hours=${hours}`);
       const success = await saveResourceAllocation(
         projectId,
         resourceId,
@@ -91,7 +92,7 @@ export function useResourceAllocationsDB(
         });
       }
     } catch (error) {
-      console.error('Error deleting allocation:', error);
+      logger.error('Error deleting allocation:', error);
     }
   }, [projectId, resourceId, resourceType, company?.id]);
 
@@ -116,7 +117,7 @@ export function useResourceAllocationsDB(
           const newData = payload.new as ResourceAllocation;
           const weekKey = formatDateKey(newData.allocation_date);
           
-          console.log('Realtime update received:', newData);
+          logger.log('Realtime update received:', newData);
           setAllocations(prev => ({
             ...prev,
             [weekKey]: newData.hours

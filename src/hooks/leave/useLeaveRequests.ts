@@ -4,6 +4,7 @@ import { useCompanyId } from '@/hooks/useCompanyId';
 import { toast } from 'sonner';
 import { LeaveRequest, LeaveFormData } from '@/types/leave';
 import { differenceInBusinessDays, eachDayOfInterval, isWeekend, format } from 'date-fns';
+import { logger } from '@/utils/logger';
 
 export const useLeaveRequests = (memberId?: string) => {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
@@ -39,14 +40,14 @@ export const useLeaveRequests = (memberId?: string) => {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching leave requests:', error);
+        logger.error('Error fetching leave requests:', error);
         toast.error('Failed to load leave requests');
         return;
       }
 
       setLeaveRequests(data as LeaveRequest[] || []);
     } catch (error) {
-      console.error('Error in fetchLeaveRequests:', error);
+      logger.error('Error in fetchLeaveRequests:', error);
       toast.error('Failed to load leave requests');
     } finally {
       setIsLoading(false);
@@ -77,7 +78,7 @@ export const useLeaveRequests = (memberId?: string) => {
       .upload(fileName, file);
 
     if (uploadError) {
-      console.error('Error uploading attachment:', uploadError);
+      logger.error('Error uploading attachment:', uploadError);
       throw new Error('Failed to upload attachment');
     }
 
@@ -118,7 +119,7 @@ export const useLeaveRequests = (memberId?: string) => {
         if (approverProfile) {
           validApproverId = approverProfile.id;
         } else {
-          console.warn('Selected approver is not a valid profile, submitting without approver');
+          logger.warn('Selected approver is not a valid profile, submitting without approver');
         }
       }
 
@@ -151,7 +152,7 @@ export const useLeaveRequests = (memberId?: string) => {
         });
 
       if (error) {
-        console.error('Error submitting leave request:', error);
+        logger.error('Error submitting leave request:', error);
         toast.error('Failed to submit leave request');
         return false;
       }
@@ -163,7 +164,7 @@ export const useLeaveRequests = (memberId?: string) => {
       await fetchLeaveRequests();
       return true;
     } catch (error) {
-      console.error('Error in submitLeaveRequest:', error);
+      logger.error('Error in submitLeaveRequest:', error);
       toast.error('Failed to submit leave request');
       return false;
     } finally {
@@ -180,7 +181,7 @@ export const useLeaveRequests = (memberId?: string) => {
         .eq('status', 'pending'); // Only allow deleting pending requests
 
       if (error) {
-        console.error('Error cancelling leave request:', error);
+        logger.error('Error cancelling leave request:', error);
         toast.error('Failed to cancel leave request');
         return false;
       }
@@ -189,7 +190,7 @@ export const useLeaveRequests = (memberId?: string) => {
       await fetchLeaveRequests();
       return true;
     } catch (error) {
-      console.error('Error in cancelLeaveRequest:', error);
+      logger.error('Error in cancelLeaveRequest:', error);
       toast.error('Failed to cancel leave request');
       return false;
     }
@@ -263,7 +264,7 @@ export const useLeaveRequests = (memberId?: string) => {
       const { error } = await query;
 
       if (error) {
-        console.error('Error updating leave request:', error);
+        logger.error('Error updating leave request:', error);
         toast.error('Failed to update leave request');
         return false;
       }
@@ -272,7 +273,7 @@ export const useLeaveRequests = (memberId?: string) => {
       await fetchLeaveRequests();
       return true;
     } catch (error) {
-      console.error('Error in updateLeaveRequest:', error);
+      logger.error('Error in updateLeaveRequest:', error);
       toast.error('Failed to update leave request');
       return false;
     } finally {

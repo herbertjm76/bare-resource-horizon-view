@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCallback, useState } from 'react';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook to check if a user has permissions to manage team members
@@ -17,9 +18,7 @@ export const useMemberPermissions = () => {
    */
   const checkUserPermissions = useCallback(async () => {
     try {
-      if (import.meta.env.DEV) {
-        console.log('Checking user permissions...');
-      }
+      logger.log('Checking user permissions...');
       
       setIsChecking(true);
       setPermissionError(null);
@@ -28,55 +27,51 @@ export const useMemberPermissions = () => {
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
-        console.error('Error fetching session:', sessionError.message);
+        logger.error('Error fetching session:', sessionError.message);
         setPermissionError('Error fetching session');
         setHasPermission(false);
         return { hasPermission: false, error: sessionError.message };
       }
       
       if (!sessionData?.session?.user) {
-        console.error('No active session found');
+        logger.error('No active session found');
         setPermissionError('No active session');
         setHasPermission(false);
         return { hasPermission: false, error: 'No active session found' };
       }
       
       const userId = sessionData.session.user.id;
-      if (import.meta.env.DEV) {
-        console.log('Current user ID:', userId);
-      }
+      logger.log('Current user ID:', userId);
       
       // Use secure RPC to check if user is admin
       try {
         const { data: isAdmin, error: roleError } = await supabase.rpc('user_is_admin_safe');
         
         if (roleError) {
-          console.error('Error checking user role:', roleError.message);
+          logger.error('Error checking user role:', roleError.message);
           setPermissionError(roleError.message);
           setHasPermission(false);
           return { hasPermission: false, error: `Error checking user role: ${roleError.message}` };
         }
         
-        if (import.meta.env.DEV) {
-          console.log('User admin status:', isAdmin);
-        }
+        logger.log('User admin status:', isAdmin);
         setHasPermission(isAdmin === true);
         
         if (!isAdmin) {
-          console.warn('User does not have sufficient permissions');
+          logger.warn('User does not have sufficient permissions');
           setPermissionError('Insufficient permissions');
           return { hasPermission: false, error: 'User does not have sufficient permissions' };
         }
         
         return { hasPermission: true, error: null };
       } catch (queryError: any) {
-        console.error('Error in profile query:', queryError.message);
+        logger.error('Error in profile query:', queryError.message);
         setPermissionError(`Profile query error: ${queryError.message}`);
         setHasPermission(false);
         return { hasPermission: false, error: queryError.message };
       }
     } catch (error: any) {
-      console.error('Error checking permissions:', error.message);
+      logger.error('Error checking permissions:', error.message);
       setPermissionError(`Error: ${error.message}`);
       setHasPermission(false);
       return { hasPermission: false, error: error.message };
