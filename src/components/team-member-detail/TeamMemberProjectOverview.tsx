@@ -10,6 +10,7 @@ import { format, startOfWeek, addWeeks } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
+import { logger } from '@/utils/logger';
 
 interface TeamMemberProjectOverviewProps {
   memberId: string;
@@ -63,7 +64,7 @@ export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps>
           return allocationDate >= currentWeek && allocationDate <= endWeek;
         }) || [];
 
-        console.log('🔍 TEAM MEMBER PROJECT OVERVIEW - FIXED:', {
+        logger.debug('Team member project overview fetched', {
           totalRecords: allocations?.length || 0,
           filteredRecords: filteredAllocations.length,
           memberId

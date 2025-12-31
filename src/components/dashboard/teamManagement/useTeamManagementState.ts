@@ -5,6 +5,7 @@ import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useTeamDialogsState } from '@/hooks/useTeamDialogsState';
 import { useInviteActions } from '@/hooks/useInviteActions';
 import { useTeamMemberHandlers } from '../handlers/TeamMemberHandlers';
+import { logger } from '@/utils/logger';
 
 interface UseTeamManagementStateProps {
   activeMembers: Profile[];
@@ -56,11 +57,13 @@ export const useTeamManagementState = ({
 
   // Effect to log team members for debugging
   useEffect(() => {
-    console.log('TeamManagement - Active members:', activeMembers?.length || 0);
-    console.log('TeamManagement - Pre-registered members:', preRegisteredMembers?.length || 0);
-    console.log('TeamManagement - All members:', allMembers?.length || 0);
-    console.log('TeamManagement - User role:', userRole);
-    console.log('TeamManagement - Company ID:', companyId);
+    logger.debug('TeamManagement state', {
+      activeMembers: activeMembers?.length || 0,
+      preRegisteredMembers: preRegisteredMembers?.length || 0,
+      allMembers: allMembers?.length || 0,
+      userRole,
+      companyId
+    });
   }, [activeMembers, preRegisteredMembers, allMembers, userRole, companyId]);
 
   return {

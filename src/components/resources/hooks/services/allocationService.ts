@@ -3,14 +3,14 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ProjectAllocations } from '../types/resourceTypes';
 import { getAllocationKey } from '../utils/allocationUtils';
+import { logger } from '@/utils/logger';
 
 export const initializeAllocations = async (
   projectId: string,
   companyId: string
 ): Promise<ProjectAllocations> => {
   try {
-    console.log('DEBUG initializeAllocations - Starting for project:', projectId, 'company:', companyId);
-    console.log('DEBUG initializeAllocations - About to query project_resource_allocations table');
+    logger.debug('initializeAllocations - Starting', { projectId, companyId });
     
     // Fetch all resource allocations for this project from database
     const { data, error } = await supabase
@@ -20,13 +20,12 @@ export const initializeAllocations = async (
       .eq('company_id', companyId);
       
     if (error) {
-      console.error('DEBUG initializeAllocations - Database error:', error);
+      logger.error('initializeAllocations - Database error', error);
       toast.error('Failed to load resource allocations');
       return {};
     }
     
-    console.log('DEBUG initializeAllocations - Raw data from database:', data);
-    console.log('DEBUG initializeAllocations - Fetched allocations count:', data?.length || 0);
+    logger.debug('initializeAllocations - Fetched allocations', { count: data?.length || 0 });
     
     // Transform the data into our allocation structure
     const initialAllocations: ProjectAllocations = {};
@@ -37,12 +36,9 @@ export const initializeAllocations = async (
       const allocationKey = getAllocationKey(resourceId, weekKey);
       const hours = allocation.hours;
       initialAllocations[allocationKey] = hours;
-      
-      console.log(`DEBUG initializeAllocations - Processing allocation: ${allocationKey} = ${hours}h`);
     });
     
-    console.log('DEBUG initializeAllocations - Final initialized allocations:', initialAllocations);
-    console.log('DEBUG initializeAllocations - Total allocation keys created:', Object.keys(initialAllocations).length);
+    logger.debug('initializeAllocations - Complete', { totalKeys: Object.keys(initialAllocations).length });
     return initialAllocations;
     
   } catch (err) {

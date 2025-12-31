@@ -4,11 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { FolderOpen, Clock, Briefcase } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { format, startOfWeek, addWeeks } from 'date-fns';
+import { startOfWeek, addWeeks } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { logger } from '@/utils/logger';
 
 interface ProjectAllocation {
   id: string;
@@ -63,7 +64,7 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
           return allocationDate >= currentWeek && allocationDate <= endWeek;
         }) || [];
 
-        console.log('🔍 TEAM MEMBER ALLOCATIONS - FIXED:', {
+        logger.debug('Team member allocations fetched', {
           totalRecords: allocations?.length || 0,
           filteredRecords: filteredAllocations.length,
           memberId
