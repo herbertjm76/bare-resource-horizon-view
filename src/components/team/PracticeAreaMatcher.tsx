@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Upload } from 'lucide-react';
 import { matchPracticeAreasFromExcel, updatePracticeAreasInDatabase } from '@/scripts/matchPracticeAreas';
+import { logger } from '@/utils/logger';
 
 export const PracticeAreaMatcher = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -20,7 +21,7 @@ export const PracticeAreaMatcher = () => {
       // Parse Excel and extract mappings
       const mappings = await matchPracticeAreasFromExcel(file);
       
-      console.log('Extracted mappings:', mappings);
+      logger.log('Extracted mappings:', mappings);
       toast.info(`Found ${mappings.length} people in Excel file`);
 
       // Update database
@@ -34,7 +35,7 @@ export const PracticeAreaMatcher = () => {
       
       if (updateResults.errors.length > 0) {
         toast.error(`${updateResults.errors.length} error(s) occurred`);
-        console.error('Errors:', updateResults.errors);
+        logger.error('Errors:', updateResults.errors);
       }
       
       if (updateResults.skipped > 0) {
@@ -42,7 +43,7 @@ export const PracticeAreaMatcher = () => {
       }
       
     } catch (error) {
-      console.error('Error:', error);
+      logger.error('Error:', error);
       toast.error('Failed to process Excel file');
     } finally {
       setIsProcessing(false);

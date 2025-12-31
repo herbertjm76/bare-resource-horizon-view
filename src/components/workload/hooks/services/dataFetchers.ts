@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/logger';
 
 export const fetchProjectAllocations = async (
   companyId: string,
@@ -10,8 +11,8 @@ export const fetchProjectAllocations = async (
   const startDateStr = format(startDate, 'yyyy-MM-dd');
   const endDateStr = format(endDate, 'yyyy-MM-dd');
   
-  console.log('🚨🚨🚨 CRITICAL DEBUG - FETCHING PROJECT ALLOCATIONS 🚨🚨🚨');
-  console.log('🔍 FETCHING PROJECT ALLOCATIONS:', {
+  logger.log('🚨🚨🚨 CRITICAL DEBUG - FETCHING PROJECT ALLOCATIONS 🚨🚨🚨');
+  logger.log('🔍 FETCHING PROJECT ALLOCATIONS:', {
     companyId,
     memberIds: memberIds.slice(0, 3),
     startDate: startDateStr,
@@ -40,7 +41,7 @@ export const fetchProjectAllocations = async (
   const paulJuliusRecords = result.data?.filter(r => r.resource_id === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82') || [];
   const paulOct13Records = paulJuliusRecords.filter(r => r.allocation_date >= '2025-10-13' && r.allocation_date <= '2025-10-19');
   
-  console.log('🔍 PROJECT ALLOCATIONS RESULT (ALL RECORDS):', {
+  logger.log('🔍 PROJECT ALLOCATIONS RESULT (ALL RECORDS):', {
     totalRecords: result.data?.length || 0,
     error: result.error,
     paulJuliusRecords: paulJuliusRecords.length,
@@ -67,7 +68,7 @@ export const fetchProjectAllocations = async (
     .in('invite_id', memberIds)
     .gt('hours', 0);
 
-  console.log('🔍 PENDING RESOURCE ALLOCATIONS:', {
+  logger.log('🔍 PENDING RESOURCE ALLOCATIONS:', {
     totalRecords: pendingResult.data?.length || 0,
     error: pendingResult.error
   });
@@ -91,7 +92,7 @@ export const fetchAnnualLeaves = async (
   startDate: Date,
   endDate: Date
 ) => {
-  console.log('🔍 FETCHING ANNUAL LEAVES - FIXED VERSION');
+  logger.log('🔍 FETCHING ANNUAL LEAVES - FIXED VERSION');
   
   // FIX: Remove restrictive date filtering - fetch ALL leaves and let frontend filter
   const result = await supabase
@@ -101,7 +102,7 @@ export const fetchAnnualLeaves = async (
     .in('member_id', memberIds)
     .order('date', { ascending: true });
 
-  console.log('🔍 ANNUAL LEAVES RESULT (ALL RECORDS):', {
+  logger.log('🔍 ANNUAL LEAVES RESULT (ALL RECORDS):', {
     totalRecords: result.data?.length || 0,
     error: result.error,
     dateRange: result.data?.length ? `${result.data[0]?.date} to ${result.data[result.data.length - 1]?.date}` : 'none'
@@ -116,7 +117,7 @@ export const fetchOtherLeaves = async (
   startDate: Date,
   endDate: Date
 ) => {
-  console.log('🔍 FETCHING OTHER LEAVES - FIXED VERSION');
+  logger.log('🔍 FETCHING OTHER LEAVES - FIXED VERSION');
   
   // FIX: Remove restrictive date filtering - fetch ALL other leaves and let frontend filter
   const result = await supabase
@@ -126,7 +127,7 @@ export const fetchOtherLeaves = async (
     .in('member_id', memberIds)
     .order('week_start_date', { ascending: true });
 
-  console.log('🔍 OTHER LEAVES RESULT (ALL RECORDS):', {
+  logger.log('🔍 OTHER LEAVES RESULT (ALL RECORDS):', {
     totalRecords: result.data?.length || 0,
     error: result.error,
     dateRange: result.data?.length ? `${result.data[0]?.week_start_date} to ${result.data[result.data.length - 1]?.week_start_date}` : 'none'
