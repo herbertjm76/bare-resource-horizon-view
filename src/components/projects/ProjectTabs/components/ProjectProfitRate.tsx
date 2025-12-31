@@ -24,7 +24,7 @@ export const ProjectProfitRate: React.FC<ProjectProfitRateProps> = ({
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <Label htmlFor="profit" className="flex items-center gap-1">
-          <Percent className="w-4 h-4" />Target Profit %<span className="text-red-500">*</span>
+          <Percent className="w-4 h-4" />Target Profit %
         </Label>
         <Input
           id="profit"
@@ -32,7 +32,6 @@ export const ProjectProfitRate: React.FC<ProjectProfitRateProps> = ({
           placeholder="Enter profit percentage"
           value={profit}
           onChange={(e) => onProfitChange(e.target.value)}
-          required
           className="mt-1"
         />
       </div>
