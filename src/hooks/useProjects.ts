@@ -1,3 +1,29 @@
+/**
+ * @fileoverview Projects data hook
+ * 
+ * React Query hook for fetching and caching project data with proper
+ * company context handling and sorting options.
+ * 
+ * @module hooks/useProjects
+ * 
+ * @example
+ * ```ts
+ * import { useProjects } from '@/hooks/useProjects';
+ * 
+ * function ProjectList() {
+ *   const { projects, isLoading, error, refetch } = useProjects('name', 'asc');
+ *   
+ *   if (isLoading) return <Spinner />;
+ *   if (error) return <Error message={error.message} />;
+ *   
+ *   return (
+ *     <ul>
+ *       {projects.map(p => <li key={p.id}>{p.name}</li>)}
+ *     </ul>
+ *   );
+ * }
+ * ```
+ */
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,11 +32,88 @@ import { useCompanyId } from '@/hooks/useCompanyId';
 import { logger } from '@/utils/logger';
 import type { Database } from '@/integrations/supabase/types';
 
-type Project = Database['public']['Tables']['projects']['Row'];
+/** Project row type from database with relations */
+type ProjectRow = Database['public']['Tables']['projects']['Row'];
 
+/** Extended project type with joined relations */
+export interface ProjectWithRelations {
+  id: string;
+  name: string;
+  code: string;
+  status: string;
+  country: string;
+  department: string | null;
+  target_profit_percentage: number;
+  current_stage: string;
+  stages: string[] | null;
+  currency: string | null;
+  project_manager: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+  } | null;
+  office: {
+    id: string;
+    name: string;
+    country: string;
+  } | null;
+}
+
+/**
+ * Available sort fields for projects
+ * - 'name': Sort alphabetically by project name
+ * - 'code': Sort by project code
+ * - 'status': Sort by project status
+ * - 'created': Sort by creation date
+ */
 export type ProjectSortBy = 'name' | 'code' | 'status' | 'created';
 
-export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'asc' | 'desc' = 'asc') => {
+/**
+ * Hook return type with projects data and loading states
+ */
+interface UseProjectsResult {
+  /** Array of project records (empty array if loading or no projects) */
+  projects: ProjectWithRelations[];
+  /** True while data is being fetched */
+  isLoading: boolean;
+  /** Error object if fetch failed, null otherwise */
+  error: Error | null;
+  /** Function to manually refetch projects */
+  refetch: () => void;
+}
+
+/**
+ * Fetches projects for the current company with sorting and caching
+ * 
+ * This hook:
+ * - Waits for company context to be ready before fetching
+ * - Caches results using React Query
+ * - Includes related data (project manager, office)
+ * - Handles loading and error states properly
+ * 
+ * @param sortBy - Field to sort by (default: 'created')
+ * @param sortDirection - Sort direction: 'asc' or 'desc' (default: 'asc')
+ * @returns {UseProjectsResult} Projects data, loading state, and error
+ * 
+ * @example
+ * ```ts
+ * // Sort by name ascending
+ * const { projects } = useProjects('name', 'asc');
+ * 
+ * // Sort by creation date descending (newest first)
+ * const { projects } = useProjects('created', 'desc');
+ * 
+ * // Manual refetch after mutation
+ * const { refetch } = useProjects();
+ * await createProject(data);
+ * refetch();
+ * ```
+ */
+export const useProjects = (
+  sortBy: ProjectSortBy = 'created', 
+  sortDirection: 'asc' | 'desc' = 'asc'
+): UseProjectsResult => {
   const { companyId, isReady, isLoading: companyLoading, error: companyError } = useCompanyId();
   
   const { data: projects, isLoading: queryLoading, error, refetch } = useQuery({
