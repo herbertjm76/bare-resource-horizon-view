@@ -6,7 +6,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 interface StageWithDates {
   id: string;
+  officeStageId: string;
   stageName: string;
+  stageCode: string;
   startDate: Date | null;
   contractedWeeks: number;
   color: string;
