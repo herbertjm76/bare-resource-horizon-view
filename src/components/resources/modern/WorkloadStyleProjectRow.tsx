@@ -106,6 +106,19 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   // Calculate FTE (workWeekHours = 1 FTE per week)
   const visibleWeeksCount = weeks.filter(w => !w.isPreviousWeek).length;
   const totalFTE = visibleWeeksCount > 0 ? totalHours / (workWeekHours * visibleWeeksCount) : 0;
+
+  const hasActiveMemberFilters = Boolean(
+    memberFilters &&
+    (memberFilters.practiceArea !== 'all' ||
+      memberFilters.department !== 'all' ||
+      memberFilters.location !== 'all' ||
+      (memberFilters.searchTerm && memberFilters.searchTerm.trim() !== ''))
+  );
+
+  // If member filters are active and no resources match, hide the project row entirely.
+  if (hasActiveMemberFilters && !isLoading && filteredResources.length === 0) {
+    return null;
+  }
   
   return (
     <>
