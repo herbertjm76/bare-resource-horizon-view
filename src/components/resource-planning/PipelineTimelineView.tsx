@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { AddProjectStageDialog } from './AddProjectStageDialog';
+import { UnscheduledStagesTray } from './UnscheduledStagesTray';
 
 interface Project {
   id: string;
@@ -105,7 +106,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     project: Project;
   } | null>(null);
   const [manageStagesProject, setManageStagesProject] = useState<Project | null>(null);
-  
+  const [expandedTrays, setExpandedTrays] = useState<Set<string>>(new Set());
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
   const WEEK_WIDTH = 64; // Width of each week column in pixels
 
@@ -374,6 +375,50 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     });
   };
 
+  // Toggle tray for a project
+  const toggleTray = (projectId: string) => {
+    setExpandedTrays(prev => {
+      const next = new Set(prev);
+      if (next.has(projectId)) {
+        next.delete(projectId);
+      } else {
+        next.add(projectId);
+      }
+      return next;
+    });
+  };
+
+  // Handle drag start from the unscheduled tray
+  const handleTrayDragStart = (e: React.DragEvent, project: Project, stage: StageWithDates) => {
+    e.dataTransfer.setData('stageId', stage.id);
+    e.dataTransfer.setData('stageName', stage.stageName);
+    e.dataTransfer.setData('projectId', project.id);
+    e.dataTransfer.setData('contractedWeeks', stage.contractedWeeks.toString());
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  // Handle drop on the timeline
+  const handleTimelineDrop = (e: React.DragEvent, weekIndex: number) => {
+    e.preventDefault();
+    const stageId = e.dataTransfer.getData('stageId');
+    const contractedWeeks = parseInt(e.dataTransfer.getData('contractedWeeks')) || 4;
+    
+    if (!stageId) return;
+    
+    const dropDate = addWeeks(startDate, weekIndex);
+    
+    updateStageMutation.mutate({
+      stageId,
+      startDate: dropDate,
+      contractedWeeks
+    });
+  };
+
+  const handleTimelineDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -497,15 +542,162 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                     {/* Project rows */}
                     {groupProjects.map(project => {
                       const stages = getProjectStagesWithPositions(project);
-                      const hasNoStagesWithDates = stages.every(s => !s.startDate);
+                      const unscheduledStages = stages.filter(s => !s.startDate);
+                      const isTrayOpen = expandedTrays.has(project.id);
                       
                       return (
+                        <div key={project.id} className="border-b border-border/20 last:border-b-0">
+                          <div
+                            className="flex items-center hover:bg-muted/30 cursor-pointer group"
+                            onClick={() => onProjectClick?.(project)}
+                          >
+                            {/* Project name */}
+                            <div className="w-48 shrink-0 p-2 border-r border-border">
+                              <div className="flex items-center gap-1">
+                                <div className="text-xs font-medium truncate group-hover:text-primary flex-1">
+                                  {project.name}
+                                </div>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-muted transition-opacity"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setManageStagesProject(project);
+                                      }}
+                                    >
+                                      <Settings2 className="h-3 w-3 text-muted-foreground" />
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-xs">Manage stages</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </div>
+                              <div className="text-[10px] text-muted-foreground font-mono">
+                                {project.code}
+                              </div>
+                            </div>
+
+                            {/* Timeline bar */}
+                            <div className="flex relative h-12">
+                              {weeks.map((_, i) => (
+                                <div 
+                                  key={i} 
+                                  className="w-16 shrink-0 border-r border-border/30"
+                                  onDragOver={handleTimelineDragOver}
+                                  onDrop={(e) => handleTimelineDrop(e, i)}
+                                />
+                              ))}
+                              
+                              {/* Stage bars - only scheduled ones */}
+                              {stages.filter(s => s.startDate).map((stage) => {
+                                const position = getStageTimelinePosition(stage);
+                                if (!position) return null;
+                                
+                                const isDragging = dragState?.stageId === stage.id;
+                                const dragOffset = isDragging ? dragState.currentOffset : 0;
+                                const displayLeft = (position.startWeek + dragOffset) * WEEK_WIDTH;
+                                
+                                return (
+                                  <Tooltip key={stage.stageName} open={isDragging ? false : undefined}>
+                                    <TooltipTrigger asChild>
+                                      <div
+                                        className={cn(
+                                          "absolute top-1/2 -translate-y-1/2 h-7 rounded-md flex items-center gap-1 pl-1 pr-2 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
+                                          isDragging ? "ring-2 ring-primary ring-offset-2 cursor-grabbing z-20 opacity-90" : "hover:ring-2 hover:ring-primary hover:ring-offset-1"
+                                        )}
+                                        style={{
+                                          left: `${displayLeft}px`,
+                                          width: `${Math.max(position.width * WEEK_WIDTH - 4, 48)}px`,
+                                          backgroundColor: stage.color,
+                                        }}
+                                        onMouseDown={(e) => handleDragStart(e, project, stage)}
+                                        onClick={(e) => !dragState && handleStageClick(e, project, stage)}
+                                      >
+                                        <GripVertical className="h-3 w-3 text-white/60 shrink-0" />
+                                        <span className="truncate">{stage.stageName}</span>
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <div className="text-xs">
+                                        <p className="font-medium">{stage.stageName}</p>
+                                        <p className="text-muted-foreground">
+                                          {stage.startDate ? format(stage.startDate, 'MMM d, yyyy') : 'No start date'} 
+                                          {' • '}{stage.contractedWeeks} weeks
+                                        </p>
+                                        <p className="text-primary mt-1">Drag to move • Click to edit</p>
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          
+                          {/* Expandable Tray for unscheduled stages */}
+                          {unscheduledStages.length > 0 && (
+                            <div className="flex border-t border-border/10 bg-muted/10">
+                              <div className="w-48 shrink-0 p-1.5 border-r border-border">
+                                <UnscheduledStagesTray
+                                  stages={stages}
+                                  isOpen={isTrayOpen}
+                                  onToggle={() => toggleTray(project.id)}
+                                  onStageClick={(e, stage) => handleStageClick(e, project, stage)}
+                                  onDragStart={(e, stage) => handleTrayDragStart(e, project, stage)}
+                                />
+                              </div>
+                              <div className="flex flex-1">
+                                {weeks.map((_, i) => (
+                                  <div 
+                                    key={i} 
+                                    className={cn(
+                                      "w-16 shrink-0 border-r border-border/20 min-h-[2rem]",
+                                      isTrayOpen && "bg-primary/5 border-dashed"
+                                    )}
+                                    onDragOver={handleTimelineDragOver}
+                                    onDrop={(e) => handleTimelineDrop(e, i)}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+
+              {/* Unassigned projects */}
+              {projectsByGroup['Unassigned']?.length > 0 && (
+                <div className="border-b border-border/50">
+                  <div className="flex items-center bg-muted/20">
+                    <div className="w-48 shrink-0 p-2 border-r border-border flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full shrink-0 bg-gray-500" />
+                      <span className="font-medium text-xs">Unassigned</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        ({projectsByGroup['Unassigned'].length})
+                      </span>
+                    </div>
+                    <div className="flex flex-1">
+                      {weeks.map((_, i) => (
+                        <div key={i} className="w-16 shrink-0 h-8 border-r border-border/30" />
+                      ))}
+                    </div>
+                  </div>
+
+                  {projectsByGroup['Unassigned'].map(project => {
+                    const stages = getProjectStagesWithPositions(project);
+                    const unscheduledStages = stages.filter(s => !s.startDate);
+                    const isTrayOpen = expandedTrays.has(project.id);
+                    
+                    return (
+                      <div key={project.id} className="border-b border-border/20 last:border-b-0">
                         <div
-                          key={project.id}
                           className="flex items-center hover:bg-muted/30 cursor-pointer group"
                           onClick={() => onProjectClick?.(project)}
                         >
-                          {/* Project name */}
                           <div className="w-48 shrink-0 p-2 border-r border-border">
                             <div className="flex items-center gap-1">
                               <div className="text-xs font-medium truncate group-hover:text-primary flex-1">
@@ -533,40 +725,20 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                             </div>
                           </div>
 
-                          {/* Timeline bar */}
                           <div className="flex relative h-12">
                             {weeks.map((_, i) => (
-                              <div key={i} className="w-16 shrink-0 border-r border-border/30" />
+                              <div 
+                                key={i} 
+                                className="w-16 shrink-0 border-r border-border/30"
+                                onDragOver={handleTimelineDragOver}
+                                onDrop={(e) => handleTimelineDrop(e, i)}
+                              />
                             ))}
                             
-                            {/* Stage bars */}
-                            {stages.map((stage) => {
+                            {/* Stage bars - only scheduled ones */}
+                            {stages.filter(s => s.startDate).map((stage) => {
                               const position = getStageTimelinePosition(stage);
-                              
-                              if (!position) {
-                                // Stage without start date - show as chip that can be clicked
-                                if (!stage.startDate) {
-                                  return (
-                                    <Tooltip key={stage.stageName}>
-                                      <TooltipTrigger asChild>
-                                      <button
-                                          className="absolute top-1 h-4 px-2 rounded text-[8px] font-medium text-foreground border border-dashed border-border bg-muted hover:bg-muted/80 transition-colors"
-                                          style={{
-                                            left: `${stages.indexOf(stage) * 52 + 4}px`,
-                                          }}
-                                          onClick={(e) => handleStageClick(e, project, stage)}
-                                        >
-                                          {stage.stageName.slice(0, 8)}
-                                        </button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p className="text-xs">Click to set start date for {stage.stageName}</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  );
-                                }
-                                return null;
-                              }
+                              if (!position) return null;
                               
                               const isDragging = dragState?.stageId === stage.id;
                               const dragOffset = isDragging ? dragState.currentOffset : 0;
@@ -596,8 +768,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                     <div className="text-xs">
                                       <p className="font-medium">{stage.stageName}</p>
                                       <p className="text-muted-foreground">
-                                        {stage.startDate ? format(stage.startDate, 'MMM d, yyyy') : 'No start date'} 
-                                        {' • '}{stage.contractedWeeks} weeks
+                                        {format(stage.startDate!, 'MMM d, yyyy')} • {stage.contractedWeeks} weeks
                                       </p>
                                       <p className="text-primary mt-1">Drag to move • Click to edit</p>
                                     </div>
@@ -605,145 +776,36 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                 </Tooltip>
                               );
                             })}
-                            
-                            {/* Show message if no stages have dates */}
-                            {hasNoStagesWithDates && stages.length > 0 && (
-                              <div className="absolute inset-0 flex items-center pl-2">
-                                <span className="text-[10px] text-muted-foreground italic">
-                                  Click stage chips above to set dates
-                                </span>
-                              </div>
-                            )}
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-
-              {/* Unassigned projects */}
-              {projectsByGroup['Unassigned']?.length > 0 && (
-                <div className="border-b border-border/50">
-                  <div className="flex items-center bg-muted/20">
-                    <div className="w-48 shrink-0 p-2 border-r border-border flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full shrink-0 bg-gray-500" />
-                      <span className="font-medium text-xs">Unassigned</span>
-                      <span className="text-[10px] text-muted-foreground">
-                        ({projectsByGroup['Unassigned'].length})
-                      </span>
-                    </div>
-                    <div className="flex flex-1">
-                      {weeks.map((_, i) => (
-                        <div key={i} className="w-16 shrink-0 h-8 border-r border-border/30" />
-                      ))}
-                    </div>
-                  </div>
-
-                  {projectsByGroup['Unassigned'].map(project => {
-                    const stages = getProjectStagesWithPositions(project);
-                    
-                    return (
-                      <div
-                        key={project.id}
-                        className="flex items-center hover:bg-muted/30 cursor-pointer group"
-                        onClick={() => onProjectClick?.(project)}
-                      >
-                        <div className="w-48 shrink-0 p-2 border-r border-border">
-                          <div className="flex items-center gap-1">
-                            <div className="text-xs font-medium truncate group-hover:text-primary flex-1">
-                              {project.name}
+                        
+                        {/* Expandable Tray for unscheduled stages */}
+                        {unscheduledStages.length > 0 && (
+                          <div className="flex border-t border-border/10 bg-muted/10">
+                            <div className="w-48 shrink-0 p-1.5 border-r border-border">
+                              <UnscheduledStagesTray
+                                stages={stages}
+                                isOpen={isTrayOpen}
+                                onToggle={() => toggleTray(project.id)}
+                                onStageClick={(e, stage) => handleStageClick(e, project, stage)}
+                                onDragStart={(e, stage) => handleTrayDragStart(e, project, stage)}
+                              />
                             </div>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-muted transition-opacity"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setManageStagesProject(project);
-                                  }}
-                                >
-                                  <Settings2 className="h-3 w-3 text-muted-foreground" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p className="text-xs">Manage stages</p>
-                              </TooltipContent>
-                            </Tooltip>
+                            <div className="flex flex-1">
+                              {weeks.map((_, i) => (
+                                <div 
+                                  key={i} 
+                                  className={cn(
+                                    "w-16 shrink-0 border-r border-border/20 min-h-[2rem]",
+                                    isTrayOpen && "bg-primary/5 border-dashed"
+                                  )}
+                                  onDragOver={handleTimelineDragOver}
+                                  onDrop={(e) => handleTimelineDrop(e, i)}
+                                />
+                              ))}
+                            </div>
                           </div>
-                          <div className="text-[10px] text-muted-foreground font-mono">
-                            {project.code}
-                          </div>
-                        </div>
-
-                        <div className="flex relative h-12">
-                          {weeks.map((_, i) => (
-                            <div key={i} className="w-16 shrink-0 border-r border-border/30" />
-                          ))}
-                          
-                          {stages.map((stage) => {
-                            const position = getStageTimelinePosition(stage);
-                            
-                            if (!position && !stage.startDate) {
-                              return (
-                                <Tooltip key={stage.stageName}>
-                                  <TooltipTrigger asChild>
-                                    <button
-                                      className="absolute top-1 h-4 px-2 rounded text-[8px] font-medium text-foreground border border-dashed border-border bg-muted hover:bg-muted/80 transition-colors"
-                                      style={{
-                                        left: `${stages.indexOf(stage) * 52 + 4}px`,
-                                      }}
-                                      onClick={(e) => handleStageClick(e, project, stage)}
-                                    >
-                                      {stage.stageName.slice(0, 8)}
-                                    </button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p className="text-xs">Click to set start date</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              );
-                            }
-                            
-                            if (!position) return null;
-                            
-                            const isDragging = dragState?.stageId === stage.id;
-                            const dragOffset = isDragging ? dragState.currentOffset : 0;
-                            const displayLeft = (position.startWeek + dragOffset) * WEEK_WIDTH;
-                            
-                            return (
-                              <Tooltip key={stage.stageName} open={isDragging ? false : undefined}>
-                                <TooltipTrigger asChild>
-                                  <div
-                                    className={cn(
-                                      "absolute top-1/2 -translate-y-1/2 h-7 rounded-md flex items-center gap-1 pl-1 pr-2 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
-                                      isDragging ? "ring-2 ring-primary ring-offset-2 cursor-grabbing z-20 opacity-90" : "hover:ring-2 hover:ring-primary hover:ring-offset-1"
-                                    )}
-                                    style={{
-                                      left: `${displayLeft}px`,
-                                      width: `${Math.max(position.width * WEEK_WIDTH - 4, 48)}px`,
-                                      backgroundColor: stage.color,
-                                    }}
-                                    onMouseDown={(e) => handleDragStart(e, project, stage)}
-                                    onClick={(e) => !dragState && handleStageClick(e, project, stage)}
-                                  >
-                                    <GripVertical className="h-3 w-3 text-white/60 shrink-0" />
-                                    <span className="truncate">{stage.stageName}</span>
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <div className="text-xs">
-                                    <p className="font-medium">{stage.stageName}</p>
-                                    <p className="text-muted-foreground">
-                                      {format(stage.startDate!, 'MMM d, yyyy')} • {stage.contractedWeeks} weeks
-                                    </p>
-                                    <p className="text-primary mt-1">Drag to move • Click to edit</p>
-                                  </div>
-                                </TooltipContent>
-                              </Tooltip>
-                            );
-                          })}
-                        </div>
+                        )}
                       </div>
                     );
                   })}
