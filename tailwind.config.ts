@@ -56,6 +56,27 @@ export default {
         "card-gradient-3": "hsl(var(--card-gradient-3))",
         "card-gradient-4": "hsl(var(--card-gradient-4))",
         
+        // Brand colors
+        "brand-primary": "hsl(var(--brand-primary))",
+        "brand-secondary": "hsl(var(--brand-secondary))",
+        "brand-accent": "hsl(var(--brand-accent))",
+        "brand-highlight": "hsl(var(--brand-highlight))",
+        
+        // Header colors
+        "header-bg": "hsl(var(--header-bg))",
+        "header-foreground": "hsl(var(--header-foreground))",
+        
+        // Card gradient backgrounds
+        "card-gradient-start": "hsl(var(--card-gradient-start))",
+        "card-gradient-end": "hsl(var(--card-gradient-end))",
+        "card-gradient-border": "hsl(var(--card-gradient-border))",
+        
+        // Landing page colors
+        "landing-footer": "hsl(var(--landing-footer-bg))",
+        "landing-gradient-1": "hsl(var(--landing-gradient-1))",
+        "landing-gradient-2": "hsl(var(--landing-gradient-2))",
+        "landing-gradient-3": "hsl(var(--landing-gradient-3))",
+        
         // Shadcn colors
         primary: {
           DEFAULT: "hsl(var(--primary))",

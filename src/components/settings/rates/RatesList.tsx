@@ -31,7 +31,7 @@ export const RatesList = ({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-[#6E59A5]">{title}</h3>
+        <h3 className="text-lg font-semibold text-brand-accent">{title}</h3>
         <span className="text-sm text-muted-foreground">
           {rates.length} {rates.length === 1 ? 'rate' : 'rates'}
         </span>

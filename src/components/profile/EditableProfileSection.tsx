@@ -63,7 +63,7 @@ export const EditableProfileSection: React.FC<EditableProfileSectionProps> = ({
           onClick={onSave}
           disabled={saving}
           size="sm"
-          className="bg-white text-[#6F4BF6] hover:bg-white/90"
+          className="bg-white text-brand-primary hover:bg-white/90"
         >
           <Check className="h-4 w-4 mr-1" />
           {saving ? 'Saving...' : 'Save'}

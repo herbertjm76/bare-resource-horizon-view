@@ -68,12 +68,12 @@ export const HerbieChat: React.FC = () => {
             <div 
               className={`max-w-[80%] p-3 rounded-2xl
                 ${message.isUser 
-                  ? 'bg-[#6F4BF6] text-white rounded-tr-none' 
+                  ? 'bg-brand-primary text-white rounded-tr-none' 
                   : 'bg-gray-100 text-gray-800 rounded-tl-none'}`
               }
             >
               <p className="text-sm">{message.content}</p>
-              <div className={`text-xs mt-1 ${message.isUser ? 'text-purple-200' : 'text-gray-500'}`}>
+              <div className={`text-xs mt-1 ${message.isUser ? 'text-white/70' : 'text-gray-500'}`}>
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
@@ -88,15 +88,12 @@ export const HerbieChat: React.FC = () => {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask Herbie about resource planning..."
-          className="flex-1 p-3 rounded-full border border-gray-200 focus:outline-none focus:border-[#6F4BF6] text-sm"
+          className="flex-1 p-3 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 text-sm"
         />
         <Button
           onClick={handleSend}
           size="icon"
-          className="rounded-full h-10 w-10"
-          style={{
-            background: 'linear-gradient(45deg, #6F4BF6 0%, #5669F7 100%)'
-          }}
+          className="rounded-full h-10 w-10 bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-90"
         >
           <Send className="h-4 w-4" />
         </Button>
