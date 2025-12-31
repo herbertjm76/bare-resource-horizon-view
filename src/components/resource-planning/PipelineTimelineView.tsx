@@ -211,7 +211,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     return map;
   }, [stageAllocationsData]);
 
-  // Mutation to update stage start date and contracted weeks
+  // Mutation to update stage start date and contracted weeks with optimistic updates
   const updateStageMutation = useMutation({
     mutationFn: async ({ stageId, startDate, contractedWeeks }: { stageId: string; startDate: Date | null; contractedWeeks: number }) => {
       const { error } = await supabase
@@ -223,12 +223,44 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
         .eq('id', stageId);
       if (error) throw error;
     },
+    onMutate: async ({ stageId, startDate, contractedWeeks }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['project-stages-timeline'] });
+      
+      // Snapshot previous value
+      const previousData = queryClient.getQueryData(['project-stages-timeline', company?.id, projects.map(p => p.id)]);
+      
+      // Optimistically update the cache
+      queryClient.setQueryData(
+        ['project-stages-timeline', company?.id, projects.map(p => p.id)],
+        (old: any[] | undefined) => {
+          if (!old) return old;
+          return old.map(stage => 
+            stage.id === stageId 
+              ? { ...stage, start_date: startDate ? format(startDate, 'yyyy-MM-dd') : null, contracted_weeks: contractedWeeks }
+              : stage
+          );
+        }
+      );
+      
+      return { previousData };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['project-stages-timeline'] });
       setSelectedStage(null);
     },
-    onError: () => {
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          ['project-stages-timeline', company?.id, projects.map(p => p.id)],
+          context.previousData
+        );
+      }
       toast.error('Failed to update stage');
+    },
+    onSettled: () => {
+      // Refetch in background to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['project-stages-timeline'] });
     }
   });
 
