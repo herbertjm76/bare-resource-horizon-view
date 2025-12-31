@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 type UserRole = 'owner' | 'admin' | 'member';
 
@@ -34,9 +35,7 @@ export const useAuthorization = ({
   const checkAuthorization = useCallback(async () => {
     // Prevent multiple simultaneous checks
     if (checkInProgress.current) {
-      if (import.meta.env.DEV) {
-        console.log("useAuthorization: Check already in progress, skipping...");
-      }
+      logger.log("useAuthorization: Check already in progress, skipping...");
       return;
     }
 
@@ -45,15 +44,13 @@ export const useAuthorization = ({
     setError(null);
 
     try {
-      if (import.meta.env.DEV) {
-        console.log("useAuthorization: Checking authorization...");
-      }
+      logger.log("useAuthorization: Checking authorization...");
       
       // Check if user is authenticated
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
-        console.error("useAuthorization: Session error", sessionError);
+        logger.error("useAuthorization: Session error", sessionError);
         setError("Failed to verify your session");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -65,9 +62,7 @@ export const useAuthorization = ({
       }
       
       if (!sessionData.session) {
-        if (import.meta.env.DEV) {
-          console.log("useAuthorization: No active session");
-        }
+        logger.log("useAuthorization: No active session");
         setError("No active session");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -78,9 +73,7 @@ export const useAuthorization = ({
         return;
       }
 
-      if (import.meta.env.DEV) {
-        console.log("useAuthorization: Session found for user", sessionData.session.user.id);
-      }
+      logger.log("useAuthorization: Session found for user", sessionData.session.user.id);
 
       // Get user role using secure RPC and company from profiles
       const [roleResult, profileResult] = await Promise.all([
@@ -92,7 +85,7 @@ export const useAuthorization = ({
       const { data: profile, error: profileError } = profileResult;
 
       if (roleError) {
-        console.error("useAuthorization: Error fetching user role", roleError);
+        logger.error("useAuthorization: Error fetching user role", roleError);
         setError("Error checking authorization");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -105,11 +98,11 @@ export const useAuthorization = ({
 
       if (profileError) {
         // Non-fatal when no specific companyId is required
-        console.warn("useAuthorization: Profile fetch error - continuing without profile as no companyId is required", profileError);
+        logger.warn("useAuthorization: Profile fetch error - continuing without profile as no companyId is required", profileError);
       }
 
       if (!userRoleData) {
-        console.error("useAuthorization: No user role found");
+        logger.error("useAuthorization: No user role found");
         setError("No user role found");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -121,7 +114,7 @@ export const useAuthorization = ({
       }
 
       if (companyId && !profile) {
-        console.error("useAuthorization: No profile found but companyId is required");
+        logger.error("useAuthorization: No profile found but companyId is required");
         setError("No user profile found");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -132,19 +125,15 @@ export const useAuthorization = ({
         return;
       }
 
-      if (import.meta.env.DEV) {
-        console.log("useAuthorization: Profile and role found", { role: userRoleData, company: profile.company_id });
-      }
+      logger.log("useAuthorization: Profile and role found", { role: userRoleData, company: profile.company_id });
 
       // Set the user's role
       setUserRole(userRoleData as UserRole);
-      if (import.meta.env.DEV) {
-        console.log("useAuthorization: User role", userRoleData);
-      }
+      logger.log("useAuthorization: User role", userRoleData);
 
       // Check if company ID is required and matches
       if (companyId && profile.company_id !== companyId) {
-        console.error("useAuthorization: Company mismatch", profile.company_id, companyId);
+        logger.error("useAuthorization: Company mismatch", profile.company_id, companyId);
         setError("Company access denied");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -160,7 +149,7 @@ export const useAuthorization = ({
       const hasRequiredRole = roles.includes(userRoleData as UserRole);
 
       if (!hasRequiredRole) {
-        console.error("useAuthorization: Role mismatch", userRoleData, requiredRole);
+        logger.error("useAuthorization: Role mismatch", userRoleData, requiredRole);
         setError("Insufficient permissions");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -172,14 +161,12 @@ export const useAuthorization = ({
       }
 
       // User is authorized
-      if (import.meta.env.DEV) {
-        console.log("useAuthorization: User is authorized");
-      }
+      logger.log("useAuthorization: User is authorized");
       setIsAuthorized(true);
       setError(null);
       authChecked.current = true;
     } catch (error: any) {
-      console.error('Authorization error:', error);
+      logger.error('Authorization error:', error);
       setError("Authorization check failed");
       setIsAuthorized(false);
       if (autoRedirect) {
@@ -197,7 +184,7 @@ export const useAuthorization = ({
   useEffect(() => {
     let mounted = true;
     
-    console.log("useAuthorization: Initializing with", {
+    logger.log("useAuthorization: Initializing with", {
       requiredRole,
       redirectTo,
       companyId,
@@ -219,17 +206,15 @@ export const useAuthorization = ({
     
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      console.log("useAuthorization: Auth state change", event);
+      logger.log("useAuthorization: Auth state change", event);
       
       if (!mounted) {
-        console.log("useAuthorization: Component not mounted, skipping auth state change handling");
+        logger.log("useAuthorization: Component not mounted, skipping auth state change handling");
         return;
       }
       
       if (event === 'SIGNED_OUT') {
-        if (import.meta.env.DEV) {
-          console.log("useAuthorization: User signed out");
-        }
+        logger.log("useAuthorization: User signed out");
         setIsAuthorized(false);
         setUserRole(null);
         authChecked.current = false;
@@ -237,24 +222,18 @@ export const useAuthorization = ({
           navigate('/auth');
         }
       } else if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
-        if (import.meta.env.DEV) {
-          console.log("useAuthorization: Auth event:", event);
-        }
+        logger.log("useAuthorization: Auth event:", event);
         
         // CRITICAL: If already authorized, NEVER re-check on these events
         // This prevents the endless "Access Denied" loop when returning to the window
         if (authChecked.current && isAuthorized) {
-          if (import.meta.env.DEV) {
-            console.log(`useAuthorization: Already authorized, skipping recheck on ${event}`);
-          }
+          logger.log(`useAuthorization: Already authorized, skipping recheck on ${event}`);
           return;
         }
         
         // Skip INITIAL_SESSION if already checked (even if not authorized)
         if (event === 'INITIAL_SESSION' && authChecked.current) {
-          if (import.meta.env.DEV) {
-            console.log('useAuthorization: Skipping recheck on redundant INITIAL_SESSION');
-          }
+          logger.log('useAuthorization: Skipping recheck on redundant INITIAL_SESSION');
           return;
         }
         
@@ -275,7 +254,7 @@ export const useAuthorization = ({
     let handleVisibility: (() => void) | null = null;
     if (recheckOnFocus) {
       handleResume = () => {
-        console.log("useAuthorization: Resuming after focus/visibility");
+        logger.log("useAuthorization: Resuming after focus/visibility");
         authChecked.current = false;
         setTimeout(() => { if (mounted) checkAuthorization(); }, 0);
       };
@@ -285,7 +264,7 @@ export const useAuthorization = ({
     }
     
     return () => {
-      console.log("useAuthorization: Cleanup called");
+      logger.log("useAuthorization: Cleanup called");
       mounted = false;
 
       if (recheckOnFocus) {
@@ -304,7 +283,7 @@ export const useAuthorization = ({
     userRole, 
     error,
     refreshAuth: useCallback(() => {
-      console.log("useAuthorization: Manual refresh triggered");
+      logger.log("useAuthorization: Manual refresh triggered");
       authChecked.current = false;
       checkAuthorization();
     }, [checkAuthorization])
