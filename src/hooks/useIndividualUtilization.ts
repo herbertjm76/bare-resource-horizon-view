@@ -8,6 +8,7 @@ import { IndividualUtilization } from './utilization/types';
 import { initializeUtilizationMap } from './utilization/utils';
 import { calculateActiveUtilizations } from './utilization/useActiveMembers';
 import { calculatePreRegisteredUtilizations } from './utilization/usePreRegisteredMembers';
+import { logger } from '@/utils/logger';
 
 export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
   const [individualUtilizations, setIndividualUtilizations] = useState<Record<string, IndividualUtilization>>({});
@@ -20,16 +21,16 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
     const active = teamMembers.filter(member => 'company_id' in member && member.company_id);
     const preRegistered = teamMembers.filter(member => !('company_id' in member) || !member.company_id);
     
-    console.log('=== MEMBER CATEGORIZATION ===');
-    console.log('Active members:', active.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
-    console.log('Pre-registered members:', preRegistered.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
+    logger.debug('=== MEMBER CATEGORIZATION ===');
+    logger.debug('Active members:', active.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
+    logger.debug('Pre-registered members:', preRegistered.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
     
     return { activeMembers: active, preRegisteredMembers: preRegistered };
   }, [teamMembers]);
 
   useEffect(() => {
     if (!company?.id || teamMembers.length === 0) {
-      console.log('Individual utilization: No company or members, setting loading to false');
+      logger.debug('Individual utilization: No company or members, setting loading to false');
       setIsLoading(false);
       return;
     }
@@ -42,9 +43,9 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
         const currentWeekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday
         const ninetyDaysAgo = subWeeks(currentWeekStart, 12);
         
-        console.log('=== INDIVIDUAL UTILIZATION CALCULATION ===');
-        console.log('Current week start (Monday):', format(currentWeekStart, 'yyyy-MM-dd'));
-        console.log('90 days ago week start:', format(ninetyDaysAgo, 'yyyy-MM-dd'));
+        logger.debug('=== INDIVIDUAL UTILIZATION CALCULATION ===');
+        logger.debug('Current week start (Monday):', format(currentWeekStart, 'yyyy-MM-dd'));
+        logger.debug('90 days ago week start:', format(ninetyDaysAgo, 'yyyy-MM-dd'));
         
         // Initialize utilization data for all members
         let utilizationMap = initializeUtilizationMap(teamMembers);
@@ -74,8 +75,8 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
           ...preRegisteredUtilizations
         };
 
-        console.log('Final individual utilizations:', utilizationMap);
-        console.log('=== END INDIVIDUAL UTILIZATION DEBUG ===');
+        logger.debug('Final individual utilizations:', utilizationMap);
+        logger.debug('=== END INDIVIDUAL UTILIZATION DEBUG ===');
         
         setIndividualUtilizations(utilizationMap);
       } catch (error) {

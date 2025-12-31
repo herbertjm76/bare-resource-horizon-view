@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CountrySelect } from "@/components/ui/CountrySelect";
 import { CitySelect } from "@/components/ui/CitySelect";
+import { logger } from '@/utils/logger';
 
 interface LocationFormData {
   code: string;
@@ -27,10 +28,10 @@ export const LocationForm: React.FC<LocationFormProps> = ({
   onSubmit,
   onCancel
 }) => {
-  console.log('LocationForm: Current formData:', formData);
+  logger.debug('LocationForm: Current formData:', formData);
 
   const handleCountryChange = (countryName: string, code?: string, flag?: string) => {
-    console.log('LocationForm: Country changed:', { countryName, code, flag });
+    logger.debug('LocationForm: Country changed:', { countryName, code, flag });
     setFormData({
       ...formData,
       country: countryName,
@@ -41,7 +42,7 @@ export const LocationForm: React.FC<LocationFormProps> = ({
   };
 
   const handleCityChange = (cityName: string) => {
-    console.log('LocationForm: City changed:', cityName);
+    logger.debug('LocationForm: City changed:', cityName);
     setFormData({
       ...formData,
       city: cityName
@@ -49,7 +50,7 @@ export const LocationForm: React.FC<LocationFormProps> = ({
   };
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('LocationForm: Code changed:', e.target.value);
+    logger.debug('LocationForm: Code changed:', e.target.value);
     setFormData({
       ...formData,
       code: e.target.value

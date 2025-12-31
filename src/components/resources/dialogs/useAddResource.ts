@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import type { ResourceOption } from './useResourceOptions';
+import { logger } from '@/utils/logger';
 
 interface AddResourceProps {
   projectId: string;
@@ -34,7 +35,7 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
       const resource = resourceOptions.find(r => r.id === selectedResource);
       if (!resource) throw new Error('Resource not found');
       
-      console.log('Adding resource:', { 
+      logger.debug('Adding resource:', { 
         resource,
         projectId,
         companyId: company.id,
@@ -58,7 +59,7 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
           throw error;
         }
         
-        console.log('Added pending resource:', data);
+        logger.debug('Added pending resource:', data);
       } else {
         // Add active resource with company_id explicitly included
         const { data, error } = await supabase
@@ -76,7 +77,7 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
           throw error;
         }
         
-        console.log('Added active resource:', data);
+        logger.debug('Added active resource:', data);
       }
       
       // Call the onAdd callback with the resource details

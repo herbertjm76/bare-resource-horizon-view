@@ -2,6 +2,7 @@
 import { useMemo } from 'react';
 import { format, addDays, isWeekend, isSunday, eachDayOfInterval, addWeeks, startOfWeek, isToday, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 import { DayInfo } from '../grid/types';
+import { logger } from '@/utils/logger';
 
 interface DisplayOptions {
   showWeekends: boolean;
@@ -85,7 +86,7 @@ export const useGridDays = (
       end: endDate
     });
     
-    console.log('Grid days debug:', {
+    logger.debug('Grid days debug:', {
       weekStartsOnSunday: displayOptions.weekStartsOnSunday,
       originalStartDate: startDate,
       adjustedStartDate,
@@ -103,7 +104,7 @@ export const useGridDays = (
       // Check if this day is a weekend based on our week start preference
       const isWeekendForThisSystem = isWeekendDay(day, displayOptions.weekStartsOnSunday);
       
-      console.log(`Day ${format(day, 'EEE')} (${dayId}):`, {
+      logger.debug(`Day ${format(day, 'EEE')} (${dayId}):`, {
         isWeekendForThisSystem,
         isInSelectedDays: displayOptions.selectedDays.includes(dayId),
         showWeekends: displayOptions.showWeekends
