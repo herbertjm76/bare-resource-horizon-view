@@ -262,8 +262,8 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg font-medium">Team Members</CardTitle>
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4">
+        <CardTitle className="text-base sm:text-lg font-medium">Team Members</CardTitle>
         {isAdmin && (
           <TeamMembersToolbar 
             editMode={editMode} 
