@@ -13,8 +13,6 @@ import { logger } from '@/utils/logger';
 interface SignupFormProps {
   onSwitchToLogin: () => void;
 }
-  onSwitchToLogin: () => void;
-}
 
 const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   // Owner fields matched to profile table

@@ -16,11 +16,6 @@ interface JoinFormProps {
   inviteCode?: string;
   onAuthModeChange?: (isSignup: boolean) => void;
 }
-  companyName: string;
-  company?: { id: string; [k: string]: any };
-  inviteCode?: string;
-  onAuthModeChange?: (isSignup: boolean) => void;
-}
 
 const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, onAuthModeChange }) => {
   const [inviteCodeInput, setInviteCodeInput] = useState('');
