@@ -5,6 +5,7 @@ import { formatDateKey } from './utils';
 import { toast } from 'sonner';
 import { getWeekStartDate } from './utils/dateUtils';
 import { format } from 'date-fns';
+import { logger } from '@/utils/logger';
 
 export const fetchResourceAllocations = async (
   projectId: string,
@@ -14,7 +15,7 @@ export const fetchResourceAllocations = async (
   dateRange?: { startDate: string; endDate: string }
 ): Promise<Record<string, number>> => {
   try {
-    console.log(`🔍 ALLOCATION API: Fetching allocations for resource ${resourceId} in project ${projectId}`);
+    logger.debug(`🔍 ALLOCATION API: Fetching allocations for resource ${resourceId} in project ${projectId}`);
     
     let query = supabase
       .from('project_resource_allocations')
@@ -26,7 +27,7 @@ export const fetchResourceAllocations = async (
     
     // Apply date range filter if provided
     if (dateRange) {
-      console.log(`🔍 ALLOCATION API: Applying date range filter: ${dateRange.startDate} to ${dateRange.endDate}`);
+      logger.debug(`🔍 ALLOCATION API: Applying date range filter: ${dateRange.startDate} to ${dateRange.endDate}`);
       query = query
         .gte('allocation_date', dateRange.startDate)
         .lte('allocation_date', dateRange.endDate);
@@ -36,7 +37,7 @@ export const fetchResourceAllocations = async (
     
     if (error) throw error;
     
-    console.log(`🔍 ALLOCATION API: Retrieved ${data?.length || 0} allocation records`);
+    logger.debug(`🔍 ALLOCATION API: Retrieved ${data?.length || 0} allocation records`);
     
     // Transform data into a week key -> hours mapping, aggregating daily hours into weekly totals
     const allocationMap: Record<string, number> = {};
@@ -44,7 +45,7 @@ export const fetchResourceAllocations = async (
       const weekKey = formatDateKey(item.allocation_date);
       // Aggregate hours by week (sum up multiple allocations for the same week)
       allocationMap[weekKey] = (allocationMap[weekKey] || 0) + item.hours;
-      console.log(`🔍 ALLOCATION API: Aggregating ${item.allocation_date} -> ${weekKey}: +${item.hours}h (total: ${allocationMap[weekKey]}h)`);
+      logger.debug(`🔍 ALLOCATION API: Aggregating ${item.allocation_date} -> ${weekKey}: +${item.hours}h (total: ${allocationMap[weekKey]}h)`);
     });
     
     return allocationMap;
@@ -75,7 +76,7 @@ export const saveResourceAllocation = async (
       formattedWeekKey = format(mondayDate, 'yyyy-MM-dd');
     }
     
-    console.log(`Saving allocation for week starting: ${formattedWeekKey} (Monday)`);
+    logger.debug(`Saving allocation for week starting: ${formattedWeekKey} (Monday)`);
     
     // Check if we already have an allocation for this week
     const { data: existingData } = await supabase

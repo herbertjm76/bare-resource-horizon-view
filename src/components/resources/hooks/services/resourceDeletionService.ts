@@ -2,6 +2,7 @@
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Resource } from '../types/resourceTypes';
+import { logger } from '@/utils/logger';
 
 export const deleteResource = async (
   resourceId: string,
@@ -11,14 +12,14 @@ export const deleteResource = async (
   resources: Resource[]
 ): Promise<boolean> => {
   try {
-    console.log('Deleting resource:', resourceId, 'globalDelete:', globalDelete);
+    logger.debug('Deleting resource:', resourceId, 'globalDelete:', globalDelete);
     
     const resourceToDelete = resources.find(r => r.id === resourceId);
     const resourceType = resourceToDelete?.isPending ? 'pre_registered' : 'active';
     
     if (globalDelete) {
       // Global deletion - remove from all projects and clean up all allocations
-      console.log('Performing global deletion for resource:', resourceId);
+      logger.debug('Performing global deletion for resource:', resourceId);
       
       if (resourceToDelete?.isPending) {
         // Delete all pre-registered resource entries

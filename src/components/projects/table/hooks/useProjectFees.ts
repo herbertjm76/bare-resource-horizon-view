@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { OfficeStage } from '../types';
+import { logger } from '@/utils/logger';
 
 export const useProjectFees = (projectId: string, office_stages: OfficeStage[]) => {
   const [stageFees, setStageFees] = useState<Record<string, number>>({});
@@ -11,7 +12,7 @@ export const useProjectFees = (projectId: string, office_stages: OfficeStage[]) 
       if (!projectId) return;
       
       try {
-        console.log('Fetching stage fees for project:', projectId);
+        logger.debug('Fetching stage fees for project:', projectId);
         
         const { data: projectStagesData, error: stagesError } = await supabase
           .from('project_stages')
@@ -23,7 +24,7 @@ export const useProjectFees = (projectId: string, office_stages: OfficeStage[]) 
           return;
         }
 
-        console.log('Project stages data:', projectStagesData);
+        logger.debug('Project stages data:', projectStagesData);
         
         const feesByStage: Record<string, number> = {};
         projectStagesData?.forEach(stage => {
@@ -40,7 +41,7 @@ export const useProjectFees = (projectId: string, office_stages: OfficeStage[]) 
           }
         });
         
-        console.log('Final mapped fees by office stage ID:', feesByOfficeStageId);
+        logger.debug('Final mapped fees by office stage ID:', feesByOfficeStageId);
         setStageFees(feesByOfficeStageId);
         
       } catch (err) {

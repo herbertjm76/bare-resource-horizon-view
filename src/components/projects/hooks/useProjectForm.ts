@@ -3,6 +3,7 @@ import { useFormState } from './form/useFormState';
 import { useFormOptions } from './form/useFormOptions';
 import { useStageManagement } from './form/useStageManagement';
 import { useEffect } from 'react';
+import { logger } from '@/utils/logger';
 
 // Accept a third refetchSignal argument, defaulting to null for backward compatibility.
 export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any = null) => {
@@ -25,15 +26,15 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
   // Debug log to track when stages are being initialized
   useEffect(() => {
     if (isOpen && officeStages.length > 0) {
-      console.log("useProjectForm - Current form stages:", form.stages);
-      console.log("useProjectForm - Current form stage fees:", form.stageFees);
-      console.log("useProjectForm - Available office stages:", officeStages);
+      logger.debug("useProjectForm - Current form stages:", form.stages);
+      logger.debug("useProjectForm - Current form stage fees:", form.stageFees);
+      logger.debug("useProjectForm - Available office stages:", officeStages);
     }
   }, [form.stages, form.stageFees, officeStages, isOpen]);
 
   useEffect(() => {
     if (isOpen && project && officeStages?.length > 0) {
-      console.log('useProjectForm - Processing project stages:', project.stages);
+      logger.debug('useProjectForm - Processing project stages:', project.stages);
       
       let stagesToSet: string[] = [];
       
@@ -50,7 +51,7 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
             if (isStageId) {
               // We already have stage IDs
               stagesToSet = [...project.stages];
-              console.log('Using existing stage IDs:', stagesToSet);
+              logger.debug('Using existing stage IDs:', stagesToSet);
             } else {
               // We have stage names, convert to IDs
               stagesToSet = project.stages
@@ -59,7 +60,7 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
                   return stage ? stage.id : null;
                 })
                 .filter(Boolean);
-              console.log('Converted stage names to IDs:', stagesToSet);  
+              logger.debug('Converted stage names to IDs:', stagesToSet);  
             }
           }
         }
@@ -71,8 +72,8 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
         stageApplicability[stageId] = true;
       });
       
-      console.log('Setting stage selections:', stageApplicability);
-      console.log('Setting stages array:', stagesToSet);
+      logger.debug('Setting stage selections:', stageApplicability);
+      logger.debug('Setting stages array:', stagesToSet);
       
       if (stagesToSet.length > 0) {
         setForm(prev => ({
@@ -94,7 +95,7 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
     officeStages,
     formErrors,
     handleChange: (key: keyof typeof form, value: any) => {
-      console.log(`handleChange: ${String(key)} =`, value);
+      logger.debug(`handleChange: ${String(key)} =`, value);
 
       // FIX: index with key as string
       setForm(prev => ({ ...prev, [key]: value }));
@@ -111,7 +112,7 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
         const newStageFees: Record<string, any> = {...form.stageFees};
         const newStageApplicability: Record<string, boolean> = {...form.stageApplicability};
         
-        console.log('Updating stages to:', value);
+        logger.debug('Updating stages to:', value);
         
         value.forEach((stageId: string) => {
           if (!newStageFees[stageId]) {
