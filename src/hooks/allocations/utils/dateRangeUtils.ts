@@ -1,5 +1,6 @@
 import { format, addDays, startOfMonth, endOfMonth } from 'date-fns';
 import { getWeekStartDate } from './dateUtils';
+import { logger } from '@/utils/logger';
 
 export interface DateRange {
   startDate: string;
@@ -14,7 +15,7 @@ export function getStandardizedDateRange(
   selectedDate: Date, 
   periodToShow?: number
 ): DateRange {
-  console.log(`🔍 DATE RANGE: Calculating range for ${selectedDate.toISOString()}, period: ${periodToShow || 'month'}`);
+  logger.debug(`🔍 DATE RANGE: Calculating range for ${selectedDate.toISOString()}, period: ${periodToShow || 'month'}`);
   
   if (periodToShow && periodToShow > 0) {
     // For Project Resources view: use exact period in weeks from selected date
@@ -26,7 +27,7 @@ export function getStandardizedDateRange(
       endDate: format(getWeekStartDate(endDate), 'yyyy-MM-dd') // Ensure end is also a Monday
     };
     
-    console.log(`🔍 DATE RANGE: Project Resources mode - ${range.startDate} to ${range.endDate} (${periodToShow} weeks)`);
+    logger.debug(`🔍 DATE RANGE: Project Resources mode - ${range.startDate} to ${range.endDate} (${periodToShow} weeks)`);
     return range;
   } else {
     // For Team Workload view: use full month range
@@ -43,7 +44,7 @@ export function getStandardizedDateRange(
       endDate: format(endDate, 'yyyy-MM-dd')
     };
     
-    console.log(`🔍 DATE RANGE: Team Workload mode - ${range.startDate} to ${range.endDate} (full month)`);
+    logger.debug(`🔍 DATE RANGE: Team Workload mode - ${range.startDate} to ${range.endDate} (full month)`);
     return range;
   }
 }
@@ -65,7 +66,7 @@ export function generateWeekKeys(startDate: string, endDate: string): string[] {
     current = addDays(current, 7); // Move to next Monday
   }
   
-  console.log(`🔍 WEEK KEYS: Generated ${weeks.length} week keys:`, weeks);
+  logger.debug(`🔍 WEEK KEYS: Generated ${weeks.length} week keys:`, weeks);
   return weeks;
 }
 

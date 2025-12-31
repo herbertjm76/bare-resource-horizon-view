@@ -2,6 +2,7 @@
 import React from 'react';
 import { ExpandedRowView } from './row/MemoizedExpandedRowView';
 import { CompactRowView } from './row/MemoizedCompactRowView';
+import { logger } from '@/utils/logger';
 
 interface NewResourceTableRowProps {
   member: any;
@@ -37,10 +38,10 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = React.mem
   selectedWeek = new Date(),
 }) => {
   // Debug viewMode changes
-  console.log(`NewResourceTableRow RENDER - Member ${member.id} received viewMode:`, viewMode);
+  logger.debug(`NewResourceTableRow RENDER - Member ${member.id} received viewMode:`, viewMode);
   
   React.useEffect(() => {
-    console.log(`NewResourceTableRow useEffect - Member ${member.id} viewMode changed to:`, viewMode);
+    logger.debug(`NewResourceTableRow useEffect - Member ${member.id} viewMode changed to:`, viewMode);
   }, [viewMode, member.id]);
   const sharedProps = {
     member,
@@ -78,7 +79,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = React.mem
   
   // Debug log to see when component should re-render
   if (!isEqual) {
-    console.log('NewResourceTableRow re-rendering due to prop changes:', {
+    logger.debug('NewResourceTableRow re-rendering due to prop changes:', {
       memberId: nextProps.member.id,
       viewMode: nextProps.viewMode,
       previousViewMode: prevProps.viewMode

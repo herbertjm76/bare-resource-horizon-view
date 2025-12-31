@@ -1,6 +1,7 @@
 
 import { format, startOfWeek, subWeeks, eachWeekOfInterval } from 'date-fns';
 import { MemberAllocation, UtilizationPeriod } from './types';
+import { logger } from '@/utils/logger';
 
 export const getUtilizationPeriods = (currentWeekStart: Date): Record<string, UtilizationPeriod> => {
   return {
@@ -24,7 +25,7 @@ export const calculatePeriodUtilization = (
     { weekStartsOn: 1 }
   );
   
-  console.log(`${periodName} weeks to check:`, weeks.map(w => format(w, 'yyyy-MM-dd')));
+  logger.debug(`${periodName} weeks to check:`, weeks.map(w => format(w, 'yyyy-MM-dd')));
   
   let totalAllocatedHours = 0;
   
@@ -36,20 +37,20 @@ export const calculatePeriodUtilization = (
     
     const weekHours = weekAllocations.reduce((sum, allocation) => {
       const hours = Number(allocation.hours) || 0;
-      console.log(`  Week ${weekKey}: ${hours}h (project: ${allocation.project_id}, type: ${allocation.resource_type})`);
+      logger.debug(`  Week ${weekKey}: ${hours}h (project: ${allocation.project_id}, type: ${allocation.resource_type})`);
       return sum + hours;
     }, 0);
     
     totalAllocatedHours += weekHours;
     if (weekHours > 0) {
-      console.log(`  Week ${weekKey} total: ${weekHours}h`);
+      logger.debug(`  Week ${weekKey} total: ${weekHours}h`);
     }
   });
   
   const totalCapacity = memberCapacity * weeks.length;
   const utilizationPercentage = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
   
-  console.log(`  ${periodName} - Total hours: ${totalAllocatedHours}, Capacity: ${totalCapacity}, Utilization: ${utilizationPercentage}%`);
+  logger.debug(`  ${periodName} - Total hours: ${totalAllocatedHours}, Capacity: ${totalCapacity}, Utilization: ${utilizationPercentage}%`);
   
   return Math.min(utilizationPercentage, 100); // Cap at 100%
 };

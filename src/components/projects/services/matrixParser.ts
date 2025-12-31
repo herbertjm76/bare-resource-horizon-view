@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/logger';
 
 export interface MatrixParseResult {
   projects: Array<{
@@ -56,7 +57,7 @@ export class MatrixParser {
           // Get first 20 rows as preview for AI analysis
           const preview = jsonData.slice(0, 20);
           
-          console.log('Calling AI to analyze matrix structure...');
+          logger.debug('Calling AI to analyze matrix structure...');
           const { data: analysisResult, error } = await supabase.functions.invoke('analyze-matrix-structure', {
             body: { preview }
           });
@@ -68,7 +69,7 @@ export class MatrixParser {
             result = this.parseWithHeuristics(jsonData);
           } else {
             const structure: MatrixStructure = analysisResult.structure;
-            console.log('AI detected structure:', structure);
+            logger.debug('AI detected structure:', structure);
             result = this.parseWithStructure(jsonData, structure);
             result.detectedStructure = structure;
           }

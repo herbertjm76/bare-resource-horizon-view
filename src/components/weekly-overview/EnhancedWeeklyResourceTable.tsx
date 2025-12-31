@@ -6,6 +6,7 @@ import { EnhancedTeamMemberRows } from './EnhancedTeamMemberRows';
 import { EnhancedProjectTotalsRow } from './EnhancedProjectTotalsRow';
 import { MemberAllocation } from './types';
 import './css/weekly-table-clean.css';
+import { logger } from '@/utils/logger';
 
 interface EnhancedWeeklyResourceTableProps {
   projects: any[];
@@ -99,7 +100,7 @@ export const EnhancedWeeklyResourceTable: React.FC<EnhancedWeeklyResourceTablePr
 
     // Handle input changes (placeholder - would need actual implementation)
     const handleInputChange = (memberId: string, field: keyof MemberAllocation, value: any) => {
-      console.log('Input change:', { memberId, field, value });
+      logger.debug('Input change:', { memberId, field, value });
       // This would need to be implemented to update the allocations
     };
 
