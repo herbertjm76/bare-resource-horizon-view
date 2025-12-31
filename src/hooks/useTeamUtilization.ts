@@ -4,8 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompanyId } from '@/hooks/useCompanyId';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getMemberCapacity } from '@/utils/capacityUtils';
-import { format, startOfWeek, subWeeks, addDays, eachWeekOfInterval } from 'date-fns';
+import { format, startOfWeek, subWeeks, eachWeekOfInterval } from 'date-fns';
 import { logger } from '@/utils/logger';
+import type { Profile } from '@/context/types';
 
 interface UtilizationData {
   days7: number;
@@ -13,7 +14,16 @@ interface UtilizationData {
   days90: number;
 }
 
-export const useTeamUtilization = (teamMembers: any[]) => {
+interface TeamMemberWithCapacity extends Pick<Profile, 'id' | 'weekly_capacity'> {}
+
+interface AllocationRecord {
+  resource_id: string;
+  hours: number;
+  allocation_date: string;
+  project_id: string;
+}
+
+export const useTeamUtilization = (teamMembers: TeamMemberWithCapacity[]) => {
   const [utilization, setUtilization] = useState<UtilizationData>({
     days7: 0,
     days30: 0,
@@ -60,18 +70,20 @@ export const useTeamUtilization = (teamMembers: any[]) => {
 
         if (error) throw error;
 
-        logger.log('Raw allocations fetched:', allocations?.length || 0);
-        logger.log('Allocations data:', allocations);
+        const typedAllocations = (allocations || []) as AllocationRecord[];
+        
+        logger.log('Raw allocations fetched:', typedAllocations.length);
+        logger.log('Allocations data:', typedAllocations);
 
         // Calculate total capacity for each period
         const totalWeeklyCapacity = teamMembers.reduce((sum, member) => 
-          sum + getMemberCapacity(member.weekly_capacity, workWeekHours), 0
+          sum + getMemberCapacity(member.weekly_capacity ?? null, workWeekHours), 0
         );
         
         logger.log('Total weekly capacity:', totalWeeklyCapacity);
 
         // Calculate utilization for different periods
-        const calculatePeriodUtilization = (startDate: Date, periodName: string) => {
+        const calculatePeriodUtilization = (startDate: Date, periodName: string): number => {
           // Get all weeks in the period
           const weeks = eachWeekOfInterval(
             { start: startDate, end: currentWeekStart },
@@ -88,9 +100,9 @@ export const useTeamUtilization = (teamMembers: any[]) => {
           // For each week, sum up all allocations
           weeks.forEach(weekStart => {
             const weekKey = format(weekStart, 'yyyy-MM-dd');
-            const weekAllocations = allocations?.filter(allocation => 
+            const weekAllocations = typedAllocations.filter(allocation => 
               allocation.allocation_date === weekKey
-            ) || [];
+            );
             
             const weekHours = weekAllocations.reduce((sum, allocation) => {
               logger.log(`Week ${weekKey}: ${allocation.resource_id} - ${allocation.hours}h (project: ${allocation.project_id})`);
@@ -112,7 +124,7 @@ export const useTeamUtilization = (teamMembers: any[]) => {
           return utilizationPercentage;
         };
 
-        const utilizationData = {
+        const utilizationData: UtilizationData = {
           days7: calculatePeriodUtilization(currentWeekStart, '7-day (current week)'),
           days30: calculatePeriodUtilization(thirtyDaysAgo, '30-day'),
           days90: calculatePeriodUtilization(ninetyDaysAgo, '90-day')
@@ -131,7 +143,7 @@ export const useTeamUtilization = (teamMembers: any[]) => {
     };
 
     fetchUtilization();
-  }, [companyId, teamMembers]);
+  }, [companyId, teamMembers, workWeekHours]);
 
   return { utilization, isLoading };
 };

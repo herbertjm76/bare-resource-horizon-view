@@ -1,19 +1,10 @@
-
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { logger } from '@/utils/logger';
-
-type CompanyContextType = {
-  company: any | null;
-  loading: boolean;
-  companySlug: string | null;
-  refreshCompany: () => Promise<void>;
-  isPathMode: boolean;
-  error: string | null;
-};
+import type { Company, CompanyContextType, Profile } from './types';
 
 const CompanyContext = createContext<CompanyContextType>({
   company: null,
@@ -29,12 +20,12 @@ export const useCompany = () => useContext(CompanyContext);
 export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
 
-  const [company, setCompany] = useState<any | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [companySlug, setCompanySlug] = useState<string | null>(null);
   const [isPathMode, setIsPathMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userProfile, setUserProfile] = useState<any | null>(null);
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
   
   // Ref to prevent duplicate fetches
   const isFetchingRef = useRef(false);
@@ -109,16 +100,16 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
       
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('companies')
         .select('*')
         .eq('subdomain', slugValue)
         .single();
 
-      if (error) {
+      if (fetchError) {
         logger.warn('CompanyProvider: no company found for slug, continuing without company', {
           slugValue,
-          error,
+          error: fetchError,
         });
         setCompany(null);
         // Do not surface a toast or error for unknown slugs – auth page should work for any company name
@@ -126,19 +117,20 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
 
-      setCompany(data);
+      setCompany(data as Company);
       logger.log('CompanyProvider: fetchCompanyBySlug success', data?.id);
-    } catch (error: any) {
-      logger.error('Error in fetchCompanyBySlug:', error);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch company data';
+      logger.error('Error in fetchCompanyBySlug:', err);
       setCompany(null);
-      setError(error.message || 'Failed to fetch company data');
+      setError(errorMessage);
     } finally {
       setLoading(false);
       logger.log('CompanyProvider: fetchCompanyBySlug end -> loading=false');
     }
   };
 
-  const fetchCompanyByProfile = async (profile: any) => {
+  const fetchCompanyByProfile = async (profile: Profile) => {
     if (!profile?.company_id) {
       logger.error('CompanyProvider: No company_id in profile', profile);
       setError("Your account is not associated with any company");
@@ -200,39 +192,41 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         id: companyData.id,
         name: companyData.name
       });
-      setCompany(companyData);
+      setCompany(companyData as Company);
       setError(null);
       setLoading(false);
-    } catch (error: any) {
-      logger.error('CompanyProvider: Exception in fetchCompanyByProfile:', error);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch company data';
+      logger.error('CompanyProvider: Exception in fetchCompanyByProfile:', err);
       setCompany(null);
-      setError(error.message || 'Failed to fetch company data');
+      setError(errorMessage);
       setLoading(false);
     } finally {
       isFetchingRef.current = false;
     }
   };
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = async (): Promise<Profile | null> => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return null;
       
-      const { data: profile, error } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
         
-      if (error) {
-        logger.error('Error fetching user profile:', error);
+      if (profileError) {
+        logger.error('Error fetching user profile:', profileError);
         return null;
       }
       
-      setUserProfile(profile);
-      return profile;
-    } catch (error) {
-      logger.error('Error in fetchUserProfile:', error);
+      const typedProfile = profile as Profile;
+      setUserProfile(typedProfile);
+      return typedProfile;
+    } catch (err) {
+      logger.error('Error in fetchUserProfile:', err);
       return null;
     }
   };
@@ -272,7 +266,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Handle demo mode
       if (isDemoMode && demoProfile) {
         logger.log('CompanyProvider: Using demo profile');
-        fetchCompanyByProfile(demoProfile);
+        fetchCompanyByProfile(demoProfile as Profile);
         return;
       }
       

@@ -4,12 +4,28 @@ import { Database } from '@/integrations/supabase/types';
 import { logger } from '@/utils/logger';
 
 // Define user role type to match the database enum
-type UserRole = Database['public']['Enums']['user_role'];
+type UserRole = Database['public']['Enums']['app_role'];
+
+interface UserData {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  companyId?: string;
+  role?: string;
+}
+
+interface ProfileData {
+  id: string;
+  email: string | undefined;
+  first_name: string | undefined;
+  last_name: string | undefined;
+  company_id: string | undefined;
+}
 
 /**
  * Ensures a user profile exists or creates one if it doesn't
  */
-export const ensureUserProfile = async (userId: string, userData?: any) => {
+export const ensureUserProfile = async (userId: string, userData?: UserData): Promise<boolean> => {
   if (!userId) {
     logger.error('Cannot ensure profile: No user ID provided');
     return false;
@@ -50,22 +66,22 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
     logger.debug('User metadata for profile creation:', metaData);
     
     // Ensure role is always a valid UserRole enum value
-    let userRole: UserRole = 'member';
+    const validRoles: UserRole[] = ['owner', 'admin', 'member'];
     const providedRole = userData?.role || metaData.role;
     
-    // Make sure the role is one of the valid enum values
-    const validRoles: UserRole[] = ['owner', 'admin', 'member'];
+    // We don't store role in profiles table directly anymore (it's in user_roles table)
+    // But we may still need it for initial setup
+    let userRole: UserRole = 'member';
     if (providedRole && validRoles.includes(providedRole as UserRole)) {
       userRole = providedRole as UserRole;
     }
     
-    const profileData = {
+    const profileData: ProfileData = {
       id: userId,
       email: userData?.email || user?.email,
       first_name: userData?.firstName || metaData.first_name,
       last_name: userData?.lastName || metaData.last_name,
       company_id: userData?.companyId || metaData.company_id,
-      role: userRole
     };
     
     logger.debug('Creating profile with data:', profileData);
