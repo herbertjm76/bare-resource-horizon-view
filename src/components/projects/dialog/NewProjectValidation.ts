@@ -1,9 +1,10 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { type FormState } from '../hooks/types/projectTypes';
+import { logger } from '@/utils/logger';
 
 export const isProjectInfoValid = (form: FormState) => {
-  console.log('Validating form:', form);
+  logger.debug('Validating form:', form);
   
   // Only require code and name for minimal project creation
   const isValid = (
@@ -11,7 +12,7 @@ export const isProjectInfoValid = (form: FormState) => {
     !!form.name
   );
   
-  console.log('Form validation result:', {
+  logger.debug('Form validation result:', {
     code: !!form.code,
     name: !!form.name,
     isValid
@@ -34,13 +35,13 @@ export const checkProjectCodeUnique = async (code: string, companyId: string) =>
       .limit(1);
     
     if (error) {
-      console.error("Error checking project code:", error);
+      logger.error("Error checking project code:", error);
       return false;
     }
     
     return !(data && data.length > 0);
   } catch (err) {
-    console.error("Exception checking project code:", err);
+    logger.error("Exception checking project code:", err);
     return false;
   }
 };

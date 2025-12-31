@@ -1,5 +1,6 @@
 
 import { MemberAllocation } from '@/components/weekly-overview/types';
+import { logger } from '@/utils/logger';
 
 interface ProjectAllocation {
   id: string;
@@ -38,7 +39,7 @@ export function processMemberAllocations(
       alloc.resource_id === member.id
     ) || [];
     
-    console.log(`Member ${member.id} (${member.first_name} ${member.last_name}) allocations:`, memberProjects);
+    logger.debug(`Member ${member.id} (${member.first_name} ${member.last_name}) allocations:`, memberProjects);
     
     // Calculate total resourced hours
     const resourcedHours = memberProjects.reduce(

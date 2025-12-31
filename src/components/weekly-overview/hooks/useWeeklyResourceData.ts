@@ -16,6 +16,7 @@ import {
   createWeeklyLeaveFunction
 } from '@/components/week-resourcing/hooks/weekResourceUtils';
 import { useCallback, useEffect, useState } from 'react';
+import { logger } from '@/utils/logger';
 
 export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: string }) => {
   // Track loading state explicitly
@@ -47,11 +48,11 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
         .order('code');
       
       if (error) {
-        console.error("Error fetching projects:", error);
+        logger.error("Error fetching projects:", error);
         return [];
       }
       
-      console.log("Fetched projects:", data?.length || 0);
+      logger.debug("Fetched projects:", data?.length || 0);
       return data || [];
     },
     enabled: !!companyId
@@ -74,11 +75,11 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
         .eq('status', 'pending');
         
       if (error) {
-        console.error("Error fetching pre-registered members:", error);
+        logger.error("Error fetching pre-registered members:", error);
         return [];
       }
       
-      console.log("Fetched pre-registered members:", data?.length || 0);
+      logger.debug("Fetched pre-registered members:", data?.length || 0);
       
       // Transform the pre-registered members to match team member structure
       return data.map(member => ({
@@ -96,7 +97,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
   // Get all members combined (active + pre-registered)
   const allMembers = useCallback(() => {
     const combined = [...(teamMembers || []), ...(preRegisteredMembers || [])];
-    console.log("All members for weekly overview:", combined.length);
+    logger.debug("All members for weekly overview:", combined.length);
     return combined;
   }, [teamMembers, preRegisteredMembers])();
 
@@ -184,10 +185,10 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
   // Determine if there are any errors
   const error = teamMembersError || pendingError || allocationsError;
 
-  console.log('=== WEEKLY OVERVIEW DATA SUMMARY ===');
-  console.log('Using comprehensive allocations for allocation map:', comprehensiveWeeklyAllocations?.length || 0);
-  console.log('Allocation map size:', allocationMap.size);
-  console.log('Sample allocation map entries:', Array.from(allocationMap.entries()).slice(0, 5));
+  logger.debug('=== WEEKLY OVERVIEW DATA SUMMARY ===');
+  logger.debug('Using comprehensive allocations for allocation map:', comprehensiveWeeklyAllocations?.length || 0);
+  logger.debug('Allocation map size:', allocationMap.size);
+  logger.debug('Sample allocation map entries:', Array.from(allocationMap.entries()).slice(0, 5));
 
   return {
     projects,

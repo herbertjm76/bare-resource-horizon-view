@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
+import { logger } from '@/utils/logger';
 
 interface PersonPracticeArea {
   name: string;
@@ -20,7 +21,7 @@ export const matchPracticeAreasFromExcel = async (file: File): Promise<PersonPra
         // Convert to array of arrays for easier processing
         const sheetData: any[][] = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
         
-        console.log('First 10 rows of Excel:', sheetData.slice(0, 10));
+        logger.debug('First 10 rows of Excel:', sheetData.slice(0, 10));
         
         // Row A (index 0) should have practice area indicators
         // Row C (index 2) should have people names
@@ -47,20 +48,20 @@ export const matchPracticeAreasFromExcel = async (file: File): Promise<PersonPra
         }
         
         if (namesRowIndex === -1) {
-          console.error('Could not find names row');
-          console.log('Sheet data:', sheetData.slice(0, 15));
+          logger.error('Could not find names row');
+          logger.debug('Sheet data:', sheetData.slice(0, 15));
           reject(new Error('Could not find row with person names'));
           return;
         }
         
-        console.log('Names found at row:', namesRowIndex);
-        console.log('Practice area indicators at row:', practiceAreaRowIndex);
+        logger.debug('Names found at row:', namesRowIndex);
+        logger.debug('Practice area indicators at row:', practiceAreaRowIndex);
         
         const namesRow = sheetData[namesRowIndex];
         const practiceAreaRow = sheetData[practiceAreaRowIndex] || [];
         
-        console.log('Names row:', namesRow);
-        console.log('Practice area row:', practiceAreaRow);
+        logger.debug('Names row:', namesRow);
+        logger.debug('Practice area row:', practiceAreaRow);
         
         const mappings: PersonPracticeArea[] = [];
         
@@ -101,17 +102,17 @@ export const matchPracticeAreasFromExcel = async (file: File): Promise<PersonPra
           }
         }
         
-        console.log('Extracted mappings:', mappings);
+        logger.debug('Extracted mappings:', mappings);
         resolve(mappings);
         
       } catch (error) {
-        console.error('Error parsing Excel:', error);
+        logger.error('Error parsing Excel:', error);
         reject(error);
       }
     };
     
     reader.onerror = (error) => {
-      console.error('FileReader error:', error);
+      logger.error('FileReader error:', error);
       reject(error);
     };
     
@@ -162,7 +163,7 @@ export const updatePracticeAreasInDatabase = async (mappings: PersonPracticeArea
       }
       
       if (profiles.length > 1) {
-        console.log(`Multiple profiles found for ${mapping.name}, updating all`);
+        logger.debug(`Multiple profiles found for ${mapping.name}, updating all`);
       }
       
       // Update all matching profiles
@@ -176,7 +177,7 @@ export const updatePracticeAreasInDatabase = async (mappings: PersonPracticeArea
           results.errors.push(`Error updating ${mapping.name}: ${updateError.message}`);
         } else {
           results.updated++;
-          console.log(`Updated ${profile.first_name} ${profile.last_name} to ${mapping.practice_area}`);
+          logger.debug(`Updated ${profile.first_name} ${profile.last_name} to ${mapping.practice_area}`);
         }
       }
       

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Percent, Building, MapPin, CheckSquare, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { logger } from "@/utils/logger";
 
 type OfficeOption = { id: string; city: string; country: string; code?: string; emoji?: string };
 type ProjectStatus = string;
@@ -27,7 +28,7 @@ const NewProjectStep2Details: React.FC<Props> = ({
 }) => {
   
   useEffect(() => {
-    console.log("NewProjectStep2Details rendered with offices:", offices);
+    logger.debug("NewProjectStep2Details rendered with offices:", offices);
   }, [offices]);
 
   return (
