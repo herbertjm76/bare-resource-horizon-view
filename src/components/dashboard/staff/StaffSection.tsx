@@ -7,6 +7,7 @@ import { useStaffAllocations } from './useStaffAllocations';
 import { TimeRange } from '../TimeRangeSelector';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getMemberCapacity } from '@/utils/capacityUtils';
+import { logger } from '@/utils/logger';
 
 export const StaffSection: React.FC<StaffSectionProps & { selectedTimeRange?: TimeRange }> = ({
   title,
@@ -33,7 +34,7 @@ export const StaffSection: React.FC<StaffSectionProps & { selectedTimeRange?: Ti
   const { allocations, isLoading } = useStaffAllocations(memberId, selectedTimeRange);
 
   const handleMemberClick = (member: typeof members[0]) => {
-    console.log('Selected member:', member);
+    logger.debug('Selected member:', member);
     setSelectedMember(member);
     setDialogOpen(true);
   };

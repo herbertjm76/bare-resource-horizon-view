@@ -1,6 +1,7 @@
 import { format, addWeeks } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { UnifiedWorkloadResult } from './types';
+import { logger } from '@/utils/logger';
 
 export const initializeWorkloadResult = (
   members: TeamMember[], 
@@ -9,7 +10,7 @@ export const initializeWorkloadResult = (
 ): UnifiedWorkloadResult => {
   const result: UnifiedWorkloadResult = {};
   
-  console.log('🔄 WORKLOAD INITIALIZER: Creating week structure', {
+  logger.debug('🔄 WORKLOAD INITIALIZER: Creating week structure', {
     startDate: format(startDate, 'yyyy-MM-dd'),
     numberOfWeeks,
     memberCount: members.length
@@ -39,7 +40,7 @@ export const initializeWorkloadResult = (
     }
   });
 
-  console.log('🔄 WORKLOAD INITIALIZER: Week keys created', {
+  logger.debug('🔄 WORKLOAD INITIALIZER: Week keys created', {
     weekKeys: weekKeys.slice(0, 5), // First 5 weeks
     totalWeeks: weekKeys.length
   });

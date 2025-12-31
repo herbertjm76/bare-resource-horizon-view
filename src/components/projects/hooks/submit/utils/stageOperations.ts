@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { ExistingStage, StageData } from "../types/stageSubmitTypes";
+import { logger } from '@/utils/logger';
 
 export const deleteUnusedStages = async (
   existingStages: ExistingStage[],
@@ -11,14 +12,14 @@ export const deleteUnusedStages = async (
     .map(stage => stage.id);
     
   if (stagesToDelete.length > 0) {
-    console.log('Deleting stages:', stagesToDelete);
+    logger.debug('Deleting stages:', stagesToDelete);
     const { error } = await supabase
       .from('project_stages')
       .delete()
       .in('id', stagesToDelete);
       
     if (error) {
-      console.error("Error deleting stages:", error);
+      logger.error("Error deleting stages:", error);
       throw error;
     }
   }
@@ -32,7 +33,7 @@ export const createOrUpdateStage = async (
   existingStage?: ExistingStage
 ): Promise<{ id: string }> => {
   if (existingStage) {
-    console.log(`Updating existing project stage ${existingStage.id} for ${stageName}`);
+    logger.debug(`Updating existing project stage ${existingStage.id} for ${stageName}`);
     
     const { error: updateError } = await supabase
       .from('project_stages')
@@ -48,14 +49,14 @@ export const createOrUpdateStage = async (
       .eq('id', existingStage.id);
 
     if (updateError) {
-      console.error(`Error updating stage ${stageName}:`, updateError);
+      logger.error(`Error updating stage ${stageName}:`, updateError);
       throw updateError;
     }
     
     return { id: existingStage.id };
   }
   
-  console.log(`Creating new project stage for ${stageName}`);
+  logger.debug(`Creating new project stage for ${stageName}`);
   
   const { data: newStage, error: newStageError } = await supabase
     .from('project_stages')
@@ -75,7 +76,7 @@ export const createOrUpdateStage = async (
     .single();
 
   if (newStageError) {
-    console.error(`Error creating stage ${stageName}:`, newStageError);
+    logger.error(`Error creating stage ${stageName}:`, newStageError);
     throw newStageError;
   }
   

@@ -3,6 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { useProjectDisplayText } from '@/hooks/useProjectDisplayText';
 import './css/test-purple-table.css';
+import { logger } from '@/utils/logger';
 
 interface TestPurpleTableProps {
   projects: any[];
@@ -10,7 +11,7 @@ interface TestPurpleTableProps {
 
 export const TestPurpleTable: React.FC<TestPurpleTableProps> = ({ projects }) => {
   const getDisplayText = useProjectDisplayText();
-  console.log("TestPurpleTable - Rendering with projects:", projects);
+  logger.debug("TestPurpleTable - Rendering with projects:", projects);
   
   return (
     <div className="test-purple-wrapper">

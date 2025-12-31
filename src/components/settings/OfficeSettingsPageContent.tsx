@@ -6,6 +6,7 @@ import { useAuthorization } from '@/hooks/useAuthorization';
 import { OfficeSettingsContent } from '@/components/settings/OfficeSettingsContent';
 import { OfficeSettingsLoadingState } from '@/components/settings/OfficeSettingsLoadingState';
 import { OfficeSettingsErrorState } from '@/components/settings/OfficeSettingsErrorState';
+import { logger } from '@/utils/logger';
 
 export const OfficeSettingsPageContent: React.FC = () => {
   const { company, loading: companyLoading, refreshCompany, error: companyError } = useCompany();
@@ -20,7 +21,7 @@ export const OfficeSettingsPageContent: React.FC = () => {
   const error = authError || companyError;
   
   const handleRefresh = () => {
-    console.log('Manually refreshing company data from OfficeSettings');
+    logger.debug('Manually refreshing company data from OfficeSettings');
     refreshCompany();
   };
 

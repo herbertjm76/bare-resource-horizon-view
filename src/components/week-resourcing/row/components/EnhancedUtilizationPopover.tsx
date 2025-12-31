@@ -3,6 +3,7 @@ import React from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
+import { logger } from '@/utils/logger';
 
 interface EnhancedUtilizationPopoverProps {
   memberName: string;
@@ -43,7 +44,7 @@ export const EnhancedUtilizationPopover: React.FC<EnhancedUtilizationPopoverProp
   // Calculate total project hours
   const totalProjectHours = projects.reduce((sum, p) => sum + p.total_hours, 0);
   
-  console.log(`DEBUG EnhancedUtilizationPopover for ${memberName}:`, {
+  logger.debug(`DEBUG EnhancedUtilizationPopover for ${memberName}:`, {
     receivedTotalUsedHours: totalUsedHours,
     receivedUtilizationPercentage: utilizationPercentage,
     receivedWeeklyCapacity: weeklyCapacity,
