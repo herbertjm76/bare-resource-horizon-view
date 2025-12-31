@@ -65,7 +65,7 @@ export const EnhancedUtilizationPopover: React.FC<EnhancedUtilizationPopoverProp
 
   return (
     <div className="space-y-4 max-w-lg">
-      <div className="font-bold text-base text-[#6465F0] border-b border-gray-200 pb-2">
+      <div className="font-bold text-base text-brand-secondary border-b border-gray-200 pb-2">
         {memberName} — Weekly Utilization
       </div>
       
