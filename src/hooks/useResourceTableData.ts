@@ -1,14 +1,36 @@
 
 import { useMemo, useState } from 'react';
-import { addDays, startOfWeek, isWithinInterval } from 'date-fns';
+import { addDays, isWithinInterval } from 'date-fns';
 import { useAnnualLeave } from '@/hooks/useAnnualLeave';
+import type { Project, Profile, ResourceAllocation } from '@/context/types';
+
+interface LeaveDay {
+  date: string;
+  hours: number;
+}
+
+interface ResourceTableDataResult {
+  membersMap: Map<string, Profile>;
+  allocationMap: Map<string, number>;
+  projectCountByMember: Map<string, number>;
+  
+  projectTotals: Map<string, number>;
+  memberTotals: Map<string, number>;
+  manualLeaveData: Record<string, Record<string, string | number>>;
+  remarksData: Record<string, string>;
+  getWeeklyLeave: (memberId: string) => LeaveDay[];
+  getTotalWeeklyLeaveHours: (memberId: string) => number;
+  handleLeaveInputChange: (memberId: string, leaveType: string, value: string) => void;
+  handleRemarksUpdate: (memberId: string, remarks: string) => void;
+  isLoadingLeave: boolean;
+}
 
 export const useResourceTableData = (
-  projects: any[],
-  members: any[],
-  allocations: any[],
+  projects: Project[],
+  members: Profile[],
+  allocations: ResourceAllocation[],
   weekStartDate: string
-) => {
+): ResourceTableDataResult => {
   // Parse week dates for leave filtering
   const weekStart = useMemo(() => new Date(weekStartDate), [weekStartDate]);
   const weekEnd = useMemo(() => addDays(weekStart, 6), [weekStart]);
@@ -25,7 +47,7 @@ export const useResourceTableData = (
   
   // Create members map
   const membersMap = useMemo(() => {
-    const map = new Map();
+    const map = new Map<string, Profile>();
     members.forEach(member => {
       map.set(member.id, member);
     });
@@ -34,7 +56,7 @@ export const useResourceTableData = (
   
   // Organize allocations by member and project for easier access
   const allocationMap = useMemo(() => {
-    const map = new Map();
+    const map = new Map<string, number>();
     
     allocations.forEach(allocation => {
       const key = `${allocation.resource_id}:${allocation.project_id}`;
@@ -46,21 +68,20 @@ export const useResourceTableData = (
   
   // Count projects per member for this week
   const projectCountByMember = useMemo(() => {
-    const countMap = new Map();
+    const countMap = new Map<string, number>();
+    const projectSets = new Map<string, Set<string>>();
     
     members.forEach(member => {
-      // Initialize count to 0
       countMap.set(member.id, 0);
+      projectSets.set(member.id, new Set<string>());
     });
     
     allocations.forEach(allocation => {
       const memberId = allocation.resource_id;
-      // Only count if hours > 0
       if (allocation.hours > 0) {
-        // Get current count or 0 if not set
-        const currentProjects = new Set(countMap.get(memberId + '_projects') || []);
+        const currentProjects = projectSets.get(memberId) || new Set<string>();
         currentProjects.add(allocation.project_id);
-        countMap.set(memberId + '_projects', currentProjects);
+        projectSets.set(memberId, currentProjects);
         countMap.set(memberId, currentProjects.size);
       }
     });
@@ -70,7 +91,7 @@ export const useResourceTableData = (
   
   // Calculate total project hours
   const projectTotals = useMemo(() => {
-    const totals = new Map();
+    const totals = new Map<string, number>();
     
     allocations.forEach(allocation => {
       const projectId = allocation.project_id;
@@ -83,7 +104,7 @@ export const useResourceTableData = (
   
   // Calculate total member hours
   const memberTotals = useMemo(() => {
-    const totals = new Map();
+    const totals = new Map<string, number>();
     
     allocations.forEach(allocation => {
       const memberId = allocation.resource_id;
@@ -95,7 +116,7 @@ export const useResourceTableData = (
   }, [allocations]);
   
   // Filter leave data for the selected week
-  const getWeeklyLeave = (memberId: string) => {
+  const getWeeklyLeave = (memberId: string): LeaveDay[] => {
     if (!leaveData[memberId]) return [];
     
     const memberLeaves = leaveData[memberId];
@@ -113,13 +134,13 @@ export const useResourceTableData = (
   };
   
   // Calculate total leave hours for the week
-  const getTotalWeeklyLeaveHours = (memberId: string) => {
+  const getTotalWeeklyLeaveHours = (memberId: string): number => {
     const weekLeaveDays = getWeeklyLeave(memberId);
     return weekLeaveDays.reduce((total, day) => total + day.hours, 0);
   };
   
   // Handler for leave input changes, now supporting notes
-  const handleLeaveInputChange = (memberId: string, leaveType: string, value: string) => {
+  const handleLeaveInputChange = (memberId: string, leaveType: string, value: string): void => {
     setManualLeaveData(prev => {
       const newLeaveData = {...prev};
       if (!newLeaveData[memberId]) {
@@ -141,7 +162,7 @@ export const useResourceTableData = (
   };
   
   // Handler for remarks updates
-  const handleRemarksUpdate = (memberId: string, remarks: string) => {
+  const handleRemarksUpdate = (memberId: string, remarks: string): void => {
     setRemarksData(prev => ({
       ...prev,
       [memberId]: remarks

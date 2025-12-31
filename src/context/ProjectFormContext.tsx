@@ -2,38 +2,30 @@ import React, { createContext, useContext, useState, useCallback, useMemo } from
 import { useCompany } from '@/context/CompanyContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { 
+  ProjectFormState, 
+  StageFee, 
+  ManagerOption, 
+  OfficeOption, 
+  StageOption,
+  Project 
+} from './types';
 
 // Eliminate prop drilling by providing form state and options through context
 
-interface FormState {
-  code: string;
-  name: string;
-  manager: string;
-  country: string;
-  profit: string;
-  avgRate: string;
-  currency: string;
-  status: string;
-  office: string;
-  current_stage: string;
-  stages: string[];
-  stageFees: Record<string, any>;
-  stageApplicability: Record<string, boolean>;
-}
-
 interface ProjectFormContextValue {
-  form: FormState;
-  setForm: React.Dispatch<React.SetStateAction<FormState>>;
+  form: ProjectFormState;
+  setForm: React.Dispatch<React.SetStateAction<ProjectFormState>>;
   formErrors: Record<string, string>;
   setFormErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  managers: Array<{ id: string; name: string }>;
+  managers: ManagerOption[];
   countries: string[];
-  offices: Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>;
-  officeStages: Array<{ id: string; name: string; color?: string }>;
-  handleChange: (key: keyof FormState, value: any) => void;
-  updateStageFee: (stageId: string, field: string, value: any) => void;
+  offices: OfficeOption[];
+  officeStages: StageOption[];
+  handleChange: <K extends keyof ProjectFormState>(key: K, value: ProjectFormState[K]) => void;
+  updateStageFee: (stageId: string, field: keyof StageFee, value: StageFee[keyof StageFee]) => void;
   updateStageApplicability: (stageId: string, applicable: boolean) => void;
 }
 
@@ -49,7 +41,7 @@ export const useProjectFormContext = () => {
 
 interface ProjectFormProviderProps {
   children: React.ReactNode;
-  project?: any;
+  project?: Project;
   isOpen: boolean;
 }
 
@@ -129,16 +121,16 @@ export const ProjectFormProvider: React.FC<ProjectFormProviderProps> = ({
     initialStageSelections[stageId] = true;
   });
 
-  const [form, setForm] = useState<FormState>({
+  const [form, setForm] = useState<ProjectFormState>({
     code: project?.code || '',
     name: project?.name || '',
-    manager: project?.project_manager?.id || '',
+    manager: project?.project_manager_id || '',
     country: project?.country || '',
     profit: project?.target_profit_percentage?.toString() || '',
-    avgRate: project?.avg_rate?.toString() || '',
+    avgRate: project?.average_rate?.toString() || '',
     currency: project?.currency || 'USD',
     status: project?.status || '',
-    office: project?.office?.id || '',
+    office: project?.office_id || '',
     current_stage: project?.current_stage || '',
     stages: initialStages,
     stageFees: {},
@@ -146,7 +138,7 @@ export const ProjectFormProvider: React.FC<ProjectFormProviderProps> = ({
   });
 
   // Optimized change handler with proper memoization
-  const handleChange = useCallback((key: keyof FormState, value: any) => {
+  const handleChange = useCallback(<K extends keyof ProjectFormState>(key: K, value: ProjectFormState[K]) => {
     setForm(prev => ({ ...prev, [key]: value }));
 
     if (formErrors[key]) {
@@ -158,12 +150,12 @@ export const ProjectFormProvider: React.FC<ProjectFormProviderProps> = ({
     }
 
     // Handle stages change
-    if (key === 'stages') {
+    if (key === 'stages' && Array.isArray(value)) {
       setForm(prev => {
-        const newStageFees: Record<string, any> = { ...prev.stageFees };
+        const newStageFees: Record<string, StageFee> = { ...prev.stageFees };
         const newStageApplicability: Record<string, boolean> = { ...prev.stageApplicability };
 
-        value.forEach((stageId: string) => {
+        (value as string[]).forEach((stageId: string) => {
           if (!newStageFees[stageId]) {
             newStageFees[stageId] = {
               fee: '',
@@ -181,9 +173,9 @@ export const ProjectFormProvider: React.FC<ProjectFormProviderProps> = ({
         });
 
         // Remove unselected stages
-        const updatedStageFees: Record<string, any> = {};
+        const updatedStageFees: Record<string, StageFee> = {};
         Object.keys(newStageFees).forEach(stageId => {
-          if (value.includes(stageId)) {
+          if ((value as string[]).includes(stageId)) {
             updatedStageFees[stageId] = newStageFees[stageId];
           }
         });
@@ -197,7 +189,7 @@ export const ProjectFormProvider: React.FC<ProjectFormProviderProps> = ({
     }
   }, [formErrors]);
 
-  const updateStageFee = useCallback((stageId: string, field: string, value: any) => {
+  const updateStageFee = useCallback((stageId: string, field: keyof StageFee, value: StageFee[keyof StageFee]) => {
     setForm(prev => ({
       ...prev,
       stageFees: {
