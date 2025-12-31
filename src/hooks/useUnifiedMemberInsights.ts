@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { UnifiedInsightsService, UnifiedMemberInsights } from '@/services/unifiedInsightsService';
+import { logger } from '@/utils/logger';
 
 export const useUnifiedMemberInsights = (memberId: string, weeklyCapacity?: number) => {
   const [insights, setInsights] = useState<UnifiedMemberInsights>({
@@ -37,7 +38,7 @@ export const useUnifiedMemberInsights = (memberId: string, weeklyCapacity?: numb
         
         setInsights(memberInsights);
       } catch (err) {
-        console.error('Error fetching unified insights:', err);
+        logger.error('Error fetching unified insights:', err);
         setError(err instanceof Error ? err : new Error('Failed to fetch insights'));
       } finally {
         setIsLoading(false);

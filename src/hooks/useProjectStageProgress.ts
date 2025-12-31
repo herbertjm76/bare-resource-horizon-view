@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { addDays, differenceInDays, isWithinInterval } from 'date-fns';
+import { logger } from '@/utils/logger';
 
 interface StageProgress {
   totalBudgetedHours: number;
@@ -46,7 +47,7 @@ export const useProjectStageProgress = (projectId: string, currentStage: string)
           .single();
 
         if (stageError && stageError.code !== 'PGRST116') {
-          console.error('Error fetching stage data:', stageError);
+          logger.error('Error fetching stage data:', stageError);
           setIsLoading(false);
           return;
         }
@@ -59,7 +60,7 @@ export const useProjectStageProgress = (projectId: string, currentStage: string)
           .single();
 
         if (projectError) {
-          console.error('Error fetching project data:', projectError);
+          logger.error('Error fetching project data:', projectError);
           setIsLoading(false);
           return;
         }
@@ -103,7 +104,7 @@ export const useProjectStageProgress = (projectId: string, currentStage: string)
         });
 
       } catch (error) {
-        console.error('Error in fetchStageProgress:', error);
+        logger.error('Error in fetchStageProgress:', error);
       } finally {
         setIsLoading(false);
       }

@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getWeekStartOptions, getWeekDateRange } from './dateUtils';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 /**
  * Fetch project allocations from the database with precise date matching
@@ -16,8 +17,8 @@ export async function fetchPreciseDateAllocations(
   // Get both Monday and Sunday dates for the selected week
   const { mondayKey, sundayKey } = getWeekStartOptions(selectedWeek);
   
-  console.log('Looking for allocations with Monday date:', mondayKey);
-  console.log('Or Sunday date:', sundayKey);
+  logger.log('Looking for allocations with Monday date:', mondayKey);
+  logger.log('Or Sunday date:', sundayKey);
   
   // Try to fetch allocations with either Monday OR Sunday as the week_start_date
   try {
@@ -35,14 +36,14 @@ export async function fetchPreciseDateAllocations(
       .in('resource_id', memberIds);
     
     if (error) {
-      console.error('Error fetching project allocations:', error);
+      logger.error('Error fetching project allocations:', error);
       return [];
     }
     
-    console.log(`Found ${data?.length || 0} allocations with exact date match`);
+    logger.log(`Found ${data?.length || 0} allocations with exact date match`);
     return data || [];
   } catch (err) {
-    console.error('Error in fetchPreciseDateAllocations:', err);
+    logger.error('Error in fetchPreciseDateAllocations:', err);
     return [];
   }
 }
@@ -61,7 +62,7 @@ export async function fetchDateRangeAllocations(
     // Get the range for the entire week
     const { startDateString, endDateString } = getWeekDateRange(selectedWeek);
     
-    console.log(`Trying date range query from ${startDateString} to ${endDateString}`);
+    logger.log(`Trying date range query from ${startDateString} to ${endDateString}`);
     
     const { data, error } = await supabase
       .from('project_resource_allocations')
@@ -78,14 +79,14 @@ export async function fetchDateRangeAllocations(
       .in('resource_id', memberIds);
       
     if (error) {
-      console.error('Error in date range query:', error);
+      logger.error('Error in date range query:', error);
       return [];
     }
     
-    console.log(`Found ${data?.length || 0} allocations with date range query`);
+    logger.log(`Found ${data?.length || 0} allocations with date range query`);
     return data || [];
   } catch (err) {
-    console.error('Error in fetchDateRangeAllocations:', err);
+    logger.error('Error in fetchDateRangeAllocations:', err);
     return [];
   }
 }
@@ -114,11 +115,11 @@ export async function fetchRecentAllocations(
     
     // Get unique dates for debugging
     const uniqueDates = [...new Set(dateData.map(item => item.allocation_date))];
-    console.log('Recent allocation dates in DB:', uniqueDates);
+    logger.log('Recent allocation dates in DB:', uniqueDates);
     
     // Try fetching with the most recent date
     const latestDate = uniqueDates[0];
-    console.log(`Trying to fetch with most recent date: ${latestDate}`);
+    logger.log(`Trying to fetch with most recent date: ${latestDate}`);
     
     const { data } = await supabase
       .from('project_resource_allocations')
@@ -133,10 +134,10 @@ export async function fetchRecentAllocations(
       .eq('company_id', companyId)
       .in('resource_id', memberIds);
       
-    console.log(`Found ${data?.length || 0} allocations using latest date: ${latestDate}`);
+    logger.log(`Found ${data?.length || 0} allocations using latest date: ${latestDate}`);
     return data || [];
   } catch (err) {
-    console.error('Error in fetchRecentAllocations:', err);
+    logger.error('Error in fetchRecentAllocations:', err);
     return [];
   }
 }

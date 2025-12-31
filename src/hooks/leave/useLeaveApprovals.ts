@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { LeaveRequest } from '@/types/leave';
+import { logger } from '@/utils/logger';
 
 export const useLeaveApprovals = () => {
   const [pendingApprovals, setPendingApprovals] = useState<LeaveRequest[]>([]);
@@ -92,7 +93,7 @@ export const useLeaveApprovals = () => {
       setCanApprove(isAdminOrOwner || isLeaveAdmin || isManager);
 
       if (error) {
-        console.error('Error fetching leave requests:', error);
+        logger.error('Error fetching leave requests:', error);
         toast.error('Failed to load leave requests');
         return;
       }
@@ -117,7 +118,7 @@ export const useLeaveApprovals = () => {
       setPendingApprovals(pending);
       setAllRequests(all);
     } catch (error) {
-      console.error('Error in fetchPendingApprovals:', error);
+      logger.error('Error in fetchPendingApprovals:', error);
       toast.error('Failed to load pending approvals');
     } finally {
       setIsLoading(false);
@@ -142,7 +143,7 @@ export const useLeaveApprovals = () => {
         .single();
 
       if (fetchError || !request) {
-        console.error('Error fetching request:', fetchError);
+        logger.error('Error fetching request:', fetchError);
         toast.error('Failed to fetch request details');
         return false;
       }
@@ -158,7 +159,7 @@ export const useLeaveApprovals = () => {
         .eq('id', requestId);
 
       if (error) {
-        console.error('Error approving request:', error);
+        logger.error('Error approving request:', error);
         toast.error('Failed to approve request');
         return false;
       }
@@ -174,7 +175,7 @@ export const useLeaveApprovals = () => {
       const leaveEntries = [];
       const currentDate = new Date(startDate);
       
-      console.log('Creating leave entries from', request.start_date, 'to', request.end_date);
+      logger.log('Creating leave entries from', request.start_date, 'to', request.end_date);
       
       while (currentDate <= endDate) {
         const dayOfWeek = currentDate.getDay();
@@ -186,7 +187,7 @@ export const useLeaveApprovals = () => {
           const day = String(currentDate.getDate()).padStart(2, '0');
           const dateStr = `${year}-${month}-${day}`;
           
-          console.log('Adding leave entry for date:', dateStr);
+          logger.log('Adding leave entry for date:', dateStr);
           
           leaveEntries.push({
             member_id: request.member_id,
@@ -206,7 +207,7 @@ export const useLeaveApprovals = () => {
           .insert(leaveEntries);
 
         if (insertError) {
-          console.error('Error creating leave entries:', insertError);
+          logger.error('Error creating leave entries:', insertError);
           // Don't fail the approval, just log the error
         }
       }
@@ -215,7 +216,7 @@ export const useLeaveApprovals = () => {
       await fetchPendingApprovals();
       return true;
     } catch (error) {
-      console.error('Error in approveRequest:', error);
+      logger.error('Error in approveRequest:', error);
       toast.error('Failed to approve request');
       return false;
     } finally {
@@ -252,7 +253,7 @@ export const useLeaveApprovals = () => {
         .eq('id', requestId);
 
       if (error) {
-        console.error('Error rejecting request:', error);
+        logger.error('Error rejecting request:', error);
         toast.error('Failed to reject request');
         return false;
       }
@@ -261,7 +262,7 @@ export const useLeaveApprovals = () => {
       await fetchPendingApprovals();
       return true;
     } catch (error) {
-      console.error('Error in rejectRequest:', error);
+      logger.error('Error in rejectRequest:', error);
       toast.error('Failed to reject request');
       return false;
     } finally {
@@ -296,7 +297,7 @@ export const useLeaveApprovals = () => {
         .eq('status', 'pending');
 
       if (error) {
-        console.error('Error reassigning approver:', error);
+        logger.error('Error reassigning approver:', error);
         toast.error('Failed to reassign approver');
         return false;
       }
@@ -305,7 +306,7 @@ export const useLeaveApprovals = () => {
       await fetchPendingApprovals();
       return true;
     } catch (error) {
-      console.error('Error in reassignApprover:', error);
+      logger.error('Error in reassignApprover:', error);
       toast.error('Failed to reassign approver');
       return false;
     } finally {

@@ -5,6 +5,7 @@ import { fetchResourceAllocations } from './api';
 import { getStandardizedDateRange } from './utils/dateRangeUtils';
 import { ResourceAllocation } from './types';
 import { formatDateKey } from './utils';
+import { logger } from '@/utils/logger';
 
 interface UseDateRangeAllocationsProps {
   projectId: string;
@@ -38,8 +39,8 @@ export function useDateRangeAllocations({
     try {
       const dateRange = getDateRange(selectedDate, periodToShow);
       
-      console.log(`🔍 DATE RANGE ALLOCATIONS: Fetching for ${resourceId} with range:`, dateRange);
-      console.log(`🔍 DATE RANGE ALLOCATIONS: Period: ${periodToShow ? `${periodToShow} weeks` : 'full month'}`);
+      logger.log(`DATE RANGE ALLOCATIONS: Fetching for ${resourceId} with range:`, dateRange);
+      logger.log(`DATE RANGE ALLOCATIONS: Period: ${periodToShow ? `${periodToShow} weeks` : 'full month'}`);
       
       const allocationMap = await fetchResourceAllocations(
         projectId,
@@ -49,7 +50,7 @@ export function useDateRangeAllocations({
         dateRange
       );
       
-      console.log(`🔍 DATE RANGE ALLOCATIONS: Retrieved ${Object.keys(allocationMap).length} allocations`);
+      logger.log(`DATE RANGE ALLOCATIONS: Retrieved ${Object.keys(allocationMap).length} allocations`);
       setAllocations(allocationMap);
     } finally {
       setIsLoading(false);
@@ -72,7 +73,7 @@ export function useDateRangeAllocations({
         table: 'project_resource_allocations',
         filter: `project_id=eq.${projectId} AND resource_id=eq.${resourceId} AND resource_type=eq.${resourceType}`
       }, (payload) => {
-        console.log('🔔 Real-time update received:', payload);
+        logger.log('Real-time update received:', payload);
         
         // Handle different types of changes
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {

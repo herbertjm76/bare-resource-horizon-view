@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Invite } from '@/components/dashboard/types';
+import { logger } from '@/utils/logger';
 
 export const useInviteActions = (triggerRefresh: () => void) => {
   const copyInviteUrl = (inviteUrl: string) => {
@@ -27,7 +28,7 @@ export const useInviteActions = (triggerRefresh: () => void) => {
       toast.success('Invite deleted successfully');
       triggerRefresh();
     } catch (error: any) {
-      console.error('Error deleting invite:', error);
+      logger.error('Error deleting invite:', error);
       toast.error(error.message || 'Failed to delete invite');
     }
   };
@@ -45,7 +46,7 @@ export const useInviteActions = (triggerRefresh: () => void) => {
       toast.success(`Invite resent to ${invite.email}`);
       triggerRefresh();
     } catch (error: any) {
-      console.error('Error resending invite:', error);
+      logger.error('Error resending invite:', error);
       toast.error(error.message || 'Failed to resend invite');
     }
   };

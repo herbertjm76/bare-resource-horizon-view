@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Invite } from '@/components/dashboard/types';
+import { logger } from '@/utils/logger';
 
 export const useTeamInvites = (companyId: string | undefined) => {
   const [inviteEmail, setInviteEmail] = useState('');
@@ -49,7 +50,7 @@ export const useTeamInvites = (companyId: string | undefined) => {
       });
 
       if (emailError) {
-        console.error('Error sending invite email:', emailError);
+        logger.error('Error sending invite email:', emailError);
         toast.error('Invite created but email failed to send');
         return false;
       }
@@ -58,7 +59,7 @@ export const useTeamInvites = (companyId: string | undefined) => {
       setInviteEmail('');
       return true;
     } catch (e: any) {
-      console.error('Error sending invite:', e);
+      logger.error('Error sending invite:', e);
       toast.error(e.message || 'Error sending invite.');
       return false;
     } finally {

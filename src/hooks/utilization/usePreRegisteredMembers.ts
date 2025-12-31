@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { calculatePeriodUtilization, getUtilizationPeriods } from './utils';
 import { IndividualUtilization } from './types';
+import { logger } from '@/utils/logger';
 
 export const calculatePreRegisteredUtilizations = async (
   preRegisteredMembers: TeamMember[],
@@ -20,7 +21,7 @@ export const calculatePreRegisteredUtilizations = async (
 
   const preRegisteredIds = preRegisteredMembers.map(member => member.id);
   
-  console.log('Fetching allocations for pre-registered member IDs:', preRegisteredIds);
+  logger.log('Fetching allocations for pre-registered member IDs:', preRegisteredIds);
   
   const { data: preRegAllocations, error: preRegError } = await supabase
     .from('project_resource_allocations')
@@ -33,21 +34,21 @@ export const calculatePreRegisteredUtilizations = async (
 
   if (preRegError) throw preRegError;
 
-  console.log('Pre-registered allocations fetched:', preRegAllocations?.length || 0);
-  console.log('Pre-registered allocations data:', preRegAllocations);
+  logger.log('Pre-registered allocations fetched:', preRegAllocations?.length || 0);
+  logger.log('Pre-registered allocations data:', preRegAllocations);
 
   // Calculate utilization for pre-registered members
   preRegisteredMembers.forEach(member => {
     const memberCapacity = member.weekly_capacity || workWeekHours;
     
-    console.log(`--- Pre-registered Member ${member.first_name} ${member.last_name} (${member.id}) (Capacity: ${memberCapacity}h/week) ---`);
+    logger.log(`--- Pre-registered Member ${member.first_name} ${member.last_name} (${member.id}) (Capacity: ${memberCapacity}h/week) ---`);
 
     const memberAllocations = preRegAllocations?.filter(allocation => 
       allocation.resource_id === member.id
     ) || [];
     
-    console.log(`Member allocations found: ${memberAllocations.length}`);
-    console.log(`Member allocations data:`, memberAllocations);
+    logger.log(`Member allocations found: ${memberAllocations.length}`);
+    logger.log(`Member allocations data:`, memberAllocations);
 
     if (memberAllocations.length > 0) {
       const periods = getUtilizationPeriods(currentWeekStart);
