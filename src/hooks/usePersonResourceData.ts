@@ -103,12 +103,12 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           .lte('allocation_date', endDate.toISOString().split('T')[0]);
 
         if (allocationsError) {
-          console.error('Error fetching allocations:', allocationsError);
+          logger.error('Error fetching allocations:', allocationsError);
           toast.error('Failed to load allocations');
           throw allocationsError;
         }
 
-        console.log('Fetched allocations:', allocations?.length || 0);
+        logger.debug('Fetched allocations:', allocations?.length || 0);
 
         // Process data: group allocations by person, then by project
         const personMap = new Map<string, PersonResourceData>();

@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useIndividualMemberUtilization } from '@/hooks/useIndividualMemberUtilization';
 import { useResourcePlanningData } from './resource-planning/hooks/useResourcePlanningData';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { logger } from '@/utils/logger';
 
 interface TeamMemberDetailContentProps {
   memberData: any;
@@ -48,15 +49,15 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
           
         clearTimeout(timeoutId);
         if (error) {
-          console.error('Error fetching user role:', error);
+          logger.error('Error fetching user role:', error);
           return null;
         }
         
-        console.log('User role fetched:', data);
+        logger.debug('User role fetched:', data);
         return { role: data };
       } catch (error) {
         clearTimeout(timeoutId);
-        console.error('Error fetching user profile:', error);
+        logger.error('Error fetching user profile:', error);
         return null;
       }
     },

@@ -7,6 +7,7 @@ import { Project, MemberAllocation } from './types';
 import { CapacityBar } from '@/components/week-resourcing/CapacityBar';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAvailableValue } from '@/utils/allocationDisplay';
+import { logger } from '@/utils/logger';
 
 interface MemberTableRowProps {
   member: any;
@@ -64,7 +65,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   const totalUsedHours = totalWeeklyAllocatedHours + annualLeave + publicHolidayHours + otherLeave;
   const availableHours = weeklyCapacity - totalUsedHours; // Remove Math.max(0, ...) to allow negative values
 
-  console.log(`MemberTableRow - Member ${member.first_name} ${member.last_name}:`, {
+  logger.debug(`MemberTableRow - Member ${member.first_name} ${member.last_name}:`, {
     totalWeeklyAllocatedHours,
     projectCount,
     weeklyCapacity,

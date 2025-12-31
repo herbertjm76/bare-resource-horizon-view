@@ -8,6 +8,7 @@ import { StaffStatusCardProps } from './types';
 import { StaffSection } from './StaffSection';
 import { categorizeStaff } from './utils';
 import { TimeRange } from '../TimeRangeSelector';
+import { logger } from '@/utils/logger';
 
 interface ExtendedStaffStatusCardProps extends StaffStatusCardProps {
   selectedTimeRange: TimeRange;
@@ -19,14 +20,14 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
 }) => {
   // Debug logging
   useEffect(() => {
-    console.log('=== STAFF STATUS CARD UPDATE ===');
-    console.log('Staff data received:', staffData.length);
-    console.log('Selected time range:', selectedTimeRange);
-    console.log('Staff members with availability:', staffData.map(s => ({ 
+    logger.debug('=== STAFF STATUS CARD UPDATE ===');
+    logger.debug('Staff data received:', staffData.length);
+    logger.debug('Selected time range:', selectedTimeRange);
+    logger.debug('Staff members with availability:', staffData.map(s => ({ 
       name: s.name, 
       availability: s.availability 
     })));
-    console.log('=== END STAFF STATUS CARD ===');
+    logger.debug('=== END STAFF STATUS CARD ===');
   }, [staffData, selectedTimeRange]);
 
   const { atCapacityStaff, optimalStaff, readyStaff } = categorizeStaff(staffData);

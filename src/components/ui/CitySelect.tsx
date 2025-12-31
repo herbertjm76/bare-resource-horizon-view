@@ -4,6 +4,7 @@ import { Command, CommandInput, CommandList, CommandItem, CommandEmpty } from "@
 import { CitySelectButton } from "./citySelect/CitySelectButton";
 import { useCitySelect } from "./citySelect/useCitySelect";
 import { CitySelectProps } from "./citySelect/types";
+import { logger } from '@/utils/logger';
 
 export const CitySelect: React.FC<CitySelectProps> = ({
   value,
@@ -13,7 +14,7 @@ export const CitySelect: React.FC<CitySelectProps> = ({
   placeholder,
   className
 }) => {
-  console.log('CitySelect: Received props:', {
+  logger.debug('CitySelect: Received props:', {
     value,
     country,
     disabled,
@@ -32,7 +33,7 @@ export const CitySelect: React.FC<CitySelectProps> = ({
     setSearchTerm
   } = useCitySelect(country, onChange);
 
-  console.log('CitySelect: Hook returned:', {
+  logger.debug('CitySelect: Hook returned:', {
     open,
     searchTerm,
     displayedCitiesCount: displayedCities.length,
