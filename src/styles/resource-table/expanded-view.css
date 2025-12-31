@@ -1,5 +1,5 @@
 
-/* Expanded View Styles */
+/* Expanded View Styles - Uses Design System CSS Variables */
 
 .resource-table-expanded {
   font-size: 14px;
@@ -31,7 +31,7 @@
   font-size: 14px;
   min-height: 36px;
   border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 10px hsl(var(--foreground) / 0.15);
 }
 
 .resource-table-expanded .enhanced-input {
@@ -39,11 +39,11 @@
   padding: 8px 12px;
   font-size: 14px;
   border-radius: 8px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid hsl(var(--border));
   transition: all 0.2s ease;
 }
 
 .resource-table-expanded .enhanced-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 4px hsl(var(--ring) / 0.1);
 }

@@ -1,5 +1,5 @@
 
-/* Enhanced Table Styles - Unified Design System */
+/* Enhanced Table Styles - Uses Design System CSS Variables */
 
 /* Base Table Container */
 .enhanced-table-scroll {
@@ -8,7 +8,7 @@
   -webkit-overflow-scrolling: touch;
   max-width: 100%;
   width: 100%;
-  background: linear-gradient(to right, rgba(255,255,255,0.95), rgba(248,250,252,0.95));
+  background: linear-gradient(to right, hsl(var(--background) / 0.95), hsl(var(--muted) / 0.95));
   border-radius: 16px;
   padding: 1px;
 }
@@ -18,9 +18,9 @@
   position: relative;
   width: 100%;
   min-width: 100%;
-  background: white;
+  background: hsl(var(--background));
   border-radius: 15px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: inset 0 1px 3px hsl(var(--foreground) / 0.1);
 }
 
 .enhanced-table {
@@ -28,16 +28,16 @@
   border-spacing: 0;
   width: 100%;
   min-width: max-content;
-  background: white;
+  background: hsl(var(--background));
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.1);
 }
 
-/* Enhanced Header Styling - Standardized to #6465F0 */
+/* Enhanced Header Styling - Uses gradient tokens */
 .enhanced-table thead {
-  background: #6465F0;
-  color: white;
+  background: hsl(var(--gradient-start));
+  color: hsl(var(--header-foreground));
   position: sticky;
   top: 0;
   z-index: 10;
@@ -49,10 +49,10 @@
   font-size: 12px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  border-right: 1px solid rgba(255,255,255,0.2);
+  border-right: 1px solid hsl(var(--header-foreground) / 0.2);
   position: relative;
-  color: white;
-  background: #6465F0;
+  color: hsl(var(--header-foreground));
+  background: hsl(var(--gradient-start));
 }
 
 .enhanced-table thead th:last-child {
@@ -62,62 +62,62 @@
 /* Enhanced Row Styling with Consistent Colors */
 .enhanced-table tbody tr {
   transition: all 0.2s ease;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 .enhanced-table tbody tr:hover {
-  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.8) 100%);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px hsl(var(--foreground) / 0.1);
 }
 
 /* Consistent row coloring */
 .enhanced-table tbody tr.even-row {
-  background: rgba(248,250,252,0.4);
+  background: hsl(var(--muted) / 0.4);
 }
 
 .enhanced-table tbody tr.odd-row {
-  background: white;
+  background: hsl(var(--background));
 }
 
 .enhanced-table tbody tr.even-row:hover {
-  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.9) 100%);
 }
 
 .enhanced-table tbody tr.odd-row:hover {
-  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.8) 100%);
 }
 
 /* Enhanced Cell Styling */
 .enhanced-table td {
   padding: 8px 6px;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid hsl(var(--border));
   font-size: 13px;
   position: relative;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .enhanced-table td:last-child {
   border-right: none;
 }
 
-/* Office/Group Header Enhancements - Standardized to #6465F0 */
+/* Office/Group Header Enhancements - Uses gradient tokens */
 .enhanced-table .group-header-row {
-  background: #6465F0;
-  color: white;
+  background: hsl(var(--gradient-start));
+  color: hsl(var(--header-foreground));
   font-weight: 600;
   position: relative;
 }
 
 .enhanced-table .group-header-row:hover {
-  background: #5856E8;
+  background: hsl(var(--gradient-start) / 0.95);
   transform: none;
 }
 
 .enhanced-table .group-header-row td {
-  border-right: 1px solid rgba(255,255,255,0.2);
+  border-right: 1px solid hsl(var(--header-foreground) / 0.2);
   padding: 12px 8px;
-  color: white;
+  color: hsl(var(--header-foreground));
 }
 
 /* Member/Resource Row Enhancements */
@@ -127,34 +127,34 @@
 }
 
 .enhanced-table .member-row:hover {
-  border-left-color: #6465F0;
+  border-left-color: hsl(var(--brand-primary));
 }
 
 /* Enhanced Input Styling */
 .enhanced-input {
-  border: 1px solid #e2e8f0;
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
   padding: 4px 6px;
   text-align: center;
   font-size: 12px;
   font-weight: 500;
-  background: white;
+  background: hsl(var(--background));
   transition: all 0.2s ease;
   width: 100%;
   height: 28px;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .enhanced-input:focus {
   outline: none;
-  border-color: #6465F0;
-  box-shadow: 0 0 0 3px rgba(100,101,240,0.1);
-  background: #fafbff;
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.1);
+  background: hsl(var(--muted) / 0.5);
 }
 
 .enhanced-input:hover {
-  border-color: #a5b4fc;
-  background: #fafbff;
+  border-color: hsl(var(--brand-primary) / 0.5);
+  background: hsl(var(--muted) / 0.5);
 }
 
 /* Enhanced Project Code Header */
@@ -171,74 +171,74 @@
   padding: 0.25rem;
 }
 
-/* Enhanced Pills - Black design */
+/* Enhanced Pills - Using foreground color */
 .enhanced-pill {
-  background: #1f2937;
-  border: 1px solid #374151;
+  background: hsl(var(--foreground));
+  border: 1px solid hsl(var(--foreground) / 0.8);
   border-radius: 20px;
   padding: 6px 12px;
   font-size: 11px;
   font-weight: 600;
-  color: white;
+  color: hsl(var(--background));
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px hsl(var(--foreground) / 0.1);
   min-width: 40px;
   justify-content: center;
 }
 
 /* New Enhanced Hours Pill for Total Hours Column */
 .enhanced-hours-pill {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border: 1px solid #2563eb;
+  background: linear-gradient(135deg, hsl(var(--info)) 0%, hsl(var(--info) / 0.8) 100%);
+  border: 1px solid hsl(var(--info));
   border-radius: 20px;
   padding: 6px 12px;
   font-size: 11px;
   font-weight: 600;
-  color: white;
+  color: hsl(var(--info-foreground));
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  box-shadow: 0 2px 4px rgba(59,130,246,0.2);
+  box-shadow: 0 2px 4px hsl(var(--info) / 0.2);
   min-width: 40px;
   justify-content: center;
 }
 
 /* New Enhanced Capacity Pill for Capacity Column */
 .enhanced-capacity-pill {
-  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-  border: 1px solid #64748b;
+  background: linear-gradient(135deg, hsl(var(--muted-foreground)) 0%, hsl(var(--muted-foreground) / 0.8) 100%);
+  border: 1px solid hsl(var(--muted-foreground));
   border-radius: 20px;
   padding: 6px 12px;
   font-size: 11px;
   font-weight: 600;
-  color: white;
+  color: hsl(var(--background));
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  box-shadow: 0 2px 4px rgba(100,116,139,0.2);
+  box-shadow: 0 2px 4px hsl(var(--muted-foreground) / 0.2);
   min-width: 40px;
   justify-content: center;
 }
 
 /* Column-specific styling */
 .total-hours-column {
-  background-color: rgba(59, 130, 246, 0.05);
-  border-left: 2px solid rgba(59, 130, 246, 0.2);
+  background-color: hsl(var(--info) / 0.05);
+  border-left: 2px solid hsl(var(--info) / 0.2);
 }
 
 .capacity-column {
-  background-color: rgba(100, 116, 139, 0.05);
-  border-left: 2px solid rgba(100, 116, 139, 0.2);
+  background-color: hsl(var(--muted-foreground) / 0.05);
+  border-left: 2px solid hsl(var(--muted-foreground) / 0.2);
 }
 
 /* Enhanced Capacity Display - Legacy support */
 .enhanced-capacity-display {
   font-weight: 600;
   font-size: 13px;
-  color: #1f2937;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: hsl(var(--foreground));
+  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.9) 100%);
   padding: 4px 8px;
   border-radius: 8px;
   text-align: center;
@@ -246,33 +246,33 @@
 
 /* Enhanced Textarea */
 .enhanced-textarea {
-  border: 1px solid #e2e8f0;
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
   padding: 4px 6px;
   font-size: 12px;
-  background: white;
+  background: hsl(var(--background));
   transition: all 0.2s ease;
   resize: none;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .enhanced-textarea:focus {
   outline: none;
-  border-color: #6465F0;
-  box-shadow: 0 0 0 3px rgba(100,101,240,0.1);
-  background: #fafbff;
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.1);
+  background: hsl(var(--muted) / 0.5);
 }
 
-/* Enhanced Totals Row - Standardized to #6465F0 */
+/* Enhanced Totals Row - Uses gradient tokens */
 .enhanced-totals-row {
-  background: #6465F0;
-  color: white;
+  background: hsl(var(--gradient-start));
+  color: hsl(var(--header-foreground));
   font-weight: 600;
 }
 
 .enhanced-totals-row td {
-  color: white;
-  border-right: 1px solid rgba(255,255,255,0.2);
+  color: hsl(var(--header-foreground));
+  border-right: 1px solid hsl(var(--header-foreground) / 0.2);
   padding: 12px 8px;
 }
 
@@ -282,18 +282,18 @@
 }
 
 .enhanced-table-scroll::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: hsl(var(--muted));
   border-radius: 6px;
 }
 
 .enhanced-table-scroll::-webkit-scrollbar-thumb {
-  background: #94a3b8;
+  background: hsl(var(--muted-foreground) / 0.5);
   border-radius: 6px;
-  border: 2px solid #f1f5f9;
+  border: 2px solid hsl(var(--muted));
 }
 
 .enhanced-table-scroll::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: hsl(var(--muted-foreground) / 0.7);
 }
 
 /* Workload Specific Styling - Updated for pill-only coloring */
@@ -305,30 +305,30 @@
   min-width: 32px;
   height: 24px;
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.1);
 }
 
 .total-column {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: hsl(var(--foreground) / 0.03);
   font-weight: 500;
 }
 
 .overallocated {
-  color: #e11d48;
+  color: hsl(var(--destructive));
 }
 
 .sunday-border {
   border-left-width: 2px !important;
-  border-left-color: rgba(111, 75, 246, 0.3) !important;
+  border-left-color: hsl(var(--brand-primary) / 0.3) !important;
 }
 
 .weekend {
-  background-color: rgba(0, 0, 0, 0.01);
+  background-color: hsl(var(--foreground) / 0.01);
 }
 
 /* Sidebar Shimmer Animation */
 .sidebar-shimmer {
-  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+  background: linear-gradient(45deg, hsl(var(--header-foreground) / 0.1) 0%, transparent 50%, hsl(var(--header-foreground) / 0.1) 100%);
   animation: sidebar-shimmer 2s ease-in-out infinite alternate;
 }
 

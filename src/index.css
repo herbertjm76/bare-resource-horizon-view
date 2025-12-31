@@ -89,6 +89,8 @@
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 10%;
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
     
     /* Brand colors - semantic tokens for consistent branding */
     --brand-primary: 249 75% 63%;           /* #6F4BF6 - Main brand purple */
@@ -151,6 +153,8 @@
     --success-foreground: 210 40% 98%;
     --warning: 45 97% 51%;
     --warning-foreground: 222.2 84% 4.9%;
+    --info: 217 91% 65%;
+    --info-foreground: 210 40% 98%;
   }
 }
 

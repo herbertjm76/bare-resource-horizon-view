@@ -1,6 +1,6 @@
 
 
-/* Compact View - Layout and Basic Styling */
+/* Compact View - Layout and Basic Styling - Uses Design System CSS Variables */
 
 .resource-table-compact {
   font-size: 13px;
@@ -18,7 +18,7 @@
 .resource-table-compact td {
   padding: 6px 4px;
   height: 48px;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  border-bottom: 1px solid hsl(var(--border) / 0.8);
 }
 
 /* Fixed Column Widths - Compact */
@@ -65,19 +65,19 @@
 
 /* Enhanced Table Container - Centered and properly sized with rounded corners */
 .resource-table-compact-container {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.8) 100%);
   border-radius: 20px;
   padding: 3px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px hsl(var(--foreground) / 0.08);
   overflow-x: auto;
   display: inline-block;
 }
 
 /* Visually round the table itself so cells do not overhang the container corners */
 .resource-table-compact-container table.resource-table-compact {
-  background: white;
+  background: hsl(var(--background));
   border-radius: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.10);
   overflow: hidden;
 }
 
@@ -124,4 +124,3 @@
 .resource-table-compact td {
   transition: width 0.2s ease-in-out;
 }
-
