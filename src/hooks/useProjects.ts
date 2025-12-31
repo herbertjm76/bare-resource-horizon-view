@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompanyId } from '@/hooks/useCompanyId';
+import { logger } from '@/utils/logger';
 import type { Database } from '@/integrations/supabase/types';
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -17,11 +18,11 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
     queryFn: async () => {
       // Safety check - should never happen if enabled is correct
       if (!companyId) {
-        console.warn('useProjects: queryFn called without companyId');
+        logger.warn('useProjects: queryFn called without companyId');
         return [];
       }
       
-      console.log('useProjects: Fetching projects for company:', companyId);
+      logger.log('useProjects: Fetching projects for company:', companyId);
       
       try {
         let query = supabase
@@ -67,15 +68,15 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
         const { data, error } = await query;
 
         if (error) {
-          console.error('useProjects: Error fetching projects:', error);
+          logger.error('useProjects: Error fetching projects:', error);
           toast.error('Failed to load projects');
           throw error;
         }
 
-        console.log('useProjects: Fetched', data?.length || 0, 'projects');
+        logger.log('useProjects: Fetched', data?.length || 0, 'projects');
         return data || [];
       } catch (err) {
-        console.error('useProjects: Exception:', err);
+        logger.error('useProjects: Exception:', err);
         throw err;
       }
     },
@@ -101,4 +102,3 @@ export const useProjects = (sortBy: ProjectSortBy = 'created', sortDirection: 'a
     refetch
   };
 };
-

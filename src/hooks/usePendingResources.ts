@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 export const usePendingResources = (companyId: string | undefined) => {
   const [isAssigning, setIsAssigning] = useState(false);
@@ -24,7 +25,7 @@ export const usePendingResources = (companyId: string | undefined) => {
       toast.success('Resources assigned successfully');
       return true;
     } catch (error: any) {
-      console.error('Error assigning resources:', error);
+      logger.error('Error assigning resources:', error);
       toast.error(error.message || 'Error assigning resources');
       return false;
     } finally {

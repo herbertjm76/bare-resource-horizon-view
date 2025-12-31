@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useActiveMemberService } from './team/useActiveMemberService';
 import { usePendingMemberService } from './team/usePendingMemberService';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook for managing team members (both active and pending)
@@ -22,14 +23,14 @@ export const useTeamMembers = (companyId: string | undefined) => {
    */
   const uploadAvatar = async (file: File): Promise<string | null> => {
     try {
-      console.log('Starting avatar upload process...');
+      logger.log('Starting avatar upload process...');
       
       // Generate a unique filename using timestamp only (no user ID needed)
       const fileExt = file.name.split('.').pop();
       const fileName = `avatar-${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       const filePath = fileName; // Store directly in avatars bucket root
 
-      console.log('Uploading avatar to:', filePath);
+      logger.log('Uploading avatar to:', filePath);
 
       const { data, error } = await supabase.storage
         .from('avatars')
@@ -39,7 +40,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
         });
 
       if (error) {
-        console.error('Error uploading avatar:', error);
+        logger.error('Error uploading avatar:', error);
         throw error;
       }
 
@@ -48,10 +49,10 @@ export const useTeamMembers = (companyId: string | undefined) => {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      console.log('Avatar uploaded successfully:', publicUrl);
+      logger.log('Avatar uploaded successfully:', publicUrl);
       return publicUrl;
     } catch (error) {
-      console.error('Failed to upload avatar:', error);
+      logger.error('Failed to upload avatar:', error);
       toast.error('Failed to upload profile picture');
       return null;
     }
@@ -71,7 +72,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
 
     try {
       setIsSaving(true);
-      console.log('Starting to save member with data:', memberData);
+      logger.log('Starting to save member with data:', memberData);
       
       // Extract avatar file from member data
       const { avatarFile, ...memberDataWithoutFile } = memberData;
@@ -79,13 +80,13 @@ export const useTeamMembers = (companyId: string | undefined) => {
 
       // Upload avatar if provided
       if (avatarFile) {
-        console.log('Avatar file detected, uploading...');
+        logger.log('Avatar file detected, uploading...');
         const uploadedUrl = await uploadAvatar(avatarFile);
         if (uploadedUrl) {
           avatarUrl = uploadedUrl;
-          console.log('Avatar uploaded, URL:', uploadedUrl);
+          logger.log('Avatar uploaded, URL:', uploadedUrl);
         } else {
-          console.log('Avatar upload failed');
+          logger.log('Avatar upload failed');
         }
       }
 
@@ -95,44 +96,44 @@ export const useTeamMembers = (companyId: string | undefined) => {
         avatar_url: avatarUrl
       };
       
-      console.log('Final member data prepared:', finalMemberData);
+      logger.log('Final member data prepared:', finalMemberData);
       
       // Enhanced detection of pending members - debugging output
       const hasPendingFlag = 'isPending' in finalMemberData && finalMemberData.isPending === true;
       const hasInvitationType = 'invitation_type' in finalMemberData && finalMemberData.invitation_type !== undefined;
-      console.log('isPending check:', hasPendingFlag);
-      console.log('invitation_type check:', hasInvitationType);
+      logger.log('isPending check:', hasPendingFlag);
+      logger.log('invitation_type check:', hasInvitationType);
       
       // Use both flags for determining if this is a pending member
       const isPendingMember = hasPendingFlag || hasInvitationType;
       
-      console.log('Is this a pending member?', isPendingMember);
-      console.log('Is this an edit operation?', isEditing);
-      console.log('Member ID:', finalMemberData.id);
+      logger.log('Is this a pending member?', isPendingMember);
+      logger.log('Is this an edit operation?', isEditing);
+      logger.log('Member ID:', finalMemberData.id);
 
       let success = false;
 
       if (isEditing && finalMemberData.id) {
-        console.log('Performing update operation...');
+        logger.log('Performing update operation...');
         if (isPendingMember) {
           // Update existing pending member
-          console.log('Updating pending member...');
+          logger.log('Updating pending member...');
           success = await updatePendingMember(finalMemberData as Partial<PendingMember>);
         } else {
           // Update existing active member
-          console.log('Updating active member...');
+          logger.log('Updating active member...');
           success = await updateActiveMember(finalMemberData as Partial<Profile>);
         }
       } else {
         // Create new pre-registered member
-        console.log('Creating new pending member...');
+        logger.log('Creating new pending member...');
         success = await createPendingMember(finalMemberData as Partial<PendingMember>);
       }
       
-      console.log('Save operation result:', success);
+      logger.log('Save operation result:', success);
       return success;
     } catch (error: any) {
-      console.error('Error saving team member:', error);
+      logger.error('Error saving team member:', error);
       toast.error(error.message || 'Failed to save team member');
       return false;
     } finally {
@@ -151,7 +152,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
 
     try {
       setIsDeleting(true);
-      console.log('Deleting member:', memberId, 'isPending:', isPending);
+      logger.log('Deleting member:', memberId, 'isPending:', isPending);
       
       let success = false;
       
@@ -169,7 +170,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
       
       return success;
     } catch (error: any) {
-      console.error('Error deleting team member:', error);
+      logger.error('Error deleting team member:', error);
       toast.error(error.message || 'Failed to delete team member');
       return false;
     } finally {

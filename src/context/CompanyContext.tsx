@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { logger } from '@/utils/logger';
 
 type CompanyContextType = {
   company: any | null;
@@ -90,7 +91,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const fetchCompanyBySlug = async (slugValue: string) => {
     try {
-      console.log('CompanyProvider: fetchCompanyBySlug start', slugValue);
+      logger.log('CompanyProvider: fetchCompanyBySlug start', slugValue);
       setLoading(true);
       setError(null);
 
@@ -104,7 +105,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setCompany(null);
         // Do NOT toast here; unauthenticated users may just be visiting a public slug
         setLoading(false);
-        console.log('CompanyProvider: unauthenticated visit, skipping company fetch');
+        logger.log('CompanyProvider: unauthenticated visit, skipping company fetch');
         return;
       }
       
@@ -115,7 +116,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .single();
 
       if (error) {
-        console.warn('CompanyProvider: no company found for slug, continuing without company', {
+        logger.warn('CompanyProvider: no company found for slug, continuing without company', {
           slugValue,
           error,
         });
@@ -126,20 +127,20 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
 
       setCompany(data);
-      console.log('CompanyProvider: fetchCompanyBySlug success', data?.id);
+      logger.log('CompanyProvider: fetchCompanyBySlug success', data?.id);
     } catch (error: any) {
-      console.error('Error in fetchCompanyBySlug:', error);
+      logger.error('Error in fetchCompanyBySlug:', error);
       setCompany(null);
       setError(error.message || 'Failed to fetch company data');
     } finally {
       setLoading(false);
-      console.log('CompanyProvider: fetchCompanyBySlug end -> loading=false');
+      logger.log('CompanyProvider: fetchCompanyBySlug end -> loading=false');
     }
   };
 
   const fetchCompanyByProfile = async (profile: any) => {
     if (!profile?.company_id) {
-      console.error('CompanyProvider: No company_id in profile', profile);
+      logger.error('CompanyProvider: No company_id in profile', profile);
       setError("Your account is not associated with any company");
       setCompany(null);
       setLoading(false);
@@ -148,13 +149,13 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     // Prevent duplicate fetches for same company
     if (isFetchingRef.current && lastFetchedCompanyIdRef.current === profile.company_id) {
-      console.log('CompanyProvider: Already fetching company, skipping duplicate request');
+      logger.log('CompanyProvider: Already fetching company, skipping duplicate request');
       return;
     }
     
     // Skip if already have this company loaded
     if (company?.id === profile.company_id && !error) {
-      console.log('CompanyProvider: Company already loaded, skipping fetch');
+      logger.log('CompanyProvider: Company already loaded, skipping fetch');
       setLoading(false);
       return;
     }
@@ -162,7 +163,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       isFetchingRef.current = true;
       lastFetchedCompanyIdRef.current = profile.company_id;
-      console.log('CompanyProvider: fetchCompanyByProfile start - company_id:', profile.company_id);
+      logger.log('CompanyProvider: fetchCompanyByProfile start - company_id:', profile.company_id);
       setLoading(true);
       setError(null);
       
@@ -173,7 +174,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .maybeSingle();
         
       if (companyError) {
-        console.error('CompanyProvider: Error fetching company by profile:', {
+        logger.error('CompanyProvider: Error fetching company by profile:', {
           error: companyError,
           code: companyError.code,
           message: companyError.message,
@@ -187,7 +188,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
       
       if (!companyData) {
-        console.error('CompanyProvider: No company found for id:', profile.company_id);
+        logger.error('CompanyProvider: No company found for id:', profile.company_id);
         setError(`Company not found for id: ${profile.company_id}`);
         setCompany(null);
         setLoading(false);
@@ -195,7 +196,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
       
       // Successfully fetched company - set state atomically
-      console.log('CompanyProvider: fetchCompanyByProfile success - company:', {
+      logger.log('CompanyProvider: fetchCompanyByProfile success - company:', {
         id: companyData.id,
         name: companyData.name
       });
@@ -203,7 +204,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setError(null);
       setLoading(false);
     } catch (error: any) {
-      console.error('CompanyProvider: Exception in fetchCompanyByProfile:', error);
+      logger.error('CompanyProvider: Exception in fetchCompanyByProfile:', error);
       setCompany(null);
       setError(error.message || 'Failed to fetch company data');
       setLoading(false);
@@ -224,14 +225,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .single();
         
       if (error) {
-        console.error('Error fetching user profile:', error);
+        logger.error('Error fetching user profile:', error);
         return null;
       }
       
       setUserProfile(profile);
       return profile;
     } catch (error) {
-      console.error('Error in fetchUserProfile:', error);
+      logger.error('Error in fetchUserProfile:', error);
       return null;
     }
   };
@@ -254,36 +255,36 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Update company data when auth changes or path changes
   useEffect(() => {
-    console.log('CompanyProvider: Main useEffect triggered');
+    logger.log('CompanyProvider: Main useEffect triggered');
     const currentSlug = extractCompanySlugFromPath();
     setCompanySlug(currentSlug);
     
     if (currentSlug) {
       // Path mode - company slug in URL
-      console.log('CompanyProvider: Using path mode:', currentSlug);
+      logger.log('CompanyProvider: Using path mode:', currentSlug);
       setIsPathMode(true);
       fetchCompanyBySlug(currentSlug);
     } else {
       // User profile mode
-      console.log('CompanyProvider: Using profile mode');
+      logger.log('CompanyProvider: Using profile mode');
       setIsPathMode(false);
       
       // Handle demo mode
       if (isDemoMode && demoProfile) {
-        console.log('CompanyProvider: Using demo profile');
+        logger.log('CompanyProvider: Using demo profile');
         fetchCompanyByProfile(demoProfile);
         return;
       }
       
       // Handle normal auth
       const initAuth = async () => {
-        console.log('CompanyProvider: Initializing auth...');
+        logger.log('CompanyProvider: Initializing auth...');
         const profile = await fetchUserProfile();
         if (profile) {
-          console.log('CompanyProvider: Profile fetched, loading company...');
+          logger.log('CompanyProvider: Profile fetched, loading company...');
           await fetchCompanyByProfile(profile);
         } else {
-          console.error('CompanyProvider: No profile found after fetch');
+          logger.error('CompanyProvider: No profile found after fetch');
           setError("No profile found");
           setCompany(null);
           setLoading(false);
@@ -296,15 +297,15 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Listen for auth state changes and refetch company
   useEffect(() => {
-    console.log('CompanyProvider: Setting up auth listener');
+    logger.log('CompanyProvider: Setting up auth listener');
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('CompanyProvider: Auth state changed:', event, session?.user?.id);
+      logger.log('CompanyProvider: Auth state changed:', event, session?.user?.id);
       
       // Only refetch on SIGNED_IN / INITIAL_SESSION / TOKEN_REFRESHED with valid session
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session?.user) {
         const currentSlug = extractCompanySlugFromPath();
         if (!currentSlug) {
-          console.log('CompanyProvider: Auth changed, scheduling profile/company refetch...');
+          logger.log('CompanyProvider: Auth changed, scheduling profile/company refetch...');
           // Defer Supabase calls to avoid auth deadlocks
           setTimeout(async () => {
             const profile = await fetchUserProfile();
@@ -317,7 +318,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
 
     return () => {
-      console.log('CompanyProvider: Cleaning up auth listener');
+      logger.log('CompanyProvider: Cleaning up auth listener');
       subscription.unsubscribe();
     };
   }, []);

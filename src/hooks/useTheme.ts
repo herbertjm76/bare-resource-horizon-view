@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
+import { logger } from '@/utils/logger';
 
 // Define applyThemeById FIRST so it can be used by other functions
 export const applyThemeById = (themeId: string) => {
@@ -39,7 +40,7 @@ export const applyThemeById = (themeId: string) => {
   const theme = themes[themeId];
   if (!theme) return;
 
-  console.log('useTheme: Applying theme on app load:', themeId);
+  logger.info('useTheme: Applying theme on app load:', themeId);
   const root = document.documentElement;
   root.style.setProperty('--gradient-start', theme.start);
   root.style.setProperty('--gradient-mid', theme.mid);
@@ -70,7 +71,7 @@ export const useTheme = () => {
     const localTheme = localStorage.getItem('app-theme');
     const themeToApply = companyTheme || localTheme || 'default';
     
-    console.log('useTheme: Applying theme:', { companyTheme, localTheme, themeToApply });
+    logger.info('useTheme: Applying theme:', { companyTheme, localTheme, themeToApply });
     
     // Only apply if different from current
     if (themeToApply !== localTheme) {
