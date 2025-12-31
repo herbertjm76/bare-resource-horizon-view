@@ -323,15 +323,136 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     }
   }, [dragState]);
 
+  // Check if a stage position would overlap with other stages
+  const checkOverlap = useCallback((
+    projectId: string,
+    stageId: string, 
+    newStartWeek: number, 
+    durationWeeks: number
+  ): { overlaps: boolean; adjustedStartWeek: number } => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return { overlaps: false, adjustedStartWeek: newStartWeek };
+    
+    const stages = getProjectStagesWithPositions(project);
+    const otherScheduledStages = stages.filter(s => s.startDate && s.id !== stageId);
+    
+    const newEndWeek = newStartWeek + durationWeeks;
+    
+    // Check for overlap with each other stage
+    for (const otherStage of otherScheduledStages) {
+      const otherPosition = getStageTimelinePosition(otherStage);
+      if (!otherPosition) continue;
+      
+      const otherStart = otherPosition.startWeek;
+      const otherEnd = otherPosition.startWeek + otherPosition.width;
+      
+      // Check if ranges overlap
+      if (newStartWeek < otherEnd && newEndWeek > otherStart) {
+        return { overlaps: true, adjustedStartWeek: newStartWeek };
+      }
+    }
+    
+    return { overlaps: false, adjustedStartWeek: newStartWeek };
+  }, [projects, getStageTimelinePosition]);
+
+  // Find nearest non-overlapping position
+  const findNearestValidPosition = useCallback((
+    projectId: string,
+    stageId: string,
+    targetStartWeek: number,
+    durationWeeks: number
+  ): number => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return targetStartWeek;
+    
+    const stages = getProjectStagesWithPositions(project);
+    const otherScheduledStages = stages.filter(s => s.startDate && s.id !== stageId);
+    
+    if (otherScheduledStages.length === 0) return Math.max(0, targetStartWeek);
+    
+    // Get occupied ranges
+    const occupiedRanges: { start: number; end: number }[] = [];
+    for (const otherStage of otherScheduledStages) {
+      const pos = getStageTimelinePosition(otherStage);
+      if (pos) {
+        occupiedRanges.push({ start: pos.startWeek, end: pos.startWeek + pos.width });
+      }
+    }
+    
+    // Sort by start
+    occupiedRanges.sort((a, b) => a.start - b.start);
+    
+    const targetEnd = targetStartWeek + durationWeeks;
+    
+    // Check if target position is valid
+    let isValid = true;
+    for (const range of occupiedRanges) {
+      if (targetStartWeek < range.end && targetEnd > range.start) {
+        isValid = false;
+        break;
+      }
+    }
+    
+    if (isValid) return Math.max(0, targetStartWeek);
+    
+    // Find nearest gap that fits
+    let bestPosition = targetStartWeek;
+    let minDistance = Infinity;
+    
+    // Try position before first occupied range
+    if (occupiedRanges[0].start >= durationWeeks) {
+      const pos = occupiedRanges[0].start - durationWeeks;
+      const distance = Math.abs(pos - targetStartWeek);
+      if (distance < minDistance) {
+        minDistance = distance;
+        bestPosition = pos;
+      }
+    }
+    
+    // Try gaps between occupied ranges
+    for (let i = 0; i < occupiedRanges.length - 1; i++) {
+      const gapStart = occupiedRanges[i].end;
+      const gapEnd = occupiedRanges[i + 1].start;
+      const gapSize = gapEnd - gapStart;
+      
+      if (gapSize >= durationWeeks) {
+        // Fit at start of gap
+        const distance = Math.abs(gapStart - targetStartWeek);
+        if (distance < minDistance) {
+          minDistance = distance;
+          bestPosition = gapStart;
+        }
+      }
+    }
+    
+    // Try position after last occupied range
+    const afterLast = occupiedRanges[occupiedRanges.length - 1].end;
+    const distanceAfter = Math.abs(afterLast - targetStartWeek);
+    if (distanceAfter < minDistance) {
+      bestPosition = afterLast;
+    }
+    
+    return Math.max(0, bestPosition);
+  }, [projects, getStageTimelinePosition]);
+
   const handleDragEnd = useCallback(() => {
     if (!dragState || dragState.currentOffset === 0) {
       setDragState(null);
       return;
     }
     
-    // Calculate new start date based on offset
-    const newStartWeek = Math.max(0, dragState.originalStartWeek + dragState.currentOffset);
-    const newStartDate = addWeeks(startDate, newStartWeek);
+    // Calculate target start week
+    const targetStartWeek = Math.max(0, dragState.originalStartWeek + dragState.currentOffset);
+    
+    // Find valid position that doesn't overlap
+    const validStartWeek = findNearestValidPosition(
+      dragState.project.id,
+      dragState.stageId,
+      targetStartWeek,
+      dragState.stage.contractedWeeks
+    );
+    
+    const newStartDate = addWeeks(startDate, validStartWeek);
     
     // Save the new date
     updateStageMutation.mutate({
@@ -341,7 +462,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     });
     
     setDragState(null);
-  }, [dragState, startDate, updateStageMutation]);
+  }, [dragState, startDate, updateStageMutation, findNearestValidPosition]);
 
   // Handle stage click
   const handleStageClick = (
@@ -398,14 +519,26 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   };
 
   // Handle drop on the timeline
-  const handleTimelineDrop = (e: React.DragEvent, weekIndex: number) => {
+  const handleTimelineDrop = (e: React.DragEvent, weekIndex: number, projectId: string) => {
     e.preventDefault();
     const stageId = e.dataTransfer.getData('stageId');
     const contractedWeeks = parseInt(e.dataTransfer.getData('contractedWeeks')) || 4;
+    const draggedProjectId = e.dataTransfer.getData('projectId');
     
     if (!stageId) return;
     
-    const dropDate = addWeeks(startDate, weekIndex);
+    // Only allow drop on the same project's timeline
+    if (draggedProjectId !== projectId) return;
+    
+    // Find valid position that doesn't overlap
+    const validStartWeek = findNearestValidPosition(
+      projectId,
+      stageId,
+      weekIndex,
+      contractedWeeks
+    );
+    
+    const dropDate = addWeeks(startDate, validStartWeek);
     
     updateStageMutation.mutate({
       stageId,
@@ -586,7 +719,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                   key={i} 
                                   className="w-16 shrink-0 border-r border-border/30"
                                   onDragOver={handleTimelineDragOver}
-                                  onDrop={(e) => handleTimelineDrop(e, i)}
+                                  onDrop={(e) => handleTimelineDrop(e, i, project.id)}
                                 />
                               ))}
                               
@@ -656,7 +789,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                       isTrayOpen && "bg-primary/5 border-dashed"
                                     )}
                                     onDragOver={handleTimelineDragOver}
-                                    onDrop={(e) => handleTimelineDrop(e, i)}
+                                    onDrop={(e) => handleTimelineDrop(e, i, project.id)}
                                   />
                                 ))}
                               </div>
@@ -731,7 +864,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                 key={i} 
                                 className="w-16 shrink-0 border-r border-border/30"
                                 onDragOver={handleTimelineDragOver}
-                                onDrop={(e) => handleTimelineDrop(e, i)}
+                                onDrop={(e) => handleTimelineDrop(e, i, project.id)}
                               />
                             ))}
                             
@@ -793,16 +926,16 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                             </div>
                             <div className="flex flex-1">
                               {weeks.map((_, i) => (
-                                <div 
-                                  key={i} 
-                                  className={cn(
-                                    "w-16 shrink-0 border-r border-border/20 min-h-[2rem]",
-                                    isTrayOpen && "bg-primary/5 border-dashed"
-                                  )}
-                                  onDragOver={handleTimelineDragOver}
-                                  onDrop={(e) => handleTimelineDrop(e, i)}
-                                />
-                              ))}
+                                  <div 
+                                    key={i} 
+                                    className={cn(
+                                      "w-16 shrink-0 border-r border-border/20 min-h-[2rem]",
+                                      isTrayOpen && "bg-primary/5 border-dashed"
+                                    )}
+                                    onDragOver={handleTimelineDragOver}
+                                    onDrop={(e) => handleTimelineDrop(e, i, project.id)}
+                                  />
+                                ))}
                             </div>
                           </div>
                         )}
