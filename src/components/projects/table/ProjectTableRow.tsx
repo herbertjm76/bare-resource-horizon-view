@@ -98,7 +98,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           <TableCell>
             <input
               type="checkbox"
-              className="h-3 w-3 rounded accent-[#6E59A5]"
+              className="h-3 w-3 rounded accent-brand-accent"
               checked={selected}
               onChange={() => onSelect(project.id)}
             />

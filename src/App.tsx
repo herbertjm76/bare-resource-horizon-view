@@ -6,6 +6,7 @@ import { CompanyProvider } from "./context/CompanyContext";
 import { ViewAsProvider } from "./hooks/usePermissions";
 import { useTheme } from "./hooks/useTheme";
 import { PermissionGuard } from "./components/auth/PermissionGuard";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
@@ -279,18 +280,20 @@ function AppWithTheme() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <TooltipProvider>
-          <Toaster />
-          <CompanyProvider>
-            <ViewAsProvider>
-              <AppWithTheme />
-            </ViewAsProvider>
-          </CompanyProvider>
-        </TooltipProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <TooltipProvider>
+            <Toaster />
+            <CompanyProvider>
+              <ViewAsProvider>
+                <AppWithTheme />
+              </ViewAsProvider>
+            </CompanyProvider>
+          </TooltipProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

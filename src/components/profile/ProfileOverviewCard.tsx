@@ -18,7 +18,7 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
   handleAvatarUpdate
 }) => {
   return (
-    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[2px] border-[#d8d4ff] rounded-xl shadow-sm p-4">
+    <Card className="bg-gradient-to-r from-card-gradient-start to-card-gradient-end border-2 border-card-gradient-border rounded-xl shadow-sm p-4">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Combined Card: Profile Picture + Basic Info (2/5 width) - Centered */}
         <BasicInfoCard

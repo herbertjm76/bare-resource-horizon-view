@@ -62,7 +62,7 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <Card className="p-6 max-w-lg w-full mx-auto relative z-50 shadow-xl">
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-[#6E59A5]">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-brand-accent">
           <Calculator className="w-5 h-5" />Average Rate Calculator
         </h2>
         
@@ -122,10 +122,10 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
           )}
         </div>
 
-        <div className="mb-6 p-3 border rounded-md bg-[#F8F4FF]">
+        <div className="mb-6 p-3 border rounded-md bg-card-gradient-end">
           <div className="flex justify-between items-center">
             <span className="font-medium text-sm">Calculated Average Rate:</span>
-            <span className="text-[#6E59A5] font-bold text-base">
+            <span className="text-brand-accent font-bold text-base">
               ${calculateAverageRate() || '--'}
             </span>
           </div>

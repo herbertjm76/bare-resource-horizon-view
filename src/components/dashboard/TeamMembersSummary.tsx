@@ -21,7 +21,7 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
   const topLocations = getTopLocations(locationStats, 3);
 
   return (
-    <Card className="w-full bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[2px] border-[#d8d4ff] rounded-lg shadow-sm mb-4">
+    <Card className="w-full bg-gradient-to-r from-card-gradient-start to-card-gradient-end border-2 border-card-gradient-border rounded-lg shadow-sm mb-4">
       <CardContent className="p-3 sm:p-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           {/* Total Members Card */}

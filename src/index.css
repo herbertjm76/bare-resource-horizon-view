@@ -89,6 +89,27 @@
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 10%;
+    
+    /* Brand colors - semantic tokens for consistent branding */
+    --brand-primary: 249 75% 63%;           /* #6F4BF6 - Main brand purple */
+    --brand-secondary: 249 58% 51%;         /* #6465F0 - Secondary purple */
+    --brand-accent: 258 47% 51%;            /* #6E59A5 - Accent purple */
+    --brand-highlight: 331 75% 60%;         /* #E64FC4 - Pink highlight */
+    
+    /* Header/Table colors */
+    --header-bg: 249 58% 51%;               /* #6465F0 */
+    --header-foreground: 0 0% 100%;         /* White */
+    
+    /* Card gradient backgrounds */
+    --card-gradient-start: 220 60% 97%;     /* #eef4ff */
+    --card-gradient-end: 280 60% 98%;       /* #fbf5ff */
+    --card-gradient-border: 252 45% 83%;    /* #d8d4ff */
+    
+    /* Landing page colors */
+    --landing-footer-bg: 222 26% 14%;       /* #1A1F2C */
+    --landing-gradient-1: 262 92% 66%;      /* #895CF7 */
+    --landing-gradient-2: 231 92% 65%;      /* #5669F7 */
+    --landing-gradient-3: 331 75% 60%;      /* #E64FC4 */
   }
 
   .dark {

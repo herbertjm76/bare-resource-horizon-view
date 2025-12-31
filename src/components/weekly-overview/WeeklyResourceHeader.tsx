@@ -16,32 +16,32 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
   
   return (
     <TableHeader>
-      <TableRow className="bg-[#6465F0] hover:bg-[#6465F0]">
-        <TableHead className="text-white font-bold text-center border-r border-white/20 sticky left-0 z-20 bg-[#6465F0] min-w-[120px] max-w-[150px]">
+      <TableRow className="bg-header-bg hover:bg-header-bg">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 sticky left-0 z-20 bg-header-bg min-w-[120px] max-w-[150px]">
           TEAM MEMBER
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[60px] bg-header-bg">
           OFFICE
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[60px] bg-header-bg">
           CAPACITY
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[60px] bg-header-bg">
           COUNT
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[60px] bg-header-bg">
           TOTAL
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[80px] bg-[#6465F0]">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[80px] bg-header-bg">
           UTILIZATION
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[60px] bg-header-bg">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -56,7 +56,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
           </TooltipProvider>
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[60px] bg-header-bg">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -71,16 +71,16 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
           </TooltipProvider>
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[60px] bg-header-bg">
           OTHER LEAVE
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
+        <TableHead className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[60px] bg-header-bg">
           REMARKS
         </TableHead>
         
         {projects.map((project) => (
-          <TableHead key={project.id} className="text-white font-bold text-center border-r border-white/20 min-w-[40px] max-w-[40px] p-1 bg-[#6465F0]">
+          <TableHead key={project.id} className="text-header-foreground font-bold text-center border-r border-white/20 min-w-[40px] max-w-[40px] p-1 bg-header-bg">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -97,7 +97,6 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
                       fontSize: '0.75rem',
                       fontWeight: '600',
                       padding: '0.25rem',
-                      color: 'white'
                     }}
                   >
                     {getDisplayText(project)}

@@ -27,9 +27,9 @@ export const SummaryDashboard: React.FC<SummaryDashboardProps> = ({
 }) => {
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case 'good': return 'text-green-600 bg-green-100';
-      case 'warning': return 'text-orange-600 bg-orange-100';
-      case 'danger': return 'text-red-600 bg-red-100';
+      case 'good': return 'text-success bg-success/10';
+      case 'warning': return 'text-warning bg-warning/10';
+      case 'danger': return 'text-destructive bg-destructive/10';
       case 'info': return 'text-blue-600 bg-blue-100';
       default: return 'text-primary bg-primary/10';
     }
@@ -48,7 +48,7 @@ export const SummaryDashboard: React.FC<SummaryDashboardProps> = ({
       {title && (
         <h2 className="text-lg font-semibold text-muted-foreground mb-3">{title}</h2>
       )}
-      <Card className="w-full bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[2px] border-[#d8d4ff] rounded-lg shadow-sm">
+      <Card className="w-full bg-gradient-to-r from-card-gradient-start to-card-gradient-end border-2 border-card-gradient-border rounded-lg shadow-sm">
         <CardContent className="p-3 sm:p-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {metrics.map((metric, index) => (
