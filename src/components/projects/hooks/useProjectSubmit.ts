@@ -29,7 +29,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       // First, get the existing project to preserve required fields if not provided
       const { data: existingProject, error: fetchError } = await supabase
         .from('projects')
-        .select('office_id, target_profit_percentage')
+        .select('office_id, target_profit_percentage, department')
         .eq('id', projectId)
         .single();
       
@@ -40,6 +40,8 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       
       // Prepare update object, ensuring required fields are preserved
       // office_id is NOT NULL in the database, so preserve existing value if not provided
+      // department should preserve existing value if form field is empty
+      const formDepartment = (form as any).department;
       const projectUpdate = {
         code: form.code,
         name: form.name,
@@ -52,7 +54,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
           ? Number(form.profit)
           : existingProject?.target_profit_percentage ?? 0,
         stages: selectedStageNames,
-        department: (form as any).department || null
+        department: formDepartment !== undefined && formDepartment !== '' ? formDepartment : existingProject?.department ?? null
       };
       
       logger.debug('Project update data:', projectUpdate);
