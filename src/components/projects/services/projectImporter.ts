@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { DataMapping } from './dataMapping';
 import { ProjectValidation } from './validation';
 import type { ImportResult, ValidationContext } from './types';
+import { logger } from '@/utils/logger';
 
 export class ProjectImporter {
   static async importProjects(
@@ -41,7 +42,7 @@ export class ProjectImporter {
       // Ensure we have a default office for the company
       const defaultOfficeId = await this.ensureDefaultOffice(companyId);
 
-      console.log(`Starting import of ${total} rows for company ${companyId} with default office ${defaultOfficeId}`);
+      logger.info(`Starting import of ${total} rows for company ${companyId} with default office ${defaultOfficeId}`);
 
       // Reset the counter for this import batch
       DataMapping.resetImportCounter();
@@ -51,7 +52,7 @@ export class ProjectImporter {
         onProgress?.((i / total) * 100);
 
         try {
-          console.log(`Processing row ${i + 2}:`, row);
+          logger.debug(`Processing row ${i + 2}:`, row);
 
           const projectData = DataMapping.mapRowToProject(
             row, 
@@ -61,7 +62,7 @@ export class ProjectImporter {
             validationContext.managers
           );
           
-          console.log(`Mapped project data for row ${i + 2}:`, projectData);
+          logger.debug(`Mapped project data for row ${i + 2}:`, projectData);
           
           const validationResult = ProjectValidation.validateProjectData(
             projectData, 
@@ -70,7 +71,7 @@ export class ProjectImporter {
           );
           
           if (validationResult.errors.length > 0) {
-            console.log(`Validation errors for row ${i + 2}:`, validationResult.errors);
+            logger.debug(`Validation errors for row ${i + 2}:`, validationResult.errors);
             errors.push(...validationResult.errors);
             continue;
           }
@@ -85,18 +86,18 @@ export class ProjectImporter {
 
           await this.insertProject(projectData, defaultOfficeId);
           successCount++;
-          console.log(`Successfully inserted project for row ${i + 2}`);
+          logger.debug(`Successfully inserted project for row ${i + 2}`);
           
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-          console.error(`Error processing row ${i + 2}:`, error);
+          logger.error(`Error processing row ${i + 2}:`, error);
           errors.push(`Row ${i + 2}: ${errorMessage}`);
         }
       }
 
       onProgress?.(100);
 
-      console.log(`Import completed. Success: ${successCount}, Errors: ${errors.length}, Warnings: ${warnings.length}`);
+      logger.info(`Import completed. Success: ${successCount}, Errors: ${errors.length}, Warnings: ${warnings.length}`);
 
       return {
         success: errors.length === 0,
@@ -107,7 +108,7 @@ export class ProjectImporter {
       };
 
     } catch (error) {
-      console.error('Import process failed:', error);
+      logger.error('Import process failed:', error);
       const errorMessage = error instanceof Error ? error.message : 'Import process failed';
       errors.push(`Import failed: ${errorMessage}`);
       
@@ -130,16 +131,16 @@ export class ProjectImporter {
         .limit(1);
 
       if (officesError) {
-        console.error('Error fetching offices:', officesError);
+        logger.error('Error fetching offices:', officesError);
       }
 
       if (offices && offices.length > 0) {
-        console.log('Using existing office:', offices[0].id);
+        logger.debug('Using existing office:', offices[0].id);
         return offices[0].id;
       }
 
       // No offices exist, create a default one
-      console.log('No offices found, creating default office');
+      logger.debug('No offices found, creating default office');
       const { data: newOffice, error: createOfficeError } = await supabase
         .from('offices')
         .insert({
@@ -150,22 +151,22 @@ export class ProjectImporter {
         .single();
 
       if (createOfficeError) {
-        console.error('Error creating default office:', createOfficeError);
+        logger.error('Error creating default office:', createOfficeError);
         throw new Error('Failed to create default office');
       }
 
-      console.log('Created default office:', newOffice.id);
+      logger.debug('Created default office:', newOffice.id);
       return newOffice.id;
 
     } catch (error) {
-      console.error('Error ensuring default office:', error);
+      logger.error('Error ensuring default office:', error);
       throw new Error(`Failed to setup default office: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   private static async getValidationContext(companyId: string): Promise<ValidationContext> {
     try {
-      console.log('Fetching validation context for company:', companyId);
+      logger.debug('Fetching validation context for company:', companyId);
 
       // Get office data for mapping
       const { data: offices, error: officesError } = await supabase
@@ -174,7 +175,7 @@ export class ProjectImporter {
         .eq('company_id', companyId);
 
       if (officesError) {
-        console.error('Error fetching offices:', officesError);
+        logger.error('Error fetching offices:', officesError);
       }
 
       // Get manager data for mapping
@@ -184,7 +185,7 @@ export class ProjectImporter {
         .eq('company_id', companyId);
 
       if (managersError) {
-        console.error('Error fetching managers:', managersError);
+        logger.error('Error fetching managers:', managersError);
       }
 
       // Define valid statuses and currencies
@@ -198,11 +199,11 @@ export class ProjectImporter {
         validCurrencies
       };
 
-      console.log('Validation context:', context);
+      logger.debug('Validation context:', context);
       return context;
 
     } catch (error) {
-      console.error('Error getting validation context:', error);
+      logger.error('Error getting validation context:', error);
       return {
         offices: [],
         managers: [],
@@ -214,7 +215,7 @@ export class ProjectImporter {
 
   private static async insertProject(projectData: any, defaultOfficeId: string): Promise<void> {
     try {
-      console.log('Inserting project:', projectData);
+      logger.debug('Inserting project:', projectData);
 
       // Ensure office_id is set - use default if not already set
       const finalProjectData = {
@@ -222,19 +223,19 @@ export class ProjectImporter {
         office_id: defaultOfficeId
       };
 
-      console.log('Final project data with office_id:', finalProjectData);
+      logger.debug('Final project data with office_id:', finalProjectData);
 
       const { error } = await supabase
         .from('projects')
         .insert(finalProjectData);
 
       if (error) {
-        console.error('Database insert error:', error);
+        logger.error('Database insert error:', error);
         throw new Error(`Database error: ${error.message}`);
       }
 
     } catch (error) {
-      console.error('Failed to insert project:', error);
+      logger.error('Failed to insert project:', error);
       throw error;
     }
   }

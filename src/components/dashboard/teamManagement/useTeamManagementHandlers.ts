@@ -4,6 +4,7 @@ import { useTeamMemberHandlers } from '../handlers/TeamMemberHandlers';
 import { TeamMember, Profile, PendingMember } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 interface UseTeamManagementHandlersProps {
   companyId: string;
@@ -75,7 +76,7 @@ export const useTeamManagementHandlers = ({
       });
 
       if (emailError) {
-        console.error('Error sending invite email:', emailError);
+        logger.error('Error sending invite email:', emailError);
         toast.error('Failed to send invite email');
         return;
       }
@@ -83,7 +84,7 @@ export const useTeamManagementHandlers = ({
       toast.success(`Invite sent to ${email}`);
       handleRefresh();
     } catch (e: any) {
-      console.error('Error sending invite:', e);
+      logger.error('Error sending invite:', e);
       toast.error(e.message || 'Error sending invite');
     }
   };
@@ -101,8 +102,8 @@ export const useTeamManagementHandlers = ({
   };
 
   const handleSaveMemberDialogSubmit = async (memberData: Partial<Profile | PendingMember> & { avatarFile?: File | null }): Promise<boolean> => {
-    console.log('handleSaveMemberDialogSubmit called with data:', memberData);
-    console.log('avatarFile present:', !!memberData.avatarFile);
+    logger.debug('handleSaveMemberDialogSubmit called with data:', memberData);
+    logger.debug('avatarFile present:', !!memberData.avatarFile);
     const success = await handleSaveMemberWrapper(memberData, currentMember);
     if (success) {
       closeAddEditDialog();

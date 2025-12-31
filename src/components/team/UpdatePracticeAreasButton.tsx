@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { updatePracticeAreasFromMapping } from '@/scripts/processHKSPracticeAreas';
 import { useState } from 'react';
+import { logger } from '@/utils/logger';
 
 export const UpdatePracticeAreasButton = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -12,7 +13,7 @@ export const UpdatePracticeAreasButton = () => {
     try {
       const results = await updatePracticeAreasFromMapping();
       
-      console.log('Update results:', results);
+      logger.debug('Update results:', results);
       
       if (results.updated > 0) {
         toast.success(`Updated ${results.updated} team member(s) with practice areas`);
@@ -20,16 +21,16 @@ export const UpdatePracticeAreasButton = () => {
       
       if (results.notFound.length > 0) {
         toast.warning(`Could not find ${results.notFound.length} team member(s): ${results.notFound.join(', ')}`);
-        console.log('Not found:', results.notFound);
+        logger.debug('Not found:', results.notFound);
       }
       
       if (results.errors.length > 0) {
         toast.error(`${results.errors.length} error(s) occurred`);
-        console.error('Errors:', results.errors);
+        logger.error('Errors:', results.errors);
       }
       
     } catch (error) {
-      console.error('Error:', error);
+      logger.error('Error:', error);
       toast.error('Failed to update practice areas');
     } finally {
       setIsProcessing(false);

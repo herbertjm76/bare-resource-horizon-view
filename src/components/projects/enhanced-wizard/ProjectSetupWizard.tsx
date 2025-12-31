@@ -10,6 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { logger } from '@/utils/logger';
 
 export interface ProjectWizardData {
   // Basic Info
@@ -65,16 +66,16 @@ export const ProjectSetupWizard: React.FC<ProjectSetupWizardProps> = ({
   const { hideFinancials } = useAppSettings();
   const [currentStep, setCurrentStep] = useState(0);
   
-  console.log('ProjectSetupWizard: hideFinancials =', hideFinancials);
+  logger.debug('ProjectSetupWizard: hideFinancials =', hideFinancials);
   
   // Filter steps based on financial settings
   const activeSteps = useMemo(() => {
     if (hideFinancials) {
-      console.log('ProjectSetupWizard: Hiding financial steps, showing only basic info');
+      logger.debug('ProjectSetupWizard: Hiding financial steps, showing only basic info');
       // Only show basic info step when financials are hidden
       return [STEPS[0]];
     }
-    console.log('ProjectSetupWizard: Showing all steps including financials');
+    logger.debug('ProjectSetupWizard: Showing all steps including financials');
     return STEPS;
   }, [hideFinancials]);
   const [wizardData, setWizardData] = useState<ProjectWizardData>({

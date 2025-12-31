@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 import { useWeekResourceTeamMembers } from '@/components/week-resourcing/hooks/useWeekResourceTeamMembers';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useDragScroll } from '@/hooks/useDragScroll';
+import { logger } from '@/utils/logger';
 import {
   Tooltip,
   TooltipContent,
@@ -201,8 +202,8 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (loc.code) locationNameToId.set(loc.code.toLowerCase(), loc.id);
     });
     
-    console.log('🏢 Office Locations mapping:', Object.fromEntries(locationNameToId));
-    console.log('🎄 Holidays data:', holidays);
+    logger.debug('Office Locations mapping:', Object.fromEntries(locationNameToId));
+    logger.debug('Holidays data:', holidays);
     
     // Build holiday hours map by location_id
     const holidayHoursByLocationId = new Map<string | null, number>();
@@ -218,10 +219,10 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const hours = holidayDays * 8;
       const current = holidayHoursByLocationId.get(locationId) || 0;
       holidayHoursByLocationId.set(locationId, current + hours);
-      console.log(`🎄 Holiday "${holiday.name}" (location_id: ${locationId}): ${holidayDays} days = ${hours}h`);
+      logger.debug(`Holiday "${holiday.name}" (location_id: ${locationId}): ${holidayDays} days = ${hours}h`);
     });
     
-    console.log('🎄 Holiday hours by location_id:', Object.fromEntries(holidayHoursByLocationId));
+    logger.debug('Holiday hours by location_id:', Object.fromEntries(holidayHoursByLocationId));
     
     allocations.forEach(alloc => {
       const key = alloc.resource_id;
@@ -290,7 +291,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       
       // Debug first few members
       if (allMembersFromParent.indexOf(m) < 3) {
-        console.log(`👤 Member ${m.first_name} ${m.last_name}:`, {
+        logger.debug(`Member ${m.first_name} ${m.last_name}:`, {
           location: m.location,
           memberLocationId,
           locationHolidayHours,
@@ -461,69 +462,60 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
                       <MemberAvailabilityCard
                         memberId={member.id}
                         memberType={member.type}
-                        avatarUrl={member.avatarUrl}
                         firstName={member.firstName}
                         lastName={member.lastName}
+                        avatarUrl={member.avatarUrl}
                         allocatedHours={member.allocatedHours}
+                        utilization={member.utilization}
+                        capacity={member.capacity}
                         projectAllocations={member.projectAllocations}
                         leaveAllocations={member.leaveAllocations}
-                        utilization={member.utilization}
                         threshold={threshold}
                         weekStartDate={weekStartDate}
-                        disableDialog={true}
-                        capacity={member.capacity}
                       />
                     </div>
                   </MemberVacationPopover>
                 ))}
-
                 </div>
               </div>
             </div>
           </div>
         )}
-
-        {/* Mobile view without arrows */}
+        
+        {/* Mobile: Grid of avatars */}
         {availableMembers.length > 0 && (
-          <div className="block sm:hidden overflow-x-auto overflow-y-hidden px-2">
-            <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[40px]">
-              {availableMembers.map((member, index) => (
-                <MemberVacationPopover
-                  key={member.id}
-                  memberId={member.id}
-                  memberName={`${member.firstName} ${member.lastName}`}
-                  weekStartDate={weekStartDate}
-                >
-                  <div className={`cursor-pointer ${index === 0 ? 'ml-6' : ''}`}>
-                    <MemberAvailabilityCard
-                      memberId={member.id}
-                      memberType={member.type}
-                      avatarUrl={member.avatarUrl}
-                      firstName={member.firstName}
-                      lastName={member.lastName}
-                      allocatedHours={member.allocatedHours}
-                      projectAllocations={member.projectAllocations}
-                      leaveAllocations={member.leaveAllocations}
-                      utilization={member.utilization}
-                      threshold={threshold}
-                      weekStartDate={weekStartDate}
-                      disableDialog={true}
-                      capacity={member.capacity}
-                    />
-                  </div>
-                </MemberVacationPopover>
-              ))}
-
-            </div>
+          <div className="sm:hidden grid grid-cols-5 gap-2">
+            {availableMembers.slice(0, 10).map((member) => (
+              <MemberVacationPopover
+                key={member.id}
+                memberId={member.id}
+                memberName={`${member.firstName} ${member.lastName}`}
+                weekStartDate={weekStartDate}
+              >
+                <div className="cursor-pointer">
+                  <MemberAvailabilityCard
+                    memberId={member.id}
+                    memberType={member.type}
+                    firstName={member.firstName}
+                    lastName={member.lastName}
+                    avatarUrl={member.avatarUrl}
+                    allocatedHours={member.allocatedHours}
+                    utilization={member.utilization}
+                    capacity={member.capacity}
+                    projectAllocations={member.projectAllocations}
+                    leaveAllocations={member.leaveAllocations}
+                    threshold={threshold}
+                    weekStartDate={weekStartDate}
+                  />
+                </div>
+              </MemberVacationPopover>
+            ))}
           </div>
         )}
-
-        {/* Empty state - compact version */}
+        
         {availableMembers.length === 0 && (
-          <div className="flex-1 flex items-center justify-center py-3 sm:py-0">
-            <p className="text-xs sm:text-sm text-muted-foreground text-center">
-              No available members
-            </p>
+          <div className="text-center text-muted-foreground text-sm py-4">
+            No team members found
           </div>
         )}
       </div>
