@@ -570,6 +570,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
                   { id: 'announcements', label: 'Announcements' },
                   { id: 'holidays', label: 'Holidays' },
                   { id: 'annualLeave', label: 'Annual Leave' },
+                  { id: 'celebrations', label: 'Celebrations' },
                 ];
                 
                 // Get visible cards in order, then add hidden cards at the end
