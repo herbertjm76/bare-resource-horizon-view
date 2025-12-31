@@ -2,6 +2,7 @@
 import { deleteUnusedStages, createOrUpdateStage } from './utils/stageOperations';
 import { handleStageFee } from './utils/feeManagement';
 import type { StageSubmitConfig } from './types/stageSubmitTypes';
+import { logger } from '@/utils/logger';
 
 export const useStageSubmit = () => {
   const handleStageSubmit = async ({
@@ -13,7 +14,7 @@ export const useStageSubmit = () => {
     stageApplicability,
     officeStages
   }: StageSubmitConfig) => {
-    console.log("Starting stage submission with data:", {
+    logger.debug("Starting stage submission with data:", {
       projectId,
       selectedStageNames,
       existingStagesCount: existingStages?.length || 0,
@@ -36,7 +37,7 @@ export const useStageSubmit = () => {
       await deleteUnusedStages(existingStages, stagesToKeep);
     }
 
-    console.log("Processing stages for submission:", selectedStageNames);
+    logger.debug("Processing stages for submission:", selectedStageNames);
 
     // Create a map from stage IDs to stage names
     const stageIdToNameMap = new Map();
@@ -50,14 +51,14 @@ export const useStageSubmit = () => {
       
       const stageName = stageIdToNameMap.get(stageId);
       if (!stageName) {
-        console.warn(`Stage name not found for ID ${stageId}`);
+        logger.warn(`Stage name not found for ID ${stageId}`);
         continue;
       }
       
       const feeData = stageFees[stageId];
       
       if (!feeData) {
-        console.warn(`No fee data found for stage ${stageId} (${stageName})`);
+        logger.warn(`No fee data found for stage ${stageId} (${stageName})`);
         continue;
       }
 
@@ -79,7 +80,7 @@ export const useStageSubmit = () => {
         currency: feeData?.currency || 'USD'
       };
       
-      console.log(`Submitting stage ${stageName} (${stageId}) with fee:`, stageData.fee);
+      logger.debug(`Submitting stage ${stageName} (${stageId}) with fee:`, stageData.fee);
       
       const existingStage = existingStages?.find(s => s.stage_name === stageName);
       const { id: newStageId } = await createOrUpdateStage(
