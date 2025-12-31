@@ -4,6 +4,7 @@ import { Check } from 'lucide-react';
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 type Theme = {
   id: string;
@@ -95,7 +96,7 @@ export const ThemeTab: React.FC = () => {
     const theme = themes.find(t => t.id === themeId);
     if (!theme) return;
 
-    console.log('Applying theme:', themeId, theme.colors);
+    logger.debug('Applying theme:', themeId, theme.colors);
     const root = document.documentElement;
     root.style.setProperty('--gradient-start', theme.colors.start);
     root.style.setProperty('--gradient-mid', theme.colors.mid);
@@ -106,7 +107,7 @@ export const ThemeTab: React.FC = () => {
     root.style.setProperty('--theme-border', theme.colors.start);
     
     // Log to confirm
-    console.log('CSS variables set:', {
+    logger.debug('CSS variables set:', {
       start: getComputedStyle(root).getPropertyValue('--gradient-start'),
       mid: getComputedStyle(root).getPropertyValue('--gradient-mid'),
       end: getComputedStyle(root).getPropertyValue('--gradient-end'),

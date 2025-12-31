@@ -2,6 +2,7 @@
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { ProjectStageFeesTab } from "../../ProjectTabs/ProjectStageFeesTab";
+import { logger } from '@/utils/logger';
 
 interface ProjectStageFeesTabContentProps {
   form: any;
@@ -16,8 +17,8 @@ export const ProjectStageFeesTabContent: React.FC<ProjectStageFeesTabContentProp
   updateStageFee,
   isDataLoaded,
 }) => {
-  console.log("ProjectStageFeesTabContent - form stageFees:", form.stageFees);
-  console.log("ProjectStageFeesTabContent - isDataLoaded:", isDataLoaded);
+  logger.debug("ProjectStageFeesTabContent - form stageFees:", form.stageFees);
+  logger.debug("ProjectStageFeesTabContent - isDataLoaded:", isDataLoaded);
   
   return (
     <TabsContent value="stageFees" className="mt-0">

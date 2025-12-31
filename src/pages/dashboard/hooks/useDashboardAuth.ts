@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
+import { logger } from '@/utils/logger';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -18,9 +19,7 @@ export const useDashboardAuth = () => {
 
   const fetchProfileData = async (userId: string) => {
     try {
-      if (import.meta.env.DEV) {
-        console.log('Dashboard: Fetching profile data for user', userId);
-      }
+      logger.debug('Dashboard: Fetching profile data for user', userId);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -29,13 +28,11 @@ export const useDashboardAuth = () => {
         .single();
 
       if (error) {
-        console.error('Dashboard: Error fetching profile:', error);
+        logger.error('Dashboard: Error fetching profile:', error);
         return;
       }
 
-      if (import.meta.env.DEV) {
-        console.log('Dashboard: Profile data fetched:', data);
-      }
+      logger.debug('Dashboard: Profile data fetched:', data);
       setProfile(data);
 
       // Check if user is admin using secure RPC
@@ -66,9 +63,7 @@ export const useDashboardAuth = () => {
 
   const fetchTeamMembers = async (companyId: string) => {
     try {
-      if (import.meta.env.DEV) {
-        console.log('Dashboard: Fetching team members for company', companyId);
-      }
+      logger.debug('Dashboard: Fetching team members for company', companyId);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -76,16 +71,14 @@ export const useDashboardAuth = () => {
         .eq('company_id', companyId);
 
       if (error) {
-        console.error('Dashboard: Error fetching team members:', error);
+        logger.error('Dashboard: Error fetching team members:', error);
         return;
       }
 
-      if (import.meta.env.DEV) {
-        console.log('Dashboard: Team members fetched:', data?.length || 0);
-      }
+      logger.debug('Dashboard: Team members fetched:', data?.length || 0);
       setTeamMembers(data || []);
     } catch (error) {
-      console.error('Dashboard: Error:', error);
+      logger.error('Dashboard: Error:', error);
     }
   };
 
@@ -95,17 +88,13 @@ export const useDashboardAuth = () => {
 
     const setupAuth = async () => {
       try {
-        if (import.meta.env.DEV) {
-          console.log('Dashboard: Setting up auth');
-        }
+        logger.debug('Dashboard: Setting up auth');
         
         // First check for existing session
         const { data: sessionData } = await supabase.auth.getSession();
         
         if (!sessionData.session) {
-          if (import.meta.env.DEV) {
-            console.log('Dashboard: No session found, redirecting to login');
-          }
+          logger.debug('Dashboard: No session found, redirecting to login');
           if (mounted) {
             setLoading(false);
             navigate('/auth');
@@ -114,18 +103,14 @@ export const useDashboardAuth = () => {
         }
         
         if (mounted) {
-          if (import.meta.env.DEV) {
-            console.log('Dashboard: Session found, user is logged in:', sessionData.session.user.id);
-          }
+          logger.debug('Dashboard: Session found, user is logged in:', sessionData.session.user.id);
           setSession(sessionData.session);
           setUser(sessionData.session.user);
         }
 
         // Then set up auth state change listener
         const { data } = supabase.auth.onAuthStateChange((event, currentSession) => {
-          if (import.meta.env.DEV) {
-            console.log('Dashboard: Auth state changed:', event);
-          }
+          logger.debug('Dashboard: Auth state changed:', event);
           
           if (!mounted) return;
           
@@ -134,9 +119,7 @@ export const useDashboardAuth = () => {
           setUser(currentSession?.user ?? null);
           
           if (event === 'SIGNED_OUT') {
-            if (import.meta.env.DEV) {
-              console.log('Dashboard: User signed out, redirecting');
-            }
+            logger.debug('Dashboard: User signed out, redirecting');
             navigate('/auth');
           }
         });
@@ -163,7 +146,7 @@ export const useDashboardAuth = () => {
     
     // Cleanup function
     return () => {
-      console.log('Dashboard: Cleaning up auth setup');
+      logger.debug('Dashboard: Cleaning up auth setup');
       mounted = false;
       if (authSubscription) {
         authSubscription.unsubscribe();

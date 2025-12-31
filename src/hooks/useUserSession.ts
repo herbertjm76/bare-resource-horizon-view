@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { logger } from '@/utils/logger';
 
 export const useUserSession = () => {
   const [userId, setUserId] = useState<string | null>(null);
@@ -14,13 +15,9 @@ export const useUserSession = () => {
         } = await supabase.auth.getSession();
         if (data.session?.user) {
           setUserId(data.session.user.id);
-          if (import.meta.env.DEV) {
-            console.log('Session found, user ID:', data.session.user.id);
-          }
+          logger.debug('Session found, user ID:', data.session.user.id);
         } else {
-          if (import.meta.env.DEV) {
-            console.log('No active session found');
-          }
+          logger.debug('No active session found');
           toast.error("You must be logged in to access this page");
         }
       } catch (error) {

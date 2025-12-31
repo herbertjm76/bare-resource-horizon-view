@@ -7,6 +7,7 @@ import LoginForm from './Auth/LoginForm';
 import SignupForm from './Auth/SignupForm';
 import { AlertCircle, Link2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { logger } from '@/utils/logger';
 
 const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -42,18 +43,16 @@ const Auth: React.FC = () => {
     
     const checkSession = async () => {
       try {
-        console.log('Auth page: Checking session');
+        logger.debug('Auth page: Checking session');
         
         // First set up auth state change listener to catch immediate events
         const { data } = supabase.auth.onAuthStateChange((event, session) => {
-          console.log('Auth page: Auth state changed:', event);
+          logger.debug('Auth page: Auth state changed:', event);
           
           if (!mounted) return;
           
           if (event === 'SIGNED_IN' && session) {
-            if (import.meta.env.DEV) {
-              console.log('Auth page: User signed in, redirecting to dashboard');
-            }
+            logger.debug('Auth page: User signed in, redirecting to dashboard');
             toast.success('Successfully signed in!');
             navigate('/dashboard');
           }
@@ -71,12 +70,10 @@ const Auth: React.FC = () => {
         }
         
         if (sessionData.session) {
-          if (import.meta.env.DEV) {
-            console.log('Auth page: User already logged in, redirecting to dashboard');
-          }
+          logger.debug('Auth page: User already logged in, redirecting to dashboard');
           navigate('/dashboard');
         } else {
-          console.log('Auth page: No active session found');
+          logger.debug('Auth page: No active session found');
           if (mounted) setIsCheckingSession(false);
         }
       } catch (err) {
@@ -88,7 +85,7 @@ const Auth: React.FC = () => {
     checkSession();
     
     return () => {
-      console.log('Auth page: Cleaning up');
+      logger.debug('Auth page: Cleaning up');
       mounted = false;
       if (authSubscription) authSubscription.unsubscribe();
     };

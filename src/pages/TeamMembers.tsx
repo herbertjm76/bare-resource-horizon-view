@@ -14,6 +14,7 @@ import { useProjects } from '@/hooks/useProjects';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import AuthGuard from '@/components/AuthGuard';
+import { logger } from '@/utils/logger';
 
 const TeamMembersPageContent = () => {
   const userId = useUserSession();
@@ -51,19 +52,19 @@ const TeamMembersPageContent = () => {
   React.useEffect(() => {
     const verifyAccess = async () => {
       if (!userId) {
-        console.log('No user ID available, cannot check permissions');
+        logger.debug('No user ID available, cannot check permissions');
         return;
       }
       
       // Add a small delay to ensure any session changes are propagated
       setTimeout(async () => {
-        console.log('Verifying access for user:', userId);
+        logger.debug('Verifying access for user:', userId);
         try {
           const result = await checkUserPermissions();
-          console.log('Permission check complete with result:', result);
+          logger.debug('Permission check complete with result:', result);
           setPermissionChecked(true);
         } catch (error) {
-          console.error('Error during permission check:', error);
+          logger.error('Error during permission check:', error);
           setPermissionChecked(true);
         }
       }, 500);

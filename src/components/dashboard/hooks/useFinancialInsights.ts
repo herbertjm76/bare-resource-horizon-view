@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+import { logger } from '@/utils/logger';
 
 interface FinancialData {
   totalProjectRevenue: number;
@@ -61,7 +62,7 @@ export const useFinancialInsights = () => {
         const averageHourlyRate = employeeRates.length > 0 ? 
           employeeRates.reduce((sum, rate) => sum + rate, 0) / employeeRates.length : 75;
 
-        console.log('Operational insights calculated:', {
+        logger.debug('Operational insights calculated:', {
           totalProjectRevenue,
           averageProjectValue,
           projectsWithoutFees,

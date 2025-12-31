@@ -7,6 +7,7 @@ import { TeamMemberDetailContent } from '@/components/team-member-detail/TeamMem
 import { useTeamMemberDetail } from '@/hooks/useTeamMemberDetail';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import AuthGuard from '@/components/AuthGuard';
+import { logger } from '@/utils/logger';
 
 const TeamMemberDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,8 +15,8 @@ const TeamMemberDetailPage = () => {
   
   // Debug logging for URL parameters
   React.useEffect(() => {
-    console.log('TeamMemberDetail - URL params:', { id });
-    console.log('TeamMemberDetail - Current URL:', window.location.href);
+    logger.debug('TeamMemberDetail - URL params:', { id });
+    logger.debug('TeamMemberDetail - Current URL:', window.location.href);
   }, [id]);
   
   const { memberData, isLoading, error } = useTeamMemberDetail(id);

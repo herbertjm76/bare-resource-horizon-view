@@ -8,8 +8,14 @@ import { ensureUserProfile } from '@/utils/authHelpers';
 import JoinFormFields from './JoinFormFields';
 import JoinAuthToggle from './JoinAuthToggle';
 import { joinSchema, loginSchema } from '@/utils/authValidation';
+import { logger } from '@/utils/logger';
 
 interface JoinFormProps {
+  companyName: string;
+  company?: { id: string; [k: string]: any };
+  inviteCode?: string;
+  onAuthModeChange?: (isSignup: boolean) => void;
+}
   companyName: string;
   company?: { id: string; [k: string]: any };
   inviteCode?: string;
@@ -32,7 +38,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
     const fetchInviteDetails = async () => {
       if (!inviteCode) return;
 
-      console.log('Fetching invite details for code:', inviteCode);
+      logger.debug('Fetching invite details for code:', inviteCode);
 
       const { data: invite, error } = await supabase
         .from('invites')
@@ -41,16 +47,16 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
         .eq('status', 'pending')
         .maybeSingle();
 
-      console.log('Invite data:', invite);
-      console.log('Invite error:', error);
+      logger.debug('Invite data:', invite);
+      logger.debug('Invite error:', error);
 
       if (!error && invite) {
-        console.log('Invite type:', invite.invitation_type);
-        console.log('Invite email:', invite.email);
+        logger.debug('Invite type:', invite.invitation_type);
+        logger.debug('Invite email:', invite.email);
         
         // Pre-fill email if invite has an email address
         if (invite.email) {
-          console.log('Setting email to:', invite.email);
+          logger.debug('Setting email to:', invite.email);
           setEmail(invite.email);
           setIsEmailLocked(true);
         }

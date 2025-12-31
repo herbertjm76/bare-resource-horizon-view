@@ -9,6 +9,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { TeamMember } from '@/components/dashboard/types';
 import { supabase } from '@/integrations/supabase/client';
 import { CapacityHeatmapContent } from '@/components/capacity/CapacityHeatmapContent';
+import { logger } from '@/utils/logger';
 
 export type HeatmapViewMode = 'actual' | 'projected' | 'gap';
 
@@ -78,7 +79,7 @@ const CapacityHeatmap: React.FC = () => {
       fullName: `${invite.first_name || 'Pre-registered'} ${invite.last_name || 'Member'}`
     }));
     
-    console.log('📊 CAPACITY HEATMAP: Combining members', {
+    logger.debug('📊 CAPACITY HEATMAP: Combining members', {
       activeMembers: teamMembers.length,
       preRegisteredMembers: preRegisteredMembers.length,
       total: teamMembers.length + preRegAsTeamMembers.length
@@ -122,7 +123,7 @@ const CapacityHeatmap: React.FC = () => {
       return true;
     });
     
-    console.log('📊 CAPACITY HEATMAP: Filtered members', {
+    logger.debug('📊 CAPACITY HEATMAP: Filtered members', {
       allMembersCount: allMembers.length,
       filteredCount: filtered.length,
       searchQuery,

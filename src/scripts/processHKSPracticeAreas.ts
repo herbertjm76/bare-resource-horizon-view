@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
+import { logger } from '@/utils/logger';
 
 // Manual mapping based on the Excel structure for HKS
 // This maps column positions to practice areas based on the Project Status Matrix
@@ -191,17 +192,17 @@ export const updatePracticeAreasFromMapping = async () => {
               .eq('id', inviteToUpdate.id);
 
             if (updateInviteError) {
-              console.error(`Error updating invite for ${name}:`, updateInviteError);
+              logger.error(`Error updating invite for ${name}:`, updateInviteError);
               results.errors.push(`${name} (invite): ${updateInviteError.message}`);
             } else {
-              console.log(`✓ Updated invite ${inviteToUpdate.first_name} ${inviteToUpdate.last_name} → ${practiceArea}`);
+              logger.info(`✓ Updated invite ${inviteToUpdate.first_name} ${inviteToUpdate.last_name} → ${practiceArea}`);
               results.updated++;
               continue; // Go to next name mapping
             }
           }
         }
 
-        console.log(`No profile or invite found for ${name}`);
+        logger.info(`No profile or invite found for ${name}`);
         results.notFound.push(name);
         continue;
       }
@@ -228,7 +229,7 @@ export const updatePracticeAreasFromMapping = async () => {
         console.error(`Error updating ${name}:`, updateError);
         results.errors.push(`${name}: ${updateError.message}`);
       } else {
-        console.log(`✓ Updated ${profileToUpdate.first_name} ${profileToUpdate.last_name} → ${practiceArea}`);
+        logger.info(`✓ Updated ${profileToUpdate.first_name} ${profileToUpdate.last_name} → ${practiceArea}`);
         results.updated++;
       }
       

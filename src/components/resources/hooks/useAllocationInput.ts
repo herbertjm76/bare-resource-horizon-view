@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useResourceAllocationsDB, useDateRangeAllocations } from '@/hooks/allocations';
+import { logger } from '@/utils/logger';
 
 interface UseAllocationInputProps {
   projectId: string;
@@ -65,7 +66,7 @@ export const useAllocationInput = ({
     const numValue = parseInt(value, 10);
     const hours = isNaN(numValue) ? 0 : numValue;
     
-    console.log(`Saving allocation for resource ${resourceId}, week ${weekKey}: ${hours} hours`);
+    logger.debug(`Saving allocation for resource ${resourceId}, week ${weekKey}: ${hours} hours`);
     
     // Save directly with week key (no conversion needed)
     saveAllocation(weekKey, hours);

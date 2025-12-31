@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface LoginFormProps {
   onSwitchToSignup: () => void;
@@ -30,7 +31,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
     setLoading(true);
     
     try {
-      console.log('LoginForm: Attempting to login with:', email);
+      logger.debug('LoginForm: Attempting to login with:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -62,7 +63,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
         return;
       }
       
-      console.log('LoginForm: Login successful, user:', data.user?.id);
+      logger.info('LoginForm: Login successful, user:', data.user?.id);
       toast.success('Login successful!');
       
       // Let the auth listener handle the redirection
