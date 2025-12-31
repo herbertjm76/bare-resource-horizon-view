@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
-import { PlayCircle, PauseCircle, Maximize, Minimize, Users, FolderOpen, LayoutGrid, Presentation } from 'lucide-react';
+import { PlayCircle, PauseCircle, Users, FolderOpen, LayoutGrid, Presentation } from 'lucide-react';
 import { RundownMode, SortOption, ViewType } from './WeeklyRundownView';
 
 interface RundownControlsProps {
@@ -18,8 +18,6 @@ interface RundownControlsProps {
   onViewTypeChange: (view: ViewType) => void;
   isAutoAdvance: boolean;
   onAutoAdvanceToggle: () => void;
-  isFullscreen: boolean;
-  onFullscreenToggle: () => void;
   currentIndex: number;
   totalItems: number;
 }
@@ -36,8 +34,6 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
   onViewTypeChange,
   isAutoAdvance,
   onAutoAdvanceToggle,
-  isFullscreen,
-  onFullscreenToggle,
   currentIndex,
   totalItems
 }) => {
@@ -156,17 +152,6 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
           </Button>
         )}
 
-        {/* Fullscreen toggle */}
-        {typeof window !== 'undefined' && window.innerWidth >= 768 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onFullscreenToggle}
-            className="h-9 w-9 p-0"
-          >
-            {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-          </Button>
-        )}
 
       </div>
     </div>
