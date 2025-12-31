@@ -9,6 +9,7 @@ import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
 import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
+import { logger } from '@/utils/logger';
 
 interface TeamMembersContentProps {
   userId: string | null;
@@ -24,28 +25,24 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
   useEffect(() => {
     const verifyAccess = async () => {
       if (!userId) {
-        if (import.meta.env.DEV) {
-          console.log('No user ID available, cannot check permissions');
-        }
+        logger.debug('No user ID available, cannot check permissions');
         return;
       }
       
       // Add a small delay to ensure any session changes are propagated
       setTimeout(async () => {
-        if (import.meta.env.DEV) {
-          console.log('Verifying access for user:', userId);
-        }
+        logger.debug('Verifying access for user:', userId);
         try {
           const result = await checkUserPermissions();
-          console.log('Permission check complete with result:', result);
+          logger.debug('Permission check complete with result:', result);
           setPermissionChecked(true);
           
           if (!result.hasPermission) {
-            console.error('Permission denied:', result.error);
+            logger.error('Permission denied:', result.error);
             toast.error('Permission check failed: ' + (result.error || 'Unknown error'));
           }
         } catch (error) {
-          console.error('Error during permission check:', error);
+          logger.error('Error during permission check:', error);
           setPermissionChecked(true);
         }
       }, 500);
@@ -91,16 +88,14 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
           .single();
           
         if (error) {
-          console.error('Profile fetch error:', error);
+          logger.error('Profile fetch error:', error);
           throw error;
         }
         
-          if (import.meta.env.DEV) {
-            console.log('User profile loaded:', data);
-          }
-          return data;
+        logger.debug('User profile loaded:', data);
+        return data;
       } catch (error) {
-        console.error('Error fetching user profile:', error);
+        logger.error('Error fetching user profile:', error);
         return null;
       }
     },
@@ -139,12 +134,10 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
-      if (import.meta.env.DEV) {
-        console.log("Current session:", data?.session ? "Active" : "None");
-        if (data?.session?.user) {
-          console.log("Session user:", data.session.user.id);
-          console.log("User metadata:", data.session.user.user_metadata);
-        }
+      logger.debug("Current session:", data?.session ? "Active" : "None");
+      if (data?.session?.user) {
+        logger.debug("Session user:", data.session.user.id);
+        logger.debug("User metadata:", data.session.user.user_metadata);
       }
     };
     

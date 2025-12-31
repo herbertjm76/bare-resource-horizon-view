@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { StagesGrid } from "./components/StagesGrid";
 import type { FormState } from "../hooks/types/projectTypes";
 import { toast } from "sonner";
+import { logger } from "@/utils/logger";
 
 interface ProjectStageFeesTabProps {
   form: FormState;
@@ -17,11 +18,11 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   updateStageFee,
   isDataLoaded
 }) => {
-  console.log("ProjectStageFeesTab - form:", form);
-  console.log("ProjectStageFeesTab - stages:", form.stages);
-  console.log("ProjectStageFeesTab - stageFees:", form.stageFees);
-  console.log("ProjectStageFeesTab - officeStages:", officeStages);
-  console.log("ProjectStageFeesTab - isDataLoaded:", isDataLoaded);
+  logger.debug("ProjectStageFeesTab - form:", form);
+  logger.debug("ProjectStageFeesTab - stages:", form.stages);
+  logger.debug("ProjectStageFeesTab - stageFees:", form.stageFees);
+  logger.debug("ProjectStageFeesTab - officeStages:", officeStages);
+  logger.debug("ProjectStageFeesTab - isDataLoaded:", isDataLoaded);
 
   const generateYearMonths = () => {
     const currentYear = new Date().getFullYear();
@@ -65,12 +66,12 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   const selectedStages = officeStages.filter(stage => form.stages.includes(stage.id));
   const billingOptions = generateYearMonths();
 
-  console.log("Selected stages for fees:", selectedStages);
+  logger.debug("Selected stages for fees:", selectedStages);
   
   if (isDataLoaded) {
-    console.log("Stage fees loaded:", form.stageFees);
+    logger.debug("Stage fees loaded:", form.stageFees);
   } else {
-    console.log("Stage fees not loaded yet");
+    logger.debug("Stage fees not loaded yet");
   }
 
   if (form.stages.length === 0) {

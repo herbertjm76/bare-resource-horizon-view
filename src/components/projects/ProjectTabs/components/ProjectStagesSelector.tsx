@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Toggle } from '@/components/ui/toggle';
+import { logger } from '@/utils/logger';
 
 interface ProjectStagesSelectorProps {
   stages: string[];
@@ -14,13 +15,13 @@ export const ProjectStagesSelector: React.FC<ProjectStagesSelectorProps> = ({
   officeStages,
   onChange,
 }) => {
-  console.log('ProjectStagesSelector - current stages:', stages);
-  console.log('ProjectStagesSelector - available office stages:', officeStages);
+  logger.debug('ProjectStagesSelector - current stages:', stages);
+  logger.debug('ProjectStagesSelector - available office stages:', officeStages);
 
   // Helper function to check if stage is selected
   const isStageSelected = (stageId: string) => {
     const selected = stages.includes(stageId);
-    console.log(`Stage ${stageId} selected:`, selected);
+    logger.debug(`Stage ${stageId} selected:`, selected);
     return selected;
   };
 
@@ -32,14 +33,14 @@ export const ProjectStagesSelector: React.FC<ProjectStagesSelectorProps> = ({
           const isSelected = isStageSelected(stage.id);
           const stageColor = stage.color || '#E5DEFF';
           
-          console.log(`Stage ${stage.name} (${stage.id}): selected=${isSelected}`);
+          logger.debug(`Stage ${stage.name} (${stage.id}): selected=${isSelected}`);
           
           return (
             <Toggle
               key={stage.id}
               pressed={isSelected}
               onPressedChange={(pressed) => {
-                console.log(`Toggle ${stage.name} to ${pressed ? 'selected' : 'unselected'}`);
+                logger.debug(`Toggle ${stage.name} to ${pressed ? 'selected' : 'unselected'}`);
                 const newStages = pressed
                   ? [...stages, stage.id]
                   : stages.filter(s => s !== stage.id);
