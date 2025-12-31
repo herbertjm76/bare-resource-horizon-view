@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 
 /**
  * STANDARDIZED utilization calculations for the Weekly Overview
@@ -16,21 +17,17 @@ export const calculateMemberProjectHours = (
 ): number => {
   let totalHours = 0;
   
-  console.log(`DEBUG calculateMemberProjectHours for ${memberId} - AllocationMap size:`, allocationMap.size);
-  console.log(`DEBUG calculateMemberProjectHours for ${memberId} - Full allocation map:`, Array.from(allocationMap.entries()));
+  logger.debug(`calculateMemberProjectHours for ${memberId} - AllocationMap size:`, allocationMap.size);
   
   allocationMap.forEach((hours, key) => {
     const [resourceId] = key.split(':');
-    console.log(`DEBUG checking allocation entry: ${key} -> ${hours}h, matches member: ${resourceId === memberId}`);
     if (resourceId === memberId) {
       totalHours += hours;
-      console.log(`DEBUG added ${hours}h to total for ${memberId}, new total: ${totalHours}h`);
     }
   });
   
-  console.log(`STANDARDIZED calculateMemberProjectHours for ${memberId}:`, {
-    totalProjectHours: totalHours,
-    allocationEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(memberId))
+  logger.debug(`calculateMemberProjectHours for ${memberId}:`, {
+    totalProjectHours: totalHours
   });
   
   return totalHours;
@@ -53,13 +50,12 @@ export const calculateUtilizationPercentage = (
   const totalHours = projectHours + leaveHours;
   const percentage = Math.round((totalHours / weeklyCapacity) * 100);
   
-  console.log(`STANDARDIZED calculateUtilizationPercentage:`, {
+  logger.debug(`calculateUtilizationPercentage:`, {
     projectHours,
     leaveHours,
     totalHours,
     weeklyCapacity,
-    calculatedPercentage: percentage,
-    formula: `(${projectHours} + ${leaveHours}) / ${weeklyCapacity} * 100 = ${percentage}%`
+    calculatedPercentage: percentage
   });
   
   return percentage;
@@ -112,13 +108,12 @@ export const calculateCapacityDisplay = (
   const totalHours = projectHours + leaveHours;
   const utilizationPercentage = calculateUtilizationPercentage(projectHours, weeklyCapacity, leaveHours);
   
-  console.log(`STANDARDIZED calculateCapacityDisplay for ${memberId}:`, {
+  logger.debug(`calculateCapacityDisplay for ${memberId}:`, {
     projectHours,
     leaveHours,
     totalHours,
     capacity: weeklyCapacity,
-    utilizationPercentage,
-    display: `(${projectHours}h + ${leaveHours}h leave) / ${weeklyCapacity}h = ${utilizationPercentage}%`
+    utilizationPercentage
   });
   
   return {

@@ -1,6 +1,6 @@
-
 import { StaffMember } from './types';
 import { STAFF_THRESHOLDS } from './constants';
+import { logger } from '@/utils/logger';
 
 export const getProfileImage = (member: StaffMember): string => {
   // Check if member has an avatar image
@@ -34,7 +34,7 @@ export const categorizeStaff = (staffData: StaffMember[]) => {
   );
   const readyStaff = staffData.filter(member => member.availability <= STAFF_THRESHOLDS.READY_MAX);
 
-  console.log('Staff categorization:', {
+  logger.debug('Staff categorization:', {
     atCapacity: atCapacityStaff.length,
     optimal: optimalStaff.length,
     ready: readyStaff.length,
