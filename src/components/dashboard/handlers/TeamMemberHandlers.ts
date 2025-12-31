@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { PendingMember, Profile, TeamMember } from '../types';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 export const useTeamMemberHandlers = (
   companyId: string | undefined,
@@ -10,8 +11,8 @@ export const useTeamMemberHandlers = (
   const { handleSaveMember, handleDeleteMember, isSaving, isDeleting } = useTeamMembers(companyId);
 
   const handleSaveMemberWrapper = async (memberData: Partial<Profile | PendingMember> & { avatarFile?: File | null }, currentMember: TeamMember | null) => {
-    console.log('handleSaveMemberWrapper - Saving member data:', memberData);
-    console.log('handleSaveMemberWrapper - avatarFile present:', !!memberData.avatarFile);
+    logger.debug('handleSaveMemberWrapper - Saving member data:', memberData);
+    logger.debug('handleSaveMemberWrapper - avatarFile present:', !!memberData.avatarFile);
     
     // Create a fresh copy to avoid modifying the original object
     const memberDataCopy = { ...memberData };
@@ -20,7 +21,7 @@ export const useTeamMemberHandlers = (
     const isPendingMember = currentMember ? ('isPending' in currentMember && currentMember.isPending === true) : false;
     
     if (isPendingMember) {
-      console.log('Current member is pending, setting isPending flag');
+      logger.debug('Current member is pending, setting isPending flag');
       // Set isPending for PendingMember type
       (memberDataCopy as Partial<PendingMember>).isPending = true;
       
@@ -31,12 +32,12 @@ export const useTeamMemberHandlers = (
     }
     
     try {
-      console.log('Calling handleSaveMember with data:', memberDataCopy, 'isEditing:', Boolean(currentMember));
-      console.log('Avatar file being passed to handleSaveMember:', !!memberDataCopy.avatarFile);
+      logger.debug('Calling handleSaveMember with data:', memberDataCopy, 'isEditing:', Boolean(currentMember));
+      logger.debug('Avatar file being passed to handleSaveMember:', !!memberDataCopy.avatarFile);
       const success = await handleSaveMember(memberDataCopy, Boolean(currentMember));
       
       if (success) {
-        console.log('Save successful, triggering refresh');
+        logger.debug('Save successful, triggering refresh');
         // Trigger refresh
         triggerRefresh();
         return true;
@@ -54,12 +55,12 @@ export const useTeamMemberHandlers = (
   const handleConfirmDelete = async (memberToDelete: string | null, isPendingMemberToDelete: boolean) => {
     if (!memberToDelete) return false;
     
-    console.log('Deleting member:', memberToDelete, 'isPending:', isPendingMemberToDelete);
+    logger.debug('Deleting member:', memberToDelete, 'isPending:', isPendingMemberToDelete);
     try {
       const success = await handleDeleteMember(memberToDelete, isPendingMemberToDelete);
       
       if (success) {
-        console.log('Delete successful, triggering refresh');
+        logger.debug('Delete successful, triggering refresh');
         triggerRefresh();
         toast.success(isPendingMemberToDelete ? 'Pre-registered member deleted successfully' : 'Team member deleted successfully');
         return true;
@@ -76,10 +77,10 @@ export const useTeamMemberHandlers = (
     if (!selectedMembers.length) return;
     
     try {
-      console.log('Bulk deleting members:', selectedMembers);
+      logger.debug('Bulk deleting members:', selectedMembers);
       const deletePromises = selectedMembers.map(memberId => {
         const isPending = pendingMembers.some(m => m.id === memberId);
-        console.log(`Deleting member ${memberId}, isPending: ${isPending}`);
+        logger.debug(`Deleting member ${memberId}, isPending: ${isPending}`);
         return handleDeleteMember(memberId, isPending);
       });
       

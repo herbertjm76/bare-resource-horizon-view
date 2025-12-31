@@ -1,4 +1,6 @@
 
+import { logger } from '@/utils/logger';
+
 /**
  * Utility functions for creating and managing allocation maps from comprehensive weekly allocations
  */
@@ -11,12 +13,12 @@ export const createAllocationMap = (comprehensiveWeeklyAllocations: any[]): Map<
   const allocationMap = new Map<string, number>();
   
   if (!comprehensiveWeeklyAllocations || comprehensiveWeeklyAllocations.length === 0) {
-    console.log('No comprehensive weekly allocations provided to createAllocationMap');
+    logger.debug('No comprehensive weekly allocations provided to createAllocationMap');
     return allocationMap;
   }
 
-  console.log('DEBUG createAllocationMap - Creating allocation map from comprehensive allocations:', comprehensiveWeeklyAllocations.length);
-  console.log('DEBUG createAllocationMap - Raw comprehensive allocations:', comprehensiveWeeklyAllocations);
+  logger.debug('DEBUG createAllocationMap - Creating allocation map from comprehensive allocations:', comprehensiveWeeklyAllocations.length);
+  logger.debug('DEBUG createAllocationMap - Raw comprehensive allocations:', comprehensiveWeeklyAllocations);
 
   comprehensiveWeeklyAllocations.forEach(allocation => {
     const memberId = allocation.resource_id;
@@ -32,11 +34,11 @@ export const createAllocationMap = (comprehensiveWeeklyAllocations: any[]): Map<
         const dayHours = parseFloat(day.hours) || 0;
         totalHours += dayHours;
       });
-      console.log(`Allocation ${key}: Summed ${totalHours}h from daily breakdown (${allocation.daily_breakdown.length} days)`);
+      logger.debug(`Allocation ${key}: Summed ${totalHours}h from daily breakdown (${allocation.daily_breakdown.length} days)`);
     } else {
       // Fallback to the hours field if no daily breakdown
       totalHours = parseFloat(allocation.hours) || 0;
-      console.log(`Allocation ${key}: Using direct hours value ${totalHours}h`);
+      logger.debug(`Allocation ${key}: Using direct hours value ${totalHours}h`);
     }
     
     // Add to existing allocation if key already exists
@@ -44,10 +46,10 @@ export const createAllocationMap = (comprehensiveWeeklyAllocations: any[]): Map<
     const newTotal = existingHours + totalHours;
     allocationMap.set(key, newTotal);
     
-    console.log(`Allocation map updated: ${key} = ${newTotal}h (was ${existingHours}h, added ${totalHours}h)`);
+    logger.debug(`Allocation map updated: ${key} = ${newTotal}h (was ${existingHours}h, added ${totalHours}h)`);
   });
 
-  console.log(`Final allocation map created with ${allocationMap.size} entries:`, Array.from(allocationMap.entries()));
+  logger.debug(`Final allocation map created with ${allocationMap.size} entries:`, Array.from(allocationMap.entries()));
   return allocationMap;
 };
 
@@ -68,11 +70,11 @@ export const calculateMemberWeeklyTotals = (
   });
 
   if (!comprehensiveWeeklyAllocations || comprehensiveWeeklyAllocations.length === 0) {
-    console.log('No comprehensive allocations for member totals calculation');
+    logger.debug('No comprehensive allocations for member totals calculation');
     return memberTotals;
   }
 
-  console.log('Calculating member weekly totals from comprehensive allocations:', comprehensiveWeeklyAllocations.length);
+  logger.debug('Calculating member weekly totals from comprehensive allocations:', comprehensiveWeeklyAllocations.length);
 
   // Group allocations by member and sum up their total hours
   const memberAllocations = new Map<string, number>();
@@ -99,9 +101,9 @@ export const calculateMemberWeeklyTotals = (
   // Update the final member totals
   memberAllocations.forEach((totalHours, memberId) => {
     memberTotals.set(memberId, totalHours);
-    console.log(`Member ${memberId} total weekly hours: ${totalHours}h`);
+    logger.debug(`Member ${memberId} total weekly hours: ${totalHours}h`);
   });
 
-  console.log(`Member weekly totals calculated for ${memberTotals.size} members`);
+  logger.debug(`Member weekly totals calculated for ${memberTotals.size} members`);
   return memberTotals;
 };

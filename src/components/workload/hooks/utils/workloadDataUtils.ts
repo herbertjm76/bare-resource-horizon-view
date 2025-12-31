@@ -2,6 +2,7 @@
 import { format, startOfWeek, addWeeks } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { ProcessedWorkloadResult, WeekStartDate } from '../types';
+import { logger } from '@/utils/logger';
 
 export const initializeWorkloadData = (
   members: TeamMember[],
@@ -31,7 +32,7 @@ export const initializeWorkloadData = (
     }
   });
 
-  console.log('Initialized workload data for:', {
+  logger.debug('Initialized workload data for:', {
     members: members.length,
     weeks: numberOfWeeks,
     totalEntries: Object.keys(result).length * numberOfWeeks
@@ -59,7 +60,7 @@ export const generateWeekStartDates = (
     });
   }
 
-  console.log('Generated week start dates:', {
+  logger.debug('Generated week start dates:', {
     count: weekStartDates.length,
     firstWeek: weekStartDates[0]?.key,
     lastWeek: weekStartDates[weekStartDates.length - 1]?.key
@@ -73,14 +74,14 @@ export const debugWorkloadData = (
   result: ProcessedWorkloadResult,
   allocations: any[]
 ) => {
-  console.log('=== WORKLOAD DATA DEBUG ===');
+  logger.debug('=== WORKLOAD DATA DEBUG ===');
   
   // Log overall statistics
   const totalMembers = Object.keys(result).length;
   const totalWeeks = totalMembers > 0 ? Object.keys(result[Object.keys(result)[0]]).length : 0;
   const totalAllocations = allocations.length;
   
-  console.log('Overall Stats:', {
+  logger.debug('Overall Stats:', {
     totalMembers,
     totalWeeks,
     totalAllocations,
@@ -93,14 +94,14 @@ export const debugWorkloadData = (
     const member = members.find(m => m.id === memberId);
     const memberName = member ? `${member.first_name} ${member.last_name}` : memberId;
     
-    console.log(`Member: ${memberName} (${memberId})`);
+    logger.debug(`Member: ${memberName} (${memberId})`);
     
     const weekKeys = Object.keys(result[memberId]).sort();
     const sampleWeeks = weekKeys.slice(0, 5);
     
     sampleWeeks.forEach(weekKey => {
       const weekData = result[memberId][weekKey];
-      console.log(`  Week ${weekKey}:`, {
+      logger.debug(`  Week ${weekKey}:`, {
         projectHours: weekData.projectHours,
         annualLeave: weekData.annualLeave,
         otherLeave: weekData.otherLeave,
@@ -117,7 +118,7 @@ export const debugWorkloadData = (
     allocationsByMember.set(allocation.resource_id, current + (parseFloat(allocation.hours) || 0));
   });
 
-  console.log('Allocation Totals by Member:', Array.from(allocationsByMember.entries()).slice(0, 5));
+  logger.debug('Allocation Totals by Member:', Array.from(allocationsByMember.entries()).slice(0, 5));
   
-  console.log('=== END WORKLOAD DATA DEBUG ===');
+  logger.debug('=== END WORKLOAD DATA DEBUG ===');
 };

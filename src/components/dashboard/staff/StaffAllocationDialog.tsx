@@ -14,6 +14,7 @@ import { StaffMember } from './types';
 import { TimeRange } from '../TimeRangeSelector';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
+import { logger } from '@/utils/logger';
 
 interface StaffAllocationDialogProps {
   open: boolean;
@@ -72,7 +73,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
   
   // Debug log for utilization data consistency
   if (member?.name?.includes('Paul')) {
-    console.log('🔍 DIALOG - Paul Julius utilization data:', {
+    logger.debug('🔍 DIALOG - Paul Julius utilization data:', {
       memberName: member.name,
       standardizedUtilization: utilizationRate,
       calculatedUtilization: (totalAllocatedHours / weeklyCapacity) * 100,
