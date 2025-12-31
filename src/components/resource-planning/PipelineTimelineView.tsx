@@ -1,7 +1,7 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useCallback } from 'react';
 import { format, addWeeks, startOfWeek, differenceInWeeks, parseISO, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, Loader2, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Calendar, GripVertical } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -95,8 +95,17 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   } | null>(null);
   const [editDate, setEditDate] = useState<Date | undefined>(undefined);
   const [editWeeks, setEditWeeks] = useState<number>(4);
+  const [dragState, setDragState] = useState<{
+    stageId: string;
+    startX: number;
+    originalStartWeek: number;
+    currentOffset: number;
+    stage: StageWithDates;
+    project: Project;
+  } | null>(null);
   
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const WEEK_WIDTH = 64; // Width of each week column in pixels
 
   // Fetch office stages for colors
   const { data: officeStages = [] } = useQuery({
@@ -276,6 +285,61 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     }
   };
 
+  // Drag handlers for stage bars
+  const handleDragStart = useCallback((
+    e: React.MouseEvent,
+    project: Project,
+    stage: StageWithDates
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!stage.startDate) return;
+    
+    const position = getStageTimelinePosition(stage);
+    if (!position) return;
+    
+    setDragState({
+      stageId: stage.id,
+      startX: e.clientX,
+      originalStartWeek: position.startWeek,
+      currentOffset: 0,
+      stage,
+      project
+    });
+  }, []);
+
+  const handleDragMove = useCallback((e: React.MouseEvent) => {
+    if (!dragState) return;
+    
+    const deltaX = e.clientX - dragState.startX;
+    const weekOffset = Math.round(deltaX / WEEK_WIDTH);
+    
+    if (weekOffset !== dragState.currentOffset) {
+      setDragState(prev => prev ? { ...prev, currentOffset: weekOffset } : null);
+    }
+  }, [dragState]);
+
+  const handleDragEnd = useCallback(() => {
+    if (!dragState || dragState.currentOffset === 0) {
+      setDragState(null);
+      return;
+    }
+    
+    // Calculate new start date based on offset
+    const newStartWeek = Math.max(0, dragState.originalStartWeek + dragState.currentOffset);
+    const newStartDate = addWeeks(startDate, newStartWeek);
+    
+    // Save the new date
+    updateStageMutation.mutate({
+      stageId: dragState.stageId,
+      startDate: newStartDate,
+      contractedWeeks: dragState.stage.contractedWeeks
+    });
+    
+    setDragState(null);
+  }, [dragState, startDate, updateStageMutation]);
+
   // Handle stage click
   const handleStageClick = (
     e: React.MouseEvent, 
@@ -283,6 +347,9 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     stage: StageWithDates
   ) => {
     e.stopPropagation();
+    // Don't open dialog if we just finished dragging
+    if (dragState) return;
+    
     setSelectedStage({
       projectId: project.id,
       projectName: project.name,
@@ -364,11 +431,19 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
           </div>
         </div>
 
-        <div className="relative">
+        <div 
+          className="relative"
+          onMouseMove={dragState ? handleDragMove : undefined}
+          onMouseUp={dragState ? handleDragEnd : undefined}
+          onMouseLeave={dragState ? handleDragEnd : undefined}
+        >
           <div 
             ref={scrollContainerRef}
-            className="overflow-x-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
-            style={{ scrollBehavior: 'smooth' }}
+            className={cn(
+              "overflow-x-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent",
+              dragState && "cursor-grabbing select-none"
+            )}
+            style={{ scrollBehavior: dragState ? 'auto' : 'smooth' }}
           >
             <div className="min-w-max">
               {/* Header */}
@@ -473,20 +548,29 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                 return null;
                               }
                               
+                              const isDragging = dragState?.stageId === stage.id;
+                              const dragOffset = isDragging ? dragState.currentOffset : 0;
+                              const displayLeft = (position.startWeek + dragOffset) * WEEK_WIDTH;
+                              
                               return (
-                                <Tooltip key={stage.stageName}>
+                                <Tooltip key={stage.stageName} open={isDragging ? false : undefined}>
                                   <TooltipTrigger asChild>
-                                    <button
-                                      className="absolute top-1/2 -translate-y-1/2 h-6 rounded-md flex items-center px-2 text-[10px] font-medium text-white shadow-sm transition-all hover:ring-2 hover:ring-primary hover:ring-offset-1"
+                                    <div
+                                      className={cn(
+                                        "absolute top-1/2 -translate-y-1/2 h-7 rounded-md flex items-center gap-1 pl-1 pr-2 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
+                                        isDragging ? "ring-2 ring-primary ring-offset-2 cursor-grabbing z-20 opacity-90" : "hover:ring-2 hover:ring-primary hover:ring-offset-1"
+                                      )}
                                       style={{
-                                        left: `${position.startWeek * 64}px`,
-                                        width: `${Math.max(position.width * 64 - 4, 48)}px`,
+                                        left: `${displayLeft}px`,
+                                        width: `${Math.max(position.width * WEEK_WIDTH - 4, 48)}px`,
                                         backgroundColor: stage.color,
                                       }}
-                                      onClick={(e) => handleStageClick(e, project, stage)}
+                                      onMouseDown={(e) => handleDragStart(e, project, stage)}
+                                      onClick={(e) => !dragState && handleStageClick(e, project, stage)}
                                     >
+                                      <GripVertical className="h-3 w-3 text-white/60 shrink-0" />
                                       <span className="truncate">{stage.stageName}</span>
-                                    </button>
+                                    </div>
                                   </TooltipTrigger>
                                   <TooltipContent>
                                     <div className="text-xs">
@@ -495,7 +579,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                         {stage.startDate ? format(stage.startDate, 'MMM d, yyyy') : 'No start date'} 
                                         {' • '}{stage.contractedWeeks} weeks
                                       </p>
-                                      <p className="text-primary mt-1">Click to edit</p>
+                                      <p className="text-primary mt-1">Drag to move • Click to edit</p>
                                     </div>
                                   </TooltipContent>
                                 </Tooltip>
@@ -585,20 +669,29 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                             
                             if (!position) return null;
                             
+                            const isDragging = dragState?.stageId === stage.id;
+                            const dragOffset = isDragging ? dragState.currentOffset : 0;
+                            const displayLeft = (position.startWeek + dragOffset) * WEEK_WIDTH;
+                            
                             return (
-                              <Tooltip key={stage.stageName}>
+                              <Tooltip key={stage.stageName} open={isDragging ? false : undefined}>
                                 <TooltipTrigger asChild>
-                                  <button
-                                    className="absolute top-1/2 -translate-y-1/2 h-6 rounded-md flex items-center px-2 text-[10px] font-medium text-white shadow-sm transition-all hover:ring-2 hover:ring-primary hover:ring-offset-1"
+                                  <div
+                                    className={cn(
+                                      "absolute top-1/2 -translate-y-1/2 h-7 rounded-md flex items-center gap-1 pl-1 pr-2 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
+                                      isDragging ? "ring-2 ring-primary ring-offset-2 cursor-grabbing z-20 opacity-90" : "hover:ring-2 hover:ring-primary hover:ring-offset-1"
+                                    )}
                                     style={{
-                                      left: `${position.startWeek * 64}px`,
-                                      width: `${Math.max(position.width * 64 - 4, 48)}px`,
+                                      left: `${displayLeft}px`,
+                                      width: `${Math.max(position.width * WEEK_WIDTH - 4, 48)}px`,
                                       backgroundColor: stage.color,
                                     }}
-                                    onClick={(e) => handleStageClick(e, project, stage)}
+                                    onMouseDown={(e) => handleDragStart(e, project, stage)}
+                                    onClick={(e) => !dragState && handleStageClick(e, project, stage)}
                                   >
+                                    <GripVertical className="h-3 w-3 text-white/60 shrink-0" />
                                     <span className="truncate">{stage.stageName}</span>
-                                  </button>
+                                  </div>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <div className="text-xs">
@@ -606,7 +699,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                     <p className="text-muted-foreground">
                                       {format(stage.startDate!, 'MMM d, yyyy')} • {stage.contractedWeeks} weeks
                                     </p>
-                                    <p className="text-primary mt-1">Click to edit</p>
+                                    <p className="text-primary mt-1">Drag to move • Click to edit</p>
                                   </div>
                                 </TooltipContent>
                               </Tooltip>
