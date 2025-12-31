@@ -1420,6 +1420,7 @@ export type Database = {
           project_id: string
           remaining_hours: number | null
           stage_name: string
+          start_date: string | null
           total_budget_amount: number | null
           total_budgeted_hours: number | null
           updated_at: string | null
@@ -1445,6 +1446,7 @@ export type Database = {
           project_id: string
           remaining_hours?: number | null
           stage_name: string
+          start_date?: string | null
           total_budget_amount?: number | null
           total_budgeted_hours?: number | null
           updated_at?: string | null
@@ -1470,6 +1472,7 @@ export type Database = {
           project_id?: string
           remaining_hours?: number | null
           stage_name?: string
+          start_date?: string | null
           total_budget_amount?: number | null
           total_budgeted_hours?: number | null
           updated_at?: string | null

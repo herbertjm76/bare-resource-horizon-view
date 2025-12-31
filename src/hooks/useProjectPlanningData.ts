@@ -23,11 +23,13 @@ export interface OfficeStage {
 }
 
 export interface ProjectStageData {
+  id: string;
   project_id: string;
   stage_name: string;
   contracted_weeks: number | null;
   total_budgeted_hours: number | null;
   total_budget_amount: number | null;
+  start_date: string | null;
 }
 
 export interface TeamCompositionSummary {
@@ -91,7 +93,7 @@ export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
 
       const { data, error } = await supabase
         .from('project_stages')
-        .select('project_id, stage_name, contracted_weeks, total_budgeted_hours, total_budget_amount')
+        .select('id, project_id, stage_name, contracted_weeks, total_budgeted_hours, total_budget_amount, start_date')
         .in('project_id', projectIds);
 
       if (error) throw error;
