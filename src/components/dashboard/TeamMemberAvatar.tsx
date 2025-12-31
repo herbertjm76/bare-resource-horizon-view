@@ -2,6 +2,7 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TeamMember } from './types';
+import { logger } from '@/utils/logger';
 
 interface TeamMemberAvatarProps {
   member: TeamMember;
@@ -17,20 +18,20 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
   const getAvatarUrl = (member: TeamMember): string | undefined => {
     const memberName = `${member.first_name} ${member.last_name}`;
     
-    console.log(`🔍 Processing avatar for ${memberName}:`);
-    console.log('- Raw avatar_url:', member.avatar_url);
-    console.log('- Member object keys:', Object.keys(member));
-    console.log('- Full member object:', member);
+    logger.debug(`🔍 Processing avatar for ${memberName}:`);
+    logger.debug('- Raw avatar_url:', member.avatar_url);
+    logger.debug('- Member object keys:', Object.keys(member));
+    logger.debug('- Full member object:', member);
     
     const avatarUrl = member.avatar_url;
     
     if (!avatarUrl) {
-      console.log(`❌ No avatar URL found for ${memberName}`);
+      logger.debug(`❌ No avatar URL found for ${memberName}`);
       return undefined;
     }
     
     // Return the URL as-is - let's not modify it
-    console.log(`✅ Final avatar URL for ${memberName}:`, avatarUrl);
+    logger.debug(`✅ Final avatar URL for ${memberName}:`, avatarUrl);
     return avatarUrl;
   };
 
@@ -38,9 +39,9 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
   const initials = getUserInitials(member);
   const memberName = `${member.first_name} ${member.last_name}`;
 
-  console.log(`🖼️ Rendering avatar for ${memberName}:`);
-  console.log('- Avatar URL to render:', avatarUrl);
-  console.log('- Initials fallback:', initials);
+  logger.debug(`🖼️ Rendering avatar for ${memberName}:`);
+  logger.debug('- Avatar URL to render:', avatarUrl);
+  logger.debug('- Initials fallback:', initials);
 
   return (
     <Avatar className="h-10 w-10">
@@ -49,25 +50,25 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
           src={avatarUrl} 
           alt={`${member.first_name} ${member.last_name}`}
           onLoad={(e) => {
-            console.log(`✅ Image SUCCESSFULLY loaded for ${memberName}`);
-            console.log('- Image element:', e.target);
-            console.log('- Natural dimensions:', (e.target as HTMLImageElement).naturalWidth, 'x', (e.target as HTMLImageElement).naturalHeight);
-            console.log('- Final src used:', (e.target as HTMLImageElement).src);
-            console.log('- Current src attribute:', (e.target as HTMLImageElement).getAttribute('src'));
+            logger.debug(`✅ Image SUCCESSFULLY loaded for ${memberName}`);
+            logger.debug('- Image element:', e.target);
+            logger.debug('- Natural dimensions:', (e.target as HTMLImageElement).naturalWidth, 'x', (e.target as HTMLImageElement).naturalHeight);
+            logger.debug('- Final src used:', (e.target as HTMLImageElement).src);
+            logger.debug('- Current src attribute:', (e.target as HTMLImageElement).getAttribute('src'));
           }}
           onError={(e) => {
-            console.log(`❌ Image FAILED to load for ${memberName}`);
-            console.log('- Error target:', e.target);
-            console.log('- Attempted URL:', avatarUrl);
-            console.log('- Error event:', e);
-            console.log('- Image src:', (e.target as HTMLImageElement).src);
-            console.log('- Current src attribute:', (e.target as HTMLImageElement).getAttribute('src'));
+            logger.debug(`❌ Image FAILED to load for ${memberName}`);
+            logger.debug('- Error target:', e.target);
+            logger.debug('- Attempted URL:', avatarUrl);
+            logger.debug('- Error event:', e);
+            logger.debug('- Image src:', (e.target as HTMLImageElement).src);
+            logger.debug('- Current src attribute:', (e.target as HTMLImageElement).getAttribute('src'));
             
             // Test if we can fetch the URL directly
             fetch(avatarUrl).then(response => {
-              console.log(`🔍 Direct fetch test for ${memberName}:`, response.status, response.statusText);
+              logger.debug(`🔍 Direct fetch test for ${memberName}:`, response.status, response.statusText);
             }).catch(fetchError => {
-              console.log(`❌ Direct fetch failed for ${memberName}:`, fetchError);
+              logger.debug(`❌ Direct fetch failed for ${memberName}:`, fetchError);
             });
           }}
         />

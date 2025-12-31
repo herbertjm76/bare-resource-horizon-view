@@ -2,6 +2,7 @@ import React, { useRef, useCallback } from 'react';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { PersonProject, PersonResourceData } from '@/hooks/usePersonResourceData';
 import { useAllocationInput } from '../hooks/useAllocationInput';
+import { logger } from '@/utils/logger';
 
 interface ProjectAllocationRowProps {
   project: PersonProject;
@@ -45,7 +46,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
     selectedDate,
     periodToShow,
     onAllocationChange: (resourceId, weekKey, hours) => {
-      console.log(`Person ${resourceId} allocation changed for project ${project.projectId} on week ${weekKey}: ${hours}h`);
+      logger.debug(`Person ${resourceId} allocation changed for project ${project.projectId} on week ${weekKey}: ${hours}h`);
       // Update local person totals immediately
       onLocalAllocationChange?.(project.projectId, weekKey, hours);
     }

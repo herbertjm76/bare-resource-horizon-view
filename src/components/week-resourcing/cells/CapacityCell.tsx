@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { formatAllocationValue, formatAvailableValue, formatCapacityValue } from '@/utils/allocationDisplay';
+import { logger } from '@/utils/logger';
 
 interface CapacityCellProps {
   availableHours: number;
@@ -52,7 +53,7 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
     return 'text-gray-600'; // Under 50% - low utilization
   };
 
-  console.log(`CapacityCell for member ${member?.first_name} ${member?.last_name}:`, {
+  logger.debug(`CapacityCell for member ${member?.first_name} ${member?.last_name}:`, {
     weeklyProjectHours,
     weeklyAnnualLeave,
     holidayHours,

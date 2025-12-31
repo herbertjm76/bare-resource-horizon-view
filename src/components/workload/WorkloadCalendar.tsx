@@ -10,6 +10,7 @@ import { WorkloadTooltip } from './WorkloadTooltip';
 import { Badge } from '@/components/ui/badge';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getMemberCapacity } from '@/utils/capacityUtils';
+import { logger } from '@/utils/logger';
 
 interface WorkloadCalendarProps {
   members: TeamMember[];
@@ -113,7 +114,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
               
               // Debug logging for Paul Julius
               if (member.first_name === 'Paul' && member.last_name === 'Julius') {
-                console.log('🔍 WORKLOAD CALENDAR: Paul Julius data:', {
+                logger.debug('🔍 WORKLOAD CALENDAR: Paul Julius data:', {
                   memberId: member.id,
                   workloadDays: memberWorkloadDays,
                   totalHours,
@@ -147,7 +148,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                     
                     // Debug logging for Paul Julius on specific date
                     if (member.first_name === 'Paul' && member.last_name === 'Julius' && dateStr === '2025-05-26') {
-                      console.log(`🔍 WORKLOAD CALENDAR: Paul Julius on ${dateStr}:`, {
+                      logger.debug(`🔍 WORKLOAD CALENDAR: Paul Julius on ${dateStr}:`, {
                         dayData,
                         dayHours,
                         dateStr

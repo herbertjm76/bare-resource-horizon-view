@@ -4,6 +4,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { useProjectUpdate } from './submit/useProjectUpdate';
 import { useStageSubmit } from './submit/useStageSubmit';
 import type { ProjectSubmitData } from './submit/types';
+import { logger } from '@/utils/logger';
 
 // Add an optional onAfterSubmit callback and call it at the end
 export const useProjectSubmit = (projectId: string, refetch: () => void, onClose: () => void, onAfterSubmit?: () => void) => {
@@ -15,7 +16,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
     if (setIsLoading) setIsLoading(true);
     
     try {
-      console.log('Submitting project update with form data:', form);
+      logger.debug('Submitting project update with form data:', form);
       
       // Get stage names from selected stage IDs
       const selectedStageNames = form.stages.map(stageId => {
@@ -23,7 +24,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         return stage ? stage.name : '';
       }).filter(Boolean);
 
-      console.log('Selected stage names:', selectedStageNames);
+      logger.debug('Selected stage names:', selectedStageNames);
       
       // Prepare update object, ensuring no empty values for UUID fields
       const projectUpdate = {
@@ -39,14 +40,14 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         department: (form as any).department || null
       };
       
-      console.log('Project update data:', projectUpdate);
+      logger.debug('Project update data:', projectUpdate);
 
       // Update the main project record and get existing stages
       const { existingStages } = await updateProject(projectId, projectUpdate);
 
       // Check if company ID is available
       if (!company?.id) {
-        console.error("Missing company ID for project stage operations");
+        logger.error("Missing company ID for project stage operations");
         throw new Error("Company context is not available");
       }
 
@@ -68,7 +69,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         onAfterSubmit();
       }
     } catch (error: any) {
-      console.error('Error updating project:', error);
+      logger.error('Error updating project:', error);
       toast.error('Failed to update project: ' + (error.message || "Unknown error"));
     } finally {
       if (setIsLoading) setIsLoading(false);

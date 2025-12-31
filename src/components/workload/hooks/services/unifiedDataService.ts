@@ -4,6 +4,7 @@ import { fetchProjectAllocations, fetchAnnualLeaves, fetchOtherLeaves } from './
 import { processProjectAllocations, processAnnualLeaves, processOtherLeaves, calculateTotals } from './dataProcessors';
 import { UnifiedWorkloadParams, UnifiedWorkloadResult, WeeklyBreakdown } from './types';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { logger } from '@/utils/logger';
 
 // Re-export types for backward compatibility
 export type { UnifiedWorkloadParams, UnifiedWorkloadResult, WeeklyBreakdown };
@@ -11,7 +12,7 @@ export type { UnifiedWorkloadParams, UnifiedWorkloadResult, WeeklyBreakdown };
 export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): Promise<UnifiedWorkloadResult> => {
   const { companyId, members, startDate, numberOfWeeks, weekStartDay = 'Monday' } = params;
   
-  console.log('🔄 UNIFIED DATA SERVICE: Fetching workload data with STANDARDIZED logic', {
+  logger.debug('🔄 UNIFIED DATA SERVICE: Fetching workload data with STANDARDIZED logic', {
     companyId,
     memberCount: members.length,
     startDate: format(startDate, 'yyyy-MM-dd'),
@@ -28,7 +29,7 @@ export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): P
     const endDate = new Date(normalizedStartDate);
     endDate.setDate(endDate.getDate() + (numberOfWeeks * 7) - 1);
     
-    console.log('🔄 UNIFIED DATA SERVICE: Date range calculation', {
+    logger.debug('🔄 UNIFIED DATA SERVICE: Date range calculation', {
       originalStartDate: format(startDate, 'yyyy-MM-dd'),
       normalizedStartDate: format(normalizedStartDate, 'yyyy-MM-dd'),
       endDate: format(endDate, 'yyyy-MM-dd'),
@@ -47,7 +48,7 @@ export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): P
       fetchOtherLeaves(companyId, memberIds, normalizedStartDate, endDate)
     ]);
 
-    console.log('🔄 UNIFIED DATA SERVICE: Raw data fetched:', {
+    logger.debug('🔄 UNIFIED DATA SERVICE: Raw data fetched:', {
       projectAllocations: projectAllocations.data?.length || 0,
       annualLeaves: annualLeaves.data?.length || 0,
       otherLeaves: otherLeaves.data?.length || 0
@@ -61,7 +62,7 @@ export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): P
     // Calculate totals for all members and weeks
     calculateTotals(result);
 
-    console.log('🔄 UNIFIED DATA SERVICE: Processing complete', {
+    logger.debug('🔄 UNIFIED DATA SERVICE: Processing complete', {
       membersWithData: Object.keys(result).filter(memberId => 
         Object.values(result[memberId]).some(week => week.total > 0)
       ).length,
@@ -86,7 +87,7 @@ export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): P
     return result;
 
   } catch (error) {
-    console.error('🔄 UNIFIED DATA SERVICE: Error in fetchUnifiedWorkloadData:', error);
+    logger.error('🔄 UNIFIED DATA SERVICE: Error in fetchUnifiedWorkloadData:', error);
     throw error;
   }
 };

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Check, ArrowRight, Brain } from 'lucide-react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
+import { logger } from '@/utils/logger';
 
 const SignUpSection = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ const SignUpSection = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
-    console.log('Form submitted:', formData);
+    logger.debug('Form submitted:', formData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

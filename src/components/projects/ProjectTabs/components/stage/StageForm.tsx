@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import type { StageFee } from "../../../../projects/hooks/types/projectTypes";
 import { MonthCalendar } from "../../../components/datepicker/MonthCalendar";
+import { logger } from '@/utils/logger';
 
 interface StageFormProps {
   stageId: string;
@@ -31,7 +32,7 @@ export const StageForm: React.FC<StageFormProps> = ({
   calculateHours,
   calculateInvoiceAge,
 }) => {
-  console.log(`StageForm for ${stageId}:`, stageFeeData);
+  logger.debug(`StageForm for ${stageId}:`, stageFeeData);
   
   const handleToday = () => {
     const today = new Date();
@@ -49,8 +50,8 @@ export const StageForm: React.FC<StageFormProps> = ({
   const currencyValue = stageFeeData?.currency || "USD";
   
   // Debug the date values
-  console.log(`Stage ${stageId} billing month:`, stageFeeData?.billingMonth);
-  console.log(`Stage ${stageId} invoice date:`, stageFeeData?.invoiceDate);
+  logger.debug(`Stage ${stageId} billing month:`, stageFeeData?.billingMonth);
+  logger.debug(`Stage ${stageId} invoice date:`, stageFeeData?.invoiceDate);
   
   // Ensure billingMonth is a proper Date object if it exists
   let billingMonth: Date | null = null;
@@ -83,7 +84,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           placeholder="0.00"
           value={feeValue}
           onChange={(e) => {
-            console.log(`Updating fee for stage ${stageId} to ${e.target.value}`);
+            logger.debug(`Updating fee for stage ${stageId} to ${e.target.value}`);
             updateStageFee(stageId, { fee: e.target.value });
           }}
           className="h-8"
@@ -96,7 +97,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <CurrencyPicker
             value={currencyValue}
             onValueChange={(value) => {
-              console.log(`Updating currency for stage ${stageId} to ${value}`);
+              logger.debug(`Updating currency for stage ${stageId} to ${value}`);
               updateStageFee(stageId, { currency: value });
             }}
           />
@@ -119,7 +120,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <MonthCalendar
             value={billingMonth}
             onChange={(date) => {
-              console.log(`Updating billing month for stage ${stageId} to ${date}`);
+              logger.debug(`Updating billing month for stage ${stageId} to ${date}`);
               updateStageFee(stageId, { billingMonth: date || null });
             }}
             showIcon={false}
@@ -130,7 +131,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <Select
             value={statusValue}
             onValueChange={(value) => {
-              console.log(`Updating status for stage ${stageId} to ${value}`);
+              logger.debug(`Updating status for stage ${stageId} to ${value}`);
               updateStageFee(stageId, { 
                 status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
               });
@@ -154,7 +155,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <InvoiceDatePicker
             value={invoiceDate}
             onChange={(date) => {
-              console.log(`Updating invoice date for stage ${stageId} to ${date}`);
+              logger.debug(`Updating invoice date for stage ${stageId} to ${date}`);
               const ageString = date ? calculateInvoiceAge(date) : '0';
               const ageNumber = parseInt(ageString, 10) || 0;
               updateStageFee(stageId, { 

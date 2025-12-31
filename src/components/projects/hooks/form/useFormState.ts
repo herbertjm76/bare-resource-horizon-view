@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FormState } from "../types/projectTypes";
 import { supabase } from "@/integrations/supabase/client";
 import React from "react";
+import { logger } from '@/utils/logger';
 
 /**
  * Loads and persists all stage fees using stageId as the key, not stageName.
@@ -26,14 +27,14 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
   const initialStages = Array.isArray(project?.stages) ? project.stages : [];
 
   // Log for debugging
-  console.log('useFormState - initializing with project:', project);
-  console.log('useFormState - initialStages:', initialStages);
+  logger.debug('useFormState - initializing with project:', project);
+  logger.debug('useFormState - initialStages:', initialStages);
 
   // Create a record of stage selections for easier lookup (by id)
   const initialStageSelections: Record<string, boolean> = {};
   initialStages.forEach((stageId: string) => {
     initialStageSelections[stageId] = true;
-    console.log(`Setting stage ${stageId} to selected`);
+    logger.debug(`Setting stage ${stageId} to selected`);
   });
 
   // Make state resettable when refetchSignal or project.id changes
@@ -90,7 +91,7 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
         .eq('project_id', project.id);
 
       if (stagesError) {
-        console.error('Error loading project stages:', stagesError);
+        logger.error('Error loading project stages:', stagesError);
         return;
       }
 
@@ -126,7 +127,7 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
               billingMonth = new Date(feeData.billing_month);
               if (isNaN(billingMonth.getTime())) billingMonth = null;
             } catch (error) {
-              console.error('Error parsing billing month:', error);
+              logger.error('Error parsing billing month:', error);
               billingMonth = null;
             }
           }

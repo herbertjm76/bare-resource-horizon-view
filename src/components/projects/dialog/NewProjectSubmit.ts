@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { FormState } from '../hooks/types/projectTypes';
 import { checkProjectCodeUnique, isProjectInfoValid } from './NewProjectValidation';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 export const submitNewProject = async (
   form: FormState,
@@ -10,10 +11,10 @@ export const submitNewProject = async (
   officeStages: Array<{ id: string; name: string }>,
   onSuccess?: () => void
 ) => {
-  console.log('Submitting new project with form:', form);
+  logger.debug('Submitting new project with form:', form);
   
   if (!isProjectInfoValid(form)) {
-    console.log('Form validation failed');
+    logger.debug('Form validation failed');
     toast.error("Please complete all required fields: Project Code and Project Name.");
     return false;
   }
@@ -63,7 +64,7 @@ export const submitNewProject = async (
       .limit(1);
 
     if (officesError) {
-      console.error('Error fetching offices:', officesError);
+      logger.error('Error fetching offices:', officesError);
       throw new Error('Failed to fetch office data');
     }
 
@@ -81,7 +82,7 @@ export const submitNewProject = async (
         .single();
 
       if (createOfficeError) {
-        console.error('Error creating default office:', createOfficeError);
+        logger.error('Error creating default office:', createOfficeError);
         throw new Error('Failed to create default office');
       }
       
@@ -90,7 +91,7 @@ export const submitNewProject = async (
       defaultOfficeId = offices[0].id;
     }
 
-    console.log('Creating project with data:', {
+    logger.debug('Creating project with data:', {
       code: form.code,
       name: form.name,
       company_id: companyId,
@@ -121,13 +122,13 @@ export const submitNewProject = async (
     }).select();
 
     if (error) {
-      console.error('Database error creating project:', error);
+      logger.error('Database error creating project:', error);
       throw error;
     }
     
     const projectId = data?.[0]?.id;
     if (projectId && form.stages.length) {
-      console.log('Creating stage fees for project:', projectId);
+      logger.debug('Creating stage fees for project:', projectId);
       const stageFeesPromises = form.stages.map(stageId => {
         const feeObj = form.stageFees[stageId];
         const stage = officeStages.find(s => s.id === stageId);
@@ -148,7 +149,7 @@ export const submitNewProject = async (
     }
     return true;
   } catch (error: any) {
-    console.error('Error creating project:', error);
+    logger.error('Error creating project:', error);
     toast.error("Failed to create project: " + (error.message || "Unknown error"));
     return false;
   }
