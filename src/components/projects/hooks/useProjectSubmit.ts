@@ -26,12 +26,25 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
 
       logger.debug('Selected stage names:', selectedStageNames);
       
-      // Prepare update object, ensuring no empty values for UUID fields
+      // First, get the existing project to preserve required fields if not provided
+      const { data: existingProject, error: fetchError } = await supabase
+        .from('projects')
+        .select('office_id')
+        .eq('id', projectId)
+        .single();
+      
+      if (fetchError) {
+        logger.error('Error fetching existing project:', fetchError);
+        throw fetchError;
+      }
+      
+      // Prepare update object, ensuring required fields are preserved
+      // office_id is NOT NULL in the database, so preserve existing value if not provided
       const projectUpdate = {
         code: form.code,
         name: form.name,
         project_manager_id: form.manager && form.manager !== 'not_assigned' ? form.manager : null,
-        office_id: form.office || null,
+        office_id: form.office || existingProject?.office_id,
         status: form.status,
         country: form.country,
         current_stage: form.current_stage,
