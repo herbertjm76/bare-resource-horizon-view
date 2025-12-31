@@ -42,7 +42,9 @@ interface PracticeArea {
 
 interface StageWithDates {
   id: string;
+  officeStageId: string;
   stageName: string;
+  stageCode: string;
   startDate: Date | null;
   contractedWeeks: number;
   color: string;
@@ -142,6 +144,73 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     enabled: !!company?.id && projects.length > 0
   });
 
+  // Fetch resource allocations for project stages
+  const { data: stageAllocationsData = [] } = useQuery({
+    queryKey: ['stage-allocations-timeline', company?.id, projects.map(p => p.id)],
+    queryFn: async () => {
+      if (!company?.id || projects.length === 0) return [];
+      const { data, error } = await supabase
+        .from('project_resource_allocations')
+        .select(`
+          id,
+          project_id,
+          stage_id,
+          resource_id,
+          resource_type
+        `)
+        .eq('company_id', company.id)
+        .in('project_id', projects.map(p => p.id));
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!company?.id && projects.length > 0
+  });
+
+  // Fetch profiles for avatars
+  const { data: profilesData = [] } = useQuery({
+    queryKey: ['profiles-avatars', company?.id],
+    queryFn: async () => {
+      if (!company?.id) return [];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .eq('company_id', company.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!company?.id
+  });
+
+  // Build profiles map for quick lookup
+  const profilesMap = useMemo(() => {
+    const map: Record<string, { firstName: string; lastName: string; avatarUrl: string | null }> = {};
+    profilesData?.forEach(p => {
+      map[p.id] = {
+        firstName: p.first_name || '',
+        lastName: p.last_name || '',
+        avatarUrl: p.avatar_url
+      };
+    });
+    return map;
+  }, [profilesData]);
+
+  // Build stage allocations map - maps project_stage.id to resource IDs
+  const stageAllocationsMap = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    stageAllocationsData?.forEach(alloc => {
+      // We need to map stage_id (office_stages.id) + project_id to get project_stages records
+      // Then map resources to project_stages.id
+      const key = `${alloc.project_id}-${alloc.stage_id}`;
+      if (!map[key]) {
+        map[key] = [];
+      }
+      if (alloc.resource_type === 'active' && !map[key].includes(alloc.resource_id)) {
+        map[key].push(alloc.resource_id);
+      }
+    });
+    return map;
+  }, [stageAllocationsData]);
+
   // Mutation to update stage start date and contracted weeks
   const updateStageMutation = useMutation({
     mutationFn: async ({ stageId, startDate, contractedWeeks }: { stageId: string; startDate: Date | null; contractedWeeks: number }) => {
@@ -166,9 +235,9 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
 
   // Build stage info map
   const stageInfoMap = useMemo(() => {
-    const map: Record<string, { color: string; orderIndex: number; id: string }> = {};
+    const map: Record<string, { color: string; orderIndex: number; id: string; code: string }> = {};
     officeStages?.forEach(s => {
-      map[s.name] = { color: s.color || '#3b82f6', orderIndex: s.order_index, id: s.id };
+      map[s.name] = { color: s.color || '#3b82f6', orderIndex: s.order_index, id: s.id, code: s.code || '' };
     });
     return map;
   }, [officeStages]);
@@ -242,12 +311,14 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     
     return project.stages
       .map(stageName => {
-        const info = stageInfoMap[stageName] || { color: '#6b7280', orderIndex: 999, id: '' };
+        const info = stageInfoMap[stageName] || { color: '#6b7280', orderIndex: 999, id: '', code: '' };
         const stageData = projectStagesMap[project.id]?.[stageName];
         
         return {
           id: stageData?.id || '',
+          officeStageId: info.id,
           stageName,
+          stageCode: info.code || stageName.substring(0, 3).toUpperCase(),
           startDate: stageData?.startDate ? parseISO(stageData.startDate) : null,
           contractedWeeks: stageData?.contractedWeeks || 4,
           color: info.color,
@@ -763,24 +834,53 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                 const dragOffset = isDragging ? dragState.currentOffset : 0;
                                 const displayLeft = (position.startWeek + dragOffset) * WEEK_WIDTH;
                                 
+                                // Get resources assigned to this stage
+                                const allocationKey = `${project.id}-${stage.officeStageId}`;
+                                const resourceIds = stageAllocationsMap[allocationKey] || [];
+                                const stageResources = resourceIds.slice(0, 3).map(id => profilesMap[id]).filter(Boolean);
+                                const extraCount = resourceIds.length > 3 ? resourceIds.length - 3 : 0;
+                                
                                 return (
                                   <Tooltip key={stage.stageName} open={isDragging ? false : undefined}>
                                     <TooltipTrigger asChild>
                                       <div
                                         className={cn(
-                                          "absolute top-1/2 -translate-y-1/2 h-7 rounded-md flex items-center gap-1 pl-1 pr-2 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
+                                          "absolute top-1/2 -translate-y-1/2 h-8 rounded-md flex items-center gap-1.5 px-1.5 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
                                           isDragging ? "ring-2 ring-primary ring-offset-2 cursor-grabbing z-20 opacity-90" : "hover:ring-2 hover:ring-primary hover:ring-offset-1"
                                         )}
                                         style={{
                                           left: `${displayLeft}px`,
-                                          width: `${Math.max(position.width * WEEK_WIDTH - 4, 48)}px`,
+                                          width: `${Math.max(position.width * WEEK_WIDTH - 4, 64)}px`,
                                           backgroundColor: stage.color,
                                         }}
                                         onMouseDown={(e) => handleDragStart(e, project, stage)}
-                                        onClick={(e) => !dragState && handleStageClick(e, project, stage)}
                                       >
                                         <GripVertical className="h-3 w-3 text-white/60 shrink-0" />
-                                        <span className="truncate">{stage.stageName}</span>
+                                        <span className="font-semibold shrink-0">{stage.stageCode}</span>
+                                        <span className="text-white/70 shrink-0">•</span>
+                                        <span className="text-white/80 shrink-0">{stage.contractedWeeks}w</span>
+                                        {stageResources.length > 0 && (
+                                          <div className="flex -space-x-1.5 ml-auto shrink-0">
+                                            {stageResources.map((resource, idx) => (
+                                              <div
+                                                key={idx}
+                                                className="h-5 w-5 rounded-full border border-white/50 bg-white/20 flex items-center justify-center text-[8px] font-medium overflow-hidden"
+                                                title={`${resource.firstName} ${resource.lastName}`}
+                                              >
+                                                {resource.avatarUrl ? (
+                                                  <img src={resource.avatarUrl} alt="" className="h-full w-full object-cover" />
+                                                ) : (
+                                                  <span>{resource.firstName?.[0]}{resource.lastName?.[0]}</span>
+                                                )}
+                                              </div>
+                                            ))}
+                                            {extraCount > 0 && (
+                                              <div className="h-5 w-5 rounded-full border border-white/50 bg-white/30 flex items-center justify-center text-[8px] font-medium">
+                                                +{extraCount}
+                                              </div>
+                                            )}
+                                          </div>
+                                        )}
                                       </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -790,7 +890,10 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                           {stage.startDate ? format(stage.startDate, 'MMM d, yyyy') : 'No start date'} 
                                           {' • '}{stage.contractedWeeks} weeks
                                         </p>
-                                        <p className="text-primary mt-1">Drag to move • Click to edit</p>
+                                        {resourceIds.length > 0 && (
+                                          <p className="text-muted-foreground">{resourceIds.length} resource{resourceIds.length !== 1 ? 's' : ''} assigned</p>
+                                        )}
+                                        <p className="text-primary mt-1">Drag to move</p>
                                       </div>
                                     </TooltipContent>
                                   </Tooltip>
@@ -908,24 +1011,53 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                               const dragOffset = isDragging ? dragState.currentOffset : 0;
                               const displayLeft = (position.startWeek + dragOffset) * WEEK_WIDTH;
                               
+                              // Get resources assigned to this stage
+                              const allocationKey = `${project.id}-${stage.officeStageId}`;
+                              const resourceIds = stageAllocationsMap[allocationKey] || [];
+                              const stageResources = resourceIds.slice(0, 3).map(id => profilesMap[id]).filter(Boolean);
+                              const extraCount = resourceIds.length > 3 ? resourceIds.length - 3 : 0;
+                              
                               return (
                                 <Tooltip key={stage.stageName} open={isDragging ? false : undefined}>
                                   <TooltipTrigger asChild>
                                     <div
                                       className={cn(
-                                        "absolute top-1/2 -translate-y-1/2 h-7 rounded-md flex items-center gap-1 pl-1 pr-2 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
+                                        "absolute top-1/2 -translate-y-1/2 h-8 rounded-md flex items-center gap-1.5 px-1.5 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
                                         isDragging ? "ring-2 ring-primary ring-offset-2 cursor-grabbing z-20 opacity-90" : "hover:ring-2 hover:ring-primary hover:ring-offset-1"
                                       )}
                                       style={{
                                         left: `${displayLeft}px`,
-                                        width: `${Math.max(position.width * WEEK_WIDTH - 4, 48)}px`,
+                                        width: `${Math.max(position.width * WEEK_WIDTH - 4, 64)}px`,
                                         backgroundColor: stage.color,
                                       }}
                                       onMouseDown={(e) => handleDragStart(e, project, stage)}
-                                      onClick={(e) => !dragState && handleStageClick(e, project, stage)}
                                     >
                                       <GripVertical className="h-3 w-3 text-white/60 shrink-0" />
-                                      <span className="truncate">{stage.stageName}</span>
+                                      <span className="font-semibold shrink-0">{stage.stageCode}</span>
+                                      <span className="text-white/70 shrink-0">•</span>
+                                      <span className="text-white/80 shrink-0">{stage.contractedWeeks}w</span>
+                                      {stageResources.length > 0 && (
+                                        <div className="flex -space-x-1.5 ml-auto shrink-0">
+                                          {stageResources.map((resource, idx) => (
+                                            <div
+                                              key={idx}
+                                              className="h-5 w-5 rounded-full border border-white/50 bg-white/20 flex items-center justify-center text-[8px] font-medium overflow-hidden"
+                                              title={`${resource.firstName} ${resource.lastName}`}
+                                            >
+                                              {resource.avatarUrl ? (
+                                                <img src={resource.avatarUrl} alt="" className="h-full w-full object-cover" />
+                                              ) : (
+                                                <span>{resource.firstName?.[0]}{resource.lastName?.[0]}</span>
+                                              )}
+                                            </div>
+                                          ))}
+                                          {extraCount > 0 && (
+                                            <div className="h-5 w-5 rounded-full border border-white/50 bg-white/30 flex items-center justify-center text-[8px] font-medium">
+                                              +{extraCount}
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
                                     </div>
                                   </TooltipTrigger>
                                   <TooltipContent>
@@ -934,7 +1066,10 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                       <p className="text-muted-foreground">
                                         {format(stage.startDate!, 'MMM d, yyyy')} • {stage.contractedWeeks} weeks
                                       </p>
-                                      <p className="text-primary mt-1">Drag to move • Click to edit</p>
+                                      {resourceIds.length > 0 && (
+                                        <p className="text-muted-foreground">{resourceIds.length} resource{resourceIds.length !== 1 ? 's' : ''} assigned</p>
+                                      )}
+                                      <p className="text-primary mt-1">Drag to move</p>
                                     </div>
                                   </TooltipContent>
                                 </Tooltip>
