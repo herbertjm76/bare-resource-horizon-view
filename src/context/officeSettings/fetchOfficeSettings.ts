@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Role, Location, Rate, Department, PracticeArea, ProjectStage, ProjectStatus, ProjectType } from './types';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 type OfficeSettings = {
   roles: Role[];
@@ -14,11 +15,11 @@ type OfficeSettings = {
 };
 
 export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSettings> => {
-  console.log("Fetching settings for company:", companyId);
+  logger.log("Fetching settings for company:", companyId);
   
   // Guard against empty/invalid companyId
   if (!companyId) {
-    console.warn('fetchOfficeSettings called without valid companyId');
+    logger.warn('fetchOfficeSettings called without valid companyId');
     return {
       roles: [],
       locations: [],
@@ -51,7 +52,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       if (error) throw error;
       locationsData = data || [];
     } catch (locationError) {
-      console.error('Error fetching locations:', locationError);
+      logger.error('Error fetching locations:', locationError);
       locationsData = [];
     }
 
@@ -66,7 +67,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       if (error) throw error;
       departmentsData = data || [];
     } catch (deptError) {
-      console.error('Error fetching departments:', deptError);
+      logger.error('Error fetching departments:', deptError);
       departmentsData = [];
     }
 
@@ -81,7 +82,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       if (error) throw error;
       practiceAreasData = data || [];
     } catch (practiceAreaError) {
-      console.error('Error fetching practice areas:', practiceAreaError);
+      logger.error('Error fetching practice areas:', practiceAreaError);
       practiceAreasData = [];
     }
 
@@ -120,14 +121,14 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       
     if (projectTypesError) throw projectTypesError;
 
-    console.log("Roles data:", rolesData);
-    console.log("Locations data:", locationsData);
-    console.log("Departments data:", departmentsData);
-    console.log("Practice Areas data:", practiceAreasData);
-    console.log("Rates data:", ratesData);
-    console.log("Stages data:", stagesData);
-    console.log("Statuses data:", statusesData);
-    console.log("Project Types data:", projectTypesData);
+    logger.log("Roles data:", rolesData);
+    logger.log("Locations data:", locationsData);
+    logger.log("Departments data:", departmentsData);
+    logger.log("Practice Areas data:", practiceAreasData);
+    logger.log("Rates data:", ratesData);
+    logger.log("Stages data:", stagesData);
+    logger.log("Statuses data:", statusesData);
+    logger.log("Project Types data:", projectTypesData);
 
     // Process data
     const processedRoles = Array.isArray(rolesData) 
@@ -234,7 +235,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       project_types: processedProjectTypes
     };
   } catch (error: any) {
-    console.error('Error fetching office settings:', error);
+    logger.error('Error fetching office settings:', error);
     toast.error('Failed to load office settings');
     
     // Return empty arrays if there's an error

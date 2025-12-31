@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { StageData } from "../types/stageSubmitTypes";
+import { logger } from '@/utils/logger';
 
 export const handleStageFee = async (
   projectId: string,
@@ -8,7 +9,7 @@ export const handleStageFee = async (
   stageId: string,
   stageData: StageData
 ): Promise<void> => {
-  console.log(`Handling stage fee for stage ID ${stageId}`);
+  logger.log(`Handling stage fee for stage ID ${stageId}`);
   
   const { data: existingFee, error: lookupError } = await supabase
     .from('project_fees')
@@ -18,7 +19,7 @@ export const handleStageFee = async (
     .maybeSingle();
     
   if (lookupError) {
-    console.error('Error checking for existing fee:', lookupError);
+    logger.error('Error checking for existing fee:', lookupError);
     throw lookupError;
   }
 
@@ -34,7 +35,7 @@ export const handleStageFee = async (
   };
 
   if (existingFee) {
-    console.log(`Updating existing fee record ${existingFee.id} for stage ${stageId}`);
+    logger.log(`Updating existing fee record ${existingFee.id} for stage ${stageId}`);
     
     const { error: updateError } = await supabase
       .from('project_fees')
@@ -42,18 +43,18 @@ export const handleStageFee = async (
       .eq('id', existingFee.id);
 
     if (updateError) {
-      console.error('Error updating fee:', updateError);
+      logger.error('Error updating fee:', updateError);
       throw updateError;
     }
   } else {
-    console.log(`Creating new fee record for stage ${stageId}`);
+    logger.log(`Creating new fee record for stage ${stageId}`);
     
     const { error: insertError } = await supabase
       .from('project_fees')
       .insert(feeRecord);
 
     if (insertError) {
-      console.error('Error inserting fee:', insertError);
+      logger.error('Error inserting fee:', insertError);
       throw insertError;
     }
   }

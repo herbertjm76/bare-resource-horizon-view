@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useResourceAllocationState } from '@/hooks/allocations/useResourceAllocationState';
 import { useFetchAllocations } from '@/hooks/allocations/useFetchAllocations';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 /**
  * Main hook that combines allocation state management and data fetching
@@ -45,8 +46,8 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
   
   // Fetch allocations when team members or selected week changes
   useEffect(() => {
-    console.log('useResourceAllocations effect triggered with week:', selectedWeek);
-    console.log('Team members count:', teamMembers.length);
+    logger.log('useResourceAllocations effect triggered with week:', selectedWeek);
+    logger.log('Team members count:', teamMembers.length);
     
     if (teamMembers.length === 0) {
       setIsLoading(false);
@@ -72,7 +73,7 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
         // Mark that initial load is complete
         setIsInitialLoad(false);
       } catch (err) {
-        console.error('Failed to load allocations:', err);
+        logger.error('Failed to load allocations:', err);
         const error = err instanceof Error ? err : new Error('Failed to load allocations');
         setError(error);
         setAllocationsStateLoading(false);
@@ -87,7 +88,7 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
 
   // Function to manually refresh allocations
   const refreshAllocations = useCallback(() => {
-    console.log('Manual refresh of allocations triggered');
+    logger.log('Manual refresh of allocations triggered');
     setIsLoading(true);
     setAllocationsStateLoading(true);
     

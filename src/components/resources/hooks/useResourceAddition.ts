@@ -1,6 +1,7 @@
 import { Resource } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 
 export const useResourceAddition = (
   projectId: string,
@@ -15,7 +16,7 @@ export const useResourceAddition = (
     role?: string; 
     isPending?: boolean 
   }) => {
-    console.log('Adding resource to database:', resource);
+    logger.log('Adding resource to database:', resource);
     
     if (!companyId) {
       toast.error('Company information not available');
@@ -60,10 +61,10 @@ export const useResourceAddition = (
       };
       
       setResources([...resources, newResource]);
-      console.log('Resource added successfully:', resource.name);
+      logger.log('Resource added successfully:', resource.name);
       
     } catch (error: any) {
-      console.error('Error adding resource:', error);
+      logger.error('Error adding resource:', error);
       toast.error(`Failed to add ${resource.name}: ${error.message}`);
     }
   };

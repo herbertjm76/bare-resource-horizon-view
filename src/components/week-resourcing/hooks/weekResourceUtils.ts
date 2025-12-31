@@ -1,5 +1,6 @@
 
 import { createAllocationMap as createAllocationMapUtil, calculateMemberWeeklyTotals as calculateMemberWeeklyTotalsUtil } from '../utils/allocationMapUtils';
+import { logger } from '@/utils/logger';
 
 /**
  * Create allocation map from comprehensive weekly allocations
@@ -31,7 +32,7 @@ export const createMemberTotalFunction = (
 ) => {
   return (memberId: string): number => {
     const total = memberWeeklyTotals.get(memberId) || 0;
-    console.log(`getMemberTotal for ${memberId}: ${total}h`);
+    logger.log(`getMemberTotal for ${memberId}: ${total}h`);
     return total;
   };
 };
@@ -61,7 +62,7 @@ export const createProjectCountFunction = (comprehensiveWeeklyAllocations: any[]
     });
     
     const count = projectSet.size;
-    console.log(`getProjectCount for ${memberId}: ${count} projects`);
+    logger.log(`getProjectCount for ${memberId}: ${count} projects`);
     return count;
   };
 };

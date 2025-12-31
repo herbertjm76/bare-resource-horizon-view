@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { logger } from '@/utils/logger';
 
 export const useWeeklyProjectHours = (
   projectAllocations: Record<string, number>, 
@@ -27,7 +28,7 @@ export const useWeeklyProjectHours = (
       }
     });
     
-    console.log("Calculated weekly project hours:", weekHours);
+    logger.log("Calculated weekly project hours:", weekHours);
     return weekHours;
   }, [projectAllocations, weeks]);
 };
