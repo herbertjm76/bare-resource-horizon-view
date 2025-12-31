@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, addMonths } from 'date-fns';
 import { TimeRange } from '../TimeRangeSelector';
+import { logger } from '@/utils/logger';
 
 interface StaffAllocation {
   projectId: string;
@@ -52,7 +53,7 @@ export const useStaffAllocations = (memberId: string | null, timeRange?: TimeRan
         const rangeStartStr = format(rangeStart, 'yyyy-MM-dd');
         const rangeEndStr = format(rangeEnd, 'yyyy-MM-dd');
 
-        console.log(`Fetching allocations for member ${memberId} for ${timeRange || 'week'} ${rangeStartStr} to ${rangeEndStr}`);
+        logger.debug(`Fetching allocations for member ${memberId} for ${timeRange || 'week'} ${rangeStartStr} to ${rangeEndStr}`);
 
         // Query project_resource_allocations with project details
         const { data: allocationData, error } = await supabase
@@ -86,7 +87,7 @@ export const useStaffAllocations = (memberId: string | null, timeRange?: TimeRan
             weekStartDate: allocation.allocation_date
           }));
 
-          console.log(`Found ${formattedAllocations.length} allocations for member ${memberId}:`, formattedAllocations);
+          logger.debug(`Found ${formattedAllocations.length} allocations for member ${memberId}:`, formattedAllocations);
           setAllocations(formattedAllocations);
         }
       } catch (error) {

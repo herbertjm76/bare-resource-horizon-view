@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+import { logger } from '@/utils/logger';
 
 export const useRateCalculator = () => {
   const { company } = useCompany();
@@ -14,20 +15,20 @@ export const useRateCalculator = () => {
 
   const loadRateOptions = async (type: 'roles' | 'locations') => {
     try {
-      console.log(`Loading ${type} data for rate calculator...`);
+      logger.debug(`Loading ${type} data for rate calculator...`);
       
       // First get base data from context or fetch if needed
       let baseData = [];
       if (type === 'roles') {
         baseData = roles;
-        console.log(`Using ${roles.length} roles from context`);
+        logger.debug(`Using ${roles.length} roles from context`);
       } else {
         baseData = locations;
-        console.log(`Using ${locations.length} locations from context`);
+        logger.debug(`Using ${locations.length} locations from context`);
       }
 
       if (baseData.length === 0) {
-        console.log(`No ${type} data found in context, fetching from database`);
+        logger.debug(`No ${type} data found in context, fetching from database`);
         if (type === 'roles') {
           const { data, error } = await supabase
             .from('office_roles')
@@ -55,7 +56,7 @@ export const useRateCalculator = () => {
         }
       }
 
-      console.log(`Using ${baseData.length} ${type} records:`, baseData);
+      logger.debug(`Using ${baseData.length} ${type} records:`, baseData);
       
       if (baseData.length > 0) {
         const rateType = type === 'roles' ? 'role' : 'location';
@@ -73,7 +74,7 @@ export const useRateCalculator = () => {
           return;
         }
 
-        console.log(`Fetched ${allRates?.length || 0} rates for ${type}`);
+        logger.debug(`Fetched ${allRates?.length || 0} rates for ${type}`);
         
         // Create a map of reference_id to rate for easy lookup
         const rateMap = new Map();
@@ -92,7 +93,7 @@ export const useRateCalculator = () => {
           };
         });
 
-        console.log(`Enriched ${type} options:`, enrichedOptions);
+        logger.debug(`Enriched ${type} options:`, enrichedOptions);
         setRateOptions(enrichedOptions);
       } else {
         setRateOptions([]);
