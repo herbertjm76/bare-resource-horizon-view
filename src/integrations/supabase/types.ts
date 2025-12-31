@@ -1603,7 +1603,7 @@ export type Database = {
           rate_basis_strategy: string | null
           stages: string[] | null
           status: string
-          target_profit_percentage: number
+          target_profit_percentage: number | null
           temp_office_location_id: string | null
           updated_at: string | null
         }
@@ -1631,7 +1631,7 @@ export type Database = {
           rate_basis_strategy?: string | null
           stages?: string[] | null
           status?: string
-          target_profit_percentage: number
+          target_profit_percentage?: number | null
           temp_office_location_id?: string | null
           updated_at?: string | null
         }
@@ -1659,7 +1659,7 @@ export type Database = {
           rate_basis_strategy?: string | null
           stages?: string[] | null
           status?: string
-          target_profit_percentage?: number
+          target_profit_percentage?: number | null
           temp_office_location_id?: string | null
           updated_at?: string | null
         }
