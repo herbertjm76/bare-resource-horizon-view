@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Clock, Users, DollarSign, CalendarDays, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Clock, Users, DollarSign, CalendarDays, Calendar } from 'lucide-react';
 import { ResourceSelector } from './ResourceSelector';
 import { TeamCompositionTable } from './TeamCompositionTable';
 import { useStageTeamComposition } from '@/hooks/useStageTeamComposition';
@@ -11,6 +11,10 @@ import { useOfficeStages } from '@/hooks/useOfficeStages';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { format, parseISO } from 'date-fns';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 
 interface Stage {
   id: string;
@@ -35,6 +39,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
   const { data: officeStages = [] } = useOfficeStages();
   const [selectedStageId, setSelectedStageId] = useState<string>(stages[0]?.id || '');
   const [contractedWeeks, setContractedWeeks] = useState<Record<string, number>>({});
+  const [stageStartDates, setStageStartDates] = useState<Record<string, Date | null>>({});
   const [projectTotalWeeks, setProjectTotalWeeks] = useState<number>(0);
   const [isUpdatingWeeks, setIsUpdatingWeeks] = useState(false);
 
@@ -58,11 +63,11 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
         setProjectTotalWeeks(Math.max(0, diffWeeks));
       }
 
-      // Fetch stage contracted weeks
+      // Fetch stage contracted weeks and start dates
       const stageNames = stages.map(s => s.name);
       const { data, error } = await supabase
         .from('project_stages')
-        .select('id, stage_name, contracted_weeks')
+        .select('id, stage_name, contracted_weeks, start_date')
         .eq('project_id', projectId)
         .in('stage_name', stageNames);
 
@@ -72,13 +77,16 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
       }
 
       const weeksMap: Record<string, number> = {};
+      const datesMap: Record<string, Date | null> = {};
       data?.forEach(stage => {
         const matchingStage = stages.find(s => s.name === stage.stage_name);
         if (matchingStage) {
           weeksMap[matchingStage.id] = stage.contracted_weeks || 0;
+          datesMap[matchingStage.id] = stage.start_date ? parseISO(stage.start_date) : null;
         }
       });
       setContractedWeeks(weeksMap);
+      setStageStartDates(datesMap);
     };
 
     fetchData();
@@ -151,6 +159,28 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
     }
   };
 
+  const handleStartDateChange = async (stageId: string, date: Date | null) => {
+    // Update local state immediately
+    setStageStartDates(prev => ({ ...prev, [stageId]: date }));
+
+    try {
+      const stage = stages.find(s => s.id === stageId);
+      if (!stage) return;
+
+      const { error } = await supabase
+        .from('project_stages')
+        .update({ start_date: date ? format(date, 'yyyy-MM-dd') : null })
+        .eq('project_id', projectId)
+        .eq('stage_name', stage.name);
+
+      if (error) throw error;
+      onStageUpdate?.();
+    } catch (error) {
+      console.error('Error updating start date:', error);
+      toast.error('Failed to update start date');
+    }
+  };
+
   if (stages.length === 0) {
     return (
       <div className="py-6 text-center">
@@ -216,7 +246,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
         stage.id === selectedStageId && (
           <div key={stage.id} className="space-y-4 animate-fade-in">
             {/* Stage Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-lg font-medium">{stage.name}</h3>
                 <p className="text-sm text-muted-foreground">
@@ -224,30 +254,66 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                 </p>
               </div>
 
-              {/* Contracted Weeks Input with total indicator */}
-              <div className="flex items-center gap-3">
-                <Label htmlFor="contracted-weeks" className="text-sm whitespace-nowrap">
-                  <CalendarDays className="h-4 w-4 inline mr-1.5" />
-                  Contracted Weeks
-                </Label>
-                <Input
-                  id="contracted-weeks"
-                  type="number"
-                  min={0}
-                  step={1}
-                  value={contractedWeeks[stage.id] || ''}
-                  onChange={(e) => handleContractedWeeksChange(stage.id, parseInt(e.target.value) || 0)}
-                  className="w-20 text-center"
-                  placeholder="0"
-                />
-                {hasWeeksConfigured && (
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">
-                    of <span className="font-medium text-foreground">{stageWeeksSum}</span> weeks
-                    {projectTotalWeeks > 0 && projectTotalWeeks !== stageWeeksSum && (
-                      <span className="text-muted-foreground/70"> ({projectTotalWeeks}w total)</span>
-                    )}
-                  </span>
-                )}
+              {/* Stage Settings Row */}
+              <div className="flex flex-wrap items-center gap-4">
+                {/* Start Date Picker */}
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="start-date" className="text-sm whitespace-nowrap">
+                    <Calendar className="h-4 w-4 inline mr-1.5" />
+                    Start Date
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-[140px] justify-start text-left font-normal",
+                          !stageStartDates[stage.id] && "text-muted-foreground"
+                        )}
+                      >
+                        {stageStartDates[stage.id] ? (
+                          format(stageStartDates[stage.id]!, 'MMM d, yyyy')
+                        ) : (
+                          <span>Pick date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="end">
+                      <CalendarComponent
+                        mode="single"
+                        selected={stageStartDates[stage.id] || undefined}
+                        onSelect={(date) => handleStartDateChange(stage.id, date || null)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* Contracted Weeks Input with total indicator */}
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="contracted-weeks" className="text-sm whitespace-nowrap">
+                    <CalendarDays className="h-4 w-4 inline mr-1.5" />
+                    Contracted Weeks
+                  </Label>
+                  <Input
+                    id="contracted-weeks"
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={contractedWeeks[stage.id] || ''}
+                    onChange={(e) => handleContractedWeeksChange(stage.id, parseInt(e.target.value) || 0)}
+                    className="w-20 text-center"
+                    placeholder="0"
+                  />
+                  {hasWeeksConfigured && (
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      of <span className="font-medium text-foreground">{stageWeeksSum}</span> weeks
+                      {projectTotalWeeks > 0 && projectTotalWeeks !== stageWeeksSum && (
+                        <span className="text-muted-foreground/70"> ({projectTotalWeeks}w total)</span>
+                      )}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
