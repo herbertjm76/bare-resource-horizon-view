@@ -29,7 +29,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       // First, get the existing project to preserve required fields if not provided
       const { data: existingProject, error: fetchError } = await supabase
         .from('projects')
-        .select('office_id')
+        .select('office_id, target_profit_percentage')
         .eq('id', projectId)
         .single();
       
@@ -48,7 +48,9 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         status: form.status,
         country: form.country,
         current_stage: form.current_stage,
-        target_profit_percentage: form.profit ? Number(form.profit) : null,
+        target_profit_percentage: form.profit !== undefined && form.profit !== null && String(form.profit).trim() !== ''
+          ? Number(form.profit)
+          : existingProject?.target_profit_percentage ?? 0,
         stages: selectedStageNames,
         department: (form as any).department || null
       };
