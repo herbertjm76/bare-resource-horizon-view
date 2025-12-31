@@ -107,6 +107,20 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   const visibleWeeksCount = weeks.filter(w => !w.isPreviousWeek).length;
   const totalFTE = visibleWeeksCount > 0 ? totalHours / (workWeekHours * visibleWeeksCount) : 0;
 
+  /**
+   * CRITICAL: Member Filter Integration
+   * ------------------------------------
+   * This logic ensures that when member filters (practiceArea, department, location, searchTerm)
+   * are active, projects with NO matching resources are hidden from the view.
+   * 
+   * DO NOT REMOVE OR MODIFY this without understanding the full filtering flow:
+   * 1. MemberFilterRow sets filters in ResourceScheduling page state
+   * 2. Filters are passed down through ProjectResourcingContent -> WorkloadStyleResourceGrid -> here
+   * 3. filteredResources is already filtered by useFilteredResources hook
+   * 4. If no resources match the active filters, this project row should not render
+   * 
+   * This was broken before and fixed - maintain this behavior!
+   */
   const hasActiveMemberFilters = Boolean(
     memberFilters &&
     (memberFilters.practiceArea !== 'all' ||
@@ -115,7 +129,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
       (memberFilters.searchTerm && memberFilters.searchTerm.trim() !== ''))
   );
 
-  // If member filters are active and no resources match, hide the project row entirely.
+  // Hide project row when member filters are active but no team members match
   if (hasActiveMemberFilters && !isLoading && filteredResources.length === 0) {
     return null;
   }
