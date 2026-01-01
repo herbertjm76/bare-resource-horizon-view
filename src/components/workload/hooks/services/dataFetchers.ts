@@ -1,6 +1,12 @@
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
+import { DEMO_COMPANY_ID, generateDemoAllocations, generateDemoAnnualLeaves, DEMO_PROJECTS } from '@/data/demoData';
+
+// Check if we're in demo mode
+const isDemoMode = () => {
+  return localStorage.getItem('demoMode') === 'true';
+};
 
 export const fetchProjectAllocations = async (
   companyId: string,
@@ -10,6 +16,34 @@ export const fetchProjectAllocations = async (
 ) => {
   const startDateStr = format(startDate, 'yyyy-MM-dd');
   const endDateStr = format(endDate, 'yyyy-MM-dd');
+  
+  // Return demo data if in demo mode
+  if (isDemoMode() || companyId === DEMO_COMPANY_ID) {
+    const demoAllocations = generateDemoAllocations();
+    
+    // Filter allocations by date range and member IDs
+    const filteredAllocations = demoAllocations
+      .filter(alloc => 
+        memberIds.includes(alloc.resource_id) &&
+        alloc.allocation_date >= startDateStr &&
+        alloc.allocation_date <= endDateStr &&
+        alloc.hours > 0
+      )
+      .map(alloc => {
+        const project = DEMO_PROJECTS.find(p => p.id === alloc.project_id);
+        return {
+          ...alloc,
+          projects: project ? { id: project.id, name: project.name, code: project.code } : null
+        };
+      });
+    
+    logger.log('🔍 DEMO PROJECT ALLOCATIONS:', {
+      totalRecords: filteredAllocations.length,
+      dateRange: `${startDateStr} to ${endDateStr}`
+    });
+    
+    return { data: filteredAllocations, error: null };
+  }
   
   logger.log('🚨🚨🚨 CRITICAL DEBUG - FETCHING PROJECT ALLOCATIONS 🚨🚨🚨');
   logger.log('🔍 FETCHING PROJECT ALLOCATIONS:', {
@@ -92,6 +126,21 @@ export const fetchAnnualLeaves = async (
   startDate: Date,
   endDate: Date
 ) => {
+  // Return demo data if in demo mode
+  if (isDemoMode() || companyId === DEMO_COMPANY_ID) {
+    const demoLeaves = generateDemoAnnualLeaves();
+    
+    const filteredLeaves = demoLeaves.filter(leave => 
+      memberIds.includes(leave.member_id)
+    );
+    
+    logger.log('🔍 DEMO ANNUAL LEAVES:', {
+      totalRecords: filteredLeaves.length
+    });
+    
+    return { data: filteredLeaves, error: null };
+  }
+  
   logger.log('🔍 FETCHING ANNUAL LEAVES - FIXED VERSION');
   
   // FIX: Remove restrictive date filtering - fetch ALL leaves and let frontend filter
@@ -117,6 +166,12 @@ export const fetchOtherLeaves = async (
   startDate: Date,
   endDate: Date
 ) => {
+  // Return empty array for demo mode (no other leaves in demo)
+  if (isDemoMode() || companyId === DEMO_COMPANY_ID) {
+    logger.log('🔍 DEMO OTHER LEAVES: []');
+    return { data: [], error: null };
+  }
+  
   logger.log('🔍 FETCHING OTHER LEAVES - FIXED VERSION');
   
   // FIX: Remove restrictive date filtering - fetch ALL other leaves and let frontend filter

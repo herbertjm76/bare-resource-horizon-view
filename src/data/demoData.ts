@@ -3,6 +3,8 @@
  * This data is used when the application is in demo mode
  */
 
+import { format, startOfWeek, addDays, addWeeks } from 'date-fns';
+
 export const DEMO_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
 // Demo team members with realistic data
@@ -160,6 +162,7 @@ export const DEMO_PROJECTS = [
     current_stage: 'Design Development',
     country: 'USA',
     office_id: '00000000-0000-0000-0002-000000000001',
+    temp_office_location_id: '00000000-0000-0000-0003-000000000001',
     department: 'Commercial',
     department_icon: '🏢',
     contract_start_date: '2024-06-01',
@@ -182,6 +185,7 @@ export const DEMO_PROJECTS = [
     current_stage: 'Schematic Design',
     country: 'USA',
     office_id: '00000000-0000-0000-0002-000000000001',
+    temp_office_location_id: '00000000-0000-0000-0003-000000000001',
     department: 'Residential',
     department_icon: '🏠',
     contract_start_date: '2024-09-01',
@@ -204,6 +208,7 @@ export const DEMO_PROJECTS = [
     current_stage: 'Documentation',
     country: 'USA',
     office_id: '00000000-0000-0000-0002-000000000002',
+    temp_office_location_id: '00000000-0000-0000-0003-000000000002',
     department: 'Healthcare',
     department_icon: '🏥',
     contract_start_date: '2023-03-01',
@@ -226,6 +231,7 @@ export const DEMO_PROJECTS = [
     current_stage: 'Concept',
     country: 'USA',
     office_id: '00000000-0000-0000-0002-000000000002',
+    temp_office_location_id: '00000000-0000-0000-0003-000000000002',
     department: 'Urban Design',
     department_icon: '🌳',
     contract_start_date: '2025-01-01',
@@ -248,6 +254,7 @@ export const DEMO_PROJECTS = [
     current_stage: 'Design Development',
     country: 'USA',
     office_id: '00000000-0000-0000-0002-000000000001',
+    temp_office_location_id: '00000000-0000-0000-0003-000000000001',
     department: 'Hospitality',
     department_icon: '🏨',
     contract_start_date: '2024-08-01',
@@ -270,6 +277,7 @@ export const DEMO_PROJECTS = [
     current_stage: 'Concept',
     country: 'USA',
     office_id: '00000000-0000-0000-0002-000000000003',
+    temp_office_location_id: '00000000-0000-0000-0003-000000000003',
     department: 'Commercial',
     department_icon: '🏢',
     contract_start_date: '2025-04-01',
@@ -292,6 +300,7 @@ export const DEMO_PROJECTS = [
     current_stage: 'Construction',
     country: 'USA',
     office_id: '00000000-0000-0000-0002-000000000001',
+    temp_office_location_id: '00000000-0000-0000-0003-000000000001',
     department: 'Residential',
     department_icon: '🏠',
     contract_start_date: '2022-01-01',
@@ -368,48 +377,143 @@ export const DEMO_COMPANY = {
   updated_at: new Date().toISOString()
 };
 
+// Demo pre-registered invites (pending team members)
+export const DEMO_PRE_REGISTERED = [
+  {
+    id: '00000000-0000-0000-0009-000000000001',
+    company_id: DEMO_COMPANY_ID,
+    email: 'david.kim@bareresource.com',
+    first_name: 'David',
+    last_name: 'Kim',
+    job_title: 'Senior Designer',
+    department: 'Interiors',
+    location: 'Los Angeles',
+    weekly_capacity: 40,
+    status: 'pending',
+    invitation_type: 'pre_registered',
+    code: 'DEMO-001',
+    created_by: '00000000-0000-0000-0000-000000000002',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '00000000-0000-0000-0009-000000000002',
+    company_id: DEMO_COMPANY_ID,
+    email: 'lisa.wang@bareresource.com',
+    first_name: 'Lisa',
+    last_name: 'Wang',
+    job_title: 'BIM Specialist',
+    department: 'Technical',
+    location: 'New York',
+    weekly_capacity: 40,
+    status: 'pending',
+    invitation_type: 'pre_registered',
+    code: 'DEMO-002',
+    created_by: '00000000-0000-0000-0000-000000000002',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
+
+// Demo holidays
+export const generateDemoHolidays = () => {
+  const today = new Date();
+  return [
+    {
+      id: '00000000-0000-0000-000A-000000000001',
+      company_id: DEMO_COMPANY_ID,
+      name: 'Independence Day',
+      date: format(addDays(today, 14), 'yyyy-MM-dd'),
+      location_id: null,
+      is_recurring: true,
+      office_locations: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: '00000000-0000-0000-000A-000000000002',
+      company_id: DEMO_COMPANY_ID,
+      name: 'Labor Day',
+      date: format(addDays(today, 45), 'yyyy-MM-dd'),
+      location_id: null,
+      is_recurring: true,
+      office_locations: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: '00000000-0000-0000-000A-000000000003',
+      company_id: DEMO_COMPANY_ID,
+      name: 'NYC Office Day',
+      date: format(addDays(today, 21), 'yyyy-MM-dd'),
+      location_id: '00000000-0000-0000-0003-000000000001',
+      is_recurring: false,
+      office_locations: { city: 'New York', country: 'USA' },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ];
+};
+
+// Demo team composition data
+export const DEMO_TEAM_COMPOSITION = [
+  { id: '00000000-0000-0000-000B-000000000001', company_id: DEMO_COMPANY_ID, project_id: '00000000-0000-0000-0001-000000000001', title: 'Principal', number_of_people: 1 },
+  { id: '00000000-0000-0000-000B-000000000002', company_id: DEMO_COMPANY_ID, project_id: '00000000-0000-0000-0001-000000000001', title: 'Project Architect', number_of_people: 2 },
+  { id: '00000000-0000-0000-000B-000000000003', company_id: DEMO_COMPANY_ID, project_id: '00000000-0000-0000-0001-000000000002', title: 'Senior Architect', number_of_people: 1 },
+  { id: '00000000-0000-0000-000B-000000000004', company_id: DEMO_COMPANY_ID, project_id: '00000000-0000-0000-0001-000000000003', title: 'Technical Director', number_of_people: 1 }
+];
+
 // Helper function to generate resource allocations for the next 12 weeks
+// Returns allocations with realistic patterns - some overloaded, some underutilized
 export const generateDemoAllocations = () => {
   const allocations: any[] = [];
   const today = new Date();
   
   // Get start of current week (Monday)
-  const startOfWeek = new Date(today);
-  const day = startOfWeek.getDay();
-  const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
-  startOfWeek.setDate(diff);
-  startOfWeek.setHours(0, 0, 0, 0);
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
 
   // Allocation patterns for each team member per project
+  // Designed to show: John (80%), Sarah (105% overloaded), Alex (110% overloaded), 
+  // Maria (80%), James (75% part-time), Emma (60% underutilized), Michael (95%)
   const allocationPatterns = [
-    { memberId: '00000000-0000-0000-0000-000000000002', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 24 },
-    { memberId: '00000000-0000-0000-0000-000000000002', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 8 },
-    { memberId: '00000000-0000-0000-0000-000000000003', projectId: '00000000-0000-0000-0001-000000000002', hoursPerWeek: 32 },
-    { memberId: '00000000-0000-0000-0000-000000000004', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 16 },
-    { memberId: '00000000-0000-0000-0000-000000000004', projectId: '00000000-0000-0000-0001-000000000005', hoursPerWeek: 24 },
+    // John Mitchell - 32h/week = 80% utilization
+    { memberId: '00000000-0000-0000-0000-000000000002', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 20 },
+    { memberId: '00000000-0000-0000-0000-000000000002', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 12 },
+    
+    // Sarah Wilson - 42h/week = 105% (overloaded)
+    { memberId: '00000000-0000-0000-0000-000000000003', projectId: '00000000-0000-0000-0001-000000000002', hoursPerWeek: 28 },
+    { memberId: '00000000-0000-0000-0000-000000000003', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 14 },
+    
+    // Alex Chen - 44h/week = 110% (overloaded)
+    { memberId: '00000000-0000-0000-0000-000000000004', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 24 },
+    { memberId: '00000000-0000-0000-0000-000000000004', projectId: '00000000-0000-0000-0001-000000000005', hoursPerWeek: 20 },
+    
+    // Maria Rodriguez - 32h/week = 80%
     { memberId: '00000000-0000-0000-0000-000000000005', projectId: '00000000-0000-0000-0001-000000000005', hoursPerWeek: 32 },
+    
+    // James Taylor - 24h/week = 75% of 32h capacity
     { memberId: '00000000-0000-0000-0000-000000000006', projectId: '00000000-0000-0000-0001-000000000004', hoursPerWeek: 24 },
-    { memberId: '00000000-0000-0000-0000-000000000007', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 32 },
-    { memberId: '00000000-0000-0000-0000-000000000008', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 24 },
-    { memberId: '00000000-0000-0000-0000-000000000008', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 8 }
+    
+    // Emma Johnson - 24h/week = 60% (underutilized)
+    { memberId: '00000000-0000-0000-0000-000000000007', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 24 },
+    
+    // Michael Brown - 38h/week = 95%
+    { memberId: '00000000-0000-0000-0000-000000000008', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 22 },
+    { memberId: '00000000-0000-0000-0000-000000000008', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 16 }
   ];
 
   // Generate 12 weeks of allocations
   for (let week = 0; week < 12; week++) {
-    const weekStart = new Date(startOfWeek);
-    weekStart.setDate(weekStart.getDate() + (week * 7));
+    const currentWeekStart = addWeeks(weekStart, week);
 
     // Generate daily allocations for each weekday
     for (let dayOffset = 0; dayOffset < 5; dayOffset++) {
-      const date = new Date(weekStart);
-      date.setDate(date.getDate() + dayOffset);
-      const dateStr = date.toISOString().split('T')[0];
+      const date = addDays(currentWeekStart, dayOffset);
+      const dateStr = format(date, 'yyyy-MM-dd');
 
       allocationPatterns.forEach((pattern, idx) => {
-        // Daily hours = weekly hours / 5 with some variation
-        const baseDaily = pattern.hoursPerWeek / 5;
-        const variation = (Math.random() - 0.5) * 2; // +/- 1 hour variation
-        const dailyHours = Math.max(0, Math.min(8, baseDaily + variation));
+        // Daily hours = weekly hours / 5
+        const dailyHours = pattern.hoursPerWeek / 5;
 
         if (dailyHours > 0) {
           allocations.push({
@@ -419,7 +523,7 @@ export const generateDemoAllocations = () => {
             resource_id: pattern.memberId,
             resource_type: 'profile',
             allocation_date: dateStr,
-            hours: Math.round(dailyHours * 10) / 10,
+            hours: dailyHours,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
@@ -449,8 +553,8 @@ export const generateDemoLeaveRequests = () => {
       company_id: DEMO_COMPANY_ID,
       member_id: '00000000-0000-0000-0000-000000000004',
       leave_type_id: '00000000-0000-0000-0007-000000000001',
-      start_date: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      end_date: new Date(today.getTime() + 11 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      start_date: format(addDays(today, 7), 'yyyy-MM-dd'),
+      end_date: format(addDays(today, 11), 'yyyy-MM-dd'),
       duration_type: 'full_day',
       total_hours: 40,
       status: 'approved',
@@ -465,8 +569,8 @@ export const generateDemoLeaveRequests = () => {
       company_id: DEMO_COMPANY_ID,
       member_id: '00000000-0000-0000-0000-000000000005',
       leave_type_id: '00000000-0000-0000-0007-000000000003',
-      start_date: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      end_date: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      start_date: format(addDays(today, 14), 'yyyy-MM-dd'),
+      end_date: format(addDays(today, 14), 'yyyy-MM-dd'),
       duration_type: 'full_day',
       total_hours: 8,
       status: 'pending',
@@ -475,6 +579,67 @@ export const generateDemoLeaveRequests = () => {
       updated_at: new Date().toISOString()
     }
   ];
+};
+
+// Demo annual leaves (for utilization calculation)
+export const generateDemoAnnualLeaves = () => {
+  const today = new Date();
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+  
+  return [
+    // Alex has vacation next week
+    {
+      id: '00000000-0000-0000-000C-000000000001',
+      company_id: DEMO_COMPANY_ID,
+      member_id: '00000000-0000-0000-0000-000000000004',
+      date: format(addDays(weekStart, 7), 'yyyy-MM-dd'),
+      hours: 8,
+      leave_type_id: '00000000-0000-0000-0007-000000000001'
+    },
+    {
+      id: '00000000-0000-0000-000C-000000000002',
+      company_id: DEMO_COMPANY_ID,
+      member_id: '00000000-0000-0000-0000-000000000004',
+      date: format(addDays(weekStart, 8), 'yyyy-MM-dd'),
+      hours: 8,
+      leave_type_id: '00000000-0000-0000-0007-000000000001'
+    }
+  ];
+};
+
+// Demo metrics for dashboard
+export const DEMO_METRICS = {
+  activeProjects: 5,
+  activeResources: 7,
+  totalRevenue: 9760000,
+  avgProjectValue: 1394285,
+  utilizationTrends: {
+    days7: 82,
+    days30: 78,
+    days90: 75
+  },
+  projectsByStatus: [
+    { name: 'Active', value: 5 },
+    { name: 'Pipeline', value: 1 },
+    { name: 'Completed', value: 1 }
+  ],
+  projectsByStage: [
+    { name: 'Concept', value: 2, color: '#10B981' },
+    { name: 'Schematic Design', value: 1, color: '#3B82F6' },
+    { name: 'Design Development', value: 2, color: '#8B5CF6' },
+    { name: 'Documentation', value: 1, color: '#F59E0B' },
+    { name: 'Construction', value: 1, color: '#EF4444' }
+  ],
+  projectsByLocation: [
+    { name: 'USA', value: 7, color: '#059669' }
+  ],
+  projectsByPM: [
+    { name: 'John Mitchell', value: 2 },
+    { name: 'Sarah Wilson', value: 2 },
+    { name: 'Michael Brown', value: 1 },
+    { name: 'James Taylor', value: 1 },
+    { name: 'Maria Rodriguez', value: 1 }
+  ]
 };
 
 // Export all demo data
@@ -488,8 +653,13 @@ export const DEMO_DATA = {
   practiceAreas: DEMO_PRACTICE_AREAS,
   stages: DEMO_STAGES,
   leaveTypes: DEMO_LEAVE_TYPES,
+  preRegistered: DEMO_PRE_REGISTERED,
+  teamComposition: DEMO_TEAM_COMPOSITION,
+  metrics: DEMO_METRICS,
   getAllocations: generateDemoAllocations,
-  getLeaveRequests: generateDemoLeaveRequests
+  getHolidays: generateDemoHolidays,
+  getLeaveRequests: generateDemoLeaveRequests,
+  getAnnualLeaves: generateDemoAnnualLeaves
 };
 
 export default DEMO_DATA;

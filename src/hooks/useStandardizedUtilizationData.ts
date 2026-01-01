@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { format, startOfWeek } from 'date-fns';
 import { UtilizationCalculationService, MemberUtilizationData, TeamUtilizationSummary } from '@/services/utilizationCalculationService';
 import { logger } from '@/utils/logger';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { generateDemoAllocations, generateDemoAnnualLeaves, DEMO_TEAM_MEMBERS } from '@/data/demoData';
 
 interface UseStandardizedUtilizationDataProps {
   selectedWeek: Date;
@@ -17,9 +19,64 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers, time
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
 
   useEffect(() => {
     const fetchUtilizationData = async () => {
+      // Handle demo mode
+      if (isDemoMode) {
+        try {
+          setIsLoading(true);
+          
+          const demoAllocations = generateDemoAllocations();
+          const demoAnnualLeaves = generateDemoAnnualLeaves();
+          const demoMembers = teamMembers.length > 0 ? teamMembers : DEMO_TEAM_MEMBERS;
+          
+          const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+          const weekEndDate = format(new Date(new Date(weekStartDate).getTime() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd');
+          
+          // Calculate utilization from demo data
+          const memberUtilizationData: MemberUtilizationData[] = demoMembers.map(member => {
+            // Get allocations for this member in the selected week
+            const memberAllocations = demoAllocations.filter(
+              alloc => alloc.resource_id === member.id && 
+                       alloc.allocation_date >= weekStartDate && 
+                       alloc.allocation_date < weekEndDate
+            );
+            
+            const projectHours = memberAllocations.reduce((sum, alloc) => sum + alloc.hours, 0);
+            
+            // Get annual leaves for this member
+            const memberLeaves = demoAnnualLeaves.filter(
+              leave => leave.member_id === member.id &&
+                       leave.date >= weekStartDate &&
+                       leave.date < weekEndDate
+            );
+            const annualLeaveHours = memberLeaves.reduce((sum, leave) => sum + leave.hours, 0);
+            
+            return UtilizationCalculationService.calculateMemberUtilization(
+              member,
+              projectHours,
+              annualLeaveHours,
+              0, // No office holidays for demo
+              0  // No other leave for demo
+            );
+          });
+
+          const teamSummaryData = UtilizationCalculationService.calculateTeamUtilization(memberUtilizationData);
+
+          setMemberUtilizations(memberUtilizationData);
+          setTeamSummary(teamSummaryData);
+          setIsLoading(false);
+          return;
+        } catch (err) {
+          logger.error('Error calculating demo utilization:', err);
+          setError(err instanceof Error ? err : new Error('Failed to calculate demo utilization'));
+          setIsLoading(false);
+          return;
+        }
+      }
+
       if (!company?.id || !teamMembers.length) {
         setMemberUtilizations([]);
         setTeamSummary(null);
@@ -169,7 +226,7 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers, time
     const timeoutId = setTimeout(fetchUtilizationData, 300);
     
     return () => clearTimeout(timeoutId);
-  }, [company?.id, format(selectedWeek, 'yyyy-MM-dd'), teamMembers.length, timeRange?.startDate, timeRange?.endDate]);
+  }, [company?.id, format(selectedWeek, 'yyyy-MM-dd'), teamMembers.length, timeRange?.startDate, timeRange?.endDate, isDemoMode]);
 
   return {
     memberUtilizations,
