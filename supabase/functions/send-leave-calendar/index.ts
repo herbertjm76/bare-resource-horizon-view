@@ -424,7 +424,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Organizer email for calendar invites
-    const organizerEmail = 'company_admin@bareresource.com';
+    const organizerEmail = 'admin@bareresource.com';
     
     // Generate ICS file with METHOD:REQUEST for native calendar invite behavior
     const icsContent = generateICSFile(leaveRequests, holidays, companyId, companyName, recipientEmail, organizerEmail);
@@ -473,13 +473,13 @@ const handler = async (req: Request): Promise<Response> => {
             <p>📆 ${dateStr}</p>
             ${leave.remarks ? `<p style="color: #666;">Remarks: ${leave.remarks}</p>` : ''}
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-            <p style="color: #999; font-size: 12px;">Sent from Leave & Holidays</p>
+            <p style="color: #999; font-size: 12px;">Sent from ${companyName}</p>
           </div>
         `;
 
         try {
           const { error } = await resend.emails.send({
-            from: "Leave & Holidays <company_admin@bareresource.com>",
+            from: `${companyName} <admin@bareresource.com>`,
             to: [recipientEmail],
             subject: `Leave: ${memberName} - ${leave.leave_type.name} (${dateStr})`,
             html: emailHtml,
@@ -512,13 +512,13 @@ const handler = async (req: Request): Promise<Response> => {
             <p><strong>${holiday.name}${locationSuffix}</strong></p>
             <p>📆 ${dateStr}</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-            <p style="color: #999; font-size: 12px;">Sent from Leave & Holidays</p>
+            <p style="color: #999; font-size: 12px;">Sent from ${companyName}</p>
           </div>
         `;
 
         try {
           const { error } = await resend.emails.send({
-            from: "Leave & Holidays <company_admin@bareresource.com>",
+            from: `${companyName} <admin@bareresource.com>`,
             to: [recipientEmail],
             subject: `🎉 Holiday: ${holiday.name}${locationSuffix} (${dateStr})`,
             html: emailHtml,
@@ -582,13 +582,13 @@ const handler = async (req: Request): Promise<Response> => {
           Events are uniquely identified, so updates won't create duplicates.
         </p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-        <p style="color: #999; font-size: 12px;">Sent from Leave & Holidays</p>
+        <p style="color: #999; font-size: 12px;">Sent from ${companyName}</p>
       </div>
     `;
 
     // Send as calendar invite using text/calendar content type for native calendar behavior
     const { error: emailError } = await resend.emails.send({
-      from: "Leave & Holidays <company_admin@bareresource.com>",
+      from: `${companyName} <admin@bareresource.com>`,
       to: [recipientEmail],
       subject: `${companyName} Leave Calendar - ${totalEvents} Event${totalEvents !== 1 ? 's' : ''}`,
       html: emailHtml,
