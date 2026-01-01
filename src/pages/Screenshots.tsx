@@ -109,7 +109,7 @@ const Screenshots: React.FC = () => {
 
   const handleLaunchDemo = () => {
     startDemoMode();
-    navigate('/dashboard');
+    navigate('/demo/dashboard');
   };
 
   const openLightbox = (screenshot: Screenshot, index: number) => {
@@ -330,7 +330,7 @@ const Screenshots: React.FC = () => {
                     onClick={() => {
                       closeLightbox();
                       startDemoMode();
-                      navigate(selectedScreenshot.route);
+                      navigate(`/demo${selectedScreenshot.route}`);
                     }}
                     className="bg-gradient-to-r from-purple-600 to-blue-600"
                   >
