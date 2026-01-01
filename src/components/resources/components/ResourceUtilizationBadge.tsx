@@ -17,13 +17,15 @@ export const ResourceUtilizationBadge: React.FC<ResourceUtilizationBadgeProps> =
   // Round utilization to nearest integer
   const roundedUtilization = Math.round(utilization);
   
-  // Helper function to get colors based on utilization percentage - using theme colors and app settings thresholds
+  // Color-coding based on utilization percentage - consistent across app
   const getUtilizationColor = (util: number) => {
-    if (util > allocationDangerThreshold) return { bg: '#FBCFE8', text: '#9D174D' }; // Pink/Magenta - danger
-    if (util > allocationWarningThreshold) return { bg: '#FED7AA', text: '#C2410C' }; // Orange - warning
-    if (util > 100) return { bg: '#FBCFE8', text: '#9D174D' }; // Pink/Magenta - over capacity
-    if (util >= 70) return { bg: '#DDD6FE', text: '#6B21A8' }; // Purple - optimal
-    return { bg: '#E5E7EB', text: '#4B5563' }; // Gray - under-utilized
+    if (util > allocationDangerThreshold) return { bg: '#FECACA', text: '#B91C1C' }; // Red - danger threshold exceeded
+    if (util > allocationWarningThreshold) return { bg: '#FED7AA', text: '#C2410C' }; // Orange - warning threshold
+    if (util > 100) return { bg: '#FECACA', text: '#B91C1C' }; // Red - over-allocated
+    if (util >= 80) return { bg: '#BBF7D0', text: '#166534' }; // Green - optimal (80-100%)
+    if (util >= 50) return { bg: '#FEF08A', text: '#A16207' }; // Yellow - moderate (50-79%)
+    if (util > 0) return { bg: '#FED7AA', text: '#C2410C' }; // Orange - underutilized (<50%)
+    return { bg: '#E5E7EB', text: '#4B5563' }; // Gray - no allocation
   };
   
   const colors = getUtilizationColor(roundedUtilization);

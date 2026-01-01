@@ -35,14 +35,16 @@ export const getUtilizationStatus = (utilization: number): {
   status: 'low' | 'optimal' | 'high' | 'overallocated'; 
   color: string;
 } => {
-  if (utilization <= 30) {
-    return { status: 'low', color: '#9CA3AF' }; // Gray
-  } else if (utilization <= 80) {
-    return { status: 'optimal', color: '#10B981' }; // Green
-  } else if (utilization <= 100) {
-    return { status: 'high', color: '#F59E0B' }; // Amber
+  if (utilization > 100) {
+    return { status: 'overallocated', color: '#EF4444' }; // Red - over-allocated
+  } else if (utilization >= 80) {
+    return { status: 'optimal', color: '#22c55e' }; // Green - optimal (80-100%)
+  } else if (utilization >= 50) {
+    return { status: 'high', color: '#eab308' }; // Yellow - moderate (50-79%)
+  } else if (utilization > 0) {
+    return { status: 'low', color: '#f97316' }; // Orange - underutilized (<50%)
   } else {
-    return { status: 'overallocated', color: '#EF4444' }; // Red
+    return { status: 'low', color: '#9CA3AF' }; // Gray - no allocation
   }
 };
 

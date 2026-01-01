@@ -73,12 +73,13 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (Math.min(utilization, 100) / 100) * circumference;
   
-  // Determine color based on utilization zones with actual HSL colors
+  // Color-coding based on utilization percentage
   const getUtilizationColor = () => {
-    if (utilization > 100) return 'hsl(0, 84%, 60%)'; // Red - overbooked
-    if (utilization === 100) return 'hsl(142, 71%, 45%)'; // Green - fully booked
-    if (utilization < 100 && utilization >= threshold) return 'hsl(38, 92%, 50%)'; // Amber - slightly available
-    return 'hsl(221, 83%, 53%)'; // Blue - highly available
+    if (utilization > 100) return 'hsl(0, 84%, 60%)'; // Red - over-allocated
+    if (utilization >= 80) return 'hsl(142, 71%, 45%)'; // Green - optimal (80-100%)
+    if (utilization >= 50) return 'hsl(48, 96%, 53%)'; // Yellow - moderate (50-79%)
+    if (utilization > 0) return 'hsl(25, 95%, 53%)'; // Orange - underutilized (<50%)
+    return 'hsl(220, 9%, 46%)'; // Gray - no allocation
   };
 
   return (

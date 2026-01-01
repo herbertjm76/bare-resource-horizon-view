@@ -28,10 +28,11 @@ export const TeamMemberInsightsGrid: React.FC<TeamMemberInsightsGridProps> = ({ 
     : 0;
 
   const getUtilizationColor = (utilization: number) => {
-    if (utilization > 90) return 'text-red-600 bg-red-50 border-red-200';
-    if (utilization > 75) return 'text-orange-600 bg-orange-50 border-orange-200';
-    if (utilization > 50) return 'text-green-600 bg-green-50 border-green-200';
-    return 'text-blue-600 bg-blue-50 border-blue-200';
+    if (utilization > 100) return 'text-red-600 bg-red-50 border-red-200'; // Over-allocated
+    if (utilization >= 80) return 'text-green-600 bg-green-50 border-green-200'; // Optimal (80-100%)
+    if (utilization >= 50) return 'text-yellow-600 bg-yellow-50 border-yellow-200'; // Moderate (50-79%)
+    if (utilization > 0) return 'text-orange-600 bg-orange-50 border-orange-200'; // Underutilized (<50%)
+    return 'text-gray-600 bg-gray-50 border-gray-200'; // No allocation
   };
   
   if (isLoading || !memberProfile) {
