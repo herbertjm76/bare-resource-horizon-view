@@ -5,16 +5,28 @@ import { useCompany } from '@/context/CompanyContext';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { format, startOfWeek, endOfWeek, addDays } from 'date-fns';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { 
+  DEMO_TEAM_MEMBERS, 
+  DEMO_PRE_REGISTERED, 
+  generateDemoAllocations, 
+  generateDemoAnnualLeaves,
+  DEMO_HOLIDAYS,
+  DEMO_COMPANY_ID
+} from '@/data/demoData';
 
 type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
 
 export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOption: SortOption = 'alphabetical') => {
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
   
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekStartString = format(weekStart, 'yyyy-MM-dd');
   const weekEndString = format(weekEnd, 'yyyy-MM-dd');
+  
+  const companyId = isDemoMode ? DEMO_COMPANY_ID : company?.id;
 
   // Stable filters for data fetching
   const stableFilters = useMemo(() => ({ 
@@ -34,8 +46,21 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
 
   // Fetch profiles for available members row
   const { data: profiles = [] } = useQuery({
-    queryKey: ['available-members-profiles', company?.id],
+    queryKey: ['available-members-profiles', companyId, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return DEMO_TEAM_MEMBERS.map(m => ({
+          id: m.id,
+          first_name: m.first_name,
+          last_name: m.last_name,
+          avatar_url: m.avatar_url,
+          weekly_capacity: m.weekly_capacity,
+          department: m.department,
+          practice_area: m.practice_area,
+          location: m.location
+        }));
+      }
+      
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('profiles')
@@ -44,14 +69,27 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
+    enabled: isDemoMode || !!company?.id,
     staleTime: 2 * 60 * 1000,
   });
 
   // Fetch invites for available members row
   const { data: invites = [] } = useQuery({
-    queryKey: ['available-members-invites', company?.id],
+    queryKey: ['available-members-invites', companyId, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return DEMO_PRE_REGISTERED.map(m => ({
+          id: m.id,
+          first_name: m.first_name,
+          last_name: m.last_name,
+          avatar_url: (m as any).avatar_url || null,
+          weekly_capacity: m.weekly_capacity,
+          department: m.department,
+          practice_area: (m as any).practice_area || null,
+          location: m.location
+        }));
+      }
+      
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('invites')
@@ -62,19 +100,39 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
+    enabled: isDemoMode || !!company?.id,
     staleTime: 2 * 60 * 1000,
   });
 
   // Fetch allocations for available members row
   const { data: availableMembersAllocations = [] } = useQuery({
-    queryKey: ['available-allocations', weekStartString, company?.id],
+    queryKey: ['available-allocations', weekStartString, companyId, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        const demoAllocations = generateDemoAllocations();
+        const weekEndDate = format(addDays(weekStart, 6), 'yyyy-MM-dd');
+        
+        return demoAllocations
+          .filter(a => a.allocation_date >= weekStartString && a.allocation_date <= weekEndDate)
+          .map(a => ({
+            resource_id: a.resource_id,
+            resource_type: a.resource_type,
+            hours: a.hours,
+            allocation_date: a.allocation_date,
+            projects: {
+              id: a.project_id,
+              name: 'Project',
+              code: 'PRJ',
+              department: null
+            }
+          }));
+      }
+      
       if (!company?.id) return [];
       
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-      const weekEndDate = format(weekEnd, 'yyyy-MM-dd');
+      const weekEndLocal = new Date(weekStart);
+      weekEndLocal.setDate(weekEndLocal.getDate() + 6);
+      const weekEndDate = format(weekEndLocal, 'yyyy-MM-dd');
       
       const { data, error } = await supabase
         .from('project_resource_allocations')
@@ -96,14 +154,25 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
+    enabled: isDemoMode || !!company?.id,
     staleTime: 2 * 60 * 1000,
   });
 
   // Fetch annual leaves for summary cards
   const { data: annualLeaves = [] } = useQuery({
-    queryKey: ['weekly-summary-leaves', weekStartString, weekEndString, company?.id],
+    queryKey: ['weekly-summary-leaves', weekStartString, weekEndString, companyId, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        const demoLeaves = generateDemoAnnualLeaves();
+        return demoLeaves
+          .filter(l => l.date >= weekStartString && l.date <= weekEndString)
+          .map(l => ({
+            member_id: l.member_id,
+            date: l.date,
+            hours: l.hours
+          }));
+      }
+      
       if (!company?.id) return [];
       
       const { data, error } = await supabase
@@ -116,7 +185,7 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
+    enabled: isDemoMode || !!company?.id,
     staleTime: 2 * 60 * 1000,
   });
 
@@ -124,8 +193,23 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
   const upcomingEndDate = format(addDays(weekEnd, 90), 'yyyy-MM-dd');
   
   const { data: holidays = [] } = useQuery({
-    queryKey: ['weekly-summary-holidays', weekStartString, upcomingEndDate, company?.id],
+    queryKey: ['weekly-summary-holidays', weekStartString, upcomingEndDate, companyId, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        // Convert DEMO_HOLIDAYS to the expected format
+        return DEMO_HOLIDAYS
+          .filter(h => {
+            const holidayDate = format(h.date, 'yyyy-MM-dd');
+            return holidayDate >= weekStartString && holidayDate <= upcomingEndDate;
+          })
+          .map(h => ({
+            id: h.id,
+            date: format(h.date, 'yyyy-MM-dd'),
+            name: h.name,
+            end_date: null
+          }));
+      }
+      
       if (!company?.id) return [];
 
       const { data, error } = await supabase
@@ -139,14 +223,19 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
+    enabled: isDemoMode || !!company?.id,
     staleTime: 2 * 60 * 1000,
   });
 
   // Fetch other leaves for summary cards
   const { data: otherLeaves = [] } = useQuery({
-    queryKey: ['weekly-summary-other-leaves', weekStartString, memberIds, company?.id],
+    queryKey: ['weekly-summary-other-leaves', weekStartString, memberIds, companyId, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        // Return empty for demo - could add demo other leaves if needed
+        return [];
+      }
+      
       if (!company?.id || memberIds.length === 0) return [];
 
       const { data, error } = await supabase
@@ -159,14 +248,19 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id && memberIds.length > 0,
+    enabled: (isDemoMode || !!company?.id) && memberIds.length > 0,
     staleTime: 2 * 60 * 1000,
   });
 
   // Fetch weekly notes for summary cards
   const { data: weeklyNotes = [] } = useQuery({
-    queryKey: ['weekly-notes', weekStartString, company?.id],
+    queryKey: ['weekly-notes', weekStartString, companyId, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        // Return empty for demo - could add demo notes if needed
+        return [];
+      }
+      
       if (!company?.id) return [];
 
       const { data, error } = await supabase
@@ -179,7 +273,7 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id,
+    enabled: isDemoMode || !!company?.id,
     staleTime: 2 * 60 * 1000,
   });
 

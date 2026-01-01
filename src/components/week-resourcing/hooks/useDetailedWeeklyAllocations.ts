@@ -5,6 +5,8 @@ import { useCompany } from '@/context/CompanyContext';
 import { format, addDays } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { generateDemoAllocations, DEMO_PROJECTS, DEMO_COMPANY_ID } from '@/data/demoData';
 
 interface DailyAllocation {
   allocation_id: string;
@@ -24,7 +26,7 @@ interface DetailedMemberAllocation {
     project_name: string;
     project_code: string;
     total_hours: number;
-    allocation_id: string; // The allocation ID for this project (from any day)
+    allocation_id: string;
     daily_breakdown: Array<{
       date: string;
       hours: number;
@@ -35,21 +37,93 @@ interface DetailedMemberAllocation {
 export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: string[], weekStartDay?: 'Monday' | 'Sunday' | 'Saturday') => {
   const { company } = useCompany();
   const { startOfWorkWeek } = useAppSettings();
+  const { isDemoMode } = useDemoAuth();
   const effectiveWeekStart = weekStartDay || startOfWorkWeek;
 
   return useQuery({
-    queryKey: ['detailed-weekly-allocations', selectedWeek, company?.id, memberIds, effectiveWeekStart],
+    queryKey: ['detailed-weekly-allocations', selectedWeek, isDemoMode ? DEMO_COMPANY_ID : company?.id, memberIds, effectiveWeekStart],
     queryFn: async (): Promise<Record<string, DetailedMemberAllocation>> => {
-      if (!company?.id || memberIds.length === 0) return {};
+      const companyId = isDemoMode ? DEMO_COMPANY_ID : company?.id;
+      if (!companyId || memberIds.length === 0) return {};
 
       const weekStart = getWeekStartDate(selectedWeek, effectiveWeekStart);
       const weekEnd = addDays(weekStart, 6);
       const weekStartDate = format(weekStart, 'yyyy-MM-dd');
       const weekEndDate = format(weekEnd, 'yyyy-MM-dd');
-      
-      console.log('🔍 DETAILED ALLOCATIONS: Fetching FULL WEEK from', weekStartDate, 'to', weekEndDate);
 
-      // FIXED: Fetch ALL 7 days of the week, not just Monday
+      // Demo mode: Use demo allocations
+      if (isDemoMode) {
+        const demoAllocations = generateDemoAllocations();
+        
+        // Filter to this week and these members
+        const filteredAllocations = demoAllocations.filter(alloc => 
+          memberIds.includes(alloc.resource_id) &&
+          alloc.allocation_date >= weekStartDate &&
+          alloc.allocation_date <= weekEndDate &&
+          alloc.hours > 0
+        );
+
+        // Group by member and build detailed structure
+        const result: Record<string, DetailedMemberAllocation> = {};
+
+        filteredAllocations.forEach(allocation => {
+          const memberId = allocation.resource_id;
+          const projectId = allocation.project_id;
+          const allocationId = allocation.id;
+          const date = allocation.allocation_date;
+          const hours = Number(allocation.hours) || 0;
+          
+          // Find project details
+          const project = DEMO_PROJECTS.find(p => p.id === projectId);
+          const projectName = project?.name || 'Unknown Project';
+          const projectCode = project?.code || 'UNK';
+
+          if (!result[memberId]) {
+            result[memberId] = {
+              member_id: memberId,
+              daily_allocations: [],
+              total_hours: 0,
+              projects: []
+            };
+          }
+
+          // Add to daily allocations
+          result[memberId].daily_allocations.push({
+            allocation_id: allocationId,
+            project_id: projectId,
+            project_name: projectName,
+            project_code: projectCode,
+            date: date,
+            hours: hours
+          });
+
+          result[memberId].total_hours += hours;
+
+          // Find or create project entry
+          let projectEntry = result[memberId].projects.find(p => p.project_id === projectId);
+          if (!projectEntry) {
+            projectEntry = {
+              project_id: projectId,
+              project_name: projectName,
+              project_code: projectCode,
+              total_hours: 0,
+              allocation_id: allocationId,
+              daily_breakdown: []
+            };
+            result[memberId].projects.push(projectEntry);
+          }
+
+          projectEntry.total_hours += hours;
+          projectEntry.daily_breakdown.push({
+            date: date,
+            hours: hours
+          });
+        });
+
+        return result;
+      }
+
+      // Real mode: Fetch from Supabase
       const { data: allocations, error } = await supabase
         .from('project_resource_allocations')
         .select(`
@@ -65,11 +139,11 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
             code
           )
         `)
-        .eq('company_id', company.id)
+        .eq('company_id', companyId)
         .in('resource_id', memberIds)
         .in('resource_type', ['active', 'pre_registered'])
-        .gte('allocation_date', weekStartDate)  // From Monday
-        .lte('allocation_date', weekEndDate)    // To Sunday
+        .gte('allocation_date', weekStartDate)
+        .lte('allocation_date', weekEndDate)
         .gt('hours', 0);
 
       if (error) {
@@ -97,7 +171,6 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
           };
         }
 
-        // Add to daily allocations
         result[memberId].daily_allocations.push({
           allocation_id: allocationId,
           project_id: projectId,
@@ -109,7 +182,6 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
 
         result[memberId].total_hours += hours;
 
-        // Find or create project entry
         let projectEntry = result[memberId].projects.find(p => p.project_id === projectId);
         if (!projectEntry) {
           projectEntry = {
@@ -117,7 +189,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
             project_name: project.name,
             project_code: project.code || project.name,
             total_hours: 0,
-            allocation_id: allocationId, // Store one allocation ID for this project
+            allocation_id: allocationId,
             daily_breakdown: []
           };
           result[memberId].projects.push(projectEntry);
@@ -132,6 +204,6 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
 
       return result;
     },
-    enabled: !!company?.id && memberIds.length > 0
+    enabled: (isDemoMode || !!company?.id) && memberIds.length > 0
   });
 };

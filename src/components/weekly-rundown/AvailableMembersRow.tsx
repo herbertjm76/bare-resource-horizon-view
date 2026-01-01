@@ -8,7 +8,10 @@ import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 import { useWeekResourceTeamMembers } from '@/components/week-resourcing/hooks/useWeekResourceTeamMembers';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useDragScroll } from '@/hooks/useDragScroll';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { generateDemoAllocations, generateDemoAnnualLeaves, DEMO_LOCATIONS, DEMO_HOLIDAYS, DEMO_PROJECTS, DEMO_COMPANY_ID } from '@/data/demoData';
 import { logger } from '@/utils/logger';
+import { format } from 'date-fns';
 import {
   Tooltip,
   TooltipContent,
@@ -71,6 +74,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   allMembers: externalMembers,
   sortOption = 'utilization'
 }) => {
+  const { isDemoMode } = useDemoAuth();
   const {
     scrollRef: membersScrollRef,
     canScrollLeft,
@@ -80,7 +84,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     containerStyle,
     shouldPreventClick
   } = useDragScroll();
-  const [sortAscending, setSortAscending] = React.useState(true); // true = ascending order
+  const [sortAscending, setSortAscending] = React.useState(true);
   const { workWeekHours } = useAppSettings();
 
   // Fetch members internally if not provided externally
@@ -92,15 +96,36 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [externalMembers, fetchedMembers]);
 
   const { data: allocations = [] } = useQuery({
-    queryKey: ['available-allocations', weekStartDate],
+    queryKey: ['available-allocations', weekStartDate, isDemoMode],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
-      
       const weekStart = new Date(weekStartDate);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);
       const weekEndDate = weekEnd.toISOString().split('T')[0];
+      
+      if (isDemoMode) {
+        const demoAllocations = generateDemoAllocations();
+        return demoAllocations
+          .filter(a => a.allocation_date >= weekStartDate && a.allocation_date <= weekEndDate)
+          .map(a => {
+            const project = DEMO_PROJECTS.find(p => p.id === a.project_id);
+            return {
+              resource_id: a.resource_id,
+              resource_type: a.resource_type,
+              hours: a.hours,
+              allocation_date: a.allocation_date,
+              projects: project ? {
+                id: project.id,
+                name: project.name,
+                code: project.code,
+                department: project.department
+              } : null
+            };
+          });
+      }
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return [];
       
       const { data, error } = await supabase
         .from('project_resource_allocations')
@@ -126,15 +151,26 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
   // Fetch annual leaves for the week
   const { data: leaves = [] } = useQuery({
-    queryKey: ['available-leaves', weekStartDate],
+    queryKey: ['available-leaves', weekStartDate, isDemoMode],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
-      
       const weekStart = new Date(weekStartDate);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);
       const weekEndDate = weekEnd.toISOString().split('T')[0];
+      
+      if (isDemoMode) {
+        const demoLeaves = generateDemoAnnualLeaves();
+        return demoLeaves
+          .filter(l => l.date >= weekStartDate && l.date <= weekEndDate)
+          .map(l => ({
+            member_id: l.member_id,
+            hours: l.hours,
+            date: l.date
+          }));
+      }
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return [];
       
       const { data, error } = await supabase
         .from('annual_leaves')
@@ -149,28 +185,51 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
 
   // Fetch office locations to map location names to IDs
   const { data: officeLocations = [] } = useQuery({
-    queryKey: ['office-locations-for-holidays'],
+    queryKey: ['office-locations-for-holidays', isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return DEMO_LOCATIONS.map(l => ({
+          id: l.id,
+          city: l.city,
+          code: l.code
+        }));
+      }
+      
       const { data, error } = await supabase
         .from('office_locations')
         .select('id, city, code');
       if (error) throw error;
       return data || [];
     },
-    staleTime: 300_000 // Cache for 5 minutes
+    staleTime: 300_000
   });
 
   // Fetch office holidays for the week
   const { data: holidays = [] } = useQuery({
-    queryKey: ['available-holidays', weekStartDate],
+    queryKey: ['available-holidays', weekStartDate, isDemoMode],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
-      
       const weekStart = new Date(weekStartDate);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);
       const weekEndDate = weekEnd.toISOString().split('T')[0];
+      
+      if (isDemoMode) {
+        return DEMO_HOLIDAYS
+          .filter(h => {
+            const holidayDate = format(h.date, 'yyyy-MM-dd');
+            return holidayDate >= weekStartDate && holidayDate <= weekEndDate;
+          })
+          .map(h => ({
+            id: h.id,
+            name: h.name,
+            date: format(h.date, 'yyyy-MM-dd'),
+            end_date: null,
+            location_id: h.location_id || null
+          }));
+      }
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return [];
       
       const { data, error } = await supabase
         .from('office_holidays')
