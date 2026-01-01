@@ -463,14 +463,14 @@ export const DEMO_TEAM_COMPOSITION = [
   { id: '00000000-0000-0000-000B-000000000004', company_id: DEMO_COMPANY_ID, project_id: '00000000-0000-0000-0001-000000000003', title: 'Technical Director', number_of_people: 1 }
 ];
 
-// Helper function to generate resource allocations for the next 12 weeks
+// Helper function to generate resource allocations spanning Nov 2025 - Jan 2026
 // Returns allocations with realistic patterns - some overloaded, some underutilized
 export const generateDemoAllocations = () => {
   const allocations: any[] = [];
-  const today = new Date();
-  
-  // Get start of current week (Monday)
-  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+
+  // Fixed date range: November 2025 to end of January 2026
+  const rangeStart = new Date('2025-11-03'); // First Monday of November 2025
+  const rangeEnd = new Date('2026-01-31');
 
   // Allocation patterns for each team member per project
   // Designed to show: John (80%), Sarah (105% overloaded), Alex (110% overloaded), 
@@ -479,37 +479,36 @@ export const generateDemoAllocations = () => {
     // John Mitchell - 32h/week = 80% utilization
     { memberId: '00000000-0000-0000-0000-000000000002', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 20 },
     { memberId: '00000000-0000-0000-0000-000000000002', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 12 },
-    
+
     // Sarah Wilson - 42h/week = 105% (overloaded)
     { memberId: '00000000-0000-0000-0000-000000000003', projectId: '00000000-0000-0000-0001-000000000002', hoursPerWeek: 28 },
     { memberId: '00000000-0000-0000-0000-000000000003', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 14 },
-    
+
     // Alex Chen - 44h/week = 110% (overloaded)
     { memberId: '00000000-0000-0000-0000-000000000004', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 24 },
     { memberId: '00000000-0000-0000-0000-000000000004', projectId: '00000000-0000-0000-0001-000000000005', hoursPerWeek: 20 },
-    
+
     // Maria Rodriguez - 32h/week = 80%
     { memberId: '00000000-0000-0000-0000-000000000005', projectId: '00000000-0000-0000-0001-000000000005', hoursPerWeek: 32 },
-    
+
     // James Taylor - 24h/week = 75% of 32h capacity
     { memberId: '00000000-0000-0000-0000-000000000006', projectId: '00000000-0000-0000-0001-000000000004', hoursPerWeek: 24 },
-    
+
     // Emma Johnson - 24h/week = 60% (underutilized)
     { memberId: '00000000-0000-0000-0000-000000000007', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 24 },
-    
+
     // Michael Brown - 38h/week = 95%
     { memberId: '00000000-0000-0000-0000-000000000008', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 22 },
-    { memberId: '00000000-0000-0000-0000-000000000008', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 16 }
+    { memberId: '00000000-0000-0000-0000-000000000008', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 16 },
   ];
 
-  // Generate 12 weeks of allocations
-  for (let week = 0; week < 12; week++) {
-    const currentWeekStart = addWeeks(weekStart, week);
-
-    // Generate daily allocations for each weekday
-    for (let dayOffset = 0; dayOffset < 5; dayOffset++) {
-      const date = addDays(currentWeekStart, dayOffset);
-      const dateStr = format(date, 'yyyy-MM-dd');
+  // Generate allocations for each week in the range
+  let currentDate = new Date(rangeStart);
+  while (currentDate <= rangeEnd) {
+    // Only generate for weekdays (Mon-Fri)
+    const dayOfWeek = currentDate.getDay();
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+      const dateStr = format(currentDate, 'yyyy-MM-dd');
 
       allocationPatterns.forEach((pattern, idx) => {
         // Daily hours = weekly hours / 5
@@ -517,23 +516,26 @@ export const generateDemoAllocations = () => {
 
         if (dailyHours > 0) {
           allocations.push({
-            id: `demo-alloc-${week}-${dayOffset}-${idx}`,
+            id: `demo-alloc-${dateStr}-${idx}`,
             company_id: DEMO_COMPANY_ID,
             project_id: pattern.projectId,
             resource_id: pattern.memberId,
-            resource_type: 'profile',
+            resource_type: 'active',
             allocation_date: dateStr,
             hours: dailyHours,
+            stage_id: null,
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           });
         }
       });
     }
+    currentDate = addDays(currentDate, 1);
   }
 
   return allocations;
 };
+
 
 // Demo leave types
 export const DEMO_LEAVE_TYPES = [
