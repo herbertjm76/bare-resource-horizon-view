@@ -4,12 +4,20 @@ import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { toast } from 'sonner';
 import { logger } from '@/utils/logger';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import {
+  DEMO_COMPANY_ID,
+  DEMO_TEAM_MEMBERS,
+  DEMO_PRE_REGISTERED,
+  DEMO_PROJECTS,
+  generateDemoAllocations,
+} from '@/data/demoData';
 
 export interface PersonProject {
   projectId: string;
   projectName: string;
   projectCode: string;
-  allocations: Record<string, number>; // dayKey -> hours
+  allocations: Record<string, number>; // weekKey -> hours
 }
 
 export interface PersonResourceData {
@@ -29,10 +37,92 @@ export interface PersonResourceData {
 export const usePersonResourceData = (startDate: Date, periodToShow: number) => {
   const { company } = useCompany();
   const { workWeekHours } = useAppSettings();
+  const { isDemoMode } = useDemoAuth();
 
   const { data: personData = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['person-resource-data', company?.id, startDate.toISOString(), periodToShow],
+    queryKey: ['person-resource-data', company?.id, startDate.toISOString(), periodToShow, isDemoMode],
     queryFn: async () => {
+      // Demo mode: return demo data
+      if (isDemoMode) {
+        logger.debug('Demo mode: returning demo person resource data');
+
+        // Build member list
+        const allMembers = [
+          ...DEMO_TEAM_MEMBERS.map((m) => ({ ...m, resourceType: 'active' as const })),
+          ...DEMO_PRE_REGISTERED.map((m) => ({ ...m, resourceType: 'pre_registered' as const })),
+        ];
+
+        // Calculate date range
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + periodToShow * 7);
+
+        const startStr = startDate.toISOString().split('T')[0];
+        const endStr = endDate.toISOString().split('T')[0];
+
+        // Filter demo allocations within date range
+        const allAllocations = generateDemoAllocations();
+        const rangeAllocations = allAllocations.filter(
+          (a) => a.allocation_date >= startStr && a.allocation_date <= endStr
+        );
+
+        // Build a project lookup
+        const projectLookup = new Map(DEMO_PROJECTS.map((p) => [p.id, p]));
+
+        // Process data: group allocations by person, then by project
+        const personMap = new Map<string, PersonResourceData>();
+
+        allMembers.forEach((member) => {
+          const avatarUrl = 'avatar_url' in member ? member.avatar_url : undefined;
+          const practiceArea = 'practice_area' in member ? member.practice_area : undefined;
+
+          personMap.set(member.id, {
+            personId: member.id,
+            firstName: member.first_name || '',
+            lastName: member.last_name || '',
+            avatarUrl: avatarUrl || undefined,
+            location: member.location || undefined,
+            jobTitle: member.job_title || undefined,
+            department: member.department || undefined,
+            practiceArea: practiceArea || undefined,
+            weeklyCapacity: member.weekly_capacity || workWeekHours,
+            resourceType: member.resourceType,
+            projects: [],
+          });
+        });
+
+        // Group allocations by person and project
+        rangeAllocations.forEach((allocation) => {
+          const person = personMap.get(allocation.resource_id);
+          if (!person) return;
+
+          let projectEntry = person.projects.find((p) => p.projectId === allocation.project_id);
+          if (!projectEntry) {
+            const proj = projectLookup.get(allocation.project_id);
+            projectEntry = {
+              projectId: allocation.project_id,
+              projectName: proj?.name || 'Unknown Project',
+              projectCode: proj?.code || '',
+              allocations: {},
+            };
+            person.projects.push(projectEntry);
+          }
+
+          // Convert the date to the week start (Monday)
+          const allocationDate = new Date(allocation.allocation_date + 'T00:00:00');
+          const dayOfWeek = allocationDate.getDay();
+          const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+          const monday = new Date(allocationDate);
+          monday.setDate(allocationDate.getDate() + daysToMonday);
+          const weekKey = monday.toISOString().split('T')[0];
+
+          // Aggregate hours by week
+          projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
+        });
+
+        return Array.from(personMap.values());
+      }
+
+      // Real mode: fetch from Supabase
       if (!company) {
         logger.debug('No company available, cannot fetch person resource data');
         return [];
@@ -69,8 +159,8 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
 
         // Combine profiles and invites, marking their type
         const allMembers = [
-          ...(profiles || []).map(p => ({ ...p, resourceType: 'active' as const })),
-          ...(invites || []).map(i => ({ ...i, resourceType: 'pre_registered' as const }))
+          ...(profiles || []).map((p) => ({ ...p, resourceType: 'active' as const })),
+          ...(invites || []).map((i) => ({ ...i, resourceType: 'pre_registered' as const })),
         ];
 
         if (allMembers.length === 0) {
@@ -80,7 +170,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
 
         // Calculate date range for allocations
         const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + (periodToShow * 7));
+        endDate.setDate(endDate.getDate() + periodToShow * 7);
 
         // Fetch all allocations for this date range and company (both active and pre-registered)
         const { data: allocations, error: allocationsError } = await supabase
@@ -114,7 +204,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         const personMap = new Map<string, PersonResourceData>();
 
         // Initialize all members (both profiles and invites)
-        allMembers.forEach(member => {
+        allMembers.forEach((member) => {
           personMap.set(member.id, {
             personId: member.id,
             firstName: member.first_name || '',
@@ -126,7 +216,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             practiceArea: (member as any).practice_area || undefined,
             weeklyCapacity: member.weekly_capacity || workWeekHours,
             resourceType: member.resourceType,
-            projects: []
+            projects: [],
           });
         });
 
@@ -136,14 +226,14 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           if (!personData) return;
 
           // Find or create project entry for this person
-          let projectEntry = personData.projects.find(p => p.projectId === allocation.project_id);
-          
+          let projectEntry = personData.projects.find((p) => p.projectId === allocation.project_id);
+
           if (!projectEntry) {
             projectEntry = {
               projectId: allocation.project_id,
               projectName: allocation.projects?.name || 'Unknown Project',
               projectCode: allocation.projects?.code || '',
-              allocations: {}
+              allocations: {},
             };
             personData.projects.push(projectEntry);
           }
@@ -155,7 +245,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           const monday = new Date(allocationDate);
           monday.setDate(allocationDate.getDate() + daysToMonday);
           const weekKey = monday.toISOString().split('T')[0];
-          
+
           // Aggregate hours by week (sum up daily hours into weekly total)
           projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });
@@ -163,22 +253,22 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         const result = Array.from(personMap.values());
         logger.debug('Processed person resource data:', result.length, 'people');
         return result;
-
       } catch (err) {
         console.error('Exception in person resource data fetch:', err);
         throw err;
       }
     },
-    enabled: !!company,
+    enabled: isDemoMode || !!company,
     retry: 2,
     retryDelay: 1000,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
   });
 
   return {
     personData,
     isLoading,
     error,
-    refetch
+    refetch,
   };
 };
+
