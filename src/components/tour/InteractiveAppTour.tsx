@@ -30,7 +30,7 @@ const tourSteps: TourStep[] = [
     category: "Overview",
     screenshot: "/lovable-uploads/1ec9c1fb-a2b7-46f5-8584-89c4034146af.png",
     features: ["Utilization snapshot", "Upcoming work", "At-a-glance KPIs"],
-    icon: <LayoutDashboard className="w-16 h-16" />,
+    icon: <LayoutDashboard className="w-16 h-16 text-primary" />,
     bgColor: "from-primary to-primary",
     route: "/dashboard"
   },
@@ -41,7 +41,7 @@ const tourSteps: TourStep[] = [
     category: "Planning",
     screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
     features: ["Table / grid views", "Availability & leave context", "Quick scanning"],
-    icon: <Calendar className="w-16 h-16" />,
+    icon: <Calendar className="w-16 h-16 text-primary" />,
     bgColor: "from-secondary to-secondary",
     route: "/weekly-overview"
   },
@@ -52,7 +52,7 @@ const tourSteps: TourStep[] = [
     category: "Scheduling",
     screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
     features: ["By project / by person", "Update allocations", "Plan ahead"],
-    icon: <TrendingUp className="w-16 h-16" />,
+    icon: <TrendingUp className="w-16 h-16 text-primary" />,
     bgColor: "from-accent to-accent",
     route: "/resource-scheduling"
   },
@@ -63,7 +63,7 @@ const tourSteps: TourStep[] = [
     category: "Projects",
     screenshot: "/lovable-uploads/d6950251-26bd-43bc-8594-4b191fe6c1a7.png",
     features: ["Pipeline view", "Stage planning", "Capacity vs demand"],
-    icon: <FolderKanban className="w-16 h-16" />,
+    icon: <FolderKanban className="w-16 h-16 text-primary" />,
     bgColor: "from-muted to-muted",
     route: "/resource-planning"
   },
@@ -74,7 +74,7 @@ const tourSteps: TourStep[] = [
     category: "Insights",
     screenshot: "/lovable-uploads/69179c95-91ed-42d6-a38b-94114edcf69f.png",
     features: ["Color-coded capacity", "Filter by team / role", "Overload detection"],
-    icon: <Flame className="w-16 h-16" />,
+    icon: <Flame className="w-16 h-16 text-primary" />,
     bgColor: "from-primary to-primary",
     route: "/capacity-heatmap"
   },
@@ -85,7 +85,7 @@ const tourSteps: TourStep[] = [
     category: "Availability",
     screenshot: "/lovable-uploads/5233d4c9-0afd-4df2-b96b-e71ad0acbabc.png",
     features: ["Leave overview", "Requests & approvals", "Coverage awareness"],
-    icon: <CalendarDays className="w-16 h-16" />,
+    icon: <CalendarDays className="w-16 h-16 text-primary" />,
     bgColor: "from-secondary to-secondary",
     route: "/team-leave"
   },
@@ -96,7 +96,7 @@ const tourSteps: TourStep[] = [
     category: "Settings",
     screenshot: "/lovable-uploads/2b26c5c4-10bc-4fcf-b864-ae226aef1708.png",
     features: ["Company settings", "Teams & roles", "Configuration"],
-    icon: <Flag className="w-16 h-16" />,
+    icon: <Flag className="w-16 h-16 text-primary" />,
     bgColor: "from-muted to-muted",
     route: "/office-settings"
   }
