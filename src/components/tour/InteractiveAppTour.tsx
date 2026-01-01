@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Play, X, Eye, LayoutDashboard, Calendar, Flag, TrendingUp, FolderKanban, Users, Flame, CalendarDays } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, X, Eye, LayoutDashboard, Calendar, TrendingUp, FolderKanban, Flame, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 
@@ -47,69 +47,47 @@ const tourSteps: TourStep[] = [
   },
   {
     id: 3,
-    title: "Capacity Heatmap",
-    description: "See overload and underutilization instantly across your team.",
-    category: "Insights",
-    screenshot: "/lovable-uploads/69179c95-91ed-42d6-a38b-94114edcf69f.png",
-    features: ["Color-coded capacity", "Filter by team / role", "Overload detection"],
-    icon: <Flame className="w-16 h-16" />,
-    bgColor: "from-accent to-accent",
-    route: "/capacity-heatmap"
-  },
-  {
-    id: 4,
     title: "Resource Scheduling",
     description: "Allocate people to projects and keep schedules aligned with reality.",
     category: "Scheduling",
     screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
     features: ["By project / by person", "Update allocations", "Plan ahead"],
     icon: <TrendingUp className="w-16 h-16" />,
-    bgColor: "from-muted to-muted",
+    bgColor: "from-accent to-accent",
     route: "/resource-scheduling"
   },
   {
-    id: 5,
-    title: "Resource Planning",
+    id: 4,
+    title: "Project Pipeline",
     description: "Understand your project pipeline and resourcing needs across stages.",
     category: "Projects",
     screenshot: "/lovable-uploads/d6950251-26bd-43bc-8594-4b191fe6c1a7.png",
     features: ["Pipeline view", "Stage planning", "Capacity vs demand"],
     icon: <FolderKanban className="w-16 h-16" />,
-    bgColor: "from-primary to-primary",
+    bgColor: "from-muted to-muted",
     route: "/resource-planning"
   },
   {
-    id: 6,
-    title: "Team Members",
-    description: "Browse the team and drill into individual profiles.",
-    category: "Team",
-    screenshot: "/lovable-uploads/8f557546-80a9-4628-8a21-7114e11f23dc.png",
-    features: ["Profiles", "Capacity settings", "Role & team info"],
-    icon: <Users className="w-16 h-16" />,
-    bgColor: "from-secondary to-secondary",
-    route: "/team-members"
+    id: 5,
+    title: "Capacity Heatmap",
+    description: "See overload and underutilization instantly across your team.",
+    category: "Insights",
+    screenshot: "/lovable-uploads/69179c95-91ed-42d6-a38b-94114edcf69f.png",
+    features: ["Color-coded capacity", "Filter by team / role", "Overload detection"],
+    icon: <Flame className="w-16 h-16" />,
+    bgColor: "from-primary to-primary",
+    route: "/capacity-heatmap"
   },
   {
-    id: 7,
+    id: 6,
     title: "Team Leave",
     description: "Track time off so plans stay realistic.",
     category: "Availability",
     screenshot: "/lovable-uploads/5233d4c9-0afd-4df2-b96b-e71ad0acbabc.png",
     features: ["Leave overview", "Requests & approvals", "Coverage awareness"],
     icon: <CalendarDays className="w-16 h-16" />,
-    bgColor: "from-accent to-accent",
+    bgColor: "from-secondary to-secondary",
     route: "/team-leave"
-  },
-  {
-    id: 8,
-    title: "Office Settings",
-    description: "Configure workspace settings and keep your org data tidy.",
-    category: "Settings",
-    screenshot: "/lovable-uploads/2b26c5c4-10bc-4fcf-b864-ae226aef1708.png",
-    features: ["Company settings", "Teams & roles", "Configuration"],
-    icon: <Flag className="w-16 h-16" />,
-    bgColor: "from-muted to-muted",
-    route: "/office-settings"
   }
 ];
 
@@ -163,7 +141,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
         </div>
 
         {/* Colored tiles for step indicators */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           {tourSteps.map((step, index) => (
             <button
               key={step.id}
