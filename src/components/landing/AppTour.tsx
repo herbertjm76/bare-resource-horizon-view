@@ -67,7 +67,7 @@ const AppTour = () => {
 
   const handleLaunchDemo = () => {
     startDemoMode();
-    navigate('/dashboard');
+    navigate('/demo/dashboard');
   };
 
   return (
