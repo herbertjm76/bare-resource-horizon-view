@@ -10,6 +10,7 @@ import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
 import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
 import { logger } from '@/utils/logger';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 interface TeamMembersContentProps {
   userId: string | null;
@@ -18,9 +19,10 @@ interface TeamMembersContentProps {
 export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }) => {
   const { checkUserPermissions, isChecking, hasPermission, permissionError } = useMemberPermissions();
   const [permissionChecked, setPermissionChecked] = useState(false);
-  
+  const { isDemoMode, profile: demoProfile } = useDemoAuth();
+
   const { company, loading: companyLoading, refreshCompany } = useCompany();
-  
+
   // Check permissions once when component mounts or userId changes
   useEffect(() => {
     const verifyAccess = async () => {
@@ -28,7 +30,7 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
         logger.debug('No user ID available, cannot check permissions');
         return;
       }
-      
+
       // Add a small delay to ensure any session changes are propagated
       setTimeout(async () => {
         logger.debug('Verifying access for user:', userId);
@@ -36,7 +38,7 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
           const result = await checkUserPermissions();
           logger.debug('Permission check complete with result:', result);
           setPermissionChecked(true);
-          
+
           if (!result.hasPermission) {
             logger.error('Permission denied:', result.error);
             toast.error('Permission check failed: ' + (result.error || 'Unknown error'));
@@ -47,51 +49,51 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
         }
       }, 500);
     };
-    
+
     if (userId && !permissionChecked) {
       verifyAccess();
     }
   }, [userId, checkUserPermissions, permissionChecked]);
-  
+
   // Ensure company data is loaded
   useEffect(() => {
     if (!company && userId) {
       refreshCompany();
     }
   }, [company, userId, refreshCompany]);
-  
+
   // Fetch team members data - passing false since we don't need inactive members
   const {
     teamMembers,
     triggerRefresh,
     forceRefresh,
     isLoading: isTeamMembersLoading,
-    error: teamMembersError
+    error: teamMembersError,
   } = useTeamMembersData(false);
 
-  // Fetch user profile
+  // Fetch user profile (demo mode uses demo profile)
   const {
     data: userProfile,
     isLoading: isProfileLoading,
     error: profileError,
-    refetch: refetchProfile
   } = useQuery({
-    queryKey: ['userProfile', userId],
+    queryKey: ['userProfile', userId, isDemoMode],
     queryFn: async () => {
       if (!userId) return null;
-      
+      if (isDemoMode) return demoProfile ?? null;
+
       try {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', userId)
           .single();
-          
+
         if (error) {
           logger.error('Profile fetch error:', error);
           throw error;
         }
-        
+
         logger.debug('User profile loaded:', data);
         return data;
       } catch (error) {
@@ -116,33 +118,19 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
     triggerRefresh,
     forceRefresh
   );
-  
+
   // Show error message if there's an issue
   useEffect(() => {
     if (teamMembersError) {
       toast.error('Failed to load team members data');
     }
-    
+
     if (profileError) {
       toast.error('Failed to load your profile');
     }
   }, [teamMembersError, profileError]);
 
   const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || (isChecking && !permissionChecked);
-
-  // Check for errors in session
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      logger.debug("Current session:", data?.session ? "Active" : "None");
-      if (data?.session?.user) {
-        logger.debug("Session user:", data.session.user.id);
-        logger.debug("User metadata:", data.session.user.user_metadata);
-      }
-    };
-    
-    checkSession();
-  }, []);
 
   return (
     <TeamMemberContent
@@ -153,3 +141,4 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
     />
   );
 };
+
