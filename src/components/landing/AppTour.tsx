@@ -127,7 +127,7 @@ const AppTour = () => {
                   Launch Interactive Demo
                 </button>
                 <button className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors">
-                  View Screenshots
+                  <Link to="/screenshots">View Screenshots</Link>
                 </button>
               </>
             )}
