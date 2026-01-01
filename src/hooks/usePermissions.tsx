@@ -2,6 +2,7 @@ import { useMemo, createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 export type AppRole = 'owner' | 'admin' | 'project_manager' | 'member' | 'contractor';
 
@@ -82,11 +83,15 @@ export const SECTION_PERMISSIONS: Record<string, Permission> = {
 
 export function usePermissions() {
   const { simulatedRole } = useViewAs();
+  const { isDemoMode } = useDemoAuth();
   
-  // Fetch user's actual role from user_roles table
+  // Fetch user's actual role from user_roles table (skip in demo mode)
   const { data: userRole, isLoading } = useQuery({
     queryKey: ['currentUserRole'],
     queryFn: async () => {
+      // In demo mode, return owner role
+      if (isDemoMode) return 'owner' as AppRole;
+      
       const { data: authData } = await supabase.auth.getUser();
       if (!authData.user) return 'member' as AppRole;
 
@@ -112,6 +117,7 @@ export function usePermissions() {
       return (roleData?.role as AppRole) || 'member';
     },
     staleTime: 5 * 60 * 1000,
+    enabled: true, // Always run, but return demo role if in demo mode
   });
 
   const actualRole: AppRole = userRole || 'member';
