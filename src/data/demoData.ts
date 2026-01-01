@@ -561,14 +561,14 @@ export const DEMO_TEAM_COMPOSITION = [
   { id: '00000000-0000-0000-000B-000000000004', company_id: DEMO_COMPANY_ID, project_id: '00000000-0000-0000-0001-000000000003', title: 'Technical Director', number_of_people: 1 }
 ];
 
-// Helper function to generate resource allocations spanning Nov 2025 - Jan 2026
+// Helper function to generate resource allocations spanning Oct 2025 - Mar 2026
 // Returns allocations with realistic patterns - some overloaded, some underutilized
 export const generateDemoAllocations = () => {
   const allocations: any[] = [];
 
-  // Fixed date range: November 2025 to end of January 2026
-  const rangeStart = new Date('2025-11-03'); // First Monday of November 2025
-  const rangeEnd = new Date('2026-01-31');
+  // Extended date range: October 2025 to end of March 2026
+  const rangeStart = new Date('2025-10-06'); // First Monday of October 2025
+  const rangeEnd = new Date('2026-03-31');
 
   // Allocation patterns for each team member per project
   // Designed to show: John (80%), Sarah (105% overloaded), Alex (110% overloaded), 
