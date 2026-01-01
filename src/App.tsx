@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CompanyProvider } from "./context/CompanyContext";
+import { DemoDataProvider } from "./context/DemoDataContext";
 import { ViewAsProvider } from "./hooks/usePermissions";
 import { useTheme } from "./hooks/useTheme";
 import { PermissionGuard } from "./components/auth/PermissionGuard";
@@ -52,6 +53,7 @@ const AppTourPage = lazy(() => import("./pages/AppTour"));
 const PricingPage = lazy(() => import("./pages/Pricing"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const Join = lazy(() => import("./pages/Join"));
+const Screenshots = lazy(() => import("./pages/Screenshots"));
 
 const queryClient = new QueryClient();
 
@@ -66,6 +68,7 @@ function AppWithTheme() {
         <Route path="/" element={<Index />} />
         <Route path="/solutions" element={<SolutionsPage />} />
         <Route path="/app-tour" element={<AppTourPage />} />
+        <Route path="/screenshots" element={<Screenshots />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/help" element={<Help />} />
         <Route path="/faq" element={<FAQ />} />
