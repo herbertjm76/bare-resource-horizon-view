@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { colors } from '@/styles/colors';
 import { toast } from 'sonner';
 import { AddProjectStageDialog } from './AddProjectStageDialog';
 import { UnscheduledStagesTray } from './UnscheduledStagesTray';
@@ -113,14 +114,15 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   const WEEK_WIDTH = 64; // Width of each week column in pixels
 
   // Fetch office stages for colors
+  // Include both company-specific stages and global defaults (company_id IS NULL)
   const { data: officeStages = [] } = useQuery({
     queryKey: ['office-stages', company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('office_stages')
-        .select('id, name, color, order_index, code')
-        .eq('company_id', company.id)
+        .select('id, name, color, order_index, code, company_id')
+        .or(`company_id.eq.${company.id},company_id.is.null`)
         .order('order_index');
       if (error) throw error;
       return data;
@@ -264,16 +266,42 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     }
   });
 
-  // Build stage info map from office_stages
+  const normalizeStageName = useCallback((name: string) => name.trim().toLowerCase(), []);
+
+  // Build stage info map from office_stages (keyed by normalized name)
+  // If both a global default and a company-specific stage exist with the same name,
+  // prefer the company-specific one.
   const stageInfoMap = useMemo(() => {
     const map: Record<string, { color: string; orderIndex: number; id: string; code: string }> = {};
-    officeStages?.forEach(s => {
-      // Use the color from database, fallback to blue only if null/empty
-      const stageColor = s.color && s.color.trim() !== '' ? s.color : '#3b82f6';
-      map[s.name] = { color: stageColor, orderIndex: s.order_index, id: s.id, code: s.code || '' };
-    });
+
+    // Insert global defaults first...
+    officeStages
+      ?.filter(s => s.company_id == null)
+      .forEach(s => {
+        const key = normalizeStageName(s.name);
+        map[key] = {
+          color: s.color && s.color.trim() !== '' ? s.color : colors.defaults.stage,
+          orderIndex: s.order_index,
+          id: s.id,
+          code: s.code || ''
+        };
+      });
+
+    // ...then override with company-specific stages
+    officeStages
+      ?.filter(s => s.company_id != null)
+      .forEach(s => {
+        const key = normalizeStageName(s.name);
+        map[key] = {
+          color: s.color && s.color.trim() !== '' ? s.color : colors.defaults.stage,
+          orderIndex: s.order_index,
+          id: s.id,
+          code: s.code || ''
+        };
+      });
+
     return map;
-  }, [officeStages]);
+  }, [officeStages, normalizeStageName]);
 
   // Build project stages map with start dates
   const projectStagesMap = useMemo(() => {
@@ -343,14 +371,14 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   const getProjectStagesWithPositions = useCallback((project: Project): StageWithDates[] => {
     const projectStagesList = projectStagesMap[project.id];
     if (!projectStagesList || Object.keys(projectStagesList).length === 0) return [];
-    
+
     return Object.entries(projectStagesList)
       .map(([stageName, stageData]) => {
-        const info = stageInfoMap[stageName];
-        
-        // Use stage color from office_stages, fallback to gray only if not found
-        const stageColor = info?.color || '#6b7280';
-        
+        const info = stageInfoMap[normalizeStageName(stageName)];
+
+        // Use stage color from office_stages, fallback to theme token only if not found
+        const stageColor = info?.color || colors.defaults.stage;
+
         return {
           id: stageData.id,
           officeStageId: info?.id || '',
@@ -363,7 +391,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
         };
       })
       .sort((a, b) => a.orderIndex - b.orderIndex);
-  }, [stageInfoMap, projectStagesMap]);
+  }, [stageInfoMap, projectStagesMap, normalizeStageName]);
 
   // Calculate stage position on timeline
   const getStageTimelinePosition = (stage: StageWithDates) => {
