@@ -30,8 +30,8 @@ const tourSteps: TourStep[] = [
     category: "Overview",
     screenshot: "/lovable-uploads/1ec9c1fb-a2b7-46f5-8584-89c4034146af.png",
     features: ["Utilization snapshot", "Upcoming work", "At-a-glance KPIs"],
-    icon: <LayoutDashboard className="w-16 h-16" style={{ color: '#A855F7' }} />,
-    bgColor: "from-primary to-primary",
+    icon: <LayoutDashboard className="w-16 h-16" />,
+    bgColor: "from-[#A855F7] to-[#EC4899]",
     route: "/dashboard"
   },
   {
@@ -41,8 +41,8 @@ const tourSteps: TourStep[] = [
     category: "Planning",
     screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
     features: ["Table / grid views", "Availability & leave context", "Quick scanning"],
-    icon: <Calendar className="w-16 h-16" style={{ color: '#A855F7' }} />,
-    bgColor: "from-secondary to-secondary",
+    icon: <Calendar className="w-16 h-16" />,
+    bgColor: "from-[#A855F7] to-[#EC4899]",
     route: "/weekly-overview"
   },
   {
@@ -52,8 +52,8 @@ const tourSteps: TourStep[] = [
     category: "Scheduling",
     screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
     features: ["By project / by person", "Update allocations", "Plan ahead"],
-    icon: <TrendingUp className="w-16 h-16" style={{ color: '#A855F7' }} />,
-    bgColor: "from-accent to-accent",
+    icon: <TrendingUp className="w-16 h-16" />,
+    bgColor: "from-[#A855F7] to-[#EC4899]",
     route: "/resource-scheduling"
   },
   {
@@ -63,8 +63,8 @@ const tourSteps: TourStep[] = [
     category: "Projects",
     screenshot: "/lovable-uploads/d6950251-26bd-43bc-8594-4b191fe6c1a7.png",
     features: ["Pipeline view", "Stage planning", "Capacity vs demand"],
-    icon: <FolderKanban className="w-16 h-16" style={{ color: '#A855F7' }} />,
-    bgColor: "from-muted to-muted",
+    icon: <FolderKanban className="w-16 h-16" />,
+    bgColor: "from-[#A855F7] to-[#EC4899]",
     route: "/resource-planning"
   },
   {
@@ -74,8 +74,8 @@ const tourSteps: TourStep[] = [
     category: "Insights",
     screenshot: "/lovable-uploads/69179c95-91ed-42d6-a38b-94114edcf69f.png",
     features: ["Color-coded capacity", "Filter by team / role", "Overload detection"],
-    icon: <Flame className="w-16 h-16" style={{ color: '#A855F7' }} />,
-    bgColor: "from-primary to-primary",
+    icon: <Flame className="w-16 h-16" />,
+    bgColor: "from-[#A855F7] to-[#EC4899]",
     route: "/capacity-heatmap"
   },
   {
@@ -85,8 +85,8 @@ const tourSteps: TourStep[] = [
     category: "Availability",
     screenshot: "/lovable-uploads/5233d4c9-0afd-4df2-b96b-e71ad0acbabc.png",
     features: ["Leave overview", "Requests & approvals", "Coverage awareness"],
-    icon: <CalendarDays className="w-16 h-16" style={{ color: '#A855F7' }} />,
-    bgColor: "from-secondary to-secondary",
+    icon: <CalendarDays className="w-16 h-16" />,
+    bgColor: "from-[#A855F7] to-[#EC4899]",
     route: "/team-leave"
   },
   {
@@ -96,8 +96,8 @@ const tourSteps: TourStep[] = [
     category: "Settings",
     screenshot: "/lovable-uploads/2b26c5c4-10bc-4fcf-b864-ae226aef1708.png",
     features: ["Company settings", "Teams & roles", "Configuration"],
-    icon: <Flag className="w-16 h-16" style={{ color: '#A855F7' }} />,
-    bgColor: "from-muted to-muted",
+    icon: <Flag className="w-16 h-16" />,
+    bgColor: "from-[#A855F7] to-[#EC4899]",
     route: "/office-settings"
   }
 ];
@@ -174,7 +174,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
                 )}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-foreground/10 to-transparent rounded-2xl" />
-                <div className="relative text-primary-foreground transition-all duration-300 group-hover:scale-110">
+                <div className="relative text-white transition-all duration-300 group-hover:scale-110">
                   {React.cloneElement(step.icon as React.ReactElement, {
                     className: "w-8 h-8 md:w-10 md:h-10",
                   })}
