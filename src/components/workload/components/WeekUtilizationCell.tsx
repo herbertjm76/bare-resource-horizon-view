@@ -17,11 +17,15 @@ export const WeekUtilizationCell: React.FC<WeekUtilizationCellProps> = ({
   const weekTotal = weekData?.total || 0;
   const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
   
+  // Color-coding based on utilization percentage (assuming 40h capacity)
+  const weeklyCapacity = 40;
   const getUtilizationColor = (hours: number) => {
-    if (hours === 0) return '#f3f4f6';
-    if (hours === 40) return '#22c55e';
-    if (hours > 40) return '#ef4444';
-    return '#eab308';
+    if (hours === 0) return '#f3f4f6'; // Gray
+    const utilization = (hours / weeklyCapacity) * 100;
+    if (utilization > 100) return '#ef4444'; // Red - over-allocated
+    if (utilization >= 80) return '#22c55e'; // Green - optimal (80-100%)
+    if (utilization >= 50) return '#eab308'; // Yellow - moderate (50-79%)
+    return '#f97316'; // Orange - underutilized (<50%)
   };
 
   return (
