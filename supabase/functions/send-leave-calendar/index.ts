@@ -424,7 +424,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Organizer email for calendar invites
-    const organizerEmail = 'admin@bareresource.com';
+    const organizerEmail = 'noreply@bareresource.com';
     
     // Generate ICS file with METHOD:REQUEST for native calendar invite behavior
     const icsContent = generateICSFile(leaveRequests, holidays, companyId, companyName, recipientEmail, organizerEmail);
@@ -479,7 +479,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         try {
           const { error } = await resend.emails.send({
-            from: `${companyName} <admin@bareresource.com>`,
+            from: `${companyName} <noreply@bareresource.com>`,
             to: [recipientEmail],
             subject: `Leave: ${memberName} - ${leave.leave_type.name} (${dateStr})`,
             html: emailHtml,
@@ -518,7 +518,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         try {
           const { error } = await resend.emails.send({
-            from: `${companyName} <admin@bareresource.com>`,
+            from: `${companyName} <noreply@bareresource.com>`,
             to: [recipientEmail],
             subject: `🎉 Holiday: ${holiday.name}${locationSuffix} (${dateStr})`,
             html: emailHtml,
@@ -588,7 +588,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send as calendar invite using text/calendar content type for native calendar behavior
     const { error: emailError } = await resend.emails.send({
-      from: `${companyName} <admin@bareresource.com>`,
+      from: `${companyName} <noreply@bareresource.com>`,
       to: [recipientEmail],
       subject: `${companyName} Leave Calendar - ${totalEvents} Event${totalEvents !== 1 ? 's' : ''}`,
       html: emailHtml,
