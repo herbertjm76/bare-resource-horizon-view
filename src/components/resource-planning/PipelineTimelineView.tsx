@@ -339,24 +339,25 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   }, [projects, orderedGroups, groupBy]);
 
   // Get stages for a project with their timeline positions
+  // Uses projectStagesData as the source of truth for stage names (not project.stages which may be empty)
   const getProjectStagesWithPositions = useCallback((project: Project): StageWithDates[] => {
-    if (!project.stages || project.stages.length === 0) return [];
+    const projectStagesList = projectStagesMap[project.id];
+    if (!projectStagesList || Object.keys(projectStagesList).length === 0) return [];
     
-    return project.stages
-      .map(stageName => {
+    return Object.entries(projectStagesList)
+      .map(([stageName, stageData]) => {
         const info = stageInfoMap[stageName];
-        const stageData = projectStagesMap[project.id]?.[stageName];
         
-        // Use stage color from office_stages, fallback to default only if not found
+        // Use stage color from office_stages, fallback to gray only if not found
         const stageColor = info?.color || '#6b7280';
         
         return {
-          id: stageData?.id || '',
+          id: stageData.id,
           officeStageId: info?.id || '',
           stageName,
           stageCode: info?.code || stageName.substring(0, 3).toUpperCase(),
-          startDate: stageData?.startDate ? parseISO(stageData.startDate) : null,
-          contractedWeeks: stageData?.contractedWeeks || 4,
+          startDate: stageData.startDate ? parseISO(stageData.startDate) : null,
+          contractedWeeks: stageData.contractedWeeks || 4,
           color: stageColor,
           orderIndex: info?.orderIndex ?? 999
         };
