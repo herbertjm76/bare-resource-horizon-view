@@ -189,7 +189,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
 
                 {/* Current step indicator */}
                 {index === currentStep && (
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full animate-pulse" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full animate-pulse" />
                 )}
               </div>
 
