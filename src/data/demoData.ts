@@ -356,6 +356,48 @@ export const DEMO_STAGES = [
   { id: '00000000-0000-0000-0006-000000000005', company_id: DEMO_COMPANY_ID, name: 'Construction', code: 'CA', color: '#EF4444', order_index: 5 }
 ];
 
+// Demo office roles
+export const DEMO_ROLES = [
+  { id: '00000000-0000-0000-0010-000000000001', company_id: DEMO_COMPANY_ID, name: 'Principal', code: 'PRIN', created_at: '2020-01-01T00:00:00Z', updated_at: new Date().toISOString() },
+  { id: '00000000-0000-0000-0010-000000000002', company_id: DEMO_COMPANY_ID, name: 'Associate Director', code: 'AD', created_at: '2020-01-01T00:00:00Z', updated_at: new Date().toISOString() },
+  { id: '00000000-0000-0000-0010-000000000003', company_id: DEMO_COMPANY_ID, name: 'Senior Architect', code: 'SA', created_at: '2020-01-01T00:00:00Z', updated_at: new Date().toISOString() },
+  { id: '00000000-0000-0000-0010-000000000004', company_id: DEMO_COMPANY_ID, name: 'Project Architect', code: 'PA', created_at: '2020-01-01T00:00:00Z', updated_at: new Date().toISOString() },
+  { id: '00000000-0000-0000-0010-000000000005', company_id: DEMO_COMPANY_ID, name: 'Architect', code: 'ARCH', created_at: '2020-01-01T00:00:00Z', updated_at: new Date().toISOString() },
+  { id: '00000000-0000-0000-0010-000000000006', company_id: DEMO_COMPANY_ID, name: 'Graduate Architect', code: 'GA', created_at: '2020-01-01T00:00:00Z', updated_at: new Date().toISOString() },
+  { id: '00000000-0000-0000-0010-000000000007', company_id: DEMO_COMPANY_ID, name: 'Interior Designer', code: 'ID', created_at: '2020-01-01T00:00:00Z', updated_at: new Date().toISOString() },
+  { id: '00000000-0000-0000-0010-000000000008', company_id: DEMO_COMPANY_ID, name: 'Technical Director', code: 'TD', created_at: '2020-01-01T00:00:00Z', updated_at: new Date().toISOString() }
+];
+
+// Demo rates (cost rates per role)
+export const DEMO_RATES = [
+  { id: '00000000-0000-0000-0011-000000000001', company_id: DEMO_COMPANY_ID, type: 'role' as const, reference_id: '00000000-0000-0000-0010-000000000001', value: 350, unit: 'hour' as const },
+  { id: '00000000-0000-0000-0011-000000000002', company_id: DEMO_COMPANY_ID, type: 'role' as const, reference_id: '00000000-0000-0000-0010-000000000002', value: 280, unit: 'hour' as const },
+  { id: '00000000-0000-0000-0011-000000000003', company_id: DEMO_COMPANY_ID, type: 'role' as const, reference_id: '00000000-0000-0000-0010-000000000003', value: 220, unit: 'hour' as const },
+  { id: '00000000-0000-0000-0011-000000000004', company_id: DEMO_COMPANY_ID, type: 'role' as const, reference_id: '00000000-0000-0000-0010-000000000004', value: 180, unit: 'hour' as const },
+  { id: '00000000-0000-0000-0011-000000000005', company_id: DEMO_COMPANY_ID, type: 'role' as const, reference_id: '00000000-0000-0000-0010-000000000005', value: 150, unit: 'hour' as const },
+  { id: '00000000-0000-0000-0011-000000000006', company_id: DEMO_COMPANY_ID, type: 'role' as const, reference_id: '00000000-0000-0000-0010-000000000006', value: 95, unit: 'hour' as const },
+  { id: '00000000-0000-0000-0011-000000000007', company_id: DEMO_COMPANY_ID, type: 'role' as const, reference_id: '00000000-0000-0000-0010-000000000007', value: 165, unit: 'hour' as const },
+  { id: '00000000-0000-0000-0011-000000000008', company_id: DEMO_COMPANY_ID, type: 'role' as const, reference_id: '00000000-0000-0000-0010-000000000008', value: 260, unit: 'hour' as const }
+];
+
+// Demo project statuses
+export const DEMO_PROJECT_STATUSES = [
+  { id: '00000000-0000-0000-0012-000000000001', company_id: DEMO_COMPANY_ID, name: 'Active', order_index: 1, color: '#10B981' },
+  { id: '00000000-0000-0000-0012-000000000002', company_id: DEMO_COMPANY_ID, name: 'On Hold', order_index: 2, color: '#F59E0B' },
+  { id: '00000000-0000-0000-0012-000000000003', company_id: DEMO_COMPANY_ID, name: 'Pipeline', order_index: 3, color: '#3B82F6' },
+  { id: '00000000-0000-0000-0012-000000000004', company_id: DEMO_COMPANY_ID, name: 'Completed', order_index: 4, color: '#6B7280' },
+  { id: '00000000-0000-0000-0012-000000000005', company_id: DEMO_COMPANY_ID, name: 'Archived', order_index: 5, color: '#9CA3AF' }
+];
+
+// Demo project types
+export const DEMO_PROJECT_TYPES = [
+  { id: '00000000-0000-0000-0013-000000000001', company_id: DEMO_COMPANY_ID, name: 'New Build', order_index: 1, icon: '🏗️', color: '#10B981' },
+  { id: '00000000-0000-0000-0013-000000000002', company_id: DEMO_COMPANY_ID, name: 'Renovation', order_index: 2, icon: '🔨', color: '#F59E0B' },
+  { id: '00000000-0000-0000-0013-000000000003', company_id: DEMO_COMPANY_ID, name: 'Fit-out', order_index: 3, icon: '🎨', color: '#8B5CF6' },
+  { id: '00000000-0000-0000-0013-000000000004', company_id: DEMO_COMPANY_ID, name: 'Masterplan', order_index: 4, icon: '🗺️', color: '#3B82F6' },
+  { id: '00000000-0000-0000-0013-000000000005', company_id: DEMO_COMPANY_ID, name: 'Feasibility Study', order_index: 5, icon: '📊', color: '#EC4899' }
+];
+
 // Demo company
 export const DEMO_COMPANY = {
   id: DEMO_COMPANY_ID,
@@ -654,6 +696,10 @@ export const DEMO_DATA = {
   departments: DEMO_DEPARTMENTS,
   practiceAreas: DEMO_PRACTICE_AREAS,
   stages: DEMO_STAGES,
+  roles: DEMO_ROLES,
+  rates: DEMO_RATES,
+  projectStatuses: DEMO_PROJECT_STATUSES,
+  projectTypes: DEMO_PROJECT_TYPES,
   leaveTypes: DEMO_LEAVE_TYPES,
   preRegistered: DEMO_PRE_REGISTERED,
   teamComposition: DEMO_TEAM_COMPOSITION,

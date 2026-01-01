@@ -1,5 +1,6 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { 
   Role, 
   Location, 
@@ -12,6 +13,16 @@ import {
   OfficeSettingsContextType 
 } from './types';
 import { fetchOfficeSettings } from './fetchOfficeSettings';
+import { 
+  DEMO_ROLES, 
+  DEMO_LOCATIONS, 
+  DEMO_RATES, 
+  DEMO_DEPARTMENTS, 
+  DEMO_PRACTICE_AREAS, 
+  DEMO_STAGES, 
+  DEMO_PROJECT_STATUSES, 
+  DEMO_PROJECT_TYPES 
+} from '@/data/demoData';
 
 export const OfficeSettingsContext = createContext<OfficeSettingsContextType | null>(null);
 
@@ -26,8 +37,23 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
   const [project_types, setProjectTypes] = useState<ProjectType[]>([]);
   const [loading, setLoading] = useState(true);
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
 
   useEffect(() => {
+    // Demo mode: load demo office settings
+    if (isDemoMode) {
+      setRoles(DEMO_ROLES);
+      setLocations(DEMO_LOCATIONS.map(loc => ({ ...loc, color: '#E5DEFF' })));
+      setRates(DEMO_RATES);
+      setDepartments(DEMO_DEPARTMENTS);
+      setPracticeAreas(DEMO_PRACTICE_AREAS);
+      setOfficeStages(DEMO_STAGES);
+      setProjectStatuses(DEMO_PROJECT_STATUSES);
+      setProjectTypes(DEMO_PROJECT_TYPES);
+      setLoading(false);
+      return;
+    }
+
     if (!company) {
       setLoading(false);
       setRoles([]);
@@ -61,7 +87,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     };
 
     loadSettings();
-  }, [company]);
+  }, [company, isDemoMode]);
 
   return (
     <OfficeSettingsContext.Provider 
