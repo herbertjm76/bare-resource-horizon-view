@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useRef, useCallback } from 'react';
 import { format, addWeeks, startOfWeek, differenceInWeeks, parseISO, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, Loader2, Calendar, GripVertical, Settings2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Calendar, GripVertical, Settings2, Pencil } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -833,19 +833,30 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                       return (
                         <div key={project.id} className="border-b border-border/20 last:border-b-0">
                           <div
-                            className="flex items-center hover:bg-muted/30 cursor-pointer group"
-                            onClick={() => {
-                              // Don't open project dialog if we just finished dragging
-                              if (justDraggedRef.current) return;
-                              onProjectClick?.(project);
-                            }}
+                            className="flex items-center hover:bg-muted/30 group"
                           >
                             {/* Project name */}
                             <div className="w-48 shrink-0 p-2 border-r border-border">
                               <div className="flex items-center gap-1">
-                                <div className="text-xs font-medium truncate group-hover:text-primary flex-1">
+                                <div className="text-xs font-medium truncate flex-1">
                                   {project.name}
                                 </div>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-muted transition-opacity"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onProjectClick?.(project);
+                                      }}
+                                    >
+                                      <Pencil className="h-3 w-3 text-muted-foreground" />
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-xs">Edit project</p>
+                                  </TooltipContent>
+                                </Tooltip>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <button
