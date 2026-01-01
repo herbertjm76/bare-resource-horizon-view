@@ -1,21 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
+import { DEMO_COMPANY_ID, DEMO_TEAM_MEMBERS } from '@/data/demoData';
 
-// Demo user data
-const DEMO_USER_ID = '00000000-0000-0000-0000-000000000002';
-const DEMO_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+// Demo user data - uses the first demo team member as the logged in user
+const DEMO_USER_ID = DEMO_TEAM_MEMBERS[0].id;
 
 const DEMO_USER: User = {
   id: DEMO_USER_ID,
-  email: 'demo@example.com',
+  email: DEMO_TEAM_MEMBERS[0].email,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
   email_confirmed_at: new Date().toISOString(),
   last_sign_in_at: new Date().toISOString(),
   app_metadata: {},
   user_metadata: {
-    first_name: 'John',
-    last_name: 'Demo',
+    first_name: DEMO_TEAM_MEMBERS[0].first_name,
+    last_name: DEMO_TEAM_MEMBERS[0].last_name,
   },
   aud: 'authenticated',
   confirmation_sent_at: new Date().toISOString()
@@ -34,89 +34,23 @@ const DEMO_PROFILE = {
   id: DEMO_USER_ID,
   company_id: DEMO_COMPANY_ID,
   role: 'owner' as const,
-  email: 'demo@example.com',
-  first_name: 'John',
-  last_name: 'Demo',
-  job_title: 'CEO',
-  department: 'Executive',
-  location: 'San Francisco, CA',
-  practice_area: null,
-  weekly_capacity: 40,
+  email: DEMO_TEAM_MEMBERS[0].email,
+  first_name: DEMO_TEAM_MEMBERS[0].first_name,
+  last_name: DEMO_TEAM_MEMBERS[0].last_name,
+  job_title: DEMO_TEAM_MEMBERS[0].job_title,
+  department: DEMO_TEAM_MEMBERS[0].department,
+  location: DEMO_TEAM_MEMBERS[0].location,
+  practice_area: DEMO_TEAM_MEMBERS[0].practice_area,
+  weekly_capacity: DEMO_TEAM_MEMBERS[0].weekly_capacity,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
   avatar_url: null,
-  bio: null,
+  bio: DEMO_TEAM_MEMBERS[0].bio,
   manager_id: null,
-  start_date: '2020-03-15',
-  date_of_birth: '1985-06-15',
+  start_date: DEMO_TEAM_MEMBERS[0].start_date,
+  date_of_birth: DEMO_TEAM_MEMBERS[0].date_of_birth,
   office_role_id: null
 };
-
-const DEMO_TEAM_MEMBERS = [
-  {
-    id: '00000000-0000-0000-0000-000000000003',
-    company_id: DEMO_COMPANY_ID,
-    role: 'admin' as const,
-    email: 'sarah.admin@example.com',
-    first_name: 'Sarah',
-    last_name: 'Wilson',
-    job_title: 'VP of Engineering',
-    department: 'Engineering',
-    location: 'San Francisco, CA',
-    practice_area: null,
-    weekly_capacity: 40,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    avatar_url: null,
-    bio: null,
-    manager_id: null,
-    start_date: '2021-01-10',
-    date_of_birth: '1988-12-20',
-    office_role_id: null
-  },
-  {
-    id: '00000000-0000-0000-0000-000000000004',
-    company_id: DEMO_COMPANY_ID,
-    role: 'member' as const,
-    email: 'alex.dev@example.com',
-    first_name: 'Alex',
-    last_name: 'Chen',
-    job_title: 'Senior Developer',
-    department: 'Engineering',
-    location: 'San Francisco, CA',
-    practice_area: null,
-    weekly_capacity: 40,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    avatar_url: null,
-    bio: null,
-    manager_id: null,
-    start_date: '2022-06-01',
-    date_of_birth: '1992-03-08',
-    office_role_id: null
-  },
-  {
-    id: '00000000-0000-0000-0000-000000000005',
-    company_id: DEMO_COMPANY_ID,
-    role: 'member' as const,
-    email: 'maria.designer@example.com',
-    first_name: 'Maria',
-    last_name: 'Rodriguez',
-    job_title: 'UX Designer',
-    department: 'Product',
-    location: 'New York, NY',
-    practice_area: null,
-    weekly_capacity: 40,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    avatar_url: null,
-    bio: null,
-    manager_id: null,
-    start_date: '2023-02-15',
-    date_of_birth: '1990-07-22',
-    office_role_id: null
-  }
-];
 
 export interface DemoAuthState {
   user: User | null;
@@ -147,10 +81,8 @@ export const useDemoAuth = () => {
     localStorage.setItem('demo_start_time', startTime.toString());
     setIsDemoMode(true);
     
-    // Auto-exit demo after timeout
-    setTimeout(() => {
-      exitDemoMode();
-    }, DEMO_TIMEOUT);
+    // Navigate to demo dashboard
+    window.location.href = '/demo/dashboard';
   }, []);
 
   const exitDemoMode = useCallback(() => {

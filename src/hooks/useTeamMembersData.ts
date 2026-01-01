@@ -5,11 +5,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/components/dashboard/types";
 import { toast } from "sonner";
 import { useCompanyId } from '@/hooks/useCompanyId';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_TEAM_MEMBERS } from '@/data/demoData';
 import { logger } from '@/utils/logger';
 
 export const useTeamMembersData = (includeInactive: boolean = false) => {
+  const { isDemoMode } = useDemoAuth();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { companyId, isLoading: companyLoading, isReady } = useCompanyId();
+  
+  // Return demo data immediately in demo mode
+  if (isDemoMode) {
+    return {
+      teamMembers: DEMO_TEAM_MEMBERS.map(m => ({
+        ...m,
+        role: m.id === '00000000-0000-0000-0000-000000000002' ? 'owner' : 'member'
+      })) as Profile[],
+      isLoading: false,
+      error: null,
+      triggerRefresh: () => {},
+      forceRefresh: () => {},
+    };
+  }
 
   // Fetch team members with refetch capability
   const {

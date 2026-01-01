@@ -1,4 +1,6 @@
 import { useCompany } from '@/context/CompanyContext';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_COMPANY_ID, DEMO_COMPANY } from '@/data/demoData';
 
 interface UseCompanyIdResult {
   /** The company ID, only defined when ready */
@@ -20,6 +22,7 @@ interface UseCompanyIdResult {
  * 1. `companyId` is only returned when the company context is fully loaded
  * 2. `isReady` can be used directly as the `enabled` condition for React Query hooks
  * 3. All hooks using company data have consistent behavior
+ * 4. Demo mode returns demo company data immediately
  * 
  * Usage in React Query hooks:
  * ```ts
@@ -33,7 +36,19 @@ interface UseCompanyIdResult {
  * ```
  */
 export const useCompanyId = (): UseCompanyIdResult => {
+  const { isDemoMode } = useDemoAuth();
   const { company, loading: companyLoading, error: companyError } = useCompany();
+  
+  // In demo mode, return demo company data immediately
+  if (isDemoMode) {
+    return {
+      companyId: DEMO_COMPANY_ID,
+      isReady: true,
+      isLoading: false,
+      error: null,
+      company: DEMO_COMPANY,
+    };
+  }
   
   const companyId = company?.id;
   
