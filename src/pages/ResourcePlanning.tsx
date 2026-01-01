@@ -14,11 +14,14 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_DEPARTMENTS, DEMO_PRACTICE_AREAS } from '@/data/demoData';
 
 const statusOptions = ['Active', 'On Hold', 'Completed', 'Planning'];
 
 const ResourcePlanning: React.FC = () => {
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
   const [activeTab, setActiveTab] = useState<string>('planning');
   const [statusFilter, setStatusFilter] = useState<string[]>(['Active', 'Planning']);
   const [showBudget, setShowBudget] = useState(false);
@@ -39,8 +42,11 @@ const ResourcePlanning: React.FC = () => {
 
   // Fetch departments
   const { data: departments = [] } = useQuery({
-    queryKey: ['office-departments', company?.id],
+    queryKey: ['office-departments', company?.id, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return DEMO_DEPARTMENTS.map(d => ({ id: d.id, name: d.name }));
+      }
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('office_departments')
@@ -50,13 +56,16 @@ const ResourcePlanning: React.FC = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    enabled: !!company?.id || isDemoMode
   });
 
   // Fetch practice areas
   const { data: practiceAreas = [] } = useQuery({
-    queryKey: ['office-practice-areas', company?.id],
+    queryKey: ['office-practice-areas', company?.id, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return DEMO_PRACTICE_AREAS.map(p => ({ id: p.id, name: p.name }));
+      }
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('office_practice_areas')
@@ -66,7 +75,7 @@ const ResourcePlanning: React.FC = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    enabled: !!company?.id || isDemoMode
   });
 
   // Filter projects by search, department, and practice area

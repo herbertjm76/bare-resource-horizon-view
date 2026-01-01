@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyId } from '@/hooks/useCompanyId';
 import { useMemo } from 'react';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_PROJECTS, DEMO_STAGES, DEMO_DEPARTMENTS } from '@/data/demoData';
 
 export interface ProjectPlanningProject {
   id: string;
@@ -40,13 +42,72 @@ export interface TeamCompositionSummary {
   headcount: number;
 }
 
+// Generate demo project stages
+const generateDemoProjectStages = (): ProjectStageData[] => {
+  const stages: ProjectStageData[] = [];
+  
+  DEMO_PROJECTS.forEach(project => {
+    DEMO_STAGES.forEach((stage, idx) => {
+      stages.push({
+        id: `demo-ps-${project.id}-${stage.id}`,
+        project_id: project.id,
+        stage_name: stage.name,
+        contracted_weeks: 4 + idx * 2,
+        total_budgeted_hours: Math.floor(project.budget_hours / 5),
+        total_budget_amount: Math.floor(project.budget_amount / 5),
+        start_date: project.contract_start_date
+      });
+    });
+  });
+  
+  return stages;
+};
+
+// Generate demo team composition summaries
+const generateDemoCompositionData = (): TeamCompositionSummary[] => {
+  const compositions: TeamCompositionSummary[] = [];
+  
+  DEMO_PROJECTS.forEach(project => {
+    DEMO_STAGES.forEach(stage => {
+      compositions.push({
+        project_id: project.id,
+        stage_id: stage.id,
+        total_hours: Math.floor(project.budget_hours / 5),
+        total_budget: Math.floor(project.budget_amount / 5),
+        headcount: 2 + Math.floor(Math.random() * 3)
+      });
+    });
+  });
+  
+  return compositions;
+};
+
 export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
   const { companyId, isReady } = useCompanyId();
+  const { isDemoMode } = useDemoAuth();
 
   // Fetch projects
   const { data: projects = [], isLoading: isLoadingProjects, refetch: refetchProjects } = useQuery({
-    queryKey: ['planning-projects', companyId, statusFilter],
+    queryKey: ['planning-projects', companyId, statusFilter, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        const demoProjects = DEMO_PROJECTS.filter(p => 
+          statusFilter.length === 0 || statusFilter.includes(p.status)
+        ).map(p => ({
+          id: p.id,
+          name: p.name,
+          code: p.code,
+          status: p.status,
+          current_stage: p.current_stage,
+          stages: p.stages,
+          contract_start_date: p.contract_start_date,
+          contract_end_date: p.contract_end_date,
+          department: p.department
+        }));
+        return demoProjects as ProjectPlanningProject[];
+      }
+      
       if (!companyId) return [];
 
       let query = supabase
@@ -63,13 +124,23 @@ export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
       if (error) throw error;
       return data as ProjectPlanningProject[];
     },
-    enabled: isReady
+    enabled: isReady || isDemoMode
   });
 
   // Fetch office stages
   const { data: officeStages = [], isLoading: isLoadingStages } = useQuery({
-    queryKey: ['office-stages', companyId],
+    queryKey: ['office-stages', companyId, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        return DEMO_STAGES.map(s => ({
+          id: s.id,
+          name: s.name,
+          code: s.code,
+          order_index: s.order_index
+        })) as OfficeStage[];
+      }
+      
       if (!companyId) return [];
 
       const { data, error } = await supabase
@@ -81,14 +152,20 @@ export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
       if (error) throw error;
       return data as OfficeStage[];
     },
-    enabled: isReady
+    enabled: isReady || isDemoMode
   });
 
   // Fetch project stages data (contracted weeks, etc.)
   const projectIds = projects.map(p => p.id);
   const { data: projectStagesData = [], isLoading: isLoadingProjectStages, refetch: refetchProjectStages } = useQuery({
-    queryKey: ['project-stages-data', projectIds],
+    queryKey: ['project-stages-data', projectIds, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        const allDemoStages = generateDemoProjectStages();
+        return allDemoStages.filter(s => projectIds.includes(s.project_id));
+      }
+      
       if (projectIds.length === 0) return [];
 
       const { data, error } = await supabase
@@ -99,13 +176,19 @@ export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
       if (error) throw error;
       return data as ProjectStageData[];
     },
-    enabled: projectIds.length > 0
+    enabled: projectIds.length > 0 || isDemoMode
   });
 
   // Fetch team composition summaries
   const { data: compositionData = [], isLoading: isLoadingComposition, refetch: refetchComposition } = useQuery({
-    queryKey: ['team-composition-summary', projectIds],
+    queryKey: ['team-composition-summary', projectIds, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        const allCompositions = generateDemoCompositionData();
+        return allCompositions.filter(c => projectIds.includes(c.project_id));
+      }
+      
       if (projectIds.length === 0) return [];
 
       const { data, error } = await supabase
@@ -135,7 +218,7 @@ export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
 
       return Object.values(aggregated);
     },
-    enabled: projectIds.length > 0
+    enabled: projectIds.length > 0 || isDemoMode
   });
 
   // Calculate totals
@@ -152,12 +235,14 @@ export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
     };
   }, [compositionData, projects]);
 
-  const isLoading = isLoadingProjects || isLoadingStages || isLoadingProjectStages || isLoadingComposition;
+  const isLoading = isDemoMode ? false : (isLoadingProjects || isLoadingStages || isLoadingProjectStages || isLoadingComposition);
 
   const refetch = () => {
-    refetchProjects();
-    refetchProjectStages();
-    refetchComposition();
+    if (!isDemoMode) {
+      refetchProjects();
+      refetchProjectStages();
+      refetchComposition();
+    }
   };
 
   return {
