@@ -14,16 +14,19 @@ export const CapacityGauge: React.FC<CapacityGaugeProps> = ({
   const percentageRemaining = Math.round((availableHours / totalCapacity) * 100);
   const percentageUsed = 100 - percentageRemaining;
   
-  // Determine color based on available hours - GREEN for 0 available (optimal)
+  // Color-coding based on utilization percentage
   const getColor = () => {
-    if (availableHours <= 0) {
-      return '#22c55e'; // Green for 0 available hours (100% utilization - optimal)
-    } else if (availableHours <= 5) {
-      return '#facc15'; // Yellow for 1-5 available hours (good utilization)
-    } else if (availableHours <= 10) {
-      return '#f97316'; // Orange for 6-10 available hours (moderate utilization)
+    const utilization = ((totalCapacity - availableHours) / totalCapacity) * 100;
+    if (availableHours < 0) {
+      return '#ef4444'; // Red - over-allocated
+    } else if (utilization >= 80) {
+      return '#22c55e'; // Green - optimal (80-100%)
+    } else if (utilization >= 50) {
+      return '#eab308'; // Yellow - moderate (50-79%)
+    } else if (utilization > 0) {
+      return '#f97316'; // Orange - underutilized (<50%)
     } else {
-      return '#ef4444'; // Red for 11+ available hours (low utilization)
+      return '#f3f4f6'; // Gray - no allocation
     }
   };
 
