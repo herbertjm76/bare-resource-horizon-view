@@ -457,7 +457,85 @@ export const DEMO_PRE_REGISTERED = [
   }
 ];
 
-// Demo holidays
+// Demo holidays - static list for HolidaysTab display (transformed format)
+export const DEMO_HOLIDAYS = [
+  {
+    id: '00000000-0000-0000-000A-000000000001',
+    name: 'New Year\'s Day',
+    date: new Date('2026-01-01'),
+    offices: ['00000000-0000-0000-0003-000000000001', '00000000-0000-0000-0003-000000000002', '00000000-0000-0000-0003-000000000003'],
+    is_recurring: true,
+    company_id: DEMO_COMPANY_ID
+  },
+  {
+    id: '00000000-0000-0000-000A-000000000002',
+    name: 'Martin Luther King Jr. Day',
+    date: new Date('2026-01-19'),
+    offices: ['00000000-0000-0000-0003-000000000001', '00000000-0000-0000-0003-000000000002', '00000000-0000-0000-0003-000000000003'],
+    is_recurring: true,
+    company_id: DEMO_COMPANY_ID
+  },
+  {
+    id: '00000000-0000-0000-000A-000000000003',
+    name: 'Presidents\' Day',
+    date: new Date('2026-02-16'),
+    offices: ['00000000-0000-0000-0003-000000000001', '00000000-0000-0000-0003-000000000002', '00000000-0000-0000-0003-000000000003'],
+    is_recurring: true,
+    company_id: DEMO_COMPANY_ID
+  },
+  {
+    id: '00000000-0000-0000-000A-000000000004',
+    name: 'NYC Studio Day',
+    date: new Date('2026-02-20'),
+    offices: ['00000000-0000-0000-0003-000000000001'],
+    is_recurring: false,
+    company_id: DEMO_COMPANY_ID,
+    location_id: '00000000-0000-0000-0003-000000000001'
+  },
+  {
+    id: '00000000-0000-0000-000A-000000000005',
+    name: 'LA Office Retreat',
+    date: new Date('2026-03-06'),
+    offices: ['00000000-0000-0000-0003-000000000002'],
+    is_recurring: false,
+    company_id: DEMO_COMPANY_ID,
+    location_id: '00000000-0000-0000-0003-000000000002'
+  },
+  {
+    id: '00000000-0000-0000-000A-000000000006',
+    name: 'Memorial Day',
+    date: new Date('2026-05-25'),
+    offices: ['00000000-0000-0000-0003-000000000001', '00000000-0000-0000-0003-000000000002', '00000000-0000-0000-0003-000000000003'],
+    is_recurring: true,
+    company_id: DEMO_COMPANY_ID
+  },
+  {
+    id: '00000000-0000-0000-000A-000000000007',
+    name: 'Independence Day',
+    date: new Date('2026-07-04'),
+    offices: ['00000000-0000-0000-0003-000000000001', '00000000-0000-0000-0003-000000000002', '00000000-0000-0000-0003-000000000003'],
+    is_recurring: true,
+    company_id: DEMO_COMPANY_ID
+  },
+  {
+    id: '00000000-0000-0000-000A-000000000008',
+    name: 'Thanksgiving',
+    date: new Date('2025-11-27'),
+    offices: ['00000000-0000-0000-0003-000000000001', '00000000-0000-0000-0003-000000000002', '00000000-0000-0000-0003-000000000003'],
+    is_recurring: true,
+    company_id: DEMO_COMPANY_ID
+  },
+  {
+    id: '00000000-0000-0000-000A-000000000009',
+    name: 'Christmas Day',
+    date: new Date('2025-12-25'),
+    offices: ['00000000-0000-0000-0003-000000000001', '00000000-0000-0000-0003-000000000002', '00000000-0000-0000-0003-000000000003'],
+    is_recurring: true,
+    company_id: DEMO_COMPANY_ID
+  }
+];
+
+// Legacy function for backward compatibility
 export const generateDemoHolidays = () => {
   const today = new Date();
   return [
@@ -469,28 +547,6 @@ export const generateDemoHolidays = () => {
       location_id: null,
       is_recurring: true,
       office_locations: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: '00000000-0000-0000-000A-000000000002',
-      company_id: DEMO_COMPANY_ID,
-      name: 'Labor Day',
-      date: format(addDays(today, 45), 'yyyy-MM-dd'),
-      location_id: null,
-      is_recurring: true,
-      office_locations: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: '00000000-0000-0000-000A-000000000003',
-      company_id: DEMO_COMPANY_ID,
-      name: 'NYC Office Day',
-      date: format(addDays(today, 21), 'yyyy-MM-dd'),
-      location_id: '00000000-0000-0000-0003-000000000001',
-      is_recurring: false,
-      office_locations: { city: 'New York', country: 'USA' },
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }
@@ -701,6 +757,7 @@ export const DEMO_DATA = {
   projectStatuses: DEMO_PROJECT_STATUSES,
   projectTypes: DEMO_PROJECT_TYPES,
   leaveTypes: DEMO_LEAVE_TYPES,
+  holidays: DEMO_HOLIDAYS,
   preRegistered: DEMO_PRE_REGISTERED,
   teamComposition: DEMO_TEAM_COMPOSITION,
   metrics: DEMO_METRICS,

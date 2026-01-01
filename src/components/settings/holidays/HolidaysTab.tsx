@@ -4,10 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { useCompany } from "@/context/CompanyContext";
+import { useDemoAuth } from "@/hooks/useDemoAuth";
 import { HolidayDialog } from "./HolidayDialog";
 import { HolidayTimelineView } from "./HolidayTimelineView";
 import { fetchHolidays, createHoliday, updateHoliday, deleteHolidays } from "./HolidayService";
 import { Holiday, HolidayFormValues } from "./types";
+import { DEMO_HOLIDAYS } from "@/data/demoData";
 import { format } from "date-fns";
 
 // Helper function to consolidate holidays with same name and date
@@ -44,8 +46,16 @@ export const HolidaysTab = () => {
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
 
   useEffect(() => {
+    // Demo mode: use static demo holidays
+    if (isDemoMode) {
+      setHolidays(DEMO_HOLIDAYS as Holiday[]);
+      setLoading(false);
+      return;
+    }
+
     const loadHolidays = async () => {
       if (!company) return;
       
@@ -56,7 +66,7 @@ export const HolidaysTab = () => {
     };
 
     loadHolidays();
-  }, [company]);
+  }, [company, isDemoMode]);
 
   // Consolidate holidays whenever the holidays array changes
   useEffect(() => {
