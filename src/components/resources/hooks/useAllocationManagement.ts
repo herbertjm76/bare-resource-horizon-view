@@ -4,19 +4,50 @@ import { useCompany } from '@/context/CompanyContext';
 import { ProjectAllocations } from './types/resourceTypes';
 import { initializeAllocations } from './services/allocationService';
 import { getAllocationKey } from './utils/allocationUtils';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { generateDemoAllocations } from '@/data/demoData';
 
 export const useAllocationManagement = (projectId: string) => {
   const [projectAllocations, setProjectAllocations] = useState<ProjectAllocations>({});
   const [isLoadingAllocations, setIsLoadingAllocations] = useState<boolean>(true);
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
 
-  // Initialize project allocations from database
+  const loadDemoAllocations = async () => {
+    if (!projectId) return;
+
+    const allocs = generateDemoAllocations().filter((a) => a.project_id === projectId);
+    const weekly: Record<string, number> = {};
+
+    allocs.forEach((a) => {
+      // Convert allocation_date to the week start (Monday)
+      const allocationDate = new Date(a.allocation_date + 'T00:00:00');
+      const dayOfWeek = allocationDate.getDay();
+      const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const monday = new Date(allocationDate);
+      monday.setDate(allocationDate.getDate() + daysToMonday);
+      const weekKey = monday.toISOString().split('T')[0];
+
+      const key = getAllocationKey(a.resource_id, weekKey);
+      weekly[key] = (weekly[key] || 0) + Number(a.hours);
+    });
+
+    setProjectAllocations(weekly);
+  };
+
+  // Initialize project allocations
   const loadAllocations = async () => {
-    if (!projectId || !company?.id) return;
-    
+    if (!projectId) return;
+
     setIsLoadingAllocations(true);
-    
+
     try {
+      if (isDemoMode) {
+        await loadDemoAllocations();
+        return;
+      }
+
+      if (!company?.id) return;
       const allocations = await initializeAllocations(projectId, company.id);
       setProjectAllocations(allocations);
     } finally {
@@ -24,28 +55,25 @@ export const useAllocationManagement = (projectId: string) => {
     }
   };
 
-  // Load resource allocations when the component mounts or project/company changes
   useEffect(() => {
-    if (projectId && company?.id) {
+    if (projectId && (isDemoMode || company?.id)) {
       loadAllocations();
     }
-  }, [projectId, company?.id]);
+  }, [projectId, company?.id, isDemoMode]);
 
-  // Handle resource allocation changes (for UI updates)
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
     const allocationKey = getAllocationKey(resourceId, weekKey);
-    
-    setProjectAllocations(prev => ({
+
+    setProjectAllocations((prev) => ({
       ...prev,
-      [allocationKey]: hours
+      [allocationKey]: hours,
     }));
   };
 
-  // Remove all allocations for a resource from local state
   const removeResourceAllocations = (resourceId: string) => {
-    setProjectAllocations(prev => {
+    setProjectAllocations((prev) => {
       const updated = { ...prev };
-      Object.keys(updated).forEach(key => {
+      Object.keys(updated).forEach((key) => {
         if (key.startsWith(`${resourceId}:`)) {
           delete updated[key];
         }
@@ -59,6 +87,7 @@ export const useAllocationManagement = (projectId: string) => {
     isLoadingAllocations,
     handleAllocationChange,
     removeResourceAllocations,
-    getAllocationKey
+    getAllocationKey,
   };
 };
+
