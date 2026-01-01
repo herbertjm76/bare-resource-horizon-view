@@ -13,20 +13,6 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
   const { isDemoMode } = useDemoAuth();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { companyId, isLoading: companyLoading, isReady } = useCompanyId();
-  
-  // Return demo data immediately in demo mode
-  if (isDemoMode) {
-    return {
-      teamMembers: DEMO_TEAM_MEMBERS.map(m => ({
-        ...m,
-        role: m.id === '00000000-0000-0000-0000-000000000002' ? 'owner' : 'member'
-      })) as Profile[],
-      isLoading: false,
-      error: null,
-      triggerRefresh: () => {},
-      forceRefresh: () => {},
-    };
-  }
 
   // Fetch team members with refetch capability
   const {
@@ -35,8 +21,16 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
     error,
     refetch: refetchTeamMembers
   } = useQuery({
-    queryKey: ['teamMembers', refreshTrigger, includeInactive, companyId],
+    queryKey: ['teamMembers', refreshTrigger, includeInactive, companyId, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        return DEMO_TEAM_MEMBERS.map(m => ({
+          ...m,
+          role: m.id === '00000000-0000-0000-0000-000000000002' ? 'owner' : 'member'
+        })) as Profile[];
+      }
+      
       logger.debug('Fetching team members, refresh trigger:', refreshTrigger);
       logger.debug('Include inactive members:', includeInactive);
       logger.debug('Company ID from context:', companyId);
@@ -136,10 +130,10 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         throw fetchError;
       }
     },
-    enabled: isReady,
+    enabled: isDemoMode || isReady,
     refetchInterval: false,
-    staleTime: 0,
-    refetchOnWindowFocus: true,
+    staleTime: isDemoMode ? Infinity : 0,
+    refetchOnWindowFocus: !isDemoMode,
   });
 
   // Force refresh function - useful for debugging
@@ -158,8 +152,8 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
 
   return {
     teamMembers: teamMembers || [],
-    isLoading: queryLoading || companyLoading,
-    error,
+    isLoading: isDemoMode ? false : (queryLoading || companyLoading),
+    error: isDemoMode ? null : error,
     triggerRefresh,
     forceRefresh,
   };

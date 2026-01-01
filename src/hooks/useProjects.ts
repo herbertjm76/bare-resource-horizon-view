@@ -119,46 +119,40 @@ export const useProjects = (
   const { isDemoMode } = useDemoAuth();
   const { companyId, isReady, isLoading: companyLoading, error: companyError } = useCompanyId();
   
-  // Return demo data immediately in demo mode
-  if (isDemoMode) {
-    const demoProjectsWithRelations: ProjectWithRelations[] = DEMO_PROJECTS.map(p => {
-      const manager = DEMO_TEAM_MEMBERS.find(m => m.id === p.project_manager_id);
-      return {
-        id: p.id,
-        name: p.name,
-        code: p.code,
-        status: p.status,
-        country: p.country,
-        department: p.department || null,
-        target_profit_percentage: 25,
-        current_stage: p.current_stage,
-        stages: p.stages || null,
-        currency: p.currency || null,
-        project_manager: manager ? {
-          id: manager.id,
-          first_name: manager.first_name,
-          last_name: manager.last_name,
-          avatar_url: manager.avatar_url
-        } : null,
-        office: {
-          id: p.office_id,
-          name: p.department || 'Main Office',
-          country: p.country
-        }
-      };
-    });
-    
-    return {
-      projects: demoProjectsWithRelations,
-      isLoading: false,
-      error: null,
-      refetch: () => {}
-    };
-  }
-  
   const { data: projects, isLoading: queryLoading, error, refetch } = useQuery({
-    queryKey: ['projects', companyId, sortBy, sortDirection],
+    queryKey: ['projects', companyId, sortBy, sortDirection, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        const demoProjectsWithRelations: ProjectWithRelations[] = DEMO_PROJECTS.map(p => {
+          const manager = DEMO_TEAM_MEMBERS.find(m => m.id === p.project_manager_id);
+          return {
+            id: p.id,
+            name: p.name,
+            code: p.code,
+            status: p.status,
+            country: p.country,
+            department: p.department || null,
+            target_profit_percentage: 25,
+            current_stage: p.current_stage,
+            stages: p.stages || null,
+            currency: p.currency || null,
+            project_manager: manager ? {
+              id: manager.id,
+              first_name: manager.first_name,
+              last_name: manager.last_name,
+              avatar_url: manager.avatar_url
+            } : null,
+            office: {
+              id: p.office_id,
+              name: p.department || 'Main Office',
+              country: p.country
+            }
+          };
+        });
+        return demoProjectsWithRelations;
+      }
+      
       // Safety check - should never happen if enabled is correct
       if (!companyId) {
         logger.warn('useProjects: queryFn called without companyId');
@@ -223,25 +217,23 @@ export const useProjects = (
         throw err;
       }
     },
-    // CRITICAL: Only enable when company context is fully ready
-    enabled: isReady,
+    // Enable in demo mode OR when company context is ready
+    enabled: isDemoMode || isReady,
     retry: 2,
     retryDelay: 1000,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: !isDemoMode,
+    staleTime: isDemoMode ? Infinity : 0,
     // Keep previous data while refetching to prevent flicker
     placeholderData: (previousData) => previousData,
   });
 
-  // Determine proper loading state:
-  // - If company is loading, we're loading
-  // - If isReady is true but query is loading, we're loading
-  // - If isReady is false (no company), we're NOT loading (we're done - nothing to fetch)
-  const isLoading = companyLoading || (isReady && queryLoading);
+  // Determine proper loading state
+  const isLoading = isDemoMode ? false : (companyLoading || (isReady && queryLoading));
 
   return {
     projects: projects || [],
     isLoading,
-    error: error || (companyError ? new Error(companyError) : null),
+    error: isDemoMode ? null : (error || (companyError ? new Error(companyError) : null)),
     refetch
   };
 };
