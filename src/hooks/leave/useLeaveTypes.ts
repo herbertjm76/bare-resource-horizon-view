@@ -1,13 +1,26 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyId } from '@/hooks/useCompanyId';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_LEAVE_TYPES } from '@/data/demoData';
 import { toast } from 'sonner';
 import { LeaveType } from '@/types/leave';
 
 export const useLeaveTypes = () => {
+  const { isDemoMode } = useDemoAuth();
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { companyId } = useCompanyId();
+  
+  // Return demo data in demo mode
+  if (isDemoMode) {
+    return {
+      leaveTypes: DEMO_LEAVE_TYPES as LeaveType[],
+      isLoading: false,
+      refreshLeaveTypes: () => {},
+      seedDefaultLeaveTypes: () => {}
+    };
+  }
 
   const fetchLeaveTypes = useCallback(async () => {
     if (!companyId) return;

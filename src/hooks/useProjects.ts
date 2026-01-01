@@ -29,6 +29,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompanyId } from '@/hooks/useCompanyId';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_PROJECTS, DEMO_TEAM_MEMBERS } from '@/data/demoData';
 import { logger } from '@/utils/logger';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -114,7 +116,45 @@ export const useProjects = (
   sortBy: ProjectSortBy = 'created', 
   sortDirection: 'asc' | 'desc' = 'asc'
 ): UseProjectsResult => {
+  const { isDemoMode } = useDemoAuth();
   const { companyId, isReady, isLoading: companyLoading, error: companyError } = useCompanyId();
+  
+  // Return demo data immediately in demo mode
+  if (isDemoMode) {
+    const demoProjectsWithRelations: ProjectWithRelations[] = DEMO_PROJECTS.map(p => {
+      const manager = DEMO_TEAM_MEMBERS.find(m => m.id === p.project_manager_id);
+      return {
+        id: p.id,
+        name: p.name,
+        code: p.code,
+        status: p.status,
+        country: p.country,
+        department: p.department || null,
+        target_profit_percentage: 25,
+        current_stage: p.current_stage,
+        stages: p.stages || null,
+        currency: p.currency || null,
+        project_manager: manager ? {
+          id: manager.id,
+          first_name: manager.first_name,
+          last_name: manager.last_name,
+          avatar_url: manager.avatar_url
+        } : null,
+        office: {
+          id: p.office_id,
+          name: p.department || 'Main Office',
+          country: p.country
+        }
+      };
+    });
+    
+    return {
+      projects: demoProjectsWithRelations,
+      isLoading: false,
+      error: null,
+      refetch: () => {}
+    };
+  }
   
   const { data: projects, isLoading: queryLoading, error, refetch } = useQuery({
     queryKey: ['projects', companyId, sortBy, sortDirection],

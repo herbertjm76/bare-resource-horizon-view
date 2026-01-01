@@ -3,7 +3,7 @@
  * This data is used when the application is in demo mode
  */
 
-const DEMO_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+export const DEMO_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
 // Demo team members with realistic data
 export const DEMO_TEAM_MEMBERS = [

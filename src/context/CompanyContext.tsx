@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { logger } from '@/utils/logger';
+import { DEMO_COMPANY } from '@/data/demoData';
 import type { Company, CompanyContextType, Profile } from './types';
 
 const CompanyContext = createContext<CompanyContextType>({
@@ -32,6 +33,17 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const lastFetchedCompanyIdRef = useRef<string | null>(null);
   
   const { isDemoMode, profile: demoProfile } = useDemoAuth();
+  
+  // Handle demo mode - immediately return demo company
+  useEffect(() => {
+    if (isDemoMode) {
+      logger.log('CompanyProvider: Demo mode active, using demo company');
+      setCompany(DEMO_COMPANY as Company);
+      setCompanySlug('demo');
+      setLoading(false);
+      setError(null);
+    }
+  }, [isDemoMode]);
 
   const extractCompanySlugFromPath = () => {
     const pathname = window.location.pathname;
@@ -249,6 +261,12 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Update company data when auth changes or path changes
   useEffect(() => {
+    // Skip Supabase fetch in demo mode - already handled by demo useEffect
+    if (isDemoMode) {
+      logger.log('CompanyProvider: Demo mode active, skipping Supabase fetch');
+      return;
+    }
+    
     logger.log('CompanyProvider: Main useEffect triggered');
     const currentSlug = extractCompanySlugFromPath();
     setCompanySlug(currentSlug);
@@ -262,13 +280,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // User profile mode
       logger.log('CompanyProvider: Using profile mode');
       setIsPathMode(false);
-      
-      // Handle demo mode
-      if (isDemoMode && demoProfile) {
-        logger.log('CompanyProvider: Using demo profile');
-        fetchCompanyByProfile(demoProfile as Profile);
-        return;
-      }
       
       // Handle normal auth
       const initAuth = async () => {
@@ -287,7 +298,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       initAuth();
     }
-  }, [isDemoMode, demoProfile, location.pathname]);
+  }, [isDemoMode, location.pathname]);
 
   // Listen for auth state changes and refetch company
   useEffect(() => {
