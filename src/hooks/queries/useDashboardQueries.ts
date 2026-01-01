@@ -3,13 +3,31 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { TimeRange } from '@/components/dashboard/TimeRangeSelector';
 import { startOfWeek, startOfMonth, subMonths, format } from 'date-fns';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import DEMO_DATA, { 
+  DEMO_TEAM_MEMBERS, 
+  DEMO_PROJECTS, 
+  DEMO_PRE_REGISTERED, 
+  DEMO_TEAM_COMPOSITION,
+  DEMO_STAGES,
+  DEMO_LOCATIONS,
+  DEMO_METRICS,
+  generateDemoHolidays
+} from '@/data/demoData';
 
 // Single source of truth for all dashboard data fetching using React Query
 
 export const useDashboardTeamMembers = (companyId?: string) => {
+  const { isDemoMode } = useDemoAuth();
+  
   return useQuery({
-    queryKey: ['team-members', companyId],
+    queryKey: ['team-members', companyId, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        return DEMO_TEAM_MEMBERS;
+      }
+      
       if (!companyId) return [];
       
       const { data, error } = await supabase
@@ -21,15 +39,22 @@ export const useDashboardTeamMembers = (companyId?: string) => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!companyId,
+    enabled: !!companyId || isDemoMode,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
 export const useDashboardPreRegistered = (companyId?: string) => {
+  const { isDemoMode } = useDemoAuth();
+  
   return useQuery({
-    queryKey: ['pre-registered-members', companyId],
+    queryKey: ['pre-registered-members', companyId, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        return DEMO_PRE_REGISTERED;
+      }
+      
       if (!companyId) return [];
       
       const { data, error } = await supabase
@@ -42,15 +67,22 @@ export const useDashboardPreRegistered = (companyId?: string) => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!companyId,
+    enabled: !!companyId || isDemoMode,
     staleTime: 5 * 60 * 1000,
   });
 };
 
 export const useDashboardProjects = (companyId?: string) => {
+  const { isDemoMode } = useDemoAuth();
+  
   return useQuery({
-    queryKey: ['projects', companyId],
+    queryKey: ['projects', companyId, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        return DEMO_PROJECTS;
+      }
+      
       if (!companyId) return [];
       
       const { data, error } = await supabase
@@ -62,15 +94,22 @@ export const useDashboardProjects = (companyId?: string) => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!companyId,
+    enabled: !!companyId || isDemoMode,
     staleTime: 5 * 60 * 1000,
   });
 };
 
 export const useDashboardTeamComposition = (companyId?: string) => {
+  const { isDemoMode } = useDemoAuth();
+  
   return useQuery({
-    queryKey: ['team-composition', companyId],
+    queryKey: ['team-composition', companyId, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        return DEMO_TEAM_COMPOSITION;
+      }
+      
       if (!companyId) return [];
       
       const { data, error } = await supabase
@@ -81,15 +120,31 @@ export const useDashboardTeamComposition = (companyId?: string) => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!companyId,
+    enabled: !!companyId || isDemoMode,
     staleTime: 5 * 60 * 1000,
   });
 };
 
 export const useDashboardHolidays = (companyId?: string) => {
+  const { isDemoMode } = useDemoAuth();
+  
   return useQuery({
-    queryKey: ['holidays', companyId],
+    queryKey: ['holidays', companyId, isDemoMode],
     queryFn: async () => {
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        const holidays = generateDemoHolidays();
+        return holidays.map(holiday => ({
+          id: holiday.id,
+          name: holiday.name,
+          date: holiday.date,
+          office: holiday.office_locations 
+            ? `${holiday.office_locations.city}, ${holiday.office_locations.country}`
+            : 'All Offices',
+          type: 'company' as const
+        }));
+      }
+      
       if (!companyId) return [];
       
       const { data, error } = await supabase
@@ -117,7 +172,7 @@ export const useDashboardHolidays = (companyId?: string) => {
         type: 'company' as const
       }));
     },
-    enabled: !!companyId,
+    enabled: !!companyId || isDemoMode,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
@@ -148,11 +203,17 @@ const getDateRangeForTimeRange = (timeRange: TimeRange) => {
 
 export const useDashboardMetrics = (companyId?: string, timeRange: TimeRange = 'month') => {
   const { workWeekHours } = useAppSettings();
+  const { isDemoMode } = useDemoAuth();
   const dateRange = getDateRangeForTimeRange(timeRange);
   
   return useQuery({
-    queryKey: ['dashboard-metrics', companyId, timeRange],
+    queryKey: ['dashboard-metrics', companyId, timeRange, isDemoMode],
     queryFn: async () => {
+      // Return demo metrics in demo mode
+      if (isDemoMode) {
+        return DEMO_METRICS;
+      }
+      
       if (!companyId) return null;
       
       // Fetch all data in parallel
@@ -269,7 +330,7 @@ export const useDashboardMetrics = (companyId?: string, timeRange: TimeRange = '
         projectsByPM: Object.entries(pmGroups).map(([name, value]) => ({ name, value }))
       };
     },
-    enabled: !!companyId,
+    enabled: !!companyId || isDemoMode,
     staleTime: 2 * 60 * 1000,
   });
 };
