@@ -609,8 +609,12 @@ export const generateDemoAllocations = () => {
       const dateStr = format(currentDate, 'yyyy-MM-dd');
 
       allocationPatterns.forEach((pattern, idx) => {
-        // Daily hours = weekly hours / 5
-        const dailyHours = pattern.hoursPerWeek / 5;
+        // Use integer daily hours to avoid floating-point artifacts in weekly totals.
+        // Example: 22h/week => 5,5,4,4,4 across Mon-Fri.
+        const weekdayIndex = dayOfWeek - 1; // Mon=0 .. Fri=4
+        const base = Math.floor(pattern.hoursPerWeek / 5);
+        const remainder = pattern.hoursPerWeek % 5;
+        const dailyHours = base + (weekdayIndex < remainder ? 1 : 0);
 
         if (dailyHours > 0) {
           allocations.push({
