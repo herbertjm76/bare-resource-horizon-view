@@ -14,11 +14,12 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
   const weekText = weekCount === 1 ? 'week' : 'weeks';
   return (
     <thead>
-      <tr className="bg-primary text-primary-foreground">
+      <tr style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
         {/* Team Member column - Fixed width, conditionally sticky */}
         <th 
-          className="workload-grid-header member-column bg-primary text-primary-foreground"
+          className="workload-grid-header member-column text-white"
           style={{ 
+            background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))',
             width: '250px',
             minWidth: '250px',
             maxWidth: '250px',
@@ -44,7 +45,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
           return (
             <th 
               key={week.key}
-              className="workload-grid-header week-column bg-primary text-primary-foreground"
+              className="workload-grid-header week-column text-white"
               style={{ 
                 width: '30px', 
                 minWidth: '30px',
@@ -141,7 +142,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
 
         {/* Total column - Fixed width */}
         <th 
-          className="workload-grid-header total-column bg-primary text-primary-foreground"
+          className="workload-grid-header total-column text-white"
           style={{ 
             width: '120px', 
             minWidth: '120px',
