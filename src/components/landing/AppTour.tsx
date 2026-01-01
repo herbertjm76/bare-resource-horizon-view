@@ -126,9 +126,12 @@ const AppTour = () => {
                   <Play className="w-4 h-4 mr-2" />
                   Launch Interactive Demo
                 </button>
-                <button className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors">
-                  <Link to="/screenshots">View Screenshots</Link>
-                </button>
+                <Link 
+                  to="/screenshots"
+                  className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors inline-block"
+                >
+                  View Screenshots
+                </Link>
               </>
             )}
           </div>
