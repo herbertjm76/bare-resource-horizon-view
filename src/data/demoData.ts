@@ -561,78 +561,160 @@ export const DEMO_TEAM_COMPOSITION = [
   { id: '00000000-0000-0000-000B-000000000004', company_id: DEMO_COMPANY_ID, project_id: '00000000-0000-0000-0001-000000000003', title: 'Technical Director', number_of_people: 1 }
 ];
 
+// Seeded random number generator for consistent demo data
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+
+// Helper to add variance to hours (realistic weekly fluctuations)
+const varyHours = (baseHours: number, weekIndex: number, memberId: string, projectId: string): number => {
+  // Create a unique seed for this member/project/week combination
+  const seed = weekIndex * 1000 + memberId.charCodeAt(memberId.length - 1) * 100 + projectId.charCodeAt(projectId.length - 1);
+  const random = seededRandom(seed);
+  
+  // Variance patterns: -30% to +40% of base hours
+  const varianceFactor = 0.7 + (random * 0.7); // 0.7 to 1.4
+  const varied = Math.round(baseHours * varianceFactor);
+  
+  // Clamp to reasonable bounds
+  return Math.max(0, Math.min(varied, 48));
+};
+
 // Helper function to generate resource allocations spanning Oct 2025 - Mar 2026
-// Returns allocations with realistic patterns - some overloaded, some underutilized
+// Returns allocations with REALISTIC VARIED patterns - not static hours every week
 export const generateDemoAllocations = () => {
   const allocations: any[] = [];
 
   // Extended date range: October 2025 to end of March 2026
   const rangeStart = new Date('2025-10-06'); // First Monday of October 2025
   const rangeEnd = new Date('2026-03-31');
+  
+  // Total weeks in range
+  const totalWeeks = Math.ceil((rangeEnd.getTime() - rangeStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
 
-  // Allocation patterns for each team member per project
-  // Designed to show: John (80%), Sarah (105% overloaded), Alex (110% overloaded), 
-  // Maria (80%), James (75% part-time), Emma (60% underutilized), Michael (95%)
-  const allocationPatterns = [
-    // John Mitchell - 32h/week = 80% utilization
-    { memberId: '00000000-0000-0000-0000-000000000002', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 20 },
-    { memberId: '00000000-0000-0000-0000-000000000002', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 12 },
-
-    // Sarah Wilson - 42h/week = 105% (overloaded)
-    { memberId: '00000000-0000-0000-0000-000000000003', projectId: '00000000-0000-0000-0001-000000000002', hoursPerWeek: 28 },
-    { memberId: '00000000-0000-0000-0000-000000000003', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 14 },
-
-    // Alex Chen - 44h/week = 110% (overloaded)
-    { memberId: '00000000-0000-0000-0000-000000000004', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 24 },
-    { memberId: '00000000-0000-0000-0000-000000000004', projectId: '00000000-0000-0000-0001-000000000005', hoursPerWeek: 20 },
-
-    // Maria Rodriguez - 32h/week = 80%
-    { memberId: '00000000-0000-0000-0000-000000000005', projectId: '00000000-0000-0000-0001-000000000005', hoursPerWeek: 32 },
-
-    // James Taylor - 24h/week = 75% of 32h capacity
-    { memberId: '00000000-0000-0000-0000-000000000006', projectId: '00000000-0000-0000-0001-000000000004', hoursPerWeek: 24 },
-
-    // Emma Johnson - 24h/week = 60% (underutilized)
-    { memberId: '00000000-0000-0000-0000-000000000007', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 24 },
-
-    // Michael Brown - 38h/week = 95%
-    { memberId: '00000000-0000-0000-0000-000000000008', projectId: '00000000-0000-0000-0001-000000000003', hoursPerWeek: 22 },
-    { memberId: '00000000-0000-0000-0000-000000000008', projectId: '00000000-0000-0000-0001-000000000001', hoursPerWeek: 16 },
+  // Define realistic allocation patterns with project phases
+  // Each pattern includes: base hours, start week offset, end week offset (relative to project lifecycle)
+  const memberProjectPatterns = [
+    // John Mitchell - Principal, multiple projects with varying intensity
+    { 
+      memberId: '00000000-0000-0000-0000-000000000002', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 20, rampUp: 3, peakWeeks: [4, 5, 6, 12, 13], lightWeeks: [8, 9, 16, 17] },
+        { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 12, rampUp: 0, peakWeeks: [2, 3, 10, 11], lightWeeks: [6, 7, 14, 15, 20] }
+      ]
+    },
+    // Sarah Wilson - Senior, heavy on Harbor View with occasional overload
+    { 
+      memberId: '00000000-0000-0000-0000-000000000003', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 28, rampUp: 2, peakWeeks: [5, 6, 7, 13, 14, 15], lightWeeks: [0, 1, 10, 18, 19] },
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 14, rampUp: 4, peakWeeks: [8, 9, 16, 17], lightWeeks: [3, 4, 12, 13, 20, 21] }
+      ]
+    },
+    // Alex Chen - Project Architect, high intensity with project switches
+    { 
+      memberId: '00000000-0000-0000-0000-000000000004', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 24, rampUp: 1, peakWeeks: [3, 4, 5, 11, 12], lightWeeks: [8, 9, 15, 16, 22] },
+        { projectId: '00000000-0000-0000-0001-000000000005', baseHours: 20, rampUp: 2, peakWeeks: [6, 7, 8, 14, 15, 16], lightWeeks: [2, 3, 11, 12, 20] }
+      ]
+    },
+    // Maria Rodriguez - Interior Designer, focused on hotel with varying weeks
+    { 
+      memberId: '00000000-0000-0000-0000-000000000005', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000005', baseHours: 32, rampUp: 3, peakWeeks: [4, 5, 6, 12, 13, 14], lightWeeks: [0, 1, 9, 10, 18, 19] }
+      ]
+    },
+    // James Taylor - Landscape (part-time 32h capacity), Urban Park focused
+    { 
+      memberId: '00000000-0000-0000-0000-000000000006', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000004', baseHours: 24, rampUp: 5, peakWeeks: [7, 8, 9, 15, 16], lightWeeks: [0, 1, 2, 12, 13, 20, 21] }
+      ]
+    },
+    // Emma Johnson - Junior, ramping up gradually on healthcare project
+    { 
+      memberId: '00000000-0000-0000-0000-000000000007', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 24, rampUp: 6, peakWeeks: [10, 11, 12, 18, 19], lightWeeks: [0, 1, 2, 3, 4, 5, 15, 16] }
+      ]
+    },
+    // Michael Brown - Tech Director, multiple critical projects
+    { 
+      memberId: '00000000-0000-0000-0000-000000000008', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 22, rampUp: 0, peakWeeks: [2, 3, 4, 10, 11, 12, 18], lightWeeks: [7, 8, 15, 16] },
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 16, rampUp: 2, peakWeeks: [5, 6, 13, 14], lightWeeks: [0, 1, 9, 10, 17, 18, 22, 23] }
+      ]
+    }
   ];
 
   // Generate allocations for each week in the range
-  let currentDate = new Date(rangeStart);
-  while (currentDate <= rangeEnd) {
-    // Only generate for weekdays (Mon-Fri)
-    const dayOfWeek = currentDate.getDay();
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-      const dateStr = format(currentDate, 'yyyy-MM-dd');
-
-      allocationPatterns.forEach((pattern, idx) => {
-        // Use integer daily hours to avoid floating-point artifacts in weekly totals.
-        // Example: 22h/week => 5,5,4,4,4 across Mon-Fri.
-        const weekdayIndex = dayOfWeek - 1; // Mon=0 .. Fri=4
-        const base = Math.floor(pattern.hoursPerWeek / 5);
-        const remainder = pattern.hoursPerWeek % 5;
-        const dailyHours = base + (weekdayIndex < remainder ? 1 : 0);
-
-        if (dailyHours > 0) {
-          allocations.push({
-            id: `demo-alloc-${dateStr}-${idx}`,
-            company_id: DEMO_COMPANY_ID,
-            project_id: pattern.projectId,
-            resource_id: pattern.memberId,
-            resource_type: 'active',
-            allocation_date: dateStr,
-            hours: dailyHours,
-            stage_id: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
+  let weekIndex = 0;
+  let currentWeekStart = new Date(rangeStart);
+  
+  while (currentWeekStart <= rangeEnd) {
+    const weekStartStr = format(currentWeekStart, 'yyyy-MM-dd');
+    
+    memberProjectPatterns.forEach((memberPattern) => {
+      memberPattern.projects.forEach((projectPattern, projIdx) => {
+        // Calculate hours for this week with realistic variations
+        let weeklyHours = projectPattern.baseHours;
+        
+        // Apply ramp-up phase (gradual increase at project start)
+        if (weekIndex < projectPattern.rampUp) {
+          const rampFactor = (weekIndex + 1) / projectPattern.rampUp;
+          weeklyHours = Math.round(weeklyHours * rampFactor * 0.7);
+        }
+        
+        // Apply peak weeks (deadline crunches, reviews)
+        if (projectPattern.peakWeeks.includes(weekIndex)) {
+          weeklyHours = Math.round(weeklyHours * 1.35);
+        }
+        
+        // Apply light weeks (waiting for approvals, between phases)
+        if (projectPattern.lightWeeks.includes(weekIndex)) {
+          weeklyHours = Math.round(weeklyHours * 0.5);
+        }
+        
+        // Add natural variance (±15-25%)
+        weeklyHours = varyHours(weeklyHours, weekIndex, memberPattern.memberId, projectPattern.projectId);
+        
+        // Skip if no hours this week (occasional gaps)
+        if (weeklyHours <= 0) return;
+        
+        // Distribute weekly hours across weekdays (Mon-Fri)
+        for (let dayOffset = 0; dayOffset < 5; dayOffset++) {
+          const dayDate = addDays(currentWeekStart, dayOffset);
+          if (dayDate > rangeEnd) break;
+          
+          const dateStr = format(dayDate, 'yyyy-MM-dd');
+          const base = Math.floor(weeklyHours / 5);
+          const remainder = weeklyHours % 5;
+          const dailyHours = base + (dayOffset < remainder ? 1 : 0);
+          
+          if (dailyHours > 0) {
+            allocations.push({
+              id: `demo-alloc-${dateStr}-${memberPattern.memberId.slice(-1)}-${projIdx}`,
+              company_id: DEMO_COMPANY_ID,
+              project_id: projectPattern.projectId,
+              resource_id: memberPattern.memberId,
+              resource_type: 'active',
+              allocation_date: dateStr,
+              hours: dailyHours,
+              stage_id: null,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+          }
         }
       });
-    }
-    currentDate = addDays(currentDate, 1);
+    });
+    
+    currentWeekStart = addWeeks(currentWeekStart, 1);
+    weekIndex++;
   }
 
   return allocations;
