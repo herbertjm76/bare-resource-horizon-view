@@ -686,28 +686,32 @@ export const generateDemoLeaveRequests = () => {
 };
 
 // Demo annual leaves (for utilization calculation)
+// Extended to include more realistic leave patterns across the team
 export const generateDemoAnnualLeaves = () => {
   const today = new Date();
   const weekStart = startOfWeek(today, { weekStartsOn: 1 });
   
   return [
-    // Alex has vacation next week
-    {
-      id: '00000000-0000-0000-000C-000000000001',
-      company_id: DEMO_COMPANY_ID,
-      member_id: '00000000-0000-0000-0000-000000000004',
-      date: format(addDays(weekStart, 7), 'yyyy-MM-dd'),
-      hours: 8,
-      leave_type_id: '00000000-0000-0000-0007-000000000001'
-    },
-    {
-      id: '00000000-0000-0000-000C-000000000002',
-      company_id: DEMO_COMPANY_ID,
-      member_id: '00000000-0000-0000-0000-000000000004',
-      date: format(addDays(weekStart, 8), 'yyyy-MM-dd'),
-      hours: 8,
-      leave_type_id: '00000000-0000-0000-0007-000000000001'
-    }
+    // Alex Chen - vacation next week (5 days)
+    { id: '00000000-0000-0000-000C-000000000001', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000004', date: format(addDays(weekStart, 7), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000001' },
+    { id: '00000000-0000-0000-000C-000000000002', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000004', date: format(addDays(weekStart, 8), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000001' },
+    { id: '00000000-0000-0000-000C-000000000003', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000004', date: format(addDays(weekStart, 9), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000001' },
+    { id: '00000000-0000-0000-000C-000000000004', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000004', date: format(addDays(weekStart, 10), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000001' },
+    { id: '00000000-0000-0000-000C-000000000005', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000004', date: format(addDays(weekStart, 11), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000001' },
+    
+    // Maria Rodriguez - personal day this week
+    { id: '00000000-0000-0000-000C-000000000006', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000005', date: format(addDays(weekStart, 3), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000003' },
+    
+    // Emma Johnson - sick leave (2 days in 2 weeks)
+    { id: '00000000-0000-0000-000C-000000000007', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000007', date: format(addDays(weekStart, 14), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000002' },
+    { id: '00000000-0000-0000-000C-000000000008', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000007', date: format(addDays(weekStart, 15), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000002' },
+    
+    // James Taylor - half day personal
+    { id: '00000000-0000-0000-000C-000000000009', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000006', date: format(addDays(weekStart, 4), 'yyyy-MM-dd'), hours: 4, leave_type_id: '00000000-0000-0000-0007-000000000003' },
+    
+    // Sarah Wilson - 2 days vacation in 3 weeks
+    { id: '00000000-0000-0000-000C-000000000010', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000003', date: format(addDays(weekStart, 21), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000001' },
+    { id: '00000000-0000-0000-000C-000000000011', company_id: DEMO_COMPANY_ID, member_id: '00000000-0000-0000-0000-000000000003', date: format(addDays(weekStart, 22), 'yyyy-MM-dd'), hours: 8, leave_type_id: '00000000-0000-0000-0007-000000000001' }
   ];
 };
 
