@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Play, X, Eye, LayoutDashboard, Calendar, TrendingUp, FolderKanban, Flame, CalendarDays } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, X, Eye, LayoutDashboard, Calendar, TrendingUp, FolderKanban, Flame, CalendarDays, Flag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 
@@ -88,6 +88,17 @@ const tourSteps: TourStep[] = [
     icon: <CalendarDays className="w-16 h-16" />,
     bgColor: "from-secondary to-secondary",
     route: "/team-leave"
+  },
+  {
+    id: 7,
+    title: "Office Settings",
+    description: "Configure workspace settings and keep your org data tidy.",
+    category: "Settings",
+    screenshot: "/lovable-uploads/2b26c5c4-10bc-4fcf-b864-ae226aef1708.png",
+    features: ["Company settings", "Teams & roles", "Configuration"],
+    icon: <Flag className="w-16 h-16" />,
+    bgColor: "from-muted to-muted",
+    route: "/office-settings"
   }
 ];
 
@@ -141,7 +152,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
         </div>
 
         {/* Colored tiles for step indicators */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
           {tourSteps.map((step, index) => (
             <button
               key={step.id}
