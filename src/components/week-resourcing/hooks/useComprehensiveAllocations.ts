@@ -2,6 +2,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { generateDemoAllocations } from '@/data/demoData';
 
 interface UseComprehensiveAllocationsOptions {
   weekStartDate: string;
@@ -15,10 +17,19 @@ export const useComprehensiveAllocations = ({
   enabled = true 
 }: UseComprehensiveAllocationsOptions) => {
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
 
   const { data: comprehensiveWeeklyAllocations, isLoading, error } = useQuery({
-    queryKey: ['comprehensive-weekly-allocations', company?.id, weekStartDate, memberIds],
+    queryKey: ['comprehensive-weekly-allocations', isDemoMode ? 'demo' : company?.id, weekStartDate, memberIds],
     queryFn: async () => {
+      // Demo mode: filter demo allocations
+      if (isDemoMode) {
+        const allAllocations = generateDemoAllocations();
+        return allAllocations.filter(
+          alloc => alloc.allocation_date === weekStartDate && memberIds.includes(alloc.resource_id)
+        );
+      }
+
       if (!company?.id || memberIds.length === 0) {
         return [];
       }
@@ -36,7 +47,7 @@ export const useComprehensiveAllocations = ({
 
       return data || [];
     },
-    enabled: !!company?.id && memberIds.length > 0 && enabled,
+    enabled: (isDemoMode || !!company?.id) && memberIds.length > 0 && enabled,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
   });

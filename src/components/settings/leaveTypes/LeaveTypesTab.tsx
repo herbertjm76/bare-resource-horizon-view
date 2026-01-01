@@ -9,9 +9,12 @@ import { LeaveType } from '@/types/leave';
 import { AddLeaveTypeDialog } from './AddLeaveTypeDialog';
 import { LeaveTypeList } from './LeaveTypeList';
 import { useLeaveTypeOperations } from './useLeaveTypeOperations';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_LEAVE_TYPES } from '@/data/demoData';
 
 export const LeaveTypesTab: React.FC = () => {
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +36,27 @@ export const LeaveTypesTab: React.FC = () => {
     handleReorder
   } = useLeaveTypeOperations(leaveTypes, setLeaveTypes, company?.id);
 
+  // Demo mode handlers that show toast notifications
+  const handleDemoAddNew = () => {
+    toast.info('Adding leave types is disabled in demo mode');
+  };
+
+  const handleDemoEdit = () => {
+    toast.info('Editing leave types is disabled in demo mode');
+  };
+
+  const handleDemoDelete = () => {
+    toast.info('Deleting leave types is disabled in demo mode');
+  };
+
   useEffect(() => {
+    // In demo mode, use demo data directly
+    if (isDemoMode) {
+      setLeaveTypes(DEMO_LEAVE_TYPES as LeaveType[]);
+      setLoading(false);
+      return;
+    }
+
     const fetchLeaveTypes = async () => {
       if (!company?.id) return;
 
@@ -80,7 +103,7 @@ export const LeaveTypesTab: React.FC = () => {
     };
 
     fetchLeaveTypes();
-  }, [company?.id]);
+  }, [company?.id, isDemoMode]);
 
   if (loading) {
     return (
@@ -102,27 +125,32 @@ export const LeaveTypesTab: React.FC = () => {
           Leave Types
         </CardTitle>
         <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant={editMode ? 'secondary' : 'outline'}
-            onClick={toggleEditMode}
-          >
-            <Edit className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:inline">{editMode ? 'Done' : 'Edit'}</span>
-          </Button>
-          <Button size="sm" onClick={handleAddNew}>
-            <Plus className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:inline">Add Type</span>
-          </Button>
+          {!isDemoMode && (
+            <>
+              <Button
+                size="sm"
+                variant={editMode ? 'secondary' : 'outline'}
+                onClick={toggleEditMode}
+              >
+                <Edit className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">{editMode ? 'Done' : 'Edit'}</span>
+              </Button>
+              <Button size="sm" onClick={handleAddNew}>
+                <Plus className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Add Type</span>
+              </Button>
+            </>
+          )}
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
             Configure the types of leave that employees can request. These will appear in the leave application form.
+            {isDemoMode && <span className="text-muted-foreground/70 ml-1">(View only in demo mode)</span>}
           </div>
 
-          {editMode && selectedTypes.length > 0 && (
+          {editMode && selectedTypes.length > 0 && !isDemoMode && (
             <div className="flex items-center gap-2 p-2 bg-accent/50 rounded-lg">
               <span className="text-sm">{selectedTypes.length} selected</span>
               <Button
@@ -135,23 +163,25 @@ export const LeaveTypesTab: React.FC = () => {
             </div>
           )}
 
-          <AddLeaveTypeDialog
-            open={showDialog}
-            onOpenChange={setShowDialog}
-            onSubmit={handleSubmit}
-            editingType={editingType}
-            isSubmitting={isSubmitting}
-            onCancel={handleCancel}
-          />
+          {!isDemoMode && (
+            <AddLeaveTypeDialog
+              open={showDialog}
+              onOpenChange={setShowDialog}
+              onSubmit={handleSubmit}
+              editingType={editingType}
+              isSubmitting={isSubmitting}
+              onCancel={handleCancel}
+            />
+          )}
 
           <LeaveTypeList
             leaveTypes={leaveTypes}
-            editMode={editMode}
-            selectedTypes={selectedTypes}
-            onSelectType={handleSelectType}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onReorder={handleReorder}
+            editMode={isDemoMode ? false : editMode}
+            selectedTypes={isDemoMode ? [] : selectedTypes}
+            onSelectType={isDemoMode ? handleDemoEdit : handleSelectType}
+            onEdit={isDemoMode ? handleDemoEdit : handleEdit}
+            onDelete={isDemoMode ? handleDemoDelete : handleDelete}
+            onReorder={isDemoMode ? () => {} : handleReorder}
           />
         </div>
       </CardContent>

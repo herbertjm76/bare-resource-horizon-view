@@ -2,6 +2,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { generateDemoAnnualLeaves, DEMO_LEAVE_TYPES } from '@/data/demoData';
 import { toast } from 'sonner';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, subDays, addDays, eachMonthOfInterval } from 'date-fns';
 
@@ -34,6 +36,7 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
   const [leaveDetails, setLeaveDetails] = useState<Record<string, Record<string, LeaveDataByDate>>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
 
   // Calculate date range based on time range selection
   const getDateRange = useCallback(() => {
@@ -69,6 +72,55 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
 
   // Function to fetch annual leave data
   const fetchLeaveData = useCallback(async () => {
+    // Demo mode: use demo data
+    if (isDemoMode) {
+      const demoLeaves = generateDemoAnnualLeaves();
+      const { start, end } = getDateRange();
+      
+      // Filter demo leaves by date range
+      const filteredLeaves = demoLeaves.filter(leave => {
+        const leaveDate = new Date(leave.date);
+        return leaveDate >= start && leaveDate <= end;
+      });
+
+      // Transform to expected format
+      const formattedData: Record<string, Record<string, number>> = {};
+      const detailedData: Record<string, Record<string, LeaveDataByDate>> = {};
+
+      filteredLeaves.forEach((leave) => {
+        // Get leave type info
+        const leaveType = DEMO_LEAVE_TYPES.find(lt => lt.id === leave.leave_type_id);
+        const leaveTypeName = leaveType?.name || 'Leave';
+        const leaveTypeColor = leaveType?.color || '#3B82F6';
+
+        // Simple hours data
+        if (!formattedData[leave.member_id]) {
+          formattedData[leave.member_id] = {};
+        }
+        formattedData[leave.member_id][leave.date] = 
+          (formattedData[leave.member_id][leave.date] || 0) + leave.hours;
+
+        // Detailed data with leave type info
+        if (!detailedData[leave.member_id]) {
+          detailedData[leave.member_id] = {};
+        }
+        if (!detailedData[leave.member_id][leave.date]) {
+          detailedData[leave.member_id][leave.date] = { totalHours: 0, entries: [] };
+        }
+        detailedData[leave.member_id][leave.date].totalHours += leave.hours;
+        detailedData[leave.member_id][leave.date].entries.push({
+          hours: leave.hours,
+          leave_type_name: leaveTypeName,
+          leave_type_color: leaveTypeColor
+        });
+      });
+
+      setLeaveData(formattedData);
+      setLeaveDetails(detailedData);
+      setIsLoading(false);
+      return;
+    }
+
     if (!company?.id) {
       setIsLoading(false);
       return;
@@ -139,7 +191,7 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
     } finally {
       setIsLoading(false);
     }
-  }, [company?.id, getDateRange]);
+  }, [company?.id, getDateRange, isDemoMode]);
 
   // Update or create leave entries
   const updateLeaveHours = useCallback(async (
@@ -147,6 +199,12 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
     date: string,
     hours: number
   ) => {
+    // Demo mode: show notification and skip update
+    if (isDemoMode) {
+      toast.info('Leave updates are disabled in demo mode');
+      return;
+    }
+
     if (!company?.id) return;
 
     try {
@@ -211,18 +269,20 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
       toast.error('Failed to update leave hours');
       fetchLeaveData();
     }
-  }, [company?.id, fetchLeaveData]);
+  }, [company?.id, fetchLeaveData, isDemoMode]);
 
   const realtimeRefreshTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (company?.id) {
+    // For demo mode or real mode, fetch leave data
+    if (isDemoMode || company?.id) {
       fetchLeaveData();
     }
-  }, [company?.id, timeRange, fetchLeaveData]);
+  }, [company?.id, timeRange, fetchLeaveData, isDemoMode]);
 
   useEffect(() => {
-    if (!company?.id) return;
+    // Skip realtime subscription in demo mode
+    if (isDemoMode || !company?.id) return;
 
     const channel = supabase
       .channel(`annual-leaves-calendar:${company.id}`)
@@ -252,7 +312,7 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
       }
       supabase.removeChannel(channel);
     };
-  }, [company?.id, fetchLeaveData]);
+  }, [company?.id, fetchLeaveData, isDemoMode]);
 
   return {
     leaveData,
