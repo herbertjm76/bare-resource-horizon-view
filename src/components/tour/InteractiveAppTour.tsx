@@ -182,8 +182,8 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
 
                 {/* Completed steps */}
                 {index < currentStep && (
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                    <div className="w-3 h-3 bg-primary-foreground rounded-full" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
+                    <div className="w-3 h-3 bg-white rounded-full" />
                   </div>
                 )}
 
