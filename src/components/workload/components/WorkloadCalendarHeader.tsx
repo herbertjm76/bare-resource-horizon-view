@@ -14,13 +14,11 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
   const weekText = weekCount === 1 ? 'week' : 'weeks';
   return (
     <thead>
-      <tr>
+      <tr className="bg-primary text-primary-foreground">
         {/* Team Member column - Fixed width, conditionally sticky */}
         <th 
-          className="workload-grid-header member-column"
+          className="workload-grid-header member-column bg-primary text-primary-foreground"
           style={{ 
-            backgroundColor: 'transparent',
-            color: 'white',
             width: '250px',
             minWidth: '250px',
             maxWidth: '250px',
@@ -29,8 +27,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
             zIndex: shouldCenterAlign ? 25 : 30,
             textAlign: 'left',
             padding: '12px 16px',
-            borderRight: '2px solid rgba(156, 163, 175, 0.8)',
-            borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
             fontWeight: '600'
           }}
         >
@@ -43,22 +41,18 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
           const isFirstOfMonth = week.date.getDate() <= 7;
           const isNewMonth = index === 0 || weekStartDates[index - 1].date.getMonth() !== week.date.getMonth();
           
-          let backgroundColor = 'transparent';
-          
           return (
             <th 
               key={week.key}
-              className="workload-grid-header week-column"
+              className="workload-grid-header week-column bg-primary text-primary-foreground"
               style={{ 
                 width: '30px', 
                 minWidth: '30px',
                 maxWidth: '30px',
-                backgroundColor,
-                color: 'white',
                 textAlign: 'center',
                 padding: '4px 2px',
-                borderRight: '1px solid rgba(156, 163, 175, 0.6)',
-                borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+                borderRight: '1px solid rgba(255, 255, 255, 0.2)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
                 borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined,
                 fontSize: '12px',
                 fontWeight: '600',
@@ -147,17 +141,15 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
 
         {/* Total column - Fixed width */}
         <th 
-          className="workload-grid-header total-column"
+          className="workload-grid-header total-column bg-primary text-primary-foreground"
           style={{ 
             width: '120px', 
             minWidth: '120px',
             maxWidth: '120px',
-            backgroundColor: 'transparent',
-            color: 'white',
             textAlign: 'center',
             padding: '12px 8px',
             borderRight: 'none',
-            borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
             fontWeight: '600'
           }}
         >
