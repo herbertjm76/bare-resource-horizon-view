@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,6 +15,17 @@ import projectPipelineScreenshot from '@/assets/tour/project-pipeline.png';
 import capacityHeatmapScreenshot from '@/assets/tour/capacity-heatmap.png';
 import teamLeaveScreenshot from '@/assets/tour/team-leave.png';
 import officeSettingsScreenshot from '@/assets/tour/office-settings.png';
+
+// Preload all screenshots for instant switching
+const allScreenshots = [
+  dashboardScreenshot,
+  weeklyOverviewScreenshot,
+  resourceSchedulingScreenshot,
+  projectPipelineScreenshot,
+  capacityHeatmapScreenshot,
+  teamLeaveScreenshot,
+  officeSettingsScreenshot,
+];
 
 interface TourStep {
   id: number;
@@ -120,6 +131,14 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Preload all images on mount for instant switching
+  useEffect(() => {
+    allScreenshots.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
 
   const currentTourStep = tourSteps[currentStep];
   const isFirstStep = currentStep === 0;
@@ -234,7 +253,6 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
                   <img
                     src={currentTourStep.screenshot}
                     alt={`${currentTourStep.title} screenshot`}
-                    loading="lazy"
                     className="w-full h-64 sm:h-80 lg:h-96 object-cover object-[75%_0%] transition-transform duration-300 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
