@@ -7,6 +7,15 @@ import { ChevronLeft, ChevronRight, Play, X, Eye, LayoutDashboard, Calendar, Tre
 import { cn } from '@/lib/utils';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 
+// Import tour screenshots
+import dashboardScreenshot from '@/assets/tour/dashboard.png';
+import weeklyOverviewScreenshot from '@/assets/tour/weekly-overview.png';
+import resourceSchedulingScreenshot from '@/assets/tour/resource-scheduling.png';
+import projectPipelineScreenshot from '@/assets/tour/project-pipeline.png';
+import capacityHeatmapScreenshot from '@/assets/tour/capacity-heatmap.png';
+import teamLeaveScreenshot from '@/assets/tour/team-leave.png';
+import officeSettingsScreenshot from '@/assets/tour/office-settings.png';
+
 interface TourStep {
   id: number;
   title: string;
@@ -20,15 +29,13 @@ interface TourStep {
   route: string;
 }
 
-// NOTE: Screenshots are placeholders until we capture them from the live demo.
-// Once you upload new screenshots, replace `screenshot` fields below.
 const tourSteps: TourStep[] = [
   {
     id: 1,
     title: "Dashboard",
     description: "A single place to understand utilization, project health, and what needs attention this week.",
     category: "Overview",
-    screenshot: "/lovable-uploads/1ec9c1fb-a2b7-46f5-8584-89c4034146af.png",
+    screenshot: dashboardScreenshot,
     features: ["Utilization snapshot", "Upcoming work", "At-a-glance KPIs"],
     icon: <LayoutDashboard className="w-16 h-16" />,
     bgColor: "#A855F7",
@@ -39,7 +46,7 @@ const tourSteps: TourStep[] = [
     title: "Weekly Overview",
     description: "Plan capacity week-by-week and spot conflicts early with fast scanning views.",
     category: "Planning",
-    screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
+    screenshot: weeklyOverviewScreenshot,
     features: ["Table / grid views", "Availability & leave context", "Quick scanning"],
     icon: <Calendar className="w-16 h-16" />,
     bgColor: "#C026D3",
@@ -50,7 +57,7 @@ const tourSteps: TourStep[] = [
     title: "Resource Scheduling",
     description: "Allocate people to projects and keep schedules aligned with reality.",
     category: "Scheduling",
-    screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
+    screenshot: resourceSchedulingScreenshot,
     features: ["By project / by person", "Update allocations", "Plan ahead"],
     icon: <TrendingUp className="w-16 h-16" />,
     bgColor: "#D946EF",
@@ -61,7 +68,7 @@ const tourSteps: TourStep[] = [
     title: "Project Pipeline",
     description: "Understand your project pipeline and resourcing needs across stages.",
     category: "Projects",
-    screenshot: "/lovable-uploads/d6950251-26bd-43bc-8594-4b191fe6c1a7.png",
+    screenshot: projectPipelineScreenshot,
     features: ["Pipeline view", "Stage planning", "Capacity vs demand"],
     icon: <FolderKanban className="w-16 h-16" />,
     bgColor: "#EC4899",
@@ -72,7 +79,7 @@ const tourSteps: TourStep[] = [
     title: "Capacity Heatmap",
     description: "See overload and underutilization instantly across your team.",
     category: "Insights",
-    screenshot: "/lovable-uploads/69179c95-91ed-42d6-a38b-94114edcf69f.png",
+    screenshot: capacityHeatmapScreenshot,
     features: ["Color-coded capacity", "Filter by team / role", "Overload detection"],
     icon: <Flame className="w-16 h-16" />,
     bgColor: "#F472B6",
@@ -83,7 +90,7 @@ const tourSteps: TourStep[] = [
     title: "Team Leave",
     description: "Track time off so plans stay realistic.",
     category: "Availability",
-    screenshot: "/lovable-uploads/5233d4c9-0afd-4df2-b96b-e71ad0acbabc.png",
+    screenshot: teamLeaveScreenshot,
     features: ["Leave overview", "Requests & approvals", "Coverage awareness"],
     icon: <CalendarDays className="w-16 h-16" />,
     bgColor: "#9333EA",
@@ -94,7 +101,7 @@ const tourSteps: TourStep[] = [
     title: "Office Settings",
     description: "Configure workspace settings and keep your org data tidy.",
     category: "Settings",
-    screenshot: "/lovable-uploads/2b26c5c4-10bc-4fcf-b864-ae226aef1708.png",
+    screenshot: officeSettingsScreenshot,
     features: ["Company settings", "Teams & roles", "Configuration"],
     icon: <Flag className="w-16 h-16" />,
     bgColor: "#BE185D",
