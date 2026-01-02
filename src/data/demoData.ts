@@ -308,6 +308,206 @@ export const DEMO_TEAM_MEMBERS = [
     start_date: '2022-01-10',
     date_of_birth: '1990-05-25',
     office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000017',
+    company_id: DEMO_COMPANY_ID,
+    email: 'nathan.foster@bareresource.com',
+    first_name: 'Nathan',
+    last_name: 'Foster',
+    job_title: 'Design Architect',
+    department: 'Architecture',
+    location: 'New York',
+    practice_area: 'Commercial',
+    weekly_capacity: 40,
+    created_at: '2021-09-15T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Focused on innovative commercial design',
+    manager_id: '00000000-0000-0000-0000-000000000002',
+    start_date: '2021-09-15',
+    date_of_birth: '1989-03-17',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000018',
+    company_id: DEMO_COMPANY_ID,
+    email: 'hannah.bell@bareresource.com',
+    first_name: 'Hannah',
+    last_name: 'Bell',
+    job_title: 'Interior Architect',
+    department: 'Interiors',
+    location: 'Chicago',
+    practice_area: 'Hospitality',
+    weekly_capacity: 40,
+    created_at: '2022-11-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Creating memorable hospitality spaces',
+    manager_id: '00000000-0000-0000-0000-000000000003',
+    start_date: '2022-11-01',
+    date_of_birth: '1991-08-24',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000019',
+    company_id: DEMO_COMPANY_ID,
+    email: 'lucas.reed@bareresource.com',
+    first_name: 'Lucas',
+    last_name: 'Reed',
+    job_title: 'Architectural Technician',
+    department: 'Technical',
+    location: 'Los Angeles',
+    practice_area: 'Residential',
+    weekly_capacity: 40,
+    created_at: '2023-07-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Technical documentation specialist',
+    manager_id: '00000000-0000-0000-0000-000000000008',
+    start_date: '2023-07-01',
+    date_of_birth: '1994-12-03',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000020',
+    company_id: DEMO_COMPANY_ID,
+    email: 'grace.murphy@bareresource.com',
+    first_name: 'Grace',
+    last_name: 'Murphy',
+    job_title: 'Project Coordinator',
+    department: 'Architecture',
+    location: 'New York',
+    practice_area: 'Healthcare',
+    weekly_capacity: 40,
+    created_at: '2024-03-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Keeping projects on track',
+    manager_id: '00000000-0000-0000-0000-000000000011',
+    start_date: '2024-03-01',
+    date_of_birth: '1995-06-18',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000021',
+    company_id: DEMO_COMPANY_ID,
+    email: 'owen.hayes@bareresource.com',
+    first_name: 'Owen',
+    last_name: 'Hayes',
+    job_title: 'Senior Designer',
+    department: 'Architecture',
+    location: 'Chicago',
+    practice_area: 'Commercial',
+    weekly_capacity: 40,
+    created_at: '2020-06-15T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Award-winning commercial design',
+    manager_id: '00000000-0000-0000-0000-000000000002',
+    start_date: '2020-06-15',
+    date_of_birth: '1986-10-09',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000022',
+    company_id: DEMO_COMPANY_ID,
+    email: 'chloe.brooks@bareresource.com',
+    first_name: 'Chloe',
+    last_name: 'Brooks',
+    job_title: 'Landscape Designer',
+    department: 'Landscape',
+    location: 'Los Angeles',
+    practice_area: 'Urban Design',
+    weekly_capacity: 40,
+    created_at: '2023-01-10T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Sustainable landscape solutions',
+    manager_id: '00000000-0000-0000-0000-000000000014',
+    start_date: '2023-01-10',
+    date_of_birth: '1992-04-27',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000023',
+    company_id: DEMO_COMPANY_ID,
+    email: 'ryan.collins@bareresource.com',
+    first_name: 'Ryan',
+    last_name: 'Collins',
+    job_title: 'BIM Specialist',
+    department: 'Technical',
+    location: 'New York',
+    practice_area: 'Commercial',
+    weekly_capacity: 40,
+    created_at: '2022-05-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'BIM modeling and coordination expert',
+    manager_id: '00000000-0000-0000-0000-000000000012',
+    start_date: '2022-05-01',
+    date_of_birth: '1990-11-14',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000024',
+    company_id: DEMO_COMPANY_ID,
+    email: 'mia.stewart@bareresource.com',
+    first_name: 'Mia',
+    last_name: 'Stewart',
+    job_title: 'Junior Designer',
+    department: 'Interiors',
+    location: 'Los Angeles',
+    practice_area: 'Residential',
+    weekly_capacity: 40,
+    created_at: '2024-08-15T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Fresh perspective on residential interiors',
+    manager_id: '00000000-0000-0000-0000-000000000009',
+    start_date: '2024-08-15',
+    date_of_birth: '1997-09-22',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000025',
+    company_id: DEMO_COMPANY_ID,
+    email: 'jack.morgan@bareresource.com',
+    first_name: 'Jack',
+    last_name: 'Morgan',
+    job_title: 'Construction Administrator',
+    department: 'Architecture',
+    location: 'Chicago',
+    practice_area: 'Healthcare',
+    weekly_capacity: 40,
+    created_at: '2021-04-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Ensuring quality construction delivery',
+    manager_id: '00000000-0000-0000-0000-000000000008',
+    start_date: '2021-04-01',
+    date_of_birth: '1987-02-11',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000026',
+    company_id: DEMO_COMPANY_ID,
+    email: 'ava.price@bareresource.com',
+    first_name: 'Ava',
+    last_name: 'Price',
+    job_title: 'Design Coordinator',
+    department: 'Architecture',
+    location: 'New York',
+    practice_area: 'Residential',
+    weekly_capacity: 40,
+    created_at: '2023-09-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Coordinating design excellence',
+    manager_id: '00000000-0000-0000-0000-000000000003',
+    start_date: '2023-09-01',
+    date_of_birth: '1993-07-30',
+    office_role_id: null
   }
 ];
 
@@ -873,6 +1073,84 @@ export const generateDemoAllocations = () => {
         { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 10, rampUp: 1, peakWeeks: [4, 5, 12, 13], lightWeeks: [0, 1, 8, 9, 16, 17] },
         { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 8, rampUp: 2, peakWeeks: [6, 7, 14, 15], lightWeeks: [2, 3, 10, 11, 18, 19] },
         { projectId: '00000000-0000-0000-0001-000000000004', baseHours: 8, rampUp: 3, peakWeeks: [8, 9, 16, 17], lightWeeks: [0, 1, 4, 5, 12, 13] }
+      ]
+    },
+    // Nathan Foster - Design Architect, commercial projects
+    { 
+      memberId: '00000000-0000-0000-0000-000000000017', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 24, rampUp: 2, peakWeeks: [3, 4, 11, 12], lightWeeks: [0, 1, 7, 8, 15, 16] },
+        { projectId: '00000000-0000-0000-0001-000000000006', baseHours: 16, rampUp: 3, peakWeeks: [8, 9, 16, 17], lightWeeks: [2, 3, 10, 11, 19, 20] }
+      ]
+    },
+    // Hannah Bell - Interior Architect, hospitality focus
+    { 
+      memberId: '00000000-0000-0000-0000-000000000018', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000005', baseHours: 28, rampUp: 1, peakWeeks: [4, 5, 12, 13], lightWeeks: [0, 8, 9, 17, 18] },
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 12, rampUp: 2, peakWeeks: [6, 7, 14, 15], lightWeeks: [2, 3, 10, 11] }
+      ]
+    },
+    // Lucas Reed - Architectural Technician, residential documentation
+    { 
+      memberId: '00000000-0000-0000-0000-000000000019', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 32, rampUp: 2, peakWeeks: [5, 6, 13, 14], lightWeeks: [0, 1, 9, 10, 18, 19] }
+      ]
+    },
+    // Grace Murphy - Project Coordinator, healthcare support
+    { 
+      memberId: '00000000-0000-0000-0000-000000000020', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 24, rampUp: 3, peakWeeks: [6, 7, 14, 15], lightWeeks: [0, 1, 2, 10, 11, 18] },
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 16, rampUp: 4, peakWeeks: [8, 9, 16, 17], lightWeeks: [3, 4, 12, 13, 20] }
+      ]
+    },
+    // Owen Hayes - Senior Designer, commercial focus
+    { 
+      memberId: '00000000-0000-0000-0000-000000000021', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 20, rampUp: 1, peakWeeks: [4, 5, 12, 13], lightWeeks: [0, 8, 9, 16, 17] },
+        { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 16, rampUp: 0, peakWeeks: [2, 3, 10, 11], lightWeeks: [6, 7, 14, 15, 20] }
+      ]
+    },
+    // Chloe Brooks - Landscape Designer, urban projects
+    { 
+      memberId: '00000000-0000-0000-0000-000000000022', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000004', baseHours: 32, rampUp: 2, peakWeeks: [5, 6, 13, 14], lightWeeks: [0, 1, 9, 10, 18, 19] }
+      ]
+    },
+    // Ryan Collins - BIM Specialist, multi-project support
+    { 
+      memberId: '00000000-0000-0000-0000-000000000023', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 16, rampUp: 1, peakWeeks: [3, 4, 11, 12], lightWeeks: [0, 7, 8, 15, 16] },
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 14, rampUp: 2, peakWeeks: [5, 6, 13, 14], lightWeeks: [1, 2, 9, 10, 17] },
+        { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 10, rampUp: 0, peakWeeks: [7, 8, 15, 16], lightWeeks: [3, 4, 11, 12, 19] }
+      ]
+    },
+    // Mia Stewart - Junior Designer, residential interiors
+    { 
+      memberId: '00000000-0000-0000-0000-000000000024', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 28, rampUp: 4, peakWeeks: [8, 9, 16, 17], lightWeeks: [0, 1, 2, 3, 12, 13] },
+        { projectId: '00000000-0000-0000-0001-000000000005', baseHours: 12, rampUp: 5, peakWeeks: [10, 11, 18, 19], lightWeeks: [0, 1, 2, 3, 4, 7, 8] }
+      ]
+    },
+    // Jack Morgan - Construction Administrator, healthcare delivery
+    { 
+      memberId: '00000000-0000-0000-0000-000000000025', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 36, rampUp: 0, peakWeeks: [2, 3, 10, 11, 18, 19], lightWeeks: [6, 7, 14, 15] }
+      ]
+    },
+    // Ava Price - Design Coordinator, residential projects
+    { 
+      memberId: '00000000-0000-0000-0000-000000000026', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 24, rampUp: 2, peakWeeks: [4, 5, 12, 13], lightWeeks: [0, 1, 8, 9, 17, 18] },
+        { projectId: '00000000-0000-0000-0001-000000000007', baseHours: 12, rampUp: 0, peakWeeks: [6, 7, 14, 15], lightWeeks: [2, 3, 10, 11, 19, 20] }
       ]
     }
   ];
