@@ -227,6 +227,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
           
           return (
             <button
+              type="button"
               key={stage.id}
               onClick={() => setSelectedStageId(stage.id)}
               className={cn(
@@ -287,6 +288,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
+                        type="button"
                         variant="outline"
                         className={cn(
                           "w-[140px] justify-start text-left font-normal",
