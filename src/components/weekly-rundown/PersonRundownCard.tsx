@@ -87,7 +87,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
       <div className={`
         relative rounded-3xl bg-card shadow-2xl border border-border
         ${isActive ? 'ring-2 ring-primary/50 scale-[1.02]' : ''}
-        ${isFullscreen ? 'h-[50vh]' : 'min-h-[500px]'}
+        ${isFullscreen ? 'h-full max-h-full' : 'min-h-[500px]'}
         transition-all duration-500 ease-out
         overflow-hidden
         flex flex-col
