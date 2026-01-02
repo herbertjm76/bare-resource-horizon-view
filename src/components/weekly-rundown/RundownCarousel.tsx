@@ -147,7 +147,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
             return (
               <div
                 key={stableKey}
-                className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 transition-transform duration-300 ease-out h-full"
+                className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 transition-transform duration-300 ease-out h-[90%] my-auto"
               >
                 <div className={`mx-auto max-w-4xl h-full ${isActive ? 'scale-100' : 'scale-95 opacity-80'} transition-transform duration-300`}>
                   {rundownMode === 'people' ? (
