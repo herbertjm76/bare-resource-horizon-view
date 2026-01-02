@@ -356,7 +356,9 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     return cardId;
   };
 
-  const toggleCollapse = () => {
+  const toggleCollapse = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     const newState = !isCollapsed;
     setIsCollapsed(newState);
     localStorage.setItem('weekly-summary-collapsed', String(newState));
