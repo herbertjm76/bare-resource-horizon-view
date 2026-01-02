@@ -395,7 +395,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   return (
     <div className="mb-0 space-y-0">
-      <div className="relative px-1.5 sm:px-2 sm:pr-10 py-2 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-visible weekly-cards-container transition-all duration-300">
+      <div className="relative px-1.5 sm:px-2 sm:pr-10 py-2 border rounded-lg bg-gradient-to-br from-card to-accent/20 overflow-visible weekly-cards-container transition-all duration-300 max-h-[30vh]">
         {/* Collapse Toggle Button - Top Right */}
         <Button
           variant="ghost"
@@ -453,7 +453,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
           {/* Card Display - Swipeable */}
           <div className="px-12 py-0.5 touch-pan-y">
             <div 
-              className={`relative h-[120px] animate-fade-in ${currentCard?.id !== 'weekInfo' ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
+              className={`relative h-[20vh] min-h-[120px] animate-fade-in ${currentCard?.id !== 'weekInfo' ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
               key={currentCard?.id}
               onClick={() => currentCard && handleCardClick(currentCard.id)}
             >
