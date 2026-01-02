@@ -2,6 +2,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_ROLES, DEMO_RATES } from '@/data/demoData';
+
+// Helper to get rate for a role from demo data
+const getDemoRoleRate = (roleId: string): number => {
+  const rate = DEMO_RATES.find(r => r.reference_id === roleId);
+  return rate?.value || 150;
+};
 
 export interface TeamCompositionItem {
   id: string;
@@ -28,14 +36,85 @@ export interface CompositionInput {
 export const useStageTeamComposition = (projectId: string, stageId: string) => {
   const queryClient = useQueryClient();
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
 
   const queryKey = ['stage-team-composition', projectId, stageId];
+
+  // Generate demo composition data for a stage
+  const generateDemoComposition = (projectId: string, stageIdx: number): TeamCompositionItem[] => {
+    const fteByProject: Record<string, number[][]> = {
+      '00000000-0000-0000-0001-000000000001': [[1, 160], [2, 320], [3, 480], [2, 320], [1, 160]], // Skyline Tower by stage
+      '00000000-0000-0000-0001-000000000002': [[1, 120], [1, 160], [2, 280], [3, 400], [2, 240]],
+      '00000000-0000-0000-0001-000000000003': [[1, 80], [2, 240], [2, 320], [3, 560], [1, 180]],
+      '00000000-0000-0000-0001-000000000004': [[1, 160], [1, 320], [2, 400], [1, 240], [1, 160]],
+      '00000000-0000-0000-0001-000000000005': [[1, 120], [1, 160], [2, 240], [2, 320], [1, 200]],
+      '00000000-0000-0000-0001-000000000006': [[2, 480], [3, 600], [4, 896], [3, 720], [2, 384]],
+      '00000000-0000-0000-0001-000000000007': [[1, 160], [2, 240], [2, 320], [2, 400], [1, 200]],
+    };
+    
+    const projectData = fteByProject[projectId] || [[1, 160], [1, 160], [2, 320], [2, 320], [1, 160]];
+    const [totalFTE, totalHours] = projectData[stageIdx] || [1, 160];
+    
+    // Distribute FTEs across roles
+    const roleDistribution = distributeRolesToFTE(totalFTE);
+    
+    return roleDistribution.map((item, idx) => {
+      const role = DEMO_ROLES[item.roleIdx % DEMO_ROLES.length];
+      const rate = getDemoRoleRate(role.id);
+      const hoursPerPerson = Math.round(totalHours / totalFTE);
+      
+      return {
+        id: `demo-comp-${stageIdx}-${idx}`,
+        referenceId: role.id,
+        referenceName: `${role.name} (${role.code})`,
+        referenceType: 'role' as const,
+        plannedQuantity: item.quantity,
+        plannedHoursPerPerson: hoursPerPerson,
+        rateSnapshot: rate,
+        totalPlannedHours: item.quantity * hoursPerPerson,
+        totalBudgetAmount: item.quantity * hoursPerPerson * rate
+      };
+    });
+  };
+
+  // Helper to distribute FTE count across roles
+  const distributeRolesToFTE = (totalFTE: number): { roleIdx: number; quantity: number }[] => {
+    if (totalFTE <= 0) return [];
+    if (totalFTE === 1) return [{ roleIdx: 2, quantity: 1 }]; // Just an Architect
+    if (totalFTE === 2) return [{ roleIdx: 1, quantity: 1 }, { roleIdx: 2, quantity: 1 }]; // SA + Architect
+    if (totalFTE === 3) return [{ roleIdx: 1, quantity: 1 }, { roleIdx: 2, quantity: 1 }, { roleIdx: 3, quantity: 1 }];
+    // For larger teams, distribute across roles
+    return [
+      { roleIdx: 0, quantity: 1 }, // Principal
+      { roleIdx: 1, quantity: Math.max(1, Math.floor((totalFTE - 2) / 3)) }, // Senior Architects
+      { roleIdx: 2, quantity: Math.max(1, Math.floor((totalFTE - 2) / 2)) }, // Architects  
+      { roleIdx: 3, quantity: Math.max(0, totalFTE - 3) } // Graduate
+    ].filter(r => r.quantity > 0);
+  };
+
+  // Get stage index from stageId for demo data
+  const getStageIndex = (stageId: string): number => {
+    const stageIndexMap: Record<string, number> = {
+      '00000000-0000-0000-0002-000000000001': 0, // CON
+      '00000000-0000-0000-0002-000000000002': 1, // SD
+      '00000000-0000-0000-0002-000000000003': 2, // DD
+      '00000000-0000-0000-0002-000000000004': 3, // CD
+      '00000000-0000-0000-0002-000000000005': 4, // CA
+    };
+    return stageIndexMap[stageId] ?? 0;
+  };
 
   // Fetch composition for the stage
   const { data: composition = [], isLoading, refetch } = useQuery({
     queryKey,
     queryFn: async () => {
       if (!projectId || !stageId) return [];
+
+      // Return demo data in demo mode
+      if (isDemoMode) {
+        const stageIdx = getStageIndex(stageId);
+        return generateDemoComposition(projectId, stageIdx);
+      }
 
       // Fetch composition items
       const { data, error } = await supabase
