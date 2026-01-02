@@ -61,6 +61,7 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
           </span>
           {isAtRisk && (
             <span 
+              className="animate-pulse"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
