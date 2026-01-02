@@ -15,7 +15,7 @@ export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek }) => {
   const year = format(today, 'yyyy');
 
   return (
-    <Card className="h-full min-h-[140px] max-h-[140px] border-2 border-primary/20 shadow-md overflow-hidden w-[140px] flex-shrink-0 bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/15 dark:to-primary/5">
+    <Card className="h-full min-h-[120px] max-h-[25vh] border-2 border-primary/20 shadow-md overflow-hidden w-[140px] flex-shrink-0 bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/15 dark:to-primary/5">
       <CardContent className="relative p-4 h-full flex flex-col items-center justify-center">
         <Calendar className="h-5 w-5 text-primary opacity-70 mb-2" />
         <div className="text-center space-y-0.5">
