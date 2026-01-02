@@ -80,7 +80,7 @@ export const useWeeklyOverviewState = () => {
     });
   }, []);
 
-  // Keep app state in sync with browser fullscreen + ensure ESC exits back to normal layout
+  // Keep app state in sync with browser fullscreen changes only
   useEffect(() => {
     const handleFullscreenChange = () => {
       if (!document.fullscreenElement) {
@@ -88,22 +88,31 @@ export const useWeeklyOverviewState = () => {
       }
     };
 
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  // ESC key handler ONLY when we're in our custom fullscreen mode (not browser fullscreen)
+  useEffect(() => {
+    if (!isFullscreen) return; // Don't listen when not in fullscreen
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
+      event.preventDefault();
+      event.stopPropagation();
       setIsFullscreen(false);
       if (document.fullscreenElement) {
         document.exitFullscreen?.();
       }
     };
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
     window.addEventListener('keydown', handleKeyDown, { capture: true });
-
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
       window.removeEventListener('keydown', handleKeyDown, { capture: true } as any);
     };
-  }, []);
+  }, [isFullscreen]);
 
   const activeFiltersCount = useMemo(() => [
     filters.practiceArea !== 'all' ? 'practiceArea' : '',
