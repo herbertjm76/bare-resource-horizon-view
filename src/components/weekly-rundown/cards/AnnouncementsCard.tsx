@@ -11,6 +11,8 @@ import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { generateDemoAnnouncements } from '@/data/demoData';
 
 interface Announcement {
   id: string;
@@ -26,6 +28,7 @@ interface AnnouncementsCardProps {
 
 export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartDate, announcements: prefetchedAnnouncements }) => {
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -37,8 +40,13 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
   // Fetch announcements from weekly_notes with a specific type marker in description
   // For now, we'll use the weekly_notes table and filter by a convention
   const { data: fetchedAnnouncements = [] } = useQuery({
-    queryKey: ['weekly-announcements', weekStartDate, company?.id],
+    queryKey: ['weekly-announcements', weekStartDate, isDemoMode ? 'demo' : company?.id],
     queryFn: async () => {
+      // Demo mode: return demo announcements
+      if (isDemoMode) {
+        return generateDemoAnnouncements();
+      }
+
       if (!company?.id) return [];
 
       const { data, error } = await supabase
@@ -63,7 +71,7 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
         };
       });
     },
-    enabled: !!company?.id && !prefetchedAnnouncements,
+    enabled: (isDemoMode || !!company?.id) && !prefetchedAnnouncements,
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });

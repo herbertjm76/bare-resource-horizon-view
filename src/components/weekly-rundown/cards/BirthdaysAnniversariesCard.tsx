@@ -7,6 +7,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { format, startOfWeek, endOfWeek, getMonth, getDate, parseISO, differenceInYears } from 'date-fns';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { generateDemoCelebrations } from '@/data/demoData';
 
 interface BirthdaysAnniversariesCardProps {
   selectedWeek: Date;
@@ -26,12 +28,18 @@ export const BirthdaysAnniversariesCard: React.FC<BirthdaysAnniversariesCardProp
   selectedWeek
 }) => {
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
 
   const { data: celebrations = [] } = useQuery({
-    queryKey: ['birthdays-anniversaries', company?.id, format(weekStart, 'yyyy-MM-dd')],
+    queryKey: ['birthdays-anniversaries', isDemoMode ? 'demo' : company?.id, format(weekStart, 'yyyy-MM-dd')],
     queryFn: async () => {
+      // Demo mode: return demo celebrations
+      if (isDemoMode) {
+        return generateDemoCelebrations();
+      }
+
       if (!company?.id) return [];
 
       // Fetch all profiles with date_of_birth or start_date
@@ -98,7 +106,7 @@ export const BirthdaysAnniversariesCard: React.FC<BirthdaysAnniversariesCardProp
 
       return results;
     },
-    enabled: !!company?.id,
+    enabled: isDemoMode || !!company?.id,
     staleTime: 5 * 60 * 1000
   });
 
