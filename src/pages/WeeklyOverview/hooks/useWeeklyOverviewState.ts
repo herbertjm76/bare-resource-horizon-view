@@ -69,29 +69,30 @@ export const useWeeklyOverviewState = () => {
   }, []);
 
   const handleFullscreenToggle = useCallback(() => {
-    // Use app-level fullscreen (CSS overlay) only.
-    // Native Fullscreen API is too fragile in embedded/iframe contexts and can exit unexpectedly.
-    setIsFullscreen(prev => !prev);
-  }, []);
+    const newState = !isFullscreen;
+    setIsFullscreen(newState);
+    
+    if (newState) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+    }
+  }, [isFullscreen]);
 
-  // We intentionally do NOT sync with the browser Fullscreen API here.
-  // App "fullscreen" is a CSS overlay and should only change via our toggle or ESC.
-
-
-  // ESC key handler ONLY when we're in our custom fullscreen mode
+  // Sync app state when browser exits fullscreen (e.g., user presses ESC natively)
   useEffect(() => {
-    if (!isFullscreen) return; // Don't listen when not in fullscreen
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      event.preventDefault();
-      event.stopPropagation();
-      setIsFullscreen(false);
+    const handleFullscreenChange = () => {
+      // Only sync when exiting - the browser exited fullscreen
+      if (!document.fullscreenElement && isFullscreen) {
+        setIsFullscreen(false);
+      }
     };
 
-    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown, { capture: true } as any);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, [isFullscreen]);
 
