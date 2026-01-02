@@ -33,6 +33,14 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
   // Calculate total capacity for the period
   const weeklyCapacity = getMemberCapacity(member.weekly_capacity, workWeekHours);
   const periodWeeks = weekStartDates.length;
+  
+  // Check if member is overutilized in any week (>100%)
+  const isAtRisk = weekStartDates.some((week) => {
+    const weekData = memberWeeklyData[week.key];
+    if (!weekData) return false;
+    const utilization = (weekData.total / weeklyCapacity) * 100;
+    return utilization > 100;
+  });
 
   return (
     <TooltipProvider>
@@ -40,7 +48,8 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
         <MemberInfoCell 
           member={member} 
           memberIndex={memberIndex} 
-          shouldCenterAlign={shouldCenterAlign} 
+          shouldCenterAlign={shouldCenterAlign}
+          isAtRisk={isAtRisk}
         />
         
         {weekStartDates.map((week) => {
