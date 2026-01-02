@@ -152,12 +152,12 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       </div>
 
       {/* Team Members Avatars */}
-      <div className="px-4 py-4 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="px-4 py-2 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
         {project.teamMembers.length > 0 ? (
           <div className="flex flex-col h-full min-h-0">
             {/* Centered team members - scrollable */}
             <div className="flex-1 flex items-center justify-center overflow-y-auto min-h-0">
-              <div className="flex flex-wrap gap-3 justify-center items-end content-center py-2">
+              <div className="flex flex-wrap gap-3 justify-center items-end content-center py-1">
                 {sortedMembers.map((member) => (
                   <TeamMemberAvatar
                     key={member.id}
