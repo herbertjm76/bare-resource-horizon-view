@@ -128,6 +128,21 @@ export const WeeklyRundownView: React.FC = () => {
     };
   }, [isFullscreen]);
 
+  // Global ESC key handler to exit fullscreen
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+        document.exitFullscreen?.();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFullscreen]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
