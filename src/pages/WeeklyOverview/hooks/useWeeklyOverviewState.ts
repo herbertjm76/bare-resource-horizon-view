@@ -74,23 +74,11 @@ export const useWeeklyOverviewState = () => {
     setIsFullscreen(prev => !prev);
   }, []);
 
-  // Keep app state in sync with browser fullscreen changes only
-  // (No-op now because we don't enter browser fullscreen, but keep cleanup-safe in case other code triggers it)
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      // If something else exits browser fullscreen, ensure our app state is not stuck.
-      if (!document.fullscreenElement) {
-        setIsFullscreen(false);
-      }
-    };
+  // We intentionally do NOT sync with the browser Fullscreen API here.
+  // App "fullscreen" is a CSS overlay and should only change via our toggle or ESC.
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
 
-  // ESC key handler ONLY when we're in our custom fullscreen mode (not browser fullscreen)
+  // ESC key handler ONLY when we're in our custom fullscreen mode
   useEffect(() => {
     if (!isFullscreen) return; // Don't listen when not in fullscreen
 
@@ -99,9 +87,6 @@ export const useWeeklyOverviewState = () => {
       event.preventDefault();
       event.stopPropagation();
       setIsFullscreen(false);
-      if (document.fullscreenElement) {
-        document.exitFullscreen?.();
-      }
     };
 
     window.addEventListener('keydown', handleKeyDown, { capture: true });
