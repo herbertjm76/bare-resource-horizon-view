@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PersonRundownCard } from './PersonRundownCard';
@@ -147,9 +148,23 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
             return (
               <div
                 key={stableKey}
-                className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 transition-transform duration-300 ease-out h-[90%] my-auto"
+                className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 h-[90%] my-auto"
               >
-                <div className={`mx-auto max-w-4xl h-full ${isActive ? 'scale-100' : 'scale-95 opacity-80'} transition-transform duration-300`}>
+                <motion.div 
+                  className="mx-auto max-w-4xl h-full"
+                  initial={false}
+                  animate={{
+                    scale: isActive ? 1 : 0.92,
+                    opacity: isActive ? 1 : 0.6,
+                    y: isActive ? 0 : 8,
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 25,
+                    duration: 0.3
+                  }}
+                >
                   {rundownMode === 'people' ? (
                     <PersonRundownCard
                       person={item}
@@ -166,7 +181,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
                       onDataChange={() => {}}
                     />
                   )}
-                </div>
+                </motion.div>
               </div>
             );
           })}
