@@ -97,7 +97,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
     <div className={`
       relative rounded-3xl bg-card shadow-2xl border border-border
       ${isActive ? 'ring-2 ring-primary/50 scale-[1.02]' : ''}
-      ${isFullscreen ? 'h-full max-h-full' : 'min-h-[400px]'}
+      h-full
       transition-all duration-500 ease-out
       flex flex-col
     `}>

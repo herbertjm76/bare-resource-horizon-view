@@ -108,8 +108,8 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   const canScrollNext = currentIndex < items.length - 1;
 
   return (
-    <div className="carousel-container relative flex items-center h-[calc(100vh-280px)] min-h-[400px] max-h-[70vh]">
-      <div className="w-full">
+    <div className="carousel-container relative flex items-center h-[calc(100vh-320px)] min-h-[350px]">
+      <div className="w-full h-full flex flex-col">
       {/* Navigation buttons - Enhanced */}
       <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
         <Button
@@ -136,8 +136,8 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
       </div>
 
       {/* Carousel content - simplified to avoid flicker and keep cards visible */}
-      <div className="overflow-visible" ref={emblaRef}>
-        <div className="flex">
+      <div className="overflow-visible flex-1" ref={emblaRef}>
+        <div className="flex h-full">
           {items.map((item, index) => {
             const isActive = index === currentIndex;
             const stableKey = `${item.id}-${rundownMode}`;
@@ -145,9 +145,9 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
             return (
               <div
                 key={stableKey}
-                className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 transition-transform duration-300 ease-out"
+                className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 transition-transform duration-300 ease-out h-full"
               >
-                <div className={`mx-auto max-w-4xl ${isActive ? 'scale-100' : 'scale-95 opacity-80'} transition-transform duration-300`}>
+                <div className={`mx-auto max-w-4xl h-full ${isActive ? 'scale-100' : 'scale-95 opacity-80'} transition-transform duration-300`}>
                   {rundownMode === 'people' ? (
                     <PersonRundownCard
                       person={item}
@@ -173,7 +173,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
 
       {/* Enhanced Dots indicator with progress */}
       {items.length > 1 && (
-        <div className="flex justify-center items-center mt-8 gap-3">
+        <div className="flex justify-center items-center mt-4 gap-3 flex-shrink-0">
           {items.map((_, index) => (
             <button
               key={index}
@@ -191,7 +191,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
       
       {/* Keyboard navigation hint */}
       {items.length > 1 && (
-        <div className="flex justify-center mt-4 text-xs text-muted-foreground">
+        <div className="flex justify-center mt-2 text-xs text-muted-foreground flex-shrink-0">
           <p className="flex items-center gap-2">
             <kbd className="px-2 py-1 bg-muted rounded border border-border">←</kbd>
             <kbd className="px-2 py-1 bg-muted rounded border border-border">→</kbd>
