@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_TEAM_MEMBERS, DEMO_PRE_REGISTERED } from '@/data/demoData';
 import type { Database } from '@/integrations/supabase/types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -23,8 +25,39 @@ export const useResourceOptions = () => {
   const [loading, setLoading] = useState(false);
   const [resourceOptions, setResourceOptions] = useState<ResourceOption[]>([]);
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
   
   useEffect(() => {
+    // Demo mode: serve options from demo data (no Supabase).
+    if (isDemoMode) {
+      const formattedResources: ResourceOption[] = [
+        ...DEMO_TEAM_MEMBERS.map((member) => ({
+          id: member.id,
+          name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || member.email,
+          email: member.email,
+          type: 'active' as const,
+          role: member.job_title || undefined,
+          department: member.department || undefined,
+          location: member.location || undefined,
+          officeRoleId: member.office_role_id,
+        })),
+        ...DEMO_PRE_REGISTERED.map((invite) => ({
+          id: invite.id,
+          name: `${invite.first_name || ''} ${invite.last_name || ''}`.trim() || invite.email,
+          email: invite.email || '',
+          type: 'pre-registered' as const,
+          role: invite.job_title || undefined,
+          department: invite.department || undefined,
+          location: invite.location || undefined,
+          officeRoleId: (invite as any).office_role_id ?? null,
+        })),
+      ];
+
+      setResourceOptions(formattedResources);
+      setLoading(false);
+      return;
+    }
+
     const fetchResources = async () => {
       if (!company?.id) return;
       
@@ -86,7 +119,7 @@ export const useResourceOptions = () => {
     };
     
     fetchResources();
-  }, [company]);
+  }, [company, isDemoMode]);
 
   return {
     resourceOptions,

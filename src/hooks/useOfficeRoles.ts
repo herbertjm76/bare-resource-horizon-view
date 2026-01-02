@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyId } from '@/hooks/useCompanyId';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_ROLES } from '@/data/demoData';
 
 export interface OfficeRole {
   id: string;
@@ -9,11 +11,16 @@ export interface OfficeRole {
 }
 
 export const useOfficeRoles = () => {
+  const { isDemoMode } = useDemoAuth();
   const { companyId, isReady } = useCompanyId();
 
   return useQuery({
-    queryKey: ['office-roles', companyId],
+    queryKey: ['office-roles', companyId, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return DEMO_ROLES.map(r => ({ id: r.id, name: r.name, code: r.code })) as OfficeRole[];
+      }
+
       if (!companyId) return [];
       
       const { data, error } = await supabase
@@ -25,6 +32,6 @@ export const useOfficeRoles = () => {
       if (error) throw error;
       return data as OfficeRole[];
     },
-    enabled: isReady,
+    enabled: isDemoMode || isReady,
   });
 };

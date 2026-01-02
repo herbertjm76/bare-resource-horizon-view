@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
-import { DEMO_ROLES, DEMO_RATES } from '@/data/demoData';
+import { DEMO_ROLES, DEMO_RATES, DEMO_STAGES } from '@/data/demoData';
 
 // Helper to get rate for a role from demo data
 const getDemoRoleRate = (roleId: string): number => {
@@ -94,6 +94,13 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
 
   // Get stage index from stageId for demo data
   const getStageIndex = (stageId: string): number => {
+    // Prefer demo stages ordering when stageId matches demo stage IDs
+    const demoStage = DEMO_STAGES.find(s => s.id === stageId);
+    if (demoStage) {
+      return Math.max(0, (demoStage.order_index ?? 1) - 1);
+    }
+
+    // Fallback for any legacy hardcoded demo IDs
     const stageIndexMap: Record<string, number> = {
       '00000000-0000-0000-0002-000000000001': 0, // CON
       '00000000-0000-0000-0002-000000000002': 1, // SD
