@@ -1,17 +1,20 @@
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { TeamMember } from '@/components/dashboard/types';
+import { AlertTriangle } from 'lucide-react';
 
 interface MemberInfoCellProps {
   member: TeamMember;
   memberIndex: number;
   shouldCenterAlign?: boolean;
+  isAtRisk?: boolean;
 }
 
 export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
   member,
   memberIndex,
-  shouldCenterAlign = false
+  shouldCenterAlign = false,
+  isAtRisk = false
 }) => {
   const displayName = member.first_name && member.last_name 
     ? `${member.first_name} ${member.last_name}`
@@ -52,10 +55,29 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
             {initials}
           </AvatarFallback>
         </Avatar>
-        <div style={{ flex: '1', minWidth: '0' }}>
+        <div style={{ flex: '1', minWidth: '0', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span className="member-name">
             {displayName}
           </span>
+          {isAtRisk && (
+            <span 
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+                backgroundColor: '#fef2f2',
+                color: '#dc2626',
+                fontSize: '10px',
+                fontWeight: 600,
+                padding: '2px 6px',
+                borderRadius: '4px',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <AlertTriangle size={10} />
+              At Risk
+            </span>
+          )}
         </div>
       </div>
     </td>
