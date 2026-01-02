@@ -69,20 +69,16 @@ export const useWeeklyOverviewState = () => {
   }, []);
 
   const handleFullscreenToggle = useCallback(() => {
-    setIsFullscreen(prev => {
-      const newState = !prev;
-      if (newState) {
-        document.documentElement.requestFullscreen?.();
-      } else {
-        document.exitFullscreen?.();
-      }
-      return newState;
-    });
+    // Use app-level fullscreen (CSS overlay) only.
+    // Native Fullscreen API is too fragile in embedded/iframe contexts and can exit unexpectedly.
+    setIsFullscreen(prev => !prev);
   }, []);
 
   // Keep app state in sync with browser fullscreen changes only
+  // (No-op now because we don't enter browser fullscreen, but keep cleanup-safe in case other code triggers it)
   useEffect(() => {
     const handleFullscreenChange = () => {
+      // If something else exits browser fullscreen, ensure our app state is not stuck.
       if (!document.fullscreenElement) {
         setIsFullscreen(false);
       }
