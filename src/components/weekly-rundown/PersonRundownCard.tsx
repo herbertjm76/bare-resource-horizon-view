@@ -132,7 +132,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         </div>
 
         {/* Interactive Bar Graph with Inline Editing */}
-        <div className="px-4 py-3 relative z-10 flex-1 flex flex-col items-center justify-center">
+        <div className="px-4 py-2 relative z-10 flex-1 flex flex-col items-center justify-center">
           <div className="w-full">
             <h2 className={`font-semibold text-foreground mb-2 ${
               isFullscreen ? 'text-lg' : 'text-base'
@@ -140,7 +140,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
               Weekly Allocation
             </h2>
           
-          <div className="w-full h-16 bg-muted/20 rounded-xl overflow-hidden flex shadow-inner border border-border/30">
+          <div className="w-full h-12 bg-muted/20 rounded-xl overflow-hidden flex shadow-inner border border-border/30">
             {/* Project Segments */}
             {person.projects && person.projects.length > 0 && person.projects.map((project: any, idx: number) => {
               const percentage = (project.hours / person.capacity) * 100;
@@ -219,7 +219,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
           
             {/* Project List */}
             {person.projects && person.projects.length > 0 && (
-              <div className="mt-3 space-y-1.5 max-h-48 overflow-y-auto">
+              <div className="mt-2 space-y-1.5 max-h-36 overflow-y-auto">
                 {person.projects.slice(0, 8).map((project, idx) => {
                   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
                   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);

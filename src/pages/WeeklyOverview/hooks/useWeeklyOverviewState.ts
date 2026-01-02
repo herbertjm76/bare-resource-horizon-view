@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { startOfWeek } from 'date-fns';
 import { ViewType, RundownMode, SortOption, TableOrientation } from '@/components/week-resourcing/UnifiedWeeklyControls';
 
@@ -78,6 +78,31 @@ export const useWeeklyOverviewState = () => {
       }
       return newState;
     });
+  }, []);
+
+  // Keep app state in sync with browser fullscreen + ensure ESC exits back to normal layout
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setIsFullscreen(false);
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      window.removeEventListener('keydown', handleKeyDown, { capture: true } as any);
+    };
   }, []);
 
   const activeFiltersCount = useMemo(() => [

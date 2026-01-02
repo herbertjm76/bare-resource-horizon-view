@@ -102,18 +102,18 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       flex flex-col
     `}>
       {/* Hero Section */}
-      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-4 pb-3">
+      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-3 pb-2">
         <div className="flex items-start gap-3">
           {/* Small Line Art Icon */}
           <div className="relative flex-shrink-0 mt-1">
-            <ProjectIcon className={`${isFullscreen ? 'h-8 w-8' : 'h-7 w-7'} text-primary`} />
+            <ProjectIcon className={`${isFullscreen ? 'h-7 w-7' : 'h-6 w-6'} text-primary`} />
           </div>
           
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 {/* Project Primary Display */}
-                <h1 className="font-bold text-foreground tracking-tight mb-0.5 text-2xl">
+                <h1 className="font-bold text-foreground tracking-tight mb-0.5 text-xl">
                   {primaryDisplay}
                 </h1>
                 
@@ -152,12 +152,12 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       </div>
 
       {/* Team Members Avatars */}
-      <div className="px-4 py-2 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="px-3 py-1.5 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
         {project.teamMembers.length > 0 ? (
           <div className="flex flex-col h-full min-h-0">
             {/* Centered team members - scrollable */}
             <div className="flex-1 flex items-center justify-center overflow-y-auto min-h-0">
-              <div className="flex flex-wrap gap-3 justify-center items-end content-center py-1">
+              <div className="flex flex-wrap gap-2 justify-center items-end content-center py-1">
                 {sortedMembers.map((member) => (
                   <TeamMemberAvatar
                     key={member.id}
@@ -170,7 +170,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               </div>
             </div>
             {/* Action buttons bottom right */}
-            <div className="flex justify-end mt-2 gap-1 flex-shrink-0">
+            <div className="flex justify-end mt-1 gap-1 flex-shrink-0">
               <AddTeamMemberAllocation
                 projectId={project.id}
                 weekStartDate={weekStartDateString}

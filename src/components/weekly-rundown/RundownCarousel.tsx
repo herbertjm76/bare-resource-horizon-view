@@ -110,7 +110,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   const canScrollNext = currentIndex < items.length - 1;
 
   return (
-    <div className="carousel-container relative flex items-center h-[calc(100vh-380px)] min-h-[280px]">
+    <div className="carousel-container relative flex items-center h-[calc(100vh-420px)] min-h-[240px] pb-10">
       <div className="w-full h-full flex flex-col">
       {/* Navigation buttons - Enhanced */}
       <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
@@ -138,7 +138,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
       </div>
 
       {/* Carousel content - simplified to avoid flicker and keep cards visible */}
-      <div className="overflow-visible flex-1" ref={emblaRef}>
+      <div className="overflow-visible flex-1 min-h-0" ref={emblaRef}>
         <div className="flex h-full">
           {items.map((item, index) => {
             const isActive = index === currentIndex;
@@ -173,32 +173,31 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
         </div>
       </div>
 
-      {/* Enhanced Dots indicator with progress */}
+      {/* Bottom UI (dots + hint) is pinned so it stays visible even when cards are tall */}
       {items.length > 1 && (
-        <div className="flex justify-center items-center mt-4 gap-3 flex-shrink-0">
-          {items.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => onGoTo(index)}
-              className={`rounded-full transition-all duration-300 hover:scale-125 ${
-                index === currentIndex 
-                  ? 'bg-primary w-4 h-4 shadow-lg shadow-primary/30' 
-                  : 'bg-muted-foreground/30 w-3 h-3 hover:bg-muted-foreground/60'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
-      
-      {/* Keyboard navigation hint */}
-      {items.length > 1 && (
-        <div className="flex justify-center mt-2 text-xs text-muted-foreground flex-shrink-0">
-          <p className="flex items-center gap-2">
-            <kbd className="px-2 py-1 bg-muted rounded border border-border">←</kbd>
-            <kbd className="px-2 py-1 bg-muted rounded border border-border">→</kbd>
-            <span>Navigate with keyboard</span>
-          </p>
+        <div className="absolute bottom-2 left-0 right-0 flex flex-col items-center gap-1">
+          <div className="flex justify-center items-center gap-3">
+            {items.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => onGoTo(index)}
+                className={`rounded-full transition-all duration-300 hover:scale-125 ${
+                  index === currentIndex
+                    ? 'bg-primary w-4 h-4 shadow-lg shadow-primary/30'
+                    : 'bg-muted-foreground/30 w-3 h-3 hover:bg-muted-foreground/60'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          <div className="text-xs text-muted-foreground">
+            <p className="flex items-center gap-2">
+              <kbd className="px-2 py-1 bg-muted rounded border border-border">←</kbd>
+              <kbd className="px-2 py-1 bg-muted rounded border border-border">→</kbd>
+              <span>Navigate with keyboard</span>
+            </p>
+          </div>
         </div>
       )}
       </div>
