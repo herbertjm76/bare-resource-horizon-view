@@ -148,6 +148,166 @@ export const DEMO_TEAM_MEMBERS = [
     start_date: '2019-08-01',
     date_of_birth: '1983-09-25',
     office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000009',
+    company_id: DEMO_COMPANY_ID,
+    email: 'olivia.martinez@bareresource.com',
+    first_name: 'Olivia',
+    last_name: 'Martinez',
+    job_title: 'Senior Interior Designer',
+    department: 'Interiors',
+    location: 'Los Angeles',
+    practice_area: 'Residential',
+    weekly_capacity: 40,
+    created_at: '2021-05-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Luxury residential interiors specialist',
+    manager_id: '00000000-0000-0000-0000-000000000003',
+    start_date: '2021-05-01',
+    date_of_birth: '1989-08-14',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000010',
+    company_id: DEMO_COMPANY_ID,
+    email: 'david.kim@bareresource.com',
+    first_name: 'David',
+    last_name: 'Kim',
+    job_title: 'Associate Architect',
+    department: 'Architecture',
+    location: 'New York',
+    practice_area: 'Commercial',
+    weekly_capacity: 40,
+    created_at: '2020-11-15T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'High-rise commercial projects expert',
+    manager_id: '00000000-0000-0000-0000-000000000002',
+    start_date: '2020-11-15',
+    date_of_birth: '1986-02-28',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000011',
+    company_id: DEMO_COMPANY_ID,
+    email: 'rachel.green@bareresource.com',
+    first_name: 'Rachel',
+    last_name: 'Green',
+    job_title: 'Project Manager',
+    department: 'Architecture',
+    location: 'Chicago',
+    practice_area: 'Healthcare',
+    weekly_capacity: 40,
+    created_at: '2022-03-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Ensuring projects deliver on time and budget',
+    manager_id: '00000000-0000-0000-0000-000000000008',
+    start_date: '2022-03-01',
+    date_of_birth: '1991-10-05',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000012',
+    company_id: DEMO_COMPANY_ID,
+    email: 'william.park@bareresource.com',
+    first_name: 'William',
+    last_name: 'Park',
+    job_title: 'BIM Manager',
+    department: 'Technical',
+    location: 'Los Angeles',
+    practice_area: 'Commercial',
+    weekly_capacity: 40,
+    created_at: '2021-08-15T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Leading digital delivery initiatives',
+    manager_id: '00000000-0000-0000-0000-000000000008',
+    start_date: '2021-08-15',
+    date_of_birth: '1988-04-18',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000013',
+    company_id: DEMO_COMPANY_ID,
+    email: 'sophia.lee@bareresource.com',
+    first_name: 'Sophia',
+    last_name: 'Lee',
+    job_title: 'Graduate Architect',
+    department: 'Architecture',
+    location: 'New York',
+    practice_area: 'Residential',
+    weekly_capacity: 40,
+    created_at: '2024-06-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Eager to learn and contribute to great design',
+    manager_id: '00000000-0000-0000-0000-000000000003',
+    start_date: '2024-06-01',
+    date_of_birth: '1998-01-22',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000014',
+    company_id: DEMO_COMPANY_ID,
+    email: 'daniel.wright@bareresource.com',
+    first_name: 'Daniel',
+    last_name: 'Wright',
+    job_title: 'Senior Landscape Architect',
+    department: 'Landscape',
+    location: 'Chicago',
+    practice_area: 'Urban Design',
+    weekly_capacity: 40,
+    created_at: '2020-02-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Creating sustainable urban environments',
+    manager_id: '00000000-0000-0000-0000-000000000002',
+    start_date: '2020-02-01',
+    date_of_birth: '1984-07-09',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000015',
+    company_id: DEMO_COMPANY_ID,
+    email: 'isabella.garcia@bareresource.com',
+    first_name: 'Isabella',
+    last_name: 'Garcia',
+    job_title: 'Visualization Specialist',
+    department: 'Technical',
+    location: 'Los Angeles',
+    practice_area: 'Commercial',
+    weekly_capacity: 40,
+    created_at: '2023-04-15T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Bringing designs to life through visualization',
+    manager_id: '00000000-0000-0000-0000-000000000008',
+    start_date: '2023-04-15',
+    date_of_birth: '1993-11-12',
+    office_role_id: null
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000016',
+    company_id: DEMO_COMPANY_ID,
+    email: 'ethan.moore@bareresource.com',
+    first_name: 'Ethan',
+    last_name: 'Moore',
+    job_title: 'Sustainability Consultant',
+    department: 'Architecture',
+    location: 'New York',
+    practice_area: 'Commercial',
+    weekly_capacity: 32,
+    created_at: '2022-01-10T00:00:00Z',
+    updated_at: new Date().toISOString(),
+    avatar_url: null,
+    bio: 'Driving sustainable design solutions',
+    manager_id: '00000000-0000-0000-0000-000000000002',
+    start_date: '2022-01-10',
+    date_of_birth: '1990-05-25',
+    office_role_id: null
   }
 ];
 
@@ -647,6 +807,72 @@ export const generateDemoAllocations = () => {
       projects: [
         { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 22, rampUp: 0, peakWeeks: [2, 3, 4, 10, 11, 12, 18], lightWeeks: [7, 8, 15, 16] },
         { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 16, rampUp: 2, peakWeeks: [5, 6, 13, 14], lightWeeks: [0, 1, 9, 10, 17, 18, 22, 23] }
+      ]
+    },
+    // Olivia Martinez - Senior Interior Designer, residential focus
+    { 
+      memberId: '00000000-0000-0000-0000-000000000009', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 28, rampUp: 2, peakWeeks: [3, 4, 5, 11, 12, 13], lightWeeks: [0, 1, 8, 9, 17, 18] },
+        { projectId: '00000000-0000-0000-0001-000000000005', baseHours: 12, rampUp: 3, peakWeeks: [6, 7, 14, 15], lightWeeks: [2, 10, 19, 20] }
+      ]
+    },
+    // David Kim - Associate Architect, commercial projects
+    { 
+      memberId: '00000000-0000-0000-0000-000000000010', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 32, rampUp: 1, peakWeeks: [4, 5, 6, 12, 13, 14], lightWeeks: [0, 8, 9, 17, 18] },
+        { projectId: '00000000-0000-0000-0001-000000000006', baseHours: 8, rampUp: 4, peakWeeks: [10, 11, 19, 20], lightWeeks: [1, 2, 3, 7, 8] }
+      ]
+    },
+    // Rachel Green - Project Manager, healthcare focus
+    { 
+      memberId: '00000000-0000-0000-0000-000000000011', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 30, rampUp: 0, peakWeeks: [2, 3, 10, 11, 18, 19], lightWeeks: [6, 7, 14, 15] },
+        { projectId: '00000000-0000-0000-0001-000000000004', baseHours: 10, rampUp: 2, peakWeeks: [8, 9, 16, 17], lightWeeks: [0, 1, 4, 5, 12, 13] }
+      ]
+    },
+    // William Park - BIM Manager, technical oversight
+    { 
+      memberId: '00000000-0000-0000-0000-000000000012', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 18, rampUp: 1, peakWeeks: [5, 6, 13, 14], lightWeeks: [0, 1, 9, 10, 18] },
+        { projectId: '00000000-0000-0000-0001-000000000003', baseHours: 16, rampUp: 0, peakWeeks: [3, 4, 11, 12], lightWeeks: [7, 8, 15, 16, 20] },
+        { projectId: '00000000-0000-0000-0001-000000000005', baseHours: 8, rampUp: 2, peakWeeks: [7, 8, 15, 16], lightWeeks: [2, 3, 10, 11] }
+      ]
+    },
+    // Sophia Lee - Graduate Architect, learning on residential
+    { 
+      memberId: '00000000-0000-0000-0000-000000000013', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 32, rampUp: 4, peakWeeks: [8, 9, 10, 16, 17, 18], lightWeeks: [0, 1, 2, 3, 12, 13] }
+      ]
+    },
+    // Daniel Wright - Senior Landscape Architect, urban design
+    { 
+      memberId: '00000000-0000-0000-0000-000000000014', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000004', baseHours: 28, rampUp: 2, peakWeeks: [4, 5, 6, 12, 13, 14], lightWeeks: [0, 1, 9, 10, 18, 19] },
+        { projectId: '00000000-0000-0000-0001-000000000006', baseHours: 12, rampUp: 5, peakWeeks: [10, 11, 18, 19], lightWeeks: [0, 1, 2, 3, 4, 7, 8] }
+      ]
+    },
+    // Isabella Garcia - Visualization Specialist, multiple projects
+    { 
+      memberId: '00000000-0000-0000-0000-000000000015', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 14, rampUp: 2, peakWeeks: [5, 6, 13, 14], lightWeeks: [1, 2, 9, 10, 17, 18] },
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 12, rampUp: 3, peakWeeks: [7, 8, 15, 16], lightWeeks: [0, 1, 4, 5, 12, 13] },
+        { projectId: '00000000-0000-0000-0001-000000000005', baseHours: 10, rampUp: 1, peakWeeks: [3, 4, 11, 12], lightWeeks: [6, 7, 14, 15, 19, 20] }
+      ]
+    },
+    // Ethan Moore - Sustainability Consultant (part-time 32h), advisory role
+    { 
+      memberId: '00000000-0000-0000-0000-000000000016', 
+      projects: [
+        { projectId: '00000000-0000-0000-0001-000000000001', baseHours: 10, rampUp: 1, peakWeeks: [4, 5, 12, 13], lightWeeks: [0, 1, 8, 9, 16, 17] },
+        { projectId: '00000000-0000-0000-0001-000000000002', baseHours: 8, rampUp: 2, peakWeeks: [6, 7, 14, 15], lightWeeks: [2, 3, 10, 11, 18, 19] },
+        { projectId: '00000000-0000-0000-0001-000000000004', baseHours: 8, rampUp: 3, peakWeeks: [8, 9, 16, 17], lightWeeks: [0, 1, 4, 5, 12, 13] }
       ]
     }
   ];
