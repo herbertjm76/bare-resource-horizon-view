@@ -24,8 +24,11 @@ export const CapacityHeatmapTable: React.FC<CapacityHeatmapTableProps> = ({
 
   return (
     <TooltipProvider>
-      <div className={`workload-resource-grid-container ${shouldCenterAlign ? 'center-aligned' : ''}`}>
-        <div className="workload-resource-table-wrapper">
+      <div 
+        className="workload-resource-grid-container center-aligned"
+        style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}
+      >
+        <div className="workload-resource-table-wrapper" style={{ width: 'auto', maxWidth: '100%', overflow: 'visible' }}>
           <table 
             className="workload-resource-table"
             style={{ 
