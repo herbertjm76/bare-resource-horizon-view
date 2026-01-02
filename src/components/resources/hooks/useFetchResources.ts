@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,11 +7,30 @@ import { logger } from '@/utils/logger';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { DEMO_TEAM_MEMBERS, generateDemoAllocations } from '@/data/demoData';
 
+const demoStorageKey = (projectId: string) => `demo_project_resources:${projectId}`;
+
+const uniqueById = <T extends { id: string }>(items: T[]): T[] => {
+  const map = new Map<string, T>();
+  for (const item of items) map.set(item.id, item);
+  return Array.from(map.values());
+};
+
 export const useFetchResources = (projectId: string) => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
   const { isDemoMode } = useDemoAuth();
+
+  // Persist demo resources so "add resource" survives refresh/navigation.
+  useEffect(() => {
+    if (!isDemoMode || !projectId) return;
+    try {
+      localStorage.setItem(demoStorageKey(projectId), JSON.stringify(resources));
+    } catch (e) {
+      // non-fatal
+      logger.debug('Demo: failed to persist project resources', e);
+    }
+  }, [isDemoMode, projectId, resources]);
 
   // Fetch resources for this project
   const fetchResources = useCallback(async () => {
@@ -21,14 +39,14 @@ export const useFetchResources = (projectId: string) => {
       return [];
     }
 
-    // Demo mode: derive resources from demo allocations (no DB reads)
+    // Demo mode: merge persisted + derived-from-demo-allocations (never overwrite additions)
     if (isDemoMode) {
       setIsLoading(true);
       try {
         const demoAllocations = generateDemoAllocations().filter((a) => a.project_id === projectId);
         const resourceIds = Array.from(new Set(demoAllocations.map((a) => a.resource_id)));
 
-        const demoResources: Resource[] = resourceIds
+        const derivedResources: Resource[] = resourceIds
           .map((id) => DEMO_TEAM_MEMBERS.find((m) => m.id === id))
           .filter(Boolean)
           .map((m) => ({
@@ -44,9 +62,18 @@ export const useFetchResources = (projectId: string) => {
             location: m!.location,
           }));
 
-        setResources(demoResources);
+        let persisted: Resource[] = [];
+        try {
+          const raw = localStorage.getItem(demoStorageKey(projectId));
+          if (raw) persisted = JSON.parse(raw);
+        } catch {
+          persisted = [];
+        }
+
+        const merged = uniqueById<Resource>([...persisted, ...derivedResources, ...resources]);
+        setResources(merged);
         setIsLoading(false);
-        return demoResources;
+        return merged;
       } catch (error) {
         logger.error('Demo: Error building project resources:', error);
         setResources([]);
@@ -215,7 +242,7 @@ export const useFetchResources = (projectId: string) => {
       setIsLoading(false);
       return [];
     }
-  }, [projectId, company?.id, isDemoMode]);
+  }, [projectId, company?.id, isDemoMode, resources]);
 
   useEffect(() => {
     if (projectId && (isDemoMode || company?.id)) {
