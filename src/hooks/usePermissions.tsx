@@ -87,11 +87,8 @@ export function usePermissions() {
   
   // Fetch user's actual role from user_roles table (skip in demo mode)
   const { data: userRole, isLoading } = useQuery({
-    queryKey: ['currentUserRole'],
+    queryKey: ['currentUserRole', isDemoMode],
     queryFn: async () => {
-      // In demo mode, return owner role
-      if (isDemoMode) return 'owner' as AppRole;
-      
       const { data: authData } = await supabase.auth.getUser();
       if (!authData.user) return 'member' as AppRole;
 
@@ -117,10 +114,11 @@ export function usePermissions() {
       return (roleData?.role as AppRole) || 'member';
     },
     staleTime: 5 * 60 * 1000,
-    enabled: true, // Always run, but return demo role if in demo mode
+    enabled: !isDemoMode, // Skip query in demo mode
   });
 
-  const actualRole: AppRole = userRole || 'member';
+  // In demo mode, always return owner role for full admin access
+  const actualRole: AppRole = isDemoMode ? 'owner' : (userRole || 'member');
   const currentRole: AppRole = simulatedRole || actualRole;
   const permissions = ROLE_PERMISSIONS[currentRole] || ROLE_PERMISSIONS.member;
 
