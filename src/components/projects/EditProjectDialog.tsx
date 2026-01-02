@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { EditProjectContent } from "./dialog/EditProjectContent";
 import { logger } from '@/utils/logger';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_PROJECTS } from '@/data/demoData';
 
 interface EditProjectDialogProps {
   project: any;
@@ -26,6 +28,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const [activeTab, setActiveTab] = useState("info");
   const { company } = useCompany();
   const { departments } = useOfficeSettings();
+  const { isDemoMode } = useDemoAuth();
   const [loadedProject, setLoadedProject] = useState(project);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,6 +38,22 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   // FIX: Add refetchSignal as a dependency to reload the latest project data after submit
   useEffect(() => {
     if (isOpen && project?.id) {
+      // In demo mode, use demo data directly instead of fetching from Supabase
+      if (isDemoMode) {
+        const demoProject = DEMO_PROJECTS.find(p => p.id === project.id);
+        if (demoProject) {
+          setLoadedProject({
+            ...demoProject,
+            project_manager: null,
+            office: { id: 'demo-office', name: 'Demo Office', country: 'United States' }
+          });
+        } else {
+          setLoadedProject(project);
+        }
+        setIsLoading(false);
+        return;
+      }
+
       const fetchCompleteProject = async () => {
         try {
           setIsLoading(true);
@@ -72,7 +91,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
       fetchCompleteProject();
     }
   // FIX: include refetchSignal so the latest project data is fetched after saving
-  }, [isOpen, project?.id, refetchSignal]);
+  }, [isOpen, project?.id, refetchSignal, isDemoMode]);
 
   // Pass the refetchSignal to useProjectForm, so all sub-hooks can use it if needed:
   const {
