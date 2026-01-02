@@ -93,9 +93,9 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         flex flex-col
       `}>
         {/* Hero Section */}
-        <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 pb-6">
-          <div className="flex items-start gap-6">
-            <Avatar className={`${isFullscreen ? 'h-24 w-24' : 'h-20 w-20'} ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
+        <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-4 pb-3">
+          <div className="flex items-start gap-4">
+            <Avatar className={`${isFullscreen ? 'h-20 w-20' : 'h-16 w-16'} ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
               <AvatarImage src={person.avatar_url} />
               <AvatarFallback className="text-2xl font-bold bg-gradient-modern text-white backdrop-blur-sm">
                 {person.first_name.charAt(0)}{person.last_name.charAt(0)}
@@ -103,9 +103,9 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
             </Avatar>
             
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-4 mb-2">
+              <div className="flex items-start justify-between gap-4 mb-1">
                 <h1 className={`font-bold text-foreground tracking-tight ${
-                  isFullscreen ? 'text-5xl' : 'text-4xl'
+                  isFullscreen ? 'text-3xl' : 'text-2xl'
                 }`}>
                   {person.first_name} {person.last_name}
                 </h1>
@@ -132,10 +132,10 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         </div>
 
         {/* Interactive Bar Graph with Inline Editing */}
-        <div className="px-8 py-8 relative z-10 flex-1 flex flex-col items-center justify-center">
+        <div className="px-4 py-3 relative z-10 flex-1 flex flex-col items-center justify-center">
           <div className="w-full">
-            <h2 className={`font-semibold text-foreground mb-3 ${
-              isFullscreen ? 'text-xl' : 'text-lg'
+            <h2 className={`font-semibold text-foreground mb-2 ${
+              isFullscreen ? 'text-lg' : 'text-base'
             }`}>
               Weekly Allocation
             </h2>
