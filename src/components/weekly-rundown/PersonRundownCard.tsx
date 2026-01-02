@@ -110,11 +110,14 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                   {person.first_name} {person.last_name}
                 </h1>
                 
-                {/* Badges - Department and Location */}
+                {/* Badges - Department, Location, and Utilization */}
                 <div className="flex flex-col items-end gap-1.5">
+                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                    <TrendingUp className="h-3 w-3" />
+                    {person.utilizationPercentage}% utilized
+                  </Badge>
                   {person.department && (
                     <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
-                      <TrendingUp className="h-3 w-3" />
                       {person.department}
                     </Badge>
                   )}
@@ -122,17 +125,6 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                     <MapPin className="h-3 w-3" />
                     {person.location}
                   </Badge>
-                </div>
-              </div>
-              
-              {/* Key Metrics Row */}
-              <div className="flex items-center gap-4 mt-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-primary" />
-                  <span className="text-2xl font-bold text-foreground">
-                    <CountUpNumber end={person.utilizationPercentage} duration={1500} />%
-                  </span>
-                  <span className="text-xs text-muted-foreground">utilization</span>
                 </div>
               </div>
             </div>
