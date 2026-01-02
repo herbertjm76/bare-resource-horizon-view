@@ -17,6 +17,8 @@ import { colors } from '@/styles/colors';
 import { toast } from 'sonner';
 import { AddProjectStageDialog } from './AddProjectStageDialog';
 import { UnscheduledStagesTray } from './UnscheduledStagesTray';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_STAGES, DEMO_PROJECTS, DEMO_TEAM_MEMBERS, DEMO_COMPANY_ID } from '@/data/demoData';
 
 interface Project {
   id: string;
@@ -86,6 +88,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   practiceAreas = [],
 }) => {
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
   const queryClient = useQueryClient();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
@@ -110,14 +113,105 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   } | null>(null);
   const [manageStagesProject, setManageStagesProject] = useState<Project | null>(null);
   const [expandedTrays, setExpandedTrays] = useState<Set<string>>(new Set());
-  const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const timelineStartDate = startOfWeek(new Date(), { weekStartsOn: 1 });
   const WEEK_WIDTH = 64; // Width of each week column in pixels
 
+  // Generate demo project stages with start dates and contracted weeks
+  const generateDemoProjectStages = useCallback(() => {
+    const stages: Array<{
+      id: string;
+      project_id: string;
+      stage_name: string;
+      start_date: string | null;
+      contracted_weeks: number;
+      is_applicable: boolean;
+    }> = [];
+    
+    // Define stage durations by project (weeks per stage)
+    const projectStageConfig: Record<string, { startOffset: number; durations: number[] }> = {
+      '00000000-0000-0000-0001-000000000001': { startOffset: -8, durations: [4, 6, 8, 10, 12] },  // Skyline Tower - in SD
+      '00000000-0000-0000-0001-000000000002': { startOffset: -4, durations: [3, 5, 6, 8, 10] },   // Greenfield Residence - in CON
+      '00000000-0000-0000-0001-000000000003': { startOffset: -20, durations: [4, 8, 10, 12, 8] }, // Metro Health - in DOC
+      '00000000-0000-0000-0001-000000000004': { startOffset: 2, durations: [4, 6, 8, 10, 8] },    // Urban Park - just starting
+      '00000000-0000-0000-0001-000000000005': { startOffset: -6, durations: [3, 4, 6, 8, 6] },    // Boutique Hotel - in DD
+      '00000000-0000-0000-0001-000000000006': { startOffset: 8, durations: [6, 8, 12, 16, 14] },  // Tech Campus - pipeline
+      '00000000-0000-0000-0001-000000000007': { startOffset: -52, durations: [4, 6, 8, 10, 8] },  // Riverside - completed
+    };
+    
+    DEMO_PROJECTS.forEach(project => {
+      const config = projectStageConfig[project.id] || { startOffset: 0, durations: [4, 4, 4, 4, 4] };
+      let cumulativeWeeks = config.startOffset;
+      
+      DEMO_STAGES.forEach((stage, idx) => {
+        const stageStartDate = addWeeks(timelineStartDate, cumulativeWeeks);
+        const contractedWeeks = config.durations[idx] || 4;
+        
+        stages.push({
+          id: `demo-ps-${project.id}-${stage.id}`,
+          project_id: project.id,
+          stage_name: stage.name,
+          start_date: format(stageStartDate, 'yyyy-MM-dd'),
+          contracted_weeks: contractedWeeks,
+          is_applicable: true
+        });
+        
+        cumulativeWeeks += contractedWeeks;
+      });
+    });
+    
+    return stages;
+  }, [timelineStartDate]);
+
+  // Generate demo resource allocations for stages
+  const generateDemoAllocations = useCallback(() => {
+    const allocations: Array<{
+      id: string;
+      project_id: string;
+      stage_id: string;
+      resource_id: string;
+      resource_type: string;
+    }> = [];
+    
+    // Assign team members to projects/stages
+    const projectTeamAssignments: Record<string, string[]> = {
+      '00000000-0000-0000-0001-000000000001': ['00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004'],
+      '00000000-0000-0000-0001-000000000002': ['00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000007'],
+      '00000000-0000-0000-0001-000000000003': ['00000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000009'],
+      '00000000-0000-0000-0001-000000000004': ['00000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000010'],
+      '00000000-0000-0000-0001-000000000005': ['00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000007'],
+    };
+    
+    Object.entries(projectTeamAssignments).forEach(([projectId, memberIds]) => {
+      DEMO_STAGES.forEach(stage => {
+        memberIds.forEach((memberId, idx) => {
+          allocations.push({
+            id: `demo-alloc-${projectId}-${stage.id}-${idx}`,
+            project_id: projectId,
+            stage_id: stage.id,
+            resource_id: memberId,
+            resource_type: 'active'
+          });
+        });
+      });
+    });
+    
+    return allocations;
+  }, []);
+
   // Fetch office stages for colors
-  // Include both company-specific stages and global defaults (company_id IS NULL)
   const { data: officeStages = [] } = useQuery({
-    queryKey: ['office-stages', company?.id],
+    queryKey: ['office-stages', company?.id, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return DEMO_STAGES.map(s => ({
+          id: s.id,
+          name: s.name,
+          color: s.color,
+          order_index: s.order_index,
+          code: s.code,
+          company_id: DEMO_COMPANY_ID
+        }));
+      }
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('office_stages')
@@ -127,13 +221,17 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       if (error) throw error;
       return data;
     },
-    enabled: !!company?.id
+    enabled: isDemoMode || !!company?.id
   });
 
   // Fetch project stages with start dates
   const { data: projectStagesData = [] } = useQuery({
-    queryKey: ['project-stages-timeline', company?.id, projects.map(p => p.id)],
+    queryKey: ['project-stages-timeline', company?.id, projects.map(p => p.id), isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        const demoStages = generateDemoProjectStages();
+        return demoStages.filter(s => projects.some(p => p.id === s.project_id));
+      }
       if (!company?.id || projects.length === 0) return [];
       const { data, error } = await supabase
         .from('project_stages')
@@ -143,13 +241,17 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id && projects.length > 0
+    enabled: isDemoMode || (!!company?.id && projects.length > 0)
   });
 
   // Fetch resource allocations for project stages
   const { data: stageAllocationsData = [] } = useQuery({
-    queryKey: ['stage-allocations-timeline', company?.id, projects.map(p => p.id)],
+    queryKey: ['stage-allocations-timeline', company?.id, projects.map(p => p.id), isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        const demoAllocations = generateDemoAllocations();
+        return demoAllocations.filter(a => projects.some(p => p.id === a.project_id));
+      }
       if (!company?.id || projects.length === 0) return [];
       const { data, error } = await supabase
         .from('project_resource_allocations')
@@ -165,13 +267,21 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id && projects.length > 0
+    enabled: isDemoMode || (!!company?.id && projects.length > 0)
   });
 
   // Fetch profiles for avatars
   const { data: profilesData = [] } = useQuery({
-    queryKey: ['profiles-avatars', company?.id],
+    queryKey: ['profiles-avatars', company?.id, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return DEMO_TEAM_MEMBERS.map(m => ({
+          id: m.id,
+          first_name: m.first_name,
+          last_name: m.last_name,
+          avatar_url: m.avatar_url
+        }));
+      }
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('profiles')
@@ -180,7 +290,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    enabled: isDemoMode || !!company?.id
   });
 
   // Build profiles map for quick lookup
@@ -325,8 +435,8 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
 
   // Generate weeks for the timeline
   const weeks = useMemo(() => {
-    return Array.from({ length: weeksToShow }, (_, i) => addWeeks(startDate, i));
-  }, [startDate, weeksToShow]);
+    return Array.from({ length: weeksToShow }, (_, i) => addWeeks(timelineStartDate, i));
+  }, [timelineStartDate, weeksToShow]);
 
   // Build group color map
   const groupColorMap = useMemo(() => {
@@ -399,15 +509,15 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     
     const stageStart = stage.startDate;
     const stageEnd = addDays(stageStart, stage.contractedWeeks * 7);
-    const timelineEnd = addWeeks(startDate, weeksToShow);
+    const timelineEnd = addWeeks(timelineStartDate, weeksToShow);
 
     // Check if stage overlaps with timeline
-    if (stageEnd < startDate || stageStart > timelineEnd) {
+    if (stageEnd < timelineStartDate || stageStart > timelineEnd) {
       return null;
     }
 
-    const startWeek = Math.max(0, differenceInWeeks(stageStart, startDate));
-    const endWeek = Math.min(weeksToShow, differenceInWeeks(stageEnd, startDate));
+    const startWeek = Math.max(0, differenceInWeeks(stageStart, timelineStartDate));
+    const endWeek = Math.min(weeksToShow, differenceInWeeks(stageEnd, timelineStartDate));
     const width = Math.max(1, endWeek - startWeek);
 
     return { startWeek, width };
@@ -613,7 +723,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       dragState.stage.contractedWeeks
     );
     
-    const newStartDate = addWeeks(startDate, validStartWeek);
+    const newStartDate = addWeeks(timelineStartDate, validStartWeek);
     
     // Save the new date directly without any popup
     updateStageMutation.mutate({
@@ -623,7 +733,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     });
     
     setDragState(null);
-  }, [dragState, startDate, updateStageMutation, findNearestValidPosition]);
+  }, [dragState, timelineStartDate, updateStageMutation, findNearestValidPosition]);
 
   // Handle stage click - for scheduled stages, open dialog; for unscheduled, auto-schedule
   const handleStageClick = (
@@ -643,7 +753,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
         0, // Start from beginning of timeline
         stage.contractedWeeks
       );
-      const newStartDate = addWeeks(startDate, validStartWeek);
+      const newStartDate = addWeeks(timelineStartDate, validStartWeek);
       
       updateStageMutation.mutate({
         stageId: stage.id,
@@ -718,7 +828,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       contractedWeeks
     );
     
-    const dropDate = addWeeks(startDate, validStartWeek);
+    const dropDate = addWeeks(timelineStartDate, validStartWeek);
     
     updateStageMutation.mutate({
       stageId,
