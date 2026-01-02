@@ -13,6 +13,8 @@ import { useOfficeStages } from '@/hooks/useOfficeStages';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_STAGES, DEMO_ROLES } from '@/data/demoData';
 
 interface ProjectStage {
   id: string;
@@ -55,11 +57,35 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
   const { company } = useCompany();
   const { data: officeStages } = useOfficeStages();
   const { projectDisplayPreference } = useAppSettings();
+  const { isDemoMode } = useDemoAuth();
+
+  // Generate demo project stages with contracted weeks
+  const generateDemoProjectStages = (projectId: string) => {
+    const stageWeeks: Record<string, number[]> = {
+      '00000000-0000-0000-0001-000000000001': [4, 6, 8, 12, 16], // Skyline Tower
+      '00000000-0000-0000-0001-000000000002': [3, 5, 7, 10, 14], // Harbor View
+      '00000000-0000-0000-0001-000000000003': [2, 4, 6, 14, 18], // Metro Health
+      '00000000-0000-0000-0001-000000000004': [4, 8, 10, 12, 8],  // Urban Park
+      '00000000-0000-0000-0001-000000000005': [3, 4, 6, 8, 10],   // Boutique Hotel
+      '00000000-0000-0000-0001-000000000006': [6, 10, 14, 20, 24], // Tech Campus
+      '00000000-0000-0000-0001-000000000007': [4, 6, 8, 10, 12],  // Riverside
+    };
+    const weeks = stageWeeks[projectId] || [4, 6, 8, 10, 12];
+    
+    return DEMO_STAGES.map((stage, idx) => ({
+      stage_name: stage.name,
+      contracted_weeks: weeks[idx] || 4 + idx * 2,
+      is_applicable: true
+    }));
+  };
 
   // Fetch project stages with contracted weeks
   const { data: projectStagesData } = useQuery({
-    queryKey: ['project-stages', project.id],
+    queryKey: ['project-stages', project.id, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return generateDemoProjectStages(project.id);
+      }
       const { data, error } = await supabase
         .from('project_stages')
         .select('stage_name, contracted_weeks, is_applicable')
@@ -102,10 +128,38 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
     return stagesWithData.reduce((sum, s) => sum + s.contractedWeeks, 0);
   }, [stagesWithData]);
 
+  // Generate demo team composition data
+  const generateDemoTeamComposition = (projectId: string) => {
+    const compositions: { planned_quantity: number; total_planned_hours: number }[] = [];
+    const fteByProject: Record<string, number[]> = {
+      '00000000-0000-0000-0001-000000000001': [1, 2, 3, 2, 1], // Skyline Tower: Principal, SA x2, PA x3, Arch x2, GA
+      '00000000-0000-0000-0001-000000000002': [1, 1, 2, 3, 2], // Harbor View
+      '00000000-0000-0000-0001-000000000003': [1, 2, 2, 3, 1], // Metro Health
+      '00000000-0000-0000-0001-000000000004': [1, 1, 2, 1, 1], // Urban Park
+      '00000000-0000-0000-0001-000000000005': [1, 1, 2, 2, 1], // Boutique Hotel
+      '00000000-0000-0000-0001-000000000006': [2, 3, 4, 3, 2], // Tech Campus
+      '00000000-0000-0000-0001-000000000007': [1, 2, 2, 2, 1], // Riverside
+    };
+    const fteData = fteByProject[projectId] || [1, 1, 2, 2, 1];
+    
+    DEMO_STAGES.forEach((stage, idx) => {
+      const fte = fteData[idx] || 1;
+      compositions.push({
+        planned_quantity: fte,
+        total_planned_hours: fte * 160 // ~4 weeks worth of hours
+      });
+    });
+    
+    return compositions;
+  };
+
   // Fetch team composition for FTE calculation
   const { data: teamCompositionData } = useQuery({
-    queryKey: ['project-team-composition-totals', project.id],
+    queryKey: ['project-team-composition-totals', project.id, isDemoMode],
     queryFn: async () => {
+      if (isDemoMode) {
+        return generateDemoTeamComposition(project.id);
+      }
       const { data, error } = await supabase
         .from('project_stage_team_composition')
         .select('planned_quantity, total_planned_hours')
