@@ -8,6 +8,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_GALLERY_IMAGES } from '@/data/demoData';
 
 interface GalleryRundownCardProps {
   cardType: {
@@ -23,6 +25,7 @@ export const GalleryRundownCard: React.FC<GalleryRundownCardProps> = ({
   weekStartDate
 }) => {
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dialogFileInputRef = useRef<HTMLInputElement>(null);
@@ -32,8 +35,13 @@ export const GalleryRundownCard: React.FC<GalleryRundownCardProps> = ({
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
   const { data: files = [], refetch } = useQuery({
-    queryKey: ['custom-card-files', cardType.id, weekStartDate],
+    queryKey: ['custom-card-files', cardType.id, weekStartDate, isDemoMode ? 'demo' : company?.id],
     queryFn: async () => {
+      // Demo mode: return demo gallery images
+      if (isDemoMode) {
+        return DEMO_GALLERY_IMAGES;
+      }
+
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('weekly_custom_card_files')
@@ -45,7 +53,7 @@ export const GalleryRundownCard: React.FC<GalleryRundownCardProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id
+    enabled: isDemoMode || !!company?.id
   });
 
   // Auto-rotate images every 4 seconds

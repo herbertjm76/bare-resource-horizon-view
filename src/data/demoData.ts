@@ -832,6 +832,76 @@ export const DEMO_METRICS = {
   ]
 };
 
+// Demo announcements for weekly rundown
+export const generateDemoAnnouncements = () => {
+  const today = new Date();
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+  
+  return [
+    {
+      id: '00000000-0000-0000-000D-000000000001',
+      title: 'Q1 Planning Meeting',
+      content: 'All-hands meeting Thursday at 2pm to discuss project priorities for Q1',
+      created_at: format(weekStart, 'yyyy-MM-dd')
+    },
+    {
+      id: '00000000-0000-0000-000D-000000000002',
+      title: 'Office Closure Friday',
+      content: 'Office will be closed this Friday for the holiday',
+      created_at: format(addDays(weekStart, 1), 'yyyy-MM-dd')
+    }
+  ];
+};
+
+// Demo celebrations (birthdays/anniversaries for current week)
+export const generateDemoCelebrations = () => {
+  const today = new Date();
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+  
+  return [
+    {
+      id: '00000000-0000-0000-0000-000000000003',
+      first_name: 'Sarah',
+      last_name: 'Wilson',
+      avatar_url: null,
+      type: 'birthday' as const,
+      date: format(addDays(weekStart, 2), 'MMM d'),
+      years: 36
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000006-anniversary',
+      first_name: 'James',
+      last_name: 'Taylor',
+      avatar_url: null,
+      type: 'anniversary' as const,
+      date: format(addDays(weekStart, 4), 'MMM d'),
+      years: 3
+    }
+  ];
+};
+
+// Demo gallery images for project photos card
+export const DEMO_GALLERY_IMAGES = [
+  {
+    id: '00000000-0000-0000-000E-000000000001',
+    file_url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop',
+    file_name: 'Modern Office Building',
+    file_type: 'image/jpeg'
+  },
+  {
+    id: '00000000-0000-0000-000E-000000000002',
+    file_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop',
+    file_name: 'Residential Complex',
+    file_type: 'image/jpeg'
+  },
+  {
+    id: '00000000-0000-0000-000E-000000000003',
+    file_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop',
+    file_name: 'Luxury Home Project',
+    file_type: 'image/jpeg'
+  }
+];
+
 // Export all demo data
 export const DEMO_DATA = {
   company: DEMO_COMPANY,
@@ -851,10 +921,13 @@ export const DEMO_DATA = {
   preRegistered: DEMO_PRE_REGISTERED,
   teamComposition: DEMO_TEAM_COMPOSITION,
   metrics: DEMO_METRICS,
+  galleryImages: DEMO_GALLERY_IMAGES,
   getAllocations: generateDemoAllocations,
   getHolidays: generateDemoHolidays,
   getLeaveRequests: generateDemoLeaveRequests,
-  getAnnualLeaves: generateDemoAnnualLeaves
+  getAnnualLeaves: generateDemoAnnualLeaves,
+  getAnnouncements: generateDemoAnnouncements,
+  getCelebrations: generateDemoCelebrations
 };
 
 export default DEMO_DATA;
