@@ -85,8 +85,6 @@ export const WeeklyRundownView: React.FC = () => {
 
   const handleModeChange = (mode: RundownMode) => {
     setRundownMode(mode);
-    // Reset to first item when changing mode
-    goToItem(0);
   };
 
   const handleSortChange = (sort: SortOption) => {

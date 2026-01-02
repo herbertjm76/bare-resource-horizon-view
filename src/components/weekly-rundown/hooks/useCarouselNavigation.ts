@@ -66,7 +66,8 @@ export const useCarouselNavigation = ({
   }, [totalItems, isAutoAdvanceActive, autoAdvance]);
 
   const goToItem = useCallback((index: number) => {
-    if (index >= 0 && index < totalItems) {
+    // Allow setting to 0 always, otherwise validate against totalItems
+    if (index === 0 || (index > 0 && index < totalItems)) {
       setCurrentIndex(index);
       // Pause auto-advance temporarily when manually navigating
       if (isAutoAdvanceActive) {
