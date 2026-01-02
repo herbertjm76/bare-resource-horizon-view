@@ -17,15 +17,17 @@ interface EditProjectDialogProps {
   isOpen: boolean;
   onClose: () => void;
   refetch: () => void;
+  initialTab?: "info" | "team";
 }
 
 export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   project,
   isOpen,
   onClose,
-  refetch
+  refetch,
+  initialTab = "info"
 }) => {
-  const [activeTab, setActiveTab] = useState("info");
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const { company } = useCompany();
   const { departments } = useOfficeSettings();
   const { isDemoMode } = useDemoAuth();
@@ -34,6 +36,13 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 
   // Add a refetch signal for fee/stage data (just a counter)
   const [refetchSignal, setRefetchSignal] = useState(0);
+
+  // Reset activeTab when initialTab changes (e.g., when opening dialog from timeline)
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
 
   // FIX: Add refetchSignal as a dependency to reload the latest project data after submit
   useEffect(() => {

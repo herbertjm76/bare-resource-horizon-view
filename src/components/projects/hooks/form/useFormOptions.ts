@@ -2,14 +2,43 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useDemoAuth } from "@/hooks/useDemoAuth";
+import { DEMO_TEAM_MEMBERS, DEMO_STAGES, DEMO_LOCATIONS, DEMO_PRACTICE_AREAS } from "@/data/demoData";
 
 export const useFormOptions = (company: any, isOpen: boolean) => {
+  const { isDemoMode } = useDemoAuth();
   const [managers, setManagers] = useState<Array<{ id: string; name: string }>>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [offices, setOffices] = useState<Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>>([]);
   const [officeStages, setOfficeStages] = useState<Array<{ id: string; name: string; color?: string; code?: string }>>([]);
 
   useEffect(() => {
+    // In demo mode, use demo data directly
+    if (isDemoMode && isOpen) {
+      setManagers(DEMO_TEAM_MEMBERS.map(m => ({
+        id: m.id,
+        name: `${m.first_name ?? ''} ${m.last_name ?? ''}`.trim()
+      })));
+      
+      setCountries(DEMO_PRACTICE_AREAS.map(a => a.name));
+      
+      setOffices(DEMO_LOCATIONS.map(o => ({
+        id: o.id,
+        city: o.city,
+        country: o.country,
+        code: o.code,
+        emoji: o.emoji
+      })));
+      
+      setOfficeStages(DEMO_STAGES.map(s => ({
+        id: s.id,
+        name: s.name,
+        color: s.color,
+        code: s.code
+      })));
+      return;
+    }
+
     const fetchFormOptions = async () => {
       if (!company || !company.id) {
         toast.error("No company context found, cannot load project resources.");
@@ -57,10 +86,10 @@ export const useFormOptions = (company: any, isOpen: boolean) => {
       }
     };
 
-    if (isOpen) {
+    if (isOpen && !isDemoMode) {
       fetchFormOptions();
     }
-  }, [company, isOpen]);
+  }, [company, isOpen, isDemoMode]);
 
   return {
     managers,

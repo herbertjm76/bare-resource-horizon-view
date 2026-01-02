@@ -32,6 +32,7 @@ const ResourcePlanning: React.FC = () => {
   // For edit dialog
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editDialogTab, setEditDialogTab] = useState<"info" | "team">("info");
 
   const { 
     projects, 
@@ -107,14 +108,16 @@ const ResourcePlanning: React.FC = () => {
     );
   };
 
-  const handleProjectClick = (project: any) => {
+  const handleProjectClick = (project: any, tab: "info" | "team" = "info") => {
     setSelectedProject(project);
+    setEditDialogTab(tab);
     setIsEditDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setIsEditDialogOpen(false);
     setSelectedProject(null);
+    setEditDialogTab("info");
   };
 
   return (
@@ -213,6 +216,7 @@ const ResourcePlanning: React.FC = () => {
             isOpen={isEditDialogOpen}
             onClose={handleCloseDialog}
             refetch={refetch}
+            initialTab={editDialogTab}
           />
         )}
       </OfficeSettingsProvider>
