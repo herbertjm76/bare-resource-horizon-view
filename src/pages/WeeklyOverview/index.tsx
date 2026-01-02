@@ -196,7 +196,8 @@ const WeeklyOverview = () => {
           className="pull-to-refresh-container"
         >
           <div className={`space-y-0 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
-            {/* Page Header */}
+          {/* Page Header - hidden in fullscreen */}
+            {!isFullscreen && (
               <div className="mb-1.5">
                 <StandardizedPageHeader
                   title="Weekly Overview"
@@ -206,6 +207,7 @@ const WeeklyOverview = () => {
                   onFullscreenToggle={handleFullscreenToggle}
                 />
               </div>
+            )}
 
             {/* Summary Cards */}
             <WeeklySummaryCards
