@@ -224,40 +224,43 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Screenshot section */}
+        {/* Screenshot section with gradient border */}
         <div className="relative">
-          <Card className="overflow-hidden shadow-lg">
-            <CardContent className="p-0">
-              <div className="relative group">
-                <img
-                  src={currentTourStep.screenshot}
-                  alt={`${currentTourStep.title} screenshot`}
-                  loading="lazy"
-                  className="w-full h-64 sm:h-80 lg:h-96 object-cover object-[75%_0%] transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          {/* Gradient border wrapper */}
+          <div className="p-[3px] rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-fuchsia-500 shadow-xl shadow-purple-500/20">
+            <Card className="overflow-hidden rounded-[13px] border-0">
+              <CardContent className="p-0">
+                <div className="relative group">
+                  <img
+                    src={currentTourStep.screenshot}
+                    alt={`${currentTourStep.title} screenshot`}
+                    loading="lazy"
+                    className="w-full h-64 sm:h-80 lg:h-96 object-cover object-[75%_0%] transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                {/* Screenshot overlay controls */}
-                <div className="absolute top-4 right-4 flex space-x-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={toggleFullscreen}
-                    className="bg-background/90 backdrop-blur-sm hover:bg-background"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
+                  {/* Screenshot overlay controls */}
+                  <div className="absolute top-4 right-4 flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={toggleFullscreen}
+                      className="bg-background/90 backdrop-blur-sm hover:bg-background"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </div>
 
-                {/* Category badge */}
-                <div className="absolute top-4 left-4">
-                  <Badge variant="secondary" className="bg-background/95 backdrop-blur-sm border-0 shadow-md">
-                    {currentTourStep.category}
-                  </Badge>
+                  {/* Category badge */}
+                  <div className="absolute top-4 left-4">
+                    <Badge variant="secondary" className="bg-background/95 backdrop-blur-sm border-0 shadow-md">
+                      {currentTourStep.category}
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Content section */}
