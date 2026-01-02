@@ -36,12 +36,29 @@ export const useRundownData = ({
       const processedPeople = allMembers.map(member => {
         const memberTotal = getMemberTotal(member.id);
         const capacity = member.weekly_capacity || workWeekHours;
-        const totalHours = memberTotal?.resourcedHours || 0;
-        const utilizationPercentage = capacity > 0 ? (totalHours / capacity) * 100 : 0;
+
+        const projectAllocations = memberTotal?.projectAllocations || [];
+        const totalProjectHours = projectAllocations.reduce(
+          (sum: number, a: any) => sum + (a?.hours || 0),
+          0
+        );
+
+        // Some data sources don't populate `resourcedHours` consistently.
+        // Prefer resourcedHours when present, otherwise derive it from project allocations.
+        const baseResourcedHours =
+          typeof memberTotal?.resourcedHours === 'number' ? memberTotal.resourcedHours : totalProjectHours;
+
+        const totalLeaveHours =
+          (memberTotal?.annualLeave || 0) +
+          (memberTotal?.vacationLeave || 0) +
+          (memberTotal?.medicalLeave || 0) +
+          (memberTotal?.publicHoliday || 0);
+
+        const totalHours = baseResourcedHours;
+        const utilizationPercentage = capacity > 0 ? ((totalHours + totalLeaveHours) / capacity) * 100 : 0;
 
         // Process project allocations
-        const projectAllocations = memberTotal?.projectAllocations || [];
-        const projects = projectAllocations.map(allocation => ({
+        const projects = projectAllocations.map((allocation: any) => ({
           id: allocation.projectId,
           name: allocation.projectName,
           code: allocation.projectCode,
