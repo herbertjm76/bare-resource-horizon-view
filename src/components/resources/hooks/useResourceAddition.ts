@@ -2,6 +2,7 @@ import { Resource } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { logger } from '@/utils/logger';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 export const useResourceAddition = (
   projectId: string,
@@ -9,6 +10,8 @@ export const useResourceAddition = (
   resources: Resource[],
   setResources: (resources: Resource[]) => void
 ) => {
+  const { isDemoMode } = useDemoAuth();
+
   // Add a new resource to the project
   const handleAddResource = async (resource: { 
     staffId: string; 
@@ -20,6 +23,22 @@ export const useResourceAddition = (
     
     if (!companyId) {
       toast.error('Company information not available');
+      return;
+    }
+
+    // Demo mode - skip Supabase and just update local state
+    if (isDemoMode) {
+      const newResource: Resource = {
+        id: resource.staffId,
+        name: resource.name,
+        role: resource.role || 'Team Member',
+        allocations: {},
+        isPending: resource.isPending
+      };
+      
+      setResources([...resources, newResource]);
+      logger.log('Demo mode: Resource added locally:', resource.name);
+      toast.success(`${resource.name} added to project`);
       return;
     }
 

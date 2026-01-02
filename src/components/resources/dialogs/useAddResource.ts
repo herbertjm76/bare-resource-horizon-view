@@ -1,10 +1,11 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import type { ResourceOption } from './useResourceOptions';
 import { logger } from '@/utils/logger';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_TEAM_MEMBERS } from '@/data/demoData';
 
 interface AddResourceProps {
   projectId: string;
@@ -21,6 +22,7 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
   const [selectedResource, setSelectedResource] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
 
   const handleAdd = async () => {
     if (!selectedResource || !company?.id || !projectId) {
@@ -39,8 +41,23 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
         resource,
         projectId,
         companyId: company.id,
-        type: resource.type 
+        type: resource.type,
+        isDemoMode
       });
+      
+      // Demo mode - skip Supabase calls
+      if (isDemoMode) {
+        onAdd({ 
+          staffId: resource.id, 
+          name: resource.name,
+          role: resource.role,
+          isPending: resource.type === 'pre-registered'
+        });
+        
+        toast.success(`${resource.name} added to project`);
+        onClose();
+        return;
+      }
       
       if (resource.type === 'pre-registered') {
         // Handle pre-registered resource (store in pending_resources)
@@ -101,6 +118,17 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
   // Helper function to get resource options
   const getResourceOptions = async (): Promise<ResourceOption[]> => {
     if (!company?.id) return [];
+
+    // Demo mode - return demo team members
+    if (isDemoMode) {
+      return DEMO_TEAM_MEMBERS.map((member) => ({
+        id: member.id,
+        name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || member.email,
+        email: member.email,
+        type: 'active' as const,
+        role: member.job_title
+      }));
+    }
 
     const { data: activeMembers } = await supabase
       .from('profiles')

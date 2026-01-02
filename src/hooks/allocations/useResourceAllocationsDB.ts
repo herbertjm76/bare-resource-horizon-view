@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +9,8 @@ import {
   deleteResourceAllocation 
 } from './api';
 import { logger } from '@/utils/logger';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { toast } from 'sonner';
 
 export function useResourceAllocationsDB(
   projectId: string, 
@@ -20,10 +21,17 @@ export function useResourceAllocationsDB(
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
 
   // Fetch initial allocations for this resource and project
   const refreshAllocations = useCallback(async () => {
     if (!projectId || !resourceId || !company?.id) return;
+    
+    // Demo mode - use empty allocations or existing state
+    if (isDemoMode) {
+      setIsLoading(false);
+      return;
+    }
     
     setIsLoading(true);
     try {
@@ -40,11 +48,22 @@ export function useResourceAllocationsDB(
     } finally {
       setIsLoading(false);
     }
-  }, [projectId, resourceId, resourceType, company?.id]);
+  }, [projectId, resourceId, resourceType, company?.id, isDemoMode]);
 
   // Save or update allocation for a specific week
   const saveAllocation = useCallback(async (weekKey: string, hours: number) => {
     if (!projectId || !resourceId || !company?.id) return;
+    
+    // Demo mode - just update local state
+    if (isDemoMode) {
+      setAllocations(prev => ({
+        ...prev,
+        [formatDateKey(weekKey)]: hours
+      }));
+      logger.log(`Demo mode: Saved allocation locally: week=${weekKey}, hours=${hours}`);
+      toast.success('Allocation saved');
+      return;
+    }
     
     setIsSaving(true);
     try {
@@ -68,11 +87,22 @@ export function useResourceAllocationsDB(
     } finally {
       setIsSaving(false);
     }
-  }, [projectId, resourceId, resourceType, company?.id]);
+  }, [projectId, resourceId, resourceType, company?.id, isDemoMode]);
 
   // Delete allocation for a specific week
   const deleteAllocation = useCallback(async (weekKey: string) => {
     if (!projectId || !resourceId || !company?.id) return;
+    
+    // Demo mode - just update local state
+    if (isDemoMode) {
+      setAllocations(prev => {
+        const updated = { ...prev };
+        delete updated[formatDateKey(weekKey)];
+        return updated;
+      });
+      logger.log(`Demo mode: Deleted allocation locally: week=${weekKey}`);
+      return;
+    }
     
     try {
       const success = await deleteResourceAllocation(
@@ -94,11 +124,17 @@ export function useResourceAllocationsDB(
     } catch (error) {
       logger.error('Error deleting allocation:', error);
     }
-  }, [projectId, resourceId, resourceType, company?.id]);
+  }, [projectId, resourceId, resourceType, company?.id, isDemoMode]);
 
   // Setup realtime subscription for this resource's allocations
   useEffect(() => {
     if (!projectId || !resourceId || !company?.id) return;
+    
+    // Demo mode - skip Supabase subscription
+    if (isDemoMode) {
+      setIsLoading(false);
+      return;
+    }
     
     // Fetch initial data
     refreshAllocations();
@@ -140,7 +176,7 @@ export function useResourceAllocationsDB(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [projectId, resourceId, resourceType, company?.id, refreshAllocations]);
+  }, [projectId, resourceId, resourceType, company?.id, refreshAllocations, isDemoMode]);
 
   return {
     allocations,
