@@ -187,6 +187,7 @@ const WeeklyOverview = () => {
       <OfficeSettingsProvider>
         <PullToRefresh 
           onRefresh={handleRefresh}
+          isPullable={!isFullscreen}
           pullingContent=""
           refreshingContent={
             <div className="flex items-center justify-center py-4">
