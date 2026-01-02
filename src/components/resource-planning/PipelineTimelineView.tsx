@@ -59,7 +59,7 @@ type GroupBy = 'department' | 'practice_area';
 interface PipelineTimelineViewProps {
   projects: Project[];
   isLoading?: boolean;
-  onProjectClick?: (project: Project) => void;
+  onProjectClick?: (project: Project, tab?: "info" | "team") => void;
   weeksToShow?: number;
   departments?: Department[];
   practiceAreas?: PracticeArea[];
@@ -985,7 +985,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                       className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-muted transition-opacity"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        onProjectClick?.(project);
+                                        onProjectClick?.(project, "info");
                                       }}
                                     >
                                       <Pencil className="h-3 w-3 text-muted-foreground" />
@@ -1048,7 +1048,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                     <TooltipTrigger asChild>
                                       <div
                                         className={cn(
-                                          "absolute top-1/2 -translate-y-1/2 h-8 rounded-md flex items-center gap-1.5 px-1.5 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
+                                          "absolute top-1/2 -translate-y-1/2 h-8 rounded-md flex items-center gap-1.5 px-1.5 text-[10px] font-medium text-white shadow-sm transition-all cursor-pointer",
                                           isDragging ? "ring-2 ring-primary ring-offset-2 cursor-grabbing z-20 opacity-90" : "hover:ring-2 hover:ring-primary hover:ring-offset-1"
                                         )}
                                         style={{
@@ -1057,6 +1057,13 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                           backgroundColor: stage.color,
                                         }}
                                         onMouseDown={(e) => handleDragStart(e, project, stage)}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // Only trigger click if not dragging
+                                          if (!dragState) {
+                                            onProjectClick?.(project, "team");
+                                          }
+                                        }}
                                       >
                                         <GripVertical className="h-3 w-3 text-white/60 shrink-0" />
                                         <span className="font-semibold shrink-0">{stage.stageCode}</span>
@@ -1096,7 +1103,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                         {resourceIds.length > 0 && (
                                           <p className="text-muted-foreground">{resourceIds.length} resource{resourceIds.length !== 1 ? 's' : ''} assigned</p>
                                         )}
-                                        <p className="text-primary mt-1">Drag to move</p>
+                                        <p className="text-primary mt-1">Click to view team • Drag to move</p>
                                       </div>
                                     </TooltipContent>
                                   </Tooltip>
@@ -1166,7 +1173,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                       <div key={project.id} className="border-b border-border/20 last:border-b-0">
                         <div
                           className="flex items-center hover:bg-muted/30 cursor-pointer group"
-                          onClick={() => onProjectClick?.(project)}
+                          onClick={() => onProjectClick?.(project, "info")}
                         >
                           <div className="w-48 shrink-0 p-2 border-r border-border">
                             <div className="flex items-center gap-1">
@@ -1225,7 +1232,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                   <TooltipTrigger asChild>
                                     <div
                                       className={cn(
-                                        "absolute top-1/2 -translate-y-1/2 h-8 rounded-md flex items-center gap-1.5 px-1.5 text-[10px] font-medium text-white shadow-sm transition-all cursor-grab",
+                                        "absolute top-1/2 -translate-y-1/2 h-8 rounded-md flex items-center gap-1.5 px-1.5 text-[10px] font-medium text-white shadow-sm transition-all cursor-pointer",
                                         isDragging ? "ring-2 ring-primary ring-offset-2 cursor-grabbing z-20 opacity-90" : "hover:ring-2 hover:ring-primary hover:ring-offset-1"
                                       )}
                                       style={{
@@ -1234,6 +1241,12 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                         backgroundColor: stage.color,
                                       }}
                                       onMouseDown={(e) => handleDragStart(e, project, stage)}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (!dragState) {
+                                          onProjectClick?.(project, "team");
+                                        }
+                                      }}
                                     >
                                       <GripVertical className="h-3 w-3 text-white/60 shrink-0" />
                                       <span className="font-semibold shrink-0">{stage.stageCode}</span>
@@ -1272,7 +1285,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                       {resourceIds.length > 0 && (
                                         <p className="text-muted-foreground">{resourceIds.length} resource{resourceIds.length !== 1 ? 's' : ''} assigned</p>
                                       )}
-                                      <p className="text-primary mt-1">Drag to move</p>
+                                      <p className="text-primary mt-1">Click to view team • Drag to move</p>
                                     </div>
                                   </TooltipContent>
                                 </Tooltip>
