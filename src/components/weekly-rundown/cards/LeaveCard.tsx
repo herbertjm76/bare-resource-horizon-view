@@ -9,6 +9,8 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { DEMO_TEAM_MEMBERS } from '@/data/demoData';
 
 interface LeaveEntry {
   member_id: string;
@@ -22,6 +24,7 @@ interface LeaveCardProps {
 
 export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
   const { workWeekHours, displayPreference } = useAppSettings();
+  const { isDemoMode } = useDemoAuth();
   const capacity = workWeekHours;
 
   // Group by member_id with dates and hours
@@ -35,7 +38,7 @@ export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
 
   const memberIds = Object.keys(leaveByMember);
 
-  // Fetch member profiles
+  // Fetch member profiles (skip in demo mode)
   const { data: profiles = [] } = useQuery({
     queryKey: ['member-profiles-leave', memberIds],
     queryFn: async () => {
@@ -48,10 +51,10 @@ export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
       if (error) throw error;
       return data || [];
     },
-    enabled: memberIds.length > 0
+    enabled: memberIds.length > 0 && !isDemoMode
   });
 
-  // Fetch pre-registered invites
+  // Fetch pre-registered invites (skip in demo mode)
   const { data: invites = [] } = useQuery({
     queryKey: ['member-invites-leave', memberIds],
     queryFn: async () => {
@@ -65,8 +68,16 @@ export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
       if (error) throw error;
       return data || [];
     },
-    enabled: memberIds.length > 0
+    enabled: memberIds.length > 0 && !isDemoMode
   });
+
+  // In demo mode, use demo team members data
+  const demoProfiles = isDemoMode
+    ? DEMO_TEAM_MEMBERS.filter(m => memberIds.includes(m.id))
+    : [];
+
+  // Combine real profiles with demo profiles
+  const allProfiles = isDemoMode ? demoProfiles : profiles;
 
   return (
     <Card className="h-full flex flex-col min-h-[140px] max-h-[140px] shadow-sm border border-border bg-card flex-1 min-w-[180px] relative overflow-hidden">
@@ -84,9 +95,9 @@ export const LeaveCard: React.FC<LeaveCardProps> = ({ leaves }) => {
             <TooltipProvider delayDuration={0}>
               {memberIds.map((id) => {
                 const leaveDays = leaveByMember[id];
-                const profile = profiles.find((p: any) => p.id === id);
+                const profile = allProfiles.find((p: any) => p.id === id);
                 const invite = invites.find((i: any) => i.id === id);
-                
+
                 const firstName = profile?.first_name || invite?.first_name || 'Unknown';
                 const lastName = profile?.last_name || invite?.last_name || 'User';
                 const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
