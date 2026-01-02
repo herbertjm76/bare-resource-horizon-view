@@ -19,6 +19,7 @@ interface ProjectDialogContentProps {
   isDataLoaded: boolean;
   projectId?: string;
   onSuccess?: () => void;
+  initialStageId?: string;
 }
 
 export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
@@ -33,11 +34,15 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
   handleChange,
   isDataLoaded,
   projectId,
-  onSuccess
+  onSuccess,
+  initialStageId
 }) => {
-  // Get stages that are selected for this project
+  // Get stages that are selected for this project.
+  // NOTE: Some older/demo flows store selected stages by *name* rather than *id*.
   const selectedStages = officeStages
-    .filter((stage) => form.stages?.includes(stage.id))
+    .filter((stage) =>
+      form.stages?.includes(stage.id) || form.stages?.includes(stage.name)
+    )
     .map((stage) => ({
       id: stage.id,
       name: stage.name,
@@ -72,6 +77,7 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
                   projectId={projectId}
                   stages={selectedStages}
                   showBudget={true}
+                  initialStageId={initialStageId}
                 />
               ) : (
                 <div className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">

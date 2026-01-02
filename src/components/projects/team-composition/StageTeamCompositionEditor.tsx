@@ -28,20 +28,32 @@ interface StageTeamCompositionEditorProps {
   stages: Stage[];
   showBudget?: boolean;
   onStageUpdate?: () => void;
+  initialStageId?: string;
 }
 
 export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProps> = ({
   projectId,
   stages,
   showBudget = false,
-  onStageUpdate
+  onStageUpdate,
+  initialStageId
 }) => {
   const { data: officeStages = [] } = useOfficeStages();
-  const [selectedStageId, setSelectedStageId] = useState<string>(stages[0]?.id || '');
+  const [selectedStageId, setSelectedStageId] = useState<string>(() => {
+    const preferred = initialStageId && stages.some(s => s.id === initialStageId) ? initialStageId : undefined;
+    return preferred || stages[0]?.id || '';
+  });
   const [contractedWeeks, setContractedWeeks] = useState<Record<string, number>>({});
   const [stageStartDates, setStageStartDates] = useState<Record<string, Date | null>>({});
   const [projectTotalWeeks, setProjectTotalWeeks] = useState<number>(0);
   const [isUpdatingWeeks, setIsUpdatingWeeks] = useState(false);
+
+  // If the dialog was opened by clicking a specific stage (e.g., timeline), preselect it.
+  useEffect(() => {
+    if (!initialStageId) return;
+    if (!stages.some(s => s.id === initialStageId)) return;
+    setSelectedStageId(initialStageId);
+  }, [initialStageId, stages]);
 
   // Fetch project contract dates and stage contracted weeks
   useEffect(() => {

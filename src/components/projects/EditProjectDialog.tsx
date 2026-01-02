@@ -18,6 +18,7 @@ interface EditProjectDialogProps {
   onClose: () => void;
   refetch: () => void;
   initialTab?: "info" | "team";
+  initialStageId?: string;
 }
 
 export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
@@ -25,7 +26,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   isOpen,
   onClose,
   refetch,
-  initialTab = "info"
+  initialTab = "info",
+  initialStageId
 }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const { company } = useCompany();
@@ -153,6 +155,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
         onClose={onClose}
         onSubmit={onSubmit}
         projectId={loadedProject?.id}
+        initialStageId={initialStageId}
       />
     </Dialog>
   );

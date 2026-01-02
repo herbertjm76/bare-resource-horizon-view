@@ -59,7 +59,7 @@ type GroupBy = 'department' | 'practice_area';
 interface PipelineTimelineViewProps {
   projects: Project[];
   isLoading?: boolean;
-  onProjectClick?: (project: Project, tab?: "info" | "team") => void;
+  onProjectClick?: (project: Project, tab?: "info" | "team", stageId?: string) => void;
   weeksToShow?: number;
   departments?: Department[];
   practiceAreas?: PracticeArea[];
@@ -1061,7 +1061,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                           e.stopPropagation();
                                           // Only trigger click if not dragging
                                           if (!dragState) {
-                                            onProjectClick?.(project, "team");
+                                            onProjectClick?.(project, "team", stage.officeStageId);
                                           }
                                         }}
                                       >
@@ -1244,7 +1244,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (!dragState) {
-                                          onProjectClick?.(project, "team");
+                                          onProjectClick?.(project, "team", stage.officeStageId);
                                         }
                                       }}
                                     >
