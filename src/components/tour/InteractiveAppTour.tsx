@@ -246,8 +246,8 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
         {/* Screenshot section with gradient border */}
         <div className="relative">
           {/* Gradient border wrapper */}
-          <div className="p-[3px] rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-fuchsia-500 shadow-xl shadow-purple-500/20">
-            <Card className="overflow-hidden rounded-[13px] border-0">
+          <div className="p-1.5 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-fuchsia-500 shadow-xl shadow-purple-500/20">
+            <Card className="overflow-hidden rounded-xl border-0">
               <CardContent className="p-0">
                 <div className="relative group">
                   <img
