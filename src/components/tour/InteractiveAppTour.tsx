@@ -233,7 +233,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
                   src={currentTourStep.screenshot}
                   alt={`${currentTourStep.title} screenshot`}
                   loading="lazy"
-                  className="w-full h-64 sm:h-80 lg:h-96 object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="w-full h-64 sm:h-80 lg:h-96 object-cover object-[75%_0%] transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
