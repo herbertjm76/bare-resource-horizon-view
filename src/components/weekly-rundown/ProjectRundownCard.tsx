@@ -142,6 +142,10 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                   <Clock className="h-3 w-3" />
                   {formatDualAllocationValue(project.totalHours, teamCapacity, displayPreference)}
                 </StandardizedBadge>
+                <StandardizedBadge variant="secondary" size="sm" className="flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  {project.teamMembers.length} team
+                </StandardizedBadge>
                 {project.office && (
                   <StandardizedBadge variant="secondary" size="sm">
                     {project.office}
@@ -152,17 +156,6 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                     {project.status}
                   </StandardizedBadge>
                 )}
-              </div>
-            </div>
-            
-            {/* Key Metrics Row */}
-            <div className="flex items-center gap-4 mt-3">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-primary" />
-                <span className="text-2xl font-bold text-foreground">
-                  <CountUpNumber end={project.teamMembers.length} duration={1500} />
-                </span>
-                <span className="text-xs text-muted-foreground">team</span>
               </div>
             </div>
           </div>
