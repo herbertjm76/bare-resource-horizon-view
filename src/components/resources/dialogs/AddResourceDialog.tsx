@@ -211,11 +211,6 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                             selectedResources.includes(member.id) && "bg-accent ring-2 ring-primary"
                           )}
                         >
-                          {selectedResources.includes(member.id) && (
-                            <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
-                              <Check className="h-3 w-3" />
-                            </div>
-                          )}
                           <ResourceSelectOption member={member} isSelected={selectedResources.includes(member.id)} />
                         </div>
                       ))}
