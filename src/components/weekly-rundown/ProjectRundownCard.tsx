@@ -97,9 +97,8 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
     <div className={`
       relative rounded-3xl bg-card shadow-2xl border border-border
       ${isActive ? 'ring-2 ring-primary/50 scale-[1.02]' : ''}
-      ${isFullscreen ? 'h-[50vh]' : 'min-h-[400px]'}
+      ${isFullscreen ? 'min-h-[50vh] max-h-[80vh] overflow-y-auto' : 'min-h-[400px]'}
       transition-all duration-500 ease-out
-      overflow-hidden
       flex flex-col
     `}>
       {/* Hero Section */}
