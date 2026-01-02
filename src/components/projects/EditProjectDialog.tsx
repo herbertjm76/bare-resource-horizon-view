@@ -135,8 +135,15 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     }, setFormLoading);
   };
 
+  // Separate handler for dialog close (without saving) vs form submit
+  const handleDialogClose = (open: boolean) => {
+    if (!open) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <EditProjectContent 
         isLoading={isLoading || formLoading}
         form={form}
