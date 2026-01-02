@@ -20,9 +20,10 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
     try {
       // In demo mode, don't attempt to write to Supabase.
       if (isDemoMode) {
-        toast.message('Demo mode: changes are not saved.');
+        toast.success('Changes saved (demo mode)');
         onClose();
         onAfterSubmit?.();
+        if (setIsLoading) setIsLoading(false);
         return;
       }
 
