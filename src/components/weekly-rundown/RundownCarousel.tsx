@@ -14,6 +14,7 @@ interface RundownCarouselProps {
   onPrev: () => void;
   onGoTo: (index: number) => void;
   isFullscreen: boolean;
+  onExitFullscreen?: () => void;
   selectedWeek: Date;
 }
 
@@ -25,6 +26,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   onPrev,
   onGoTo,
   isFullscreen,
+  onExitFullscreen,
   selectedWeek
 }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
@@ -80,8 +82,8 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
           onNext();
           break;
         case 'Escape':
-          if (isFullscreen) {
-            document.exitFullscreen?.();
+          if (isFullscreen && onExitFullscreen) {
+            onExitFullscreen();
           }
           break;
       }
@@ -91,7 +93,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onNext, onPrev, isFullscreen]);
+  }, [onNext, onPrev, isFullscreen, onExitFullscreen]);
 
   if (items.length === 0) {
     return (

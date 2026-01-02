@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { format, startOfWeek } from 'date-fns';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
 import { RundownControls } from './RundownControls';
@@ -98,14 +98,35 @@ export const WeeklyRundownView: React.FC = () => {
     toggleAutoAdvance();
   };
 
-  const handleFullscreenToggle = () => {
+  const handleFullscreenToggle = useCallback(() => {
     setIsFullscreen(!isFullscreen);
     if (!isFullscreen) {
       document.documentElement.requestFullscreen?.();
     } else {
       document.exitFullscreen?.();
     }
-  };
+  }, [isFullscreen]);
+
+  const handleExitFullscreen = useCallback(() => {
+    if (isFullscreen) {
+      setIsFullscreen(false);
+      document.exitFullscreen?.();
+    }
+  }, [isFullscreen]);
+
+  // Sync fullscreen state with browser fullscreen changes (e.g., user presses ESC)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, [isFullscreen]);
 
   if (isLoading) {
     return (
@@ -172,6 +193,7 @@ export const WeeklyRundownView: React.FC = () => {
           onPrev={prevItem}
           onGoTo={goToItem}
           isFullscreen={isFullscreen}
+          onExitFullscreen={handleExitFullscreen}
           selectedWeek={selectedWeek}
         />
       ) : (
