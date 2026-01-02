@@ -131,9 +131,9 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
       <div className="relative group">
         {isEditing ? (
           <div className="flex flex-col items-center gap-2 p-2 bg-background/90 backdrop-blur-sm rounded-lg border border-border">
-            <Avatar className="h-24 w-24 ring-2 ring-primary/20 shadow-lg">
+            <Avatar className="h-16 w-16 ring-2 ring-primary/20 shadow-lg">
               <AvatarImage src={member.avatar} />
-              <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm text-lg">
+              <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm text-sm">
                 {firstName.charAt(0)}{lastName.charAt(0)}
               </AvatarFallback>
             </Avatar>
@@ -176,9 +176,9 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
                 <TooltipTrigger asChild>
                   <div className="relative flex flex-col items-center gap-2">
                     <div className="relative">
-                      <Avatar className="h-24 w-24 ring-2 ring-primary/20 shadow-lg hover:ring-primary/40 transition-all hover:scale-105">
+                      <Avatar className="h-16 w-16 ring-2 ring-primary/20 shadow-lg hover:ring-primary/40 transition-all hover:scale-105">
                         <AvatarImage src={member.avatar} />
-                        <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm text-lg">
+                        <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm text-sm">
                           {firstName.charAt(0)}{lastName.charAt(0)}
                         </AvatarFallback>
                       </Avatar>

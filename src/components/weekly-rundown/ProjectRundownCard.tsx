@@ -102,7 +102,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       flex flex-col
     `}>
       {/* Hero Section */}
-      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-6">
+      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-4 pb-3">
         <div className="flex items-start gap-3">
           {/* Small Line Art Icon */}
           <div className="relative flex-shrink-0 mt-1">
@@ -113,26 +113,15 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 {/* Project Primary Display */}
-                <h1 className={`font-bold text-foreground tracking-tight mb-1 ${
-                  isFullscreen ? 'text-5xl' : 'text-4xl'
-                }`}>
+                <h1 className="font-bold text-foreground tracking-tight mb-0.5 text-2xl">
                   {primaryDisplay}
                 </h1>
                 
                 {/* Project Secondary Display */}
                 {secondaryDisplay && (
-                  <h2 className={`font-semibold text-muted-foreground mb-0.5 ${
-                    isFullscreen ? 'text-xl' : 'text-lg'
-                  }`}>
+                  <h2 className="font-medium text-muted-foreground text-sm">
                     {secondaryDisplay}
                   </h2>
-                )}
-                
-                {/* Department - Tertiary */}
-                {project.department && (
-                  <p className="text-xs text-muted-foreground">
-                    {project.department}
-                  </p>
                 )}
               </div>
               
@@ -163,12 +152,12 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       </div>
 
       {/* Team Members Avatars */}
-      <div className="px-6 py-8 relative z-10 flex-1 flex flex-col">
+      <div className="px-4 py-4 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
         {project.teamMembers.length > 0 ? (
-          <div className="flex flex-col h-full">
-            {/* Centered team members */}
-            <div className="flex-1 flex items-center justify-center">
-              <div className="flex flex-wrap gap-4 justify-center items-end">
+          <div className="flex flex-col h-full min-h-0">
+            {/* Centered team members - scrollable */}
+            <div className="flex-1 flex items-center justify-center overflow-y-auto min-h-0">
+              <div className="flex flex-wrap gap-3 justify-center items-end content-center py-2">
                 {sortedMembers.map((member) => (
                   <TeamMemberAvatar
                     key={member.id}
@@ -181,7 +170,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               </div>
             </div>
             {/* Action buttons bottom right */}
-            <div className="flex justify-end mt-4 gap-1">
+            <div className="flex justify-end mt-2 gap-1 flex-shrink-0">
               <AddTeamMemberAllocation
                 projectId={project.id}
                 weekStartDate={weekStartDateString}
@@ -209,7 +198,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                 <p className="text-muted-foreground text-sm">No team members allocated this week</p>
               </div>
             </div>
-            <div className="flex justify-end mt-4 gap-1">
+            <div className="flex justify-end mt-2 gap-1 flex-shrink-0">
               <AddTeamMemberAllocation
                 projectId={project.id}
                 weekStartDate={weekStartDateString}
