@@ -110,7 +110,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   const canScrollNext = currentIndex < items.length - 1;
 
   return (
-    <div className="carousel-container relative flex items-center h-[calc(100vh-320px)] min-h-[350px]">
+    <div className="carousel-container relative flex items-center h-[calc(100vh-380px)] min-h-[280px]">
       <div className="w-full h-full flex flex-col">
       {/* Navigation buttons - Enhanced */}
       <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
