@@ -1,14 +1,22 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { logger } from '@/utils/logger';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 export const usePendingResources = (companyId: string | undefined) => {
   const [isAssigning, setIsAssigning] = useState(false);
+  const { isDemoMode } = useDemoAuth();
 
   const assignResources = async (inviteId: string, projectId: string, hours: number) => {
     if (!companyId) return false;
+    
+    // Demo mode - simulate success
+    if (isDemoMode) {
+      logger.log('Demo mode: Simulating resource assignment');
+      toast.success('Resources assigned successfully');
+      return true;
+    }
     
     setIsAssigning(true);
     try {
