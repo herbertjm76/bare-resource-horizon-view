@@ -5,19 +5,29 @@ import { useProjectUpdate } from './submit/useProjectUpdate';
 import { useStageSubmit } from './submit/useStageSubmit';
 import type { ProjectSubmitData } from './submit/types';
 import { logger } from '@/utils/logger';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 // Add an optional onAfterSubmit callback and call it at the end
 export const useProjectSubmit = (projectId: string, refetch: () => void, onClose: () => void, onAfterSubmit?: () => void) => {
   const { company } = useCompany();
+  const { isDemoMode } = useDemoAuth();
   const { updateProject } = useProjectUpdate();
   const { handleStageSubmit } = useStageSubmit();
 
   const handleSubmit = async (form: ProjectSubmitData, setIsLoading: (loading: boolean) => void) => {
     if (setIsLoading) setIsLoading(true);
-    
+
     try {
+      // In demo mode, don't attempt to write to Supabase.
+      if (isDemoMode) {
+        toast.message('Demo mode: changes are not saved.');
+        onClose();
+        onAfterSubmit?.();
+        return;
+      }
+
       logger.debug('Submitting project update with form data:', form);
-      
+
       // Get stage names from selected stage IDs
       const selectedStageNames = form.stages.map(stageId => {
         const stage = form.officeStages?.find(s => s.id === stageId);
@@ -31,7 +41,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         .from('projects')
         .select('office_id, target_profit_percentage, department')
         .eq('id', projectId)
-        .single();
+        .maybeSingle();
       
       if (fetchError) {
         logger.error('Error fetching existing project:', fetchError);

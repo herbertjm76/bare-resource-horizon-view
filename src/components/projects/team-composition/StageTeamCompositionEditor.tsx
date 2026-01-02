@@ -15,6 +15,7 @@ import { format, parseISO } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 interface Stage {
   id: string;
@@ -38,6 +39,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
   onStageUpdate,
   initialStageId
 }) => {
+  const { isDemoMode } = useDemoAuth();
   const { data: officeStages = [] } = useOfficeStages();
   const [selectedStageId, setSelectedStageId] = useState<string>(() => {
     const preferred = initialStageId && stages.some(s => s.id === initialStageId) ? initialStageId : undefined;
@@ -57,15 +59,23 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
 
   // Fetch project contract dates and stage contracted weeks
   useEffect(() => {
+    // In demo mode, we don't fetch anything from Supabase.
+    if (isDemoMode) return;
+
     const fetchData = async () => {
       if (!projectId || stages.length === 0) return;
 
       // Fetch project contract dates to calculate total weeks
-      const { data: projectData } = await supabase
+      const { data: projectData, error: projectError } = await supabase
         .from('projects')
         .select('contract_start_date, contract_end_date')
         .eq('id', projectId)
-        .single();
+        .maybeSingle();
+
+      if (projectError) {
+        // Don't toast here (it's noisy); just log.
+        console.error('Error fetching project contract dates:', projectError);
+      }
 
       if (projectData?.contract_start_date && projectData?.contract_end_date) {
         const startDate = new Date(projectData.contract_start_date);
@@ -102,7 +112,7 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
     };
 
     fetchData();
-  }, [projectId, stages]);
+  }, [projectId, stages, isDemoMode]);
 
   const {
     composition,

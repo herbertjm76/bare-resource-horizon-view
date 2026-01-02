@@ -38,7 +38,7 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
   const { company } = useCompany();
   const { isDemoMode } = useDemoAuth();
 
-  const queryKey = ['stage-team-composition', projectId, stageId];
+  const queryKey = ['stage-team-composition', projectId, stageId, isDemoMode];
 
   // Generate demo composition data for a stage
   const generateDemoComposition = (projectId: string, stageIdx: number): TeamCompositionItem[] => {
