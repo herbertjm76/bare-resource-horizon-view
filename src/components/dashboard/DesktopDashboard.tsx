@@ -146,65 +146,83 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     <div className="space-y-6">
       {/* Hero Metrics - 4 Key Numbers */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <SparklineMetricCard
-          title="Team Utilization"
-          value={`${Math.round(utilizationRate)}%`}
-          subtitle={`${timeRangeLabel} • ${teamSize} members`}
-          icon={TrendingUp}
-          trend={utilizationTrend}
-          status={utilizationStatus.status}
-          badge={utilizationStatus.badge}
-        />
-        <SparklineMetricCard
-          title="Active Projects"
-          value={activeProjects}
-          subtitle={`${totalProjects} total projects`}
-          icon={Briefcase}
-          status={atRiskProjects > 0 ? 'warning' : 'good'}
-          badge={atRiskProjects > 0 ? `${atRiskProjects} at risk` : 'On Track'}
-        />
-        <SparklineMetricCard
-          title={`${timeRangeLabel} Capacity`}
-          value={formatCapacityValue(Math.round(totalTeamCapacityForRange), displayPreference)}
-          subtitle={`${teamSize} resources × ${formatCapacityValue(workWeekHours, displayPreference)} × ${weekMultiplier}w`}
-          icon={Users}
-          status={overloadedCount > 0 ? 'danger' : 'good'}
-          badge={overloadedCount > 0 ? `${overloadedCount} overbooked` : 'Balanced'}
-        />
-        <SparklineMetricCard
-          title="Capacity Gap"
-          value={hasCapacityGap 
-            ? `${formatAllocationValue(Math.round(capacityGapHours), totalTeamCapacityForRange, displayPreference)} over` 
-            : `${formatAllocationValue(Math.round(remainingCapacity), totalTeamCapacityForRange, displayPreference)} free`}
-          subtitle={`${timeRangeLabel} ${hasCapacityGap ? 'overbooked' : 'available'}`}
-          icon={AlertCircle}
-          status={hasCapacityGap ? 'danger' : remainingCapacity < totalTeamCapacityForRange * 0.1 ? 'warning' : 'good'}
-          badge={hasCapacityGap ? 'Over Capacity' : remainingCapacity < totalTeamCapacityForRange * 0.1 ? 'Nearly Full' : 'Well Planned'}
-        />
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-0">
+          <SparklineMetricCard
+            title="Team Utilization"
+            value={`${Math.round(utilizationRate)}%`}
+            subtitle={`${timeRangeLabel} • ${teamSize} members`}
+            icon={TrendingUp}
+            trend={utilizationTrend}
+            status={utilizationStatus.status}
+            badge={utilizationStatus.badge}
+          />
+        </div>
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-100">
+          <SparklineMetricCard
+            title="Active Projects"
+            value={activeProjects}
+            subtitle={`${totalProjects} total projects`}
+            icon={Briefcase}
+            status={atRiskProjects > 0 ? 'warning' : 'good'}
+            badge={atRiskProjects > 0 ? `${atRiskProjects} at risk` : 'On Track'}
+          />
+        </div>
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
+          <SparklineMetricCard
+            title={`${timeRangeLabel} Capacity`}
+            value={formatCapacityValue(Math.round(totalTeamCapacityForRange), displayPreference)}
+            subtitle={`${teamSize} resources × ${formatCapacityValue(workWeekHours, displayPreference)} × ${weekMultiplier}w`}
+            icon={Users}
+            status={overloadedCount > 0 ? 'danger' : 'good'}
+            badge={overloadedCount > 0 ? `${overloadedCount} overbooked` : 'Balanced'}
+          />
+        </div>
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-300">
+          <SparklineMetricCard
+            title="Capacity Gap"
+            value={hasCapacityGap 
+              ? `${formatAllocationValue(Math.round(capacityGapHours), totalTeamCapacityForRange, displayPreference)} over` 
+              : `${formatAllocationValue(Math.round(remainingCapacity), totalTeamCapacityForRange, displayPreference)} free`}
+            subtitle={`${timeRangeLabel} ${hasCapacityGap ? 'overbooked' : 'available'}`}
+            icon={AlertCircle}
+            status={hasCapacityGap ? 'danger' : remainingCapacity < totalTeamCapacityForRange * 0.1 ? 'warning' : 'good'}
+            badge={hasCapacityGap ? 'Over Capacity' : remainingCapacity < totalTeamCapacityForRange * 0.1 ? 'Nearly Full' : 'Well Planned'}
+          />
+        </div>
       </div>
 
       {/* Alerts + Forecast Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RiskAlertsSection
-          overloadedCount={overloadedCount}
-          atRiskProjects={atRiskProjects}
-          upcomingGaps={hasCapacityGap ? 1 : 0}
-        />
-        <CapacityForecastChart data={capacityForecastData} />
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-400">
+          <RiskAlertsSection
+            overloadedCount={overloadedCount}
+            atRiskProjects={atRiskProjects}
+            upcomingGaps={hasCapacityGap ? 1 : 0}
+          />
+        </div>
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
+          <CapacityForecastChart data={capacityForecastData} />
+        </div>
       </div>
 
       {/* Second Row: Top Resources + Project Pipeline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TopResourcesTable resources={topOverloadedResources} />
-        <HorizontalBarChart
-          title="Project Pipeline"
-          data={projectsByStatus}
-        />
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-600">
+          <TopResourcesTable resources={topOverloadedResources} />
+        </div>
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-700">
+          <HorizontalBarChart
+            title="Project Pipeline"
+            data={projectsByStatus}
+          />
+        </div>
       </div>
 
       {/* Third Row: Holidays */}
       <div className="grid grid-cols-1 gap-6">
-        <UnifiedHolidayCard data={data} />
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-800">
+          <UnifiedHolidayCard data={data} />
+        </div>
       </div>
     </div>
   );
