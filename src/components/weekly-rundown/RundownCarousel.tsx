@@ -111,7 +111,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   const canScrollNext = currentIndex < items.length - 1;
 
   return (
-    <div className="carousel-container relative flex items-center h-[70vh] max-h-[70vh] min-h-[420px]">
+    <div className="carousel-container relative flex items-center h-[58vh] max-h-[58vh] min-h-[360px]">
       <div className="w-full h-full flex flex-col">
         {/* Navigation buttons - Enhanced */}
         <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
@@ -139,7 +139,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
         </div>
 
         {/* Carousel content */}
-        <div className="overflow-visible flex-1 min-h-0 pb-24" ref={emblaRef}>
+        <div className="overflow-visible flex-1 min-h-0 pb-12" ref={emblaRef}>
           <div className="flex h-full">
             {items.map((item, index) => {
               const isActive = index === currentIndex;
@@ -151,7 +151,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
                   className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 h-full"
                 >
                   <motion.div
-                    className="mx-auto max-w-4xl h-[80%] my-auto"
+                    className="mx-auto max-w-4xl h-full"
                     initial={false}
                     animate={{
                       scale: isActive ? 1 : 0.92,
@@ -190,7 +190,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
 
         {/* Footer (dots + keyboard hint) */}
         {items.length > 1 && (
-          <div className="absolute bottom-2 left-0 right-0 z-20 flex flex-col items-center gap-1 pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 z-20 pb-2 flex flex-col items-center gap-1 pointer-events-none">
             <div className="flex justify-center items-center gap-3 pointer-events-auto">
               {items.map((_, index) => (
                 <button
