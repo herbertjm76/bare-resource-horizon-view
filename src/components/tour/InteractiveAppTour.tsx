@@ -95,7 +95,8 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
   const [currentStep, setCurrentStep] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [direction, setDirection] = useState(0);
-  const [loadedIframes, setLoadedIframes] = useState<Set<number>>(new Set([0]));
+  const [loadedIframes, setLoadedIframes] = useState<Set<number>>(() => new Set(tourSteps.map((_, i) => i)));
+  const [iframesReady, setIframesReady] = useState<Set<number>>(new Set());
 
   const currentTourStep = tourSteps[currentStep];
   const isFirstStep = currentStep === 0;
@@ -106,30 +107,11 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
     [currentStep]
   );
 
-  // Preload adjacent iframes for smoother navigation
-  useEffect(() => {
-    const preloadIndexes = new Set<number>();
-    // Always load current
-    preloadIndexes.add(currentStep);
-    // Preload next 2 and previous 1
-    if (currentStep > 0) preloadIndexes.add(currentStep - 1);
-    if (currentStep < tourSteps.length - 1) preloadIndexes.add(currentStep + 1);
-    if (currentStep < tourSteps.length - 2) preloadIndexes.add(currentStep + 2);
-    
-    setLoadedIframes(prev => {
-      const newSet = new Set(prev);
-      preloadIndexes.forEach(i => newSet.add(i));
-      return newSet;
-    });
-  }, [currentStep]);
+  const handleIframeLoad = (index: number) => {
+    setIframesReady(prev => new Set(prev).add(index));
+  };
 
-  // Preload all iframes after initial mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoadedIframes(new Set(tourSteps.map((_, i) => i)));
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  const isCurrentReady = iframesReady.has(currentStep);
 
   const handleNext = () => {
     if (!isLastStep) {
@@ -270,6 +252,13 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
 
                 {/* Live iframe preview - All preloaded */}
                 <div className="relative aspect-[16/10] overflow-hidden bg-muted/20">
+                  {/* Loading spinner */}
+                  {!isCurrentReady && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-30">
+                      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                  
                   {tourSteps.map((step, index) => (
                     loadedIframes.has(index) && (
                       <div
@@ -290,6 +279,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
                             height: '200%',
                           }}
                           sandbox="allow-same-origin allow-scripts"
+                          onLoad={() => handleIframeLoad(index)}
                         />
                       </div>
                     )
