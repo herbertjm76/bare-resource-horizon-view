@@ -17,12 +17,12 @@ export const PricingPlans = () => {
         "Basic reporting",
         "Email support"
       ],
-      cta: "Get Started",
+      cta: "Reserve Your Spot",
       popular: false,
-      note: "No setup fees • Cancel anytime",
+      note: "Lock in this price forever • Limited spots",
       color: "from-gray-600 to-gray-700",
       icon: <Users className="w-5 h-5" />,
-      badge: "Essential"
+      badge: "Founding Rate"
     },
     {
       name: "Studio",
@@ -36,12 +36,12 @@ export const PricingPlans = () => {
         "Team utilization dashboard",
         "Priority support"
       ],
-      cta: "Get Started", 
+      cta: "Reserve Your Spot", 
       popular: true,
-      note: "No setup fees • Cancel anytime",
+      note: "Lock in this price forever • Limited spots",
       color: "from-purple-600 to-blue-600",
       icon: <Building className="w-5 h-5" />,
-      badge: "Most Popular"
+      badge: "Early Access"
     }
   ];
 
