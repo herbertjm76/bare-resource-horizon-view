@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { GradientOrbs } from '@/components/common/VisualElements';
-import { PricingHeader, PricingPlans, PricingFeatures } from './pricing';
+import { PricingHeader, PricingPlans } from './pricing';
 
 const Pricing = () => {
   return (
@@ -11,7 +11,6 @@ const Pricing = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <PricingHeader />
         <PricingPlans />
-        <PricingFeatures />
       </div>
     </div>
   );
