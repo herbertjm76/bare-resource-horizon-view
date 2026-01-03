@@ -111,110 +111,110 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   const canScrollNext = currentIndex < items.length - 1;
 
   return (
-    <div className="carousel-container relative flex items-center h-[calc(100vh-480px)] min-h-[200px] pb-16">
+    <div className="carousel-container relative flex items-center h-[70vh] max-h-[70vh] min-h-[420px]">
       <div className="w-full h-full flex flex-col">
-      {/* Navigation buttons - Enhanced */}
-      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onPrev}
-          disabled={!canScrollPrev}
-          className="h-14 w-14 rounded-full bg-background/90 backdrop-blur-md border-2 border-primary/20 shadow-2xl hover:shadow-primary/30 hover:scale-110 transition-all duration-300 disabled:opacity-30 disabled:hover:scale-100"
-        >
-          <ChevronLeft className="h-7 w-7" />
-        </Button>
-      </div>
-      
-      <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onNext}
-          disabled={!canScrollNext}
-          className="h-14 w-14 rounded-full bg-background/90 backdrop-blur-md border-2 border-primary/20 shadow-2xl hover:shadow-primary/30 hover:scale-110 transition-all duration-300 disabled:opacity-30 disabled:hover:scale-100"
-        >
-          <ChevronRight className="h-7 w-7" />
-        </Button>
-      </div>
+        {/* Navigation buttons - Enhanced */}
+        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onPrev}
+            disabled={!canScrollPrev}
+            className="h-14 w-14 rounded-full bg-background/90 backdrop-blur-md border-2 border-primary/20 shadow-2xl hover:shadow-primary/30 hover:scale-110 transition-all duration-300 disabled:opacity-30 disabled:hover:scale-100"
+          >
+            <ChevronLeft className="h-7 w-7" />
+          </Button>
+        </div>
 
-      {/* Carousel content - simplified to avoid flicker and keep cards visible */}
-      <div className="overflow-visible flex-1 min-h-0" ref={emblaRef}>
-        <div className="flex h-full">
-          {items.map((item, index) => {
-            const isActive = index === currentIndex;
-            const stableKey = `${item.id}-${rundownMode}`;
+        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onNext}
+            disabled={!canScrollNext}
+            className="h-14 w-14 rounded-full bg-background/90 backdrop-blur-md border-2 border-primary/20 shadow-2xl hover:shadow-primary/30 hover:scale-110 transition-all duration-300 disabled:opacity-30 disabled:hover:scale-100"
+          >
+            <ChevronRight className="h-7 w-7" />
+          </Button>
+        </div>
 
-            return (
-              <div
-                key={stableKey}
-                className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 h-[80%] my-auto"
-              >
-                <motion.div 
-                  className="mx-auto max-w-4xl h-full"
-                  initial={false}
-                  animate={{
-                    scale: isActive ? 1 : 0.92,
-                    opacity: isActive ? 1 : 0.6,
-                    y: isActive ? 0 : 8,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 120,
-                    damping: 20,
-                    mass: 0.8
-                  }}
+        {/* Carousel content */}
+        <div className="overflow-visible flex-1 min-h-0 pb-24" ref={emblaRef}>
+          <div className="flex h-full">
+            {items.map((item, index) => {
+              const isActive = index === currentIndex;
+              const stableKey = `${item.id}-${rundownMode}`;
+
+              return (
+                <div
+                  key={stableKey}
+                  className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 h-full"
                 >
-                  {rundownMode === 'people' ? (
-                    <PersonRundownCard
-                      person={item}
-                      isActive={isActive}
-                      isFullscreen={isFullscreen}
-                      selectedWeek={selectedWeek}
-                    />
-                  ) : (
-                    <ProjectRundownCard
-                      project={item}
-                      isActive={isActive}
-                      isFullscreen={isFullscreen}
-                      selectedWeek={selectedWeek}
-                      onDataChange={() => {}}
-                    />
-                  )}
-                </motion.div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Bottom UI (dots + hint) is pinned so it stays visible even when cards are tall */}
-      {items.length > 1 && (
-        <div className="absolute bottom-2 left-0 right-0 flex flex-col items-center gap-1">
-          <div className="flex justify-center items-center gap-3">
-            {items.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => onGoTo(index)}
-                className={`rounded-full transition-all duration-300 hover:scale-125 ${
-                  index === currentIndex
-                    ? 'bg-primary w-4 h-4 shadow-lg shadow-primary/30'
-                    : 'bg-muted-foreground/30 w-3 h-3 hover:bg-muted-foreground/60'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-
-          <div className="text-xs text-muted-foreground">
-            <p className="flex items-center gap-2">
-              <kbd className="px-2 py-1 bg-muted rounded border border-border">←</kbd>
-              <kbd className="px-2 py-1 bg-muted rounded border border-border">→</kbd>
-              <span>Navigate with keyboard</span>
-            </p>
+                  <motion.div
+                    className="mx-auto max-w-4xl h-[80%] my-auto"
+                    initial={false}
+                    animate={{
+                      scale: isActive ? 1 : 0.92,
+                      opacity: isActive ? 1 : 0.6,
+                      y: isActive ? 0 : 8,
+                    }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 120,
+                      damping: 20,
+                      mass: 0.8,
+                    }}
+                  >
+                    {rundownMode === 'people' ? (
+                      <PersonRundownCard
+                        person={item}
+                        isActive={isActive}
+                        isFullscreen={isFullscreen}
+                        selectedWeek={selectedWeek}
+                      />
+                    ) : (
+                      <ProjectRundownCard
+                        project={item}
+                        isActive={isActive}
+                        isFullscreen={isFullscreen}
+                        selectedWeek={selectedWeek}
+                        onDataChange={() => {}}
+                      />
+                    )}
+                  </motion.div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
+
+        {/* Footer (dots + keyboard hint) */}
+        {items.length > 1 && (
+          <div className="absolute bottom-2 left-0 right-0 z-20 flex flex-col items-center gap-1 pointer-events-none">
+            <div className="flex justify-center items-center gap-3 pointer-events-auto">
+              {items.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => onGoTo(index)}
+                  className={`rounded-full transition-all duration-300 hover:scale-125 ${
+                    index === currentIndex
+                      ? 'bg-primary w-4 h-4 shadow-lg shadow-primary/30'
+                      : 'bg-muted-foreground/30 w-3 h-3 hover:bg-muted-foreground/60'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+
+            <div className="text-xs text-muted-foreground pointer-events-none">
+              <p className="flex items-center gap-2">
+                <kbd className="px-2 py-1 bg-muted rounded border border-border">←</kbd>
+                <kbd className="px-2 py-1 bg-muted rounded border border-border">→</kbd>
+                <span>Navigate with keyboard</span>
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
