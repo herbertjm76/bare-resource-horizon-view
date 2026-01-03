@@ -40,20 +40,20 @@ const Hero = () => {
           {/* Text Content - Full width on mobile, 4 cols on desktop */}
           <div className="lg:col-span-4 space-y-4 sm:space-y-5 text-center lg:text-left">
             <div className="space-y-3 sm:space-y-4">
-              <AnimatedSection animation="fadeInUp" delay={200}>
+              <AnimatedSection animation="cascadeUp" delay={0}>
                 <div className="inline-flex items-center px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-white text-xs font-medium">
                   <Calendar className="w-4 h-4 mr-2" />
                   For Design Studios
                 </div>
               </AnimatedSection>
               
-              <AnimatedSection animation="fadeInUp" delay={400}>
+              <AnimatedSection animation="cascadeUp" delay={200}>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white leading-tight">
                   Resource Planning for Design Studios
                 </h1>
               </AnimatedSection>
 
-               <AnimatedSection animation="fadeInUp" delay={500}>
+               <AnimatedSection animation="cascadeUp" delay={400}>
                  <p className="text-base sm:text-lg font-bold uppercase tracking-wide leading-relaxed max-w-lg mx-auto lg:mx-0">
                    <span style={{color: '#141947'}}>BALANCE CAPACITY.</span> <span style={{color: '#141947'}}>SPOT BOTTLENECKS.</span> <span style={{color: '#141947'}}>DELIVER ON TIME.</span>
                    <br />
@@ -61,7 +61,7 @@ const Hero = () => {
                  </p>
                </AnimatedSection>
               
-              <AnimatedSection animation="fadeInUp" delay={600}>
+              <AnimatedSection animation="cascadeUp" delay={600}>
                 <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 sm:p-4 border border-white/20 max-w-md mx-auto lg:mx-0">
                   <ul className="space-y-1 text-sm sm:text-base text-white/90">
                     <li className="flex items-start">
@@ -86,7 +86,7 @@ const Hero = () => {
             </div>
             
             {/* CTA Buttons */}
-            <AnimatedSection animation="fadeInUp" delay={1000}>
+            <AnimatedSection animation="cascadeUp" delay={800}>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <button onClick={() => navigate('/auth')} className="group bg-white text-purple-600 px-5 py-2.5 rounded-2xl font-semibold hover:bg-purple-50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl text-sm sm:text-base">
                   Get Started
@@ -101,7 +101,7 @@ const Hero = () => {
           
           {/* Dashboard Image with Floating Cards - Hidden on mobile, visible on tablet+ */}
           <div className="hidden sm:block lg:col-span-8 relative">
-            <AnimatedSection animation="fadeInRight" delay={600}>
+            <AnimatedSection animation="cascadeScale" delay={400}>
               <div ref={floatingRef} className="relative w-full max-w-4xl mx-auto" style={{
                 minHeight: 400,
                 transform: 'scale(0.88)' // Optimized scale for better balance with improved cards
@@ -136,7 +136,7 @@ const Hero = () => {
 
           {/* Mobile-only Dashboard Preview */}
           <div className="block sm:hidden w-full mt-6">
-            <AnimatedSection animation="fadeInUp" delay={600}>
+            <AnimatedSection animation="cascadeUp" delay={600}>
               <img 
                 src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
                 alt="Rolling Availability Calendar and Burn Meter Dashboard" 

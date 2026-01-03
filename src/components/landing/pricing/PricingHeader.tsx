@@ -4,7 +4,7 @@ import { Zap } from 'lucide-react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 
 export const PricingHeader = () => (
-  <AnimatedSection animation="fadeInUp" className="text-center mb-12">
+  <AnimatedSection animation="cascadeUp" delay={0} className="text-center mb-12">
     <div className="flex flex-col items-center justify-center mb-6">
       <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full text-amber-700 font-semibold text-sm mb-4 border border-amber-200">
         <Zap className="w-4 h-4 mr-2" />

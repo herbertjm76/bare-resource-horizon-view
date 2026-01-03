@@ -48,7 +48,7 @@ const Solutions = () => {
   return (
     <div id="solutions" className="py-20 bg-muted/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection animation="fadeInUp">
+        <AnimatedSection animation="cascadeUp" delay={0}>
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
               Solutions for Every Team
@@ -62,7 +62,7 @@ const Solutions = () => {
 
         <div className="grid md:grid-cols-2 gap-8 mb-20">
           {solutions.map((solution, index) => (
-            <AnimatedSection key={index} animation="fadeInUp" delay={index * 150}>
+            <AnimatedSection key={index} animation="cascadeScale" delay={200 + index * 200}>
               <VisualCard className="h-full p-8 hover:shadow-lg transition-shadow">
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 p-3 bg-muted rounded-lg">
@@ -82,7 +82,7 @@ const Solutions = () => {
           ))}
         </div>
 
-        <AnimatedSection animation="fadeInUp" delay={600}>
+        <AnimatedSection animation="cascadeUp" delay={1000}>
           <div className="text-center mb-12">
             <h3 className="text-2xl font-bold text-foreground mb-12">
               The New Way of Resource Allocation
@@ -92,7 +92,7 @@ const Solutions = () => {
 
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           {quotes.map((quote, index) => (
-            <AnimatedSection key={index} animation="fadeInUp" delay={700 + index * 150}>
+            <AnimatedSection key={index} animation="cascadeUp" delay={1200 + index * 200}>
               <div className="bg-card p-6 rounded-lg shadow-sm border-l-4 border-purple-600">
                 <p className="text-foreground italic mb-4">"{quote.text}"</p>
                 <div className="text-sm">

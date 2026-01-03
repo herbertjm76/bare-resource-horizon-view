@@ -73,7 +73,7 @@ const AppTour = () => {
   return (
     <div id="app-tour" className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection animation="fadeInUp">
+        <AnimatedSection animation="cascadeUp" delay={0}>
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               {isMainPage ? 'Explore the Platform' : 'Interactive Demo Available'}
@@ -89,7 +89,7 @@ const AppTour = () => {
 
         <div className={`grid gap-8 ${isMainPage ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4 lg:grid-cols-4'}`}>
           {displayFeatures.map((feature, index) => (
-            <AnimatedSection key={index} animation="fadeInUp" delay={index * 100}>
+            <AnimatedSection key={index} animation="cascadeScale" delay={200 + index * 150}>
               <div className="group text-center">
                 <div className={`relative mb-4 mx-auto w-24 h-24 rounded-2xl bg-gradient-to-br ${feature.bgColor} flex items-center justify-center shadow-lg backdrop-blur-sm group-hover:scale-110 transition-all duration-300 group-hover:shadow-xl`}>
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl"></div>
@@ -108,7 +108,7 @@ const AppTour = () => {
           ))}
         </div>
 
-        <AnimatedSection animation="fadeInUp" delay={600}>
+        <AnimatedSection animation="cascadeUp" delay={800}>
           <div className="text-center mt-16">
             {isMainPage ? (
               <Link 
