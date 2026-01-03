@@ -146,7 +146,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     <div className="space-y-6">
       {/* Hero Metrics - 4 Key Numbers */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-0">
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-0 h-full">
           <SparklineMetricCard
             title="Team Utilization"
             value={`${Math.round(utilizationRate)}%`}
@@ -157,7 +157,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             badge={utilizationStatus.badge}
           />
         </div>
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-100">
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-100 h-full">
           <SparklineMetricCard
             title="Active Projects"
             value={activeProjects}
@@ -167,7 +167,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             badge={atRiskProjects > 0 ? `${atRiskProjects} at risk` : 'On Track'}
           />
         </div>
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200 h-full">
           <SparklineMetricCard
             title={`${timeRangeLabel} Capacity`}
             value={formatCapacityValue(Math.round(totalTeamCapacityForRange), displayPreference)}
@@ -177,7 +177,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             badge={overloadedCount > 0 ? `${overloadedCount} overbooked` : 'Balanced'}
           />
         </div>
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-300">
+        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-300 h-full">
           <SparklineMetricCard
             title="Capacity Gap"
             value={hasCapacityGap 
