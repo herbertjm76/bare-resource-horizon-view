@@ -15,8 +15,8 @@ const LeadMagnet = () => {
                 <FileSpreadsheet className="w-8 h-8 text-white" />
               </div>
               <div className="text-left">
-                <h3 className="text-2xl font-bold text-foreground">Free Capacity Planner Kit</h3>
-                <p className="text-muted-foreground">Google Sheet template + 5-step guide</p>
+                <h3 className="text-2xl font-bold text-foreground">Free Resource Planner Excel</h3>
+                <p className="text-muted-foreground">Excel template + 5-step guide</p>
               </div>
             </div>
             
