@@ -174,7 +174,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
             <div className="cursor-pointer">
               <Tooltip delayDuration={200}>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center gap-2">
+                  <div className="relative flex flex-col items-center gap-0.5">
                     <div className="relative">
                       <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-lg hover:ring-primary/40 transition-all hover:scale-105">
                         <AvatarImage src={member.avatar} />
@@ -211,8 +211,8 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
                     </div>
                     
                     {/* Name and hours below avatar */}
-                    <div className="flex flex-col items-center gap-1">
-                      <p className="font-semibold text-sm text-foreground">{firstName}</p>
+                    <div className="flex flex-col items-center">
+                      <p className="font-semibold text-xs text-foreground">{firstName}</p>
                       <StandardizedBadge variant="metric" size="sm">
                         {formatDualAllocationValue(member.hours, capacity, displayPreference)}
                       </StandardizedBadge>
