@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -95,7 +95,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
   const [currentStep, setCurrentStep] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [direction, setDirection] = useState(0);
-  const [iframeKey, setIframeKey] = useState(0);
+  const [loadedIframes, setLoadedIframes] = useState<Set<number>>(new Set([0]));
 
   const currentTourStep = tourSteps[currentStep];
   const isFirstStep = currentStep === 0;
@@ -106,11 +106,35 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
     [currentStep]
   );
 
+  // Preload adjacent iframes for smoother navigation
+  useEffect(() => {
+    const preloadIndexes = new Set<number>();
+    // Always load current
+    preloadIndexes.add(currentStep);
+    // Preload next 2 and previous 1
+    if (currentStep > 0) preloadIndexes.add(currentStep - 1);
+    if (currentStep < tourSteps.length - 1) preloadIndexes.add(currentStep + 1);
+    if (currentStep < tourSteps.length - 2) preloadIndexes.add(currentStep + 2);
+    
+    setLoadedIframes(prev => {
+      const newSet = new Set(prev);
+      preloadIndexes.forEach(i => newSet.add(i));
+      return newSet;
+    });
+  }, [currentStep]);
+
+  // Preload all iframes after initial mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadedIframes(new Set(tourSteps.map((_, i) => i)));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleNext = () => {
     if (!isLastStep) {
       setDirection(1);
       setCurrentStep((s) => s + 1);
-      setIframeKey((k) => k + 1);
     }
   };
 
@@ -118,14 +142,12 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
     if (!isFirstStep) {
       setDirection(-1);
       setCurrentStep((s) => s - 1);
-      setIframeKey((k) => k + 1);
     }
   };
 
   const handleStepClick = (stepIndex: number) => {
     setDirection(stepIndex > currentStep ? 1 : -1);
     setCurrentStep(stepIndex);
-    setIframeKey((k) => k + 1);
   };
 
   const toggleFullscreen = () => setIsFullscreen((v) => !v);
@@ -137,7 +159,6 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
 
   // Get the demo route URL for iframe
   const getIframeUrl = (route: string) => {
-    // Use the current origin with the demo route
     return `/demo${route}?embed=true`;
   };
 
@@ -247,39 +268,35 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
                   </Button>
                 </div>
 
-                {/* Live iframe preview */}
+                {/* Live iframe preview - All preloaded */}
                 <div className="relative aspect-[16/10] overflow-hidden bg-muted/20">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={`${currentStep}-${iframeKey}`}
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.98 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      className="absolute inset-0"
-                    >
-                      <iframe
-                        src={getIframeUrl(currentTourStep.route)}
-                        title={`${currentTourStep.title} preview`}
-                        className="w-full h-full border-0 pointer-events-none"
-                        style={{
-                          transform: 'scale(0.5)',
-                          transformOrigin: 'top left',
-                          width: '200%',
-                          height: '200%',
-                        }}
-                        sandbox="allow-same-origin allow-scripts"
-                      />
-                    </motion.div>
-                  </AnimatePresence>
-                  
-                  {/* Loading overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-background/50 opacity-0 pointer-events-none transition-opacity">
-                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  </div>
+                  {tourSteps.map((step, index) => (
+                    loadedIframes.has(index) && (
+                      <div
+                        key={step.id}
+                        className={cn(
+                          "absolute inset-0 transition-opacity duration-200",
+                          index === currentStep ? "opacity-100 z-10" : "opacity-0 z-0"
+                        )}
+                      >
+                        <iframe
+                          src={getIframeUrl(step.route)}
+                          title={`${step.title} preview`}
+                          className="w-full h-full border-0 pointer-events-none"
+                          style={{
+                            transform: 'scale(0.5)',
+                            transformOrigin: 'top left',
+                            width: '200%',
+                            height: '200%',
+                          }}
+                          sandbox="allow-same-origin allow-scripts"
+                        />
+                      </div>
+                    )
+                  ))}
                   
                   {/* Overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/10 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/10 via-transparent to-transparent pointer-events-none z-20" />
                 </div>
               </div>
             </div>
