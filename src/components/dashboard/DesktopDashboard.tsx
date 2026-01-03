@@ -191,7 +191,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         </div>
       </div>
 
-      {/* Alerts + Forecast Side by Side */}
+      {/* Alerts + Project Pipeline Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-400">
           <RiskAlertsSection
@@ -201,20 +201,20 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           />
         </div>
         <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
-          <CapacityForecastChart data={capacityForecastData} />
+          <HorizontalBarChart
+            title="Project Pipeline"
+            data={projectsByStatus}
+          />
         </div>
       </div>
 
-      {/* Second Row: Top Resources + Project Pipeline */}
+      {/* Second Row: Top Resources + Capacity Forecast */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-600">
           <TopResourcesTable resources={topOverloadedResources} />
         </div>
         <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-700">
-          <HorizontalBarChart
-            title="Project Pipeline"
-            data={projectsByStatus}
-          />
+          <CapacityForecastChart data={capacityForecastData} />
         </div>
       </div>
 
