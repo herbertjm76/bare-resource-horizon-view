@@ -5,21 +5,17 @@ import { AnimatedSection } from '@/components/common/AnimatedSection';
 
 export const PricingHeader = () => (
   <AnimatedSection animation="fadeInUp" className="text-center mb-12">
-    <div className="flex items-center justify-center mb-6">
-      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center animate-pulse">
-        <Zap className="w-6 h-6 text-white" />
+    <div className="flex flex-col items-center justify-center mb-6">
+      <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full text-amber-700 font-semibold text-sm mb-4 border border-amber-200">
+        <Zap className="w-4 h-4 mr-2" />
+        Limited Early Access
       </div>
-      <div className="ml-4">
-        <div className="inline-flex items-center px-3 py-1 bg-green-100 rounded-full text-green-600 font-semibold text-sm mb-1">
-          Simple Flat Rate Pricing
-        </div>
-        <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
-          One Price, No Surprises
-        </h2>
-      </div>
+      <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
+        Be a Founding Member
+      </h2>
     </div>
     <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-      Predictable pricing that scales with your team. All plans include 14-day free trial.
+      Join the first 100 teams to shape the future of resource planning. Lock in founding member pricing forever.
     </p>
   </AnimatedSection>
 );
