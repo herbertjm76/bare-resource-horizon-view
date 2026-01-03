@@ -148,7 +148,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
               return (
                 <div
                   key={stableKey}
-                  className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 h-full py-6 pb-8"
+                  className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 h-full py-6 pb-12"
                 >
                   <motion.div
                     className="mx-auto max-w-4xl h-full"
