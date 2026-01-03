@@ -22,13 +22,13 @@ const FAQ = () => {
   return (
     <div className="py-16 bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection animation="fadeInUp" className="text-center mb-12">
+        <AnimatedSection animation="cascadeUp" delay={0} className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Frequently Asked Questions
           </h2>
         </AnimatedSection>
 
-        <AnimatedSection animation="fadeInUp" delay={200}>
+        <AnimatedSection animation="cascadeUp" delay={300}>
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`} className="border border-gray-200 rounded-lg px-6">

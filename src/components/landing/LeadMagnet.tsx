@@ -8,7 +8,7 @@ const LeadMagnet = () => {
   return (
     <div className="py-16 bg-gradient-to-br from-blue-50 to-indigo-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection animation="fadeInUp">
+        <AnimatedSection animation="cascadeScale" delay={0}>
           <VisualCard className="text-center p-8">
             <div className="flex items-center justify-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mr-4">

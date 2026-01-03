@@ -9,7 +9,7 @@ export const PricingPlans = () => {
 
   return (
     <>
-      <AnimatedSection animation="scaleIn" className="max-w-xl mx-auto mb-8 sm:mb-12 px-4 sm:px-0">
+      <AnimatedSection animation="cascadeScale" delay={200} className="max-w-xl mx-auto mb-8 sm:mb-12 px-4 sm:px-0">
         <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-8 text-center text-white shadow-2xl">
           <div className="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-white/90 font-semibold text-sm mb-4">
             <Sparkles className="w-4 h-4 mr-2" />

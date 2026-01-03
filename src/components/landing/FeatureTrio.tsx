@@ -34,7 +34,7 @@ const FeatureTrio = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           {features.map((feature, index) => (
-            <AnimatedSection key={index} animation="fadeInUp" delay={index * 200}>
+            <AnimatedSection key={index} animation="cascadeScale" delay={index * 250}>
               <VisualCard className="text-center h-full">
                 <div className="mb-4 sm:mb-6">
                   <img 
