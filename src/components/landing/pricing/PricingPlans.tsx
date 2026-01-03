@@ -1,55 +1,48 @@
 
-import React from 'react';
-import { Users, Building } from 'lucide-react';
-import { PricingCard } from './PricingCard';
+import React, { useState } from 'react';
+import { Sparkles, ArrowRight } from 'lucide-react';
+import { AnimatedSection } from '@/components/common/AnimatedSection';
+import { EarlyAccessModal } from './EarlyAccessModal';
 
 export const PricingPlans = () => {
-  const plans = [
-    {
-      name: "Starter",
-      price: "S$59",
-      period: "per month",
-      description: "Up to 10 people",
-      features: [
-        "Rolling Availability Calendar",
-        "Live Burn Meter", 
-        "Morning Heads-Up",
-        "Basic reporting",
-        "Email support"
-      ],
-      cta: "Reserve Your Spot",
-      popular: false,
-      note: "Lock in this price forever • Limited spots",
-      color: "from-gray-600 to-gray-700",
-      icon: <Users className="w-5 h-5" />,
-      badge: "Founding Rate"
-    },
-    {
-      name: "Studio",
-      price: "S$99",
-      period: "per month",
-      description: "Up to 25 people",
-      features: [
-        "Everything in Starter",
-        "Predictive alerts (AI-powered)",
-        "Advanced capacity planning",
-        "Team utilization dashboard",
-        "Priority support"
-      ],
-      cta: "Reserve Your Spot", 
-      popular: true,
-      note: "Lock in this price forever • Limited spots",
-      color: "from-purple-600 to-blue-600",
-      icon: <Building className="w-5 h-5" />,
-      badge: "Early Access"
-    }
-  ];
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto mb-8 sm:mb-12 px-2 sm:px-0">
-      {plans.map((plan, index) => (
-        <PricingCard key={index} plan={plan} index={index} />
-      ))}
-    </div>
+    <>
+      <AnimatedSection animation="scaleIn" className="max-w-xl mx-auto mb-8 sm:mb-12 px-4 sm:px-0">
+        <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-8 text-center text-white shadow-2xl">
+          <div className="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-white/90 font-semibold text-sm mb-4">
+            <Sparkles className="w-4 h-4 mr-2" />
+            Limited to 100 Founding Members
+          </div>
+          
+          <h3 className="text-2xl font-bold mb-3">
+            Get Early Access
+          </h3>
+          
+          <p className="text-white/80 mb-6 max-w-md mx-auto">
+            Be the first to try our resource planning tool. Founding members get exclusive pricing and direct input on features.
+          </p>
+          
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-white text-purple-600 hover:bg-gray-100 py-3 px-8 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 inline-flex items-center gap-2"
+          >
+            Reserve Your Spot
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          
+          <p className="text-white/60 text-sm mt-4">
+            No credit card required • We'll notify you when we launch
+          </p>
+        </div>
+      </AnimatedSection>
+
+      <EarlyAccessModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        planName="Early Access"
+      />
+    </>
   );
 };
