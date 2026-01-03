@@ -93,36 +93,36 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         flex flex-col
       `}>
         {/* Hero Section - Responsive */}
-        <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl px-4 sm:px-6 py-2 sm:py-3 flex-shrink-0">
-          <div className="flex items-start gap-3 sm:gap-4">
-            <Avatar className={`${isFullscreen ? 'h-16 w-16 sm:h-20 sm:w-20' : 'h-12 w-12 sm:h-16 sm:w-16'} ring-2 sm:ring-4 ring-primary/20 shadow-xl sm:shadow-2xl transition-transform hover:scale-105 flex-shrink-0`}>
+        <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl px-3 sm:px-4 py-1.5 sm:py-2 flex-shrink-0">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <Avatar className={`${isFullscreen ? 'h-10 w-10 sm:h-12 sm:w-12' : 'h-8 w-8 sm:h-10 sm:w-10'} ring-1 sm:ring-2 ring-primary/20 shadow-lg transition-transform hover:scale-105 flex-shrink-0`}>
               <AvatarImage src={person.avatar_url} />
-              <AvatarFallback className="text-lg sm:text-2xl font-bold bg-gradient-modern text-white backdrop-blur-sm">
+              <AvatarFallback className="text-xs sm:text-sm font-bold bg-gradient-modern text-white backdrop-blur-sm">
                 {person.first_name.charAt(0)}{person.last_name.charAt(0)}
               </AvatarFallback>
             </Avatar>
             
             <div className="flex-1 min-w-0 overflow-hidden">
-              <div className="flex items-start justify-between gap-2 sm:gap-4 mb-1">
+              <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-0.5">
                 <h1 className={`font-bold text-foreground tracking-tight truncate ${
-                  isFullscreen ? 'text-xl sm:text-3xl' : 'text-lg sm:text-2xl'
+                  isFullscreen ? 'text-base sm:text-lg' : 'text-sm sm:text-base'
                 }`}>
                   {person.first_name} {person.last_name}
                 </h1>
                 
                 {/* Badges - Responsive flex wrap */}
-                <div className="flex flex-wrap items-end justify-end gap-1 sm:gap-1.5 flex-shrink-0 max-w-[50%]">
-                  <Badge variant="outline" className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs whitespace-nowrap">
-                    <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                <div className="flex flex-wrap items-end justify-end gap-0.5 sm:gap-1 flex-shrink-0 max-w-[50%]">
+                  <Badge variant="outline" className="flex items-center gap-0.5 px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] whitespace-nowrap">
+                    <TrendingUp className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
                     {person.utilizationPercentage}%
                   </Badge>
                   {person.department && (
-                    <Badge variant="outline" className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs truncate max-w-[80px] sm:max-w-none">
+                    <Badge variant="outline" className="flex items-center gap-0.5 px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] truncate max-w-[60px] sm:max-w-none">
                       {person.department}
                     </Badge>
                   )}
-                  <Badge variant="outline" className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs whitespace-nowrap">
-                    <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  <Badge variant="outline" className="flex items-center gap-0.5 px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] whitespace-nowrap">
+                    <MapPin className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
                     {person.location}
                   </Badge>
                 </div>
@@ -132,15 +132,15 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         </div>
 
         {/* Interactive Bar Graph with Inline Editing - Responsive */}
-        <div className="px-4 sm:px-6 py-2 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
+        <div className="px-3 sm:px-4 py-1.5 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
           <div className="w-full flex flex-col min-h-0 flex-1">
-            <h2 className={`font-semibold text-foreground mb-1.5 sm:mb-2 flex-shrink-0 ${
-              isFullscreen ? 'text-base sm:text-lg' : 'text-sm sm:text-base'
+            <h2 className={`font-semibold text-foreground mb-1 sm:mb-1.5 flex-shrink-0 ${
+              isFullscreen ? 'text-xs sm:text-sm' : 'text-[10px] sm:text-xs'
             }`}>
               Weekly Allocation
             </h2>
           
-          <div className="w-full h-10 sm:h-12 bg-muted/20 rounded-lg sm:rounded-xl overflow-hidden flex shadow-inner border border-border/30 flex-shrink-0">
+          <div className="w-full h-7 sm:h-8 bg-muted/20 rounded-md sm:rounded-lg overflow-hidden flex shadow-inner border border-border/30 flex-shrink-0">
             {/* Project Segments */}
             {person.projects && person.projects.length > 0 && person.projects.map((project: any, idx: number) => {
               const percentage = (project.hours / person.capacity) * 100;
@@ -173,7 +173,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    className="h-full flex items-center justify-center text-foreground font-semibold text-sm cursor-pointer hover:brightness-110 transition-all border-r border-border/30"
+                    className="h-full flex items-center justify-center text-foreground font-semibold text-[10px] sm:text-xs cursor-pointer hover:brightness-110 transition-all border-r border-border/30"
                     style={{
                       width: `${(totalLeaveHours / person.capacity) * 100}%`,
                       backgroundColor: 'hsl(var(--primary) / 0.1)',
@@ -196,7 +196,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    className="h-full flex items-center justify-center text-muted-foreground font-medium text-sm cursor-pointer hover:bg-muted/40 transition-all"
+                    className="h-full flex items-center justify-center text-muted-foreground font-medium text-[10px] sm:text-xs cursor-pointer hover:bg-muted/40 transition-all"
                     style={{
                       width: `${(availableHours / person.capacity) * 100}%`,
                       backgroundColor: 'hsl(var(--muted))',
@@ -219,26 +219,26 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
           
             {/* Project List - Scrollable with flex sizing */}
             {person.projects && person.projects.length > 0 && (
-              <div className="mt-1.5 sm:mt-2 space-y-1 sm:space-y-1.5 flex-1 min-h-0 overflow-y-auto">
+              <div className="mt-1 sm:mt-1.5 space-y-0.5 sm:space-y-1 flex-1 min-h-0 overflow-y-auto">
                 {person.projects.slice(0, 8).map((project, idx) => {
                   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
                   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
                   return (
-                    <div key={`${project.id}-list-${idx}`} className="flex items-center text-[10px] sm:text-xs project-list-item">
+                    <div key={`${project.id}-list-${idx}`} className="flex items-center text-[8px] sm:text-[10px] project-list-item">
                       <div
-                        className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0 mr-1.5 sm:mr-2"
+                        className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full flex-shrink-0 mr-1 sm:mr-1.5"
                         style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
                       />
-                      <span className="font-semibold text-foreground mr-1.5 sm:mr-2 project-code truncate" data-project-code>{primaryDisplay}</span>
-                      {secondaryDisplay && <span className="text-muted-foreground mr-1.5 sm:mr-2 truncate max-w-[100px] sm:max-w-[200px] project-name hidden sm:inline">{secondaryDisplay}</span>}
-                      <StandardizedBadge variant="metric" size="sm" className="project-hours-badge text-[9px] sm:text-xs ml-auto flex-shrink-0">
+                      <span className="font-semibold text-foreground mr-1 sm:mr-1.5 project-code truncate" data-project-code>{primaryDisplay}</span>
+                      {secondaryDisplay && <span className="text-muted-foreground mr-1 sm:mr-1.5 truncate max-w-[80px] sm:max-w-[150px] project-name hidden sm:inline">{secondaryDisplay}</span>}
+                      <StandardizedBadge variant="metric" size="sm" className="project-hours-badge text-[7px] sm:text-[9px] ml-auto flex-shrink-0">
                         {formatDualAllocationValue(project.hours, person.capacity, displayPreference)}
                       </StandardizedBadge>
                     </div>
                   );
                 })}
                 {person.projects.length > 8 && (
-                  <p className="text-[10px] sm:text-xs text-muted-foreground text-center pt-1">
+                  <p className="text-[8px] sm:text-[10px] text-muted-foreground text-center pt-0.5">
                     +{person.projects.length - 8} more
                   </p>
                 )}
@@ -246,7 +246,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
             )}
           
             {/* Action Buttons - Lower Right */}
-            <div className="mt-2 sm:mt-3 flex justify-end gap-1 flex-shrink-0">
+            <div className="mt-1 sm:mt-1.5 flex justify-end gap-0.5 flex-shrink-0">
               <AddProjectAllocation
                 memberId={person.id}
                 weekStartDate={weekStartDate}
@@ -264,9 +264,9 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                 size="icon"
                 variant="ghost"
                 onClick={() => setEditDialogOpen(true)}
-                className="h-6 w-6 sm:h-7 sm:w-7"
+                className="h-5 w-5 sm:h-6 sm:w-6"
               >
-                <Pencil className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <Pencil className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
               </Button>
             </div>
           </div>
