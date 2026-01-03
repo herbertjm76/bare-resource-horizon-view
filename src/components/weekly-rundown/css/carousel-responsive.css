@@ -4,7 +4,8 @@
 .carousel-container {
   position: relative;
   width: 100%;
-  min-height: 70vh;
+  /* Height/min-height is controlled by the component via Tailwind */
+  min-height: 0;
 }
 
 /* Navigation buttons positioning */
@@ -27,7 +28,7 @@
 @media (max-width: 640px) {
   /* Mobile: smaller buttons, positioned at edges */
   .carousel-container {
-    min-height: 60vh;
+    min-height: 0;
   }
   
   .carousel-container .absolute.left-4 {
@@ -80,7 +81,7 @@
 @media (max-width: 480px) {
   /* Very small screens */
   .carousel-container {
-    min-height: 50vh;
+    min-height: 0;
   }
   
   .carousel-container .glass-card {
