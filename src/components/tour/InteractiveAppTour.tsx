@@ -204,29 +204,32 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
         </motion.div>
       </div>
 
-      {/* Step Navigation Pills */}
-      <div className="mb-10">
-        <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+      {/* Step Navigation Pills - Single Line */}
+      <div className="mb-8 overflow-x-auto scrollbar-hide">
+        <div className="flex justify-center gap-1.5 min-w-max px-4">
           {tourSteps.map((step, index) => (
             <motion.button
               key={step.id}
               onClick={() => handleStepClick(index)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               className={cn(
-                "relative flex items-center gap-2.5 px-4 py-2.5 rounded-full transition-all duration-300",
-                "text-sm font-medium",
+                "relative flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-300",
+                "text-xs font-medium whitespace-nowrap",
                 index === currentStep
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                  ? "text-white shadow-lg"
                   : index < currentStep
-                    ? "bg-primary/10 text-primary hover:bg-primary/20"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-primary/15 text-primary hover:bg-primary/25"
+                    : "bg-muted/40 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
               )}
+              style={index === currentStep ? {
+                background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)))'
+              } : undefined}
             >
-              <span className="text-base">{step.icon}</span>
-              <span className="hidden sm:inline">{step.title}</span>
+              <span className="text-sm">{step.icon}</span>
+              <span>{step.title}</span>
               {index < currentStep && (
-                <Check className="w-3.5 h-3.5 text-primary" />
+                <Check className="w-3 h-3" />
               )}
             </motion.button>
           ))}
