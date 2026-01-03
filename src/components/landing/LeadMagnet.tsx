@@ -21,8 +21,7 @@ const LeadMagnet = () => {
             </div>
             
             <p className="text-lg text-foreground mb-6 max-w-2xl mx-auto">
-              See how the manual way works, then discover how BareResource does it in one click. 
-              Auto-email series shows you the faster path.
+              Start planning your team's capacity today with our ready-to-use Excel template.
             </p>
             
             <button className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold border-2 border-blue-200 hover:border-blue-300 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center mx-auto">
