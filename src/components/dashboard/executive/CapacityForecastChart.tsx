@@ -28,7 +28,7 @@ export const CapacityForecastChart: React.FC<CapacityForecastChartProps> = ({
   };
 
   return (
-    <Card className="rounded-2xl border-border/50 bg-card">
+    <Card className="rounded-2xl border-border/50 bg-card h-full">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Capacity Forecast (Next 8 Weeks)</CardTitle>
         <p className="text-xs text-muted-foreground">

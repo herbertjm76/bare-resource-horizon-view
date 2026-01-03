@@ -44,7 +44,7 @@ export const RiskAlertsSection: React.FC<RiskAlertsSectionProps> = ({
 
   if (alerts.length === 0) {
     return (
-      <Card className="rounded-2xl border-border/50 bg-card">
+      <Card className="rounded-2xl border-border/50 bg-card h-full">
         <CardContent className="p-4">
           <div className="flex items-center gap-3 text-green-600">
             <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
@@ -61,7 +61,7 @@ export const RiskAlertsSection: React.FC<RiskAlertsSectionProps> = ({
   }
 
   return (
-    <Card className="rounded-2xl border-border/50 bg-card">
+    <Card className="rounded-2xl border-border/50 bg-card h-full">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-orange-600" />

@@ -18,7 +18,7 @@ export const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   data
 }) => {
   return (
-    <Card className="rounded-2xl border-border/50 bg-card">
+    <Card className="rounded-2xl border-border/50 bg-card h-full">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>
