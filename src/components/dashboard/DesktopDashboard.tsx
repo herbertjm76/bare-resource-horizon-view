@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { SparklineMetricCard } from './executive/SparklineMetricCard';
 import { RiskAlertsSection } from './executive/RiskAlertsSection';
 import { HorizontalBarChart } from './executive/HorizontalBarChart';
@@ -12,6 +13,28 @@ import { Users, Briefcase, TrendingUp, AlertCircle } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useTimeRangeCapacity, getTimeRangeLabel } from '@/hooks/useTimeRangeCapacity';
 import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
+
+const rowVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut" as const
+    }
+  }
+};
 
 interface DesktopDashboardProps {
   selectedTimeRange: TimeRange;
@@ -145,8 +168,14 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   return (
     <div className="space-y-6">
       {/* Hero Metrics - 4 Key Numbers */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-0 h-full">
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        variants={rowVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <motion.div variants={cardVariants} className="h-full">
           <SparklineMetricCard
             title="Team Utilization"
             value={`${Math.round(utilizationRate)}%`}
@@ -156,8 +185,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             status={utilizationStatus.status}
             badge={utilizationStatus.badge}
           />
-        </div>
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-100 h-full">
+        </motion.div>
+        <motion.div variants={cardVariants} className="h-full">
           <SparklineMetricCard
             title="Active Projects"
             value={activeProjects}
@@ -166,8 +195,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             status={atRiskProjects > 0 ? 'warning' : 'good'}
             badge={atRiskProjects > 0 ? `${atRiskProjects} at risk` : 'On Track'}
           />
-        </div>
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200 h-full">
+        </motion.div>
+        <motion.div variants={cardVariants} className="h-full">
           <SparklineMetricCard
             title={`${timeRangeLabel} Capacity`}
             value={formatCapacityValue(Math.round(totalTeamCapacityForRange), displayPreference)}
@@ -176,8 +205,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             status={overloadedCount > 0 ? 'danger' : 'good'}
             badge={overloadedCount > 0 ? `${overloadedCount} overbooked` : 'Balanced'}
           />
-        </div>
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-300 h-full">
+        </motion.div>
+        <motion.div variants={cardVariants} className="h-full">
           <SparklineMetricCard
             title="Capacity Gap"
             value={hasCapacityGap 
@@ -188,42 +217,60 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             status={hasCapacityGap ? 'danger' : remainingCapacity < totalTeamCapacityForRange * 0.1 ? 'warning' : 'good'}
             badge={hasCapacityGap ? 'Over Capacity' : remainingCapacity < totalTeamCapacityForRange * 0.1 ? 'Nearly Full' : 'Well Planned'}
           />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Alerts + Project Pipeline Side by Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-400 h-full">
+      <motion.div 
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        variants={rowVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <motion.div variants={cardVariants} className="h-full">
           <RiskAlertsSection
             overloadedCount={overloadedCount}
             atRiskProjects={atRiskProjects}
             upcomingGaps={hasCapacityGap ? 1 : 0}
           />
-        </div>
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500 h-full">
+        </motion.div>
+        <motion.div variants={cardVariants} className="h-full">
           <HorizontalBarChart
             title="Project Pipeline"
             data={projectsByStatus}
           />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Second Row: Top Resources + Capacity Forecast */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-600 h-full">
+      <motion.div 
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        variants={rowVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <motion.div variants={cardVariants} className="h-full">
           <TopResourcesTable resources={topOverloadedResources} />
-        </div>
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-700 h-full">
+        </motion.div>
+        <motion.div variants={cardVariants} className="h-full">
           <CapacityForecastChart data={capacityForecastData} />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Third Row: Holidays */}
-      <div className="grid grid-cols-1 gap-6">
-        <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-800">
+      <motion.div 
+        className="grid grid-cols-1 gap-6"
+        variants={rowVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <motion.div variants={cardVariants}>
           <UnifiedHolidayCard data={data} />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };
