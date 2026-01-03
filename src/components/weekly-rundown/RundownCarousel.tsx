@@ -139,7 +139,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
         </div>
 
         {/* Carousel content */}
-        <div className="overflow-visible flex-1 min-h-0 pb-12" ref={emblaRef}>
+        <div className="overflow-hidden flex-1 min-h-0" ref={emblaRef}>
           <div className="flex h-full">
             {items.map((item, index) => {
               const isActive = index === currentIndex;
@@ -148,7 +148,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
               return (
                 <div
                   key={stableKey}
-                  className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 h-full"
+                  className="flex-[0_0_100%] sm:flex-[0_0_80%] lg:flex-[0_0_60%] px-4 h-full py-2"
                 >
                   <motion.div
                     className="mx-auto max-w-4xl h-full"
@@ -190,8 +190,8 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
 
         {/* Footer (dots + keyboard hint) */}
         {items.length > 1 && (
-          <div className="absolute bottom-0 left-0 right-0 z-20 pb-2 flex flex-col items-center gap-1 pointer-events-none">
-            <div className="flex justify-center items-center gap-3 pointer-events-auto">
+          <div className="pb-2 flex flex-col items-center gap-1">
+            <div className="flex justify-center items-center gap-3">
               {items.map((_, index) => (
                 <button
                   key={index}
