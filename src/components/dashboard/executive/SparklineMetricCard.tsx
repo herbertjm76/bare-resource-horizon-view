@@ -68,18 +68,18 @@ export const SparklineMetricCard: React.FC<SparklineMetricCardProps> = ({
   };
 
   return (
-    <Card className="rounded-2xl border-border/50 bg-card hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
+    <Card className="rounded-2xl border-border/50 bg-card hover:shadow-md transition-shadow h-full">
+      <CardContent className="p-4 h-full flex flex-col">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1 min-h-[2rem]">
               {title}
             </p>
             <p className="text-3xl font-bold text-foreground tracking-tight">
               {value}
             </p>
             {subtitle && (
-              <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+              <p className="text-xs text-muted-foreground mt-1 min-h-[1rem]">{subtitle}</p>
             )}
           </div>
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 ml-3">
@@ -87,13 +87,17 @@ export const SparklineMetricCard: React.FC<SparklineMetricCardProps> = ({
           </div>
         </div>
         
-        {badge && (
-          <Badge variant={getBadgeVariant()} className="text-xs mb-2">
-            {badge}
-          </Badge>
-        )}
-        
-        {renderSparkline()}
+        <div className="mt-auto">
+          {badge && (
+            <Badge variant={getBadgeVariant()} className="text-xs mb-2">
+              {badge}
+            </Badge>
+          )}
+          
+          <div className="h-[24px]">
+            {renderSparkline()}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
