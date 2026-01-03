@@ -93,7 +93,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         flex flex-col
       `}>
         {/* Hero Section */}
-        <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-4 pb-3">
+        <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl px-6 py-3">
           <div className="flex items-start gap-4">
             <Avatar className={`${isFullscreen ? 'h-20 w-20' : 'h-16 w-16'} ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
               <AvatarImage src={person.avatar_url} />
@@ -132,7 +132,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         </div>
 
         {/* Interactive Bar Graph with Inline Editing */}
-        <div className="px-4 py-2 relative z-10 flex-1 flex flex-col items-center justify-center">
+        <div className="px-6 py-2 relative z-10 flex-1 flex flex-col items-center justify-center">
           <div className="w-full">
             <h2 className={`font-semibold text-foreground mb-2 ${
               isFullscreen ? 'text-lg' : 'text-base'
