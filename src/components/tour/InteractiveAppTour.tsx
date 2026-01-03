@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,32 +7,11 @@ import { cn } from '@/lib/utils';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Import tour screenshots
-import dashboardScreenshot from '@/assets/tour/dashboard.png';
-import weeklyOverviewScreenshot from '@/assets/tour/weekly-overview.png';
-import resourceSchedulingScreenshot from '@/assets/tour/resource-scheduling.png';
-import projectPipelineScreenshot from '@/assets/tour/project-pipeline.png';
-import capacityHeatmapScreenshot from '@/assets/tour/capacity-heatmap.png';
-import teamLeaveScreenshot from '@/assets/tour/team-leave.png';
-import officeSettingsScreenshot from '@/assets/tour/office-settings.png';
-
-// Preload all screenshots for instant switching
-const allScreenshots = [
-  dashboardScreenshot,
-  weeklyOverviewScreenshot,
-  resourceSchedulingScreenshot,
-  projectPipelineScreenshot,
-  capacityHeatmapScreenshot,
-  teamLeaveScreenshot,
-  officeSettingsScreenshot,
-];
-
 interface TourStep {
   id: number;
   title: string;
   description: string;
   category: string;
-  screenshot: string;
   features: string[];
   icon: string;
   route: string;
@@ -44,7 +23,6 @@ const tourSteps: TourStep[] = [
     title: "Dashboard",
     description: "A single place to understand utilization, project health, and what needs attention this week.",
     category: "Overview",
-    screenshot: dashboardScreenshot,
     features: ["Utilization snapshot", "Upcoming work", "At-a-glance KPIs"],
     icon: "📊",
     route: "/dashboard"
@@ -54,7 +32,6 @@ const tourSteps: TourStep[] = [
     title: "Weekly Overview",
     description: "Plan capacity week-by-week and spot conflicts early with fast scanning views.",
     category: "Planning",
-    screenshot: weeklyOverviewScreenshot,
     features: ["Table / grid views", "Availability & leave context", "Quick scanning"],
     icon: "📅",
     route: "/weekly-overview"
@@ -64,7 +41,6 @@ const tourSteps: TourStep[] = [
     title: "Resource Scheduling",
     description: "Allocate people to projects and keep schedules aligned with reality.",
     category: "Scheduling",
-    screenshot: resourceSchedulingScreenshot,
     features: ["By project / by person", "Update allocations", "Plan ahead"],
     icon: "📈",
     route: "/resource-scheduling"
@@ -74,7 +50,6 @@ const tourSteps: TourStep[] = [
     title: "Project Pipeline",
     description: "Understand your project pipeline and resourcing needs across stages.",
     category: "Projects",
-    screenshot: projectPipelineScreenshot,
     features: ["Pipeline view", "Stage planning", "Capacity vs demand"],
     icon: "📁",
     route: "/resource-planning"
@@ -84,7 +59,6 @@ const tourSteps: TourStep[] = [
     title: "Capacity Heatmap",
     description: "See overload and underutilization instantly across your team.",
     category: "Insights",
-    screenshot: capacityHeatmapScreenshot,
     features: ["Color-coded capacity", "Filter by team / role", "Overload detection"],
     icon: "🔥",
     route: "/capacity-heatmap"
@@ -94,7 +68,6 @@ const tourSteps: TourStep[] = [
     title: "Team Leave",
     description: "Track time off so plans stay realistic.",
     category: "Availability",
-    screenshot: teamLeaveScreenshot,
     features: ["Leave overview", "Requests & approvals", "Coverage awareness"],
     icon: "🏖️",
     route: "/team-leave"
@@ -104,7 +77,6 @@ const tourSteps: TourStep[] = [
     title: "Office Settings",
     description: "Configure workspace settings and keep your org data tidy.",
     category: "Settings",
-    screenshot: officeSettingsScreenshot,
     features: ["Company settings", "Teams & roles", "Configuration"],
     icon: "⚙️",
     route: "/office-settings"
@@ -123,14 +95,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
   const [currentStep, setCurrentStep] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [direction, setDirection] = useState(0);
-
-  // Preload all images on mount for instant switching
-  useEffect(() => {
-    allScreenshots.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-    });
-  }, []);
+  const [iframeKey, setIframeKey] = useState(0);
 
   const currentTourStep = tourSteps[currentStep];
   const isFirstStep = currentStep === 0;
@@ -145,6 +110,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
     if (!isLastStep) {
       setDirection(1);
       setCurrentStep((s) => s + 1);
+      setIframeKey((k) => k + 1);
     }
   };
 
@@ -152,12 +118,14 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
     if (!isFirstStep) {
       setDirection(-1);
       setCurrentStep((s) => s - 1);
+      setIframeKey((k) => k + 1);
     }
   };
 
   const handleStepClick = (stepIndex: number) => {
     setDirection(stepIndex > currentStep ? 1 : -1);
     setCurrentStep(stepIndex);
+    setIframeKey((k) => k + 1);
   };
 
   const toggleFullscreen = () => setIsFullscreen((v) => !v);
@@ -167,19 +135,10 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
     navigate(`/demo${currentTourStep.route}`);
   };
 
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 100 : -100,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => ({
-      x: direction < 0 ? 100 : -100,
-      opacity: 0,
-    }),
+  // Get the demo route URL for iframe
+  const getIframeUrl = (route: string) => {
+    // Use the current origin with the demo route
+    return `/demo${route}?embed=true`;
   };
 
   return (
@@ -254,13 +213,13 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
 
       {/* Main Content Area */}
       <div className="grid lg:grid-cols-5 gap-8 lg:gap-12 items-start">
-        {/* Screenshot Section - Takes 3 columns */}
+        {/* Live Preview Section - Takes 3 columns */}
         <div className="lg:col-span-3">
           <div className="relative group">
             {/* Decorative background blur */}
             <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
             
-            {/* Screenshot container */}
+            {/* Preview container */}
             <div className="relative">
               {/* Subtle border glow */}
               <div className="absolute -inset-px bg-gradient-to-br from-primary/40 via-transparent to-primary/40 rounded-2xl opacity-60" />
@@ -288,22 +247,36 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
                   </Button>
                 </div>
 
-                {/* Screenshot with animation */}
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <AnimatePresence mode="wait" custom={direction}>
-                    <motion.img
-                      key={currentStep}
-                      custom={direction}
-                      variants={slideVariants}
-                      initial="enter"
-                      animate="center"
-                      exit="exit"
+                {/* Live iframe preview */}
+                <div className="relative aspect-[16/10] overflow-hidden bg-muted/20">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`${currentStep}-${iframeKey}`}
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
                       transition={{ duration: 0.3, ease: "easeInOut" }}
-                      src={currentTourStep.screenshot}
-                      alt={`${currentTourStep.title} screenshot`}
-                      className="absolute inset-0 w-full h-full object-cover object-top"
-                    />
+                      className="absolute inset-0"
+                    >
+                      <iframe
+                        src={getIframeUrl(currentTourStep.route)}
+                        title={`${currentTourStep.title} preview`}
+                        className="w-full h-full border-0 pointer-events-none"
+                        style={{
+                          transform: 'scale(0.5)',
+                          transformOrigin: 'top left',
+                          width: '200%',
+                          height: '200%',
+                        }}
+                        sandbox="allow-same-origin allow-scripts"
+                      />
+                    </motion.div>
                   </AnimatePresence>
+                  
+                  {/* Loading overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-background/50 opacity-0 pointer-events-none transition-opacity">
+                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  </div>
                   
                   {/* Overlay gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/10 via-transparent to-transparent pointer-events-none" />
@@ -397,7 +370,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
         </div>
       </div>
 
-      {/* Fullscreen modal */}
+      {/* Fullscreen modal with live iframe */}
       <AnimatePresence>
         {isFullscreen && (
           <motion.div
@@ -411,7 +384,7 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-w-7xl w-full"
+              className="relative max-w-7xl w-full h-[85vh]"
               onClick={(e) => e.stopPropagation()}
             >
               <Button
@@ -423,11 +396,14 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
                 <X className="h-4 w-4 mr-2" />
                 Close
               </Button>
-              <img
-                src={currentTourStep.screenshot}
-                alt={`${currentTourStep.title} screenshot (fullscreen)`}
-                className="w-full h-auto max-h-[85vh] object-contain rounded-xl shadow-2xl"
-              />
+              <div className="w-full h-full bg-background rounded-xl shadow-2xl overflow-hidden">
+                <iframe
+                  src={getIframeUrl(currentTourStep.route)}
+                  title={`${currentTourStep.title} fullscreen preview`}
+                  className="w-full h-full border-0"
+                  sandbox="allow-same-origin allow-scripts"
+                />
+              </div>
             </motion.div>
           </motion.div>
         )}
