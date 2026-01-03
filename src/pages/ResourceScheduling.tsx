@@ -96,142 +96,146 @@ const ResourceScheduling = () => {
     <StandardLayout>
       <div className="w-full h-full flex flex-col">
         <div className="max-w-[1600px] mx-auto w-full">
-          <StandardizedPageHeader
-            icon={GanttChartSquare}
-            title="Resource Scheduling"
-            description="Manage resource allocation across projects and team members"
-          />
+          <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-0">
+            <StandardizedPageHeader
+              icon={GanttChartSquare}
+              title="Resource Scheduling"
+              description="Manage resource allocation across projects and team members"
+            />
+          </div>
 
           {/* Centered Tabs with distinct styling */}
-          <CenteredTabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            tabs={[
-              { value: 'by-project', label: 'By Project', icon: GanttChartSquare },
-              { value: 'by-person', label: 'By Person', icon: Users },
-            ]}
-          >
-            <TabsContent value="by-project" className="mt-0 py-3">
-              <div className="space-y-4">
-                {/* 1. Available Members Row - always sorted by utilization, NOT filtered */}
-                <div className="px-3 sm:px-6">
-                  <AvailableMembersRow
-                    weekStartDate={weekStartDate}
-                    threshold={80}
-                  />
-                </div>
-                
-                {/* 2. Combined Controls + Member Filters - grouped in single card */}
-                <div className="px-3 sm:px-6">
-                  <div className="bg-card rounded-lg border shadow-sm">
-                    <ProjectResourcingContent
-                      selectedMonth={selectedMonth}
-                      searchTerm={projectSearchTerm}
-                      sortBy={sortBy}
-                      sortDirection={sortDirection}
-                      filters={filters}
-                      displayOptions={displayOptions}
-                      officeOptions={officeOptions}
-                      countryOptions={countryOptions}
-                      managers={managers}
-                      activeFiltersCount={activeFiltersCount}
-                      onMonthChange={handleMonthChange}
-                      onSearchChange={handleProjectSearchChange}
-                      onFilterChange={handleFilterChange}
-                      onPeriodChange={handlePeriodChange}
-                      onSortChange={handleSortChange}
-                      onSortDirectionToggle={handleSortDirectionToggle}
-                      onDisplayOptionChange={handleDisplayOptionChange}
-                      onClearFilters={clearProjectFilters}
-                      showOnlyControls={true}
-                    />
-                    <MemberFilterRow
-                      filters={memberFilters}
-                      onFilterChange={handleMemberFilterChange}
-                      activeFiltersCount={activeMemberFiltersCount}
-                      clearFilters={clearMemberFilters}
+          <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-100">
+            <CenteredTabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              tabs={[
+                { value: 'by-project', label: 'By Project', icon: GanttChartSquare },
+                { value: 'by-person', label: 'By Person', icon: Users },
+              ]}
+            >
+              <TabsContent value="by-project" className="mt-0 py-3">
+                <div className="space-y-4">
+                  {/* 1. Available Members Row - always sorted by utilization, NOT filtered */}
+                  <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
+                    <AvailableMembersRow
+                      weekStartDate={weekStartDate}
+                      threshold={80}
                     />
                   </div>
-                </div>
-                
-                {/* 3. Grid below */}
-                <div className="overflow-x-auto">
-                  <div className="px-3 sm:px-6">
-                    <ProjectResourcingContent
-                      selectedMonth={selectedMonth}
-                      searchTerm={projectSearchTerm}
-                      sortBy={sortBy}
-                      sortDirection={sortDirection}
-                      filters={filters}
-                      displayOptions={displayOptions}
-                      officeOptions={officeOptions}
-                      countryOptions={countryOptions}
-                      managers={managers}
-                      activeFiltersCount={activeFiltersCount}
-                      onMonthChange={handleMonthChange}
-                      onSearchChange={handleProjectSearchChange}
-                      onFilterChange={handleFilterChange}
-                      onPeriodChange={handlePeriodChange}
-                      onSortChange={handleSortChange}
-                      onSortDirectionToggle={handleSortDirectionToggle}
-                      onDisplayOptionChange={handleDisplayOptionChange}
-                      onClearFilters={clearProjectFilters}
-                      showOnlyGrid={true}
-                      memberFilters={memberFilters}
-                    />
+                  
+                  {/* 2. Combined Controls + Member Filters - grouped in single card */}
+                  <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-300">
+                    <div className="bg-card rounded-lg border shadow-sm">
+                      <ProjectResourcingContent
+                        selectedMonth={selectedMonth}
+                        searchTerm={projectSearchTerm}
+                        sortBy={sortBy}
+                        sortDirection={sortDirection}
+                        filters={filters}
+                        displayOptions={displayOptions}
+                        officeOptions={officeOptions}
+                        countryOptions={countryOptions}
+                        managers={managers}
+                        activeFiltersCount={activeFiltersCount}
+                        onMonthChange={handleMonthChange}
+                        onSearchChange={handleProjectSearchChange}
+                        onFilterChange={handleFilterChange}
+                        onPeriodChange={handlePeriodChange}
+                        onSortChange={handleSortChange}
+                        onSortDirectionToggle={handleSortDirectionToggle}
+                        onDisplayOptionChange={handleDisplayOptionChange}
+                        onClearFilters={clearProjectFilters}
+                        showOnlyControls={true}
+                      />
+                      <MemberFilterRow
+                        filters={memberFilters}
+                        onFilterChange={handleMemberFilterChange}
+                        activeFiltersCount={activeMemberFiltersCount}
+                        clearFilters={clearMemberFilters}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* 3. Grid below */}
+                  <div className="overflow-x-auto opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
+                    <div className="px-3 sm:px-6">
+                      <ProjectResourcingContent
+                        selectedMonth={selectedMonth}
+                        searchTerm={projectSearchTerm}
+                        sortBy={sortBy}
+                        sortDirection={sortDirection}
+                        filters={filters}
+                        displayOptions={displayOptions}
+                        officeOptions={officeOptions}
+                        countryOptions={countryOptions}
+                        managers={managers}
+                        activeFiltersCount={activeFiltersCount}
+                        onMonthChange={handleMonthChange}
+                        onSearchChange={handleProjectSearchChange}
+                        onFilterChange={handleFilterChange}
+                        onPeriodChange={handlePeriodChange}
+                        onSortChange={handleSortChange}
+                        onSortDirectionToggle={handleSortDirectionToggle}
+                        onDisplayOptionChange={handleDisplayOptionChange}
+                        onClearFilters={clearProjectFilters}
+                        showOnlyGrid={true}
+                        memberFilters={memberFilters}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="by-person" className="mt-0 py-3">
-              <div className="space-y-4">
-                {/* 1. Available Members Row - always sorted by utilization, NOT filtered */}
-                <div className="px-3 sm:px-6">
-                  <AvailableMembersRow
-                    weekStartDate={weekStartDate}
-                    threshold={80}
-                  />
-                </div>
-                
-                {/* 2. Combined Controls + Member Filters - grouped in single card */}
-                <div className="px-3 sm:px-6">
-                  <div className="bg-card rounded-lg border shadow-sm">
-                    <PersonResourceView
-                      startDate={selectedMonth}
-                      periodToShow={filters.periodToShow}
-                      displayOptions={displayOptions}
-                      onMonthChange={handleMonthChange}
-                      onPeriodChange={handlePeriodChange}
-                      showOnlyControls={true}
-                    />
-                    <MemberFilterRow
-                      filters={memberFilters}
-                      onFilterChange={handleMemberFilterChange}
-                      activeFiltersCount={activeMemberFiltersCount}
-                      clearFilters={clearMemberFilters}
+              <TabsContent value="by-person" className="mt-0 py-3">
+                <div className="space-y-4">
+                  {/* 1. Available Members Row - always sorted by utilization, NOT filtered */}
+                  <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
+                    <AvailableMembersRow
+                      weekStartDate={weekStartDate}
+                      threshold={80}
                     />
                   </div>
-                </div>
-                
-                {/* 3. Grid below */}
-                <div className="overflow-x-auto">
-                  <div className="px-3 sm:px-6">
-                    <PersonResourceView
-                      startDate={selectedMonth}
-                      periodToShow={filters.periodToShow}
-                      displayOptions={displayOptions}
-                      onMonthChange={handleMonthChange}
-                      onPeriodChange={handlePeriodChange}
-                      showOnlyGrid={true}
-                      memberFilters={memberFilters}
-                    />
+                  
+                  {/* 2. Combined Controls + Member Filters - grouped in single card */}
+                  <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-300">
+                    <div className="bg-card rounded-lg border shadow-sm">
+                      <PersonResourceView
+                        startDate={selectedMonth}
+                        periodToShow={filters.periodToShow}
+                        displayOptions={displayOptions}
+                        onMonthChange={handleMonthChange}
+                        onPeriodChange={handlePeriodChange}
+                        showOnlyControls={true}
+                      />
+                      <MemberFilterRow
+                        filters={memberFilters}
+                        onFilterChange={handleMemberFilterChange}
+                        activeFiltersCount={activeMemberFiltersCount}
+                        clearFilters={clearMemberFilters}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* 3. Grid below */}
+                  <div className="overflow-x-auto opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
+                    <div className="px-3 sm:px-6">
+                      <PersonResourceView
+                        startDate={selectedMonth}
+                        periodToShow={filters.periodToShow}
+                        displayOptions={displayOptions}
+                        onMonthChange={handleMonthChange}
+                        onPeriodChange={handlePeriodChange}
+                        showOnlyGrid={true}
+                        memberFilters={memberFilters}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </TabsContent>
+              </TabsContent>
 
-          </CenteredTabs>
+            </CenteredTabs>
+          </div>
         </div>
       </div>
     </StandardLayout>
