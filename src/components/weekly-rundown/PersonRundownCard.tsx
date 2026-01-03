@@ -92,37 +92,37 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         overflow-hidden
         flex flex-col
       `}>
-        {/* Hero Section */}
-        <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl px-6 py-3">
-          <div className="flex items-start gap-4">
-            <Avatar className={`${isFullscreen ? 'h-20 w-20' : 'h-16 w-16'} ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
+        {/* Hero Section - Responsive */}
+        <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl px-4 sm:px-6 py-2 sm:py-3 flex-shrink-0">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <Avatar className={`${isFullscreen ? 'h-16 w-16 sm:h-20 sm:w-20' : 'h-12 w-12 sm:h-16 sm:w-16'} ring-2 sm:ring-4 ring-primary/20 shadow-xl sm:shadow-2xl transition-transform hover:scale-105 flex-shrink-0`}>
               <AvatarImage src={person.avatar_url} />
-              <AvatarFallback className="text-2xl font-bold bg-gradient-modern text-white backdrop-blur-sm">
+              <AvatarFallback className="text-lg sm:text-2xl font-bold bg-gradient-modern text-white backdrop-blur-sm">
                 {person.first_name.charAt(0)}{person.last_name.charAt(0)}
               </AvatarFallback>
             </Avatar>
             
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-4 mb-1">
-                <h1 className={`font-bold text-foreground tracking-tight ${
-                  isFullscreen ? 'text-3xl' : 'text-2xl'
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <div className="flex items-start justify-between gap-2 sm:gap-4 mb-1">
+                <h1 className={`font-bold text-foreground tracking-tight truncate ${
+                  isFullscreen ? 'text-xl sm:text-3xl' : 'text-lg sm:text-2xl'
                 }`}>
                   {person.first_name} {person.last_name}
                 </h1>
                 
-                {/* Badges - Department, Location, and Utilization */}
-                <div className="flex flex-col items-end gap-1.5">
-                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
-                    <TrendingUp className="h-3 w-3" />
-                    {person.utilizationPercentage}% utilized
+                {/* Badges - Responsive flex wrap */}
+                <div className="flex flex-wrap items-end justify-end gap-1 sm:gap-1.5 flex-shrink-0 max-w-[50%]">
+                  <Badge variant="outline" className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs whitespace-nowrap">
+                    <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                    {person.utilizationPercentage}%
                   </Badge>
                   {person.department && (
-                    <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                    <Badge variant="outline" className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs truncate max-w-[80px] sm:max-w-none">
                       {person.department}
                     </Badge>
                   )}
-                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
-                    <MapPin className="h-3 w-3" />
+                  <Badge variant="outline" className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs whitespace-nowrap">
+                    <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                     {person.location}
                   </Badge>
                 </div>
@@ -131,16 +131,16 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
           </div>
         </div>
 
-        {/* Interactive Bar Graph with Inline Editing */}
-        <div className="px-6 py-2 relative z-10 flex-1 flex flex-col items-center justify-center">
-          <div className="w-full">
-            <h2 className={`font-semibold text-foreground mb-2 ${
-              isFullscreen ? 'text-lg' : 'text-base'
+        {/* Interactive Bar Graph with Inline Editing - Responsive */}
+        <div className="px-4 sm:px-6 py-2 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
+          <div className="w-full flex flex-col min-h-0 flex-1">
+            <h2 className={`font-semibold text-foreground mb-1.5 sm:mb-2 flex-shrink-0 ${
+              isFullscreen ? 'text-base sm:text-lg' : 'text-sm sm:text-base'
             }`}>
               Weekly Allocation
             </h2>
           
-          <div className="w-full h-12 bg-muted/20 rounded-xl overflow-hidden flex shadow-inner border border-border/30">
+          <div className="w-full h-10 sm:h-12 bg-muted/20 rounded-lg sm:rounded-xl overflow-hidden flex shadow-inner border border-border/30 flex-shrink-0">
             {/* Project Segments */}
             {person.projects && person.projects.length > 0 && person.projects.map((project: any, idx: number) => {
               const percentage = (project.hours / person.capacity) * 100;
@@ -217,36 +217,36 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
             )}
           </div>
           
-            {/* Project List */}
+            {/* Project List - Scrollable with flex sizing */}
             {person.projects && person.projects.length > 0 && (
-              <div className="mt-2 space-y-1.5 max-h-36 overflow-y-auto">
+              <div className="mt-1.5 sm:mt-2 space-y-1 sm:space-y-1.5 flex-1 min-h-0 overflow-y-auto">
                 {person.projects.slice(0, 8).map((project, idx) => {
                   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
                   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
                   return (
-                    <div key={`${project.id}-list-${idx}`} className="flex items-center text-xs project-list-item">
+                    <div key={`${project.id}-list-${idx}`} className="flex items-center text-[10px] sm:text-xs project-list-item">
                       <div
-                        className="w-2 h-2 rounded-full flex-shrink-0 mr-2"
+                        className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0 mr-1.5 sm:mr-2"
                         style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
                       />
-                      <span className="font-semibold text-foreground mr-2 project-code" data-project-code>{primaryDisplay}</span>
-                      {secondaryDisplay && <span className="text-muted-foreground mr-2 truncate max-w-[200px] project-name">{secondaryDisplay}</span>}
-                      <StandardizedBadge variant="metric" size="sm" className="project-hours-badge">
+                      <span className="font-semibold text-foreground mr-1.5 sm:mr-2 project-code truncate" data-project-code>{primaryDisplay}</span>
+                      {secondaryDisplay && <span className="text-muted-foreground mr-1.5 sm:mr-2 truncate max-w-[100px] sm:max-w-[200px] project-name hidden sm:inline">{secondaryDisplay}</span>}
+                      <StandardizedBadge variant="metric" size="sm" className="project-hours-badge text-[9px] sm:text-xs ml-auto flex-shrink-0">
                         {formatDualAllocationValue(project.hours, person.capacity, displayPreference)}
                       </StandardizedBadge>
                     </div>
                   );
                 })}
                 {person.projects.length > 8 && (
-                  <p className="text-xs text-muted-foreground text-center pt-1">
-                    +{person.projects.length - 8} more projects
+                  <p className="text-[10px] sm:text-xs text-muted-foreground text-center pt-1">
+                    +{person.projects.length - 8} more
                   </p>
                 )}
               </div>
             )}
           
             {/* Action Buttons - Lower Right */}
-            <div className="mt-3 flex justify-end gap-1">
+            <div className="mt-2 sm:mt-3 flex justify-end gap-1 flex-shrink-0">
               <AddProjectAllocation
                 memberId={person.id}
                 weekStartDate={weekStartDate}
@@ -264,9 +264,9 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
                 size="icon"
                 variant="ghost"
                 onClick={() => setEditDialogOpen(true)}
-                className="h-7 w-7"
+                className="h-6 w-6 sm:h-7 sm:w-7"
               >
-                <Pencil className="h-3.5 w-3.5" />
+                <Pencil className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </Button>
             </div>
           </div>
