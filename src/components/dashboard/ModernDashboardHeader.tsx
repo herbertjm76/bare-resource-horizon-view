@@ -18,20 +18,15 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   const { company } = useCompany();
   
   return (
-    <div className="bg-card/50 border border-border rounded-lg shadow-sm">
-      <div className="text-center py-6">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}>
-            <LayoutDashboard className="h-5 w-5" style={{ color: 'hsl(var(--theme-primary))' }} />
-          </div>
-          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: 'hsl(var(--theme-primary))' }}>
-            {company?.name || 'Company'} Dashboard
-          </h1>
-        </div>
-        <p className="text-muted-foreground text-lg">
-          Real-time insights into your team and project performance
-        </p>
-      </div>
+    <div className="flex flex-wrap items-center gap-2 mb-3 py-2">
+      <LayoutDashboard className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" style={{ color: 'hsl(var(--theme-primary))' }} />
+      <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight truncate" style={{ color: 'hsl(var(--theme-primary))' }}>
+        {company?.name || 'Company'} Dashboard
+      </h1>
+      <span className="text-muted-foreground hidden sm:inline">•</span>
+      <p className="text-sm text-muted-foreground hidden sm:block truncate">
+        Real-time insights into your team and project performance
+      </p>
     </div>
   );
 };

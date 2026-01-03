@@ -21,49 +21,38 @@ export const StandardizedPageHeader: React.FC<StandardizedPageHeaderProps> = ({
   onFullscreenToggle
 }) => {
   return (
-    <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6">
-      {/* Main Header Section with Subtle Background */}
-      <div className="bg-card/50 border border-border rounded-lg shadow-sm">
-        <div className="text-center py-4 sm:py-6 relative">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}>
-              <Icon className="h-5 w-5" style={{ color: 'hsl(var(--theme-primary))' }} />
-            </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: 'hsl(var(--theme-primary))' }}>
-              {title}
-            </h1>
-          </div>
-          <p className="text-muted-foreground text-lg hidden sm:block">
-            {description}
-          </p>
-          
-          {/* Fullscreen toggle in top-right */}
-          {typeof window !== 'undefined' && window.innerWidth >= 768 && onFullscreenToggle && (
-            <div className="absolute top-4 right-4">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onFullscreenToggle}
-                    className="h-9 w-9 p-0"
-                  >
-                    {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}</TooltipContent>
-              </Tooltip>
-            </div>
-          )}
-        </div>
+    <div className="flex flex-wrap items-center justify-between gap-2 mb-3 py-2">
+      {/* Left side: Icon, Title, Description */}
+      <div className="flex items-center gap-2 min-w-0">
+        <Icon className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" style={{ color: 'hsl(var(--theme-primary))' }} />
+        <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight truncate" style={{ color: 'hsl(var(--theme-primary))' }}>
+          {title}
+        </h1>
+        <span className="text-muted-foreground hidden sm:inline">•</span>
+        <p className="text-sm text-muted-foreground hidden sm:block truncate">
+          {description}
+        </p>
       </div>
 
-      {/* Additional content like stats cards */}
-      {children && (
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {children}
-        </div>
-      )}
+      {/* Right side: Children and Fullscreen toggle */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {children}
+        {typeof window !== 'undefined' && window.innerWidth >= 768 && onFullscreenToggle && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onFullscreenToggle}
+                className="h-8 w-8 p-0"
+              >
+                {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}</TooltipContent>
+          </Tooltip>
+        )}
+      </div>
     </div>
   );
 };
