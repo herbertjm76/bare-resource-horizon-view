@@ -160,9 +160,9 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
                   }}
                   transition={{
                     type: "spring",
-                    stiffness: 300,
-                    damping: 25,
-                    duration: 0.3
+                    stiffness: 120,
+                    damping: 20,
+                    mass: 0.8
                   }}
                 >
                   {rundownMode === 'people' ? (
