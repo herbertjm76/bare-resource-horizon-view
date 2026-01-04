@@ -113,10 +113,13 @@ const WeeklyOverview = () => {
   }, [selectedWeek]);
 
   // Create unfiltered members list for the avatar row (not affected by filters)
+  // Use stable reference with useMemo to prevent unnecessary re-renders
   const unfilteredMembers = useMemo(() => {
+    if (!profiles?.length && !invites?.length) return [];
+    
     const combined = [
-      ...(profiles || []).map(p => ({ ...p, status: 'active' })),
-      ...(invites || []).map(i => ({ ...i, status: 'pre_registered' }))
+      ...(profiles || []).map(p => ({ ...p, status: 'active' as const })),
+      ...(invites || []).map(i => ({ ...i, status: 'pre_registered' as const }))
     ];
     return combined.sort((a, b) => {
       const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase();
@@ -125,15 +128,17 @@ const WeeklyOverview = () => {
     });
   }, [profiles, invites]);
 
+  // Optimized refresh - invalidate in parallel, not sequentially
   const handleRefresh = useCallback(async () => {
-    await queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
-    await queryClient.invalidateQueries({ queryKey: ['active-team-members'] });
-    await queryClient.invalidateQueries({ queryKey: ['pre-registered-members'] });
-    await queryClient.invalidateQueries({ queryKey: ['available-members-profiles'] });
-    await queryClient.invalidateQueries({ queryKey: ['available-members-invites'] });
-    await queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
-    await queryClient.invalidateQueries({ queryKey: ['weekly-summary'] });
-    
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] }),
+      queryClient.invalidateQueries({ queryKey: ['active-team-members'] }),
+      queryClient.invalidateQueries({ queryKey: ['pre-registered-members'] }),
+      queryClient.invalidateQueries({ queryKey: ['available-members-profiles'] }),
+      queryClient.invalidateQueries({ queryKey: ['available-members-invites'] }),
+      queryClient.invalidateQueries({ queryKey: ['available-allocations'] }),
+      queryClient.invalidateQueries({ queryKey: ['weekly-summary'] }),
+    ]);
     toast.success('Weekly data refreshed!');
   }, [queryClient]);
 
@@ -212,8 +217,8 @@ const WeeklyOverview = () => {
               </AnimatedSection>
             )}
 
-            {/* Summary Cards */}
-            <AnimatedSection animation="cascadeUp" delay={100} staggerChildren staggerDelay={50}>
+            {/* Summary Cards - internal cascade handles staggering */}
+            <AnimatedSection animation="cascadeUp" delay={100}>
               <WeeklySummaryCards
                 selectedWeek={selectedWeek}
                 memberIds={memberIds}
@@ -232,8 +237,8 @@ const WeeklyOverview = () => {
 
             {/* Connected Filter and Content Section */}
             <div className="mt-0">
-              {/* Available Members Row - FIRST (shows availability/utilization) - NOT filtered */}
-              <AnimatedSection animation="cascadeUp" delay={200} staggerChildren staggerDelay={30}>
+              {/* Available Members Row - internal cascade handles avatar staggering */}
+              <AnimatedSection animation="cascadeUp" delay={200}>
                 <AvailableMembersRow
                   weekStartDate={weekStartString}
                   threshold={80}
@@ -243,7 +248,7 @@ const WeeklyOverview = () => {
               </AnimatedSection>
 
               {/* Unified Controls + Filters Combined */}
-              <AnimatedSection animation="cascadeUp" delay={300} staggerChildren staggerDelay={40}>
+              <AnimatedSection animation="cascadeUp" delay={250}>
                 <UnifiedWeeklyControls
                   selectedWeek={selectedWeek}
                   onWeekChange={handleWeekChange}
@@ -271,7 +276,7 @@ const WeeklyOverview = () => {
 
               {/* Table View */}
               {viewType === 'table' && (
-                <AnimatedSection animation="cascadeUp" delay={400} staggerChildren staggerDelay={50}>
+                <AnimatedSection animation="cascadeUp" delay={300}>
                   <WeekResourceView
                     selectedWeek={selectedWeek}
                     weekLabel={weekLabel}
@@ -295,7 +300,7 @@ const WeeklyOverview = () => {
 
               {/* Grid View */}
               {viewType === 'grid' && (
-                <AnimatedSection animation="cascadeUp" delay={400} staggerChildren staggerDelay={60} className="mt-4">
+                <AnimatedSection animation="cascadeUp" delay={300} className="mt-4">
                   <RundownGridView
                     items={rundownItems}
                     rundownMode={rundownMode}
@@ -307,7 +312,7 @@ const WeeklyOverview = () => {
 
               {/* Carousel View */}
               {viewType === 'carousel' && (
-                <AnimatedSection animation="cascadeUp" delay={400} staggerChildren staggerDelay={50} className="mt-4">
+                <AnimatedSection animation="cascadeUp" delay={300} className="mt-4">
                   <RundownCarousel
                     items={rundownItems}
                     rundownMode={rundownMode}
