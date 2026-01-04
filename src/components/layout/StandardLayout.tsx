@@ -27,7 +27,6 @@ export const StandardLayout: React.FC<StandardLayoutProps> = ({
         <AppSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 max-w-full">
           <AppHeader />
-          <div style={{ height: HEADER_HEIGHT }} />
           <main className={`flex-1 overflow-auto ${contentClassName} min-w-0 max-w-full`}>
             {title && (
               <div className="mb-6">
