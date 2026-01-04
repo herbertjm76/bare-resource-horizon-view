@@ -511,29 +511,34 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
               >
                 <div className="flex gap-1.5 sm:gap-2 items-center justify-start member-avatars-scroll min-h-[40px]">
                 {availableMembers.map((member, index) => (
-                  <MemberVacationPopover
+                  <div 
                     key={member.id}
-                    memberId={member.id}
-                    memberName={`${member.firstName} ${member.lastName}`}
-                    weekStartDate={weekStartDate}
+                    className="opacity-0 translate-y-3 animate-[cascadeUp_0.4s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards]"
+                    style={{ animationDelay: `${index * 30}ms` }}
                   >
-                    <div className={`cursor-pointer ${index === 0 ? 'ml-8' : ''}`}>
-                      <MemberAvailabilityCard
-                        memberId={member.id}
-                        memberType={member.type}
-                        firstName={member.firstName}
-                        lastName={member.lastName}
-                        avatarUrl={member.avatarUrl}
-                        allocatedHours={member.allocatedHours}
-                        utilization={member.utilization}
-                        capacity={member.capacity}
-                        projectAllocations={member.projectAllocations}
-                        leaveAllocations={member.leaveAllocations}
-                        threshold={threshold}
-                        weekStartDate={weekStartDate}
-                      />
-                    </div>
-                  </MemberVacationPopover>
+                    <MemberVacationPopover
+                      memberId={member.id}
+                      memberName={`${member.firstName} ${member.lastName}`}
+                      weekStartDate={weekStartDate}
+                    >
+                      <div className={`cursor-pointer ${index === 0 ? 'ml-8' : ''}`}>
+                        <MemberAvailabilityCard
+                          memberId={member.id}
+                          memberType={member.type}
+                          firstName={member.firstName}
+                          lastName={member.lastName}
+                          avatarUrl={member.avatarUrl}
+                          allocatedHours={member.allocatedHours}
+                          utilization={member.utilization}
+                          capacity={member.capacity}
+                          projectAllocations={member.projectAllocations}
+                          leaveAllocations={member.leaveAllocations}
+                          threshold={threshold}
+                          weekStartDate={weekStartDate}
+                        />
+                      </div>
+                    </MemberVacationPopover>
+                  </div>
                 ))}
                 </div>
               </div>
@@ -544,30 +549,35 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         {/* Mobile: Grid of avatars */}
         {availableMembers.length > 0 && (
           <div className="sm:hidden grid grid-cols-5 gap-2">
-            {availableMembers.slice(0, 10).map((member) => (
-              <MemberVacationPopover
+            {availableMembers.slice(0, 10).map((member, index) => (
+              <div 
                 key={member.id}
-                memberId={member.id}
-                memberName={`${member.firstName} ${member.lastName}`}
-                weekStartDate={weekStartDate}
+                className="opacity-0 translate-y-3 animate-[cascadeUp_0.4s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards]"
+                style={{ animationDelay: `${index * 40}ms` }}
               >
-                <div className="cursor-pointer">
-                  <MemberAvailabilityCard
-                    memberId={member.id}
-                    memberType={member.type}
-                    firstName={member.firstName}
-                    lastName={member.lastName}
-                    avatarUrl={member.avatarUrl}
-                    allocatedHours={member.allocatedHours}
-                    utilization={member.utilization}
-                    capacity={member.capacity}
-                    projectAllocations={member.projectAllocations}
-                    leaveAllocations={member.leaveAllocations}
-                    threshold={threshold}
-                    weekStartDate={weekStartDate}
-                  />
-                </div>
-              </MemberVacationPopover>
+                <MemberVacationPopover
+                  memberId={member.id}
+                  memberName={`${member.firstName} ${member.lastName}`}
+                  weekStartDate={weekStartDate}
+                >
+                  <div className="cursor-pointer">
+                    <MemberAvailabilityCard
+                      memberId={member.id}
+                      memberType={member.type}
+                      firstName={member.firstName}
+                      lastName={member.lastName}
+                      avatarUrl={member.avatarUrl}
+                      allocatedHours={member.allocatedHours}
+                      utilization={member.utilization}
+                      capacity={member.capacity}
+                      projectAllocations={member.projectAllocations}
+                      leaveAllocations={member.leaveAllocations}
+                      threshold={threshold}
+                      weekStartDate={weekStartDate}
+                    />
+                  </div>
+                </MemberVacationPopover>
+              </div>
             ))}
           </div>
         )}

@@ -506,10 +506,11 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
               style={containerStyle}
               {...dragHandlers}
             >
-              {cards.filter(c => c.id !== 'weekInfo').map((card) => (
+              {cards.filter(c => c.id !== 'weekInfo').map((card, index) => (
                 <div 
                   key={card.id} 
-                  className={`flex-1 min-w-[180px] cursor-pointer hover:scale-[1.02] transition-transform`}
+                  className={`flex-1 min-w-[180px] cursor-pointer hover:scale-[1.02] transition-transform opacity-0 translate-y-4 animate-[cascadeUp_0.5s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards]`}
+                  style={{ animationDelay: `${index * 60}ms` }}
                   onClick={(e) => {
                     if (shouldPreventClick()) {
                       e.preventDefault();
