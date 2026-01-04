@@ -8,6 +8,7 @@ import { RundownCarousel } from '@/components/weekly-rundown/RundownCarousel';
 import { UnifiedWeeklyControls } from '@/components/week-resourcing/UnifiedWeeklyControls';
 import { WeeklySummaryCards } from '@/components/weekly-rundown/WeeklySummaryCards';
 import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
+import { WeeklyOverviewSkeleton } from '@/components/weekly-rundown/skeletons/WeeklyOverviewSkeleton';
 
 import { useRundownData } from '@/components/weekly-rundown/hooks/useRundownData';
 import { useCarouselNavigation } from '@/components/weekly-rundown/hooks/useCarouselNavigation';
@@ -169,12 +170,7 @@ const WeeklyOverview = () => {
   if (isLoading) {
     return (
       <StandardLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading weekly data...</p>
-          </div>
-        </div>
+        <WeeklyOverviewSkeleton />
       </StandardLayout>
     );
   }
