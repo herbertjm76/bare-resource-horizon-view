@@ -29,7 +29,7 @@ interface RundownGridViewProps {
   selectedWeek: Date;
 }
 
-export const RundownGridView: React.FC<RundownGridViewProps> = ({
+export const RundownGridView: React.FC<RundownGridViewProps> = React.memo(({
   items,
   rundownMode,
   isFullscreen,
@@ -63,9 +63,9 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
       </div>
     </TooltipProvider>
   );
-};
+});
 
-const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person, selectedWeek }) => {
+const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = React.memo(({ person, selectedWeek }) => {
   const { startOfWorkWeek, displayPreference, workWeekHours, projectDisplayPreference } = useAppSettings();
   const capacity = person.capacity || workWeekHours;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -272,9 +272,9 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = ({ person,
     />
     </>
   );
-};
+});
 
-const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ project, selectedWeek }) => {
+const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = React.memo(({ project, selectedWeek }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
   const { projectDisplayPreference, startOfWorkWeek, displayPreference, workWeekHours } = useAppSettings();
@@ -464,4 +464,4 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = ({ proje
       />
     </>
   );
-};
+});

@@ -37,7 +37,7 @@ interface ProjectRundownCardProps {
   onDataChange: () => void;
 }
 
-export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
+export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = React.memo(({
   project,
   isActive,
   isFullscreen,
@@ -227,4 +227,4 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       />
     </div>
   );
-};
+});
