@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
+import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
 import { RundownGridView } from '@/components/weekly-rundown/RundownGridView';
 import { RundownCarousel } from '@/components/weekly-rundown/RundownCarousel';
@@ -22,27 +22,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import PullToRefresh from 'react-simple-pull-to-refresh';
 import '@/components/weekly-rundown/index.css';
 
-const rowVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut" as const
-    }
-  }
-};
 
 const WeeklyOverview = () => {
   const queryClient = useQueryClient();
@@ -222,176 +201,124 @@ const WeeklyOverview = () => {
           <div className={`space-y-0 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8 overflow-auto' : ''}`}>
           {/* Page Header - hidden in fullscreen */}
             {!isFullscreen && (
-              <motion.div 
-                className="mb-1.5"
-                variants={rowVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-              >
-                <motion.div variants={cardVariants}>
-                  <StandardizedPageHeader
-                    title="Weekly Overview"
-                    description="Switch between table, grid, and carousel views to manage your team's weekly resource allocation"
-                    icon={Calendar}
-                    isFullscreen={isFullscreen}
-                    onFullscreenToggle={handleFullscreenToggle}
-                  />
-                </motion.div>
-              </motion.div>
+              <AnimatedSection animation="cascadeUp" className="mb-1.5">
+                <StandardizedPageHeader
+                  title="Weekly Overview"
+                  description="Switch between table, grid, and carousel views to manage your team's weekly resource allocation"
+                  icon={Calendar}
+                  isFullscreen={isFullscreen}
+                  onFullscreenToggle={handleFullscreenToggle}
+                />
+              </AnimatedSection>
             )}
 
             {/* Summary Cards */}
-            <motion.div
-              variants={rowVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-            >
-              <motion.div variants={cardVariants}>
-                <WeeklySummaryCards
-                  selectedWeek={selectedWeek}
-                  memberIds={memberIds}
-                  cardVisibility={cardVisibility}
-                  cardOrder={cardOrder}
-                  toggleCard={toggleCard}
-                  moveCard={moveCard}
-                  reorderCards={reorderCards}
-                  annualLeaves={annualLeaves}
-                  holidays={holidays}
-                  otherLeaves={otherLeaves}
-                  weeklyNotes={weeklyNotes}
-                  customCardTypes={customCardTypes}
-                />
-              </motion.div>
-            </motion.div>
+            <AnimatedSection animation="cascadeUp" delay={100}>
+              <WeeklySummaryCards
+                selectedWeek={selectedWeek}
+                memberIds={memberIds}
+                cardVisibility={cardVisibility}
+                cardOrder={cardOrder}
+                toggleCard={toggleCard}
+                moveCard={moveCard}
+                reorderCards={reorderCards}
+                annualLeaves={annualLeaves}
+                holidays={holidays}
+                otherLeaves={otherLeaves}
+                weeklyNotes={weeklyNotes}
+                customCardTypes={customCardTypes}
+              />
+            </AnimatedSection>
 
             {/* Connected Filter and Content Section */}
             <div className="mt-0">
               {/* Available Members Row - FIRST (shows availability/utilization) - NOT filtered */}
-              <motion.div
-                variants={rowVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-              >
-                <motion.div variants={cardVariants}>
-                  <AvailableMembersRow
-                    weekStartDate={weekStartString}
-                    threshold={80}
-                    allMembers={unfilteredMembers}
-                    sortOption={sortOption}
-                  />
-                </motion.div>
-              </motion.div>
+              <AnimatedSection animation="cascadeUp" delay={200}>
+                <AvailableMembersRow
+                  weekStartDate={weekStartString}
+                  threshold={80}
+                  allMembers={unfilteredMembers}
+                  sortOption={sortOption}
+                />
+              </AnimatedSection>
 
               {/* Unified Controls + Filters Combined */}
-              <motion.div
-                variants={rowVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-              >
-                <motion.div variants={cardVariants}>
-                  <UnifiedWeeklyControls
-                    selectedWeek={selectedWeek}
-                    onWeekChange={handleWeekChange}
-                    weekLabel={weekLabel}
-                    viewType={viewType}
-                    onViewTypeChange={handleViewTypeChangeWithReset}
-                    rundownMode={rundownMode}
-                    onModeChange={handleModeChangeWithReset}
-                    sortOption={sortOption}
-                    onSortChange={handleSortChangeWithReset}
-                    isAutoAdvance={isAutoAdvance}
-                    onAutoAdvanceToggle={handleAutoAdvanceToggleWithCarousel}
-                    isFullscreen={isFullscreen}
-                    onFullscreenToggle={handleFullscreenToggle}
-                    viewMode={viewMode}
-                    onViewModeChange={setViewMode}
-                    tableOrientation={tableOrientation}
-                    onTableOrientationChange={setTableOrientation}
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                    activeFiltersCount={activeFiltersCount}
-                    clearFilters={clearFilters}
-                  />
-                </motion.div>
-              </motion.div>
+              <AnimatedSection animation="cascadeUp" delay={300}>
+                <UnifiedWeeklyControls
+                  selectedWeek={selectedWeek}
+                  onWeekChange={handleWeekChange}
+                  weekLabel={weekLabel}
+                  viewType={viewType}
+                  onViewTypeChange={handleViewTypeChangeWithReset}
+                  rundownMode={rundownMode}
+                  onModeChange={handleModeChangeWithReset}
+                  sortOption={sortOption}
+                  onSortChange={handleSortChangeWithReset}
+                  isAutoAdvance={isAutoAdvance}
+                  onAutoAdvanceToggle={handleAutoAdvanceToggleWithCarousel}
+                  isFullscreen={isFullscreen}
+                  onFullscreenToggle={handleFullscreenToggle}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                  tableOrientation={tableOrientation}
+                  onTableOrientationChange={setTableOrientation}
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  activeFiltersCount={activeFiltersCount}
+                  clearFilters={clearFilters}
+                />
+              </AnimatedSection>
 
               {/* Table View */}
               {viewType === 'table' && (
-                <motion.div
-                  variants={rowVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-50px" }}
-                >
-                  <motion.div variants={cardVariants}>
-                    <WeekResourceView
-                      selectedWeek={selectedWeek}
-                      weekLabel={weekLabel}
-                      tableOrientation={tableOrientation}
-                      allMembers={allMembers}
-                      projects={projects}
-                      isLoading={isLoading}
-                      error={error}
-                      allocationMap={allocationMap}
-                      annualLeaveData={annualLeaveData}
-                      holidaysData={holidaysData}
-                      otherLeaveData={otherLeaveData}
-                      getMemberTotal={getMemberTotal}
-                      getProjectCount={getProjectCount}
-                      getWeeklyLeave={getWeeklyLeave}
-                      updateOtherLeave={updateOtherLeave}
-                      searchTerm={filters.searchTerm}
-                    />
-                  </motion.div>
-                </motion.div>
+                <AnimatedSection animation="cascadeUp" delay={400}>
+                  <WeekResourceView
+                    selectedWeek={selectedWeek}
+                    weekLabel={weekLabel}
+                    tableOrientation={tableOrientation}
+                    allMembers={allMembers}
+                    projects={projects}
+                    isLoading={isLoading}
+                    error={error}
+                    allocationMap={allocationMap}
+                    annualLeaveData={annualLeaveData}
+                    holidaysData={holidaysData}
+                    otherLeaveData={otherLeaveData}
+                    getMemberTotal={getMemberTotal}
+                    getProjectCount={getProjectCount}
+                    getWeeklyLeave={getWeeklyLeave}
+                    updateOtherLeave={updateOtherLeave}
+                    searchTerm={filters.searchTerm}
+                  />
+                </AnimatedSection>
               )}
 
               {/* Grid View */}
               {viewType === 'grid' && (
-                <motion.div
-                  className="mt-4"
-                  variants={rowVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-50px" }}
-                >
-                  <motion.div variants={cardVariants}>
-                    <RundownGridView
-                      items={rundownItems}
-                      rundownMode={rundownMode}
-                      isFullscreen={isFullscreen}
-                      selectedWeek={selectedWeek}
-                    />
-                  </motion.div>
-                </motion.div>
+                <AnimatedSection animation="cascadeUp" delay={400} className="mt-4">
+                  <RundownGridView
+                    items={rundownItems}
+                    rundownMode={rundownMode}
+                    isFullscreen={isFullscreen}
+                    selectedWeek={selectedWeek}
+                  />
+                </AnimatedSection>
               )}
 
               {/* Carousel View */}
               {viewType === 'carousel' && (
-                <motion.div
-                  className="mt-4"
-                  variants={rowVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-50px" }}
-                >
-                  <motion.div variants={cardVariants}>
-                    <RundownCarousel
-                      items={rundownItems}
-                      rundownMode={rundownMode}
-                      currentIndex={currentIndex}
-                      onNext={nextItem}
-                      onPrev={prevItem}
-                      onGoTo={goToItem}
-                      selectedWeek={selectedWeek}
-                      isFullscreen={isFullscreen}
-                    />
-                  </motion.div>
-                </motion.div>
+                <AnimatedSection animation="cascadeUp" delay={400} className="mt-4">
+                  <RundownCarousel
+                    items={rundownItems}
+                    rundownMode={rundownMode}
+                    currentIndex={currentIndex}
+                    onNext={nextItem}
+                    onPrev={prevItem}
+                    onGoTo={goToItem}
+                    selectedWeek={selectedWeek}
+                    isFullscreen={isFullscreen}
+                  />
+                </AnimatedSection>
               )}
             </div>
           </div>
