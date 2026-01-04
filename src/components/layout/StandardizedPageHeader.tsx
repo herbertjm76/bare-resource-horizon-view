@@ -21,15 +21,16 @@ export const StandardizedPageHeader: React.FC<StandardizedPageHeaderProps> = ({
   onFullscreenToggle
 }) => {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 mb-3 py-2">
+    <div className="flex flex-wrap items-start justify-between gap-2 mb-3 py-2">
       {/* Left side: Icon, Title, Description */}
-      <div className="flex items-center gap-2 min-w-0">
-        <Icon className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" style={{ color: 'hsl(var(--theme-primary))' }} />
-        <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight truncate" style={{ color: 'hsl(var(--theme-primary))' }}>
-          {title}
-        </h1>
-        <span className="text-muted-foreground hidden sm:inline">•</span>
-        <p className="text-sm text-muted-foreground hidden sm:block truncate">
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <div className="flex items-center gap-2">
+          <Icon className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" style={{ color: 'hsl(var(--theme-primary))' }} />
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight truncate" style={{ color: 'hsl(var(--theme-primary))' }}>
+            {title}
+          </h1>
+        </div>
+        <p className="text-sm text-muted-foreground truncate pl-7 sm:pl-8">
           {description}
         </p>
       </div>
