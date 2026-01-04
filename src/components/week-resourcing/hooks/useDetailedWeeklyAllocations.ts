@@ -204,6 +204,9 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
 
       return result;
     },
-    enabled: (isDemoMode || !!company?.id) && memberIds.length > 0
+    enabled: (isDemoMode || !!company?.id) && memberIds.length > 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes - keep data fresh longer
+    gcTime: 5 * 60 * 1000,    // 5 minutes cache
+    placeholderData: (previousData) => previousData, // Show previous data while loading new
   });
 };
