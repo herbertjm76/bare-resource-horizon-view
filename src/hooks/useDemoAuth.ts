@@ -66,7 +66,10 @@ export const useDemoAuth = () => {
   const [isDemoMode, setIsDemoMode] = useState<boolean>(() => {
     const fromStorage = localStorage.getItem('demo_mode') === 'true';
     const fromRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/demo');
-    return fromStorage || fromRoute;
+    // Also check if company slug is 'demo' (case-insensitive)
+    const pathParts = typeof window !== 'undefined' ? window.location.pathname.split('/').filter(Boolean) : [];
+    const fromCompanySlug = pathParts.length > 0 && pathParts[0].toLowerCase() === 'demo';
+    return fromStorage || fromRoute || fromCompanySlug;
   });
 
   const [demoStartTime] = useState<number>(() => {
@@ -96,17 +99,20 @@ export const useDemoAuth = () => {
     window.location.href = '/';
   }, []);
 
-  // Keep demo mode consistent when user lands directly on /demo routes
+  // Keep demo mode consistent when user lands directly on /demo routes or /demo/* company slug routes
   useEffect(() => {
     const onDemoRoute = window.location.pathname.startsWith('/demo');
-    if (onDemoRoute && !isDemoMode) {
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const onDemoCompanySlug = pathParts.length > 0 && pathParts[0].toLowerCase() === 'demo';
+    
+    if ((onDemoRoute || onDemoCompanySlug) && !isDemoMode) {
       const startTime = Date.now();
       localStorage.setItem('demo_mode', 'true');
       localStorage.setItem('demo_start_time', startTime.toString());
       setIsDemoMode(true);
     }
 
-    if (!onDemoRoute && isDemoMode && localStorage.getItem('demo_mode') !== 'true') {
+    if (!onDemoRoute && !onDemoCompanySlug && isDemoMode && localStorage.getItem('demo_mode') !== 'true') {
       // If demo mode was only inferred from route and user navigates away, disable it.
       setIsDemoMode(false);
     }
