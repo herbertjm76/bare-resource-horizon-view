@@ -213,7 +213,7 @@ const WeeklyOverview = () => {
             )}
 
             {/* Summary Cards */}
-            <AnimatedSection animation="cascadeUp" delay={100}>
+            <AnimatedSection animation="cascadeUp" delay={100} staggerChildren staggerDelay={50}>
               <WeeklySummaryCards
                 selectedWeek={selectedWeek}
                 memberIds={memberIds}
@@ -233,7 +233,7 @@ const WeeklyOverview = () => {
             {/* Connected Filter and Content Section */}
             <div className="mt-0">
               {/* Available Members Row - FIRST (shows availability/utilization) - NOT filtered */}
-              <AnimatedSection animation="cascadeUp" delay={200}>
+              <AnimatedSection animation="cascadeUp" delay={200} staggerChildren staggerDelay={30}>
                 <AvailableMembersRow
                   weekStartDate={weekStartString}
                   threshold={80}
@@ -243,7 +243,7 @@ const WeeklyOverview = () => {
               </AnimatedSection>
 
               {/* Unified Controls + Filters Combined */}
-              <AnimatedSection animation="cascadeUp" delay={300}>
+              <AnimatedSection animation="cascadeUp" delay={300} staggerChildren staggerDelay={40}>
                 <UnifiedWeeklyControls
                   selectedWeek={selectedWeek}
                   onWeekChange={handleWeekChange}
@@ -271,7 +271,7 @@ const WeeklyOverview = () => {
 
               {/* Table View */}
               {viewType === 'table' && (
-                <AnimatedSection animation="cascadeUp" delay={400}>
+                <AnimatedSection animation="cascadeUp" delay={400} staggerChildren staggerDelay={50}>
                   <WeekResourceView
                     selectedWeek={selectedWeek}
                     weekLabel={weekLabel}
@@ -295,7 +295,7 @@ const WeeklyOverview = () => {
 
               {/* Grid View */}
               {viewType === 'grid' && (
-                <AnimatedSection animation="cascadeUp" delay={400} className="mt-4">
+                <AnimatedSection animation="cascadeUp" delay={400} staggerChildren staggerDelay={60} className="mt-4">
                   <RundownGridView
                     items={rundownItems}
                     rundownMode={rundownMode}
@@ -307,7 +307,7 @@ const WeeklyOverview = () => {
 
               {/* Carousel View */}
               {viewType === 'carousel' && (
-                <AnimatedSection animation="cascadeUp" delay={400} className="mt-4">
+                <AnimatedSection animation="cascadeUp" delay={400} staggerChildren staggerDelay={50} className="mt-4">
                   <RundownCarousel
                     items={rundownItems}
                     rundownMode={rundownMode}
