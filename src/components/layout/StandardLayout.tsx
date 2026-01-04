@@ -13,10 +13,12 @@ interface StandardLayoutProps {
   title?: string;
 }
 
+const CONTENT_CLASS = "pt-2 sm:pt-3 px-4 sm:px-8 pb-4 sm:pb-8";
+
 export const StandardLayout: React.FC<StandardLayoutProps> = ({ 
   children, 
   className = "bg-gray-50",
-  contentClassName = "p-4 sm:p-8",
+  contentClassName = CONTENT_CLASS,
   title
 }) => {
   return (
