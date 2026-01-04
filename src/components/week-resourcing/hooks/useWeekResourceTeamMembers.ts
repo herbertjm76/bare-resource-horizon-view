@@ -62,7 +62,9 @@ export const useWeekResourceTeamMembers = () => {
       );
     },
     enabled: true,
-    staleTime: 60_000,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000,    // 5 minutes cache
+    placeholderData: (previousData) => previousData,
   });
 
   // Get pre-registered team members
@@ -113,7 +115,9 @@ export const useWeekResourceTeamMembers = () => {
       }));
     },
     enabled: true,
-    staleTime: 60_000,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000,    // 5 minutes cache
+    placeholderData: (previousData) => previousData,
   });
 
   const members = [...activeMembers, ...preRegisteredMembers].sort((a, b) => {

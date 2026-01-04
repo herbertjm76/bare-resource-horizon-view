@@ -57,8 +57,8 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
       return data || [];
     },
     enabled: canFetch,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000,    // 5 minutes cache
     placeholderData: (previousData) => previousData,
   });
 };

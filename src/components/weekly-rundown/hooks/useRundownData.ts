@@ -99,7 +99,7 @@ export const useRundownData = ({
       // No sorting needed - allMembers is already sorted by useStreamlinedWeekResourceData
       return processedPeople;
     } else {
-      // Process projects data
+      // Process projects data - show ALL projects even without allocations
       // First, build a map of all project allocations per member
       const memberProjectsMap = new Map<string, Array<{ id: string; name: string; code: string; hours: number }>>();
       
@@ -161,8 +161,7 @@ export const useRundownData = ({
           department: project.department,
           teamMembers
         };
-      })
-      .filter(project => project.totalHours > 0); // Only show projects with allocations
+      }); // Show ALL projects, not just those with allocations
 
       // Sort projects based on sortOption
       processedProjects.sort((a, b) => {
