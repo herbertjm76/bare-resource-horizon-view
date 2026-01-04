@@ -182,21 +182,12 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
     return weeklyLeaveDetails[memberId] || [];
   }, [weeklyLeaveDetails]);
 
-  // Create a stable serialized version of memberTotalsMap for dependency tracking
-  const memberTotalsMapSerialized = useMemo(() => {
-    return JSON.stringify(Array.from(memberTotalsMap.entries()));
-  }, [memberTotalsMap]);
-
   // Apply sorting to filtered members - centralized sorting logic
   // This is the SINGLE SOURCE OF TRUTH for member ordering
   const members = useMemo(() => {
     if (!filteredMembers || filteredMembers.length === 0) return [];
     
-    // Parse the serialized map to get actual utilization values
-    const totalsEntries: [string, number][] = JSON.parse(memberTotalsMapSerialized);
-    const totalsMap = new Map<string, number>(totalsEntries);
-    
-    const sorted = [...filteredMembers].sort((a, b) => {
+    return [...filteredMembers].sort((a, b) => {
       const nameA = `${a.first_name || ''} ${a.last_name || ''}`.trim().toLowerCase();
       const nameB = `${b.first_name || ''} ${b.last_name || ''}`.trim().toLowerCase();
       
@@ -204,8 +195,8 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
         case 'alphabetical':
           return nameA.localeCompare(nameB);
         case 'utilization': {
-          const aTotal = totalsMap.get(a.id) || 0;
-          const bTotal = totalsMap.get(b.id) || 0;
+          const aTotal = memberTotalsMap.get(a.id) || 0;
+          const bTotal = memberTotalsMap.get(b.id) || 0;
           const aCapacity = a.weekly_capacity || workWeekHours;
           const bCapacity = b.weekly_capacity || workWeekHours;
           const aUtil = aCapacity > 0 ? (aTotal / aCapacity) * 100 : 0;
@@ -227,9 +218,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
           return nameA.localeCompare(nameB);
       }
     });
-    
-    return sorted;
-  }, [filteredMembers, sortOption, memberTotalsMapSerialized]);
+  }, [filteredMembers, sortOption, memberTotalsMap, workWeekHours]);
 
   // Simplified loading state - only block UI while team members are loading
   const isLoading = useMemo(() => {

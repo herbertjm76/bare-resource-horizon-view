@@ -39,7 +39,7 @@ interface MemberAvailabilityCardProps {
   capacity?: number;
 }
 
-export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
+export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = React.memo(({
   avatarUrl,
   firstName,
   lastName,
@@ -186,4 +186,6 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = ({
       </Tooltip>
     </TooltipProvider>
   );
-};
+});
+
+MemberAvailabilityCard.displayName = 'MemberAvailabilityCard';
