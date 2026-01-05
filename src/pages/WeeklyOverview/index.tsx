@@ -297,7 +297,7 @@ const WeeklyOverview = () => {
 
               {/* Grid View */}
               {viewType === 'grid' && (
-                <AnimatedSection animation="cascadeUp" delay={300} className="mt-4">
+                <div className="mt-4">
                   <RundownGridView
                     items={rundownItems}
                     rundownMode={rundownMode}
@@ -305,7 +305,7 @@ const WeeklyOverview = () => {
                     selectedWeek={selectedWeek}
                     isLoading={isLoading || isAllocationsLoading}
                   />
-                </AnimatedSection>
+                </div>
               )}
 
               {/* Carousel View */}
