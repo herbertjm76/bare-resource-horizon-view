@@ -53,7 +53,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
   });
   
   // Fetch allocations for ALL members - FIXED: Use detailed allocations that fetch all 7 days of the week
-  const { data: detailedAllocations } = useDetailedWeeklyAllocations(
+  const { data: detailedAllocations, isLoading: isLoadingAllocations } = useDetailedWeeklyAllocations(
     selectedWeek, 
     shouldFetchData ? allMemberIds : []
   );
@@ -226,6 +226,9 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
     return loadingMembers;
   }, [loadingMembers]);
 
+  // Separate flag for allocation loading - used for grid/carousel skeleton states
+  const isAllocationsLoading = shouldFetchData && isLoadingAllocations;
+
   const error = membersError || null;
 
   // Unsorted members for avatar row (alphabetical order by default)
@@ -246,6 +249,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
     projects: projects || [],
     allocations: detailedAllocations ? Object.values(detailedAllocations).flatMap(m => m.daily_allocations) : [],
     isLoading,
+    isAllocationsLoading,
     error,
     allocationMap,
     getMemberTotal,
@@ -262,6 +266,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
     projects,
     detailedAllocations,
     isLoading,
+    isAllocationsLoading,
     error,
     allocationMap,
     getMemberTotal,

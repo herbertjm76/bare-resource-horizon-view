@@ -27,14 +27,61 @@ interface RundownGridViewProps {
   rundownMode: RundownMode;
   isFullscreen: boolean;
   selectedWeek: Date;
+  isLoading?: boolean;
 }
+
+// Skeleton component for grid cards
+const GridCardSkeleton: React.FC = () => (
+  <div className="glass-card rounded-xl border p-4 animate-pulse">
+    <div className="flex items-center gap-3 mb-3">
+      <div className="h-10 w-10 rounded-full bg-muted" />
+      <div className="flex-1">
+        <div className="h-4 bg-muted rounded w-24 mb-1" />
+        <div className="h-3 bg-muted rounded w-16" />
+      </div>
+      <div className="h-5 w-12 bg-muted rounded" />
+    </div>
+    <div className="h-6 bg-muted/30 rounded-lg mb-3" />
+    <div className="space-y-1.5">
+      <div className="flex justify-between">
+        <div className="h-3 bg-muted rounded w-20" />
+        <div className="h-3 bg-muted rounded w-10" />
+      </div>
+      <div className="flex justify-between">
+        <div className="h-3 bg-muted rounded w-24" />
+        <div className="h-3 bg-muted rounded w-8" />
+      </div>
+    </div>
+    <div className="flex justify-between mt-3 pt-2 border-t border-border/50">
+      <div className="h-3 bg-muted rounded w-16" />
+      <div className="flex gap-1">
+        <div className="h-7 w-7 bg-muted rounded" />
+        <div className="h-7 w-7 bg-muted rounded" />
+      </div>
+    </div>
+  </div>
+);
 
 export const RundownGridView: React.FC<RundownGridViewProps> = React.memo(({
   items,
   rundownMode,
   isFullscreen,
-  selectedWeek
+  selectedWeek,
+  isLoading = false
 }) => {
+  const gridCols = isFullscreen ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+
+  // Show skeletons while loading
+  if (isLoading) {
+    return (
+      <div className={`grid ${gridCols} gap-4`}>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <GridCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return (
       <div className="flex items-center justify-center h-96 bg-card rounded-lg border">
@@ -45,8 +92,6 @@ export const RundownGridView: React.FC<RundownGridViewProps> = React.memo(({
       </div>
     );
   }
-
-  const gridCols = isFullscreen ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
 
   return (
     <TooltipProvider>
