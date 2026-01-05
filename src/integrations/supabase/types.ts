@@ -2256,6 +2256,19 @@ export type Database = {
         }[]
       }
       get_current_user_company_id: { Args: never; Returns: string }
+      get_invite_by_code: {
+        Args: { invite_code: string }
+        Returns: {
+          company_id: string
+          email: string
+          first_name: string
+          id: string
+          invitation_type: string
+          last_name: string
+          role: string
+          status: string
+        }[]
+      }
       get_user_company_id: { Args: { user_id: string }; Returns: string }
       get_user_company_id_safe: { Args: never; Returns: string }
       get_user_profile_by_id: {
