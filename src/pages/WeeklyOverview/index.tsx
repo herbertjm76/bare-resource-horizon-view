@@ -303,7 +303,7 @@ const WeeklyOverview = () => {
                     rundownMode={rundownMode}
                     isFullscreen={isFullscreen}
                     selectedWeek={selectedWeek}
-                    isLoading={isAllocationsLoading}
+                    isLoading={isLoading || isAllocationsLoading}
                   />
                 </AnimatedSection>
               )}
