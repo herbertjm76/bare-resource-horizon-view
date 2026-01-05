@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
@@ -7,6 +8,31 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Processing import-excel-ai request for user:', user.id);
+
     const { detectionType, examples, explanation, allData } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
@@ -15,19 +41,13 @@ serve(async (req) => {
     }
 
     // Smart data sampling to avoid context window limits
-    // Include the specific range the user mentioned, plus surrounding context
     let sampledData = allData;
     const dataSize = JSON.stringify(allData).length;
     const MAX_SIZE = 500000; // ~500KB limit for AI context
     
     if (dataSize > MAX_SIZE) {
-      // If data is too large, intelligently sample it
       const totalRows = allData.length;
-      
-      // Always include first 20 rows (likely headers and structure)
       const headerRows = allData.slice(0, 20);
-      
-      // Include middle and end samples
       const middleStart = Math.floor(totalRows / 2) - 10;
       const middleRows = allData.slice(middleStart, middleStart + 20);
       const endRows = allData.slice(-20);
