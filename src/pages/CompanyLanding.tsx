@@ -19,12 +19,11 @@ const CompanyLanding: React.FC = () => {
         const authenticated = !!session?.user;
         setIsAuthenticated(authenticated);
 
-        // Try to fetch company info (no auth required for this check)
-        const { data: company } = await supabase
-          .from('companies')
-          .select('id, name')
-          .eq('subdomain', companySlug)
-          .maybeSingle();
+        // Use secure function to fetch limited company info (no auth required)
+        const { data: companyResult } = await supabase
+          .rpc('get_company_by_subdomain', { subdomain_param: companySlug });
+        
+        const company = companyResult && companyResult.length > 0 ? companyResult[0] : null;
 
         if (company) {
           setCompanyName(company.name);

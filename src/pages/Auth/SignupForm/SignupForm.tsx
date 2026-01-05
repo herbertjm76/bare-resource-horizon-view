@@ -37,13 +37,11 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const checkSubdomainAvailability = async (subdomain: string) => {
     setSubdomainCheck({ isChecking: true, error: '' });
     try {
-      const { count, error } = await supabase
-        .from('companies')
-        .select('*', { count: 'exact', head: true })
-        .eq('subdomain', subdomain.toLowerCase());
+      const { data: isAvailable, error } = await supabase
+        .rpc('check_subdomain_available', { subdomain_param: subdomain.toLowerCase() });
       if (error) throw error;
       setSubdomainCheck({ isChecking: false, error: '' });
-      return count === 0;
+      return isAvailable === true;
     } catch {
       setSubdomainCheck({ isChecking: false, error: 'Could not check subdomain.' });
       return false;

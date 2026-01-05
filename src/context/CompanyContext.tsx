@@ -101,10 +101,12 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // For unauthenticated users, still fetch company data for public pages like /join
       const { data: { session } } = await supabase.auth.getSession();
       
-      // Check if we're on a public join page
+      // Check if we're on a public join page or company landing page
       const isJoinPage = window.location.pathname.startsWith('/join/');
+      const isCompanyLandingPage = !window.location.pathname.includes('/') || 
+        window.location.pathname.split('/').filter(Boolean).length === 1;
       
-      if (!session?.user && !isJoinPage) {
+      if (!session?.user && !isJoinPage && !isCompanyLandingPage) {
         setCompany(null);
         // Do NOT toast here; unauthenticated users may just be visiting a public slug
         setLoading(false);
@@ -112,11 +114,25 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
       
-      const { data, error: fetchError } = await supabase
-        .from('companies')
-        .select('*')
-        .eq('subdomain', slugValue)
-        .single();
+      // For unauthenticated users, use the secure RPC function that returns limited data
+      // For authenticated users, use direct table access
+      let data;
+      let fetchError;
+      
+      if (!session?.user) {
+        const { data: rpcResult, error: rpcError } = await supabase
+          .rpc('get_company_by_subdomain', { subdomain_param: slugValue });
+        data = rpcResult && rpcResult.length > 0 ? rpcResult[0] : null;
+        fetchError = rpcError;
+      } else {
+        const { data: tableData, error: tableError } = await supabase
+          .from('companies')
+          .select('*')
+          .eq('subdomain', slugValue)
+          .single();
+        data = tableData;
+        fetchError = tableError;
+      }
 
       if (fetchError) {
         logger.warn('CompanyProvider: no company found for slug, continuing without company', {
