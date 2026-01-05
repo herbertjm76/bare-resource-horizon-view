@@ -273,29 +273,31 @@ const WeeklyOverview = () => {
 
               {/* Table View */}
               {viewType === 'table' && (
-                <WeekResourceView
-                  selectedWeek={selectedWeek}
-                  weekLabel={weekLabel}
-                  tableOrientation={tableOrientation}
-                  allMembers={allMembers}
-                  projects={projects}
-                  isLoading={isLoading}
-                  error={error}
-                  allocationMap={allocationMap}
-                  annualLeaveData={annualLeaveData}
-                  holidaysData={holidaysData}
-                  otherLeaveData={otherLeaveData}
-                  getMemberTotal={getMemberTotal}
-                  getProjectCount={getProjectCount}
-                  getWeeklyLeave={getWeeklyLeave}
-                  updateOtherLeave={updateOtherLeave}
-                  searchTerm={filters.searchTerm}
-                />
+                <AnimatedSection animation="cascadeUp" delay={300} className="mt-4">
+                  <WeekResourceView
+                    selectedWeek={selectedWeek}
+                    weekLabel={weekLabel}
+                    tableOrientation={tableOrientation}
+                    allMembers={allMembers}
+                    projects={projects}
+                    isLoading={isLoading}
+                    error={error}
+                    allocationMap={allocationMap}
+                    annualLeaveData={annualLeaveData}
+                    holidaysData={holidaysData}
+                    otherLeaveData={otherLeaveData}
+                    getMemberTotal={getMemberTotal}
+                    getProjectCount={getProjectCount}
+                    getWeeklyLeave={getWeeklyLeave}
+                    updateOtherLeave={updateOtherLeave}
+                    searchTerm={filters.searchTerm}
+                  />
+                </AnimatedSection>
               )}
 
               {/* Grid View */}
               {viewType === 'grid' && (
-                <div className="mt-4">
+                <AnimatedSection animation="cascadeUp" delay={300} className="mt-4">
                   <RundownGridView
                     items={rundownItems}
                     rundownMode={rundownMode}
@@ -303,7 +305,7 @@ const WeeklyOverview = () => {
                     selectedWeek={selectedWeek}
                     isLoading={isLoading || isAllocationsLoading}
                   />
-                </div>
+                </AnimatedSection>
               )}
 
               {/* Carousel View */}
