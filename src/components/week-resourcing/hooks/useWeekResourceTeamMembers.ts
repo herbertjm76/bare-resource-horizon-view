@@ -2,10 +2,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { useCompanyId } from '@/hooks/useCompanyId';
 import { DEMO_PRE_REGISTERED, DEMO_TEAM_MEMBERS } from '@/data/demoData';
 
 export const useWeekResourceTeamMembers = () => {
   const { isDemoMode } = useDemoAuth();
+  const { companyId, isReady } = useCompanyId();
 
   // Keep session query for non-demo mode
   useQuery({
@@ -18,9 +20,11 @@ export const useWeekResourceTeamMembers = () => {
     enabled: !isDemoMode,
   });
 
+  const canFetch = (isDemoMode || isReady) && (isDemoMode || !!companyId);
+
   // Get active team members
   const { data: activeMembers = [], isLoading: isLoadingActive, error: activeError } = useQuery({
-    queryKey: ['active-team-members', isDemoMode],
+    queryKey: ['active-team-members', isDemoMode, isDemoMode ? 'demo' : companyId],
     queryFn: async () => {
       if (isDemoMode) {
         return DEMO_TEAM_MEMBERS.map((m) => ({
@@ -37,12 +41,12 @@ export const useWeekResourceTeamMembers = () => {
         }));
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
+      if (!companyId) return [];
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, location, department, practice_area, weekly_capacity, avatar_url');
+        .select('id, first_name, last_name, email, location, department, practice_area, weekly_capacity, avatar_url')
+        .eq('company_id', companyId);
 
       if (error) return [];
 
@@ -61,9 +65,9 @@ export const useWeekResourceTeamMembers = () => {
         })) || []
       );
     },
-    enabled: true,
+    enabled: canFetch,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000,    // 5 minutes cache
+    gcTime: 5 * 60 * 1000, // 5 minutes cache
     placeholderData: (previousData) => previousData,
   });
 
@@ -73,7 +77,7 @@ export const useWeekResourceTeamMembers = () => {
     isLoading: isLoadingPreRegistered,
     error: preRegisteredError,
   } = useQuery({
-    queryKey: ['pre-registered-members', isDemoMode],
+    queryKey: ['pre-registered-members', isDemoMode, isDemoMode ? 'demo' : companyId],
     queryFn: async () => {
       if (isDemoMode) {
         return DEMO_PRE_REGISTERED.map((m) => ({
@@ -90,12 +94,12 @@ export const useWeekResourceTeamMembers = () => {
         }));
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.id) return [];
+      if (!companyId) return [];
 
       const { data, error } = await supabase
         .from('invites')
         .select('id, first_name, last_name, email, department, location, practice_area, job_title, role, weekly_capacity, avatar_url')
+        .eq('company_id', companyId)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
 
@@ -114,9 +118,9 @@ export const useWeekResourceTeamMembers = () => {
         status: 'pre_registered',
       }));
     },
-    enabled: true,
+    enabled: canFetch,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000,    // 5 minutes cache
+    gcTime: 5 * 60 * 1000, // 5 minutes cache
     placeholderData: (previousData) => previousData,
   });
 
@@ -135,4 +139,5 @@ export const useWeekResourceTeamMembers = () => {
     membersError,
   };
 };
+
 
