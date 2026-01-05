@@ -61,6 +61,7 @@ const WeeklyOverview = () => {
     allMembers,
     projects,
     isLoading,
+    isAllocationsLoading,
     error,
     getMemberTotalForRundown,
     getMemberTotal,
@@ -302,6 +303,7 @@ const WeeklyOverview = () => {
                     rundownMode={rundownMode}
                     isFullscreen={isFullscreen}
                     selectedWeek={selectedWeek}
+                    isLoading={isAllocationsLoading}
                   />
                 </AnimatedSection>
               )}
