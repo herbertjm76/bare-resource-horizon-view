@@ -64,11 +64,9 @@ export const useResourceOptions = () => {
       try {
         setLoading(true);
         
-        // Fetch active team members from profiles with office_role_id
+        // Fetch active team members using secure function that masks emails for non-admins
         const { data: activeMembers, error: activeError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('company_id', company.id);
+          .rpc('get_profiles_secure', { p_company_id: company.id });
           
         if (activeError) throw activeError;
         
