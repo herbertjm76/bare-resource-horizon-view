@@ -13,6 +13,7 @@ import { CountUpNumber } from '@/components/common/CountUpNumber';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { usePermissions } from '@/hooks/usePermissions';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { formatAllocationValue, formatDualAllocationValue, formatAvailableValue } from '@/utils/allocationDisplay';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
@@ -59,7 +60,9 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
   const [refreshKey, setRefreshKey] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { projectDisplayPreference, displayPreference, startOfWorkWeek } = useAppSettings();
-  
+  const { isAtLeastRole } = usePermissions();
+  const canManageAllocations = isAtLeastRole('admin');
+
   const getUtilizationStatus = (percentage: number) => {
     if (percentage > 100) return { color: 'destructive', label: 'Overloaded', icon: AlertTriangle };
     if (percentage >= 90) return { color: 'warning', label: 'High Utilization', icon: AlertTriangle };
@@ -247,27 +250,31 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
           
             {/* Action Buttons - Lower Right */}
             <div className="mt-1 sm:mt-1.5 flex justify-end gap-0.5 flex-shrink-0">
-              <AddProjectAllocation
-                memberId={person.id}
-                weekStartDate={weekStartDate}
-                existingProjectIds={person.projects.map(p => p.id)}
-                onAdd={handleDataChange}
-                variant="compact"
-              />
-              <OtherLeaveSection
-                memberId={person.id}
-                weekStartDate={weekStartDate}
-                onUpdate={handleDataChange}
-                variant="compact"
-              />
-              <Button 
-                size="icon"
-                variant="ghost"
-                onClick={() => setEditDialogOpen(true)}
-                className="h-5 w-5 sm:h-6 sm:w-6"
-              >
-                <Pencil className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-              </Button>
+              {canManageAllocations && (
+                <>
+                  <AddProjectAllocation
+                    memberId={person.id}
+                    weekStartDate={weekStartDate}
+                    existingProjectIds={person.projects.map(p => p.id)}
+                    onAdd={handleDataChange}
+                    variant="compact"
+                  />
+                  <OtherLeaveSection
+                    memberId={person.id}
+                    weekStartDate={weekStartDate}
+                    onUpdate={handleDataChange}
+                    variant="compact"
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setEditDialogOpen(true)}
+                    className="h-5 w-5 sm:h-6 sm:w-6"
+                  >
+                    <Pencil className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

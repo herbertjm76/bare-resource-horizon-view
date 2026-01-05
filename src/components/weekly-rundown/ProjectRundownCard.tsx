@@ -9,6 +9,7 @@ import { CountUpNumber } from '@/components/common/CountUpNumber';
 import * as LucideIcons from 'lucide-react';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { usePermissions } from '@/hooks/usePermissions';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { formatDualAllocationValue } from '@/utils/allocationDisplay';
 
@@ -47,8 +48,10 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = React.memo(
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
   const { projectDisplayPreference, startOfWorkWeek, workWeekHours, displayPreference } = useAppSettings();
+  const { isAtLeastRole } = usePermissions();
+  const canManageAllocations = isAtLeastRole('admin');
   const sortedMembers = [...project.teamMembers].sort((a, b) => b.hours - a.hours);
-  
+
   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
 
@@ -171,21 +174,25 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = React.memo(
             </div>
             {/* Action buttons bottom right */}
             <div className="flex justify-end mt-0.5 gap-0.5 flex-shrink-0">
-              <AddTeamMemberAllocation
-                projectId={project.id}
-                weekStartDate={weekStartDateString}
-                existingMemberIds={project.teamMembers.map(m => m.id)}
-                onAdd={onDataChange}
-                variant="compact"
-              />
-              <Button 
-                size="icon"
-                variant="ghost"
-                onClick={() => setEditDialogOpen(true)}
-                className="h-5 w-5 sm:h-6 sm:w-6"
-              >
-                <Pencil className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-              </Button>
+              {canManageAllocations && (
+                <>
+                  <AddTeamMemberAllocation
+                    projectId={project.id}
+                    weekStartDate={weekStartDateString}
+                    existingMemberIds={project.teamMembers.map(m => m.id)}
+                    onAdd={onDataChange}
+                    variant="compact"
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setEditDialogOpen(true)}
+                    className="h-5 w-5 sm:h-6 sm:w-6"
+                  >
+                    <Pencil className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         ) : (
@@ -199,21 +206,25 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = React.memo(
               </div>
             </div>
             <div className="flex justify-end mt-1 gap-0.5 flex-shrink-0">
-              <AddTeamMemberAllocation
-                projectId={project.id}
-                weekStartDate={weekStartDateString}
-                existingMemberIds={[]}
-                onAdd={onDataChange}
-                variant="compact"
-              />
-              <Button 
-                size="icon"
-                variant="ghost"
-                onClick={() => setEditDialogOpen(true)}
-                className="h-5 w-5 sm:h-6 sm:w-6"
-              >
-                <Pencil className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-              </Button>
+              {canManageAllocations && (
+                <>
+                  <AddTeamMemberAllocation
+                    projectId={project.id}
+                    weekStartDate={weekStartDateString}
+                    existingMemberIds={[]}
+                    onAdd={onDataChange}
+                    variant="compact"
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setEditDialogOpen(true)}
+                    className="h-5 w-5 sm:h-6 sm:w-6"
+                  >
+                    <Pencil className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
