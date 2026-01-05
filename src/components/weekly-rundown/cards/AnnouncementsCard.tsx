@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { generateDemoAnnouncements } from '@/data/demoData';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Announcement {
   id: string;
@@ -29,6 +30,7 @@ interface AnnouncementsCardProps {
 export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartDate, announcements: prefetchedAnnouncements }) => {
   const { company } = useCompany();
   const { isDemoMode } = useDemoAuth();
+  const { isSuperAdmin } = usePermissions();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -171,14 +173,16 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
         <CardHeader className="pb-1 flex-shrink-0 h-[40px] flex items-start pt-3">
           <div className="flex items-center justify-between w-full">
             <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Announcements</CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0 -mt-1"
-              onClick={(e) => { e.stopPropagation(); handleAdd(); }}
-            >
-              <Plus className="h-3.5 w-3.5" />
-            </Button>
+            {isSuperAdmin && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 -mt-1"
+                onClick={(e) => { e.stopPropagation(); handleAdd(); }}
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto scrollbar-grey relative z-10">
@@ -195,24 +199,26 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
                         <p className="text-xs text-muted-foreground line-clamp-2">{announcement.content}</p>
                       )}
                     </div>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={() => handleEdit(announcement)}
-                      >
-                        <Pencil className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={() => deleteMutation.mutate(announcement.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
+                    {isSuperAdmin && (
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => handleEdit(announcement)}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => deleteMutation.mutate(announcement.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </li>
               ))}
