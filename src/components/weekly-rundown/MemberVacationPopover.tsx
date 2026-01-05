@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getTotalAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
 import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
-import { useAuthorization } from '@/hooks/useAuthorization';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface MemberVacationPopoverProps {
   memberId: string;
@@ -42,14 +42,14 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
 }) => {
   const { company } = useCompany();
   const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
+  const { isSuperAdmin } = usePermissions();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('project');
-  
-  // Check if user is admin or owner
-  const { userRole } = useAuthorization();
-  const canEdit = userRole === 'admin' || userRole === 'owner';
-  
+
+  // Super Admin only: if not allowed, render non-clickable children (no popover)
+  const canEdit = isSuperAdmin;
+
   // Leave types from company settings
   const { leaveTypes } = useLeaveTypes();
 
