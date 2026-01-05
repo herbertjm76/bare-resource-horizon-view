@@ -2256,6 +2256,14 @@ export type Database = {
         }[]
       }
       get_current_user_company_id: { Args: never; Returns: string }
+      get_financial_data_secure: {
+        Args: {
+          p_company_id: string
+          p_data_type: string
+          p_project_id?: string
+        }
+        Returns: Json
+      }
       get_invite_by_code: {
         Args: { invite_code: string }
         Returns: {
@@ -2290,6 +2298,29 @@ export type Database = {
           start_date: string
           updated_at: string
           weekly_capacity: number
+        }[]
+      }
+      get_projects_secure: {
+        Args: { p_company_id?: string }
+        Returns: {
+          average_rate: number
+          blended_rate: number
+          budget_amount: number
+          budget_hours: number
+          code: string
+          consumed_hours: number
+          contract_end_date: string
+          contract_start_date: string
+          country: string
+          current_stage: string
+          department: string
+          financial_status: string
+          id: string
+          name: string
+          project_manager_id: string
+          stages: string[]
+          status: string
+          target_profit_percentage: number
         }[]
       }
       get_user_company_id: { Args: { user_id: string }; Returns: string }
