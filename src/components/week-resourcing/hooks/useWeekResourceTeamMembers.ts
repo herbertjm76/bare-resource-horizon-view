@@ -7,7 +7,7 @@ import { DEMO_PRE_REGISTERED, DEMO_TEAM_MEMBERS } from '@/data/demoData';
 
 export const useWeekResourceTeamMembers = () => {
   const { isDemoMode } = useDemoAuth();
-  const { companyId, isReady } = useCompanyId();
+  const { companyId, isReady, isLoading: isCompanyLoading } = useCompanyId();
 
   // Keep session query for non-demo mode
   useQuery({
@@ -21,7 +21,8 @@ export const useWeekResourceTeamMembers = () => {
   });
 
   const canFetch = isDemoMode || (isReady && !!companyId);
-  const isWaitingForCompany = !isDemoMode && !isReady;
+  // Only treat as "waiting" during actual loading, not when there's an error
+  const isWaitingForCompany = !isDemoMode && isCompanyLoading;
 
   // Get active team members
   const { data: activeMembers = [], isLoading: isLoadingActive, error: activeError } = useQuery({
