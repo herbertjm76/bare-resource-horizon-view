@@ -72,11 +72,9 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Fetch profiles
+        // Fetch profiles using secure function that masks emails for non-admins
         const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('company_id', resolvedCompanyId);
+          .rpc('get_profiles_secure', { p_company_id: resolvedCompanyId });
 
         if (profilesError) {
           logger.error('Failed to load team members:', profilesError);

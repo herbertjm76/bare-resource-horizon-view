@@ -2269,6 +2269,29 @@ export type Database = {
           status: string
         }[]
       }
+      get_profiles_secure: {
+        Args: { p_company_id?: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          company_id: string
+          created_at: string
+          date_of_birth: string
+          department: string
+          email: string
+          first_name: string
+          id: string
+          job_title: string
+          last_name: string
+          location: string
+          manager_id: string
+          office_role_id: string
+          practice_area: string
+          start_date: string
+          updated_at: string
+          weekly_capacity: number
+        }[]
+      }
       get_user_company_id: { Args: { user_id: string }; Returns: string }
       get_user_company_id_safe: { Args: never; Returns: string }
       get_user_profile_by_id: {
