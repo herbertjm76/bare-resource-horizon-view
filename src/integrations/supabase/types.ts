@@ -2277,6 +2277,7 @@ export type Database = {
           status: string
         }[]
       }
+      get_my_company_id: { Args: never; Returns: string }
       get_profiles_secure: {
         Args: { p_company_id?: string }
         Returns: {
