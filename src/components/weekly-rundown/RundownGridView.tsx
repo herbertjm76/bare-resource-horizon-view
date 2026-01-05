@@ -17,6 +17,7 @@ import { AddProjectAllocation } from './AddProjectAllocation';
 import { OtherLeaveSection } from './OtherLeaveSection';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { usePermissions } from '@/hooks/usePermissions';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
 import { formatAllocationValue, formatDualAllocationValue } from '@/utils/allocationDisplay';
@@ -112,10 +113,13 @@ export const RundownGridView: React.FC<RundownGridViewProps> = React.memo(({
 
 const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = React.memo(({ person, selectedWeek }) => {
   const { startOfWorkWeek, displayPreference, workWeekHours, projectDisplayPreference } = useAppSettings();
+  const { isAtLeastRole } = usePermissions();
+  const canManageAllocations = isAtLeastRole('admin');
+
   const capacity = person.capacity || workWeekHours;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  
+
   // Calculate week start date string for MemberVacationPopover
   const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
   const personName = `${person.first_name || ''} ${person.last_name || ''}`.trim() || person.name || 'Unknown';
@@ -284,27 +288,31 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = React.memo
           <span>{person.projects?.length || 0} projects</span>
         </div>
         <div className="flex items-center gap-1">
-          <AddProjectAllocation
-            memberId={person.id}
-            weekStartDate={weekStartDate}
-            existingProjectIds={person.projects?.map((p: any) => p.id) || []}
-            onAdd={handleDataChange}
-            variant="compact"
-          />
-          <OtherLeaveSection
-            memberId={person.id}
-            weekStartDate={weekStartDate}
-            onUpdate={handleDataChange}
-            variant="compact"
-          />
-          <Button 
-            size="icon"
-            variant="ghost"
-            onClick={() => setEditDialogOpen(true)}
-            className="h-7 w-7"
-          >
-            <Pencil className="h-3.5 w-3.5" />
-          </Button>
+          {canManageAllocations && (
+            <>
+              <AddProjectAllocation
+                memberId={person.id}
+                weekStartDate={weekStartDate}
+                existingProjectIds={person.projects?.map((p: any) => p.id) || []}
+                onAdd={handleDataChange}
+                variant="compact"
+              />
+              <OtherLeaveSection
+                memberId={person.id}
+                weekStartDate={weekStartDate}
+                onUpdate={handleDataChange}
+                variant="compact"
+              />
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setEditDialogOpen(true)}
+                className="h-7 w-7"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -323,7 +331,9 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = React.me
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
   const { projectDisplayPreference, startOfWorkWeek, displayPreference, workWeekHours } = useAppSettings();
-  
+  const { isAtLeastRole } = usePermissions();
+  const canManageAllocations = isAtLeastRole('admin');
+
   // Calculate week start date string for MemberVacationPopover
   const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
   
@@ -480,22 +490,26 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = React.me
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <AddTeamMemberAllocation
-                projectId={project.id}
-                weekStartDate={weekStartDate}
-                variant="compact"
-              />
-              <Button 
-                size="icon"
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditDialogOpen(true);
-                }}
-                className="h-7 w-7"
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
+              {canManageAllocations && (
+                <>
+                  <AddTeamMemberAllocation
+                    projectId={project.id}
+                    weekStartDate={weekStartDate}
+                    variant="compact"
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditDialogOpen(true);
+                    }}
+                    className="h-7 w-7"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
