@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getTotalAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
 import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
+import { useAuthorization } from '@/hooks/useAuthorization';
 
 interface MemberVacationPopoverProps {
   memberId: string;
@@ -45,9 +46,13 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('project');
   
+  // Check if user is admin or owner
+  const { userRole } = useAuthorization();
+  const canEdit = userRole === 'admin' || userRole === 'owner';
+  
   // Leave types from company settings
   const { leaveTypes } = useLeaveTypes();
-  
+
   // Get default value based on display preference
   const getDefaultHours = () => displayPreference === 'percentage' ? '20' : '8'; // 20% of 40h = 8h
   
@@ -343,6 +348,11 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     
     return { totalHours, workingDays };
   }, [vacationDate, vacationEndDate, startDayPortion, endDayPortion, dailyHours]);
+
+  // If user doesn't have edit permission, just render children without popover
+  if (!canEdit) {
+    return <>{children}</>;
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
