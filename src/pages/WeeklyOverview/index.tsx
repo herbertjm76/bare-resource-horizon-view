@@ -273,26 +273,24 @@ const WeeklyOverview = () => {
 
               {/* Table View */}
               {viewType === 'table' && (
-                <AnimatedSection animation="cascadeUp" delay={300}>
-                  <WeekResourceView
-                    selectedWeek={selectedWeek}
-                    weekLabel={weekLabel}
-                    tableOrientation={tableOrientation}
-                    allMembers={allMembers}
-                    projects={projects}
-                    isLoading={isLoading}
-                    error={error}
-                    allocationMap={allocationMap}
-                    annualLeaveData={annualLeaveData}
-                    holidaysData={holidaysData}
-                    otherLeaveData={otherLeaveData}
-                    getMemberTotal={getMemberTotal}
-                    getProjectCount={getProjectCount}
-                    getWeeklyLeave={getWeeklyLeave}
-                    updateOtherLeave={updateOtherLeave}
-                    searchTerm={filters.searchTerm}
-                  />
-                </AnimatedSection>
+                <WeekResourceView
+                  selectedWeek={selectedWeek}
+                  weekLabel={weekLabel}
+                  tableOrientation={tableOrientation}
+                  allMembers={allMembers}
+                  projects={projects}
+                  isLoading={isLoading}
+                  error={error}
+                  allocationMap={allocationMap}
+                  annualLeaveData={annualLeaveData}
+                  holidaysData={holidaysData}
+                  otherLeaveData={otherLeaveData}
+                  getMemberTotal={getMemberTotal}
+                  getProjectCount={getProjectCount}
+                  getWeeklyLeave={getWeeklyLeave}
+                  updateOtherLeave={updateOtherLeave}
+                  searchTerm={filters.searchTerm}
+                />
               )}
 
               {/* Grid View */}
