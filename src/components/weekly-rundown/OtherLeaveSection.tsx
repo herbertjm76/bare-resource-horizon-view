@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface OtherLeaveSectionProps {
   memberId: string;
@@ -31,6 +32,7 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
   variant = 'default'
 }) => {
   const { company } = useCompany();
+  const { isSuperAdmin } = usePermissions();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [hours, setHours] = useState<number>(0);
@@ -123,6 +125,10 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
       console.error(error);
     }
   });
+  // If not super admin, don't render any buttons
+  if (!isSuperAdmin) {
+    return null;
+  }
 
   return (
     <>
