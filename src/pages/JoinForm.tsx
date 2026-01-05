@@ -35,13 +35,11 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
 
       logger.debug('Fetching invite details for code:', inviteCode);
 
-      const { data: invite, error } = await supabase
-        .from('invites')
-        .select('*')
-        .eq('code', inviteCode)
-        .eq('status', 'pending')
-        .maybeSingle();
+      // Use secure RPC function that only returns invite data when exact code matches
+      const { data: invites, error } = await supabase
+        .rpc('get_invite_by_code', { invite_code: inviteCode });
 
+      const invite = invites?.[0];
       logger.debug('Invite data:', invite);
       logger.debug('Invite error:', error);
 
@@ -94,15 +92,13 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
 
         const validatedData = validationResult.data;
 
-        // Validate invite code if provided
+        // Validate invite code if provided using secure RPC function
         let inviteRecord = null;
         if (effectiveInviteCode) {
-          const { data: invite, error: inviteError } = await supabase
-            .from('invites')
-            .select('*')
-            .eq('code', effectiveInviteCode)
-            .eq('status', 'pending')
-            .maybeSingle();
+          const { data: invites, error: inviteError } = await supabase
+            .rpc('get_invite_by_code', { invite_code: effectiveInviteCode });
+
+          const invite = invites?.[0];
 
           if (inviteError) {
             console.error('Error validating invite:', inviteError);
