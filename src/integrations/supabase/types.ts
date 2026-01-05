@@ -2231,6 +2231,19 @@ export type Database = {
           total_spent: number
         }[]
       }
+      check_subdomain_available: {
+        Args: { subdomain_param: string }
+        Returns: boolean
+      }
+      get_company_by_subdomain: {
+        Args: { subdomain_param: string }
+        Returns: {
+          id: string
+          logo_url: string
+          name: string
+          subdomain: string
+        }[]
+      }
       get_company_leave_approvers: {
         Args: { p_company_id: string }
         Returns: {
