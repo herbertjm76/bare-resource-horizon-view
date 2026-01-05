@@ -65,7 +65,6 @@ const JoinFormFields: React.FC<JoinFormFieldsProps> = ({
         required
         disabled={isEmailLocked}
         autoComplete="off"
-        key={email}
       />
       {isEmailLocked && (
         <p className="text-xs text-white/60 mt-1">Email is locked to match your invite</p>
