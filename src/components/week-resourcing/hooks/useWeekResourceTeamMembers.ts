@@ -20,7 +20,8 @@ export const useWeekResourceTeamMembers = () => {
     enabled: !isDemoMode,
   });
 
-  const canFetch = (isDemoMode || isReady) && (isDemoMode || !!companyId);
+  const canFetch = isDemoMode || (isReady && !!companyId);
+  const isWaitingForCompany = !isDemoMode && !isReady;
 
   // Get active team members
   const { data: activeMembers = [], isLoading: isLoadingActive, error: activeError } = useQuery({
@@ -130,7 +131,8 @@ export const useWeekResourceTeamMembers = () => {
     return nameA.localeCompare(nameB);
   });
 
-  const loadingMembers = isLoadingActive || isLoadingPreRegistered;
+  // Treat waiting for companyId as loading state to show skeleton
+  const loadingMembers = isWaitingForCompany || isLoadingActive || isLoadingPreRegistered;
   const membersError = activeError || preRegisteredError;
 
   return {
