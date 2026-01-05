@@ -24,10 +24,46 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      throw new Error("No authorization header");
+      console.error("No authorization header provided");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Extract and verify the JWT token
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error("Invalid token or user not found:", authError);
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`User ${user.id} authenticated, verifying company access`);
+
+    // Get the user's company_id from their profile
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("company_id")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile?.company_id) {
+      console.error("User has no company:", profileError);
+      return new Response(
+        JSON.stringify({ error: "User does not belong to a company" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userCompanyId = profile.company_id;
+    console.log(`User belongs to company: ${userCompanyId}`);
 
     const { inviteIds }: BulkInviteRequest = await req.json();
 
@@ -41,13 +77,14 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Processing ${inviteIds.length} invites`);
+    console.log(`Processing ${inviteIds.length} invites for company ${userCompanyId}`);
 
-    // Fetch invite details
+    // Fetch invite details - CRITICAL: Filter by user's company_id
     const { data: invites, error: invitesError } = await supabase
       .from("invites")
-      .select("id, email, first_name, last_name, code, invitation_type, companies(name, subdomain)")
+      .select("id, email, first_name, last_name, code, invitation_type, company_id, companies(name, subdomain)")
       .in("id", inviteIds)
+      .eq("company_id", userCompanyId) // Only allow invites from user's company
       .eq("invitation_type", "pre_registered")
       .eq("status", "pending");
 
@@ -58,7 +95,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!invites || invites.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No valid pre-registered invites found" }),
+        JSON.stringify({ error: "No valid pre-registered invites found for your company" }),
         {
           status: 404,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -66,7 +103,19 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Found ${invites.length} valid invites to send`);
+    // Security check: Ensure we found all requested invites in user's company
+    if (invites.length !== inviteIds.length) {
+      console.warn(`Security: User ${user.id} attempted to access ${inviteIds.length} invites but only ${invites.length} belong to their company`);
+      return new Response(
+        JSON.stringify({ error: "Some invite IDs do not belong to your company" }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log(`Found ${invites.length} valid invites to send for company ${userCompanyId}`);
 
     const results = {
       successful: 0,
