@@ -62,19 +62,26 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
       </td>
       
       {/* Project name column with stage controls */}
-      <td className={`project-name-column ${headerBgClass} p-2`}>
+      <td
+        className={`project-name-column ${headerBgClass} p-2 cursor-pointer`}
+        onClick={onToggleExpand}
+        role="button"
+        aria-label={isExpanded ? 'Collapse project' : 'Expand project'}
+      >
         <div className="flex items-center justify-between gap-2">
           <div className="truncate-text flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <div className="font-medium text-foreground text-sm truncate">
                 {getProjectDisplayName(project, projectDisplayPreference)}
               </div>
-              <StageSelector
-                projectId={project.id}
-                currentStage={currentStage}
-                availableStages={project.stages || []}
-                onStageChange={handleStageChange}
-              />
+              <div onClick={(e) => e.stopPropagation()}>
+                <StageSelector
+                  projectId={project.id}
+                  currentStage={currentStage}
+                  availableStages={project.stages || []}
+                  onStageChange={handleStageChange}
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between gap-2">
