@@ -115,19 +115,7 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
             {managers.map(manager => (
               <option key={manager.id} value={manager.id}>{manager.name}</option>
             ))}
-          </select>
-        </div>
-        
-        {/* Search */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Search Projects</label>
-          <input
-            type="text"
-            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search by name or code..."
-          />
+        </select>
         </div>
       </div>
       
