@@ -73,17 +73,6 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
       <h3 className="text-sm font-medium mb-2">Display Settings</h3>
       
       <div className="flex items-center justify-between">
-        <Label htmlFor="show-weekends" className="cursor-pointer">
-          Show Weekends
-        </Label>
-        <Switch 
-          id="show-weekends" 
-          checked={showWeekends} 
-          onCheckedChange={handleWeekendToggle}
-        />
-      </div>
-      
-      <div className="flex items-center justify-between">
         <Label htmlFor="week-start" className="cursor-pointer">
           Week starts on Sunday
         </Label>
@@ -93,18 +82,6 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
           onCheckedChange={handleWeekStartChange}
         />
       </div>
-      
-      {weekStartsOnSunday && (
-        <div className="text-xs text-gray-600 bg-blue-50 p-2 rounded">
-          <strong>Sunday Week:</strong> Weekdays are S-M-T-W-Th, Weekends are F-Sa
-        </div>
-      )}
-      
-      {!weekStartsOnSunday && (
-        <div className="text-xs text-gray-600 bg-green-50 p-2 rounded">
-          <strong>Monday Week:</strong> Weekdays are M-T-W-Th-F, Weekends are Sa-S
-        </div>
-      )}
     </div>
   );
 };

@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { PeriodSelector } from './PeriodSelector';
 import { FilterBadges } from './FilterBadges';
 import { DisplayOptions } from './DisplayOptions';
 import { Separator } from "@/components/ui/separator";
@@ -48,14 +47,7 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
   return (
     <div className="space-y-4 p-4">
       <div className="grid grid-cols-1 gap-4">
-        <PeriodSelector
-          selectedPeriod={filters.periodToShow}
-          onPeriodChange={onPeriodChange}
-        />
-        
-        <Separator className="my-2" />
-        
-        <DisplayOptions 
+        <DisplayOptions
           showWeekends={displayOptions.showWeekends}
           onToggleWeekends={(show) => onDisplayOptionChange('showWeekends', show)}
           selectedDays={displayOptions.selectedDays}
