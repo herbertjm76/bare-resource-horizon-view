@@ -273,7 +273,7 @@ const WeeklyOverview = () => {
 
               {/* Table View */}
               {viewType === 'table' && (
-                <AnimatedSection animation="cascadeUp" delay={300} className="mt-4">
+                <div className="mt-4 opacity-0 translate-y-12 animate-[cascadeUp_0.8s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards]" style={{ animationDelay: '300ms' }}>
                   <WeekResourceView
                     selectedWeek={selectedWeek}
                     weekLabel={weekLabel}
@@ -292,12 +292,12 @@ const WeeklyOverview = () => {
                     updateOtherLeave={updateOtherLeave}
                     searchTerm={filters.searchTerm}
                   />
-                </AnimatedSection>
+                </div>
               )}
 
               {/* Grid View */}
               {viewType === 'grid' && (
-                <AnimatedSection animation="cascadeUp" delay={300} className="mt-4">
+                <div className="mt-4 opacity-0 translate-y-12 animate-[cascadeUp_0.8s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards]" style={{ animationDelay: '300ms' }}>
                   <RundownGridView
                     items={rundownItems}
                     rundownMode={rundownMode}
@@ -305,7 +305,7 @@ const WeeklyOverview = () => {
                     selectedWeek={selectedWeek}
                     isLoading={isLoading || isAllocationsLoading}
                   />
-                </AnimatedSection>
+                </div>
               )}
 
               {/* Carousel View */}
