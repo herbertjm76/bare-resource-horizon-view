@@ -65,28 +65,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     ? "bg-theme-primary/5 hover:bg-theme-primary/10" 
     : "bg-theme-primary/5 hover:bg-theme-primary/10";
 
-  if ((isLoading || isLoadingAllocations) && isExpanded) {
-    return (
-      <tr className={`border-t border-b border-gray-200 ${headerBgClass} h-8`}>
-        <ProjectHeader
-          project={project}
-          resourceCount={0}
-          isExpanded={isExpanded}
-          onToggleExpand={onToggleExpand}
-          headerBgClass={headerBgClass}
-        />
-        
-        {days.map((day) => (
-          <td key={getDayKey(day.date)} className="p-0 text-center">
-            <div className="h-full flex items-center justify-center">-</div>
-          </td>
-        ))}
-        
-        {/* Add blank flexible cell */}
-        <td className="p-0"></td>
-      </tr>
-    );
-  }
+  // IMPORTANT: Projects should always be expandable (so users can add resources),
+  // even while allocations/resources are still loading.
+  const isBusy = isLoading || isLoadingAllocations;
 
   return (
     <>
