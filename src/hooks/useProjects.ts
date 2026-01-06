@@ -205,15 +205,35 @@ export const useProjects = (
         const { data, error } = await query;
 
         if (error) {
-          logger.error('useProjects: Error fetching projects:', error);
-          toast.error('Failed to load projects');
+          // Enhanced error logging for debugging
+          logger.error('useProjects: Error fetching projects:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            companyId,
+            route: window.location.pathname
+          });
+          
+          // Show actionable toast based on error type
+          if (error.code === 'PGRST301' || error.message?.includes('JWT')) {
+            toast.error('Session expired. Please sign in again.');
+          } else if (error.code === '42501' || error.message?.includes('permission denied')) {
+            toast.error('Access denied. Please contact your administrator.');
+          } else {
+            toast.error(`Failed to load projects: ${error.message || 'Unknown error'}`);
+          }
           throw error;
         }
 
         logger.log('useProjects: Fetched', data?.length || 0, 'projects');
         return data || [];
-      } catch (err) {
-        logger.error('useProjects: Exception:', err);
+      } catch (err: any) {
+        logger.error('useProjects: Exception:', {
+          message: err?.message,
+          companyId,
+          route: window.location.pathname
+        });
         throw err;
       }
     },
