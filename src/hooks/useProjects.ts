@@ -49,13 +49,19 @@ export interface ProjectWithRelations {
   current_stage: string;
   stages: string[] | null;
   currency: string | null;
-  project_manager: {
+
+  // IDs are always available from the projects table
+  project_manager_id?: string | null;
+  office_id?: string | null;
+
+  // Relations may be omitted for users who don't have permission to read related tables
+  project_manager?: {
     id: string;
     first_name: string | null;
     last_name: string | null;
     avatar_url: string | null;
   } | null;
-  office: {
+  office?: {
     id: string;
     name: string;
     country: string;
@@ -175,8 +181,8 @@ export const useProjects = (
             current_stage,
             stages,
             currency,
-            project_manager:profiles(id, first_name, last_name, avatar_url),
-            office:offices(id, name, country)
+            project_manager_id,
+            office_id
           `)
           .eq('company_id', companyId);
 
