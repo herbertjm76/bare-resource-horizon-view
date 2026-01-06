@@ -37,12 +37,21 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   return (
     <>
       {/* Counter column */}
-      <td className={`counter-column ${headerBgClass} p-1 text-center`}>
+      <td
+        className={`counter-column ${headerBgClass} p-1 text-center cursor-pointer`}
+        onClick={onToggleExpand}
+        role="button"
+        aria-label={isExpanded ? 'Collapse project' : 'Expand project'}
+      >
         <Button
+          type="button"
           variant="ghost"
           size="sm"
-          className="h-6 w-6 p-0 text-white hover:bg-white/20"
-          onClick={onToggleExpand}
+          className="h-6 w-6 p-0 text-foreground hover:bg-muted"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleExpand();
+          }}
         >
           {isExpanded ? (
             <ChevronDown className="h-3 w-3" />
@@ -57,7 +66,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
         <div className="flex items-center justify-between gap-2">
           <div className="truncate-text flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <div className="font-medium text-white text-sm truncate">
+              <div className="font-medium text-foreground text-sm truncate">
                 {getProjectDisplayName(project, projectDisplayPreference)}
               </div>
               <StageSelector
@@ -67,9 +76,9 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 onStageChange={handleStageChange}
               />
             </div>
-            
+
             <div className="flex items-center justify-between gap-2">
-              <div className="text-xs text-white/80">
+              <div className="text-xs text-muted-foreground">
                 {resourceCount} resource{resourceCount !== 1 ? 's' : ''}
                 {totalHours > 0 && (
                   <span className="ml-2">
