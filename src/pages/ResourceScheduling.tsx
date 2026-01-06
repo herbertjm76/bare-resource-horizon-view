@@ -178,6 +178,7 @@ const ResourceScheduling = () => {
                         onFilterChange={handleMemberFilterChange}
                         activeFiltersCount={activeMemberFiltersCount}
                         clearFilters={clearMemberFilters}
+                        hideSearch={true}
                       />
                     </div>
                   </div>
