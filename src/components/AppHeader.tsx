@@ -3,12 +3,18 @@ import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, LogOut } from "lucide-react";
+import { User as UserIcon, LogOut, HelpCircle, Rocket } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { DateDisplay } from "@/components/ui/date-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { ViewAsRoleSwitcher } from "@/components/ViewAsRoleSwitcher";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
@@ -43,6 +49,13 @@ export const AppHeader: React.FC = () => {
     navigate("/auth");
   };
 
+  const handleRestartTour = () => {
+    // Clear onboarding storage and reload to trigger tour
+    localStorage.removeItem('onboarding_completed');
+    localStorage.removeItem('onboarding_user_id');
+    window.location.reload();
+  };
+
   return (
     <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-30 h-16 shadow-sm">
       <div className="h-full px-4 sm:px-6 py-2 flex items-center justify-between">
@@ -64,6 +77,26 @@ export const AppHeader: React.FC = () => {
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* View As Role Switcher (admin only) */}
           <ViewAsRoleSwitcher />
+          
+          {/* Help dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+              >
+                <HelpCircle className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Help</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={handleRestartTour} className="cursor-pointer">
+                <Rocket className="h-4 w-4 mr-2" />
+                Restart Tour
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           {/* Desktop Profile button */}
           <Button
