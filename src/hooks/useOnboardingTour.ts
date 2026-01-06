@@ -1,9 +1,14 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { usePermissions, type AppRole, type Permission } from '@/hooks/usePermissions';
+import { supabase } from '@/integrations/supabase/client';
 
-const ONBOARDING_STORAGE_KEY = 'onboarding_completed';
-const ONBOARDING_USER_KEY = 'onboarding_user_id';
+// Legacy keys (kept for backward compatibility / cleanup)
+const LEGACY_ONBOARDING_STORAGE_KEY = 'onboarding_completed';
+const LEGACY_ONBOARDING_USER_KEY = 'onboarding_user_id';
+
+const dontShowAgainKey = (companyId: string, userId: string) =>
+  `onboarding:dont_show_again:${companyId}:${userId}`;
 
 export interface OnboardingTourStep {
   id: string;
@@ -101,25 +106,46 @@ export const useOnboardingTour = () => {
     return ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.member;
   }, [role]);
   
-  // Check if onboarding should be shown (first-time user)
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isUserLoading, setIsUserLoading] = useState(true);
+
+  // Fetch current user id (needed to persist "Don't show again" per user)
   useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      if (!company?.id || isPermissionsLoading) return;
-      
-      // Check localStorage for onboarding completion
-      const completedOnboarding = localStorage.getItem(ONBOARDING_STORAGE_KEY);
-      const onboardedUserId = localStorage.getItem(ONBOARDING_USER_KEY);
-      
-      // Show onboarding if not completed or if it's a different company
-      if (!completedOnboarding || onboardedUserId !== company.id) {
-        setShowOnboarding(true);
-        setIsWelcomeStep(true);
-        setCurrentStep(0);
+    let isMounted = true;
+
+    const loadUser = async () => {
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (!isMounted) return;
+        setUserId(data.user?.id ?? null);
+      } finally {
+        if (isMounted) setIsUserLoading(false);
       }
     };
-    
-    checkOnboardingStatus();
-  }, [company?.id, isPermissionsLoading]);
+
+    loadUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Show onboarding unless user explicitly checked "Don't show again"
+  useEffect(() => {
+    if (!company?.id || isPermissionsLoading || isUserLoading || !userId) return;
+
+    // Clean up legacy flags (older versions marked onboarding as "completed" too aggressively)
+    localStorage.removeItem(LEGACY_ONBOARDING_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_ONBOARDING_USER_KEY);
+
+    const dismissed = localStorage.getItem(dontShowAgainKey(company.id, userId)) === 'true';
+
+    if (!dismissed) {
+      setShowOnboarding(true);
+      setIsWelcomeStep(true);
+      setCurrentStep(0);
+    }
+  }, [company?.id, isPermissionsLoading, isUserLoading, userId]);
 
   const startTour = useCallback(() => {
     setIsWelcomeStep(false);
@@ -145,29 +171,26 @@ export const useOnboardingTour = () => {
   }, [filteredSteps.length]);
 
   const completeTour = useCallback(() => {
-    if (company?.id) {
-      localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
-      localStorage.setItem(ONBOARDING_USER_KEY, company.id);
-    }
     setShowOnboarding(false);
-  }, [company?.id]);
+  }, []);
 
   const skipTour = useCallback((dontShowAgain: boolean = false) => {
-    if (dontShowAgain) {
-      completeTour();
-    } else {
-      // Just hide for this session without persisting
-      setShowOnboarding(false);
+    if (dontShowAgain && company?.id && userId) {
+      localStorage.setItem(dontShowAgainKey(company.id, userId), 'true');
     }
-  }, [completeTour]);
+    setShowOnboarding(false);
+  }, [company?.id, userId]);
 
   const resetTour = useCallback(() => {
-    localStorage.removeItem(ONBOARDING_STORAGE_KEY);
-    localStorage.removeItem(ONBOARDING_USER_KEY);
+    if (company?.id && userId) {
+      localStorage.removeItem(dontShowAgainKey(company.id, userId));
+    }
+    localStorage.removeItem(LEGACY_ONBOARDING_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_ONBOARDING_USER_KEY);
     setShowOnboarding(true);
     setIsWelcomeStep(true);
     setCurrentStep(0);
-  }, []);
+  }, [company?.id, userId]);
 
   return {
     showOnboarding,
