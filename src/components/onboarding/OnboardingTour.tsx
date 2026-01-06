@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -18,6 +18,7 @@ import {
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useOnboardingTour, ONBOARDING_STEPS } from '@/hooks/useOnboardingTour';
 import { useCompany } from '@/context/CompanyContext';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
@@ -39,6 +40,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
   const navigate = useNavigate();
   const { company, companySlug } = useCompany();
   const { profile } = useDemoAuth();
+  const [dontShowAgain, setDontShowAgain] = useState(false);
   const {
     showOnboarding,
     currentStep,
@@ -59,8 +61,12 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
   const baseUrl = companySlug ? `/${companySlug}` : '';
 
   const handleStartResourcing = () => {
-    completeTour();
+    skipTour(dontShowAgain);
     navigate(`${baseUrl}/resource-scheduling`);
+  };
+
+  const handleClose = () => {
+    skipTour(dontShowAgain);
   };
 
   const handleGoToStep = (stepRoute: string) => {
@@ -73,7 +79,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
   if (!showOnboarding) return null;
 
   return (
-    <Dialog open={showOnboarding} onOpenChange={(open) => !open && skipTour()}>
+    <Dialog open={showOnboarding} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden border-0 bg-gradient-to-br from-background via-background to-muted/30">
         <AnimatePresence mode="wait">
           {isWelcomeStep ? (
@@ -149,24 +155,41 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="flex flex-col sm:flex-row gap-3 justify-center"
+                className="flex flex-col gap-4"
               >
-                <Button
-                  onClick={startTour}
-                  size="lg"
-                  className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                >
-                  <Rocket className="w-4 h-4 mr-2" />
-                  Take the Tour
-                </Button>
-                <Button
-                  onClick={handleStartResourcing}
-                  variant="outline"
-                  size="lg"
-                >
-                  Skip & Start Resourcing
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button
+                    onClick={startTour}
+                    size="lg"
+                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                  >
+                    <Rocket className="w-4 h-4 mr-2" />
+                    Take the Tour
+                  </Button>
+                  <Button
+                    onClick={handleStartResourcing}
+                    variant="outline"
+                    size="lg"
+                  >
+                    Skip & Start Resourcing
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+                
+                {/* Don't show again checkbox */}
+                <div className="flex items-center justify-center gap-2">
+                  <Checkbox
+                    id="dont-show-again"
+                    checked={dontShowAgain}
+                    onCheckedChange={(checked) => setDontShowAgain(checked === true)}
+                  />
+                  <label
+                    htmlFor="dont-show-again"
+                    className="text-sm text-muted-foreground cursor-pointer"
+                  >
+                    Don't show this again
+                  </label>
+                </div>
               </motion.div>
             </motion.div>
           ) : (
@@ -187,7 +210,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={skipTour}
+                    onClick={handleClose}
                     className="h-8 w-8"
                   >
                     <X className="w-4 h-4" />
@@ -268,31 +291,48 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
               </AnimatePresence>
 
               {/* Navigation Footer */}
-              <div className="px-6 py-4 flex items-center justify-between border-t">
-                <Button
-                  variant="ghost"
-                  onClick={prevStep}
-                  disabled={currentStep === 0}
-                  className="gap-1"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </Button>
-                
-                {currentStep === totalSteps - 1 ? (
+              <div className="px-6 py-4 flex flex-col gap-3 border-t">
+                <div className="flex items-center justify-between">
                   <Button
-                    onClick={handleStartResourcing}
-                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                    variant="ghost"
+                    onClick={prevStep}
+                    disabled={currentStep === 0}
+                    className="gap-1"
                   >
-                    <Rocket className="w-4 h-4 mr-2" />
-                    Start Resourcing
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
                   </Button>
-                ) : (
-                  <Button onClick={nextStep} className="gap-1">
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                )}
+                  
+                  {currentStep === totalSteps - 1 ? (
+                    <Button
+                      onClick={handleStartResourcing}
+                      className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                    >
+                      <Rocket className="w-4 h-4 mr-2" />
+                      Start Resourcing
+                    </Button>
+                  ) : (
+                    <Button onClick={nextStep} className="gap-1">
+                      Next
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+                
+                {/* Don't show again checkbox */}
+                <div className="flex items-center justify-center gap-2">
+                  <Checkbox
+                    id="dont-show-again-tour"
+                    checked={dontShowAgain}
+                    onCheckedChange={(checked) => setDontShowAgain(checked === true)}
+                  />
+                  <label
+                    htmlFor="dont-show-again-tour"
+                    className="text-sm text-muted-foreground cursor-pointer"
+                  >
+                    Don't show this again
+                  </label>
+                </div>
               </div>
             </motion.div>
           )}
