@@ -23,6 +23,9 @@ interface MemberFilterRowProps {
   searchLabel?: string;
   searchPlaceholder?: string;
   hideSearch?: boolean;
+  // Optional external search (e.g., for project search)
+  searchTerm?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 type FilterType = 'practiceArea' | 'department' | 'location';
@@ -254,7 +257,7 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
                     className={`h-9 w-9 p-0 shrink-0 relative ${filters.searchTerm ? 'ring-2 ring-primary' : ''}`}
                   >
                     <Search className="h-4 w-4" />
-                    {filters.searchTerm && (
+                    {searchValue && (
                       <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full" />
                     )}
                   </Button>
@@ -265,18 +268,18 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
-                        value={filters.searchTerm}
-                        onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+                        value={searchValue}
+                        onChange={(e) => handleSearchChange(e.target.value)}
                         placeholder={searchPlaceholder}
                         className="pl-9"
                         autoFocus
                       />
-                      {filters.searchTerm && (
+                      {searchValue && (
                         <Button
                           variant="ghost"
                           size="sm"
                           className="absolute right-1 top-1/2 h-7 w-7 p-0 -translate-y-1/2"
-                          onClick={() => onFilterChange('searchTerm', '')}
+                          onClick={() => handleSearchChange('')}
                         >
                           <X className="h-3 w-3" />
                         </Button>
