@@ -178,7 +178,9 @@ const ResourceScheduling = () => {
                         onFilterChange={handleMemberFilterChange}
                         activeFiltersCount={activeMemberFiltersCount}
                         clearFilters={clearMemberFilters}
-                        hideSearch={true}
+                        searchTerm={projectSearchTerm}
+                        onSearchChange={handleProjectSearchChange}
+                        searchPlaceholder="Search projects..."
                       />
                     </div>
                   </div>
