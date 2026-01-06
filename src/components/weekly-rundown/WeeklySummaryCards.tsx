@@ -468,7 +468,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         <div className="hidden sm:flex relative pb-4 gap-2">
           {/* Fixed Week Info Card */}
           {cards.find(c => c.id === 'weekInfo') && (
-            <div className="flex-shrink-0 h-[120px]">
+            <div className="flex-shrink-0">
               {cards.find(c => c.id === 'weekInfo')?.component}
             </div>
           )}
