@@ -74,7 +74,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
   };
 
   const handleGoToStep = (stepRoute: string) => {
-    completeTour();
+    skipTour(dontShowAgain); // Only persist if user checked "Don't show again"
     navigate(`${baseUrl}${stepRoute}`);
   };
 
