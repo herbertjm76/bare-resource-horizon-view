@@ -468,7 +468,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         <div className="hidden sm:flex relative pb-4 gap-2">
           {/* Fixed Week Info Card */}
           {cards.find(c => c.id === 'weekInfo') && (
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 h-[120px]">
               {cards.find(c => c.id === 'weekInfo')?.component}
             </div>
           )}
@@ -509,7 +509,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
               {cards.filter(c => c.id !== 'weekInfo').map((card, index) => (
                 <div 
                   key={card.id} 
-                  className={`flex-1 min-w-[180px] cursor-pointer hover:scale-[1.02] transition-transform opacity-0 translate-y-4 animate-[cascadeUp_0.5s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards]`}
+                  className={`flex-1 min-w-[180px] h-[120px] cursor-pointer hover:scale-[1.02] transition-transform opacity-0 translate-y-4 animate-[cascadeUp_0.5s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards]`}
                   style={{ animationDelay: `${index * 60}ms` }}
                   onClick={(e) => {
                     if (shouldPreventClick()) {
