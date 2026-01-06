@@ -45,14 +45,26 @@ export interface ProjectWithRelations {
   status: string;
   country: string;
   department: string | null;
-  target_profit_percentage: number;
   current_stage: string;
   stages: string[] | null;
-  currency: string | null;
 
-  // IDs are always available from the projects table
+  // May be returned as null/undefined depending on permissions & query shape
+  currency?: string | null;
+  target_profit_percentage?: number | null;
+
+  // IDs are always available from the projects table / secure RPC
   project_manager_id?: string | null;
   office_id?: string | null;
+
+  // Optional financial fields (may be masked for non-admins in get_projects_secure)
+  budget_amount?: number | null;
+  budget_hours?: number | null;
+  consumed_hours?: number | null;
+  average_rate?: number | null;
+  blended_rate?: number | null;
+  financial_status?: string | null;
+  contract_start_date?: string | null;
+  contract_end_date?: string | null;
 
   // Relations may be omitted for users who don't have permission to read related tables
   project_manager?: {
@@ -165,83 +177,69 @@ export const useProjects = (
         return [];
       }
       
-      logger.log('useProjects: Fetching projects for company:', companyId);
-      
-      try {
-        let query = supabase
-          .from('projects')
-          .select(`
-            id,
-            name,
-            code,
-            status,
-            country,
-            department,
-            target_profit_percentage,
-            current_stage,
-            stages,
-            currency,
-            project_manager_id,
-            office_id
-          `)
-          .eq('company_id', companyId);
+       logger.log('useProjects: Fetching projects for company:', companyId);
+       
+       try {
+         // Use SECURITY DEFINER RPC to avoid RLS failures on joins (profiles/offices)
+         const { data, error } = await supabase.rpc('get_projects_secure', {
+           p_company_id: companyId
+         });
 
-        // Apply sorting based on sortBy parameter
-        const ascending = sortDirection === 'asc';
-        
-        switch (sortBy) {
-          case 'code':
-            query = query.order('code', { ascending }).order('name', { ascending });
-            break;
-          case 'status':
-            query = query.order('status', { ascending }).order('name', { ascending });
-            break;
-          case 'created':
-            query = query.order('created_at', { ascending });
-            break;
-          case 'name':
-          default:
-            query = query.order('name', { ascending }).order('code', { ascending });
-            break;
-        }
-        
-        // Always add ID as final tie-breaker for stability
-        query = query.order('id', { ascending: true });
+         if (error) {
+           // Enhanced error logging for debugging
+           logger.error('useProjects: Error fetching projects (rpc:get_projects_secure):', {
+             code: error.code,
+             message: error.message,
+             details: error.details,
+             hint: error.hint,
+             companyId,
+             route: window.location.pathname
+           });
 
-        const { data, error } = await query;
+           if (error.code === 'PGRST301' || error.message?.includes('JWT')) {
+             toast.error('Session expired. Please sign in again.');
+           } else if (error.code === '42501' || error.message?.includes('permission denied')) {
+             toast.error('Access denied. Please contact your administrator.');
+           } else {
+             toast.error(`Failed to load projects: ${error.message || 'Unknown error'}`);
+           }
 
-        if (error) {
-          // Enhanced error logging for debugging
-          logger.error('useProjects: Error fetching projects:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            companyId,
-            route: window.location.pathname
-          });
-          
-          // Show actionable toast based on error type
-          if (error.code === 'PGRST301' || error.message?.includes('JWT')) {
-            toast.error('Session expired. Please sign in again.');
-          } else if (error.code === '42501' || error.message?.includes('permission denied')) {
-            toast.error('Access denied. Please contact your administrator.');
-          } else {
-            toast.error(`Failed to load projects: ${error.message || 'Unknown error'}`);
-          }
-          throw error;
-        }
+           throw error;
+         }
 
-        logger.log('useProjects: Fetched', data?.length || 0, 'projects');
-        return data || [];
-      } catch (err: any) {
-        logger.error('useProjects: Exception:', {
-          message: err?.message,
-          companyId,
-          route: window.location.pathname
-        });
-        throw err;
-      }
+         const projects = (data || []) as unknown as ProjectWithRelations[];
+
+         // Client-side sorting (RPC doesn't guarantee order)
+         const ascending = sortDirection === 'asc';
+         const sorted = [...projects].sort((a, b) => {
+           const dir = ascending ? 1 : -1;
+
+           const safe = (v: unknown) => (v ?? '') as any;
+
+           switch (sortBy) {
+             case 'code':
+               return String(safe(a.code)).localeCompare(String(safe(b.code))) * dir;
+             case 'status':
+               return String(safe(a.status)).localeCompare(String(safe(b.status))) * dir;
+             case 'created':
+               // created_at isn't returned by RPC; keep stable order
+               return String(safe(a.id)).localeCompare(String(safe(b.id)));
+             case 'name':
+             default:
+               return String(safe(a.name)).localeCompare(String(safe(b.name))) * dir;
+           }
+         });
+
+         logger.log('useProjects: Fetched', sorted.length, 'projects');
+         return sorted;
+       } catch (err: any) {
+         logger.error('useProjects: Exception:', {
+           message: err?.message,
+           companyId,
+           route: window.location.pathname
+         });
+         throw err;
+       }
     },
     // Enable in demo mode OR when company context is ready
     enabled: isDemoMode || isReady,
