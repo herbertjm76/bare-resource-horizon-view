@@ -164,7 +164,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                 e.stopPropagation();
                 onToggleExpand();
               }}
-              disabled={isLoading}
+              aria-label={isExpanded ? 'Collapse project' : 'Expand project'}
             >
               {isExpanded ? (
                 <ChevronDown className="w-3 h-3" />
