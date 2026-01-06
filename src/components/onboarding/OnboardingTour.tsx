@@ -13,13 +13,15 @@ import {
   X,
   Rocket,
   CheckCircle2,
-  Building2
+  Building2,
+  Shield
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useOnboardingTour, ONBOARDING_STEPS } from '@/hooks/useOnboardingTour';
+import { Badge } from '@/components/ui/badge';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { useCompany } from '@/context/CompanyContext';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { cn } from '@/lib/utils';
@@ -48,6 +50,8 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
     totalSteps,
     currentStepData,
     steps,
+    role,
+    roleInfo,
     startTour,
     nextStep,
     prevStep,
@@ -123,11 +127,34 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
                 </motion.div>
               </div>
 
+              {/* Role Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 }}
+                className="flex justify-center mb-4"
+              >
+                <Badge variant="secondary" className="px-3 py-1 flex items-center gap-2">
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>Your role: {roleInfo.title}</span>
+                </Badge>
+              </motion.div>
+
+              {/* Role Description */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-center text-sm text-muted-foreground mb-6 max-w-md mx-auto"
+              >
+                {roleInfo.description}
+              </motion.p>
+
               {/* Success Badges */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0.55 }}
                 className="flex flex-wrap justify-center gap-3 mb-8"
               >
                 <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
@@ -147,7 +174,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
                 transition={{ delay: 0.6 }}
                 className="text-center text-muted-foreground mb-8"
               >
-                Let's take a quick tour of the key features to help you get the most out of your resource planning.
+                Let's take a quick tour of the {totalSteps} pages you have access to.
               </motion.p>
 
               {/* Action Buttons */}
