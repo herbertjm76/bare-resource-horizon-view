@@ -107,8 +107,13 @@ export const useOnboardingTour = () => {
     setShowOnboarding(false);
   }, [company?.id]);
 
-  const skipTour = useCallback(() => {
-    completeTour();
+  const skipTour = useCallback((dontShowAgain: boolean = false) => {
+    if (dontShowAgain) {
+      completeTour();
+    } else {
+      // Just hide for this session without persisting
+      setShowOnboarding(false);
+    }
   }, [completeTour]);
 
   const resetTour = useCallback(() => {
