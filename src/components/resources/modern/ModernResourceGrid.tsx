@@ -20,6 +20,8 @@ interface ModernResourceGridProps {
   periodToShow: number;
   sortBy?: 'name' | 'code' | 'status' | 'created';
   sortDirection?: 'asc' | 'desc';
+  // When provided, avoids refetching projects and prevents repeated "failed loading projects" toasts
+  projects?: any[];
   filters: any;
   displayOptions: any;
   onExpandAll?: () => void;
@@ -35,6 +37,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   periodToShow,
   sortBy = 'created',
   sortDirection = 'asc',
+  projects: projectsProp,
   filters,
   displayOptions,
   onExpandAll,
@@ -44,7 +47,11 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   onToggleProjectExpand,
   memberFilters
 }) => {
-  const { projects, isLoading: isLoadingProjects } = useProjects(sortBy, sortDirection);
+  const shouldFetchProjects = !projectsProp;
+  const { projects: fetchedProjects, isLoading: isLoadingProjects } = useProjects(sortBy, sortDirection, {
+    enabled: shouldFetchProjects
+  });
+  const projects = projectsProp ?? fetchedProjects;
   const filteredProjects = useFilteredProjects(projects, filters);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
 

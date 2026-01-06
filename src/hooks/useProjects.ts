@@ -132,7 +132,8 @@ interface UseProjectsResult {
  */
 export const useProjects = (
   sortBy: ProjectSortBy = 'created', 
-  sortDirection: 'asc' | 'desc' = 'asc'
+  sortDirection: 'asc' | 'desc' = 'asc',
+  options?: { enabled?: boolean }
 ): UseProjectsResult => {
   const { isDemoMode } = useDemoAuth();
   const { companyId, isReady, isLoading: companyLoading, error: companyError } = useCompanyId();
@@ -170,79 +171,79 @@ export const useProjects = (
         });
         return demoProjectsWithRelations;
       }
-      
+
       // Safety check - should never happen if enabled is correct
       if (!companyId) {
         logger.warn('useProjects: queryFn called without companyId');
         return [];
       }
-      
-       logger.log('useProjects: Fetching projects for company:', companyId);
-       
-       try {
-         // Use SECURITY DEFINER RPC to avoid RLS failures on joins (profiles/offices)
-         const { data, error } = await supabase.rpc('get_projects_secure', {
-           p_company_id: companyId
-         });
 
-         if (error) {
-           // Enhanced error logging for debugging
-           logger.error('useProjects: Error fetching projects (rpc:get_projects_secure):', {
-             code: error.code,
-             message: error.message,
-             details: error.details,
-             hint: error.hint,
-             companyId,
-             route: window.location.pathname
-           });
+      logger.log('useProjects: Fetching projects for company:', companyId);
 
-           if (error.code === 'PGRST301' || error.message?.includes('JWT')) {
-             toast.error('Session expired. Please sign in again.');
-           } else if (error.code === '42501' || error.message?.includes('permission denied')) {
-             toast.error('Access denied. Please contact your administrator.');
-           } else {
-             toast.error(`Failed to load projects: ${error.message || 'Unknown error'}`);
-           }
+      try {
+        // Use SECURITY DEFINER RPC to avoid RLS failures on joins (profiles/offices)
+        const { data, error } = await supabase.rpc('get_projects_secure', {
+          p_company_id: companyId
+        });
 
-           throw error;
-         }
+        if (error) {
+          // Enhanced error logging for debugging
+          logger.error('useProjects: Error fetching projects (rpc:get_projects_secure):', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            companyId,
+            route: window.location.pathname
+          });
 
-         const projects = (data || []) as unknown as ProjectWithRelations[];
+          if (error.code === 'PGRST301' || error.message?.includes('JWT')) {
+            toast.error('Session expired. Please sign in again.');
+          } else if (error.code === '42501' || error.message?.includes('permission denied')) {
+            toast.error('Access denied. Please contact your administrator.');
+          } else {
+            toast.error(`Failed to load projects: ${error.message || 'Unknown error'}`);
+          }
 
-         // Client-side sorting (RPC doesn't guarantee order)
-         const ascending = sortDirection === 'asc';
-         const sorted = [...projects].sort((a, b) => {
-           const dir = ascending ? 1 : -1;
+          throw error;
+        }
 
-           const safe = (v: unknown) => (v ?? '') as any;
+        const projects = (data || []) as unknown as ProjectWithRelations[];
 
-           switch (sortBy) {
-             case 'code':
-               return String(safe(a.code)).localeCompare(String(safe(b.code))) * dir;
-             case 'status':
-               return String(safe(a.status)).localeCompare(String(safe(b.status))) * dir;
-             case 'created':
-               // created_at isn't returned by RPC; keep stable order
-               return String(safe(a.id)).localeCompare(String(safe(b.id)));
-             case 'name':
-             default:
-               return String(safe(a.name)).localeCompare(String(safe(b.name))) * dir;
-           }
-         });
+        // Client-side sorting (RPC doesn't guarantee order)
+        const ascending = sortDirection === 'asc';
+        const sorted = [...projects].sort((a, b) => {
+          const dir = ascending ? 1 : -1;
 
-         logger.log('useProjects: Fetched', sorted.length, 'projects');
-         return sorted;
-       } catch (err: any) {
-         logger.error('useProjects: Exception:', {
-           message: err?.message,
-           companyId,
-           route: window.location.pathname
-         });
-         throw err;
-       }
+          const safe = (v: unknown) => (v ?? '') as any;
+
+          switch (sortBy) {
+            case 'code':
+              return String(safe(a.code)).localeCompare(String(safe(b.code))) * dir;
+            case 'status':
+              return String(safe(a.status)).localeCompare(String(safe(b.status))) * dir;
+            case 'created':
+              // created_at isn't returned by RPC; keep stable order
+              return String(safe(a.id)).localeCompare(String(safe(b.id)));
+            case 'name':
+            default:
+              return String(safe(a.name)).localeCompare(String(safe(b.name))) * dir;
+          }
+        });
+
+        logger.log('useProjects: Fetched', sorted.length, 'projects');
+        return sorted;
+      } catch (err: any) {
+        logger.error('useProjects: Exception:', {
+          message: err?.message,
+          companyId,
+          route: window.location.pathname
+        });
+        throw err;
+      }
     },
-    // Enable in demo mode OR when company context is ready
-    enabled: isDemoMode || isReady,
+    // Enable in demo mode OR when company context is ready, but allow caller to override
+    enabled: options?.enabled ?? (isDemoMode || isReady),
     retry: 2,
     retryDelay: 1000,
     refetchOnWindowFocus: !isDemoMode,
