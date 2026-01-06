@@ -181,6 +181,7 @@ const ResourceScheduling = () => {
                         searchTerm={projectSearchTerm}
                         onSearchChange={handleProjectSearchChange}
                         searchPlaceholder="Search projects..."
+                        availableFilterTypes={['department']}
                       />
                     </div>
                   </div>

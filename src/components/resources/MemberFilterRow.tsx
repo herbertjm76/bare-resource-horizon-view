@@ -10,6 +10,8 @@ import {
   Search, X, Users, FolderOpen, MapPin, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
+type FilterType = 'practiceArea' | 'department' | 'location';
+
 interface MemberFilterRowProps {
   filters: {
     practiceArea: string;
@@ -26,9 +28,11 @@ interface MemberFilterRowProps {
   // Optional external search (e.g., for project search)
   searchTerm?: string;
   onSearchChange?: (value: string) => void;
+  // Restrict which filter types are available (defaults to all)
+  availableFilterTypes?: FilterType[];
 }
 
-type FilterType = 'practiceArea' | 'department' | 'location';
+const ALL_FILTER_TYPES: FilterType[] = ['department', 'practiceArea', 'location'];
 
 export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
   filters,
@@ -39,7 +43,8 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
   searchPlaceholder = 'Search...',
   hideSearch = false,
   searchTerm: externalSearchTerm,
-  onSearchChange: externalOnSearchChange
+  onSearchChange: externalOnSearchChange,
+  availableFilterTypes = ALL_FILTER_TYPES
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
@@ -47,12 +52,12 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
   const searchValue = externalSearchTerm !== undefined ? externalSearchTerm : filters.searchTerm;
   const handleSearchChange = externalOnSearchChange || ((value: string) => onFilterChange('searchTerm', value));
   
-  // Determine initial filter type based on which filter is set
+  // Determine initial filter type based on which filter is set (only from available types)
   const getInitialFilterType = (): FilterType => {
-    if (filters.practiceArea && filters.practiceArea !== 'all') return 'practiceArea';
-    if (filters.department && filters.department !== 'all') return 'department';
-    if (filters.location && filters.location !== 'all') return 'location';
-    return 'practiceArea'; // Default to practice area
+    if (availableFilterTypes.includes('practiceArea') && filters.practiceArea && filters.practiceArea !== 'all') return 'practiceArea';
+    if (availableFilterTypes.includes('department') && filters.department && filters.department !== 'all') return 'department';
+    if (availableFilterTypes.includes('location') && filters.location && filters.location !== 'all') return 'location';
+    return availableFilterTypes[0]; // Default to first available
   };
   
   const [activeFilterType, setActiveFilterType] = useState<FilterType>(getInitialFilterType);
@@ -136,24 +141,30 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
                 </div>
               </SelectTrigger>
         <SelectContent className="bg-background z-50">
-          <SelectItem value="department">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span>Department</span>
-            </div>
-          </SelectItem>
-          <SelectItem value="practiceArea">
-            <div className="flex items-center gap-2">
-              <FolderOpen className="h-4 w-4" />
-              <span>Practice Area</span>
-            </div>
-          </SelectItem>
-          <SelectItem value="location">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <span>Location</span>
-            </div>
-          </SelectItem>
+          {availableFilterTypes.includes('department') && (
+            <SelectItem value="department">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span>Department</span>
+              </div>
+            </SelectItem>
+          )}
+          {availableFilterTypes.includes('practiceArea') && (
+            <SelectItem value="practiceArea">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4" />
+                <span>Practice Area</span>
+              </div>
+            </SelectItem>
+          )}
+          {availableFilterTypes.includes('location') && (
+            <SelectItem value="location">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span>Location</span>
+              </div>
+            </SelectItem>
+          )}
             </SelectContent>
           </Select>
           </div>
