@@ -13,6 +13,7 @@ import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMember
 import { format } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { useProjects } from '@/hooks/useProjects';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 const ResourceScheduling = () => {
@@ -92,6 +93,26 @@ const ResourceScheduling = () => {
     memberFilters.searchTerm ? 'search' : ''
   ].filter(Boolean).length, [memberFilters.practiceArea, memberFilters.department, memberFilters.location, memberFilters.searchTerm]);
 
+  // Lift expandedProjects state up so controls and grid share the same state
+  const { projects } = useProjects(sortBy, sortDirection);
+  const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
+
+  const expandAll = useCallback(() => {
+    if (projects) {
+      setExpandedProjects(projects.map((p) => p.id));
+    }
+  }, [projects]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedProjects([]);
+  }, []);
+
+  const handleToggleProjectExpand = useCallback((projectId: string) => {
+    setExpandedProjects((prev) =>
+      prev.includes(projectId) ? prev.filter((id) => id !== projectId) : [...prev, projectId]
+    );
+  }, []);
+
   return (
     <StandardLayout>
       <div className="w-full h-full flex flex-col">
@@ -147,12 +168,48 @@ const ResourceScheduling = () => {
                         onDisplayOptionChange={handleDisplayOptionChange}
                         onClearFilters={clearProjectFilters}
                         showOnlyControls={true}
+                        expandedProjects={expandedProjects}
+                        onExpandAll={expandAll}
+                        onCollapseAll={collapseAll}
+                        onToggleProjectExpand={handleToggleProjectExpand}
                       />
                       <MemberFilterRow
                         filters={memberFilters}
                         onFilterChange={handleMemberFilterChange}
                         activeFiltersCount={activeMemberFiltersCount}
                         clearFilters={clearMemberFilters}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* 3. Grid below */}
+                  <div className="overflow-x-auto opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
+                    <div className="px-3 sm:px-6">
+                      <ProjectResourcingContent
+                        selectedMonth={selectedMonth}
+                        searchTerm={projectSearchTerm}
+                        sortBy={sortBy}
+                        sortDirection={sortDirection}
+                        filters={filters}
+                        displayOptions={displayOptions}
+                        officeOptions={officeOptions}
+                        countryOptions={countryOptions}
+                        managers={managers}
+                        activeFiltersCount={activeFiltersCount}
+                        onMonthChange={handleMonthChange}
+                        onSearchChange={handleProjectSearchChange}
+                        onFilterChange={handleFilterChange}
+                        onPeriodChange={handlePeriodChange}
+                        onSortChange={handleSortChange}
+                        onSortDirectionToggle={handleSortDirectionToggle}
+                        onDisplayOptionChange={handleDisplayOptionChange}
+                        onClearFilters={clearProjectFilters}
+                        showOnlyGrid={true}
+                        memberFilters={memberFilters}
+                        expandedProjects={expandedProjects}
+                        onExpandAll={expandAll}
+                        onCollapseAll={collapseAll}
+                        onToggleProjectExpand={handleToggleProjectExpand}
                       />
                     </div>
                   </div>
