@@ -37,17 +37,24 @@ export const useAllocationManagement = (projectId: string) => {
 
   // Initialize project allocations
   const loadAllocations = async () => {
-    if (!projectId) return;
+    if (!projectId) {
+      setIsLoadingAllocations(false);
+      return;
+    }
 
     setIsLoadingAllocations(true);
 
     try {
       if (isDemoMode) {
         await loadDemoAllocations();
+        setIsLoadingAllocations(false);
         return;
       }
 
-      if (!company?.id) return;
+      if (!company?.id) {
+        setIsLoadingAllocations(false);
+        return;
+      }
       const allocations = await initializeAllocations(projectId, company.id);
       setProjectAllocations(allocations);
     } finally {
