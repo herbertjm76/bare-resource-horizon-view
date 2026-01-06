@@ -57,6 +57,11 @@ interface ProjectResourcingContentProps {
   showOnlyControls?: boolean;
   showOnlyGrid?: boolean;
   memberFilters?: MemberFilters;
+  // External expand state props (when lifted to parent)
+  expandedProjects?: string[];
+  onExpandAll?: () => void;
+  onCollapseAll?: () => void;
+  onToggleProjectExpand?: (projectId: string) => void;
 }
 
 // Inner component that uses office settings
@@ -81,31 +86,39 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onClearFilters,
   showOnlyControls = false,
   showOnlyGrid = false,
-  memberFilters
+  memberFilters,
+  // External expand state props
+  expandedProjects: externalExpandedProjects,
+  onExpandAll: externalExpandAll,
+  onCollapseAll: externalCollapseAll,
+  onToggleProjectExpand: externalToggleProjectExpand
 }) => {
   // Fetch projects only for expand all functionality and total count
   const { projects, isLoading } = useProjects(sortBy, sortDirection);
-  const [expandedProjects, setExpandedProjects] = React.useState<string[]>([]);
+  const [internalExpandedProjects, setInternalExpandedProjects] = React.useState<string[]>([]);
   const [isExporting, setIsExporting] = React.useState(false);
 
+  // Use external state if provided, otherwise use internal state
+  const expandedProjects = externalExpandedProjects ?? internalExpandedProjects;
+
   // Expand all projects
-  const expandAll = () => {
+  const expandAll = externalExpandAll ?? (() => {
     if (projects) {
-      setExpandedProjects(projects.map((p) => p.id));
+      setInternalExpandedProjects(projects.map((p) => p.id));
     }
-  };
+  });
 
   // Collapse all projects
-  const collapseAll = () => {
-    setExpandedProjects([]);
-  };
+  const collapseAll = externalCollapseAll ?? (() => {
+    setInternalExpandedProjects([]);
+  });
 
   // Toggle individual project
-  const handleToggleProjectExpand = (projectId: string) => {
-    setExpandedProjects((prev) =>
+  const handleToggleProjectExpand = externalToggleProjectExpand ?? ((projectId: string) => {
+    setInternalExpandedProjects((prev) =>
       prev.includes(projectId) ? prev.filter((id) => id !== projectId) : [...prev, projectId]
     );
-  };
+  });
 
   // Export to PDF
   const handleExport = () => {

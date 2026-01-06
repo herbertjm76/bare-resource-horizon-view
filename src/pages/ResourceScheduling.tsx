@@ -213,34 +213,6 @@ const ResourceScheduling = () => {
                       />
                     </div>
                   </div>
-                  
-                  {/* 3. Grid below */}
-                  <div className="overflow-x-auto opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
-                    <div className="px-3 sm:px-6">
-                      <ProjectResourcingContent
-                        selectedMonth={selectedMonth}
-                        searchTerm={projectSearchTerm}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        filters={filters}
-                        displayOptions={displayOptions}
-                        officeOptions={officeOptions}
-                        countryOptions={countryOptions}
-                        managers={managers}
-                        activeFiltersCount={activeFiltersCount}
-                        onMonthChange={handleMonthChange}
-                        onSearchChange={handleProjectSearchChange}
-                        onFilterChange={handleFilterChange}
-                        onPeriodChange={handlePeriodChange}
-                        onSortChange={handleSortChange}
-                        onSortDirectionToggle={handleSortDirectionToggle}
-                        onDisplayOptionChange={handleDisplayOptionChange}
-                        onClearFilters={clearProjectFilters}
-                        showOnlyGrid={true}
-                        memberFilters={memberFilters}
-                      />
-                    </div>
-                  </div>
                 </div>
               </TabsContent>
 
