@@ -52,7 +52,16 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
     enabled: shouldFetchProjects
   });
   const projects = projectsProp ?? fetchedProjects;
-  const filteredProjects = useFilteredProjects(projects, filters);
+
+  // Project-level filtering driven by the "filter row" chips (department in Resource Scheduling).
+  // This is intentionally separate from memberFilters filtering (which happens within each project row).
+  const projectsFilteredByDepartment = React.useMemo(() => {
+    if (!projects) return projects;
+    if (!memberFilters?.department || memberFilters.department === 'all') return projects;
+    return projects.filter((p: any) => (p.department ?? '') === memberFilters.department);
+  }, [projects, memberFilters?.department]);
+
+  const filteredProjects = useFilteredProjects(projectsFilteredByDepartment || [], filters);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
 
   // On tablet and mobile, only show a single week column (prefer THIS WEEK)
