@@ -290,6 +290,8 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
           <ModernResourceGrid
             startDate={selectedMonth}
             periodToShow={filters.periodToShow}
+            // Pass projects down to avoid a redundant refetch (prevents repeated "Failed to load projects" toasts)
+            projects={projects}
             filters={combinedFilters}
             displayOptions={displayOptions}
             sortBy={sortBy}
