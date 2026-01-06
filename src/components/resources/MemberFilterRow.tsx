@@ -35,11 +35,17 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
   onFilterChange,
   activeFiltersCount,
   clearFilters,
-  searchLabel = 'Search Members',
-  searchPlaceholder = 'Search by name...',
-  hideSearch = false
+  searchLabel = 'Search',
+  searchPlaceholder = 'Search...',
+  hideSearch = false,
+  searchTerm: externalSearchTerm,
+  onSearchChange: externalOnSearchChange
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+  // Use external search if provided, otherwise use filters.searchTerm
+  const searchValue = externalSearchTerm !== undefined ? externalSearchTerm : filters.searchTerm;
+  const handleSearchChange = externalOnSearchChange || ((value: string) => onFilterChange('searchTerm', value));
   
   // Determine initial filter type based on which filter is set
   const getInitialFilterType = (): FilterType => {
