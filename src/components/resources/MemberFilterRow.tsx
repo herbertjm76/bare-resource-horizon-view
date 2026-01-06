@@ -20,6 +20,9 @@ interface MemberFilterRowProps {
   onFilterChange: (key: string, value: string) => void;
   activeFiltersCount: number;
   clearFilters: () => void;
+  searchLabel?: string;
+  searchPlaceholder?: string;
+  hideSearch?: boolean;
 }
 
 type FilterType = 'practiceArea' | 'department' | 'location';
@@ -28,7 +31,10 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
   filters,
   onFilterChange,
   activeFiltersCount,
-  clearFilters
+  clearFilters,
+  searchLabel = 'Search Members',
+  searchPlaceholder = 'Search by name...',
+  hideSearch = false
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
@@ -236,52 +242,54 @@ export const MemberFilterRow: React.FC<MemberFilterRowProps> = ({
       )}
 
       {/* Search Icon Button */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div>
-            <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className={`h-9 w-9 p-0 shrink-0 relative ${filters.searchTerm ? 'ring-2 ring-primary' : ''}`}
-                >
-                  <Search className="h-4 w-4" />
-                  {filters.searchTerm && (
-                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full" />
-                  )}
-                </Button>
-              </PopoverTrigger>
-        <PopoverContent className="w-80 p-4 bg-background z-50" align="end">
-          <div className="space-y-2">
-            <h4 className="font-medium text-sm">Search Members</h4>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={filters.searchTerm}
-                onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-                placeholder="Search by name..."
-                className="pl-9"
-                autoFocus
-              />
-              {filters.searchTerm && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-1 top-1/2 h-7 w-7 p-0 -translate-y-1/2"
-                  onClick={() => onFilterChange('searchTerm', '')}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              )}
+      {!hideSearch && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>
+              <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className={`h-9 w-9 p-0 shrink-0 relative ${filters.searchTerm ? 'ring-2 ring-primary' : ''}`}
+                  >
+                    <Search className="h-4 w-4" />
+                    {filters.searchTerm && (
+                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full" />
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-4 bg-background z-50" align="end">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">{searchLabel}</h4>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        value={filters.searchTerm}
+                        onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+                        placeholder={searchPlaceholder}
+                        className="pl-9"
+                        autoFocus
+                      />
+                      {filters.searchTerm && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-1 top-1/2 h-7 w-7 p-0 -translate-y-1/2"
+                          onClick={() => onFilterChange('searchTerm', '')}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
-          </div>
-            </PopoverContent>
-          </Popover>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent><p>Search members</p></TooltipContent>
-      </Tooltip>
+          </TooltipTrigger>
+          <TooltipContent><p>{searchLabel}</p></TooltipContent>
+        </Tooltip>
+      )}
     </div>
   );
 };
