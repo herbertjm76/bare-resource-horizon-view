@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { CenteredTabs, CenteredTabItem, TabsContent } from '@/components/ui/centered-tabs';
-import { GanttChartSquare, Users } from 'lucide-react';
+import { GanttChartSquare, Users, Plus } from 'lucide-react';
 import { MemberFilterRow } from '@/components/resources/MemberFilterRow';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
@@ -14,6 +14,8 @@ import { format } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
 import { useProjects } from '@/hooks/useProjects';
+import { NewProjectDialog } from '@/components/projects/NewProjectDialog';
+import { Button } from '@/components/ui/button';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 const ResourceScheduling = () => {
@@ -94,7 +96,7 @@ const ResourceScheduling = () => {
   ].filter(Boolean).length, [memberFilters.practiceArea, memberFilters.department, memberFilters.location, memberFilters.searchTerm]);
 
   // Lift expandedProjects state up so controls and grid share the same state
-  const { projects } = useProjects(sortBy, sortDirection);
+  const { projects, refetch: refetchProjects } = useProjects(sortBy, sortDirection);
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
 
   const expandAll = useCallback(() => {
@@ -122,7 +124,17 @@ const ResourceScheduling = () => {
               icon={GanttChartSquare}
               title="Resource Scheduling"
               description="Manage resource allocation across projects and team members"
-            />
+            >
+              <NewProjectDialog
+                onProjectCreated={refetchProjects}
+                trigger={
+                  <Button size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Project
+                  </Button>
+                }
+              />
+            </StandardizedPageHeader>
           </div>
 
           {/* Centered Tabs with distinct styling */}
