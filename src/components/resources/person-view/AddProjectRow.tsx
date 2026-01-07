@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { startOfWeek } from 'date-fns';
+import { startOfWeek, format } from 'date-fns';
 import { Plus, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,7 +67,7 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
       const weekStartsOn = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
       const firstWeekDate: Date | undefined = weeks[0]?.weekStartDate;
       const firstWeekKey = firstWeekDate
-        ? startOfWeek(firstWeekDate, { weekStartsOn }).toISOString().split('T')[0]
+        ? format(startOfWeek(firstWeekDate, { weekStartsOn }), 'yyyy-MM-dd')
         : undefined;
 
       if (firstWeekKey) {
@@ -215,7 +215,7 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
         </div>
       </td>
       {weeks.map((week) => {
-        const weekKey = week.weekStartDate.toISOString().split('T')[0];
+        const weekKey = format(week.weekStartDate, 'yyyy-MM-dd');
         return (
           <td
             key={weekKey}
