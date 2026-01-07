@@ -32,7 +32,7 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
   variant = 'default'
 }) => {
   const { company } = useCompany();
-  const { isSuperAdmin } = usePermissions();
+  const { isSuperAdmin, permissionsBootstrapping } = usePermissions();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [hours, setHours] = useState<number>(0);
@@ -125,6 +125,27 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
       console.error(error);
     }
   });
+
+  // While permissions are resolving, render a stable disabled control instead of "disappearing"
+  if (permissionsBootstrapping) {
+    return variant === 'compact' ? (
+      <Button
+        disabled
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7 rounded-full border border-dashed border-muted-foreground/50"
+        title="Loading permissions…"
+      >
+        <Palmtree className="h-3.5 w-3.5" />
+      </Button>
+    ) : (
+      <Button disabled variant="outline" size="sm" title="Loading permissions…" className="glass">
+        <Plus className="h-3 w-3 mr-1.5" />
+        Add Other Leave
+      </Button>
+    );
+  }
+
   // If not super admin, don't render any buttons
   if (!isSuperAdmin) {
     return null;
