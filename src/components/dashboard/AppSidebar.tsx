@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Settings, HelpCircle } from 'lucide-react';
+import { Settings, HelpCircle, Loader2 } from 'lucide-react';
 import { 
   Sidebar, 
   SidebarContent, 
@@ -20,11 +20,12 @@ import { cn } from '@/lib/utils';
 export const AppSidebar: React.FC = () => {
   const { state } = useSidebar();
   const { companySlug } = useCompany();
-  const { hasPermission } = usePermissions();
+  const { hasPermission, permissionsReady } = usePermissions();
   const collapsed = state === "collapsed";
   const baseUrl = companySlug ? `/${companySlug}` : '';
   
-  const canViewSettings = hasPermission('view:settings');
+  const canViewSettings = permissionsReady && hasPermission('view:settings');
+  const showSettingsPlaceholder = !permissionsReady;
 
   return (
     <Sidebar 
@@ -41,29 +42,44 @@ export const AppSidebar: React.FC = () => {
         <SidebarMenu className={cn(
           collapsed ? "space-y-0 flex flex-col items-center" : "space-y-1"
         )}>
-          {canViewSettings && (
+          {(canViewSettings || showSettingsPlaceholder) && (
             <SidebarMenuItem className={collapsed ? "w-full flex justify-center" : ""}>
               <SidebarMenuButton
-                asChild
+                asChild={!showSettingsPlaceholder}
                 tooltip={collapsed ? "Company Settings" : undefined}
                 className={cn(
                   "flex items-center text-sm rounded-lg transition-all duration-300",
-                  "text-indigo-100 hover:bg-indigo-800/30 hover:text-white",
+                  showSettingsPlaceholder
+                    ? "opacity-50 cursor-not-allowed text-indigo-200/50"
+                    : "text-indigo-100 hover:bg-indigo-800/30 hover:text-white",
                   collapsed 
                     ? "justify-center p-2 h-10 w-10 mx-auto" 
                     : "justify-start px-3 py-2 w-full"
                 )}
               >
-                <Link to={`${baseUrl}/office-settings`} className={cn(
-                  "flex items-center",
-                  collapsed ? "justify-center w-full h-full" : "w-full"
-                )}>
-                  <Settings className={cn(
-                    "h-5 w-5 text-indigo-200 group-hover:text-white",
-                    collapsed ? "mr-0" : "mr-3"
-                  )} />
-                  {!collapsed && <span className="font-medium">Settings</span>}
-                </Link>
+                {showSettingsPlaceholder ? (
+                  <div className={cn(
+                    "flex items-center",
+                    collapsed ? "justify-center w-full h-full" : "w-full"
+                  )}>
+                    <Loader2 className={cn(
+                      "h-5 w-5 animate-spin text-indigo-200",
+                      collapsed ? "mr-0" : "mr-3"
+                    )} />
+                    {!collapsed && <span className="font-medium">Settings</span>}
+                  </div>
+                ) : (
+                  <Link to={`${baseUrl}/office-settings`} className={cn(
+                    "flex items-center",
+                    collapsed ? "justify-center w-full h-full" : "w-full"
+                  )}>
+                    <Settings className={cn(
+                      "h-5 w-5 text-indigo-200 group-hover:text-white",
+                      collapsed ? "mr-0" : "mr-3"
+                    )} />
+                    {!collapsed && <span className="font-medium">Settings</span>}
+                  </Link>
+                )}
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}

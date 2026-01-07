@@ -95,32 +95,45 @@ export function usePermissions() {
   const { simulatedRole } = useViewAs();
   const { isDemoMode } = useDemoAuth();
   const queryClient = useQueryClient();
+  
+  // Track auth state synchronously to know when we're still bootstrapping
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
 
-  // Get current auth user ID for cache key (prevents stale role caching across users)
-  const { data: authUserId } = useQuery({
-    queryKey: ['authUserId'],
-    queryFn: async () => {
-      const { data } = await supabase.auth.getUser();
-      return data.user?.id ?? null;
-    },
-    staleTime: 60 * 1000, // 1 minute
-  });
-
-  // Invalidate role query on auth state changes
+  // Synchronously check auth on mount and subscribe to changes
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-        logger.log('[usePermissions] Auth state changed, invalidating role cache:', event);
-        queryClient.invalidateQueries({ queryKey: ['authUserId'] });
-        queryClient.invalidateQueries({ queryKey: ['currentUserRole'] });
+    let mounted = true;
+    
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (mounted) {
+        setAuthUserId(user?.id || null);
+        setAuthChecked(true);
+      }
+    };
+    
+    checkAuth();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (mounted) {
+        setAuthUserId(session?.user?.id || null);
+        setAuthChecked(true);
+        // Invalidate role cache on auth changes
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          logger.log('[usePermissions] Auth state changed, invalidating role cache:', event);
+          queryClient.invalidateQueries({ queryKey: ['currentUserRole'] });
+        }
       }
     });
-    return () => subscription.unsubscribe();
+    
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [queryClient]);
 
   // Fetch user's actual role from user_roles table (skip in demo mode)
-  // CRITICAL: queryKey now includes authUserId to prevent stale caching across users
-  const { data: roleData, isLoading, error: roleError } = useQuery({
+  const { data: roleData, isLoading: isRoleLoading, error: roleError, isFetched: isRoleFetched } = useQuery({
     queryKey: ['currentUserRole', authUserId, isDemoMode],
     queryFn: async (): Promise<{ role: AppRole; debugInfo: PermissionDebugInfo }> => {
       const debugInfo: PermissionDebugInfo = {
@@ -201,9 +214,20 @@ export function usePermissions() {
         return { role: 'member', debugInfo };
       }
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes (reduced from 5)
+    staleTime: 2 * 60 * 1000, // 2 minutes
     enabled: !isDemoMode && !!authUserId, // Only run when we have a userId and not in demo
   });
+
+  // CRITICAL: permissionsReady tells consumers when role is definitively resolved
+  const permissionsReady = useMemo(() => {
+    if (isDemoMode) return true; // Demo mode is always ready
+    if (!authChecked) return false; // Still checking auth
+    if (!authUserId) return true; // No user = ready (unauthorized state)
+    return isRoleFetched; // Role query has completed
+  }, [isDemoMode, authChecked, authUserId, isRoleFetched]);
+
+  // For backwards compatibility - true when still bootstrapping
+  const isLoading = !permissionsReady;
 
   // In demo mode, always return owner role for full admin access
   const actualRole: AppRole = isDemoMode ? 'owner' : (roleData?.role || 'member');
@@ -257,6 +281,7 @@ export function usePermissions() {
     canEditAll,
     isAtLeastRole,
     isLoading,
+    permissionsReady,
     canUseViewAs: actualRole === 'owner' || actualRole === 'admin',
     isSuperAdmin: currentRole === 'owner',
     isAdmin: currentRole === 'admin' || currentRole === 'owner',

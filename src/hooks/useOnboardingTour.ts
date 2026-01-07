@@ -86,20 +86,25 @@ export const ONBOARDING_STEPS: OnboardingTourStep[] = [
   }
 ];
 
+// Storage key for tracking if user has seen the tour
+const seenTourKey = (companyId: string, userId: string) =>
+  `onboarding:seen:${companyId}:${userId}`;
+
 export const useOnboardingTour = () => {
   const { company } = useCompany();
-  const { role, hasPermission, isLoading: isPermissionsLoading } = usePermissions();
+  const { role, hasPermission, permissionsReady } = usePermissions();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isWelcomeStep, setIsWelcomeStep] = useState(true);
 
   // Filter steps based on user's permissions
   const filteredSteps = useMemo(() => {
+    if (!permissionsReady) return [];
     return ONBOARDING_STEPS.filter(step => {
       if (!step.requiredPermission) return true;
       return hasPermission(step.requiredPermission);
     });
-  }, [hasPermission]);
+  }, [hasPermission, permissionsReady]);
 
   // Get role info
   const roleInfo = useMemo(() => {
@@ -130,22 +135,25 @@ export const useOnboardingTour = () => {
     };
   }, []);
 
-  // Show onboarding unless user explicitly checked "Don't show again"
+  // CRITICAL: Only show onboarding AFTER permissions are ready
+  // This prevents showing the wrong role/steps during bootstrap
   useEffect(() => {
-    if (!company?.id || isPermissionsLoading || isUserLoading || !userId) return;
+    if (!company?.id || !permissionsReady || isUserLoading || !userId) return;
 
-    // Clean up legacy flags (older versions marked onboarding as "completed" too aggressively)
+    // Clean up legacy flags
     localStorage.removeItem(LEGACY_ONBOARDING_STORAGE_KEY);
     localStorage.removeItem(LEGACY_ONBOARDING_USER_KEY);
 
+    const hasSeen = localStorage.getItem(seenTourKey(company.id, userId)) === 'true';
     const dismissed = localStorage.getItem(dontShowAgainKey(company.id, userId)) === 'true';
 
-    if (!dismissed) {
+    // Only show if user hasn't seen it AND hasn't opted out
+    if (!hasSeen && !dismissed) {
       setShowOnboarding(true);
       setIsWelcomeStep(true);
       setCurrentStep(0);
     }
-  }, [company?.id, isPermissionsLoading, isUserLoading, userId]);
+  }, [company?.id, permissionsReady, isUserLoading, userId]);
 
   const startTour = useCallback(() => {
     setIsWelcomeStep(false);
@@ -170,20 +178,30 @@ export const useOnboardingTour = () => {
     }
   }, [filteredSteps.length]);
 
+  // Mark tour as seen when closing
+  const markAsSeen = useCallback(() => {
+    if (company?.id && userId) {
+      localStorage.setItem(seenTourKey(company.id, userId), 'true');
+    }
+  }, [company?.id, userId]);
+
   const completeTour = useCallback(() => {
+    markAsSeen();
     setShowOnboarding(false);
-  }, []);
+  }, [markAsSeen]);
 
   const skipTour = useCallback((dontShowAgain: boolean = false) => {
+    markAsSeen();
     if (dontShowAgain && company?.id && userId) {
       localStorage.setItem(dontShowAgainKey(company.id, userId), 'true');
     }
     setShowOnboarding(false);
-  }, [company?.id, userId]);
+  }, [company?.id, userId, markAsSeen]);
 
   const resetTour = useCallback(() => {
     if (company?.id && userId) {
       localStorage.removeItem(dontShowAgainKey(company.id, userId));
+      localStorage.removeItem(seenTourKey(company.id, userId));
     }
     localStorage.removeItem(LEGACY_ONBOARDING_STORAGE_KEY);
     localStorage.removeItem(LEGACY_ONBOARDING_USER_KEY);

@@ -6,7 +6,7 @@ import { useSidebar } from '@/components/ui/sidebar';
 import { useCompany } from '@/context/CompanyContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Workflow, ClipboardList } from 'lucide-react';
+import { Eye, Workflow, ClipboardList, Loader2 } from 'lucide-react';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -27,16 +27,24 @@ export const SidebarNavigation: React.FC = () => {
   const location = useLocation();
   const { state } = useSidebar();
   const { companySlug } = useCompany();
-  const { hasPermission } = usePermissions();
+  const { hasPermission, permissionsReady } = usePermissions();
   const collapsed = state === "collapsed";
   
   const navigationItems = getNavigationItems(companySlug);
 
-  // Filter sections based on user permissions
-  const visibleSections = navigationItems.filter(section => {
-    if (!section.requiredPermission) return true;
-    return hasPermission(section.requiredPermission);
-  });
+  // While permissions are loading, show all sections as disabled placeholders
+  // Once ready, filter by actual permissions
+  const visibleSections = React.useMemo(() => {
+    if (!permissionsReady) {
+      // Return all sections but mark them as loading
+      return navigationItems;
+    }
+    
+    return navigationItems.filter(section => {
+      if (!section.requiredPermission) return true;
+      return hasPermission(section.requiredPermission);
+    });
+  }, [navigationItems, hasPermission, permissionsReady]);
 
   return (
     <nav className="mt-4 px-2 space-y-1">
@@ -67,6 +75,9 @@ export const SidebarNavigation: React.FC = () => {
                 )}>
                   {section.label}
                 </span>
+                {!permissionsReady && (
+                  <Loader2 className="h-3 w-3 animate-spin text-indigo-300/50 ml-auto" />
+                )}
               </SidebarGroupLabel>
             )}
             <SidebarGroupContent>
@@ -74,61 +85,87 @@ export const SidebarNavigation: React.FC = () => {
                 {section.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.url;
+                  const isDisabled = !permissionsReady || item.comingSoon;
                   
                   return (
                     <SidebarMenuItem key={item.url} className={collapsed ? "w-full flex justify-center" : ""}>
                       <SidebarMenuButton
-                        asChild
+                        asChild={!isDisabled}
                         tooltip={collapsed ? item.title : undefined}
-                        isActive={isActive}
+                        isActive={isActive && !isDisabled}
                         className={cn(
                           "flex items-center text-sm rounded-lg transition-all duration-300 group relative overflow-hidden",
-                          isActive 
-                            ? "bg-white/10 text-white shadow-lg border border-white/20 backdrop-blur-sm" 
-                            : "text-indigo-100 hover:bg-indigo-800/30 hover:text-white hover:backdrop-blur-sm",
+                          isDisabled
+                            ? "opacity-50 cursor-not-allowed text-indigo-200/50"
+                            : isActive 
+                              ? "bg-white/10 text-white shadow-lg border border-white/20 backdrop-blur-sm" 
+                              : "text-indigo-100 hover:bg-indigo-800/30 hover:text-white hover:backdrop-blur-sm",
                           collapsed 
                             ? "justify-center p-2 h-10 w-10 mx-auto" 
                             : "justify-start px-3 py-2 w-full"
                         )}
-                        style={isActive ? {
+                        style={isActive && !isDisabled ? {
                           background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
                           boxShadow: '0 8px 32px rgba(100, 101, 240, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
                           backdropFilter: 'blur(10px)',
                           WebkitBackdropFilter: 'blur(10px)',
                         } : {}}
                       >
-                        <Link to={item.comingSoon ? '#' : item.url} className={cn(
-                          "flex items-center",
-                          collapsed ? "justify-center w-full h-full" : "w-full",
-                          item.comingSoon && "cursor-not-allowed opacity-60"
-                        )} onClick={(e) => item.comingSoon && e.preventDefault()}>
-                          <Icon className={cn(
-                            "h-5 w-5 transition-all duration-300",
-                            isActive ? "text-white drop-shadow-sm" : "text-indigo-200 group-hover:text-white",
-                            collapsed ? "mr-0" : "mr-3"
-                          )} />
-                          {!collapsed && (
-                            <>
-                              <span className={cn(
-                                "font-medium transition-all duration-300",
-                                isActive ? "text-white drop-shadow-sm" : ""
-                              )}>{item.title}</span>
-                              {item.comingSoon && (
-                                <Badge 
-                                  variant="secondary" 
-                                  className="ml-auto text-[10px] px-1.5 py-0 bg-indigo-400/20 text-indigo-100 border-indigo-300/30"
-                                >
-                                  Soon
-                                </Badge>
-                              )}
-                            </>
-                          )}
-                          {isActive && !item.comingSoon && (
-                            <div 
-                              className="absolute inset-0 rounded-lg opacity-20 sidebar-shimmer"
-                            />
-                          )}
-                        </Link>
+                        {isDisabled ? (
+                          <div className={cn(
+                            "flex items-center",
+                            collapsed ? "justify-center w-full h-full" : "w-full"
+                          )}>
+                            {!permissionsReady ? (
+                              <Loader2 className={cn(
+                                "h-5 w-5 animate-spin",
+                                collapsed ? "mr-0" : "mr-3"
+                              )} />
+                            ) : (
+                              <Icon className={cn(
+                                "h-5 w-5",
+                                collapsed ? "mr-0" : "mr-3"
+                              )} />
+                            )}
+                            {!collapsed && (
+                              <>
+                                <span className="font-medium">{item.title}</span>
+                                {item.comingSoon && (
+                                  <Badge 
+                                    variant="secondary" 
+                                    className="ml-auto text-[10px] px-1.5 py-0 bg-indigo-400/20 text-indigo-100 border-indigo-300/30"
+                                  >
+                                    Soon
+                                  </Badge>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <Link to={item.url} className={cn(
+                            "flex items-center",
+                            collapsed ? "justify-center w-full h-full" : "w-full"
+                          )}>
+                            <Icon className={cn(
+                              "h-5 w-5 transition-all duration-300",
+                              isActive ? "text-white drop-shadow-sm" : "text-indigo-200 group-hover:text-white",
+                              collapsed ? "mr-0" : "mr-3"
+                            )} />
+                            {!collapsed && (
+                              <>
+                                <span className={cn(
+                                  "font-medium transition-all duration-300",
+                                  isActive ? "text-white drop-shadow-sm" : ""
+                                )}>{item.title}</span>
+                              </>
+                            )}
+                            {isActive && (
+                              <div 
+                                className="absolute inset-0 rounded-lg opacity-20 sidebar-shimmer"
+                              />
+                            )}
+                          </Link>
+                        )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
