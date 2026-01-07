@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { useProjectForm } from '../hooks/useProjectForm';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ProjectDialogActions } from './ProjectDialogActions';
 import { submitNewProject } from './NewProjectSubmit';
 import { useCompany } from '@/context/CompanyContext';
+import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { NewProjectForm } from './NewProjectForm';
 
@@ -12,7 +12,8 @@ interface NewProjectDialogContentProps {
   onSuccess?: () => void;
 }
 
-export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = ({
+// Inner component that uses the office settings context
+const NewProjectDialogInner: React.FC<NewProjectDialogContentProps> = ({
   onSuccess
 }) => {
   const { company } = useCompany();
@@ -80,5 +81,14 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
         submitLabel="Create Project"
       />
     </div>
+  );
+};
+
+// Wrapper component that provides the OfficeSettingsProvider
+export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (props) => {
+  return (
+    <OfficeSettingsProvider>
+      <NewProjectDialogInner {...props} />
+    </OfficeSettingsProvider>
   );
 };
