@@ -41,35 +41,20 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   children
 }) => {
   const { company } = useCompany();
-  const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
+  const {
+    displayPreference,
+    workWeekHours,
+    allocationWarningThreshold,
+    allocationDangerThreshold,
+    allocationMaxLimit,
+  } = useAppSettings();
   const { isAdmin, permissionsBootstrapping, permissionsReady } = usePermissions();
+  const { leaveTypes } = useLeaveTypes();
   const queryClient = useQueryClient();
+
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('project');
 
-  // While permissions are resolving, make the UI stable (no "missing" controls)
-  if (permissionsBootstrapping) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="opacity-60 cursor-wait" onClick={(e) => e.preventDefault()}>
-            {children}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="top">
-          <p className="text-xs">Loading permissions…</p>
-        </TooltipContent>
-      </Tooltip>
-    );
-  }
-
-  // Admin/Owner: if not allowed, render non-clickable children (no popover)
-  const canEdit = permissionsReady && isAdmin;
-  const { leaveTypes } = useLeaveTypes();
-
-  // Get default value based on display preference
-  const getDefaultHours = () => displayPreference === 'percentage' ? '20' : '8'; // 20% of 40h = 8h
-  
   // Vacation state
   const [vacationDate, setVacationDate] = useState<Date>();
   const [vacationEndDate, setVacationEndDate] = useState<Date>();
@@ -77,24 +62,26 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const [endDayPortion, setEndDayPortion] = useState<'full' | 'am' | 'pm'>('full');
   const [selectedLeaveTypeId, setSelectedLeaveTypeId] = useState<string>('');
   const [isSavingVacation, setIsSavingVacation] = useState(false);
-  
+
   // Calculate daily hours (working hours per day)
   const dailyHours = workWeekHours / 5;
-  
-  // Project state - now just single week allocation based on weekStartDate
+
+  // Project state - single week allocation based on weekStartDate
   const [selectedProject, setSelectedProject] = useState('');
   const [projectComboboxOpen, setProjectComboboxOpen] = useState(false);
-  const [projectHours, setProjectHours] = useState<string>(''); // Single week input
+  const [projectHours, setProjectHours] = useState<string>('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const [isSavingProject, setIsSavingProject] = useState(false);
-  
+
+  // Admin/Owner can edit once permissions are resolved
+  const canEdit = permissionsReady && isAdmin;
+
   // Auto-select first leave type (usually Annual Leave)
   React.useEffect(() => {
     if (leaveTypes.length > 0 && !selectedLeaveTypeId) {
       setSelectedLeaveTypeId(leaveTypes[0].id);
     }
   }, [leaveTypes, selectedLeaveTypeId]);
-
   // Get week display info for the selected week
   const getWeekDisplayInfo = () => {
     const weekDate = new Date(weekStartDate);
@@ -355,6 +342,22 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     
     return { totalHours, workingDays };
   }, [vacationDate, vacationEndDate, startDayPortion, endDayPortion, dailyHours]);
+
+  // While permissions are resolving, keep the UI stable
+  if (permissionsBootstrapping) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="opacity-60 cursor-wait" onClick={(e) => e.preventDefault()}>
+            {children}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <p className="text-xs">Loading permissions…</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
 
   // If user doesn't have edit permission, just render children without popover
   if (!canEdit) {
