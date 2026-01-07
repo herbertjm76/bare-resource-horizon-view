@@ -101,17 +101,22 @@ export function usePermissions() {
 
       if (!profile?.company_id) return 'member' as AppRole;
 
-      // Get user's role from user_roles table
-      const { data: roleData } = await supabase
+      // Get user's role(s) from user_roles table
+      // Note: a user may have multiple rows (historical/data issues). We always pick the highest role.
+      const { data: rolesData } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', authData.user.id)
-        .eq('company_id', profile.company_id)
-        .order('role')
-        .limit(1)
-        .single();
+        .eq('company_id', profile.company_id);
 
-      return (roleData?.role as AppRole) || 'member';
+      const roles = (rolesData ?? []).map(r => r.role as AppRole);
+      if (roles.length === 0) return 'member' as AppRole;
+
+      const highestRole = roles.reduce<AppRole>((best, role) => {
+        return ROLE_HIERARCHY[role] > ROLE_HIERARCHY[best] ? role : best;
+      }, roles[0]);
+
+      return highestRole;
     },
     staleTime: 5 * 60 * 1000,
     enabled: !isDemoMode, // Skip query in demo mode
