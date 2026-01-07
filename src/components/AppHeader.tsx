@@ -9,6 +9,7 @@ import { DateDisplay } from "@/components/ui/date-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { ViewAsRoleSwitcher } from "@/components/ViewAsRoleSwitcher";
+import { useOnboardingTour } from "@/hooks/useOnboardingTour";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,7 @@ export const AppHeader: React.FC = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { state } = useSidebar();
+  const { resetTour } = useOnboardingTour();
 
   useEffect(() => {
     let authSubscription: { unsubscribe: () => void } | null = null;
@@ -50,10 +52,8 @@ export const AppHeader: React.FC = () => {
   };
 
   const handleRestartTour = () => {
-    // Clear onboarding storage and reload to trigger tour
-    localStorage.removeItem('onboarding_completed');
-    localStorage.removeItem('onboarding_user_id');
-    window.location.reload();
+    // Use the hook's resetTour which properly clears all keys
+    resetTour();
   };
 
   return (
