@@ -81,10 +81,11 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   // Calculate daily hours (working hours per day)
   const dailyHours = workWeekHours / 5;
   
-  // Project state
+  // Project state - now just single week allocation based on weekStartDate
   const [selectedProject, setSelectedProject] = useState('');
   const [projectComboboxOpen, setProjectComboboxOpen] = useState(false);
-  const [projectWeeks, setProjectWeeks] = useState<Record<string, string>>({});
+  const [projectHours, setProjectHours] = useState<string>(''); // Single week input
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const [isSavingProject, setIsSavingProject] = useState(false);
   
   // Auto-select first leave type (usually Annual Leave)
@@ -94,40 +95,50 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     }
   }, [leaveTypes, selectedLeaveTypeId]);
 
-  // Generate next 4 weeks starting from current week
-  const generateWeeks = () => {
-    const weeks = [];
-    const today = new Date();
-    const currentDay = today.getDay();
-    const diff = currentDay === 0 ? -6 : 1 - currentDay;
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + diff);
-    
-    for (let i = 0; i < 4; i++) {
-      const weekStart = new Date(monday);
-      weekStart.setDate(monday.getDate() + (i * 7));
-      weeks.push(format(weekStart, 'yyyy-MM-dd'));
-    }
-    return weeks;
+  // Get week display info for the selected week
+  const getWeekDisplayInfo = () => {
+    const weekDate = new Date(weekStartDate);
+    const weekEnd = new Date(weekDate);
+    weekEnd.setDate(weekDate.getDate() + 6);
+    return {
+      label: `${format(weekDate, 'MMM d')} - ${format(weekEnd, 'MMM d')}`,
+      weekKey: weekStartDate
+    };
   };
 
-  const weeks = generateWeeks();
+  const weekInfo = getWeekDisplayInfo();
 
-  // Fetch projects
+  // Fetch projects with department
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from('projects')
-        .select('id, name, code')
+        .select('id, name, code, department, status')
         .eq('company_id', company.id)
+        .in('status', ['Active', 'In Progress', 'Planning'])
         .order('name');
       if (error) throw error;
       return data || [];
     },
     enabled: !!company?.id && open,
   });
+
+  // Get unique departments from projects
+  const departments = useMemo(() => {
+    const depts = new Set<string>();
+    projects.forEach(p => {
+      if (p.department) depts.add(p.department);
+    });
+    return Array.from(depts).sort();
+  }, [projects]);
+
+  // Filter projects by department
+  const filteredProjects = useMemo(() => {
+    if (selectedDepartment === 'all') return projects;
+    return projects.filter(p => p.department === selectedDepartment);
+  }, [projects, selectedDepartment]);
 
   // Helper to check if a date is a working day (Mon-Fri)
   const isWorkingDay = (date: Date): boolean => {
@@ -237,52 +248,40 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const handleSaveProject = async () => {
     if (!selectedProject || !company?.id) return;
 
-    // Validate all week entries before saving
+    const inputValue = parseFloat(projectHours) || 0;
+    if (inputValue <= 0) {
+      toast.error(`Please enter a valid ${displayPreference === 'percentage' ? 'percentage' : 'hours'}`);
+      return;
+    }
+
+    // Validate allocation limit
     const maxHours = (workWeekHours * allocationMaxLimit) / 100;
-    for (const [weekKey, value] of Object.entries(projectWeeks)) {
-      if (value && parseFloat(value) > 0) {
-        const inputValue = parseFloat(value);
-        if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
-          toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
-          return;
-        }
-        if (displayPreference === 'hours' && inputValue > maxHours) {
-          toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
-          return;
-        }
-      }
+    if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
+      toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
+      return;
+    }
+    if (displayPreference === 'hours' && inputValue > maxHours) {
+      toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
+      return;
     }
 
     setIsSavingProject(true);
     try {
-      // Get all weeks with values entered and convert to hours
-      const weekEntries = Object.entries(projectWeeks)
-        .filter(([_, value]) => value && parseFloat(value) > 0)
-        .map(([weekKey, value]) => {
-          const inputValue = parseFloat(value);
-          // Convert display value to hours if percentage mode
-          const hours = displayPreference === 'percentage' 
-            ? (inputValue / 100) * workWeekHours 
-            : inputValue;
-          
-          return {
-            project_id: selectedProject,
-            resource_id: memberId,
-            resource_type: 'active' as const,
-            allocation_date: weekKey,
-            hours,
-            company_id: company.id
-          };
-        });
-
-      if (weekEntries.length === 0) {
-        toast.error(`Please enter ${displayPreference === 'percentage' ? 'percentage' : 'hours'} for at least one week`);
-        return;
-      }
+      // Convert display value to hours if percentage mode
+      const hours = displayPreference === 'percentage' 
+        ? (inputValue / 100) * workWeekHours 
+        : inputValue;
 
       const { error } = await supabase
         .from('project_resource_allocations')
-        .insert(weekEntries);
+        .insert({
+          project_id: selectedProject,
+          resource_id: memberId,
+          resource_type: 'active' as const,
+          allocation_date: weekStartDate,
+          hours,
+          company_id: company.id
+        });
 
       if (error) throw error;
 
@@ -294,7 +293,8 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       
       toast.success('Project allocation saved');
       setSelectedProject('');
-      setProjectWeeks({});
+      setProjectHours('');
+      setSelectedDepartment('all');
       setOpen(false);
     } catch (error) {
       console.error('Error saving project allocation:', error);
@@ -302,13 +302,6 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     } finally {
       setIsSavingProject(false);
     }
-  };
-
-  const handleWeekHoursChange = (weekKey: string, value: string) => {
-    setProjectWeeks(prev => ({
-      ...prev,
-      [weekKey]: value
-    }));
   };
 
   // Calculate warning status for each week input (simplified - just checks single project allocation)
@@ -560,6 +553,26 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
             </TabsContent>
             
             <TabsContent value="project" className="mt-4 space-y-4">
+              {/* Department filter */}
+              {departments.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-text-primary">Department</Label>
+                  <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                    <SelectTrigger className="h-9 border-border-primary">
+                      <SelectValue placeholder="All Departments" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Departments</SelectItem>
+                      {departments.map((dept) => (
+                        <SelectItem key={dept} value={dept}>
+                          {dept}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-text-primary">Project</Label>
                 <Popover open={projectComboboxOpen} onOpenChange={setProjectComboboxOpen}>
@@ -571,7 +584,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                       className="w-full justify-between h-10 border-border-primary"
                     >
                       {selectedProject
-                        ? projects.find((project) => project.id === selectedProject)?.name || "Select project"
+                        ? filteredProjects.find((project) => project.id === selectedProject)?.name || projects.find((project) => project.id === selectedProject)?.name || "Select project"
                         : "Select project"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -582,7 +595,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                       <CommandList>
                         <CommandEmpty>No project found.</CommandEmpty>
                         <CommandGroup>
-                          {projects.map((project) => (
+                          {filteredProjects.map((project) => (
                             <CommandItem
                               key={project.id}
                               value={`${project.name} ${project.code}`}
@@ -591,7 +604,12 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                                 setProjectComboboxOpen(false);
                               }}
                             >
-                              {project.name}
+                              <div className="flex flex-col">
+                                <span>{project.name}</span>
+                                {project.department && (
+                                  <span className="text-xs text-muted-foreground">{project.department}</span>
+                                )}
+                              </div>
                               <Check
                                 className={cn(
                                   "ml-auto h-4 w-4",
@@ -607,54 +625,42 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                 </Popover>
               </div>
 
+              {/* Single week allocation input */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-text-primary">
-                  {displayPreference === 'percentage' ? 'Percentage per Week' : 'Hours per Week'}
+                  {displayPreference === 'percentage' ? 'Percentage' : 'Hours'} for {weekInfo.label}
                 </Label>
-                <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
-                  {weeks.map((weekKey) => {
-                    const weekDate = new Date(weekKey);
-                    const weekEnd = new Date(weekDate);
-                    weekEnd.setDate(weekDate.getDate() + 6);
-                    
-                    return (
-                      <div key={weekKey} className="flex items-center gap-2">
-                        <Label className="text-xs text-text-secondary w-32 flex-shrink-0">
-                          {format(weekDate, 'MMM d')} - {format(weekEnd, 'MMM d')}
-                        </Label>
-                        {getWeekWarningStatus(projectWeeks[weekKey] || '').level !== 'normal' && (
-                          <AlertTriangle className={`h-3 w-3 flex-shrink-0 ${getWeekWarningStatus(projectWeeks[weekKey] || '').level === 'warning' ? 'text-amber-500' : 'text-destructive'}`} />
-                        )}
-                        <TooltipProvider>
-                          <Tooltip open={getWeekWarningStatus(projectWeeks[weekKey] || '').level !== 'normal'}>
-                            <TooltipTrigger asChild>
-                              <Input
-                                type="number"
-                                min="0"
-                                max={displayPreference === 'percentage' ? '200' : '168'}
-                                step={displayPreference === 'percentage' ? '5' : '0.5'}
-                                value={projectWeeks[weekKey] || ''}
-                                onChange={(e) => handleWeekHoursChange(weekKey, e.target.value)}
-                                placeholder="0"
-                                className={`flex-1 h-9 ${getWeekWarningStatus(projectWeeks[weekKey] || '').borderClass} ${getWeekWarningStatus(projectWeeks[weekKey] || '').bgClass} ${getWeekWarningStatus(projectWeeks[weekKey] || '').textClass}`}
-                              />
-                            </TooltipTrigger>
-                            {getWeekWarningStatus(projectWeeks[weekKey] || '').message && (
-                              <TooltipContent side="top" className={getWeekWarningStatus(projectWeeks[weekKey] || '').level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
-                                <p>{getWeekWarningStatus(projectWeeks[weekKey] || '').message}</p>
-                              </TooltipContent>
-                            )}
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                    );
-                  })}
+                <div className="flex items-center gap-2">
+                  {getWeekWarningStatus(projectHours).level !== 'normal' && (
+                    <AlertTriangle className={`h-4 w-4 flex-shrink-0 ${getWeekWarningStatus(projectHours).level === 'warning' ? 'text-amber-500' : 'text-destructive'}`} />
+                  )}
+                  <TooltipProvider>
+                    <Tooltip open={getWeekWarningStatus(projectHours).level !== 'normal'}>
+                      <TooltipTrigger asChild>
+                        <Input
+                          type="number"
+                          min="0"
+                          max={displayPreference === 'percentage' ? '200' : '168'}
+                          step={displayPreference === 'percentage' ? '5' : '0.5'}
+                          value={projectHours}
+                          onChange={(e) => setProjectHours(e.target.value)}
+                          placeholder={displayPreference === 'percentage' ? 'Enter percentage (e.g. 50)' : 'Enter hours'}
+                          className={`flex-1 h-10 ${getWeekWarningStatus(projectHours).borderClass} ${getWeekWarningStatus(projectHours).bgClass} ${getWeekWarningStatus(projectHours).textClass}`}
+                        />
+                      </TooltipTrigger>
+                      {getWeekWarningStatus(projectHours).message && (
+                        <TooltipContent side="top" className={getWeekWarningStatus(projectHours).level === 'warning' ? 'bg-amber-500 text-white' : 'bg-destructive text-destructive-foreground'}>
+                          <p>{getWeekWarningStatus(projectHours).message}</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
 
               <Button 
                 onClick={handleSaveProject}
-                disabled={!selectedProject || isSavingProject}
+                disabled={!selectedProject || !projectHours || isSavingProject}
                 className="w-full h-10 bg-gradient-start hover:bg-gradient-mid text-white"
               >
                 {isSavingProject ? 'Saving...' : 'Save Project Allocation'}
