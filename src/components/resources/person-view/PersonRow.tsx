@@ -231,6 +231,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
           periodToShow={periodToShow}
           onLocalAllocationChange={handleLocalAllocationChange}
           initialAllocations={project.allocations}
+          onProjectRemoved={onRefresh}
         />
       ))}
       

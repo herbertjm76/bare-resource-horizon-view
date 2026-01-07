@@ -1,9 +1,23 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
+import { Trash2 } from 'lucide-react';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { PersonProject, PersonResourceData } from '@/hooks/usePersonResourceData';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 import { logger } from '@/utils/logger';
 import { toUTCDateKey } from '@/utils/dateKey';
+import { supabase } from '@/integrations/supabase/client';
+import { useCompany } from '@/context/CompanyContext';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface ProjectAllocationRowProps {
   project: PersonProject;
@@ -14,7 +28,8 @@ interface ProjectAllocationRowProps {
   selectedDate?: Date;
   periodToShow?: number;
   onLocalAllocationChange?: (projectId: string, weekKey: string, hours: number) => void;
-  initialAllocations?: Record<string, number>; // Pre-loaded allocations from parent
+  initialAllocations?: Record<string, number>;
+  onProjectRemoved?: () => void;
 }
 
 export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
@@ -26,8 +41,12 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
   selectedDate,
   periodToShow,
   onLocalAllocationChange,
-  initialAllocations
+  initialAllocations,
+  onProjectRemoved
 }) => {
+  const { company } = useCompany();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const rowBgColor = isEven ? '#f9fafb' : '#ffffff';
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
@@ -83,55 +102,128 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
       } else if (e.key === 'Enter') {
         e.currentTarget.blur();
       }
-      // Let Tab behave natively so it follows DOM order
     },
     [weeks]
   );
 
+  const handleDeleteProject = async () => {
+    if (!company?.id) return;
+    
+    setIsDeleting(true);
+    try {
+      // Delete all allocations for this person on this project
+      const { error: allocError } = await supabase
+        .from('project_resource_allocations')
+        .delete()
+        .eq('project_id', project.projectId)
+        .eq('resource_id', person.personId)
+        .eq('resource_type', person.resourceType)
+        .eq('company_id', company.id);
+
+      if (allocError) throw allocError;
+
+      // Also remove from project_resources if it's an active resource
+      if (person.resourceType === 'active') {
+        await supabase
+          .from('project_resources')
+          .delete()
+          .eq('project_id', project.projectId)
+          .eq('staff_id', person.personId)
+          .eq('company_id', company.id);
+      } else {
+        // For pre-registered, remove from pending_resources
+        await supabase
+          .from('pending_resources')
+          .delete()
+          .eq('project_id', project.projectId)
+          .eq('invite_id', person.personId)
+          .eq('company_id', company.id);
+      }
+
+      toast.success(`Removed ${project.projectName} from ${person.firstName}`);
+      setShowDeleteDialog(false);
+      onProjectRemoved?.();
+    } catch (error) {
+      logger.error('Failed to remove project:', error);
+      toast.error('Failed to remove project');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <tr className="workload-resource-row resource-row">
-      {/* Project info column - Fixed width, sticky */}
-      <td 
-        className="workload-resource-cell resource-name-column"
-        style={{
-          width: '250px',
-          minWidth: '250px',
-          maxWidth: '250px',
-          position: 'sticky',
-          left: '0',
-          zIndex: 10,
-          backgroundColor: rowBgColor,
-          textAlign: 'left',
-          padding: '8px 16px 8px 48px',
-          borderRight: '2px solid rgba(156, 163, 175, 0.8)',
-          borderBottom: '1px solid rgba(229, 231, 235, 0.8)',
-          verticalAlign: 'middle'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ flex: '1', minWidth: '0' }}>
-            <div style={{ 
-              fontSize: '13px', 
-              fontWeight: '500', 
-              color: '#374151',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            }}>
-              {project.projectName}
-            </div>
-            {project.projectCode && (
+    <>
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove <strong>{project.projectName}</strong> from <strong>{person.firstName} {person.lastName}</strong> and delete all their allocations on this project.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteProject}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Removing...' : 'Remove'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <tr className="workload-resource-row resource-row group">
+        {/* Project info column - Fixed width, sticky */}
+        <td 
+          className="workload-resource-cell resource-name-column"
+          style={{
+            width: '250px',
+            minWidth: '250px',
+            maxWidth: '250px',
+            position: 'sticky',
+            left: '0',
+            zIndex: 10,
+            backgroundColor: rowBgColor,
+            textAlign: 'left',
+            padding: '8px 16px 8px 48px',
+            borderRight: '2px solid rgba(156, 163, 175, 0.8)',
+            borderBottom: '1px solid rgba(229, 231, 235, 0.8)',
+            verticalAlign: 'middle'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ flex: '1', minWidth: '0' }}>
               <div style={{ 
-                fontSize: '11px',
-                color: '#6b7280',
-                marginTop: '2px'
+                fontSize: '13px', 
+                fontWeight: '500', 
+                color: '#374151',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
               }}>
-                {project.projectCode}
+                {project.projectName}
               </div>
-            )}
+              {project.projectCode && (
+                <div style={{ 
+                  fontSize: '11px',
+                  color: '#6b7280',
+                  marginTop: '2px'
+                }}>
+                  {project.projectCode}
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => setShowDeleteDialog(true)}
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+              title="Remove project"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
           </div>
-        </div>
-      </td>
+        </td>
       
       {/* Week allocation cells */}
       {weeks.map((week, weekIndex) => {
@@ -196,6 +288,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
           </td>
         );
       })}
-    </tr>
+      </tr>
+    </>
   );
 };
