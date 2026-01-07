@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { startOfWeek } from 'date-fns';
+import { startOfWeek, format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
@@ -112,7 +112,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
 
           // Convert the date to the week start based on company settings
           const allocationDate = new Date(allocation.allocation_date + 'T00:00:00');
-          const weekKey = startOfWeek(allocationDate, { weekStartsOn }).toISOString().split('T')[0];
+          const weekKey = format(startOfWeek(allocationDate, { weekStartsOn }), 'yyyy-MM-dd');
           // Aggregate hours by week
           projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });
@@ -187,8 +187,8 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           `)
           .eq('company_id', company.id)
           .in('resource_type', ['active', 'pre_registered'])
-          .gte('allocation_date', startDate.toISOString().split('T')[0])
-          .lte('allocation_date', endDate.toISOString().split('T')[0]);
+          .gte('allocation_date', format(startDate, 'yyyy-MM-dd'))
+          .lte('allocation_date', format(endDate, 'yyyy-MM-dd'));
 
         if (allocationsError) {
           logger.error('Error fetching allocations:', allocationsError);
@@ -238,7 +238,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
 
           // Convert the date to the week start based on company settings
           const allocationDate = new Date(allocation.allocation_date + 'T00:00:00');
-          const weekKey = startOfWeek(allocationDate, { weekStartsOn }).toISOString().split('T')[0];
+          const weekKey = format(startOfWeek(allocationDate, { weekStartsOn }), 'yyyy-MM-dd');
           // Aggregate hours by week (sum up daily hours into weekly total)
           projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });

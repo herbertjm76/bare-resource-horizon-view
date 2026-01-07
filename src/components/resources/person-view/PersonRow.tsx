@@ -246,10 +246,14 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
     </>
   );
 }, (prevProps, nextProps) => {
+  const prevProjectIds = prevProps.person.projects.map((p) => p.projectId).join(',');
+  const nextProjectIds = nextProps.person.projects.map((p) => p.projectId).join(',');
+
   return (
     prevProps.person.personId === nextProps.person.personId &&
     prevProps.isExpanded === nextProps.isExpanded &&
     prevProps.isEven === nextProps.isEven &&
-    prevProps.weeks.length === nextProps.weeks.length
+    prevProps.weeks.length === nextProps.weeks.length &&
+    prevProjectIds === nextProjectIds
   );
 });
