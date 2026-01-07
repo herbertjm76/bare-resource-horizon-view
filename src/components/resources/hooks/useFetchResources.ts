@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -15,11 +15,20 @@ const uniqueById = <T extends { id: string }>(items: T[]): T[] => {
   return Array.from(map.values());
 };
 
+// Module-level toast throttle to prevent spam across all instances
+let lastErrorToastAt = 0;
+const TOAST_THROTTLE_MS = 5000; // Only show one error toast per 5 seconds
+
 export const useFetchResources = (projectId: string) => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { company } = useCompany();
   const { isDemoMode } = useDemoAuth();
+  
+  // Use ref to access latest resources without adding to callback deps
+  const resourcesRef = useRef<Resource[]>([]);
+  resourcesRef.current = resources;
 
   // Persist demo resources so "add resource" survives refresh/navigation.
   useEffect(() => {
@@ -38,6 +47,8 @@ export const useFetchResources = (projectId: string) => {
       setIsLoading(false);
       return [];
     }
+
+    setError(null);
 
     // Demo mode: merge persisted + derived-from-demo-allocations (never overwrite additions)
     if (isDemoMode) {
@@ -70,7 +81,8 @@ export const useFetchResources = (projectId: string) => {
           persisted = [];
         }
 
-        const merged = uniqueById<Resource>([...persisted, ...derivedResources, ...resources]);
+        // Use ref to get current resources without dependency
+        const merged = uniqueById<Resource>([...persisted, ...derivedResources, ...resourcesRef.current]);
         setResources(merged);
         setIsLoading(false);
         return merged;
@@ -100,7 +112,7 @@ export const useFetchResources = (projectId: string) => {
         .eq('company_id', company.id);
 
       if (activeError) {
-        logger.error('Error fetching active members:', activeError);
+        logger.error('Error fetching active members:', activeError.message, activeError.code, activeError.details);
         throw activeError;
       }
 
@@ -112,7 +124,7 @@ export const useFetchResources = (projectId: string) => {
         .eq('company_id', company.id);
 
       if (pendingError) {
-        logger.error('Error fetching pending members:', pendingError);
+        logger.error('Error fetching pending members:', pendingError.message, pendingError.code, pendingError.details);
         throw pendingError;
       }
 
@@ -263,13 +275,31 @@ export const useFetchResources = (projectId: string) => {
       setIsLoading(false);
 
       return combinedResources;
-    } catch (error) {
-      logger.error('Error fetching project resources:', error);
-      toast.error('Failed to load project resources');
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Unknown error';
+      const errorCode = error?.code || 'UNKNOWN';
+      const errorDetails = error?.details || '';
+      
+      logger.error('Error fetching project resources:', { 
+        projectId, 
+        message: errorMessage, 
+        code: errorCode, 
+        details: errorDetails 
+      });
+      
+      setError(errorMessage);
       setIsLoading(false);
+      
+      // Throttle toast to prevent spam across multiple project rows
+      const now = Date.now();
+      if (now - lastErrorToastAt > TOAST_THROTTLE_MS) {
+        lastErrorToastAt = now;
+        toast.error('Some project resources could not be loaded. Check permissions.');
+      }
+      
       return [];
     }
-  }, [projectId, company?.id, isDemoMode, resources]);
+  }, [projectId, company?.id, isDemoMode]); // Removed 'resources' from deps - using ref instead
 
   useEffect(() => {
     if (projectId && (isDemoMode || company?.id)) {
@@ -280,8 +310,8 @@ export const useFetchResources = (projectId: string) => {
   return {
     resources,
     isLoading,
+    error,
     setResources,
     refreshResources: fetchResources,
   };
 };
-
