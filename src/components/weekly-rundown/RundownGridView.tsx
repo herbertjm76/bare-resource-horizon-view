@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Clock, Users, Calendar, Building, Pencil, Circle, Palmtree } from 'lucide-react';
+import { MapPin, Clock, Users, Calendar, Building, Pencil, Circle, Palmtree, Loader2 } from 'lucide-react';
 import { RundownMode } from './WeeklyRundownView';
 import { AvatarWithHourDial } from './AvatarWithHourDial';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
@@ -113,8 +113,8 @@ export const RundownGridView: React.FC<RundownGridViewProps> = React.memo(({
 
 const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = React.memo(({ person, selectedWeek }) => {
   const { startOfWorkWeek, displayPreference, workWeekHours, projectDisplayPreference } = useAppSettings();
-  const { isAtLeastRole } = usePermissions();
-  const canManageAllocations = isAtLeastRole('admin');
+  const { isAtLeastRole, permissionsReady, permissionsBootstrapping } = usePermissions();
+  const canManageAllocations = permissionsReady && isAtLeastRole('admin');
 
   const capacity = person.capacity || workWeekHours;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -288,7 +288,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = React.memo
           <span>{person.projects?.length || 0} projects</span>
         </div>
         <div className="flex items-center gap-1">
-          {canManageAllocations && (
+          {canManageAllocations ? (
             <>
               <AddProjectAllocation
                 memberId={person.id}
@@ -312,7 +312,17 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = React.memo
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
             </>
-          )}
+          ) : permissionsBootstrapping ? (
+            <Button
+              size="icon"
+              variant="ghost"
+              disabled
+              className="h-7 w-7 cursor-wait"
+              title="Loading permissions…"
+            >
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            </Button>
+          ) : null}
         </div>
       </div>
     </div>
@@ -331,8 +341,8 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = React.me
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
   const { projectDisplayPreference, startOfWorkWeek, displayPreference, workWeekHours } = useAppSettings();
-  const { isAtLeastRole } = usePermissions();
-  const canManageAllocations = isAtLeastRole('admin');
+  const { isAtLeastRole, permissionsReady, permissionsBootstrapping } = usePermissions();
+  const canManageAllocations = permissionsReady && isAtLeastRole('admin');
 
   // Calculate week start date string for MemberVacationPopover
   const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
@@ -490,7 +500,7 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = React.me
               </div>
             </div>
             <div className="flex items-center gap-1">
-              {canManageAllocations && (
+              {canManageAllocations ? (
                 <>
                   <AddTeamMemberAllocation
                     projectId={project.id}
@@ -509,7 +519,17 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = React.me
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
                 </>
-              )}
+              ) : permissionsBootstrapping ? (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  disabled
+                  className="h-7 w-7 cursor-wait"
+                  title="Loading permissions…"
+                >
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                </Button>
+              ) : null}
             </div>
           </div>
         </div>

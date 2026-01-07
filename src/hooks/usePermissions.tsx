@@ -137,7 +137,7 @@ export function usePermissions() {
     queryKey: ['currentUserRole', authUserId, isDemoMode],
     queryFn: async (): Promise<{ role: AppRole; debugInfo: PermissionDebugInfo }> => {
       const debugInfo: PermissionDebugInfo = {
-        userId: null,
+        userId: authUserId,
         companyId: null,
         rawRoles: [],
         fetchError: null,
@@ -145,25 +145,16 @@ export function usePermissions() {
       };
 
       try {
-        const { data: authData, error: authError } = await supabase.auth.getUser();
-        if (authError) {
-          debugInfo.fetchError = `Auth error: ${authError.message}`;
-          logger.error('[usePermissions] Auth error:', authError);
-          return { role: 'member', debugInfo };
-        }
-        
-        if (!authData.user) {
+        if (!authUserId) {
           debugInfo.fetchError = 'No authenticated user';
           return { role: 'member', debugInfo };
         }
-
-        debugInfo.userId = authData.user.id;
 
         // Get user's company ID first
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('company_id')
-          .eq('id', authData.user.id)
+          .eq('id', authUserId)
           .single();
 
         if (profileError) {
@@ -183,7 +174,7 @@ export function usePermissions() {
         const { data: rolesData, error: rolesError } = await supabase
           .from('user_roles')
           .select('role, company_id')
-          .eq('user_id', authData.user.id)
+          .eq('user_id', authUserId)
           .eq('company_id', profile.company_id);
 
         if (rolesError) {
@@ -197,7 +188,7 @@ export function usePermissions() {
         const roles = (rolesData ?? []).map(r => r.role as AppRole);
         if (roles.length === 0) {
           debugInfo.fetchError = 'No roles found for user+company';
-          logger.warn('[usePermissions] No roles found for user:', authData.user.id, 'company:', profile.company_id);
+          logger.warn('[usePermissions] No roles found for user:', authUserId, 'company:', profile.company_id);
           return { role: 'member', debugInfo };
         }
 
@@ -206,7 +197,7 @@ export function usePermissions() {
           return ROLE_HIERARCHY[role] > ROLE_HIERARCHY[best] ? role : best;
         }, roles[0]);
 
-        logger.log('[usePermissions] Role resolved:', highestRole, 'for user:', authData.user.id);
+        logger.log('[usePermissions] Role resolved:', highestRole, 'for user:', authUserId);
         return { role: highestRole, debugInfo };
       } catch (err: any) {
         debugInfo.fetchError = `Unexpected error: ${err.message}`;
@@ -226,7 +217,13 @@ export function usePermissions() {
     return isRoleFetched; // Role query has completed
   }, [isDemoMode, authChecked, authUserId, isRoleFetched]);
 
-  // For backwards compatibility - true when still bootstrapping
+  // True while we know we're signed in but haven't resolved role yet
+  const permissionsBootstrapping = useMemo(() => {
+    if (isDemoMode) return false;
+    return authChecked && !!authUserId && !isRoleFetched;
+  }, [isDemoMode, authChecked, authUserId, isRoleFetched]);
+
+  // For backwards compatibility
   const isLoading = !permissionsReady;
 
   // In demo mode, always return owner role for full admin access
@@ -282,6 +279,7 @@ export function usePermissions() {
     isAtLeastRole,
     isLoading,
     permissionsReady,
+    permissionsBootstrapping,
     canUseViewAs: actualRole === 'owner' || actualRole === 'admin',
     isSuperAdmin: currentRole === 'owner',
     isAdmin: currentRole === 'admin' || currentRole === 'owner',

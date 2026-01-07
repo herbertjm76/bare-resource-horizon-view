@@ -42,15 +42,29 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
 }) => {
   const { company } = useCompany();
   const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
-  const { isSuperAdmin } = usePermissions();
+  const { isSuperAdmin, permissionsBootstrapping, permissionsReady } = usePermissions();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('project');
 
-  // Super Admin only: if not allowed, render non-clickable children (no popover)
-  const canEdit = isSuperAdmin;
+  // While permissions are resolving, make the UI stable (no "missing" controls)
+  if (permissionsBootstrapping) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="opacity-60 cursor-wait" onClick={(e) => e.preventDefault()}>
+            {children}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <p className="text-xs">Loading permissions…</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
 
-  // Leave types from company settings
+  // Super Admin only: if not allowed, render non-clickable children (no popover)
+  const canEdit = permissionsReady && isSuperAdmin;
   const { leaveTypes } = useLeaveTypes();
 
   // Get default value based on display preference

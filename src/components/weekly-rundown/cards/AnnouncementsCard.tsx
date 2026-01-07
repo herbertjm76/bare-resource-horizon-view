@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Megaphone, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Megaphone, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -30,7 +30,7 @@ interface AnnouncementsCardProps {
 export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartDate, announcements: prefetchedAnnouncements }) => {
   const { company } = useCompany();
   const { isDemoMode } = useDemoAuth();
-  const { isSuperAdmin } = usePermissions();
+  const { isSuperAdmin, permissionsBootstrapping } = usePermissions();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -173,15 +173,21 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
         <CardHeader className="pb-1 flex-shrink-0 h-[40px] flex items-start pt-3">
           <div className="flex items-center justify-between w-full">
             <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wide">Announcements</CardTitle>
-            {isSuperAdmin && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 -mt-1"
-                onClick={(e) => { e.stopPropagation(); handleAdd(); }}
-              >
-                <Plus className="h-3.5 w-3.5" />
+            {permissionsBootstrapping ? (
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0 -mt-1 cursor-wait" disabled title="Loading permissions…">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               </Button>
+            ) : (
+              isSuperAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 -mt-1"
+                  onClick={(e) => { e.stopPropagation(); handleAdd(); }}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </Button>
+              )
             )}
           </div>
         </CardHeader>
