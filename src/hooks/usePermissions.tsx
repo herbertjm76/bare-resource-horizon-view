@@ -1,8 +1,9 @@
-import { useMemo, createContext, useContext, useState } from 'react';
+import { useMemo, createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { logger } from '@/utils/logger';
 
 export type AppRole = 'owner' | 'admin' | 'project_manager' | 'member' | 'contractor';
 
@@ -32,7 +33,7 @@ export function useViewAs() {
 
 // Define which roles can access which sections
 // Roles are hierarchical: owner > admin > project_manager > member/contractor
-const ROLE_HIERARCHY: Record<AppRole, number> = {
+export const ROLE_HIERARCHY: Record<AppRole, number> = {
   owner: 5,
   admin: 4,
   project_manager: 3,
@@ -81,51 +82,134 @@ export const SECTION_PERMISSIONS: Record<string, Permission> = {
   'MANAGE': 'view:team',
 };
 
+// Debug info interface for troubleshooting
+export interface PermissionDebugInfo {
+  userId: string | null;
+  companyId: string | null;
+  rawRoles: Array<{ role: string; company_id: string }>;
+  fetchError: string | null;
+  lastFetchedAt: string | null;
+}
+
 export function usePermissions() {
   const { simulatedRole } = useViewAs();
   const { isDemoMode } = useDemoAuth();
-  
-  // Fetch user's actual role from user_roles table (skip in demo mode)
-  const { data: userRole, isLoading } = useQuery({
-    queryKey: ['currentUserRole', isDemoMode],
+  const queryClient = useQueryClient();
+
+  // Get current auth user ID for cache key (prevents stale role caching across users)
+  const { data: authUserId } = useQuery({
+    queryKey: ['authUserId'],
     queryFn: async () => {
-      const { data: authData } = await supabase.auth.getUser();
-      if (!authData.user) return 'member' as AppRole;
-
-      // Get user's company ID first
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('company_id')
-        .eq('id', authData.user.id)
-        .single();
-
-      if (!profile?.company_id) return 'member' as AppRole;
-
-      // Get user's role(s) from user_roles table
-      // Note: a user may have multiple rows (historical/data issues). We always pick the highest role.
-      const { data: rolesData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', authData.user.id)
-        .eq('company_id', profile.company_id);
-
-      const roles = (rolesData ?? []).map(r => r.role as AppRole);
-      if (roles.length === 0) return 'member' as AppRole;
-
-      const highestRole = roles.reduce<AppRole>((best, role) => {
-        return ROLE_HIERARCHY[role] > ROLE_HIERARCHY[best] ? role : best;
-      }, roles[0]);
-
-      return highestRole;
+      const { data } = await supabase.auth.getUser();
+      return data.user?.id ?? null;
     },
-    staleTime: 5 * 60 * 1000,
-    enabled: !isDemoMode, // Skip query in demo mode
+    staleTime: 60 * 1000, // 1 minute
+  });
+
+  // Invalidate role query on auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        logger.log('[usePermissions] Auth state changed, invalidating role cache:', event);
+        queryClient.invalidateQueries({ queryKey: ['authUserId'] });
+        queryClient.invalidateQueries({ queryKey: ['currentUserRole'] });
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [queryClient]);
+
+  // Fetch user's actual role from user_roles table (skip in demo mode)
+  // CRITICAL: queryKey now includes authUserId to prevent stale caching across users
+  const { data: roleData, isLoading, error: roleError } = useQuery({
+    queryKey: ['currentUserRole', authUserId, isDemoMode],
+    queryFn: async (): Promise<{ role: AppRole; debugInfo: PermissionDebugInfo }> => {
+      const debugInfo: PermissionDebugInfo = {
+        userId: null,
+        companyId: null,
+        rawRoles: [],
+        fetchError: null,
+        lastFetchedAt: new Date().toISOString(),
+      };
+
+      try {
+        const { data: authData, error: authError } = await supabase.auth.getUser();
+        if (authError) {
+          debugInfo.fetchError = `Auth error: ${authError.message}`;
+          logger.error('[usePermissions] Auth error:', authError);
+          return { role: 'member', debugInfo };
+        }
+        
+        if (!authData.user) {
+          debugInfo.fetchError = 'No authenticated user';
+          return { role: 'member', debugInfo };
+        }
+
+        debugInfo.userId = authData.user.id;
+
+        // Get user's company ID first
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('company_id')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (profileError) {
+          debugInfo.fetchError = `Profile error: ${profileError.message}`;
+          logger.error('[usePermissions] Profile fetch error:', profileError);
+          return { role: 'member', debugInfo };
+        }
+
+        if (!profile?.company_id) {
+          debugInfo.fetchError = 'No company_id in profile';
+          return { role: 'member', debugInfo };
+        }
+
+        debugInfo.companyId = profile.company_id;
+
+        // Get user's role(s) from user_roles table
+        const { data: rolesData, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('role, company_id')
+          .eq('user_id', authData.user.id)
+          .eq('company_id', profile.company_id);
+
+        if (rolesError) {
+          debugInfo.fetchError = `Roles error: ${rolesError.message}`;
+          logger.error('[usePermissions] Roles fetch error:', rolesError);
+          return { role: 'member', debugInfo };
+        }
+
+        debugInfo.rawRoles = (rolesData ?? []).map(r => ({ role: r.role, company_id: r.company_id }));
+
+        const roles = (rolesData ?? []).map(r => r.role as AppRole);
+        if (roles.length === 0) {
+          debugInfo.fetchError = 'No roles found for user+company';
+          logger.warn('[usePermissions] No roles found for user:', authData.user.id, 'company:', profile.company_id);
+          return { role: 'member', debugInfo };
+        }
+
+        // Pick highest role if user has multiple
+        const highestRole = roles.reduce<AppRole>((best, role) => {
+          return ROLE_HIERARCHY[role] > ROLE_HIERARCHY[best] ? role : best;
+        }, roles[0]);
+
+        logger.log('[usePermissions] Role resolved:', highestRole, 'for user:', authData.user.id);
+        return { role: highestRole, debugInfo };
+      } catch (err: any) {
+        debugInfo.fetchError = `Unexpected error: ${err.message}`;
+        logger.error('[usePermissions] Unexpected error:', err);
+        return { role: 'member', debugInfo };
+      }
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes (reduced from 5)
+    enabled: !isDemoMode && !!authUserId, // Only run when we have a userId and not in demo
   });
 
   // In demo mode, always return owner role for full admin access
-  const actualRole: AppRole = isDemoMode ? 'owner' : (userRole || 'member');
+  const actualRole: AppRole = isDemoMode ? 'owner' : (roleData?.role || 'member');
   const currentRole: AppRole = simulatedRole || actualRole;
   const permissions = ROLE_PERMISSIONS[currentRole] || ROLE_PERMISSIONS.member;
+  const debugInfo = roleData?.debugInfo ?? null;
 
   const hasPermission = useMemo(() => {
     return (permission: Permission): boolean => {
@@ -157,6 +241,11 @@ export function usePermissions() {
     };
   }, [currentRole]);
 
+  // Function to force refresh permissions
+  const refreshPermissions = () => {
+    queryClient.invalidateQueries({ queryKey: ['currentUserRole'] });
+  };
+
   return {
     role: currentRole,
     actualRole,
@@ -174,5 +263,9 @@ export function usePermissions() {
     isPM: currentRole === 'project_manager',
     isMember: currentRole === 'member',
     isContractor: currentRole === 'contractor',
+    // Debug helpers
+    debugInfo,
+    roleError: roleError?.message ?? null,
+    refreshPermissions,
   };
 }
