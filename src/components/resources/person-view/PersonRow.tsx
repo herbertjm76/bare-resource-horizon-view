@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import { toUTCDateKey } from '@/utils/dateKey';
 import { ChevronDown, ChevronRight, Briefcase } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProjectAllocationRow } from './ProjectAllocationRow';
@@ -167,7 +167,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
         
         {/* Week allocation cells - show total hours for person across all projects */}
         {weeks.map((week) => {
-          const weekKey = format(week.weekStartDate, 'yyyy-MM-dd');
+          const weekKey = toUTCDateKey(week.weekStartDate);
           
           // Calculate week total from all projects for this person (using local state)
           const weekTotal = projectAllocations.reduce((total, project) => {

@@ -1,11 +1,11 @@
 
-import { format, parseISO } from 'date-fns';
+import { toUTCDateKey, parseUTCDateKey } from '@/utils/dateKey';
 
 /**
- * Format a date key to ensure consistent format
+ * Format a date key to ensure consistent format (UTC-safe)
  * 
  * @param dateKey String date in any format
- * @returns Formatted date in YYYY-MM-DD format
+ * @returns Formatted date in YYYY-MM-DD format (UTC)
  */
 export const formatDateKey = (dateKey: string): string => {
   try {
@@ -14,9 +14,9 @@ export const formatDateKey = (dateKey: string): string => {
       return dateKey;
     }
     
-    // Parse and format the date
-    const date = parseISO(dateKey);
-    return format(date, 'yyyy-MM-dd');
+    // Parse as UTC and format using UTC date key
+    const date = parseUTCDateKey(dateKey.split('T')[0]);
+    return toUTCDateKey(date);
   } catch (error) {
     console.error('Error formatting date key:', dateKey, error);
     return dateKey;

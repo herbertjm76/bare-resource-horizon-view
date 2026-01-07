@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { startOfWeek, format } from 'date-fns';
+import { startOfWeek } from 'date-fns';
 import { Plus, X, Search } from 'lucide-react';
+import { toUTCDateKey } from '@/utils/dateKey';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -66,24 +67,41 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
       // Must align with how the grid groups weeks (company week start day).
       const weekStartsOn = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
       const firstWeekDate: Date | undefined = weeks[0]?.weekStartDate;
-      const firstWeekKey = firstWeekDate
-        ? format(startOfWeek(firstWeekDate, { weekStartsOn }), 'yyyy-MM-dd')
-        : undefined;
-
-      if (firstWeekKey) {
-        const { error } = await supabase
-          .from('project_resource_allocations')
-          .insert({
-            project_id: selectedProject,
-            resource_id: personId,
-            resource_type: resourceType,
-            allocation_date: firstWeekKey,
-            hours: 0,
-            company_id: company.id,
-          });
-
-        if (error) throw error;
+      
+      if (!firstWeekDate) {
+        toast.error('No visible weeks to add allocation');
+        return;
       }
+      
+      // Use UTC-based date key to avoid timezone drift
+      const weekStart = startOfWeek(firstWeekDate, { weekStartsOn });
+      const allocationDateKey = toUTCDateKey(weekStart);
+      
+      console.log('[AddProjectRow] inserting allocation:', {
+        personId,
+        selectedProject,
+        weekStartsOn,
+        firstWeekDate: firstWeekDate.toISOString(),
+        weekStart: weekStart.toISOString(),
+        allocationDateKey,
+      });
+
+      const { data: insertedRow, error } = await supabase
+        .from('project_resource_allocations')
+        .insert({
+          project_id: selectedProject,
+          resource_id: personId,
+          resource_type: resourceType,
+          allocation_date: allocationDateKey,
+          hours: 0,
+          company_id: company.id,
+        })
+        .select('id, allocation_date')
+        .single();
+
+      if (error) throw error;
+      
+      console.log('[AddProjectRow] inserted row:', insertedRow);
 
       toast.success('Project added');
       onProjectAdded();
@@ -215,7 +233,7 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
         </div>
       </td>
       {weeks.map((week) => {
-        const weekKey = format(week.weekStartDate, 'yyyy-MM-dd');
+        const weekKey = toUTCDateKey(week.weekStartDate);
         return (
           <td
             key={weekKey}
