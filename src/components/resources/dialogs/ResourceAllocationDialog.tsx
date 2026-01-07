@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -46,6 +45,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
   const { toast } = useToast();
   const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [saving, setSaving] = useState(false);
 
@@ -61,7 +61,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
-        .select('id, name, code, status')
+        .select('id, name, code, status, department')
         .eq('company_id', company?.id)
         .in('status', ['Active', 'In Progress', 'Planning'])
         .order('name');
@@ -95,11 +95,21 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
     enabled: open,
   });
 
-  const filteredProjects = projects.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Get unique departments from projects
+  const departments = useMemo(() => {
+    const depts = new Set<string>();
+    projects.forEach(p => {
+      if (p.department) depts.add(p.department);
+    });
+    return Array.from(depts).sort();
+  }, [projects]);
+
+  const filteredProjects = projects.filter((p) => {
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.code.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDepartment = selectedDepartment === 'all' || p.department === selectedDepartment;
+    return matchesSearch && matchesDepartment;
+  });
 
   const handleHoursChange = (projectId: string, hours: string) => {
     const value = hours === '' ? 0 : parseFloat(hours);
@@ -224,15 +234,32 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
         </DialogHeader>
 
         <div className="space-y-3">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <Input
-              placeholder="Search projects..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-8 pl-8 text-sm"
-            />
+          {/* Search and Department Filter */}
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <Input
+                placeholder="Search projects..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-8 pl-8 text-sm"
+              />
+            </div>
+            {departments.length > 0 && (
+              <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                <SelectTrigger className="h-8 w-[140px] text-xs">
+                  <SelectValue placeholder="Department" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Departments</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept} value={dept}>
+                      {dept}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Projects grid */}
