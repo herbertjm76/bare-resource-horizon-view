@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { startOfWeek, format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -39,6 +40,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
   const { company } = useCompany();
   const { workWeekHours, startOfWorkWeek } = useAppSettings();
   const { isDemoMode } = useDemoAuth();
+  const queryClient = useQueryClient();
 
   const weekStartsOn = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
 
@@ -256,6 +258,38 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
     retryDelay: 1000,
     refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    if (isDemoMode) return;
+    if (!company?.id) return;
+
+    console.log('[realtime] subscribing to project_resource_allocations for company', company.id);
+
+    const channel = supabase
+      .channel(`person-resource-allocations:${company.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'project_resource_allocations',
+          filter: `company_id=eq.${company.id}`,
+        },
+        (payload) => {
+          console.log('[realtime] project_resource_allocations change', payload);
+          // Invalidate so "By Person" refreshes immediately for all users
+          queryClient.invalidateQueries({ queryKey: ['person-resource-data', company.id] });
+        }
+      )
+      .subscribe((status) => {
+        console.log('[realtime] subscription status (person-resource-allocations)', status);
+      });
+
+    return () => {
+      console.log('[realtime] removing subscription (person-resource-allocations)');
+      supabase.removeChannel(channel);
+    };
+  }, [company?.id, isDemoMode, queryClient]);
 
   return {
     personData,
