@@ -168,8 +168,10 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           return [];
         }
 
-        // Calculate date range for allocations
-        const endDate = new Date(startDate);
+        // Calculate date range for allocations (must align with grid weeks).
+        // The grid may render the first visible week starting BEFORE the selected month.
+        const rangeStart = startOfWeek(startDate, { weekStartsOn });
+        const endDate = new Date(rangeStart);
         endDate.setDate(endDate.getDate() + periodToShow * 7);
 
         // Fetch all allocations for this date range and company (both active and pre-registered)
@@ -189,7 +191,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           `)
           .eq('company_id', company.id)
           .in('resource_type', ['active', 'pre_registered'])
-          .gte('allocation_date', format(startDate, 'yyyy-MM-dd'))
+          .gte('allocation_date', format(rangeStart, 'yyyy-MM-dd'))
           .lte('allocation_date', format(endDate, 'yyyy-MM-dd'));
 
         if (allocationsError) {
@@ -277,8 +279,8 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         },
         (payload) => {
           console.log('[realtime] project_resource_allocations change', payload);
-          // Invalidate so "By Person" refreshes immediately for all users
-          queryClient.invalidateQueries({ queryKey: ['person-resource-data', company.id] });
+          // Invalidate so "By Person" refreshes immediately for all visible date ranges
+          queryClient.invalidateQueries({ queryKey: ['person-resource-data'], exact: false });
         }
       )
       .subscribe((status) => {
