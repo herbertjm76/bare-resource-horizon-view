@@ -10,9 +10,11 @@ import { useCompany } from '@/context/CompanyContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { toast } from 'sonner';
 
 interface AddProjectRowProps {
   personId: string;
+  resourceType: 'active' | 'pre_registered';
   existingProjectIds: string[];
   weeks: any[];
   onProjectAdded: () => void;
@@ -20,6 +22,7 @@ interface AddProjectRowProps {
 
 export const AddProjectRow: React.FC<AddProjectRowProps> = ({
   personId,
+  resourceType,
   existingProjectIds,
   weeks,
   onProjectAdded
@@ -66,28 +69,31 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
       const firstWeekKey = firstWeekDate
         ? startOfWeek(firstWeekDate, { weekStartsOn }).toISOString().split('T')[0]
         : undefined;
+
       if (firstWeekKey) {
         const { error } = await supabase
           .from('project_resource_allocations')
           .insert({
             project_id: selectedProject,
             resource_id: personId,
-            resource_type: 'active',
+            resource_type: resourceType,
             allocation_date: firstWeekKey,
             hours: 0,
-            company_id: company.id
+            company_id: company.id,
           });
 
         if (error) throw error;
       }
 
+      toast.success('Project added');
       onProjectAdded();
       setIsAdding(false);
       setSelectedProject('');
       setSearchTerm('');
       setPopoverOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding project:', error);
+      toast.error(error?.message ? `Failed to add project: ${error.message}` : 'Failed to add project');
     }
   };
 
