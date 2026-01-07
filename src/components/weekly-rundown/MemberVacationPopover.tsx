@@ -42,7 +42,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
 }) => {
   const { company } = useCompany();
   const { displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
-  const { isSuperAdmin, permissionsBootstrapping, permissionsReady } = usePermissions();
+  const { isAdmin, permissionsBootstrapping, permissionsReady } = usePermissions();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'vacation' | 'project'>('project');
@@ -63,8 +63,8 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     );
   }
 
-  // Super Admin only: if not allowed, render non-clickable children (no popover)
-  const canEdit = permissionsReady && isSuperAdmin;
+  // Admin/Owner: if not allowed, render non-clickable children (no popover)
+  const canEdit = permissionsReady && isAdmin;
   const { leaveTypes } = useLeaveTypes();
 
   // Get default value based on display preference

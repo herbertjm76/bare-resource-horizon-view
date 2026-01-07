@@ -103,29 +103,45 @@ export function usePermissions() {
   // Synchronously check auth on mount and subscribe to changes
   useEffect(() => {
     let mounted = true;
-    
+
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (mounted) {
-        setAuthUserId(user?.id || null);
+      try {
+        // Prefer session (fast) to avoid long delays before UI becomes interactive
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!mounted) return;
+        setAuthUserId(sessionData.session?.user?.id || null);
         setAuthChecked(true);
-      }
-    };
-    
-    checkAuth();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (mounted) {
-        setAuthUserId(session?.user?.id || null);
-        setAuthChecked(true);
-        // Invalidate role cache on auth changes
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          logger.log('[usePermissions] Auth state changed, invalidating role cache:', event);
-          queryClient.invalidateQueries({ queryKey: ['currentUserRole'] });
+
+        // Best-effort: confirm user object (may include latest claims)
+        // Do not block UI on this call.
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (!mounted) return;
+          setAuthUserId(user?.id || sessionData.session?.user?.id || null);
+        }).catch(() => {
+          // ignore
+        });
+      } catch {
+        if (mounted) {
+          setAuthUserId(null);
+          setAuthChecked(true);
         }
       }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+
+      setAuthUserId(session?.user?.id || null);
+      setAuthChecked(true);
+
+      // Invalidate role cache on sign-in/out only (token refresh can be frequent)
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        queryClient.invalidateQueries({ queryKey: ['currentUserRole'] });
+      }
     });
-    
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
@@ -197,7 +213,6 @@ export function usePermissions() {
           return ROLE_HIERARCHY[role] > ROLE_HIERARCHY[best] ? role : best;
         }, roles[0]);
 
-        logger.log('[usePermissions] Role resolved:', highestRole, 'for user:', authUserId);
         return { role: highestRole, debugInfo };
       } catch (err: any) {
         debugInfo.fetchError = `Unexpected error: ${err.message}`;

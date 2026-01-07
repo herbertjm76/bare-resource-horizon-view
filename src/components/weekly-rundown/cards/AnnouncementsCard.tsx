@@ -30,7 +30,7 @@ interface AnnouncementsCardProps {
 export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartDate, announcements: prefetchedAnnouncements }) => {
   const { company } = useCompany();
   const { isDemoMode } = useDemoAuth();
-  const { isSuperAdmin, permissionsBootstrapping } = usePermissions();
+  const { isAdmin, permissionsBootstrapping } = usePermissions();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -178,7 +178,7 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
               </Button>
             ) : (
-              isSuperAdmin && (
+              isAdmin && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -205,7 +205,7 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ weekStartD
                         <p className="text-xs text-muted-foreground line-clamp-2">{announcement.content}</p>
                       )}
                     </div>
-                    {isSuperAdmin && (
+                    {isAdmin && (
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                         <Button
                           variant="ghost"

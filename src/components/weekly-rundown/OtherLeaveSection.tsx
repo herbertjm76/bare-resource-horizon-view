@@ -32,7 +32,7 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
   variant = 'default'
 }) => {
   const { company } = useCompany();
-  const { isSuperAdmin, permissionsBootstrapping } = usePermissions();
+  const { isAdmin, permissionsBootstrapping } = usePermissions();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [hours, setHours] = useState<number>(0);
@@ -146,8 +146,8 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
     );
   }
 
-  // If not super admin, don't render any buttons
-  if (!isSuperAdmin) {
+  // If not admin/owner, don't render any buttons
+  if (!isAdmin) {
     return null;
   }
 

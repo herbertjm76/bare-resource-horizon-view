@@ -26,7 +26,7 @@ interface NotesCardProps {
 
 export const NotesCard: React.FC<NotesCardProps> = ({ notes, weekStartDate }) => {
   const { company } = useCompany();
-  const { isSuperAdmin, permissionsBootstrapping } = usePermissions();
+  const { isAdmin, permissionsBootstrapping } = usePermissions();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<WeeklyNote | null>(null);
@@ -140,7 +140,7 @@ export const NotesCard: React.FC<NotesCardProps> = ({ notes, weekStartDate }) =>
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
               </Button>
             ) : (
-              isSuperAdmin && (
+              isAdmin && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -167,7 +167,7 @@ export const NotesCard: React.FC<NotesCardProps> = ({ notes, weekStartDate }) =>
                     </span>{' '}
                     <span className="text-muted-foreground">{note.description}</span>
                   </div>
-                  {isSuperAdmin && (
+                  {isAdmin && (
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button
                         variant="ghost"
