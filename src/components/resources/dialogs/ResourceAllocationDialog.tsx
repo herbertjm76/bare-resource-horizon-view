@@ -63,7 +63,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
         .from('projects')
         .select('id, name, code, status')
         .eq('company_id', company?.id)
-        .in('status', ['In Progress', 'Planning'])
+        .in('status', ['Active', 'In Progress', 'Planning'])
         .order('name');
 
       if (error) throw error;
