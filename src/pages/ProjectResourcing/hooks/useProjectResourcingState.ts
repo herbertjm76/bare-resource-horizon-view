@@ -12,6 +12,9 @@ const getWeekStartsOn = (weekStartDay: WeekStartDay): 0 | 1 | 6 => {
 export const useProjectResourcingState = () => {
   const { startOfWorkWeek } = useAppSettings();
   
+  // Derive weekStartsOnSunday from company settings - single source of truth
+  const weekStartsOnSundayFromSettings = startOfWorkWeek === 'Sunday';
+  
   // Calculate the start of the current week based on company settings
   const getCurrentWeekStart = useCallback(() => {
     const today = new Date();
@@ -49,11 +52,33 @@ export const useProjectResourcingState = () => {
 
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(initialPreferences.sortDirection);
   
-  const [displayOptions, setDisplayOptions] = useState({
-    showWeekends: false, // Default to not showing weekends
-    selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'], // Default to weekdays only (Monday start)
-    weekStartsOnSunday: false // Default: week starts on Monday
-  });
+  // Initialize displayOptions using company settings as default
+  const [displayOptions, setDisplayOptions] = useState(() => ({
+    showWeekends: false,
+    selectedDays: weekStartsOnSundayFromSettings 
+      ? ['sun', 'mon', 'tue', 'wed', 'thu'] 
+      : ['mon', 'tue', 'wed', 'thu', 'fri'],
+    weekStartsOnSunday: weekStartsOnSundayFromSettings
+  }));
+  
+  // Keep weekStartsOnSunday in sync if company setting changes
+  useEffect(() => {
+    setDisplayOptions(prev => {
+      if (prev.weekStartsOnSunday !== weekStartsOnSundayFromSettings) {
+        const newSelectedDays = prev.showWeekends
+          ? ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+          : weekStartsOnSundayFromSettings
+            ? ['sun', 'mon', 'tue', 'wed', 'thu']
+            : ['mon', 'tue', 'wed', 'thu', 'fri'];
+        return {
+          ...prev,
+          weekStartsOnSunday: weekStartsOnSundayFromSettings,
+          selectedDays: newSelectedDays
+        };
+      }
+      return prev;
+    });
+  }, [weekStartsOnSundayFromSettings]);
 
   // Save sort preferences to localStorage whenever they change
   useEffect(() => {
