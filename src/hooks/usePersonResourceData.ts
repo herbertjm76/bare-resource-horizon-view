@@ -58,9 +58,11 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           ...DEMO_PRE_REGISTERED.map((m) => ({ ...m, resourceType: 'pre_registered' as const })),
         ];
 
-        // Calculate date range using UTC-based keys
-        const rangeStart = startOfWeek(startDate, { weekStartsOn });
-        const endDate = new Date(rangeStart);
+        // Calculate date range using UTC-based keys (include previous week like grid does)
+        const adjustedStart = startOfWeek(startDate, { weekStartsOn });
+        const rangeStart = new Date(adjustedStart);
+        rangeStart.setDate(rangeStart.getDate() - 7); // Include previous week
+        const endDate = new Date(adjustedStart);
         endDate.setDate(endDate.getDate() + periodToShow * 7);
 
         const startStr = toUTCDateKey(rangeStart);
@@ -172,8 +174,13 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
 
         // Calculate date range for allocations (must align with grid weeks).
         // The grid may render the first visible week starting BEFORE the selected month.
-        const rangeStart = startOfWeek(startDate, { weekStartsOn });
-        const endDate = new Date(rangeStart);
+        // On desktop, useGridWeeks includes the previous week, so we must also query it.
+        const adjustedStart = startOfWeek(startDate, { weekStartsOn });
+        // Include one previous week to match useGridWeeks (which shows previous week on desktop)
+        const rangeStart = new Date(adjustedStart);
+        rangeStart.setDate(rangeStart.getDate() - 7);
+        
+        const endDate = new Date(adjustedStart);
         endDate.setDate(endDate.getDate() + periodToShow * 7);
         
         // Use UTC-based date keys to avoid timezone drift
