@@ -116,13 +116,13 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = React.memo(
             <div className="flex items-start justify-between gap-1.5 sm:gap-2">
               <div className="flex-1 min-w-0">
                 {/* Project Primary Display */}
-                <h1 className="font-bold text-foreground tracking-tight mb-0.5 text-sm sm:text-base truncate">
+                <h1 className="font-bold text-foreground tracking-tight mb-0.5 text-lg sm:text-xl truncate">
                   {primaryDisplay}
                 </h1>
                 
                 {/* Project Secondary Display */}
                 {secondaryDisplay && (
-                  <h2 className="font-medium text-muted-foreground text-[10px] sm:text-xs truncate">
+                  <h2 className="font-medium text-muted-foreground text-xs sm:text-sm truncate">
                     {secondaryDisplay}
                   </h2>
                 )}
