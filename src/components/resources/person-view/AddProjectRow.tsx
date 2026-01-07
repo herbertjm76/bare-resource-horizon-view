@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { startOfWeek } from 'date-fns';
 import { Plus, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +25,7 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
   onProjectAdded
 }) => {
   const { company } = useCompany();
-  const { projectDisplayPreference } = useAppSettings();
+  const { projectDisplayPreference, startOfWorkWeek } = useAppSettings();
   const [isAdding, setIsAdding] = useState(false);
   const [selectedProject, setSelectedProject] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -58,19 +59,12 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
     if (!selectedProject || !company?.id) return;
 
     try {
-      // Create an initial allocation with 0 hours for the first visible week
-      // NOTE: Our person view groups allocations by the *Monday* of a week.
-      // Some grids can start on Sunday, so normalize to Monday to ensure the
-      // allocation falls within the same date-range query.
+      // Create an initial allocation with 0 hours for the first visible week.
+      // Must align with how the grid groups weeks (company week start day).
+      const weekStartsOn = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
       const firstWeekDate: Date | undefined = weeks[0]?.weekStartDate;
       const firstWeekKey = firstWeekDate
-        ? (() => {
-            const dayOfWeek = firstWeekDate.getDay();
-            const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-            const monday = new Date(firstWeekDate);
-            monday.setDate(firstWeekDate.getDate() + daysToMonday);
-            return monday.toISOString().split('T')[0];
-          })()
+        ? startOfWeek(firstWeekDate, { weekStartsOn }).toISOString().split('T')[0]
         : undefined;
       if (firstWeekKey) {
         const { error } = await supabase

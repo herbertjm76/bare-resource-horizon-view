@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { startOfWeek } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
@@ -36,8 +37,10 @@ export interface PersonResourceData {
 
 export const usePersonResourceData = (startDate: Date, periodToShow: number) => {
   const { company } = useCompany();
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, startOfWorkWeek } = useAppSettings();
   const { isDemoMode } = useDemoAuth();
+
+  const weekStartsOn = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
 
   const { data: personData = [], isLoading, error, refetch } = useQuery({
     queryKey: ['person-resource-data', company?.id, startDate.toISOString(), periodToShow, isDemoMode],
@@ -107,14 +110,9 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             person.projects.push(projectEntry);
           }
 
-          // Convert the date to the week start (Monday)
+          // Convert the date to the week start based on company settings
           const allocationDate = new Date(allocation.allocation_date + 'T00:00:00');
-          const dayOfWeek = allocationDate.getDay();
-          const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-          const monday = new Date(allocationDate);
-          monday.setDate(allocationDate.getDate() + daysToMonday);
-          const weekKey = monday.toISOString().split('T')[0];
-
+          const weekKey = startOfWeek(allocationDate, { weekStartsOn }).toISOString().split('T')[0];
           // Aggregate hours by week
           projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });
@@ -238,14 +236,9 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             personData.projects.push(projectEntry);
           }
 
-          // Convert the date to the week start (Monday)
+          // Convert the date to the week start based on company settings
           const allocationDate = new Date(allocation.allocation_date + 'T00:00:00');
-          const dayOfWeek = allocationDate.getDay();
-          const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-          const monday = new Date(allocationDate);
-          monday.setDate(allocationDate.getDate() + daysToMonday);
-          const weekKey = monday.toISOString().split('T')[0];
-
+          const weekKey = startOfWeek(allocationDate, { weekStartsOn }).toISOString().split('T')[0];
           // Aggregate hours by week (sum up daily hours into weekly total)
           projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });
