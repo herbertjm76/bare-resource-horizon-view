@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { startOfWeek } from 'date-fns';
 import { Plus, X, Search } from 'lucide-react';
 import { toUTCDateKey } from '@/utils/dateKey';
 import { Button } from '@/components/ui/button';
@@ -12,12 +11,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { toast } from 'sonner';
+import { WeekInfo } from '../hooks/useGridWeeks';
 
 interface AddProjectRowProps {
   personId: string;
   resourceType: 'active' | 'pre_registered';
   existingProjectIds: string[];
-  weeks: any[];
+  weeks: WeekInfo[];
   onProjectAdded: () => void;
 }
 
@@ -29,7 +29,7 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
   onProjectAdded
 }) => {
   const { company } = useCompany();
-  const { projectDisplayPreference, startOfWorkWeek } = useAppSettings();
+  const { projectDisplayPreference } = useAppSettings();
   const [isAdding, setIsAdding] = useState(false);
   const [selectedProject, setSelectedProject] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -63,26 +63,23 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
     if (!selectedProject || !company?.id) return;
 
     try {
-      // Create an initial allocation with 0 hours for the first visible week.
-      // Must align with how the grid groups weeks (company week start day).
-      const weekStartsOn = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
-      const firstWeekDate: Date | undefined = weeks[0]?.weekStartDate;
+      // Find the first non-previous week (current period), or fallback to first week
+      const targetWeek = weeks.find(w => !w.isPreviousWeek) || weeks[0];
       
-      if (!firstWeekDate) {
+      if (!targetWeek?.weekStartDate) {
         toast.error('No visible weeks to add allocation');
         return;
       }
       
-      // Use UTC-based date key to avoid timezone drift
-      const weekStart = startOfWeek(firstWeekDate, { weekStartsOn });
-      const allocationDateKey = toUTCDateKey(weekStart);
+      // CRITICAL: Use the grid's weekStartDate directly - it's already computed correctly.
+      // Do NOT re-apply startOfWeek() which would introduce drift.
+      const allocationDateKey = toUTCDateKey(targetWeek.weekStartDate);
       
       console.log('[AddProjectRow] inserting allocation:', {
         personId,
         selectedProject,
-        weekStartsOn,
-        firstWeekDate: firstWeekDate.toISOString(),
-        weekStart: weekStart.toISOString(),
+        targetWeekLabel: targetWeek.weekLabel,
+        weekStartDate: targetWeek.weekStartDate.toISOString(),
         allocationDateKey,
       });
 
