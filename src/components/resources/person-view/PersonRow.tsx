@@ -237,6 +237,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
       {isExpanded && (
         <AddProjectRow
           personId={person.personId}
+          resourceType={person.resourceType}
           existingProjectIds={projectAllocations.map(p => p.projectId)}
           weeks={weeks}
           onProjectAdded={onRefresh}
