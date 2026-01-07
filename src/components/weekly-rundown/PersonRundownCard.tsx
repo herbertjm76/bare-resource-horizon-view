@@ -108,7 +108,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
             <div className="flex-1 min-w-0 overflow-hidden">
               <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-0.5">
                 <h1 className={`font-bold text-foreground tracking-tight truncate ${
-                  isFullscreen ? 'text-base sm:text-lg' : 'text-sm sm:text-base'
+                  isFullscreen ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'
                 }`}>
                   {person.first_name} {person.last_name}
                 </h1>
@@ -138,7 +138,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         <div className="px-3 sm:px-4 py-1.5 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
           <div className="w-full flex flex-col min-h-0 flex-1">
             <h2 className={`font-semibold text-foreground mb-1 sm:mb-1.5 flex-shrink-0 ${
-              isFullscreen ? 'text-xs sm:text-sm' : 'text-[10px] sm:text-xs'
+              isFullscreen ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'
             }`}>
               Weekly Allocation
             </h2>
