@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Check, ChevronsUpDown } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
@@ -63,18 +63,20 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
   const [newProjectCode, setNewProjectCode] = useState('');
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectCountry, setNewProjectCountry] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const { company } = useCompany();
   const queryClient = useQueryClient();
   const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
 
-  // Fetch available projects
+  // Fetch available projects with department
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', company?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
-        .select('id, code, name, status')
+        .select('id, code, name, status, department')
         .eq('company_id', company?.id)
+        .in('status', ['Active', 'In Progress', 'Planning'])
         .order('code', { ascending: true });
       
       if (error) throw error;
@@ -82,6 +84,15 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
     },
     enabled: !!company?.id && open
   });
+
+  // Get unique departments from projects
+  const departments = useMemo(() => {
+    const depts = new Set<string>();
+    projects.forEach(p => {
+      if (p.department) depts.add(p.department);
+    });
+    return Array.from(depts).sort();
+  }, [projects]);
 
   // Fetch offices for new project creation
   const { data: offices = [] } = useQuery({
@@ -206,7 +217,12 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
     addMutation.mutate({ projectId: selectedProjectId, allocationHours });
   };
 
-  const availableProjects = projects.filter(p => !existingProjectIds.includes(p.id));
+  // Filter available projects by department
+  const availableProjects = useMemo(() => {
+    const filtered = projects.filter(p => !existingProjectIds.includes(p.id));
+    if (selectedDepartment === 'all') return filtered;
+    return filtered.filter(p => p.department === selectedDepartment);
+  }, [projects, existingProjectIds, selectedDepartment]);
 
   return (
     <>
@@ -243,6 +259,26 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
           <div className="space-y-4 py-4">
             {!showCreateNew ? (
               <>
+                {/* Department filter */}
+                {departments.length > 0 && (
+                  <div className="space-y-2">
+                    <Label htmlFor="department">Department</Label>
+                    <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                      <SelectTrigger id="department">
+                        <SelectValue placeholder="All Departments" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Departments</SelectItem>
+                        {departments.map((dept) => (
+                          <SelectItem key={dept} value={dept}>
+                            {dept}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="project">Project</Label>
                   <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
@@ -274,7 +310,12 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
                                   setComboboxOpen(false);
                                 }}
                               >
-                                {getProjectDisplayName(project, projectDisplayPreference)}
+                                <div className="flex flex-col">
+                                  <span>{getProjectDisplayName(project, projectDisplayPreference)}</span>
+                                  {project.department && (
+                                    <span className="text-xs text-muted-foreground">{project.department}</span>
+                                  )}
+                                </div>
                                 <Check
                                   className={cn(
                                     "ml-auto h-4 w-4",
