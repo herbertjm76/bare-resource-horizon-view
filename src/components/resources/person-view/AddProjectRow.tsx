@@ -58,9 +58,20 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
     if (!selectedProject || !company?.id) return;
 
     try {
-      // Create an initial allocation with 0 hours for the first week
-      const firstWeekKey = weeks[0]?.weekStartDate.toISOString().split('T')[0];
-      
+      // Create an initial allocation with 0 hours for the first visible week
+      // NOTE: Our person view groups allocations by the *Monday* of a week.
+      // Some grids can start on Sunday, so normalize to Monday to ensure the
+      // allocation falls within the same date-range query.
+      const firstWeekDate: Date | undefined = weeks[0]?.weekStartDate;
+      const firstWeekKey = firstWeekDate
+        ? (() => {
+            const dayOfWeek = firstWeekDate.getDay();
+            const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            const monday = new Date(firstWeekDate);
+            monday.setDate(firstWeekDate.getDate() + daysToMonday);
+            return monday.toISOString().split('T')[0];
+          })()
+        : undefined;
       if (firstWeekKey) {
         const { error } = await supabase
           .from('project_resource_allocations')
