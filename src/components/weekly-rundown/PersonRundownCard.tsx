@@ -108,24 +108,24 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
             <div className="flex-1 min-w-0 overflow-hidden">
               <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-0.5">
                 <h1 className={`font-bold text-foreground tracking-tight truncate ${
-                  isFullscreen ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'
+                  isFullscreen ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'
                 }`}>
                   {person.first_name} {person.last_name}
                 </h1>
                 
                 {/* Badges - Responsive flex wrap */}
-                <div className="flex flex-wrap items-end justify-end gap-0.5 sm:gap-1 flex-shrink-0 max-w-[50%]">
-                  <Badge variant="outline" className="flex items-center gap-0.5 px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] whitespace-nowrap">
-                    <TrendingUp className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                <div className="flex flex-wrap items-end justify-end gap-1 sm:gap-1.5 flex-shrink-0 max-w-[50%]">
+                  <Badge variant="outline" className="flex items-center gap-1 px-2 sm:px-3 py-1 text-xs sm:text-sm whitespace-nowrap">
+                    <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
                     {person.utilizationPercentage}%
                   </Badge>
                   {person.department && (
-                    <Badge variant="outline" className="flex items-center gap-0.5 px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] truncate max-w-[60px] sm:max-w-none">
+                    <Badge variant="outline" className="flex items-center gap-1 px-2 sm:px-3 py-1 text-xs sm:text-sm truncate max-w-[80px] sm:max-w-none">
                       {person.department}
                     </Badge>
                   )}
-                  <Badge variant="outline" className="flex items-center gap-0.5 px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] whitespace-nowrap">
-                    <MapPin className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                  <Badge variant="outline" className="flex items-center gap-1 px-2 sm:px-3 py-1 text-xs sm:text-sm whitespace-nowrap">
+                    <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
                     {person.location}
                   </Badge>
                 </div>
@@ -138,7 +138,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
         <div className="px-3 sm:px-4 py-1.5 relative z-10 flex-1 flex flex-col min-h-0 overflow-hidden">
           <div className="w-full flex flex-col min-h-0 flex-1">
             <h2 className={`font-semibold text-foreground mb-1 sm:mb-1.5 flex-shrink-0 ${
-              isFullscreen ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'
+              isFullscreen ? 'text-base sm:text-lg' : 'text-sm sm:text-base'
             }`}>
               Weekly Allocation
             </h2>

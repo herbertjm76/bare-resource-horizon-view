@@ -116,35 +116,35 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = React.memo(
             <div className="flex items-start justify-between gap-1.5 sm:gap-2">
               <div className="flex-1 min-w-0">
                 {/* Project Primary Display */}
-                <h1 className="font-bold text-foreground tracking-tight mb-0.5 text-lg sm:text-xl truncate">
+                <h1 className="font-bold text-foreground tracking-tight mb-0.5 text-2xl sm:text-3xl truncate">
                   {primaryDisplay}
                 </h1>
                 
                 {/* Project Secondary Display */}
                 {secondaryDisplay && (
-                  <h2 className="font-medium text-muted-foreground text-xs sm:text-sm truncate">
+                  <h2 className="font-medium text-muted-foreground text-sm sm:text-base truncate">
                     {secondaryDisplay}
                   </h2>
                 )}
               </div>
               
               {/* Badges - Responsive flex wrap */}
-              <div className="flex flex-wrap items-end justify-end gap-0.5 sm:gap-1 flex-shrink-0 max-w-[50%]">
-                <StandardizedBadge variant="metric" size="sm" className="flex items-center gap-0.5 text-[8px] sm:text-[10px]">
-                  <Clock className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+              <div className="flex flex-wrap items-end justify-end gap-1 sm:gap-1.5 flex-shrink-0 max-w-[50%]">
+                <StandardizedBadge variant="metric" size="sm" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-1">
+                  <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                   {formatDualAllocationValue(project.totalHours, teamCapacity, displayPreference)}
                 </StandardizedBadge>
-                <StandardizedBadge variant="secondary" size="sm" className="flex items-center gap-0.5 text-[8px] sm:text-[10px]">
-                  <Users className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                <StandardizedBadge variant="secondary" size="sm" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-1">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4" />
                   {project.teamMembers.length}
                 </StandardizedBadge>
                 {project.office && (
-                  <StandardizedBadge variant="secondary" size="sm" className="text-[8px] sm:text-[10px] truncate max-w-[50px] sm:max-w-none">
+                  <StandardizedBadge variant="secondary" size="sm" className="text-xs sm:text-sm px-2 py-1 truncate max-w-[70px] sm:max-w-none">
                     {project.office}
                   </StandardizedBadge>
                 )}
                 {project.status && (
-                  <StandardizedBadge variant="status" size="sm" className="text-[8px] sm:text-[10px]">
+                  <StandardizedBadge variant="status" size="sm" className="text-xs sm:text-sm px-2 py-1">
                     {project.status}
                   </StandardizedBadge>
                 )}
