@@ -3,6 +3,7 @@ import { WeekInfo } from '../hooks/useGridWeeks';
 import { PersonProject, PersonResourceData } from '@/hooks/usePersonResourceData';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 import { logger } from '@/utils/logger';
+import { toUTCDateKey } from '@/utils/dateKey';
 
 interface ProjectAllocationRowProps {
   project: PersonProject;
@@ -61,7 +62,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
         e.preventDefault();
         const nextIndex = currentIndex + 1;
         if (nextIndex < weeks.length) {
-          const nextWeekKey = weeks[nextIndex].weekStartDate.toISOString().split('T')[0];
+          const nextWeekKey = toUTCDateKey(weeks[nextIndex].weekStartDate);
           const nextInput = inputRefs.current[nextWeekKey];
           if (nextInput) {
             nextInput.focus();
@@ -72,7 +73,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
         e.preventDefault();
         const prevIndex = currentIndex - 1;
         if (prevIndex >= 0) {
-          const prevWeekKey = weeks[prevIndex].weekStartDate.toISOString().split('T')[0];
+          const prevWeekKey = toUTCDateKey(weeks[prevIndex].weekStartDate);
           const prevInput = inputRefs.current[prevWeekKey];
           if (prevInput) {
             prevInput.focus();
@@ -134,7 +135,7 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
       
       {/* Week allocation cells */}
       {weeks.map((week, weekIndex) => {
-        const weekKey = week.weekStartDate.toISOString().split('T')[0];
+        const weekKey = toUTCDateKey(week.weekStartDate);
         const allocation = allocations[weekKey] || 0;
         
         return (

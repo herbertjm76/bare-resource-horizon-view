@@ -4,7 +4,7 @@ import { ResourceAllocation } from './types';
 import { formatDateKey } from './utils';
 import { toast } from 'sonner';
 import { getWeekStartDate } from './utils/dateUtils';
-import { format } from 'date-fns';
+import { toUTCDateKey } from '@/utils/dateKey';
 import { logger } from '@/utils/logger';
 
 export const fetchResourceAllocations = async (
@@ -68,12 +68,11 @@ export const saveResourceAllocation = async (
     // Ensure we're using Monday as the week start
     let formattedWeekKey = formatDateKey(weekKey);
     
-    // Double-check that the date is a Monday
-    // If it's not already a formatted date string, parse it
+    // Double-check that the date is a Monday (use UTC for consistency)
     if (weekKey.includes('T') || weekKey.includes(' ')) {
       const date = new Date(weekKey);
       const mondayDate = getWeekStartDate(date);
-      formattedWeekKey = format(mondayDate, 'yyyy-MM-dd');
+      formattedWeekKey = toUTCDateKey(mondayDate);
     }
     
     logger.debug(`Saving allocation for week starting: ${formattedWeekKey} (Monday)`);
@@ -130,14 +129,13 @@ export const deleteResourceAllocation = async (
   companyId: string
 ): Promise<boolean> => {
   try {
-    // Ensure we're using Monday as the week start
+    // Ensure we're using Monday as the week start (UTC for consistency)
     let formattedWeekKey = formatDateKey(weekKey);
     
-    // Double-check that the date is a Monday
     if (weekKey.includes('T') || weekKey.includes(' ')) {
       const date = new Date(weekKey);
       const mondayDate = getWeekStartDate(date);
-      formattedWeekKey = format(mondayDate, 'yyyy-MM-dd');
+      formattedWeekKey = toUTCDateKey(mondayDate);
     }
     
     const { error } = await supabase

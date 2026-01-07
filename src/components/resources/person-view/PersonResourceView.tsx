@@ -1,19 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { PersonResourceGrid } from './PersonResourceGrid';
 import { usePersonResourceData } from '@/hooks/usePersonResourceData';
 import { useGridWeeks } from '../hooks/useGridWeeks';
 import { GridLoadingState } from '../grid/GridLoadingState';
 import { Button } from '@/components/ui/button';
-import { Calendar, ChevronLeft, ChevronRight, Filter, Expand, Shrink, Download, Settings } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Expand, Shrink, Download, Settings } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
 import { MobilePersonControls } from './MobilePersonControls';
-import { logger } from '@/utils/logger';
 
 interface MemberFilters {
   practiceArea: string;
@@ -47,7 +43,6 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
   const [expandedPeople, setExpandedPeople] = useState<string[]>([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const { company } = useCompany();
 
   // Filter person data based on member filters
   const filteredPersonData = useMemo(() => {
@@ -68,33 +63,11 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
         const fullName = `${person.firstName} ${person.lastName}`.toLowerCase();
         if (!fullName.includes(searchLower)) return false;
       }
-      return true;
+    return true;
     });
   }, [personData, memberFilters]);
 
-  // Setup real-time subscription for allocation changes to update person totals instantly
-  useEffect(() => {
-    if (!company?.id) return;
-
-    logger.log('🔔 Setting up real-time subscription for person totals');
-    
-    const channel = supabase
-      .channel('person-allocations-updates')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'project_resource_allocations',
-        filter: `company_id=eq.${company.id}`
-      }, (payload) => {
-        logger.log('🔔 Allocation changed, refreshing person totals:', payload);
-        refetch();
-      })
-      .subscribe();
-    
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [company?.id, refetch]);
+  // Realtime subscription is now handled inside usePersonResourceData hook (single source)
 
   const handleTogglePersonExpand = (personId: string) => {
     setExpandedPeople(prev => 

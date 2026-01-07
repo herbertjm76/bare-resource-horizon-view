@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { startOfWeek, format } from 'date-fns';
+import { startOfWeek } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { toast } from 'sonner';
 import { logger } from '@/utils/logger';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { toUTCDateKey, parseUTCDateKey } from '@/utils/dateKey';
 import {
   DEMO_COMPANY_ID,
   DEMO_TEAM_MEMBERS,
@@ -57,12 +58,13 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           ...DEMO_PRE_REGISTERED.map((m) => ({ ...m, resourceType: 'pre_registered' as const })),
         ];
 
-        // Calculate date range
-        const endDate = new Date(startDate);
+        // Calculate date range using UTC-based keys
+        const rangeStart = startOfWeek(startDate, { weekStartsOn });
+        const endDate = new Date(rangeStart);
         endDate.setDate(endDate.getDate() + periodToShow * 7);
 
-        const startStr = startDate.toISOString().split('T')[0];
-        const endStr = endDate.toISOString().split('T')[0];
+        const startStr = toUTCDateKey(rangeStart);
+        const endStr = toUTCDateKey(endDate);
 
         // Filter demo allocations within date range
         const allAllocations = generateDemoAllocations();
@@ -112,9 +114,9 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             person.projects.push(projectEntry);
           }
 
-          // Convert the date to the week start based on company settings
-          const allocationDate = new Date(allocation.allocation_date + 'T00:00:00');
-          const weekKey = format(startOfWeek(allocationDate, { weekStartsOn }), 'yyyy-MM-dd');
+          // Convert the date to the week start based on company settings (UTC-safe)
+          const allocationDate = parseUTCDateKey(allocation.allocation_date);
+          const weekKey = toUTCDateKey(startOfWeek(allocationDate, { weekStartsOn }));
           // Aggregate hours by week
           projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });
@@ -173,6 +175,12 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         const rangeStart = startOfWeek(startDate, { weekStartsOn });
         const endDate = new Date(rangeStart);
         endDate.setDate(endDate.getDate() + periodToShow * 7);
+        
+        // Use UTC-based date keys to avoid timezone drift
+        const rangeStartKey = toUTCDateKey(rangeStart);
+        const endDateKey = toUTCDateKey(endDate);
+        
+        console.log('[usePersonResourceData] query range:', { rangeStartKey, endDateKey });
 
         // Fetch all allocations for this date range and company (both active and pre-registered)
         const { data: allocations, error: allocationsError } = await supabase
@@ -191,8 +199,8 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           `)
           .eq('company_id', company.id)
           .in('resource_type', ['active', 'pre_registered'])
-          .gte('allocation_date', format(rangeStart, 'yyyy-MM-dd'))
-          .lte('allocation_date', format(endDate, 'yyyy-MM-dd'));
+          .gte('allocation_date', rangeStartKey)
+          .lte('allocation_date', endDateKey);
 
         if (allocationsError) {
           logger.error('Error fetching allocations:', allocationsError);
@@ -240,9 +248,9 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
             personData.projects.push(projectEntry);
           }
 
-          // Convert the date to the week start based on company settings
-          const allocationDate = new Date(allocation.allocation_date + 'T00:00:00');
-          const weekKey = format(startOfWeek(allocationDate, { weekStartsOn }), 'yyyy-MM-dd');
+          // Convert the date to the week start based on company settings (UTC-safe)
+          const allocationDate = parseUTCDateKey(allocation.allocation_date);
+          const weekKey = toUTCDateKey(startOfWeek(allocationDate, { weekStartsOn }));
           // Aggregate hours by week (sum up daily hours into weekly total)
           projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });
