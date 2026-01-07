@@ -9,9 +9,12 @@ import { ProfileTabs } from './Profile/components/ProfileTabs';
 import { ProfileLoadingState } from './Profile/components/ProfileLoadingState';
 import { ProfileErrorState } from './Profile/components/ProfileErrorState';
 import { useProfile } from './Profile/hooks/useProfile';
+import { PermissionsDebugPanel } from '@/components/profile/PermissionsDebugPanel';
+import { usePermissions } from '@/hooks/usePermissions';
 
 export default function Profile() {
   const { company, loading: companyLoading } = useCompany();
+  const { canUseViewAs } = usePermissions();
   const {
     profile,
     loading,
@@ -54,6 +57,13 @@ export default function Profile() {
           onSave={handleSave}
           error={error}
         />
+
+        {/* Permissions Debug Panel - only visible to admins/owners */}
+        {canUseViewAs && (
+          <div className="mt-6">
+            <PermissionsDebugPanel />
+          </div>
+        )}
       </OfficeSettingsProvider>
     </ProfileLayout>
   );
