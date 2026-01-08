@@ -25,6 +25,7 @@
  * ```
  */
 
+import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -137,7 +138,11 @@ export const useProjects = (
 ): UseProjectsResult => {
   const { isDemoMode } = useDemoAuth();
   const { companyId, isReady, isLoading: companyLoading, error: companyError } = useCompanyId();
-  
+
+  // Keep last successful projects to prevent UI flicker when company context temporarily becomes "not ready"
+  // (e.g. during route changes or company refetch).
+  const lastProjectsRef = useRef<ProjectWithRelations[]>([]);
+  const lastCompanyIdRef = useRef<string | null>(null);
   const { data: projects, isLoading: queryLoading, error, refetch } = useQuery({
     queryKey: ['projects', companyId, sortBy, sortDirection, isDemoMode],
     queryFn: async () => {
@@ -252,14 +257,41 @@ export const useProjects = (
     placeholderData: (previousData) => previousData,
   });
 
+  // Update cache only when we have a stable companyId
+  useEffect(() => {
+    if (isDemoMode) {
+      lastProjectsRef.current = projects || [];
+      lastCompanyIdRef.current = 'demo';
+      return;
+    }
+
+    if (!companyId || !isReady) return;
+
+    // Allow caching empty arrays too (legit "no projects" state)
+    lastProjectsRef.current = projects || [];
+    lastCompanyIdRef.current = companyId;
+  }, [projects, companyId, isReady, isDemoMode]);
+
   // Determine proper loading state - return true when:
   // 1. Company context is still loading
   // 2. Company context is not ready yet (query disabled)
   // 3. Query is actively fetching
   const isLoading = isDemoMode ? false : (companyLoading || !isReady || queryLoading);
 
+  const resolvedProjects = (() => {
+    // Normal case
+    if (projects) return projects;
+
+    // Prevent the "projects disappear" flicker when companyId temporarily null/ready=false
+    if (!isDemoMode && lastCompanyIdRef.current && lastProjectsRef.current) {
+      return lastProjectsRef.current;
+    }
+
+    return [] as ProjectWithRelations[];
+  })();
+
   return {
-    projects: projects || [],
+    projects: resolvedProjects,
     isLoading,
     error: isDemoMode ? null : (error || (companyError ? new Error(companyError) : null)),
     refetch
