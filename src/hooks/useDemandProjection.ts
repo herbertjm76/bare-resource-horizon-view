@@ -36,7 +36,7 @@ export interface DemandProjectionResult {
 }
 
 export const useDemandProjection = (startDate: Date, numberOfWeeks: number = 12): DemandProjectionResult => {
-  const { companyId, isReady } = useCompanyId();
+  const { companyId, isReady, isLoading: companyLoading } = useCompanyId();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['demand-projection', companyId, startDate.toISOString(), numberOfWeeks],
@@ -207,7 +207,8 @@ export const useDemandProjection = (startDate: Date, numberOfWeeks: number = 12)
 
   return {
     ...processedData,
-    isLoading,
+    // Return true when company loading, not ready, or query loading
+    isLoading: companyLoading || !isReady || isLoading,
     error: error as Error | null,
   };
 };

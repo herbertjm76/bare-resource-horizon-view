@@ -30,6 +30,8 @@ interface ModernResourceGridProps {
   totalProjects: number;
   onToggleProjectExpand: (projectId: string) => void;
   memberFilters?: MemberFilters;
+  // External loading state (when projects passed from parent)
+  isLoading?: boolean;
 }
 
 export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
@@ -45,7 +47,8 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   expandedProjects,
   totalProjects,
   onToggleProjectExpand,
-  memberFilters
+  memberFilters,
+  isLoading: externalIsLoading
 }) => {
   const shouldFetchProjects = !projectsProp;
   const { projects: fetchedProjects, isLoading: isLoadingProjects } = useProjects(sortBy, sortDirection, {
@@ -89,10 +92,12 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
     return weeks.length > 0 ? [weeks[0]] : weeks;
   }, [weeks]);
 
-  if (isLoadingProjects) {
+  // Show loading state if internal fetch is loading OR parent says we're loading
+  if (isLoadingProjects || externalIsLoading) {
     return <GridLoadingState />;
   }
 
+  // Only show empty state if we're truly done loading and have no projects
   if (!filteredProjects?.length) {
     return <GridEmptyState />;
   }

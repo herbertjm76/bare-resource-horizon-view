@@ -252,8 +252,11 @@ export const useProjects = (
     placeholderData: (previousData) => previousData,
   });
 
-  // Determine proper loading state
-  const isLoading = isDemoMode ? false : (companyLoading || (isReady && queryLoading));
+  // Determine proper loading state - return true when:
+  // 1. Company context is still loading
+  // 2. Company context is not ready yet (query disabled)
+  // 3. Query is actively fetching
+  const isLoading = isDemoMode ? false : (companyLoading || !isReady || queryLoading);
 
   return {
     projects: projects || [],

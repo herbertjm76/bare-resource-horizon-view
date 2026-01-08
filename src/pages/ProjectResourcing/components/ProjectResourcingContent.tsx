@@ -62,6 +62,10 @@ interface ProjectResourcingContentProps {
   onExpandAll?: () => void;
   onCollapseAll?: () => void;
   onToggleProjectExpand?: (projectId: string) => void;
+  // External loading state (when projects passed from parent)
+  isLoading?: boolean;
+  // External projects (when passed from parent to avoid double-fetch)
+  projects?: any[];
 }
 
 // Inner component that uses office settings
@@ -91,10 +95,19 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   expandedProjects: externalExpandedProjects,
   onExpandAll: externalExpandAll,
   onCollapseAll: externalCollapseAll,
-  onToggleProjectExpand: externalToggleProjectExpand
+  onToggleProjectExpand: externalToggleProjectExpand,
+  // External loading/projects props
+  isLoading: externalIsLoading,
+  projects: externalProjects
 }) => {
-  // Fetch projects only for expand all functionality and total count
-  const { projects, isLoading } = useProjects(sortBy, sortDirection);
+  // Only fetch projects if not passed from parent
+  const { projects: fetchedProjects, isLoading: fetchedIsLoading } = useProjects(sortBy, sortDirection, {
+    enabled: !externalProjects
+  });
+  
+  // Use external data if provided, otherwise use fetched data
+  const projects = externalProjects ?? fetchedProjects;
+  const isLoading = externalIsLoading ?? fetchedIsLoading;
   const [internalExpandedProjects, setInternalExpandedProjects] = React.useState<string[]>([]);
   const [isExporting, setIsExporting] = React.useState(false);
 
