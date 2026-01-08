@@ -64,9 +64,29 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
   const companyName = company?.name || 'Your Company';
   const baseUrl = companySlug ? `/${companySlug}` : '';
 
-  const handleStartResourcing = () => {
+  // Role-specific route and button text
+  const getPrimaryAction = () => {
+    // Project managers go to resource scheduling
+    if (role === 'project_manager') {
+      return {
+        route: '/resource-scheduling',
+        label: 'Start Resourcing',
+        skipLabel: 'Skip & Start Resourcing'
+      };
+    }
+    // Owner, admin, and members go to weekly overview
+    return {
+      route: '/weekly-overview',
+      label: 'Go to Weekly Overview',
+      skipLabel: 'Skip & View Weekly Overview'
+    };
+  };
+
+  const primaryAction = getPrimaryAction();
+
+  const handlePrimaryAction = () => {
     skipTour(dontShowAgain);
-    navigate(`${baseUrl}/resource-scheduling`);
+    navigate(`${baseUrl}${primaryAction.route}`);
   };
 
   const handleClose = () => {
@@ -194,11 +214,11 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
                     Take the Tour
                   </Button>
                   <Button
-                    onClick={handleStartResourcing}
+                    onClick={handlePrimaryAction}
                     variant="outline"
                     size="lg"
                   >
-                    Skip & Start Resourcing
+                    {primaryAction.skipLabel}
                     <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
@@ -332,11 +352,11 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ userName }) => {
                   
                   {currentStep === totalSteps - 1 ? (
                     <Button
-                      onClick={handleStartResourcing}
+                      onClick={handlePrimaryAction}
                       className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
                     >
                       <Rocket className="w-4 h-4 mr-2" />
-                      Start Resourcing
+                      {primaryAction.label}
                     </Button>
                   ) : (
                     <Button onClick={nextStep} className="gap-1">
