@@ -259,7 +259,8 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
     searchTerm
   };
 
-  if (isLoading) {
+  // Only show loading state when we truly have no data yet (prevents "flash then disappear" during background refetches)
+  if (isLoading && (!projects || projects.length === 0)) {
     return <GridLoadingState />;
   }
 
