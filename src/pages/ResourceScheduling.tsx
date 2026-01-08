@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { CenteredTabs, CenteredTabItem, TabsContent } from '@/components/ui/centered-tabs';
@@ -72,6 +72,7 @@ const ResourceScheduling = () => {
     searchTerm: ""
   });
 
+
   const handleMemberFilterChange = useCallback((key: string, value: string) => {
     setMemberFilters(prev => ({
       ...prev,
@@ -97,7 +98,29 @@ const ResourceScheduling = () => {
 
   // Lift expandedProjects state up so controls and grid share the same state
   const { projects, isLoading: projectsLoading, refetch: refetchProjects } = useProjects(sortBy, sortDirection);
+
+  // Debug: track the exact moment filters/data flip (DEV only)
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    // eslint-disable-next-line no-console
+    console.log('[ResourceScheduling] state', {
+      memberDepartment: memberFilters.department,
+      projectSearchTerm,
+      statusFilter: filters.status,
+      projectsLoading,
+      projectsCount: projects?.length ?? 0,
+      selectedMonth: selectedMonth?.toISOString?.(),
+    });
+  }, [
+    memberFilters.department,
+    projectSearchTerm,
+    filters.status,
+    projectsLoading,
+    projects,
+    selectedMonth,
+  ]);
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
+
 
   const expandAll = useCallback(() => {
     if (projects) {

@@ -98,6 +98,30 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   const filteredProjects = useFilteredProjects(projectsFilteredByDepartment || [], filters);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
 
+  // Debug: see why results go empty after a brief render (DEV only)
+  React.useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    // eslint-disable-next-line no-console
+    console.log('[ModernResourceGrid] pipeline', {
+      memberDepartment: memberFilters?.department,
+      isLoadingProjects,
+      externalIsLoading,
+      projectsCount: projects?.length ?? 0,
+      deptFilteredCount: projectsFilteredByDepartment?.length ?? 0,
+      finalFilteredCount: filteredProjects?.length ?? 0,
+      statusFilter: (filters as any)?.status,
+      searchTerm: (filters as any)?.searchTerm,
+    });
+  }, [
+    memberFilters?.department,
+    isLoadingProjects,
+    externalIsLoading,
+    projects,
+    projectsFilteredByDepartment,
+    filteredProjects,
+    filters,
+  ]);
+
   // On tablet and mobile, only show a single week column (prefer THIS WEEK)
   const displayedWeeks = React.useMemo(() => {
     if (!weeks || weeks.length === 0) return weeks;
