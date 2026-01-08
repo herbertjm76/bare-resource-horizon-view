@@ -66,8 +66,16 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
     const normalize = (v: unknown) => String(v ?? '').trim().toLowerCase();
     const selectedNorm = normalize(selected);
 
-    // Departments in DB are sometimes stored with different casing than the UI chip labels.
-    return projects.filter((p: any) => normalize(p?.department) === selectedNorm);
+    // Departments are user-entered strings in many datasets (casing, spacing, suffixes like "Hospitality /MP").
+    // So we match loosely rather than exact equality.
+    return projects.filter((p: any) => {
+      const deptNorm = normalize(p?.department);
+      return (
+        deptNorm === selectedNorm ||
+        deptNorm.includes(selectedNorm) ||
+        selectedNorm.includes(deptNorm)
+      );
+    });
   }, [projects, memberFilters?.department]);
 
   const filteredProjects = useFilteredProjects(projectsFilteredByDepartment || [], filters);
