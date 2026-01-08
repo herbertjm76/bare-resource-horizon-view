@@ -60,8 +60,14 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   // This is intentionally separate from memberFilters filtering (which happens within each project row).
   const projectsFilteredByDepartment = React.useMemo(() => {
     if (!projects) return projects;
-    if (!memberFilters?.department || memberFilters.department === 'all') return projects;
-    return projects.filter((p: any) => (p.department ?? '') === memberFilters.department);
+    const selected = memberFilters?.department;
+    if (!selected || selected === 'all') return projects;
+
+    const normalize = (v: unknown) => String(v ?? '').trim().toLowerCase();
+    const selectedNorm = normalize(selected);
+
+    // Departments in DB are sometimes stored with different casing than the UI chip labels.
+    return projects.filter((p: any) => normalize(p?.department) === selectedNorm);
   }, [projects, memberFilters?.department]);
 
   const filteredProjects = useFilteredProjects(projectsFilteredByDepartment || [], filters);
