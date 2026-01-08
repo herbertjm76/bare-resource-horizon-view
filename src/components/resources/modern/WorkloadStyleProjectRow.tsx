@@ -58,6 +58,8 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   const rowBgColor = isEven ? '#ffffff' : '#f9fafb';
 
   // Filter resources based on member filters
+  // IMPORTANT: memberFilters.department is used for PROJECT-level filtering in ModernResourceGrid,
+  // NOT for filtering resources within a project. So we exclude it here.
   const filteredResources = React.useMemo(() => {
     if (!memberFilters) return resources;
     
@@ -67,10 +69,9 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
         if (resource.practice_area !== memberFilters.practiceArea) return false;
       }
       
-      // Filter by department
-      if (memberFilters.department && memberFilters.department !== 'all') {
-        if (resource.department !== memberFilters.department) return false;
-      }
+      // NOTE: We do NOT filter by memberFilters.department here.
+      // department filtering is applied at the PROJECT level (ModernResourceGrid filters projects by project.department).
+      // Filtering resources by department here would incorrectly hide project rows.
       
       // Filter by location
       if (memberFilters.location && memberFilters.location !== 'all') {
@@ -108,29 +109,27 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   const totalFTE = visibleWeeksCount > 0 ? totalHours / (workWeekHours * visibleWeeksCount) : 0;
 
   /**
-   * CRITICAL: Member Filter Integration
-   * ------------------------------------
-   * This logic ensures that when member filters (practiceArea, department, location, searchTerm)
+   * CRITICAL: Member Filter Integration (Resource-Level Only)
+   * ----------------------------------------------------------
+   * This logic ensures that when RESOURCE-level filters (practiceArea, location, searchTerm)
    * are active, projects with NO matching resources are hidden from the view.
    * 
-   * DO NOT REMOVE OR MODIFY this without understanding the full filtering flow:
-   * 1. MemberFilterRow sets filters in ResourceScheduling page state
-   * 2. Filters are passed down through ProjectResourcingContent -> WorkloadStyleResourceGrid -> here
-   * 3. filteredResources is already filtered by useFilteredResources hook
-   * 4. If no resources match the active filters, this project row should not render
-   * 
-   * This was broken before and fixed - maintain this behavior!
+   * IMPORTANT: memberFilters.department is used for PROJECT-level filtering (in ModernResourceGrid),
+   * so we do NOT include it here. Including it caused the "flash then disappear" bug where
+   * selecting a department would filter projects correctly, but then this check would hide
+   * all project rows because no resources matched the department filter.
    */
-  const hasActiveMemberFilters = Boolean(
+  const hasActiveResourceFilters = Boolean(
     memberFilters &&
     (memberFilters.practiceArea !== 'all' ||
-      memberFilters.department !== 'all' ||
       memberFilters.location !== 'all' ||
       (memberFilters.searchTerm && memberFilters.searchTerm.trim() !== ''))
   );
 
-  // Hide project row when member filters are active but no team members match
-  if (hasActiveMemberFilters && !isLoading && filteredResources.length === 0) {
+  // Hide project row when resource-level filters are active but no team members match
+  // Note: We only hide based on resource filters (practiceArea, location, searchTerm),
+  // NOT department - department filters projects at the grid level, not resources.
+  if (hasActiveResourceFilters && !isLoading && filteredResources.length === 0) {
     return null;
   }
   
