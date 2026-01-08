@@ -147,8 +147,8 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
     return weeks.length > 0 ? [weeks[0]] : weeks;
   }, [weeks]);
 
-  // Show loading state if internal fetch is loading OR parent says we're loading
-  if (isLoadingProjects || externalIsLoading) {
+  // Show loading state only when we truly have no data yet (prevents flicker during background refetches)
+  if ((isLoadingProjects || externalIsLoading) && (!projects || projects.length === 0)) {
     return <GridLoadingState />;
   }
 
