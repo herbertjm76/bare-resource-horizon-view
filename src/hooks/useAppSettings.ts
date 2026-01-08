@@ -25,6 +25,7 @@
  * ```
  */
 
+import { useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 
 /**
@@ -110,7 +111,7 @@ export interface AppSettings {
 export const useAppSettings = (): AppSettings => {
   const { company } = useCompany();
 
-  return {
+  return useMemo(() => ({
     workWeekHours: company?.work_week_hours || 40,
     displayPreference: (company?.use_hours_or_percentage as DisplayPreference) || 'hours',
     startOfWorkWeek: (company?.start_of_work_week as WeekStartDay) || 'Monday',
@@ -119,5 +120,5 @@ export const useAppSettings = (): AppSettings => {
     allocationWarningThreshold: company?.allocation_warning_threshold || 150,
     allocationDangerThreshold: company?.allocation_danger_threshold || 180,
     allocationMaxLimit: (company as any)?.allocation_max_limit || 200,
-  };
+  }), [company]);
 };

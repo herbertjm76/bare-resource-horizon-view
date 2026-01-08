@@ -56,19 +56,33 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   });
   const projects = projectsProp ?? fetchedProjects;
 
+  // Stable cache ref to prevent flicker during transient loading states
+  const lastValidProjectsRef = React.useRef<any[]>([]);
+
   // Project-level filtering driven by the "filter row" chips (department in Resource Scheduling).
   // This is intentionally separate from memberFilters filtering (which happens within each project row).
   const projectsFilteredByDepartment = React.useMemo(() => {
-    if (!projects) return projects;
+    // If projects is null/undefined during a transient state, return cached data
+    if (!projects || projects.length === 0) {
+      // Only return cached data if we're in a transient loading state
+      if (isLoadingProjects || externalIsLoading) {
+        return lastValidProjectsRef.current;
+      }
+      return projects ?? [];
+    }
+    
     const selected = memberFilters?.department;
-    if (!selected || selected === 'all') return projects;
+    if (!selected || selected === 'all') {
+      lastValidProjectsRef.current = projects;
+      return projects;
+    }
 
     const normalize = (v: unknown) => String(v ?? '').trim().toLowerCase();
     const selectedNorm = normalize(selected);
 
     // Departments are user-entered strings in many datasets (casing, spacing, suffixes like "Hospitality /MP").
     // So we match loosely rather than exact equality.
-    return projects.filter((p: any) => {
+    const result = projects.filter((p: any) => {
       const deptNorm = normalize(p?.department);
       return (
         deptNorm === selectedNorm ||
@@ -76,7 +90,10 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
         selectedNorm.includes(deptNorm)
       );
     });
-  }, [projects, memberFilters?.department]);
+    
+    lastValidProjectsRef.current = result;
+    return result;
+  }, [projects, memberFilters?.department, isLoadingProjects, externalIsLoading]);
 
   const filteredProjects = useFilteredProjects(projectsFilteredByDepartment || [], filters);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
