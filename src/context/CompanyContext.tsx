@@ -326,7 +326,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       initAuth();
     }
-  }, [isDemoMode, location.pathname, company, error]);
+  }, [isDemoMode, location.pathname]);
 
   // Listen for auth state changes and refetch company
   useEffect(() => {
