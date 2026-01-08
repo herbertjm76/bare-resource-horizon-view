@@ -83,7 +83,7 @@ const generateDemoCompositionData = (): TeamCompositionSummary[] => {
 };
 
 export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
-  const { companyId, isReady } = useCompanyId();
+  const { companyId, isReady, isLoading: companyLoading } = useCompanyId();
   const { isDemoMode } = useDemoAuth();
 
   // Fetch projects
@@ -235,7 +235,8 @@ export const useProjectPlanningData = (statusFilter: string[] = ['Active']) => {
     };
   }, [compositionData, projects]);
 
-  const isLoading = isDemoMode ? false : (isLoadingProjects || isLoadingStages || isLoadingProjectStages || isLoadingComposition);
+  // Return true when company loading, not ready, or any query loading
+  const isLoading = isDemoMode ? false : (companyLoading || !isReady || isLoadingProjects || isLoadingStages || isLoadingProjectStages || isLoadingComposition);
 
   const refetch = () => {
     if (!isDemoMode) {

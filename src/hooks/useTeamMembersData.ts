@@ -150,7 +150,8 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
 
   return {
     teamMembers: teamMembers || [],
-    isLoading: isDemoMode ? false : (queryLoading || companyLoading),
+    // Return true when company loading, not ready, or query loading
+    isLoading: isDemoMode ? false : (companyLoading || !isReady || queryLoading),
     error: isDemoMode ? null : error,
     triggerRefresh,
     forceRefresh,

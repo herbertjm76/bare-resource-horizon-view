@@ -31,6 +31,8 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Ref to prevent duplicate fetches
   const isFetchingRef = useRef(false);
   const lastFetchedCompanyIdRef = useRef<string | null>(null);
+  // Track previous slug to avoid unnecessary refetches on navigation
+  const previousSlugRef = useRef<string | null>(null);
   
   const { isDemoMode, profile: demoProfile } = useDemoAuth();
   
@@ -285,6 +287,16 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     logger.log('CompanyProvider: Main useEffect triggered');
     const currentSlug = extractCompanySlugFromPath();
+    
+    // Skip refetch if slug hasn't changed AND we already have company data
+    if (currentSlug && currentSlug === previousSlugRef.current && company && !error) {
+      logger.log('CompanyProvider: Slug unchanged, skipping refetch:', currentSlug);
+      setCompanySlug(currentSlug);
+      setIsPathMode(true);
+      return;
+    }
+    
+    previousSlugRef.current = currentSlug;
     setCompanySlug(currentSlug);
     
     if (currentSlug) {
@@ -314,7 +326,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       initAuth();
     }
-  }, [isDemoMode, location.pathname]);
+  }, [isDemoMode, location.pathname, company, error]);
 
   // Listen for auth state changes and refetch company
   useEffect(() => {

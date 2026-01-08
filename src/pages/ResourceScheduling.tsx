@@ -96,7 +96,7 @@ const ResourceScheduling = () => {
   ].filter(Boolean).length, [memberFilters.practiceArea, memberFilters.department, memberFilters.location, memberFilters.searchTerm]);
 
   // Lift expandedProjects state up so controls and grid share the same state
-  const { projects, refetch: refetchProjects } = useProjects(sortBy, sortDirection);
+  const { projects, isLoading: projectsLoading, refetch: refetchProjects } = useProjects(sortBy, sortDirection);
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
 
   const expandAll = useCallback(() => {
@@ -184,6 +184,8 @@ const ResourceScheduling = () => {
                         onExpandAll={expandAll}
                         onCollapseAll={collapseAll}
                         onToggleProjectExpand={handleToggleProjectExpand}
+                        projects={projects}
+                        isLoading={projectsLoading}
                       />
                       <MemberFilterRow
                         filters={memberFilters}
@@ -226,6 +228,8 @@ const ResourceScheduling = () => {
                         onExpandAll={expandAll}
                         onCollapseAll={collapseAll}
                         onToggleProjectExpand={handleToggleProjectExpand}
+                        projects={projects}
+                        isLoading={projectsLoading}
                       />
                     </div>
                   </div>
