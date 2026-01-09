@@ -3,6 +3,7 @@ import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
@@ -53,7 +54,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
 
   // STANDARDIZED CALCULATIONS - Use the utility functions ONLY
   const weeklyCapacity = member.weekly_capacity || workWeekHours;
@@ -135,7 +136,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
                 className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium bg-blue-100 text-blue-800"
                 title={`${hours}h allocated to ${project.code || project.name}`}
               >
-                {hours}
+                {formatAllocationValue(hours, weeklyCapacity, displayPreference, false)}
               </div>
             ) : (
               <span className="text-gray-300 text-xs">—</span>
