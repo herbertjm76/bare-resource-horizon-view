@@ -122,10 +122,11 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
   });
 
   const createProjectMutation = useMutation({
-    mutationFn: async ({ code, name, country }: { code: string; name: string; country: string }) => {
-      const office = offices.find(o => o.country === country);
+    mutationFn: async ({ code, name, country }: { code: string; name: string; country?: string }) => {
+      // Find office - use selected country or fallback to first available office
+      let office = country ? offices.find(o => o.country === country) : offices[0];
       if (!office) {
-        throw new Error('Please select a valid country');
+        throw new Error('No office available. Please create an office first.');
       }
 
       const { data, error } = await supabase
@@ -133,7 +134,7 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
         .insert({
           code: code.toUpperCase(),
           name,
-          country,
+          country: country || office.country,
           office_id: office.id,
           company_id: company?.id,
           status: 'Active',
@@ -210,14 +211,14 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
   };
 
   const handleCreateProject = () => {
-    if (!newProjectCode || !newProjectName || !newProjectCountry) {
-      toast.error('Please fill in all project fields');
+    if (!newProjectCode || !newProjectName) {
+      toast.error('Please fill in project code and name');
       return;
     }
     createProjectMutation.mutate({ 
       code: newProjectCode, 
       name: newProjectName,
-      country: newProjectCountry
+      country: newProjectCountry || undefined
     });
   };
 
@@ -396,10 +397,10 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="projectCountry">Country *</Label>
+              <Label htmlFor="projectCountry">Country <span className="text-muted-foreground text-xs">(optional)</span></Label>
               <Select value={newProjectCountry} onValueChange={setNewProjectCountry}>
                 <SelectTrigger id="projectCountry">
-                  <SelectValue placeholder="Select a country" />
+                  <SelectValue placeholder="Select a country (optional)" />
                 </SelectTrigger>
                 <SelectContent>
                   {offices.map((office) => (
@@ -415,7 +416,7 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
               type="button"
               className="w-full"
               onClick={handleCreateProject}
-              disabled={createProjectMutation.isPending || !newProjectCode || !newProjectName || !newProjectCountry}
+              disabled={createProjectMutation.isPending || !newProjectCode || !newProjectName}
             >
               {createProjectMutation.isPending ? 'Creating...' : 'Create Project'}
             </Button>
