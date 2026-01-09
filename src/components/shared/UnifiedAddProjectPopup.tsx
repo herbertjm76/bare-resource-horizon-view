@@ -172,10 +172,15 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
 
   const createProjectMutation = useMutation({
     mutationFn: async ({ code, name, country }: { code: string; name: string; country?: string }) => {
-      // Find office - use selected country or fallback to first available office
-      let office = country ? offices.find(o => o.country === country) : offices[0];
-      if (!office) {
-        throw new Error('No office available. Please create an office first.');
+      // Fetch offices directly to ensure we have the latest data
+      const { data: officeData, error: officeError } = await supabase
+        .from('offices')
+        .select('id, name, country')
+        .limit(1)
+        .single();
+      
+      if (officeError || !officeData) {
+        throw new Error('No office available. Please create an office in Settings first.');
       }
 
       const { data, error } = await supabase
@@ -183,8 +188,8 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
         .insert({
           code: code.toUpperCase(),
           name,
-          country: country || office.country,
-          office_id: office.id,
+          country: country || 'Global',
+          office_id: officeData.id,
           company_id: company?.id,
           status: 'Active',
           current_stage: 'Planning',
