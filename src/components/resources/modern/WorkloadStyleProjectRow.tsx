@@ -12,6 +12,7 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getMemberCapacity } from '@/utils/capacityUtils';
+import { toUTCDateKey } from '@/utils/dateKey';
 
 interface MemberFilters {
   practiceArea: string;
@@ -96,7 +97,8 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
       const resourceHours = weeks
         .filter(week => !week.isPreviousWeek) // Exclude previous week from calculation
         .reduce((sum, week) => {
-          const weekKey = week.weekStartDate.toISOString().split('T')[0];
+          // IMPORTANT: Use canonical UTC date keys to match allocation_date in DB.
+          const weekKey = toUTCDateKey(week.weekStartDate);
           const allocationKey = getAllocationKey(resource.id, weekKey);
           const hours = projectAllocations[allocationKey] || 0;
           return sum + hours;
@@ -201,7 +203,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
         
         {/* Week allocation cells */}
         {weeks.map((week) => {
-          const weekKey = week.weekStartDate.toISOString().split('T')[0];
+          const weekKey = toUTCDateKey(week.weekStartDate);
           
           // Calculate week total from all resources for this project
           const weekTotal = resources.reduce((total, resource) => {

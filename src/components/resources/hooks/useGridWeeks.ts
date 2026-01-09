@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
-import { format, addWeeks, startOfWeek, eachWeekOfInterval, endOfWeek } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { logger } from '@/utils/logger';
+import { toUTCDateKey, parseUTCDateKey } from '@/utils/dateKey';
 
 export interface WeekInfo {
-  weekStartDate: Date;
-  weekEndDate: Date;
+  weekStartDate: Date; // midnight UTC
+  weekEndDate: Date; // end of day UTC (represented as date key + 6)
   weekLabel: string; // e.g., "Jan 1-7"
   monthLabel: string; // e.g., "Jan"
   weekNumber: number; // Week number in the year
@@ -13,8 +14,25 @@ export interface WeekInfo {
 
 interface DisplayOptions {
   weekStartsOnSunday: boolean;
-  weekStartsOnSaturday?: boolean; // Support Saturday start too
+  weekStartsOnSaturday?: boolean;
 }
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+const getWeekStartsOn = (opts: DisplayOptions): 0 | 1 | 6 => {
+  return opts.weekStartsOnSaturday ? 6 : opts.weekStartsOnSunday ? 0 : 1;
+};
+
+const startOfWeekUTC = (date: Date, weekStartsOn: 0 | 1 | 6): Date => {
+  // Anchor to midnight UTC first
+  const anchored = parseUTCDateKey(toUTCDateKey(date));
+  const dow = anchored.getUTCDay();
+
+  let diff = dow - weekStartsOn;
+  if (diff < 0) diff += 7;
+
+  return new Date(anchored.getTime() - diff * MS_PER_DAY);
+};
 
 export const useGridWeeks = (
   startDate: Date,
@@ -22,77 +40,53 @@ export const useGridWeeks = (
   displayOptions: DisplayOptions
 ): WeekInfo[] => {
   return useMemo(() => {
-    // Check if mobile/tablet viewport (up to 1024px)
     const isMobileOrTablet = typeof window !== 'undefined' && window.innerWidth <= 1024;
-    
-    // Determine week start day: 0 = Sunday, 1 = Monday, 6 = Saturday
-    const weekStartsOn: 0 | 1 | 6 = displayOptions.weekStartsOnSaturday 
-      ? 6 
-      : displayOptions.weekStartsOnSunday 
-        ? 0 
-        : 1;
-    
-    // Adjust start date to beginning of week
-    const adjustedStartDate = startOfWeek(startDate, { weekStartsOn });
-    
-    // Only include previous week on desktop, not on mobile/tablet
-    const previousWeekStartDate = isMobileOrTablet 
-      ? adjustedStartDate 
-      : addWeeks(adjustedStartDate, -1);
-    
-    // Calculate end date based on periodToShow
-    const endDate = addWeeks(adjustedStartDate, periodToShow - 1);
-    
-    // Get all weeks in the interval
-    const allWeeks = eachWeekOfInterval(
-      {
-        start: previousWeekStartDate,
-        end: endDate
-      },
-      { weekStartsOn }
+    const weekStartsOn = getWeekStartsOn(displayOptions);
+
+    // Week starts are computed in UTC to match allocation_date keys.
+    const adjustedStartDate = startOfWeekUTC(startDate, weekStartsOn);
+
+    const previousWeekStartDate = isMobileOrTablet
+      ? adjustedStartDate
+      : addDays(adjustedStartDate, -7);
+
+    const totalWeeks = (isMobileOrTablet ? 0 : 1) + periodToShow;
+    const allWeeks: Date[] = Array.from({ length: totalWeeks }).map((_, idx) =>
+      addDays(previousWeekStartDate, idx * 7)
     );
-    
+
     logger.debug('Grid weeks debug:', {
-      weekStartsOnSunday: displayOptions.weekStartsOnSunday,
+      weekStartsOn,
       originalStartDate: startDate,
       adjustedStartDate,
       totalWeeks: allWeeks.length,
-      periodToShow
+      periodToShow,
     });
-    
+
     return allWeeks.map((weekStart) => {
-      const weekEnd = endOfWeek(weekStart, { weekStartsOn });
-      
-      // Check if this is the previous week
+      const weekEnd = addDays(weekStart, 6);
       const isPreviousWeek = weekStart < adjustedStartDate;
-      
-      // Format week label
+
       const startDay = format(weekStart, 'd');
       const endDay = format(weekEnd, 'd');
       const startMonth = format(weekStart, 'MMM');
       const endMonth = format(weekEnd, 'MMM');
-      
-      // If same month: "Jan 1-7", if different months: "Jan 30-Feb 5"
-      const weekLabel = startMonth === endMonth 
+
+      const weekLabel = startMonth === endMonth
         ? `${startMonth} ${startDay}-${endDay}`
         : `${startMonth} ${startDay}-${endMonth} ${endDay}`;
-      
-      // Get week number
+
       const weekNumber = parseInt(format(weekStart, 'w'), 10);
-      
+
       return {
         weekStartDate: weekStart,
         weekEndDate: weekEnd,
         weekLabel,
         monthLabel: startMonth,
         weekNumber,
-        isPreviousWeek
+        isPreviousWeek,
       };
     });
-  }, [
-    startDate, 
-    periodToShow, 
-    displayOptions.weekStartsOnSunday,
-    displayOptions.weekStartsOnSaturday
-  ]);
+  }, [startDate, periodToShow, displayOptions.weekStartsOnSunday, displayOptions.weekStartsOnSaturday]);
 };
+

@@ -9,6 +9,7 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { getInputConfig } from '@/utils/allocationDisplay';
 import { getMemberCapacity } from '@/utils/capacityUtils';
 import { logger } from '@/utils/logger';
+import { toUTCDateKey } from '@/utils/dateKey';
 
 interface WorkloadStyleResourceRowProps {
   resource: any;
@@ -49,7 +50,8 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     : resource.name.split(' ').map((n: string) => n.charAt(0)).join('').slice(0, 2);
 
   // Get week start date from the first week in weeks array
-  const weekStartDate = weeks.length > 0 ? weeks[0].weekStartDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+  // IMPORTANT: Use canonical UTC date keys to match allocation_date in DB.
+  const weekStartDate = weeks.length > 0 ? toUTCDateKey(weeks[0].weekStartDate) : toUTCDateKey(new Date());
 
   const rowBgColor = '#fcfcfc';
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
@@ -114,7 +116,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
 
   // Calculate total allocated hours for this resource from project-level allocations
   const totalAllocatedHours = weeks.reduce((sum, week) => {
-    const weekKey = week.weekStartDate.toISOString().split('T')[0];
+    const weekKey = toUTCDateKey(week.weekStartDate);
     const allocationKey = getAllocationKey(resource.id, weekKey);
     const hours = projectAllocations[allocationKey] || 0;
     return sum + hours;
@@ -193,7 +195,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
       
       {/* Week allocation cells */}
       {weeks.map((week, weekIndex) => {
-        const weekKey = week.weekStartDate.toISOString().split('T')[0];
+        const weekKey = toUTCDateKey(week.weekStartDate);
         // Get allocation from the project-level allocation map
         const allocationKey = getAllocationKey(resource.id, weekKey);
         const allocation = projectAllocations[allocationKey] || 0;
