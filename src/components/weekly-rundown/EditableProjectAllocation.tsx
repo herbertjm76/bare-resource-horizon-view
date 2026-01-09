@@ -11,6 +11,7 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getTotalAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
+import { normalizeToWeekStart } from '@/utils/weekNormalization';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   AlertDialog,
@@ -58,7 +59,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
   const { company } = useCompany();
-  const { projectDisplayPreference, displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours, allocationWarningThreshold, allocationDangerThreshold, allocationMaxLimit, startOfWorkWeek } = useAppSettings();
   
   const effectiveCapacity = capacity || workWeekHours;
   
@@ -107,7 +108,8 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
         'active',
         weekStartDate,
         newHours,
-        company.id
+        company.id,
+        startOfWorkWeek
       );
 
       if (!success) {
@@ -141,7 +143,8 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
         memberId,
         'active',
         weekStartDate,
-        company.id
+        company.id,
+        startOfWorkWeek
       );
 
       if (!success) {

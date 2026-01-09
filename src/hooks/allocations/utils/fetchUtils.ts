@@ -1,8 +1,33 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { getWeekStartOptions, getWeekDateRange } from './dateUtils';
+import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { toast } from 'sonner';
 import { logger } from '@/utils/logger';
+
+// Local helpers for legacy fetch utilities (always use Monday for backward compatibility)
+const getWeekStartOptions = (selectedWeek: Date) => {
+  const monday = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() - 1);
+  return { 
+    monday, 
+    sunday, 
+    mondayKey: format(monday, 'yyyy-MM-dd'), 
+    sundayKey: format(sunday, 'yyyy-MM-dd') 
+  };
+};
+
+const getWeekDateRange = (selectedWeek: Date) => {
+  const startDate = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+  return { 
+    startDate, 
+    endDate, 
+    startDateString: format(startDate, 'yyyy-MM-dd'), 
+    endDateString: format(endDate, 'yyyy-MM-dd') 
+  };
+};
 
 /**
  * Fetch project allocations from the database with precise date matching

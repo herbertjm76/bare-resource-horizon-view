@@ -10,6 +10,7 @@ import {
 } from './api';
 import { logger } from '@/utils/logger';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { toast } from 'sonner';
 
 export function useResourceAllocationsDB(
@@ -22,6 +23,7 @@ export function useResourceAllocationsDB(
   const [isSaving, setIsSaving] = useState(false);
   const { company } = useCompany();
   const { isDemoMode } = useDemoAuth();
+  const { startOfWorkWeek } = useAppSettings();
 
   // Fetch initial allocations for this resource and project
   const refreshAllocations = useCallback(async () => {
@@ -39,7 +41,8 @@ export function useResourceAllocationsDB(
         projectId,
         resourceId,
         resourceType,
-        company.id
+        company.id,
+        startOfWorkWeek
         // Note: No date range for backward compatibility - fetches all allocations
       );
       
@@ -48,7 +51,7 @@ export function useResourceAllocationsDB(
     } finally {
       setIsLoading(false);
     }
-  }, [projectId, resourceId, resourceType, company?.id, isDemoMode]);
+  }, [projectId, resourceId, resourceType, company?.id, isDemoMode, startOfWorkWeek]);
 
   // Save or update allocation for a specific week
   const saveAllocation = useCallback(async (weekKey: string, hours: number) => {
@@ -74,7 +77,8 @@ export function useResourceAllocationsDB(
         resourceType,
         weekKey,
         hours,
-        company.id
+        company.id,
+        startOfWorkWeek
       );
       
       if (success) {
@@ -87,7 +91,7 @@ export function useResourceAllocationsDB(
     } finally {
       setIsSaving(false);
     }
-  }, [projectId, resourceId, resourceType, company?.id, isDemoMode]);
+  }, [projectId, resourceId, resourceType, company?.id, isDemoMode, startOfWorkWeek]);
 
   // Delete allocation for a specific week
   const deleteAllocation = useCallback(async (weekKey: string) => {
@@ -110,7 +114,8 @@ export function useResourceAllocationsDB(
         resourceId,
         resourceType,
         weekKey,
-        company.id
+        company.id,
+        startOfWorkWeek
       );
       
       if (success) {
@@ -124,7 +129,7 @@ export function useResourceAllocationsDB(
     } catch (error) {
       logger.error('Error deleting allocation:', error);
     }
-  }, [projectId, resourceId, resourceType, company?.id, isDemoMode]);
+  }, [projectId, resourceId, resourceType, company?.id, isDemoMode, startOfWorkWeek]);
 
   // Setup realtime subscription for this resource's allocations
   useEffect(() => {
