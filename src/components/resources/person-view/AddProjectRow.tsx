@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import { Plus, X, Search } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { toUTCDateKey } from '@/utils/dateKey';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useAppSettings } from '@/hooks/useAppSettings';
-import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { toast } from 'sonner';
 import { WeekInfo } from '../hooks/useGridWeeks';
+import { UnifiedAddProjectPopup } from '@/components/shared/UnifiedAddProjectPopup';
 
 interface AddProjectRowProps {
   personId: string;
@@ -29,38 +24,11 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
   onProjectAdded
 }) => {
   const { company } = useCompany();
-  const { projectDisplayPreference } = useAppSettings();
   const [isAdding, setIsAdding] = useState(false);
-  const [selectedProject, setSelectedProject] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
 
-  // Fetch available projects
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects', company?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('id, name, code')
-        .eq('company_id', company?.id)
-        .order('name');
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!company?.id && isAdding,
-  });
-
-  // Filter out projects already assigned to this person and apply search
-  const availableProjects = projects
-    .filter(p => !existingProjectIds.includes(p.id))
-    .filter(p => 
-      p.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-  const selectedProjectData = projects.find(p => p.id === selectedProject);
-
-  const handleAddProject = async () => {
-    if (!selectedProject || !company?.id) return;
+  const handleProjectSelected = async (projectId: string) => {
+    if (!projectId || !company?.id) return;
 
     try {
       // Find the first non-previous week (current period), or fallback to first week
@@ -71,41 +39,25 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
         return;
       }
       
-      // CRITICAL: Use the grid's weekStartDate directly - it's already computed correctly.
-      // Do NOT re-apply startOfWeek() which would introduce drift.
       const allocationDateKey = toUTCDateKey(targetWeek.weekStartDate);
-      
-      console.log('[AddProjectRow] inserting allocation:', {
-        personId,
-        selectedProject,
-        targetWeekLabel: targetWeek.weekLabel,
-        weekStartDate: targetWeek.weekStartDate.toISOString(),
-        allocationDateKey,
-      });
 
-      const { data: insertedRow, error } = await supabase
+      const { error } = await supabase
         .from('project_resource_allocations')
         .insert({
-          project_id: selectedProject,
+          project_id: projectId,
           resource_id: personId,
           resource_type: resourceType,
           allocation_date: allocationDateKey,
           hours: 0,
           company_id: company.id,
-        })
-        .select('id, allocation_date')
-        .single();
+        });
 
       if (error) throw error;
-      
-      console.log('[AddProjectRow] inserted row:', insertedRow);
 
       toast.success('Project added');
       onProjectAdded();
       setIsAdding(false);
-      setSelectedProject('');
-      setSearchTerm('');
-      setPopoverOpen(false);
+      setPopupOpen(false);
     } catch (error: any) {
       console.error('Error adding project:', error);
       toast.error(error?.message ? `Failed to add project: ${error.message}` : 'Failed to add project');
@@ -130,7 +82,10 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsAdding(true)}
+            onClick={() => {
+              setIsAdding(true);
+              setPopupOpen(true);
+            }}
             className="text-muted-foreground hover:text-foreground"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -158,70 +113,33 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
         }}
       >
         <div className="flex items-center gap-2">
-          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-            <PopoverTrigger asChild>
+          <UnifiedAddProjectPopup
+            open={popupOpen}
+            onOpenChange={(open) => {
+              setPopupOpen(open);
+              if (!open) setIsAdding(false);
+            }}
+            existingProjectIds={existingProjectIds}
+            variant="popover"
+            showAllocationInput={false}
+            onProjectSelected={handleProjectSelected}
+            onProjectCreated={onProjectAdded}
+            trigger={
               <Button
                 variant="outline"
                 role="combobox"
                 className="h-8 flex-1 justify-between"
               >
-                {selectedProjectData ? selectedProjectData.name : "Select project"}
-                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                Select project...
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0" align="start">
-              <div className="p-2 border-b">
-                <div className="relative">
-                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search projects..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="h-8 pl-8"
-                  />
-                </div>
-              </div>
-              <ScrollArea className="h-[250px]">
-                <div className="p-1">
-                  {availableProjects.length === 0 ? (
-                    <div className="py-6 text-center text-sm text-muted-foreground">
-                      {searchTerm ? 'No projects found' : 'No available projects'}
-                    </div>
-                  ) : (
-                    availableProjects.map((project) => (
-                      <div
-                        key={project.id}
-                        onClick={() => {
-                          setSelectedProject(project.id);
-                          setPopoverOpen(false);
-                          setSearchTerm('');
-                        }}
-                        className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-                      >
-                        {getProjectDisplayName(project, projectDisplayPreference)}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
-          <Button
-            size="sm"
-            onClick={handleAddProject}
-            disabled={!selectedProject}
-            className="h-8 px-3"
-          >
-            Add
-          </Button>
+            }
+          />
           <Button
             variant="ghost"
             size="sm"
             onClick={() => {
               setIsAdding(false);
-              setSelectedProject('');
-              setSearchTerm('');
-              setPopoverOpen(false);
+              setPopupOpen(false);
             }}
             className="h-8 w-8 p-0"
           >
