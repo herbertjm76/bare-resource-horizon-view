@@ -75,6 +75,9 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
   const [newProjectCode, setNewProjectCode] = useState('');
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectCountry, setNewProjectCountry] = useState('');
+  const [isCreatingCountry, setIsCreatingCountry] = useState(false);
+  const [newCountryName, setNewCountryName] = useState('');
+  const [newCountryCode, setNewCountryCode] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const { company } = useCompany();
   const queryClient = useQueryClient();
@@ -119,6 +122,36 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
       return data;
     },
     enabled: showCreateNew
+  });
+
+  // Create country/project area mutation
+  const createCountryMutation = useMutation({
+    mutationFn: async ({ name, code }: { name: string; code: string }) => {
+      const { data, error } = await supabase
+        .from('project_areas')
+        .insert({
+          name,
+          code: code.toUpperCase(),
+          company_id: company?.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success('Country/Area created successfully');
+      queryClient.invalidateQueries({ queryKey: ['project-areas'] });
+      setNewProjectCountry(data.name);
+      setIsCreatingCountry(false);
+      setNewCountryName('');
+      setNewCountryCode('');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to create country/area');
+      console.error('Create country error:', error);
+    }
   });
 
   const createProjectMutation = useMutation({
@@ -207,7 +240,21 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
     setNewProjectCode('');
     setNewProjectName('');
     setNewProjectCountry('');
+    setIsCreatingCountry(false);
+    setNewCountryName('');
+    setNewCountryCode('');
     onOpenChange(false);
+  };
+
+  const handleCreateCountry = () => {
+    if (!newCountryName || !newCountryCode) {
+      toast.error('Please fill in country name and code');
+      return;
+    }
+    createCountryMutation.mutate({
+      name: newCountryName,
+      code: newCountryCode
+    });
   };
 
   const handleCreateProject = () => {
@@ -398,18 +445,81 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
 
             <div className="space-y-2">
               <Label htmlFor="projectCountry">Country <span className="text-muted-foreground text-xs">(optional)</span></Label>
-              <Select value={newProjectCountry} onValueChange={setNewProjectCountry}>
-                <SelectTrigger id="projectCountry">
-                  <SelectValue placeholder="Select a country (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {offices.map((office) => (
-                    <SelectItem key={office.id} value={office.country}>
-                      {office.country} ({office.name})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {!isCreatingCountry ? (
+                <>
+                  <Select value={newProjectCountry} onValueChange={setNewProjectCountry}>
+                    <SelectTrigger id="projectCountry">
+                      <SelectValue placeholder="Select a country (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {offices.map((office) => (
+                        <SelectItem key={office.id} value={office.country}>
+                          {office.country} ({office.name})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <button
+                    type="button"
+                    onClick={() => setIsCreatingCountry(true)}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                  >
+                    <Plus className="h-3 w-3" />
+                    or add a new country
+                  </button>
+                </>
+              ) : (
+                <div className="border rounded-md p-3 space-y-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">New Country/Area</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => {
+                        setIsCreatingCountry(false);
+                        setNewCountryName('');
+                        setNewCountryCode('');
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="countryCode" className="text-xs">Code *</Label>
+                      <Input
+                        id="countryCode"
+                        value={newCountryCode}
+                        onChange={(e) => setNewCountryCode(e.target.value)}
+                        placeholder="e.g., US"
+                        maxLength={10}
+                        className="h-8"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="countryName" className="text-xs">Name *</Label>
+                      <Input
+                        id="countryName"
+                        value={newCountryName}
+                        onChange={(e) => setNewCountryName(e.target.value)}
+                        placeholder="e.g., United States"
+                        className="h-8"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="w-full"
+                    onClick={handleCreateCountry}
+                    disabled={createCountryMutation.isPending || !newCountryName || !newCountryCode}
+                  >
+                    {createCountryMutation.isPending ? 'Creating...' : 'Create Country'}
+                  </Button>
+                </div>
+              )}
             </div>
 
             <Button
