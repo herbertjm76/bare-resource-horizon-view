@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { ProjectAllocations } from '../types/resourceTypes';
 import { getAllocationKey } from '../utils/allocationUtils';
 import { logger } from '@/utils/logger';
+import { getWeekStartDate } from '@/hooks/allocations/utils/dateUtils';
+import { toUTCDateKey } from '@/utils/dateKey';
 
 export const initializeAllocations = async (
   projectId: string,
@@ -28,14 +30,20 @@ export const initializeAllocations = async (
     logger.debug('initializeAllocations - Fetched allocations', { count: data?.length || 0 });
     
     // Transform the data into our allocation structure
+    // IMPORTANT: Normalize all allocation dates to Monday of their week for consistent lookups
     const initialAllocations: ProjectAllocations = {};
     
     data?.forEach(allocation => {
-      const weekKey = allocation.allocation_date;
+      // Parse the allocation date and normalize to Monday of that week
+      const allocationDate = new Date(allocation.allocation_date + 'T00:00:00Z');
+      const mondayDate = getWeekStartDate(allocationDate);
+      const weekKey = toUTCDateKey(mondayDate);
+      
       const resourceId = allocation.resource_id;
       const allocationKey = getAllocationKey(resourceId, weekKey);
       const hours = allocation.hours;
-      initialAllocations[allocationKey] = hours;
+      // Aggregate hours for the same week (in case of multiple allocations)
+      initialAllocations[allocationKey] = (initialAllocations[allocationKey] || 0) + hours;
     });
     
     logger.debug('initializeAllocations - Complete', { totalKeys: Object.keys(initialAllocations).length });

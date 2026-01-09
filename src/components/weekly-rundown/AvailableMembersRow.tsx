@@ -12,6 +12,8 @@ import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { generateDemoAllocations, generateDemoAnnualLeaves, DEMO_LOCATIONS, DEMO_HOLIDAYS, DEMO_PROJECTS, DEMO_COMPANY_ID } from '@/data/demoData';
 import { logger } from '@/utils/logger';
 import { format } from 'date-fns';
+import { getWeekStartDate } from '@/hooks/allocations/utils/dateUtils';
+import { toUTCDateKey } from '@/utils/dateKey';
 import {
   Tooltip,
   TooltipContent,
@@ -283,7 +285,22 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     
     logger.debug('Holiday hours by location_id:', Object.fromEntries(holidayHoursByLocationId));
     
+    // Parse the target week's Monday for comparison
+    const targetWeekMonday = getWeekStartDate(new Date(weekStartDate + 'T00:00:00Z'));
+    const targetWeekMondayKey = toUTCDateKey(targetWeekMonday);
+    
     allocations.forEach(alloc => {
+      // Normalize the allocation date to its week's Monday
+      const allocDate = new Date(alloc.allocation_date + 'T00:00:00Z');
+      const allocWeekMonday = getWeekStartDate(allocDate);
+      const allocWeekMondayKey = toUTCDateKey(allocWeekMonday);
+      
+      // Only include allocations that belong to our target week
+      if (allocWeekMondayKey !== targetWeekMondayKey) {
+        logger.debug(`Skipping allocation for ${alloc.resource_id}: ${alloc.allocation_date} (week ${allocWeekMondayKey}) != target week ${targetWeekMondayKey}`);
+        return;
+      }
+      
       const key = alloc.resource_id;
       const current = allocationMap.get(key) || 0;
       allocationMap.set(key, current + Number(alloc.hours));
