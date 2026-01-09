@@ -52,13 +52,16 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     isLoading,
     isSaving,
     handleInputChange,
-    handleInputBlur
+    handleInputBlur,
   } = useAllocationInput({
     projectId,
     resourceId: resource.id,
     resourceType,
-    onAllocationChange
+    // Day inputs: treat 8h as 100% when displayPreference is percentage
+    capacityHours: 8,
+    onAllocationChange,
   });
+
 
   // Helper to get day key for allocation lookup
   const getDayKey = (date: Date): string => {
