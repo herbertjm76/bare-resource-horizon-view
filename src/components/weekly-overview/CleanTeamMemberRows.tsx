@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Project, MemberAllocation } from './types';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface CleanTeamMemberRowsProps {
   filteredOffices: string[];
@@ -23,7 +24,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
   handleInputChange,
   projects
 }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   // Helper to get user initials
   const getUserInitials = (member: any): string => {
     const firstName = member.first_name || '';
@@ -140,14 +141,14 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                   {/* Total Hours */}
                   <TableCell className="text-center p-2">
                     <div className="inline-flex items-center justify-center px-2 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full min-w-[50px]">
-                      {totalHours}h
+                      {formatAllocationValue(totalHours, weeklyCapacity, displayPreference)}
                     </div>
                   </TableCell>
 
                   {/* Capacity */}
                   <TableCell className="text-center p-2">
                     <div className="inline-flex items-center justify-center px-2 py-1 bg-muted text-foreground text-sm font-medium rounded-full min-w-[50px]">
-                      {weeklyCapacity}h
+                      {formatCapacityValue(weeklyCapacity, displayPreference)}
                     </div>
                   </TableCell>
 

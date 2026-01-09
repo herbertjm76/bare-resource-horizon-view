@@ -2,6 +2,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, TrendingUp, AlertTriangle, Briefcase } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface ResourcePlanningMetricsProps {
   weeklyCapacity: number;
@@ -23,8 +25,11 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
   averageFutureUtilization,
   overallocatedWeeks,
   activeProjectsCount,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isLoading = false
 }) => {
+  const { displayPreference } = useAppSettings();
+  
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -53,9 +58,9 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-blue-600">
-            {weeklyCapacity}h
+            {formatCapacityValue(weeklyCapacity, displayPreference)}
           </div>
-          <p className="text-xs text-gray-500 mt-1">Standard weekly hours</p>
+          <p className="text-xs text-gray-500 mt-1">Standard weekly capacity</p>
         </CardContent>
       </Card>
 

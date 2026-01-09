@@ -1,6 +1,8 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { TrendingUp, Users, FolderKanban, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatCapacityValue, formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ResourcePlanningMetricsProps {
   totalProjectedHours: number;
@@ -19,6 +21,7 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
   selectedWeeks,
   projectCount
 }) => {
+  const { displayPreference } = useAppSettings();
   const utilizationPct = totalTeamCapacity > 0 
     ? Math.round((totalProjectedHours / totalTeamCapacity) * 100) 
     : 0;
@@ -33,7 +36,7 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs text-muted-foreground">Projected Demand</p>
-            <p className="text-2xl font-bold mt-1">{Math.round(totalProjectedHours).toLocaleString()}h</p>
+            <p className="text-2xl font-bold mt-1">{formatAllocationValue(Math.round(totalProjectedHours), totalTeamCapacity, displayPreference)}</p>
             <p className="text-xs text-muted-foreground mt-1">{selectedWeeks} weeks</p>
           </div>
           <TrendingUp className="h-5 w-5 text-muted-foreground" />
@@ -45,8 +48,8 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs text-muted-foreground">Team Capacity</p>
-            <p className="text-2xl font-bold mt-1">{Math.round(totalTeamCapacity).toLocaleString()}h</p>
-            <p className="text-xs text-muted-foreground mt-1">{weeklyCapacity}h/week</p>
+            <p className="text-2xl font-bold mt-1">{formatAllocationValue(Math.round(totalTeamCapacity), totalTeamCapacity, displayPreference)}</p>
+            <p className="text-xs text-muted-foreground mt-1">{formatCapacityValue(weeklyCapacity, displayPreference)}/week</p>
           </div>
           <Users className="h-5 w-5 text-muted-foreground" />
         </div>
@@ -74,7 +77,7 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
           <div>
             <p className="text-xs text-muted-foreground">Capacity Gap</p>
             <p className={`text-2xl font-bold mt-1 ${isOverCapacity ? 'text-destructive' : 'text-green-600'}`}>
-              {isOverCapacity ? '-' : '+'}{Math.abs(Math.round(gapHours)).toLocaleString()}h
+              {isOverCapacity ? '-' : '+'}{formatAllocationValue(Math.abs(Math.round(gapHours)), totalTeamCapacity, displayPreference)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               {isOverCapacity ? 'Need more resources' : 'Available capacity'}
