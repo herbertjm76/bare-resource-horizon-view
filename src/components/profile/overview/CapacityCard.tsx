@@ -3,6 +3,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getMemberCapacity } from '@/utils/capacityUtils';
+import { formatCapacityValue, formatAllocationValue } from '@/utils/allocationDisplay';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, format } from 'date-fns';
@@ -12,7 +13,7 @@ interface CapacityCardProps {
 }
 
 export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
-  const { workWeekHours } = useAppSettings();
+  const { workWeekHours, displayPreference } = useAppSettings();
   const weeklyCapacity = getMemberCapacity(profile.weekly_capacity, workWeekHours);
   const isUsingDefault = profile.weekly_capacity === null || profile.weekly_capacity === undefined;
 
@@ -82,7 +83,7 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
           <div>
             <p className="text-xs text-muted-foreground">Weekly Capacity</p>
             <div className="flex items-center gap-2">
-              <p className="text-xl font-bold text-foreground">{weeklyCapacity}h</p>
+              <p className="text-xl font-bold text-foreground">{formatCapacityValue(weeklyCapacity, displayPreference)}</p>
               {isUsingDefault && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                   Company Default
@@ -102,7 +103,7 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
                   />
                 </div>
                 <span className="text-xs font-medium min-w-[32px] text-right">
-                  {isLoading ? '...' : `${Math.round(weekHours)}h`}
+                  {isLoading ? '...' : formatAllocationValue(Math.round(weekHours), weeklyCapacity, displayPreference)}
                 </span>
               </div>
             </div>
@@ -117,7 +118,7 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
                   />
                 </div>
                 <span className="text-xs font-medium min-w-[32px] text-right">
-                  {isLoading ? '...' : `${Math.round(monthHours)}h`}
+                  {isLoading ? '...' : formatAllocationValue(Math.round(monthHours), monthCapacity, displayPreference)}
                 </span>
               </div>
             </div>
@@ -132,7 +133,7 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
                   />
                 </div>
                 <span className="text-xs font-medium min-w-[32px] text-right">
-                  {isLoading ? '...' : `${Math.round(quarterHours)}h`}
+                  {isLoading ? '...' : formatAllocationValue(Math.round(quarterHours), quarterCapacity, displayPreference)}
                 </span>
               </div>
             </div>
