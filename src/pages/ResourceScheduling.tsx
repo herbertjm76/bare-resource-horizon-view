@@ -14,11 +14,13 @@ import { format } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
 import { useProjects } from '@/hooks/useProjects';
-import { NewProjectDialog } from '@/components/projects/NewProjectDialog';
+import { UnifiedAddProjectPopup } from '@/components/shared/UnifiedAddProjectPopup';
 import { Button } from '@/components/ui/button';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
+
 const ResourceScheduling = () => {
+  const [addProjectOpen, setAddProjectOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('by-project');
   
   // Project Resourcing State
@@ -148,12 +150,14 @@ const ResourceScheduling = () => {
               title="Resource Scheduling"
               description="Manage resource allocation across projects and team members"
             >
-              <NewProjectDialog
+              <UnifiedAddProjectPopup
+                open={addProjectOpen}
+                onOpenChange={setAddProjectOpen}
                 onProjectCreated={refetchProjects}
                 trigger={
                   <Button size="sm">
                     <Plus className="h-4 w-4 mr-2" />
-                    New Project
+                    Add Project
                   </Button>
                 }
               />
