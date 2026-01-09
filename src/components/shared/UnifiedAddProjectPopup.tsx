@@ -124,6 +124,22 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
     enabled: showCreateNew
   });
 
+  // Fetch project areas (countries) for new project creation
+  const { data: projectAreas = [] } = useQuery({
+    queryKey: ['project-areas', company?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('project_areas')
+        .select('id, name, code')
+        .eq('company_id', company?.id)
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: showCreateNew && !!company?.id
+  });
+
   // Create country/project area mutation
   const createCountryMutation = useMutation({
     mutationFn: async ({ name, code }: { name: string; code: string }) => {
@@ -142,7 +158,7 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
     },
     onSuccess: (data) => {
       toast.success('Country/Area created successfully');
-      queryClient.invalidateQueries({ queryKey: ['project-areas'] });
+      queryClient.invalidateQueries({ queryKey: ['project-areas', company?.id] });
       setNewProjectCountry(data.name);
       setIsCreatingCountry(false);
       setNewCountryName('');
@@ -452,9 +468,9 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
                       <SelectValue placeholder="Select a country (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      {offices.map((office) => (
-                        <SelectItem key={office.id} value={office.country}>
-                          {office.country} ({office.name})
+                      {projectAreas.map((area) => (
+                        <SelectItem key={area.id} value={area.name}>
+                          {area.name} ({area.code})
                         </SelectItem>
                       ))}
                     </SelectContent>
