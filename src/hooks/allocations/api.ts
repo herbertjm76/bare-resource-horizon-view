@@ -40,12 +40,17 @@ export const fetchResourceAllocations = async (
     logger.debug(`🔍 ALLOCATION API: Retrieved ${data?.length || 0} allocation records`);
     
     // Transform data into a week key -> hours mapping, aggregating daily hours into weekly totals
+    // IMPORTANT: Normalize all allocation dates to their week start Monday for consistent lookups
     const allocationMap: Record<string, number> = {};
     data?.forEach(item => {
-      const weekKey = formatDateKey(item.allocation_date);
-      // Aggregate hours by week (sum up multiple allocations for the same week)
+      // Parse the allocation date and normalize to Monday of that week
+      const allocationDate = new Date(item.allocation_date + 'T00:00:00Z');
+      const mondayDate = getWeekStartDate(allocationDate);
+      const weekKey = toUTCDateKey(mondayDate);
+      
+      // Aggregate hours by normalized week
       allocationMap[weekKey] = (allocationMap[weekKey] || 0) + item.hours;
-      logger.debug(`🔍 ALLOCATION API: Aggregating ${item.allocation_date} -> ${weekKey}: +${item.hours}h (total: ${allocationMap[weekKey]}h)`);
+      logger.debug(`🔍 ALLOCATION API: Aggregating ${item.allocation_date} -> ${weekKey} (normalized to Monday): +${item.hours}h (total: ${allocationMap[weekKey]}h)`);
     });
     
     return allocationMap;
