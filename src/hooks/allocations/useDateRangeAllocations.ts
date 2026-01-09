@@ -6,6 +6,7 @@ import { getStandardizedDateRange } from './utils/dateRangeUtils';
 import { ResourceAllocation } from './types';
 import { formatDateKey } from './utils';
 import { logger } from '@/utils/logger';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface UseDateRangeAllocationsProps {
   projectId: string;
@@ -25,6 +26,7 @@ export function useDateRangeAllocations({
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
+  const { startOfWorkWeek } = useAppSettings();
 
   // Calculate standardized date range based on the view
   const getDateRange = useCallback((date: Date, period?: number) => {
@@ -47,6 +49,7 @@ export function useDateRangeAllocations({
         resourceId,
         resourceType,
         company.id,
+        startOfWorkWeek,
         dateRange
       );
       
@@ -55,7 +58,7 @@ export function useDateRangeAllocations({
     } finally {
       setIsLoading(false);
     }
-  }, [projectId, resourceId, resourceType, company?.id, selectedDate, periodToShow, getDateRange]);
+  }, [projectId, resourceId, resourceType, company?.id, selectedDate, periodToShow, getDateRange, startOfWorkWeek]);
 
   // Setup realtime subscription for instant updates
   useEffect(() => {

@@ -1,6 +1,8 @@
-import { format, addDays, startOfMonth, endOfMonth } from 'date-fns';
-import { getWeekStartDate } from './dateUtils';
+import { format, addDays, startOfMonth, endOfMonth, startOfWeek } from 'date-fns';
 import { logger } from '@/utils/logger';
+
+// Local helper - always uses Monday for backward compatibility in date range queries
+const getWeekStartDate = (date: Date): Date => startOfWeek(date, { weekStartsOn: 1 });
 
 export interface DateRange {
   startDate: string;

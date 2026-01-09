@@ -1,10 +1,8 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { ResourceAllocation } from './types';
 import { formatDateKey } from './utils';
 import { toast } from 'sonner';
-import { getWeekStartDate } from './utils/dateUtils';
-import { toUTCDateKey } from '@/utils/dateKey';
+import { normalizeToWeekStart, assertIsWeekStart } from '@/utils/weekNormalization';
+import type { WeekStartDay } from '@/hooks/useAppSettings';
 import { logger } from '@/utils/logger';
 
 export const fetchResourceAllocations = async (
@@ -12,6 +10,7 @@ export const fetchResourceAllocations = async (
   resourceId: string, 
   resourceType: 'active' | 'pre_registered',
   companyId: string,
+  weekStartDay: WeekStartDay,
   dateRange?: { startDate: string; endDate: string }
 ): Promise<Record<string, number>> => {
   try {
@@ -40,17 +39,15 @@ export const fetchResourceAllocations = async (
     logger.debug(`🔍 ALLOCATION API: Retrieved ${data?.length || 0} allocation records`);
     
     // Transform data into a week key -> hours mapping, aggregating daily hours into weekly totals
-    // IMPORTANT: Normalize all allocation dates to their week start Monday for consistent lookups
+    // IMPORTANT: Normalize all allocation dates to company week start for consistent lookups
     const allocationMap: Record<string, number> = {};
     data?.forEach(item => {
-      // Parse the allocation date and normalize to Monday of that week
-      const allocationDate = new Date(item.allocation_date + 'T00:00:00Z');
-      const mondayDate = getWeekStartDate(allocationDate);
-      const weekKey = toUTCDateKey(mondayDate);
+      // Normalize to company's week start day
+      const weekKey = normalizeToWeekStart(item.allocation_date, weekStartDay);
       
       // Aggregate hours by normalized week
       allocationMap[weekKey] = (allocationMap[weekKey] || 0) + item.hours;
-      logger.debug(`🔍 ALLOCATION API: Aggregating ${item.allocation_date} -> ${weekKey} (normalized to Monday): +${item.hours}h (total: ${allocationMap[weekKey]}h)`);
+      logger.debug(`🔍 ALLOCATION API: Aggregating ${item.allocation_date} -> ${weekKey} (normalized to ${weekStartDay}): +${item.hours}h (total: ${allocationMap[weekKey]}h)`);
     });
     
     return allocationMap;
@@ -67,20 +64,15 @@ export const saveResourceAllocation = async (
   resourceType: 'active' | 'pre_registered',
   weekKey: string,
   hours: number,
-  companyId: string
+  companyId: string,
+  weekStartDay: WeekStartDay
 ): Promise<boolean> => {
   try {
-    // Ensure we're using Monday as the week start
-    let formattedWeekKey = formatDateKey(weekKey);
+    // Always normalize the weekKey to company's week start
+    const normalizedWeekKey = normalizeToWeekStart(weekKey, weekStartDay);
+    assertIsWeekStart(normalizedWeekKey, weekStartDay, 'saveResourceAllocation');
     
-    // Double-check that the date is a Monday (use UTC for consistency)
-    if (weekKey.includes('T') || weekKey.includes(' ')) {
-      const date = new Date(weekKey);
-      const mondayDate = getWeekStartDate(date);
-      formattedWeekKey = toUTCDateKey(mondayDate);
-    }
-    
-    logger.debug(`Saving allocation for week starting: ${formattedWeekKey} (Monday)`);
+    logger.debug(`Saving allocation for week starting: ${normalizedWeekKey} (${weekStartDay})`);
     
     // Check if we already have an allocation for this week
     const { data: existingData } = await supabase
@@ -89,7 +81,7 @@ export const saveResourceAllocation = async (
       .eq('project_id', projectId)
       .eq('resource_id', resourceId)
       .eq('resource_type', resourceType)
-      .eq('allocation_date', formattedWeekKey)
+      .eq('allocation_date', normalizedWeekKey)
       .eq('company_id', companyId)
       .maybeSingle();
     
@@ -103,14 +95,14 @@ export const saveResourceAllocation = async (
         .eq('id', existingData.id)
         .select();
     } else {
-      // Insert new allocation
+      // Insert new allocation (DB trigger will also normalize the date as safety net)
       result = await supabase
         .from('project_resource_allocations')
         .insert({
           project_id: projectId,
           resource_id: resourceId,
           resource_type: resourceType,
-          allocation_date: formattedWeekKey,
+          allocation_date: normalizedWeekKey,
           hours,
           company_id: companyId
         })
@@ -131,17 +123,12 @@ export const deleteResourceAllocation = async (
   resourceId: string,
   resourceType: 'active' | 'pre_registered',
   weekKey: string,
-  companyId: string
+  companyId: string,
+  weekStartDay: WeekStartDay
 ): Promise<boolean> => {
   try {
-    // Ensure we're using Monday as the week start (UTC for consistency)
-    let formattedWeekKey = formatDateKey(weekKey);
-    
-    if (weekKey.includes('T') || weekKey.includes(' ')) {
-      const date = new Date(weekKey);
-      const mondayDate = getWeekStartDate(date);
-      formattedWeekKey = toUTCDateKey(mondayDate);
-    }
+    // Always normalize the weekKey to company's week start
+    const normalizedWeekKey = normalizeToWeekStart(weekKey, weekStartDay);
     
     const { error } = await supabase
       .from('project_resource_allocations')
@@ -149,7 +136,7 @@ export const deleteResourceAllocation = async (
       .eq('project_id', projectId)
       .eq('resource_id', resourceId)
       .eq('resource_type', resourceType)
-      .eq('allocation_date', formattedWeekKey)
+      .eq('allocation_date', normalizedWeekKey)
       .eq('company_id', companyId);
     
     if (error) throw error;

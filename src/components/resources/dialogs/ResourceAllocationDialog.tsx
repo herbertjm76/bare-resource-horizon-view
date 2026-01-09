@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { normalizeToWeekStart } from '@/utils/weekNormalization';
 
 interface ResourceAllocationDialogProps {
   open: boolean;
@@ -43,11 +44,17 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
 }) => {
   const { company } = useCompany();
   const { toast } = useToast();
-  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours, startOfWorkWeek } = useAppSettings();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [saving, setSaving] = useState(false);
+
+  // Normalize the weekStartDate to ensure consistency
+  const normalizedWeekStart = useMemo(() => 
+    normalizeToWeekStart(weekStartDate, startOfWorkWeek), 
+    [weekStartDate, startOfWorkWeek]
+  );
 
   const fullName = [member.firstName, member.lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [member.firstName?.[0], member.lastName?.[0]]
@@ -72,15 +79,15 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
     enabled: open && !!company?.id,
   });
 
-  // Fetch existing allocations
+  // Fetch existing allocations using normalized week start
   const { data: existingAllocations } = useQuery({
-    queryKey: ['allocations', member.id, weekStartDate],
+    queryKey: ['allocations', member.id, normalizedWeekStart],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select('project_id, hours')
         .eq('resource_id', member.id)
-        .eq('allocation_date', weekStartDate)
+        .eq('allocation_date', normalizedWeekStart)
         .eq('resource_type', member.type);
 
       if (error) throw error;
@@ -122,13 +129,13 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
     if (!company?.id) return;
 
     try {
-      // Delete from database immediately
+      // Delete from database immediately using normalized week start
       const { error } = await supabase
         .from('project_resource_allocations')
         .delete()
         .eq('resource_id', member.id)
         .eq('project_id', projectId)
-        .eq('allocation_date', weekStartDate)
+        .eq('allocation_date', normalizedWeekStart)
         .eq('resource_type', member.type);
 
       if (error) throw error;
@@ -164,21 +171,22 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
         (projectId) => allocations[projectId] > 0
       );
 
-      // Delete existing allocations for this member and week
+      // Delete existing allocations for this member and week using normalized date
       await supabase
         .from('project_resource_allocations')
         .delete()
         .eq('resource_id', member.id)
-        .eq('allocation_date', weekStartDate)
+        .eq('allocation_date', normalizedWeekStart)
         .eq('resource_type', member.type);
 
-      // Insert new allocations
+      // Insert new allocations with normalized week start
+      // (DB trigger will also normalize as safety net)
       if (projectsToUpdate.length > 0) {
         const allocationsToInsert = projectsToUpdate.map((projectId) => ({
           project_id: projectId,
           resource_id: member.id,
           resource_type: member.type,
-          allocation_date: weekStartDate,
+          allocation_date: normalizedWeekStart,
           hours: allocations[projectId],
           company_id: company.id,
         }));
@@ -223,7 +231,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
               <span className="font-semibold">{fullName}</span>
               <span className="text-[11px] text-muted-foreground font-normal flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                {format(new Date(weekStartDate), 'MMM d, yyyy')}
+                {format(new Date(normalizedWeekStart), 'MMM d, yyyy')}
               </span>
             </div>
             <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 bg-muted rounded-md">

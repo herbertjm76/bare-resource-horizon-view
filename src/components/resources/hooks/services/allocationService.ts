@@ -1,18 +1,18 @@
-
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ProjectAllocations } from '../types/resourceTypes';
 import { getAllocationKey } from '../utils/allocationUtils';
 import { logger } from '@/utils/logger';
-import { getWeekStartDate } from '@/hooks/allocations/utils/dateUtils';
-import { toUTCDateKey } from '@/utils/dateKey';
+import { normalizeToWeekStart } from '@/utils/weekNormalization';
+import type { WeekStartDay } from '@/hooks/useAppSettings';
 
 export const initializeAllocations = async (
   projectId: string,
-  companyId: string
+  companyId: string,
+  weekStartDay: WeekStartDay = 'Monday'
 ): Promise<ProjectAllocations> => {
   try {
-    logger.debug('initializeAllocations - Starting', { projectId, companyId });
+    logger.debug('initializeAllocations - Starting', { projectId, companyId, weekStartDay });
     
     // Fetch all resource allocations for this project from database
     const { data, error } = await supabase
@@ -30,18 +30,25 @@ export const initializeAllocations = async (
     logger.debug('initializeAllocations - Fetched allocations', { count: data?.length || 0 });
     
     // Transform the data into our allocation structure
-    // IMPORTANT: Normalize all allocation dates to Monday of their week for consistent lookups
+    // IMPORTANT: Normalize all allocation dates to company's week start for consistent lookups
     const initialAllocations: ProjectAllocations = {};
     
     data?.forEach(allocation => {
-      // Parse the allocation date and normalize to Monday of that week
-      const allocationDate = new Date(allocation.allocation_date + 'T00:00:00Z');
-      const mondayDate = getWeekStartDate(allocationDate);
-      const weekKey = toUTCDateKey(mondayDate);
+      // Normalize to company's week start day
+      const weekKey = normalizeToWeekStart(allocation.allocation_date, weekStartDay);
+      
+      // Development warning for non-normalized dates (DB trigger should have fixed these)
+      if (process.env.NODE_ENV === 'development') {
+        const originalDate = allocation.allocation_date;
+        if (originalDate !== weekKey) {
+          logger.warn(`⚠️ Found allocation_date that differs after normalization: ${originalDate} -> ${weekKey}. DB trigger should have normalized this.`);
+        }
+      }
       
       const resourceId = allocation.resource_id;
       const allocationKey = getAllocationKey(resourceId, weekKey);
       const hours = allocation.hours;
+      
       // Aggregate hours for the same week (in case of multiple allocations)
       initialAllocations[allocationKey] = (initialAllocations[allocationKey] || 0) + hours;
     });
