@@ -1,86 +1,63 @@
-import { startOfWeek, format } from 'date-fns';
 import type { WeekStartDay } from '@/hooks/useAppSettings';
+import { toUTCDateKey, parseUTCDateKey } from '@/utils/dateKey';
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+const weekStartDayToDow = (weekStartDay: WeekStartDay): 0 | 1 | 6 => {
+  return weekStartDay === 'Sunday' ? 0 : weekStartDay === 'Saturday' ? 6 : 1;
+};
 
 /**
  * CRITICAL: Normalize any date to the company's week start day.
- * 
- * This is the SINGLE SOURCE OF TRUTH for week normalization.
- * All allocation operations MUST use this function.
- * 
- * The database has a trigger that also enforces this as a safety net,
- * but we normalize client-side for:
- * 1. Consistent local state
- * 2. Correct cache keys
- * 3. Proper UI display
- * 
+ *
+ * IMPORTANT:
+ * - This implementation is **UTC-based**.
+ * - We intentionally do NOT use date-fns startOfWeek here because it is local-timezone based and
+ *   can shift date keys (e.g. 2026-01-05 -> 2026-01-04) depending on the viewer's timezone.
+ *
  * @param dateInput - Date object or YYYY-MM-DD string
- * @param weekStartDay - Company's week start preference (REQUIRED - no default to force explicit usage)
- * @returns YYYY-MM-DD string for the week start
+ * @param weekStartDay - Company's week start preference (REQUIRED)
+ * @returns YYYY-MM-DD string for the week start (UTC date key)
  */
-export function normalizeToWeekStart(
-  dateInput: Date | string, 
-  weekStartDay: WeekStartDay
-): string {
-  let date: Date;
-  
-  if (typeof dateInput === 'string') {
-    // Parse as UTC to avoid timezone issues
-    date = new Date(dateInput.split('T')[0] + 'T00:00:00Z');
-  } else {
-    date = dateInput;
-  }
-  
-  const weekStartsOn = weekStartDay === 'Sunday' ? 0 
-    : weekStartDay === 'Saturday' ? 6 
-    : 1; // Monday default
-  
-  const weekStart = startOfWeek(date, { weekStartsOn });
-  return format(weekStart, 'yyyy-MM-dd');
+export function normalizeToWeekStart(dateInput: Date | string, weekStartDay: WeekStartDay): string {
+  const date = typeof dateInput === 'string'
+    ? parseUTCDateKey(dateInput.split('T')[0])
+    : parseUTCDateKey(toUTCDateKey(dateInput));
+
+  const targetDow = weekStartDayToDow(weekStartDay);
+  const currentDow = date.getUTCDay();
+
+  let diff = currentDow - targetDow;
+  if (diff < 0) diff += 7;
+
+  const weekStart = new Date(date.getTime() - diff * MS_PER_DAY);
+  return toUTCDateKey(weekStart);
 }
 
 /**
- * Get the week start Date object based on company preference.
- * 
- * @param date - Date to get week start for
- * @param weekStartDay - Company's week start preference
- * @returns Date object for the week start
+ * Get the week start Date object (midnight UTC) based on company preference.
  */
 export function getWeekStartDate(date: Date, weekStartDay: WeekStartDay): Date {
-  const weekStartsOn = weekStartDay === 'Sunday' ? 0 
-    : weekStartDay === 'Saturday' ? 6 
-    : 1; // Monday default
-    
-  return startOfWeek(date, { weekStartsOn });
+  return parseUTCDateKey(normalizeToWeekStart(date, weekStartDay));
 }
 
 /**
  * Validate that a date matches the expected week start day.
- * Logs a warning if the date doesn't match.
- * 
- * @param dateKey - YYYY-MM-DD string to validate
- * @param weekStartDay - Expected week start day
- * @param context - Optional context for debugging
  */
-export function assertIsWeekStart(
-  dateKey: string, 
-  weekStartDay: WeekStartDay,
-  context?: string
-): void {
-  const date = new Date(dateKey + 'T00:00:00Z');
+export function assertIsWeekStart(dateKey: string, weekStartDay: WeekStartDay, context?: string): void {
+  const date = parseUTCDateKey(dateKey);
   const dayOfWeek = date.getUTCDay();
-  
-  const expectedDay = weekStartDay === 'Sunday' ? 0 
-    : weekStartDay === 'Saturday' ? 6 
-    : 1; // Monday
-  
+
+  const expectedDay = weekStartDayToDow(weekStartDay);
+
   if (dayOfWeek !== expectedDay) {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const message = `CRITICAL: allocation_date should be ${weekStartDay} but got ${days[dayOfWeek]} (${dateKey})${context ? ` in ${context}` : ''}`;
     console.warn(message);
-    
-    // In development, throw to catch issues early
+
     if (process.env.NODE_ENV === 'development') {
-      console.error('⚠️ Week start mismatch detected. The database trigger will fix this, but the code should be using normalizeToWeekStart()');
+      console.error('⚠️ Week start mismatch detected. Ensure week keys are produced via normalizeToWeekStart()');
     }
   }
 }
+
