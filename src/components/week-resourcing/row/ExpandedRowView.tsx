@@ -7,6 +7,8 @@ import { EnhancedTooltip } from '../EnhancedTooltip';
 import { MultiLeaveBadgeCell } from './MultiLeaveBadgeCell';
 import { LongCapacityBar } from '../LongCapacityBar';
 import { RowData, useRowData } from './RowUtilsHooks';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ExpandedRowViewProps extends RowData {
   viewMode: 'expanded';
@@ -24,6 +26,8 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
   getWeeklyLeave,
   onOtherLeaveEdit,
 }) => {
+  const { displayPreference } = useAppSettings();
+  
   const {
     weeklyCapacity,
     totalUsedHours,
@@ -122,7 +126,7 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
             >
               {hours > 0 && (
                 <span className="inline-flex items-center justify-center w-10 h-8 bg-green-500 text-white rounded-lg font-semibold text-sm shadow-sm">
-                  {hours}
+                  {formatAllocationValue(hours, weeklyCapacity, displayPreference, false)}
                 </span>
               )}
             </EnhancedTooltip>
