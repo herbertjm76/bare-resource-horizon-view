@@ -221,11 +221,36 @@ export const useFetchResources = (projectId: string) => {
       const existingResourceIds = new Set([...activeResources.map((r) => r.id), ...pendingResources.map((r) => r.id)]);
 
       const orphanedResourceIds = new Set<string>();
+      const orphanedPreRegisteredIds = new Set<string>();
       orphanedAllocations?.forEach((allocation: any) => {
         if (allocation?.resource_id && !existingResourceIds.has(allocation.resource_id)) {
           orphanedResourceIds.add(allocation.resource_id);
+          // Track pre-registered orphans that need invite lookup
+          if (allocation.resource_type === 'pre_registered' && !inviteById.has(allocation.resource_id)) {
+            orphanedPreRegisteredIds.add(allocation.resource_id);
+          }
         }
       });
+
+      // Fetch missing invite details for orphaned pre-registered resources
+      if (orphanedPreRegisteredIds.size > 0) {
+        try {
+          const { data: additionalInvites, error: additionalInvitesError } = await supabase
+            .from('invites')
+            .select('id, first_name, last_name, job_title, department, practice_area, location, avatar_url')
+            .in('id', Array.from(orphanedPreRegisteredIds));
+
+          if (additionalInvitesError) {
+            logger.warn('Could not fetch additional invites for orphaned resources:', additionalInvitesError);
+          } else {
+            (additionalInvites || []).forEach((i: any) => {
+              inviteById.set(i.id, i);
+            });
+          }
+        } catch (e) {
+          logger.warn('Could not fetch additional invites (continuing):', e);
+        }
+      }
 
       // Build best-effort resources for orphaned IDs
       const orphanedResources: Resource[] = [];

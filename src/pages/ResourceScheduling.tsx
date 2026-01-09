@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { CenteredTabs, CenteredTabItem, TabsContent } from '@/components/ui/centered-tabs';
-import { GanttChartSquare, Users, Plus } from 'lucide-react';
+import { GanttChartSquare, Users } from 'lucide-react';
 import { MemberFilterRow } from '@/components/resources/MemberFilterRow';
 import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
@@ -14,13 +14,10 @@ import { format } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
 import { useProjects } from '@/hooks/useProjects';
-import { UnifiedAddProjectPopup } from '@/components/shared/UnifiedAddProjectPopup';
-import { Button } from '@/components/ui/button';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
 const ResourceScheduling = () => {
-  const [addProjectOpen, setAddProjectOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('by-project');
   
   // Project Resourcing State
@@ -149,19 +146,7 @@ const ResourceScheduling = () => {
               icon={GanttChartSquare}
               title="Resource Scheduling"
               description="Manage resource allocation across projects and team members"
-            >
-              <UnifiedAddProjectPopup
-                open={addProjectOpen}
-                onOpenChange={setAddProjectOpen}
-                onProjectCreated={refetchProjects}
-                trigger={
-                  <Button size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Project
-                  </Button>
-                }
-              />
-            </StandardizedPageHeader>
+            />
           </div>
 
           {/* Centered Tabs with distinct styling */}
