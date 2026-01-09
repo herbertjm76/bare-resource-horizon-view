@@ -5,6 +5,9 @@ import { WeekInfo } from '../hooks/useGridWeeks';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
 import { ResourceActions } from '../components/ResourceActions';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getInputConfig } from '@/utils/allocationDisplay';
+import { getMemberCapacity } from '@/utils/capacityUtils';
 import { logger } from '@/utils/logger';
 
 interface WorkloadStyleResourceRowProps {
@@ -50,7 +53,11 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
 
   const rowBgColor = '#fcfcfc';
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
-  
+
+  const { workWeekHours, displayPreference } = useAppSettings();
+  const inputConfig = getInputConfig(displayPreference);
+  const capacity = getMemberCapacity(resource?.weekly_capacity, workWeekHours);
+
   // Use the allocation input system for this resource
   const {
     allocations,
@@ -65,6 +72,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     resourceType: resource.isPending ? 'pre_registered' : 'active',
     selectedDate,
     periodToShow,
+    capacityHours: capacity,
     onAllocationChange: (resourceId, weekKey, hours) => {
       // Update the parent project's allocation state immediately
       onAllocationChange?.(resourceId, weekKey, hours);
@@ -220,20 +228,23 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
             <input
               ref={(el) => inputRefs.current[weekKey] = el}
               type="number"
-              min="0"
-              max="200"
-              value={inputValues[weekKey] ?? (allocation > 0 ? String(allocation) : '')}
+              min={String(inputConfig.min)}
+              max={String(inputConfig.max)}
+              step={String(inputConfig.step)}
+              value={inputValues[weekKey] ?? ''}
               onChange={(e) => handleInputChange(weekKey, e.target.value)}
               onBlur={(e) => handleInputBlur(weekKey, e.target.value)}
               onFocus={(e) => e.target.select()}
               onKeyDown={(e) => handleKeyDown(e, weekKey, weekIndex)}
-              disabled={isLoading || week.isPreviousWeek}
-              className={`
+              disabled={isLoading || isSaving || week.isPreviousWeek}
+              className={
+                `
                 w-full h-full px-1 py-1 text-center border-0 bg-transparent
                 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white
                 ${allocation > 0 ? 'font-semibold text-primary' : 'text-muted-foreground'}
                 ${week.isPreviousWeek ? 'cursor-not-allowed' : ''}
-              `}
+              `
+              }
               style={{
                 fontSize: '13px',
                 lineHeight: '24px',
@@ -243,7 +254,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
                 WebkitAppearance: 'none',
                 margin: 0
               }}
-              placeholder="0"
+              placeholder={inputConfig.placeholder}
             />
           </td>
         );

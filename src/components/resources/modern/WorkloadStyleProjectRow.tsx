@@ -10,6 +10,7 @@ import { useProjectResources } from '../hooks/useProjectResources';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getMemberCapacity } from '@/utils/capacityUtils';
 
 interface MemberFilters {
@@ -40,7 +41,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   periodToShow,
   memberFilters
 }) => {
-  const { projectDisplayPreference, workWeekHours } = useAppSettings();
+  const { projectDisplayPreference, workWeekHours, displayPreference } = useAppSettings();
   const { 
     resources, 
     isLoading, 
@@ -236,7 +237,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
               }}>
                 {weekTotal > 0 ? (
                   <span className="project-total-hours" style={{ fontSize: '13px' }}>
-                    {weekTotal}h
+                    {formatAllocationValue(weekTotal, workWeekHours, displayPreference)}
                   </span>
                 ) : (
                   <span style={{ 
