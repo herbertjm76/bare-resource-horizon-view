@@ -13,6 +13,7 @@ export interface WeekInfo {
 
 interface DisplayOptions {
   weekStartsOnSunday: boolean;
+  weekStartsOnSaturday?: boolean; // Support Saturday start too
 }
 
 export const useGridWeeks = (
@@ -24,8 +25,12 @@ export const useGridWeeks = (
     // Check if mobile/tablet viewport (up to 1024px)
     const isMobileOrTablet = typeof window !== 'undefined' && window.innerWidth <= 1024;
     
-    // Determine week start day: 0 = Sunday, 1 = Monday
-    const weekStartsOn = displayOptions.weekStartsOnSunday ? 0 : 1;
+    // Determine week start day: 0 = Sunday, 1 = Monday, 6 = Saturday
+    const weekStartsOn: 0 | 1 | 6 = displayOptions.weekStartsOnSaturday 
+      ? 6 
+      : displayOptions.weekStartsOnSunday 
+        ? 0 
+        : 1;
     
     // Adjust start date to beginning of week
     const adjustedStartDate = startOfWeek(startDate, { weekStartsOn });
@@ -87,6 +92,7 @@ export const useGridWeeks = (
   }, [
     startDate, 
     periodToShow, 
-    displayOptions.weekStartsOnSunday
+    displayOptions.weekStartsOnSunday,
+    displayOptions.weekStartsOnSaturday
   ]);
 };
