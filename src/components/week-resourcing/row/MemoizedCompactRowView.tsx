@@ -377,6 +377,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
                 onChange={(e) => setEditInputValue(e.target.value)}
                 onBlur={() => handleSaveAllocation(project.id)}
                 onKeyDown={(e) => handleKeyDown(e, project.id)}
+                onMouseDown={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
                 disabled={isSaving}
                 placeholder={inputConfig.placeholder}
                 className={cn(
