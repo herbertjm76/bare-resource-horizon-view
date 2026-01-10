@@ -13,7 +13,8 @@ import { useCompanyId } from '@/hooks/useCompanyId';
 import { generateDemoAllocations, generateDemoAnnualLeaves, DEMO_LOCATIONS, DEMO_HOLIDAYS, DEMO_PROJECTS } from '@/data/demoData';
 import { logger } from '@/utils/logger';
 import { format } from 'date-fns';
-import { normalizeToWeekStart } from '@/utils/weekNormalization';
+// RULEBOOK: Use canonical week utilities
+import { getAllocationWeekKey } from '@/utils/allocationWeek';
 import { parseUTCDateKey, toUTCDateKey } from '@/utils/dateKey';
 import {
   Tooltip,
@@ -92,9 +93,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const { workWeekHours, startOfWorkWeek } = useAppSettings();
   const queryClient = useQueryClient();
 
-  // Normalize weekStartDate to the canonical week start key
+  // RULEBOOK: Use canonical week key utility
   const targetWeekStart = React.useMemo(
-    () => normalizeToWeekStart(weekStartDate, startOfWorkWeek),
+    () => getAllocationWeekKey(weekStartDate, startOfWorkWeek),
     [weekStartDate, startOfWorkWeek]
   );
 
@@ -119,6 +120,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [allMembersFromParent]);
 
   // Fetch allocations - exact match on targetWeekStart for consistency with table
+  // PERFORMANCE: Removed redundant session check, increased staleTime, simplified query
   const { data: allocations = [] } = useQuery({
     queryKey: ['available-allocations', companyId, targetWeekStart, isDemoMode],
     queryFn: async () => {
@@ -126,7 +128,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         const demoAllocations = generateDemoAllocations();
         // Match exact week start for demo mode too
         return demoAllocations
-          .filter(a => normalizeToWeekStart(a.allocation_date, startOfWorkWeek) === targetWeekStart)
+          .filter(a => getAllocationWeekKey(a.allocation_date, startOfWorkWeek) === targetWeekStart)
           .map(a => {
             const project = DEMO_PROJECTS.find(p => p.id === a.project_id);
             return {
@@ -146,10 +148,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       
       if (!companyId) return [];
       
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
-      
-      // Use exact match on allocation_date (week start key) for consistency with table
+      // PERFORMANCE: Removed supabase.auth.getSession() - Supabase client handles auth
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select(`
@@ -170,8 +169,9 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: companyReady || isDemoMode,
-    staleTime: 60_000
+    enabled: (companyReady && !!companyId) || isDemoMode,
+    staleTime: 120_000, // PERFORMANCE: Increased from 60s to 2 minutes
+    gcTime: 300_000, // Keep in cache for 5 minutes
   });
 
   // Instant refresh when allocations are edited in the scheduling grid
@@ -187,7 +187,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (!weekKey) return;
 
       // Only refresh if the edit belongs to the week this avatar row represents.
-      const editedWeekStart = normalizeToWeekStart(weekKey, startOfWorkWeek);
+      const editedWeekStart = getAllocationWeekKey(weekKey, startOfWorkWeek);
       if (editedWeekStart !== targetWeekStart) return;
 
       queryClient.invalidateQueries({
@@ -202,6 +202,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   }, [isDemoMode, queryClient, startOfWorkWeek, targetWeekStart, companyId]);
 
   // Fetch annual leaves for the week
+  // PERFORMANCE: Removed redundant session check, increased staleTime
   const { data: leaves = [] } = useQuery({
     queryKey: ['available-leaves', companyId, targetWeekStart, isDemoMode],
     queryFn: async () => {
@@ -218,9 +219,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       
       if (!companyId) return [];
       
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
-      
+      // PERFORMANCE: Removed supabase.auth.getSession() - Supabase client handles auth
       const { data, error } = await supabase
         .from('annual_leaves')
         .select('member_id, hours, date')
@@ -231,11 +230,13 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: companyReady || isDemoMode,
-    staleTime: 60_000
+    enabled: (companyReady && !!companyId) || isDemoMode,
+    staleTime: 120_000, // PERFORMANCE: Increased to 2 minutes
+    gcTime: 300_000,
   });
 
   // Fetch office locations to map location names to IDs
+  // PERFORMANCE: Very slow-changing data, long staleTime
   const { data: officeLocations = [] } = useQuery({
     queryKey: ['office-locations-for-holidays', companyId, isDemoMode],
     queryFn: async () => {
@@ -257,11 +258,13 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: companyReady || isDemoMode,
-    staleTime: 300_000
+    enabled: (companyReady && !!companyId) || isDemoMode,
+    staleTime: 600_000, // PERFORMANCE: 10 minutes - locations rarely change
+    gcTime: 900_000,
   });
 
   // Fetch office holidays for the week with proper overlap logic
+  // PERFORMANCE: Removed redundant session check, increased staleTime
   const { data: holidays = [] } = useQuery({
     queryKey: ['available-holidays', companyId, targetWeekStart, isDemoMode],
     queryFn: async () => {
@@ -270,7 +273,6 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           .filter(h => {
             const holidayDate = format(h.date, 'yyyy-MM-dd');
             const holidayEndDate = h.date ? format(h.date, 'yyyy-MM-dd') : holidayDate;
-            // Check if holiday overlaps with week
             return holidayDate <= weekEndDate && holidayEndDate >= targetWeekStart;
           })
           .map(h => ({
@@ -284,12 +286,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       
       if (!companyId) return [];
       
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return [];
-      
-      // A holiday overlaps the week if: holiday.date <= weekEnd AND (holiday.end_date IS NULL OR holiday.end_date >= weekStart)
-      // For single-day holidays: date must be within the week range
-      // For multi-day holidays: the range must overlap with our week
+      // PERFORMANCE: Removed supabase.auth.getSession() - Supabase client handles auth
       const { data, error } = await supabase
         .from('office_holidays')
         .select('id, name, date, end_date, location_id')
@@ -299,16 +296,15 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       
       if (error) throw error;
       
-      // Additional client-side filter to ensure proper overlap for single-day holidays
       return (data || []).filter(h => {
         const holidayStart = h.date;
         const holidayEnd = h.end_date || h.date;
-        // Holiday overlaps week if: holidayStart <= weekEnd AND holidayEnd >= weekStart
         return holidayStart <= weekEndDate && holidayEnd >= targetWeekStart;
       });
     },
-    enabled: companyReady || isDemoMode,
-    staleTime: 60_000
+    enabled: (companyReady && !!companyId) || isDemoMode,
+    staleTime: 300_000, // PERFORMANCE: 5 minutes - holidays rarely change
+    gcTime: 600_000,
   });
 
   const availableMembers: AvailableMember[] = React.useMemo(() => {

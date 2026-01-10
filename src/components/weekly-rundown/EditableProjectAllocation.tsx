@@ -1,17 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Edit2, Check, X, Trash2, AlertTriangle } from 'lucide-react';
+import { Check, X, Trash2, AlertTriangle } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
-import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getTotalAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
-import { normalizeToWeekStart } from '@/utils/weekNormalization';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   AlertDialog,
@@ -23,6 +20,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+// RULEBOOK: Use canonical input parsing utilities
+import { 
+  parseInputToHours, 
+  hoursToInputDisplay, 
+  formatHoursForDisplay,
+  getAllocationInputConfig 
+} from '@/utils/allocationInput';
 
 interface EditableProjectAllocationProps {
   memberId: string;
@@ -63,33 +67,26 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   
   const effectiveCapacity = capacity || workWeekHours;
   
-  // Convert hours to display value based on preference
-  const getDisplayValue = (h: number) => {
-    if (displayPreference === 'percentage') {
-      return effectiveCapacity > 0 ? ((h / effectiveCapacity) * 100).toFixed(1) : '0';
-    }
-    return h.toString();
-  };
-  
-  const [editedValue, setEditedValue] = useState(() => getDisplayValue(hours));
+  // RULEBOOK: Use canonical input utilities for consistent hours<->display conversion
+  const [editedValue, setEditedValue] = useState(() => 
+    hoursToInputDisplay(hours, effectiveCapacity, displayPreference)
+  );
   
   // Reset editedValue whenever the hours prop changes (e.g., after save or external update)
   useEffect(() => {
     if (!isEditing) {
-      setEditedValue(getDisplayValue(hours));
+      setEditedValue(hoursToInputDisplay(hours, effectiveCapacity, displayPreference));
     }
   }, [hours, effectiveCapacity, displayPreference, isEditing]);
   
   const displayText = getProjectDisplayName({ code: projectCode, name: projectName }, projectDisplayPreference);
-  const formattedHours = formatAllocationValue(hours, effectiveCapacity, displayPreference);
+  const formattedHours = formatHoursForDisplay(hours, effectiveCapacity, displayPreference);
+  const inputConfig = getAllocationInputConfig(displayPreference, effectiveCapacity);
 
-  // Calculate warning status based on TOTAL allocation (this project + other projects + leave)
+  // RULEBOOK: Calculate warning status using canonical parsing
   const warningStatus = useMemo(() => {
-    const inputValue = parseFloat(editedValue) || 0;
-    // Convert input to hours if in percentage mode
-    const currentProjectHours = displayPreference === 'percentage' 
-      ? (inputValue / 100) * effectiveCapacity 
-      : inputValue;
+    // Use canonical parsing to convert input to hours
+    const currentProjectHours = parseInputToHours(editedValue, effectiveCapacity, displayPreference);
     
     return getTotalAllocationWarningStatus(
       currentProjectHours,
@@ -174,16 +171,13 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   });
 
   const handleSave = () => {
-    const inputValue = parseFloat(editedValue);
-    if (isNaN(inputValue) || inputValue < 0) {
+    // RULEBOOK: Use canonical parsing for consistent input handling
+    const newHours = parseInputToHours(editedValue, effectiveCapacity, displayPreference);
+    
+    if (newHours < 0) {
       toast.error('Please enter a valid number');
       return;
     }
-    
-    // Convert display value to hours
-    const newHours = displayPreference === 'percentage' 
-      ? (inputValue / 100) * effectiveCapacity 
-      : inputValue;
     
     // Calculate total allocation for validation
     const totalHours = newHours + totalOtherHours + leaveHours;
@@ -204,7 +198,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
   };
 
   const handleCancel = () => {
-    setEditedValue(getDisplayValue(hours));
+    setEditedValue(hoursToInputDisplay(hours, effectiveCapacity, displayPreference));
     setIsEditing(false);
   };
 
@@ -239,9 +233,10 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
                     value={editedValue}
                     onChange={(e) => setEditedValue(e.target.value)}
                     className={`w-14 h-7 text-xs text-center bg-background/90 ${warningStatus.textClass || 'text-foreground'} ${warningStatus.borderClass} ${warningStatus.bgClass}`}
-                    step={displayPreference === 'percentage' ? '1' : '0.5'}
-                    min="0"
-                    placeholder={displayPreference === 'percentage' ? '%' : 'h'}
+                    step={String(inputConfig.step)}
+                    min={String(inputConfig.min)}
+                    max={String(inputConfig.max)}
+                    placeholder={inputConfig.placeholder}
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleSave();
