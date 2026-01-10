@@ -66,17 +66,35 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = React.mem
   return <CompactRowView {...sharedProps} viewMode="compact" />;
 }, (prevProps, nextProps) => {
   // Include viewMode in the comparison to ensure re-render when view mode changes
+  // IMPORTANT: allocationMap.size is NOT enough (hours can change without size changing).
+  const memberId = nextProps.member.id;
+
+  const getMemberAllocationSignature = (allocationMap: Map<string, number>, projects: any[]) => {
+    let hash = 0;
+    for (let i = 0; i < projects.length; i++) {
+      const p = projects[i];
+      const key = `${memberId}:${p.id}`;
+      const hours = allocationMap.get(key) || 0;
+      hash = (hash * 31 + Math.round(hours * 10) + i) >>> 0;
+    }
+    return hash;
+  };
+
+  const allocationsEqual =
+    getMemberAllocationSignature(prevProps.allocationMap, prevProps.projects) ===
+    getMemberAllocationSignature(nextProps.allocationMap, nextProps.projects);
+
   const isEqual = (
     prevProps.member.id === nextProps.member.id &&
     prevProps.memberIndex === nextProps.memberIndex &&
     prevProps.viewMode === nextProps.viewMode &&
     prevProps.projects.length === nextProps.projects.length &&
-    prevProps.allocationMap.size === nextProps.allocationMap.size &&
+    allocationsEqual &&
     prevProps.annualLeaveData === nextProps.annualLeaveData &&
     prevProps.holidaysData === nextProps.holidaysData &&
     prevProps.otherLeaveData === nextProps.otherLeaveData
   );
-  
+
   // Debug log to see when component should re-render
   if (!isEqual) {
     logger.debug('NewResourceTableRow re-rendering due to prop changes:', {
@@ -85,6 +103,6 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = React.mem
       previousViewMode: prevProps.viewMode
     });
   }
-  
+
   return isEqual;
 });

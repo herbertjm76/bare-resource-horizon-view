@@ -319,7 +319,24 @@ export const CompactRowView = memo(CompactRowViewComponent, (prevProps, nextProp
   const indexEqual = prevProps.memberIndex === nextProps.memberIndex;
   const projectsEqual = prevProps.projects.length === nextProps.projects.length;
   const viewModeEqual = prevProps.viewMode === nextProps.viewMode;
-  const allocationEqual = prevProps.allocationMap.size === nextProps.allocationMap.size;
+
+  // IMPORTANT: allocationMap.size is NOT enough (hours can change without size changing).
+  // Build a lightweight per-member signature across all projects to detect updates.
+  const getMemberAllocationSignature = (allocationMap: Map<string, number>, projects: any[]) => {
+    let hash = 0;
+    for (let i = 0; i < projects.length; i++) {
+      const p = projects[i];
+      const key = `${memberId}:${p.id}`;
+      const hours = allocationMap.get(key) || 0;
+      // Simple rolling hash: order-sensitive, cheap, stable
+      hash = (hash * 31 + Math.round(hours * 10) + i) >>> 0;
+    }
+    return hash;
+  };
+
+  const allocationEqual =
+    getMemberAllocationSignature(prevProps.allocationMap, prevProps.projects) ===
+    getMemberAllocationSignature(nextProps.allocationMap, nextProps.projects);
 
   const annualLeaveEqual = (prevProps.annualLeaveData?.[memberId] || 0) === (nextProps.annualLeaveData?.[memberId] || 0);
   const holidayEqual = (prevProps.holidaysData?.[memberId] || 0) === (nextProps.holidaysData?.[memberId] || 0);
