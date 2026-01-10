@@ -9,9 +9,6 @@ import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectR
 import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
 import { PersonResourceView } from '@/components/resources/person-view/PersonResourceView';
-import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
-import { useAppSettings } from '@/hooks/useAppSettings';
-import { normalizeToWeekStart } from '@/utils/weekNormalization';
 import { useProjects } from '@/hooks/useProjects';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
@@ -53,15 +50,6 @@ const ResourceScheduling = () => {
     setDisplayOptions,
     filters.periodToShow
   );
-
-  const { startOfWorkWeek } = useAppSettings();
-  
-  // Calculate week start date for the available members row.
-  // This row is meant to reflect the CURRENT week (the column marked "THIS WEEK")
-  // regardless of which month is being browsed in the grid.
-  const weekStartDate = useMemo(() => {
-    return normalizeToWeekStart(new Date(), startOfWorkWeek);
-  }, [startOfWorkWeek]);
 
   // Member filters state
   const [memberFilters, setMemberFilters] = useState({
@@ -161,16 +149,8 @@ const ResourceScheduling = () => {
             >
               <TabsContent value="by-project" className="mt-0 py-3">
                 <div className="space-y-4">
-                  {/* 1. Available Members Row - always sorted by utilization, NOT filtered */}
+                  {/* 1. Combined Controls + Member Filters - grouped in single card */}
                   <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
-                    <AvailableMembersRow
-                      weekStartDate={weekStartDate}
-                      threshold={80}
-                    />
-                  </div>
-                  
-                  {/* 2. Combined Controls + Member Filters - grouped in single card */}
-                  <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-300">
                     <div className="bg-card rounded-lg border shadow-sm">
                       <ProjectResourcingContent
                         selectedMonth={selectedMonth}
@@ -250,16 +230,8 @@ const ResourceScheduling = () => {
 
               <TabsContent value="by-person" className="mt-0 py-3">
                 <div className="space-y-4">
-                  {/* 1. Available Members Row - always sorted by utilization, NOT filtered */}
+                  {/* 1. Combined Controls + Member Filters - grouped in single card */}
                   <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
-                    <AvailableMembersRow
-                      weekStartDate={weekStartDate}
-                      threshold={80}
-                    />
-                  </div>
-                  
-                  {/* 2. Combined Controls + Member Filters - grouped in single card */}
-                  <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-300">
                     <div className="bg-card rounded-lg border shadow-sm">
                       <PersonResourceView
                         startDate={selectedMonth}
