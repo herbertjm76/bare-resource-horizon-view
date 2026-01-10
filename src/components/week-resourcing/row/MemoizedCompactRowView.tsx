@@ -52,14 +52,88 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   const { company } = useCompany();
   const queryClient = useQueryClient();
   
+  // STANDARDIZED CALCULATIONS - Use the utility functions consistently
+  // NOTE: weeklyCapacity must be defined before callbacks that use it
+  const weeklyCapacity = useMemo(() => member?.weekly_capacity || workWeekHours, [member?.weekly_capacity, workWeekHours]);
+  
   // State for tracking which cell is being edited
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editInputValue, setEditInputValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const editInputRef = useRef<HTMLInputElement>(null);
   
-  // STANDARDIZED CALCULATIONS - Use the utility functions consistently
-  const weeklyCapacity = useMemo(() => member?.weekly_capacity || workWeekHours, [member?.weekly_capacity, workWeekHours]);
+  // Input configuration based on display preference
+  const inputConfig = useMemo(() => 
+    getAllocationInputConfig(displayPreference, workWeekHours),
+    [displayPreference, workWeekHours]
+  );
+  
+  // Handle starting edit mode
+  const handleStartEdit = useCallback((projectId: string, currentHours: number) => {
+    setEditingProjectId(projectId);
+    setEditInputValue(hoursToInputDisplay(currentHours, weeklyCapacity, displayPreference));
+  }, [weeklyCapacity, displayPreference]);
+  
+  // Handle saving allocation
+  const handleSaveAllocation = useCallback(async (projectId: string) => {
+    if (isSaving) return;
+    
+    const newHours = parseInputToHours(editInputValue, weeklyCapacity, displayPreference);
+    const key = `${member.id}:${projectId}`;
+    const currentHours = allocationMap.get(key) || 0;
+    
+    // Only save if value changed
+    if (Math.abs(newHours - currentHours) > 0.01) {
+      setIsSaving(true);
+      try {
+        const weekKey = format(startOfWeek(selectedWeek, { weekStartsOn: startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1 }), 'yyyy-MM-dd');
+        await saveResourceAllocation(
+          projectId,
+          member.id,
+          'active',
+          weekKey,
+          newHours,
+          company?.id || '',
+          startOfWorkWeek
+        );
+        
+        // Invalidate queries to refresh data
+        queryClient.invalidateQueries({ queryKey: ['weekly-allocations'] });
+        queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+        
+        // Dispatch event for other components
+        window.dispatchEvent(new CustomEvent('allocation-updated', {
+          detail: { memberId: member.id, projectId, hours: newHours }
+        }));
+      } catch (error) {
+        console.error('Failed to save allocation:', error);
+      } finally {
+        setIsSaving(false);
+      }
+    }
+    
+    setEditingProjectId(null);
+    setEditInputValue('');
+  }, [isSaving, editInputValue, weeklyCapacity, displayPreference, member.id, allocationMap, selectedWeek, company?.id, queryClient, startOfWorkWeek]);
+  
+  // Handle keyboard events
+  const handleKeyDown = useCallback((e: React.KeyboardEvent, projectId: string) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveAllocation(projectId);
+    } else if (e.key === 'Escape') {
+      setEditingProjectId(null);
+      setEditInputValue('');
+    }
+  }, [handleSaveAllocation]);
+  
+  // Focus input when editing starts
+  useEffect(() => {
+    if (editingProjectId && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [editingProjectId]);
   
   // Get leave data directly from props for reliability
   const annualLeave = annualLeaveData?.[member.id] || 0;
