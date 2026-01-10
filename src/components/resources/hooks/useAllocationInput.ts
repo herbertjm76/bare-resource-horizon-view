@@ -84,6 +84,14 @@ export const useAllocationInput = ({
     saveAllocation(weekKey, hours);
     onAllocationChange(resourceId, weekKey, hours);
 
+    // Notify other parts of the UI (e.g. AvailableMembersRow avatar utilization) to refresh instantly.
+    // We keep this as a lightweight client-side event so we don't depend on Supabase Realtime.
+    window.dispatchEvent(
+      new CustomEvent('allocation-updated', {
+        detail: { resourceId, weekKey, hours, projectId, resourceType },
+      })
+    );
+
     // Normalize what we show after save
     setInputValues((prev) => ({
       ...prev,
