@@ -10,9 +10,8 @@ import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectRe
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
 import { PersonResourceView } from '@/components/resources/person-view/PersonResourceView';
 import { AvailableMembersRow } from '@/components/weekly-rundown/AvailableMembersRow';
-import { format } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { normalizeToWeekStart } from '@/utils/weekNormalization';
 import { useProjects } from '@/hooks/useProjects';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
@@ -58,9 +57,9 @@ const ResourceScheduling = () => {
   const { startOfWorkWeek } = useAppSettings();
   
   // Calculate week start date from selected month for the available members row
+  // Use UTC-based normalizeToWeekStart for consistency with allocation date keys
   const weekStartDate = useMemo(() => {
-    const weekStart = getWeekStartDate(selectedMonth, startOfWorkWeek);
-    return format(weekStart, 'yyyy-MM-dd');
+    return normalizeToWeekStart(selectedMonth, startOfWorkWeek);
   }, [selectedMonth, startOfWorkWeek]);
 
   // Member filters state
