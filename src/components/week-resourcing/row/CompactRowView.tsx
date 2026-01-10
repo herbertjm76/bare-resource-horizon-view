@@ -4,12 +4,14 @@ import { TableRow, TableCell } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { ResourceAllocationCell } from '../ResourceAllocationCell';
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
   getUtilizationColor,
   calculateCapacityDisplay
 } from '../utils/utilizationCalculations';
+import { format, startOfWeek } from 'date-fns';
 
 interface CompactRowViewProps {
   member: any;
@@ -54,12 +56,16 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  const { workWeekHours, displayPreference } = useAppSettings();
+  const { workWeekHours, displayPreference, startOfWorkWeek } = useAppSettings();
 
   // STANDARDIZED CALCULATIONS - Use the utility functions ONLY
   const weeklyCapacity = member.weekly_capacity || workWeekHours;
   const capacityDisplay = calculateCapacityDisplay(member.id, allocationMap, weeklyCapacity);
   const projectCount = getProjectCount(member.id);
+
+  // Calculate weekStartDate for inline editing
+  const weekStartDay = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
+  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: weekStartDay as 0 | 1 | 6 }), 'yyyy-MM-dd');
 
   const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
 
@@ -114,33 +120,42 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
         </div>
       </TableCell>
       
-      {/* Project allocation cells */}
+      {/* Project allocation cells - with inline editing */}
       {projects.map((project) => {
         const key = `${member.id}:${project.id}`;
         const hours = allocationMap.get(key) || 0;
         
+        // Calculate other projects hours for this member
+        let otherProjectsHours = 0;
+        allocationMap.forEach((h, k) => {
+          if (k.startsWith(`${member.id}:`) && k !== key) {
+            otherProjectsHours += h;
+          }
+        });
+        
+        const leaveHours = (annualLeaveData[member.id] || 0) + (holidaysData[member.id] || 0);
+        
         return (
           <TableCell 
             key={project.id} 
-            className="text-center border-r border-gray-200 text-sm"
+            className="text-center border-r border-gray-200 text-sm p-0"
             style={{ 
-              width: '35px', 
-              minWidth: '35px',
-              maxWidth: '35px',
+              width: '50px', 
+              minWidth: '50px',
+              maxWidth: '50px',
               backgroundColor: rowBgColor,
-              padding: '4px'
             }}
           >
-            {hours > 0 ? (
-              <div 
-                className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium bg-blue-100 text-blue-800"
-                title={`${hours}h allocated to ${project.code || project.name}`}
-              >
-                {formatAllocationValue(hours, weeklyCapacity, displayPreference, false)}
-              </div>
-            ) : (
-              <span className="text-gray-300 text-xs">—</span>
-            )}
+            <ResourceAllocationCell
+              resourceId={member.id}
+              projectId={project.id}
+              hours={hours}
+              weekStartDate={weekStartDate}
+              memberCapacity={weeklyCapacity}
+              totalOtherHours={otherProjectsHours}
+              leaveHours={leaveHours}
+              editable={true}
+            />
           </TableCell>
         );
       })}

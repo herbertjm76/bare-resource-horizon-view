@@ -29,6 +29,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 // RULEBOOK: Use canonical allocation utilities
 import { saveResourceAllocation } from '@/hooks/allocations/api';
 import { parseInputToHours, getAllocationInputConfig } from '@/utils/allocationInput';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface MemberVacationPopoverProps {
   memberId: string;
@@ -51,6 +52,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     allocationDangerThreshold,
     allocationMaxLimit,
     startOfWorkWeek,
+    projectDisplayPreference,
   } = useAppSettings();
   const { isAdmin, permissionsBootstrapping, permissionsReady } = usePermissions();
   const { leaveTypes } = useLeaveTypes();
@@ -587,7 +589,11 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                       className="w-full justify-between h-10 border-border-primary"
                     >
                       {selectedProject
-                        ? filteredProjects.find((project) => project.id === selectedProject)?.name || projects.find((project) => project.id === selectedProject)?.name || "Select project"
+                        ? getProjectDisplayName(
+                            filteredProjects.find((project) => project.id === selectedProject) || 
+                            projects.find((project) => project.id === selectedProject),
+                            projectDisplayPreference
+                          ) || "Select project"
                         : "Select project"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -608,7 +614,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                               }}
                             >
                               <div className="flex flex-col">
-                                <span>{project.name}</span>
+                                <span>{getProjectDisplayName(project, projectDisplayPreference)}</span>
                                 {project.department && (
                                   <span className="text-xs text-muted-foreground">{project.department}</span>
                                 )}

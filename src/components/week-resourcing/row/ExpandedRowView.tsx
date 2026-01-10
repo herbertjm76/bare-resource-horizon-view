@@ -9,9 +9,12 @@ import { LongCapacityBar } from '../LongCapacityBar';
 import { RowData, useRowData } from './RowUtilsHooks';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
+import { ResourceAllocationCell } from '../ResourceAllocationCell';
+import { format, startOfWeek } from 'date-fns';
 
 interface ExpandedRowViewProps extends RowData {
   viewMode: 'expanded';
+  selectedWeek?: Date;
 }
 
 export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
@@ -25,8 +28,9 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
   getProjectCount,
   getWeeklyLeave,
   onOtherLeaveEdit,
+  selectedWeek = new Date(),
 }) => {
-  const { displayPreference } = useAppSettings();
+  const { displayPreference, startOfWorkWeek } = useAppSettings();
   
   const {
     weeklyCapacity,
@@ -50,6 +54,10 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
     getWeeklyLeave,
     onOtherLeaveEdit,
   });
+
+  // Calculate weekStartDate for inline editing
+  const weekStartDay = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
+  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: weekStartDay as 0 | 1 | 6 }), 'yyyy-MM-dd');
 
   return (
     <TableRow className={`${memberIndex % 2 === 0 ? 'bg-muted/50' : 'bg-background'} hover:bg-accent/50 transition-colors duration-200 border-b border-border`} style={{ height: '80px' }}>
@@ -114,21 +122,35 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
         onOtherLeaveChange={handleOtherLeaveChange}
       />
       
-      {/* Project allocation cells */}
+      {/* Project allocation cells - with inline editing */}
       {projects.map((project) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
+        
+        // Calculate other projects hours for this member
+        let otherProjectsHours = 0;
+        allocationMap.forEach((h, k) => {
+          if (k.startsWith(`${member.id}:`) && k !== allocationKey) {
+            otherProjectsHours += h;
+          }
+        });
+        
         return (
-          <TableCell key={project.id} className="text-center border-r border-gray-200 px-2 py-3">
+          <TableCell key={project.id} className="text-center border-r border-gray-200 p-0" style={{ minWidth: '60px' }}>
             <EnhancedTooltip
               type="project"
               projectBreakdown={getProjectBreakdown(project, hours)}
             >
-              {hours > 0 && (
-                <span className="inline-flex items-center justify-center w-10 h-8 bg-green-500 text-white rounded-lg font-semibold text-sm shadow-sm">
-                  {formatAllocationValue(hours, weeklyCapacity, displayPreference, false)}
-                </span>
-              )}
+              <ResourceAllocationCell
+                resourceId={member.id}
+                projectId={project.id}
+                hours={hours}
+                weekStartDate={weekStartDate}
+                memberCapacity={weeklyCapacity}
+                totalOtherHours={otherProjectsHours}
+                leaveHours={annualLeave + holidayHours}
+                editable={true}
+              />
             </EnhancedTooltip>
           </TableCell>
         );

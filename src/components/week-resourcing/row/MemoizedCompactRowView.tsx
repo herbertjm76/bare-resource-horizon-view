@@ -1,5 +1,5 @@
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
@@ -13,8 +13,13 @@ import { useDetailedWeeklyAllocations } from '../hooks/useDetailedWeeklyAllocati
 import { MemberVacationPopover } from '@/components/weekly-rundown/MemberVacationPopover';
 import { format, startOfWeek } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { useCompany } from '@/context/CompanyContext';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { formatAllocationValue, formatDualAllocationValue } from '@/utils/allocationDisplay';
+import { parseInputToHours, hoursToInputDisplay, getAllocationInputConfig } from '@/utils/allocationInput';
+import { saveResourceAllocation } from '@/hooks/allocations/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
@@ -43,7 +48,15 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   onOtherLeaveEdit,
   ...props
 }) => {
-  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours, startOfWorkWeek } = useAppSettings();
+  const { company } = useCompany();
+  const queryClient = useQueryClient();
+  
+  // State for tracking which cell is being edited
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [editInputValue, setEditInputValue] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const editInputRef = useRef<HTMLInputElement>(null);
   
   // STANDARDIZED CALCULATIONS - Use the utility functions consistently
   const weeklyCapacity = useMemo(() => member?.weekly_capacity || workWeekHours, [member?.weekly_capacity, workWeekHours]);
@@ -266,25 +279,67 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         </span>
       </TableCell>
       
-      {/* Project Cells - all 35px fixed with enhanced tooltips */}
+      {/* Project Cells - all 50px fixed with inline editing */}
       {projects.map((project) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
         const projectDetailedData = memberDetailedData?.projects.find(p => p.project_id === project.id);
+        const isEditing = editingProjectId === project.id;
         
         return (
           <TableCell
             key={project.id}
             className="text-center border-r border-gray-200 px-0.5 py-0.5 project-column bg-gradient-to-r from-purple-50 to-violet-50"
-            style={{ width: 35, minWidth: 35, maxWidth: 35 }}
+            style={{ width: 50, minWidth: 50, maxWidth: 50 }}
           >
-            {hours > 0 && (
+            {isEditing ? (
+              <input
+                ref={editInputRef}
+                type="number"
+                min={inputConfig.min}
+                max={inputConfig.max}
+                step={inputConfig.step}
+                value={editInputValue}
+                onChange={(e) => setEditInputValue(e.target.value)}
+                onBlur={() => handleSaveAllocation(project.id)}
+                onKeyDown={(e) => handleKeyDown(e, project.id)}
+                disabled={isSaving}
+                placeholder={inputConfig.placeholder}
+                className={cn(
+                  "w-full h-6 text-center text-[11px] font-medium border rounded",
+                  "bg-background focus:ring-2 focus:ring-primary/30 focus:border-primary",
+                  "transition-all duration-150",
+                  isSaving && "opacity-50 cursor-wait"
+                )}
+              />
+            ) : (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-sm font-semibold text-[11px] hover:bg-emerald-600 transition-colors duration-100 cursor-pointer">
-                      {formatAllocationValue(hours, weeklyCapacity, displayPreference)}
-                    </span>
+                    <div 
+                      onClick={() => handleStartEdit(project.id, hours)}
+                      className={cn(
+                        "w-full h-full flex items-center justify-center cursor-pointer hover:bg-accent/50 rounded transition-colors",
+                        hours > 0 ? "" : "text-gray-300"
+                      )}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleStartEdit(project.id, hours);
+                        }
+                      }}
+                      aria-label={hours > 0 ? `Edit ${hours}h allocation` : 'Add allocation'}
+                    >
+                      {hours > 0 ? (
+                        <span className="inline-flex items-center justify-center w-7 h-6 bg-emerald-500 text-white rounded-sm font-semibold text-[11px] hover:bg-emerald-600 transition-colors duration-100">
+                          {formatAllocationValue(hours, weeklyCapacity, displayPreference)}
+                        </span>
+                      ) : (
+                        <span className="text-[11px]">—</span>
+                      )}
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent 
                     className="z-[250] max-w-xs px-3 py-2 bg-popover border border-border shadow-xl"
@@ -300,6 +355,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
                       capacity={weeklyCapacity}
                       dailyBreakdown={projectDetailedData?.daily_breakdown}
                     />
+                    <p className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-2">Click to edit</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

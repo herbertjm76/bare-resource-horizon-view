@@ -2,6 +2,7 @@ import React from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface ProjectCellTooltipProps {
   projectName: string;
@@ -25,7 +26,7 @@ export const ProjectCellTooltip: React.FC<ProjectCellTooltipProps> = ({
   capacity,
   dailyBreakdown = []
 }) => {
-  const { displayPreference } = useAppSettings();
+  const { displayPreference, projectDisplayPreference } = useAppSettings();
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   
@@ -38,10 +39,16 @@ export const ProjectCellTooltip: React.FC<ProjectCellTooltipProps> = ({
     dailyHours.set(day.date, day.hours);
   });
 
+  // Use project display preference for consistent display
+  const projectDisplayText = getProjectDisplayName(
+    { code: projectCode, name: projectName },
+    projectDisplayPreference
+  );
+
   return (
     <div className="space-y-3 max-w-xs">
       <div className="font-bold text-sm text-brand-secondary border-b border-gray-200 pb-2">
-        {projectCode || projectName}
+        {projectDisplayText}
       </div>
       
       <div className="text-xs text-gray-600">
