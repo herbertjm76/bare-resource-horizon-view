@@ -56,11 +56,12 @@ const ResourceScheduling = () => {
 
   const { startOfWorkWeek } = useAppSettings();
   
-  // Calculate week start date from selected month for the available members row
-  // Use UTC-based normalizeToWeekStart for consistency with allocation date keys
+  // Calculate week start date for the available members row.
+  // This row is meant to reflect the CURRENT week (the column marked "THIS WEEK")
+  // regardless of which month is being browsed in the grid.
   const weekStartDate = useMemo(() => {
-    return normalizeToWeekStart(selectedMonth, startOfWorkWeek);
-  }, [selectedMonth, startOfWorkWeek]);
+    return normalizeToWeekStart(new Date(), startOfWorkWeek);
+  }, [startOfWorkWeek]);
 
   // Member filters state
   const [memberFilters, setMemberFilters] = useState({
