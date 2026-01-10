@@ -9,10 +9,12 @@ import { useWeekResourceTeamMembers } from '@/components/week-resourcing/hooks/u
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
-import { generateDemoAllocations, generateDemoAnnualLeaves, DEMO_LOCATIONS, DEMO_HOLIDAYS, DEMO_PROJECTS, DEMO_COMPANY_ID } from '@/data/demoData';
+import { useCompanyId } from '@/hooks/useCompanyId';
+import { generateDemoAllocations, generateDemoAnnualLeaves, DEMO_LOCATIONS, DEMO_HOLIDAYS, DEMO_PROJECTS } from '@/data/demoData';
 import { logger } from '@/utils/logger';
 import { format } from 'date-fns';
-import { normalizeToWeekStart, getWeekStartDate } from '@/utils/weekNormalization';
+import { normalizeToWeekStart } from '@/utils/weekNormalization';
+import { parseUTCDateKey, toUTCDateKey } from '@/utils/dateKey';
 import {
   Tooltip,
   TooltipContent,
@@ -76,6 +78,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   sortOption = 'utilization'
 }) => {
   const { isDemoMode } = useDemoAuth();
+  const { companyId, isReady: companyReady } = useCompanyId();
   const {
     scrollRef: membersScrollRef,
     canScrollLeft,
@@ -89,10 +92,18 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   const { workWeekHours, startOfWorkWeek } = useAppSettings();
   const queryClient = useQueryClient();
 
+  // Normalize weekStartDate to the canonical week start key
   const targetWeekStart = React.useMemo(
     () => normalizeToWeekStart(weekStartDate, startOfWorkWeek),
     [weekStartDate, startOfWorkWeek]
   );
+
+  // Calculate week end date for range queries (leave, holidays)
+  const weekEndDate = React.useMemo(() => {
+    const weekStart = parseUTCDateKey(targetWeekStart);
+    const weekEnd = new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000);
+    return toUTCDateKey(weekEnd);
+  }, [targetWeekStart]);
 
   // Fetch members internally if not provided externally
   const { members: fetchedMembers } = useWeekResourceTeamMembers();
@@ -102,18 +113,20 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     return externalMembers || fetchedMembers || [];
   }, [externalMembers, fetchedMembers]);
 
+  // Extract member IDs for efficient filtering
+  const memberIds = React.useMemo(() => {
+    return allMembersFromParent.map(m => m.id);
+  }, [allMembersFromParent]);
+
+  // Fetch allocations - exact match on targetWeekStart for consistency with table
   const { data: allocations = [] } = useQuery({
-    queryKey: ['available-allocations', weekStartDate, isDemoMode],
+    queryKey: ['available-allocations', companyId, targetWeekStart, isDemoMode],
     queryFn: async () => {
-      const weekStart = new Date(weekStartDate);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-      const weekEndDate = weekEnd.toISOString().split('T')[0];
-      
       if (isDemoMode) {
         const demoAllocations = generateDemoAllocations();
+        // Match exact week start for demo mode too
         return demoAllocations
-          .filter(a => a.allocation_date >= weekStartDate && a.allocation_date <= weekEndDate)
+          .filter(a => normalizeToWeekStart(a.allocation_date, startOfWorkWeek) === targetWeekStart)
           .map(a => {
             const project = DEMO_PROJECTS.find(p => p.id === a.project_id);
             return {
@@ -131,9 +144,12 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           });
       }
       
+      if (!companyId) return [];
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return [];
       
+      // Use exact match on allocation_date (week start key) for consistency with table
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select(`
@@ -148,15 +164,17 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
             department
           )
         `)
-        .gte('allocation_date', weekStartDate)
-        .lte('allocation_date', weekEndDate);
+        .eq('company_id', companyId)
+        .eq('allocation_date', targetWeekStart);
+      
       if (error) throw error;
       return data || [];
     },
+    enabled: companyReady || isDemoMode,
     staleTime: 60_000
   });
 
-  // Instant refresh when allocations are edited in the scheduling grid (no page refresh needed).
+  // Instant refresh when allocations are edited in the scheduling grid
   React.useEffect(() => {
     if (isDemoMode) return;
 
@@ -173,7 +191,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (editedWeekStart !== targetWeekStart) return;
 
       queryClient.invalidateQueries({
-        queryKey: ['available-allocations', weekStartDate, isDemoMode],
+        queryKey: ['available-allocations', companyId, targetWeekStart, isDemoMode],
       });
     };
 
@@ -181,21 +199,16 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     return () => {
       window.removeEventListener('allocation-updated', onAllocationUpdated as EventListener);
     };
-  }, [isDemoMode, queryClient, startOfWorkWeek, targetWeekStart, weekStartDate]);
+  }, [isDemoMode, queryClient, startOfWorkWeek, targetWeekStart, companyId]);
 
   // Fetch annual leaves for the week
   const { data: leaves = [] } = useQuery({
-    queryKey: ['available-leaves', weekStartDate, isDemoMode],
+    queryKey: ['available-leaves', companyId, targetWeekStart, isDemoMode],
     queryFn: async () => {
-      const weekStart = new Date(weekStartDate);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-      const weekEndDate = weekEnd.toISOString().split('T')[0];
-      
       if (isDemoMode) {
         const demoLeaves = generateDemoAnnualLeaves();
         return demoLeaves
-          .filter(l => l.date >= weekStartDate && l.date <= weekEndDate)
+          .filter(l => l.date >= targetWeekStart && l.date <= weekEndDate)
           .map(l => ({
             member_id: l.member_id,
             hours: l.hours,
@@ -203,23 +216,28 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           }));
       }
       
+      if (!companyId) return [];
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return [];
       
       const { data, error } = await supabase
         .from('annual_leaves')
         .select('member_id, hours, date')
-        .gte('date', weekStartDate)
+        .eq('company_id', companyId)
+        .gte('date', targetWeekStart)
         .lte('date', weekEndDate);
+      
       if (error) throw error;
       return data || [];
     },
+    enabled: companyReady || isDemoMode,
     staleTime: 60_000
   });
 
   // Fetch office locations to map location names to IDs
   const { data: officeLocations = [] } = useQuery({
-    queryKey: ['office-locations-for-holidays', isDemoMode],
+    queryKey: ['office-locations-for-holidays', companyId, isDemoMode],
     queryFn: async () => {
       if (isDemoMode) {
         return DEMO_LOCATIONS.map(l => ({
@@ -229,29 +247,31 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
         }));
       }
       
+      if (!companyId) return [];
+      
       const { data, error } = await supabase
         .from('office_locations')
-        .select('id, city, code');
+        .select('id, city, code')
+        .eq('company_id', companyId);
+      
       if (error) throw error;
       return data || [];
     },
+    enabled: companyReady || isDemoMode,
     staleTime: 300_000
   });
 
-  // Fetch office holidays for the week
+  // Fetch office holidays for the week with proper overlap logic
   const { data: holidays = [] } = useQuery({
-    queryKey: ['available-holidays', weekStartDate, isDemoMode],
+    queryKey: ['available-holidays', companyId, targetWeekStart, isDemoMode],
     queryFn: async () => {
-      const weekStart = new Date(weekStartDate);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-      const weekEndDate = weekEnd.toISOString().split('T')[0];
-      
       if (isDemoMode) {
         return DEMO_HOLIDAYS
           .filter(h => {
             const holidayDate = format(h.date, 'yyyy-MM-dd');
-            return holidayDate >= weekStartDate && holidayDate <= weekEndDate;
+            const holidayEndDate = h.date ? format(h.date, 'yyyy-MM-dd') : holidayDate;
+            // Check if holiday overlaps with week
+            return holidayDate <= weekEndDate && holidayEndDate >= targetWeekStart;
           })
           .map(h => ({
             id: h.id,
@@ -262,16 +282,32 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           }));
       }
       
+      if (!companyId) return [];
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return [];
       
+      // A holiday overlaps the week if: holiday.date <= weekEnd AND (holiday.end_date IS NULL OR holiday.end_date >= weekStart)
+      // For single-day holidays: date must be within the week range
+      // For multi-day holidays: the range must overlap with our week
       const { data, error } = await supabase
         .from('office_holidays')
         .select('id, name, date, end_date, location_id')
-        .or(`and(date.gte.${weekStartDate},date.lte.${weekEndDate}),and(end_date.gte.${weekStartDate},end_date.lte.${weekEndDate})`);
+        .eq('company_id', companyId)
+        .lte('date', weekEndDate)
+        .or(`end_date.is.null,end_date.gte.${targetWeekStart}`);
+      
       if (error) throw error;
-      return data || [];
+      
+      // Additional client-side filter to ensure proper overlap for single-day holidays
+      return (data || []).filter(h => {
+        const holidayStart = h.date;
+        const holidayEnd = h.end_date || h.date;
+        // Holiday overlaps week if: holidayStart <= weekEnd AND holidayEnd >= weekStart
+        return holidayStart <= weekEndDate && holidayEnd >= targetWeekStart;
+      });
     },
+    enabled: companyReady || isDemoMode,
     staleTime: 60_000
   });
 
@@ -299,37 +335,39 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     logger.debug('Holidays data:', holidays);
     
     // Build holiday hours map by location_id
+    // Calculate only hours that fall within our target week
     const holidayHoursByLocationId = new Map<string | null, number>();
     holidays.forEach(holiday => {
       const locationId = holiday.location_id;
-      // Calculate hours for this holiday (8 hours per day)
-      let holidayDays = 1;
-      if (holiday.end_date && holiday.date) {
-        const start = new Date(holiday.date);
-        const end = new Date(holiday.end_date);
-        holidayDays = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+      
+      // Calculate overlapping days with our week
+      const holidayStart = parseUTCDateKey(holiday.date);
+      const holidayEnd = holiday.end_date ? parseUTCDateKey(holiday.end_date) : holidayStart;
+      const weekStart = parseUTCDateKey(targetWeekStart);
+      const weekEnd = parseUTCDateKey(weekEndDate);
+      
+      // Find the overlap between holiday range and week range
+      const overlapStart = new Date(Math.max(holidayStart.getTime(), weekStart.getTime()));
+      const overlapEnd = new Date(Math.min(holidayEnd.getTime(), weekEnd.getTime()));
+      
+      // Count days that fall within the week
+      let daysInWeek = 0;
+      if (overlapStart <= overlapEnd) {
+        daysInWeek = Math.ceil((overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       }
-      const hours = holidayDays * 8;
-      const current = holidayHoursByLocationId.get(locationId) || 0;
-      holidayHoursByLocationId.set(locationId, current + hours);
-      logger.debug(`Holiday "${holiday.name}" (location_id: ${locationId}): ${holidayDays} days = ${hours}h`);
+      
+      if (daysInWeek > 0) {
+        const hours = daysInWeek * 8;
+        const current = holidayHoursByLocationId.get(locationId) || 0;
+        holidayHoursByLocationId.set(locationId, current + hours);
+        logger.debug(`Holiday "${holiday.name}" (location_id: ${locationId}): ${daysInWeek} days in week = ${hours}h`);
+      }
     });
     
     logger.debug('Holiday hours by location_id:', Object.fromEntries(holidayHoursByLocationId));
     
-    // Normalize the target week start based on company preference
-    const targetWeekStart = normalizeToWeekStart(weekStartDate, startOfWorkWeek);
-    
+    // Process allocations - they should already be for targetWeekStart
     allocations.forEach(alloc => {
-      // Normalize the allocation date to its week start (using company preference)
-      const allocWeekStart = normalizeToWeekStart(alloc.allocation_date, startOfWorkWeek);
-      
-      // Only include allocations that belong to our target week
-      if (allocWeekStart !== targetWeekStart) {
-        logger.debug(`Skipping allocation for ${alloc.resource_id}: ${alloc.allocation_date} (week ${allocWeekStart}) != target week ${targetWeekStart}`);
-        return;
-      }
-      
       const key = alloc.resource_id;
       const current = allocationMap.get(key) || 0;
       allocationMap.set(key, current + Number(alloc.hours));
@@ -364,7 +402,6 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     });
 
     // Map members to AvailableMember format
-    // Parent provides filtered members, but we apply our own utilization sorting
     const available = allMembersFromParent.map(m => {
       const key = m.id;
       const capacity = m.weekly_capacity || workWeekHours;
@@ -372,8 +409,6 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const leaveHours = memberLeaveMap.get(key) || 0;
       
       // Get holiday hours for this member's location
-      // Note: member.location is a free-text field (e.g. "Singapore", "SG", "Singapore (SG)").
-      // Try multiple matching strategies to resolve the correct office_locations.id.
       const rawMemberLocation = (m.location || '').trim();
       const memberLocationKey = rawMemberLocation.toLowerCase();
 
@@ -488,9 +523,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
       return nameA.localeCompare(nameB);
     });
-  }, [allMembersFromParent, allocations, leaves, holidays, officeLocations, sortOption, sortAscending, startOfWorkWeek, workWeekHours]);
-
-  // Note: Scroll position checking and scroll functions are now handled by useDragScroll hook
+  }, [allMembersFromParent, allocations, leaves, holidays, officeLocations, sortOption, sortAscending, startOfWorkWeek, workWeekHours, targetWeekStart, weekEndDate]);
 
   return (
     <div className="w-full">
