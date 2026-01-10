@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -71,7 +71,14 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
     return h.toString();
   };
   
-  const [editedValue, setEditedValue] = useState(getDisplayValue(hours));
+  const [editedValue, setEditedValue] = useState(() => getDisplayValue(hours));
+  
+  // Reset editedValue whenever the hours prop changes (e.g., after save or external update)
+  useEffect(() => {
+    if (!isEditing) {
+      setEditedValue(getDisplayValue(hours));
+    }
+  }, [hours, effectiveCapacity, displayPreference, isEditing]);
   
   const displayText = getProjectDisplayName({ code: projectCode, name: projectName }, projectDisplayPreference);
   const formattedHours = formatAllocationValue(hours, effectiveCapacity, displayPreference);
