@@ -7,6 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { saveResourceAllocation } from '@/hooks/allocations/api';
+import { parseInputToHours } from '@/utils/allocationInput';
 import {
   Popover,
   PopoverContent,
@@ -54,7 +56,7 @@ export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = (
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const { company } = useCompany();
-  const { displayPreference, workWeekHours } = useAppSettings();
+  const { displayPreference, workWeekHours, startOfWorkWeek } = useAppSettings();
 
   // Fetch active members from profiles
   const { data: activeMembers = [] } = useQuery({
@@ -110,32 +112,24 @@ export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = (
       if (!selectedMember || !company?.id) return;
 
       const capacity = selectedMember.weekly_capacity || workWeekHours;
-      let allocationHours: number;
-      
-      if (displayPreference === 'percentage') {
-        const percentage = parseFloat(inputValue);
-        allocationHours = (percentage / 100) * capacity;
-      } else {
-        allocationHours = parseFloat(inputValue);
-      }
+      // RULEBOOK: Use canonical input parsing
+      const allocationHours = parseInputToHours(inputValue, capacity, displayPreference);
       
       const resourceType = selectedMember.type === 'pre_registered' ? 'pre_registered' : 'active';
       
-      const { data, error } = await supabase
-        .from('project_resource_allocations')
-        .insert({
-          project_id: projectId,
-          resource_id: selectedMember.id,
-          resource_type: resourceType,
-          allocation_date: weekStartDate,
-          hours: allocationHours,
-          company_id: company.id
-        })
-        .select()
-        .single();
+      // RULEBOOK: Use canonical saveResourceAllocation for proper upsert
+      const success = await saveResourceAllocation(
+        projectId,
+        selectedMember.id,
+        resourceType,
+        weekStartDate,
+        allocationHours,
+        company.id,
+        startOfWorkWeek
+      );
 
-      if (error) throw error;
-      return data;
+      if (!success) throw new Error('Failed to save allocation');
+      return { success: true };
     },
     onSuccess: () => {
       toast.success('Team member added');

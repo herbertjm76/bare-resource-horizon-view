@@ -26,6 +26,9 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { getTotalAllocationWarningStatus } from '@/hooks/allocations/utils/utilizationUtils';
 import { useLeaveTypes } from '@/hooks/leave/useLeaveTypes';
 import { usePermissions } from '@/hooks/usePermissions';
+// RULEBOOK: Use canonical allocation utilities
+import { saveResourceAllocation } from '@/hooks/allocations/api';
+import { parseInputToHours, getAllocationInputConfig } from '@/utils/allocationInput';
 
 interface MemberVacationPopoverProps {
   memberId: string;
@@ -47,6 +50,7 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     allocationWarningThreshold,
     allocationDangerThreshold,
     allocationMaxLimit,
+    startOfWorkWeek,
   } = useAppSettings();
   const { isAdmin, permissionsBootstrapping, permissionsReady } = usePermissions();
   const { leaveTypes } = useLeaveTypes();
@@ -235,42 +239,37 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
   const handleSaveProject = async () => {
     if (!selectedProject || !company?.id) return;
 
-    const inputValue = parseFloat(projectHours) || 0;
-    if (inputValue <= 0) {
+    // RULEBOOK: Use canonical input parsing for consistent hours conversion
+    const hours = parseInputToHours(projectHours, workWeekHours, displayPreference);
+    
+    if (hours <= 0) {
       toast.error(`Please enter a valid ${displayPreference === 'percentage' ? 'percentage' : 'hours'}`);
       return;
     }
 
-    // Validate allocation limit
+    // Validate allocation limit using hours
     const maxHours = (workWeekHours * allocationMaxLimit) / 100;
-    if (displayPreference === 'percentage' && inputValue > allocationMaxLimit) {
-      toast.error(`Allocation cannot exceed ${allocationMaxLimit}%`);
-      return;
-    }
-    if (displayPreference === 'hours' && inputValue > maxHours) {
-      toast.error(`Allocation cannot exceed ${maxHours}h (${allocationMaxLimit}% of capacity)`);
+    if (hours > maxHours) {
+      toast.error(`Allocation cannot exceed ${allocationMaxLimit}% (${Math.round(maxHours)}h)`);
       return;
     }
 
     setIsSavingProject(true);
     try {
-      // Convert display value to hours if percentage mode
-      const hours = displayPreference === 'percentage' 
-        ? (inputValue / 100) * workWeekHours 
-        : inputValue;
+      // RULEBOOK: Use canonical saveResourceAllocation for proper upsert handling
+      const success = await saveResourceAllocation(
+        selectedProject,
+        memberId,
+        'active',
+        weekStartDate,
+        hours,
+        company.id,
+        startOfWorkWeek
+      );
 
-      const { error } = await supabase
-        .from('project_resource_allocations')
-        .insert({
-          project_id: selectedProject,
-          resource_id: memberId,
-          resource_type: 'active' as const,
-          allocation_date: weekStartDate,
-          hours,
-          company_id: company.id
-        });
-
-      if (error) throw error;
+      if (!success) {
+        throw new Error('Failed to save allocation');
+      }
 
       queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       queryClient.invalidateQueries({ queryKey: ['available-members-profiles'] });
@@ -291,13 +290,11 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
     }
   };
 
-  // Calculate warning status for each week input (simplified - just checks single project allocation)
-  // Full total allocation check happens in the parent components where context is available
+  // RULEBOOK: Use canonical input parsing for warning status calculation
   const getWeekWarningStatus = (weekValue: string) => {
-    const inputValue = parseFloat(weekValue) || 0;
-    const currentHours = displayPreference === 'percentage' 
-      ? (inputValue / 100) * workWeekHours 
-      : inputValue;
+    // Use canonical parsing to convert input to hours
+    const currentHours = parseInputToHours(weekValue, workWeekHours, displayPreference);
+    
     // For new allocations, we don't have other project context, so check this allocation only
     return getTotalAllocationWarningStatus(
       currentHours, 
@@ -310,6 +307,9 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
       allocationMaxLimit
     );
   };
+  
+  // Get input configuration from canonical utilities
+  const inputConfig = getAllocationInputConfig(displayPreference, workWeekHours);
   
   // Calculate preview of vacation hours
   const vacationPreview = useMemo(() => {
@@ -642,12 +642,12 @@ export const MemberVacationPopover: React.FC<MemberVacationPopoverProps> = ({
                       <TooltipTrigger asChild>
                         <Input
                           type="number"
-                          min="0"
-                          max={displayPreference === 'percentage' ? '200' : '168'}
-                          step={displayPreference === 'percentage' ? '5' : '0.5'}
+                          min={String(inputConfig.min)}
+                          max={String(inputConfig.max)}
+                          step={String(inputConfig.step)}
                           value={projectHours}
                           onChange={(e) => setProjectHours(e.target.value)}
-                          placeholder={displayPreference === 'percentage' ? 'Enter percentage (e.g. 50)' : 'Enter hours'}
+                          placeholder={inputConfig.placeholder}
                           className={`flex-1 h-10 ${getWeekWarningStatus(projectHours).borderClass} ${getWeekWarningStatus(projectHours).bgClass} ${getWeekWarningStatus(projectHours).textClass}`}
                         />
                       </TooltipTrigger>
