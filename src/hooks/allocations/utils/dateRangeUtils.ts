@@ -1,8 +1,19 @@
-import { format, addDays, startOfMonth, endOfMonth, startOfWeek } from 'date-fns';
-import { logger } from '@/utils/logger';
+/**
+ * Date Range Utilities - RULEBOOK COMPLIANT
+ * 
+ * Uses the canonical allocationWeek module for all week key generation.
+ * DO NOT use date-fns startOfWeek directly here.
+ */
 
-// Local helper - always uses Monday for backward compatibility in date range queries
-const getWeekStartDate = (date: Date): Date => startOfWeek(date, { weekStartsOn: 1 });
+import { addDays, startOfMonth, endOfMonth } from 'date-fns';
+import { logger } from '@/utils/logger';
+import { 
+  getAllocationWeekKey, 
+  generateWeekKeysForPeriod,
+  toUTCDateKey,
+  parseUTCDateKey,
+  type WeekStartDay 
+} from '@/utils/allocationWeek';
 
 export interface DateRange {
   startDate: string;
@@ -10,23 +21,32 @@ export interface DateRange {
 }
 
 /**
- * Calculate standardized date range for resource allocation queries
- * This ensures consistent date ranges between Team Workload and Project Resources views
+ * Calculate standardized date range for resource allocation queries.
+ * Uses the canonical week normalization from allocationWeek module.
+ * 
+ * @param selectedDate - Reference date
+ * @param periodToShow - Number of weeks (if provided), otherwise uses month mode
+ * @param weekStartDay - Company's week start preference (default: Monday)
  */
 export function getStandardizedDateRange(
   selectedDate: Date, 
-  periodToShow?: number
+  periodToShow?: number,
+  weekStartDay: WeekStartDay = 'Monday'
 ): DateRange {
-  logger.debug(`🔍 DATE RANGE: Calculating range for ${selectedDate.toISOString()}, period: ${periodToShow || 'month'}`);
+  logger.debug(`🔍 DATE RANGE: Calculating range for ${selectedDate.toISOString()}, period: ${periodToShow || 'month'}, weekStart: ${weekStartDay}`);
   
   if (periodToShow && periodToShow > 0) {
     // For Project Resources view: use exact period in weeks from selected date
-    const startDate = getWeekStartDate(selectedDate);
-    const endDate = addDays(startDate, (periodToShow * 7) - 1);
+    const startWeekKey = getAllocationWeekKey(selectedDate, weekStartDay);
+    const startDate = parseUTCDateKey(startWeekKey);
+    
+    // End is the start of the last week in the period
+    const endDate = new Date(startDate);
+    endDate.setUTCDate(endDate.getUTCDate() + ((periodToShow - 1) * 7));
     
     const range = {
-      startDate: format(startDate, 'yyyy-MM-dd'),
-      endDate: format(getWeekStartDate(endDate), 'yyyy-MM-dd') // Ensure end is also a Monday
+      startDate: startWeekKey,
+      endDate: toUTCDateKey(endDate)
     };
     
     logger.debug(`🔍 DATE RANGE: Project Resources mode - ${range.startDate} to ${range.endDate} (${periodToShow} weeks)`);
@@ -36,14 +56,14 @@ export function getStandardizedDateRange(
     const monthStart = startOfMonth(selectedDate);
     const monthEnd = endOfMonth(selectedDate);
     
-    // Get the Monday of the week containing the first day of the month
-    const startDate = getWeekStartDate(monthStart);
-    // Get the Monday of the week containing the last day of the month
-    const endDate = getWeekStartDate(monthEnd);
+    // Get the week start containing the first day of the month
+    const startWeekKey = getAllocationWeekKey(monthStart, weekStartDay);
+    // Get the week start containing the last day of the month
+    const endWeekKey = getAllocationWeekKey(monthEnd, weekStartDay);
     
     const range = {
-      startDate: format(startDate, 'yyyy-MM-dd'),
-      endDate: format(endDate, 'yyyy-MM-dd')
+      startDate: startWeekKey,
+      endDate: endWeekKey
     };
     
     logger.debug(`🔍 DATE RANGE: Team Workload mode - ${range.startDate} to ${range.endDate} (full month)`);
@@ -52,20 +72,32 @@ export function getStandardizedDateRange(
 }
 
 /**
- * Generate Monday-based week keys for a given date range
- * This is used to create consistent week identifiers across the application
+ * Generate week keys for a given date range.
+ * Uses the canonical week normalization from allocationWeek module.
+ * 
+ * @param startDate - Start date string (YYYY-MM-DD)
+ * @param endDate - End date string (YYYY-MM-DD)
+ * @param weekStartDay - Company's week start preference (default: Monday)
  */
-export function generateWeekKeys(startDate: string, endDate: string): string[] {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+export function generateWeekKeys(
+  startDate: string, 
+  endDate: string,
+  weekStartDay: WeekStartDay = 'Monday'
+): string[] {
+  const start = parseUTCDateKey(startDate);
+  const end = parseUTCDateKey(endDate);
+  
+  // Normalize both to week starts
+  const startWeekKey = getAllocationWeekKey(start, weekStartDay);
+  const endWeekKey = getAllocationWeekKey(end, weekStartDay);
+  
   const weeks: string[] = [];
+  let currentDate = parseUTCDateKey(startWeekKey);
+  const endWeekDate = parseUTCDateKey(endWeekKey);
   
-  let current = getWeekStartDate(start);
-  const endWeek = getWeekStartDate(end);
-  
-  while (current <= endWeek) {
-    weeks.push(format(current, 'yyyy-MM-dd'));
-    current = addDays(current, 7); // Move to next Monday
+  while (currentDate <= endWeekDate) {
+    weeks.push(toUTCDateKey(currentDate));
+    currentDate.setUTCDate(currentDate.getUTCDate() + 7);
   }
   
   logger.debug(`🔍 WEEK KEYS: Generated ${weeks.length} week keys:`, weeks);
@@ -76,10 +108,5 @@ export function generateWeekKeys(startDate: string, endDate: string): string[] {
  * Check if two date ranges overlap
  */
 export function dateRangesOverlap(range1: DateRange, range2: DateRange): boolean {
-  const start1 = new Date(range1.startDate);
-  const end1 = new Date(range1.endDate);
-  const start2 = new Date(range2.startDate);
-  const end2 = new Date(range2.endDate);
-  
-  return start1 <= end2 && start2 <= end1;
+  return range1.startDate <= range2.endDate && range2.startDate <= range1.endDate;
 }

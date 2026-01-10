@@ -1,15 +1,16 @@
 
 import { useCallback } from 'react';
 import { useCompanyId } from '@/hooks/useCompanyId';
+import { useCompany } from '@/context/CompanyContext';
 import { MemberAllocation } from '@/components/weekly-overview/types';
 import { toast } from 'sonner';
 import {
   fetchPreciseDateAllocations,
   fetchDateRangeAllocations,
-  fetchRecentAllocations
 } from './utils/fetchUtils';
 import { processMemberAllocations } from './utils/processingUtils';
 import { logger } from '@/utils/logger';
+import { getAllocationWeekKey, getWeekRange, type WeekStartDay } from '@/utils/allocationWeek';
 
 interface TeamMember {
   id: string;
@@ -20,10 +21,15 @@ interface TeamMember {
 }
 
 /**
- * Hook for fetching resource allocations from the database
+ * Hook for fetching resource allocations from the database.
+ * Uses the canonical allocationWeek module for week key generation.
  */
 export function useFetchAllocations() {
   const { companyId } = useCompanyId();
+  const { company } = useCompany();
+  
+  // Get company's week start day
+  const weekStartDay = (company?.start_of_work_week as WeekStartDay) || 'Monday';
   
   // Fetch allocations for all team members for the selected week
   const fetchAllocations = useCallback(async (
@@ -44,26 +50,31 @@ export function useFetchAllocations() {
     setError(null);
     
     try {
-      logger.log('Selected week JS date:', selectedWeek);
+      // Get canonical week key using rulebook
+      const weekKey = getAllocationWeekKey(selectedWeek, weekStartDay);
+      logger.log('Fetching allocations for canonical week key:', weekKey);
       
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
       logger.log('Fetching allocations for members:', memberIds.length);
       
-      // Try different fetching strategies in sequence until we get data
-      let projectAllocations = [];
+      // Fetch with precise week key (DB triggers ensure this is normalized)
+      let projectAllocations = await fetchPreciseDateAllocations(
+        memberIds, 
+        selectedWeek, 
+        companyId,
+        weekStartDay
+      );
       
-      // 1. First try precise date matching (Monday or Sunday)
-      projectAllocations = await fetchPreciseDateAllocations(memberIds, selectedWeek, companyId);
-      
-      // 2. If no allocations found with exact match, try a date range query
+      // If no data for exact week, try a small range (±1 week) for edge cases
       if (projectAllocations.length === 0) {
-        projectAllocations = await fetchDateRangeAllocations(memberIds, selectedWeek, companyId);
-      }
-      
-      // 3. As a last resort, try to fetch any recent allocations to help debug
-      if (projectAllocations.length === 0) {
-        projectAllocations = await fetchRecentAllocations(memberIds, companyId);
+        const { start, end } = getWeekRange(weekKey);
+        projectAllocations = await fetchDateRangeAllocations(
+          memberIds, 
+          start, 
+          end, 
+          companyId
+        );
       }
       
       logger.log('Project allocations before processing:', projectAllocations);
@@ -81,7 +92,7 @@ export function useFetchAllocations() {
     } finally {
       setIsLoading(false);
     }
-  }, [companyId]);
+  }, [companyId, weekStartDay]);
   
   return { fetchAllocations };
 }
