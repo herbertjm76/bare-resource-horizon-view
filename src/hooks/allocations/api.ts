@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatDateKey } from './utils';
 import { toast } from 'sonner';
 import { normalizeToWeekStart, assertIsWeekStart } from '@/utils/weekNormalization';
+import { assertValidWeekKey } from '@/utils/allocationWeek';
 import type { WeekStartDay } from '@/hooks/useAppSettings';
 import { logger } from '@/utils/logger';
 
@@ -129,6 +130,9 @@ export const deleteResourceAllocation = async (
   try {
     // Always normalize the weekKey to company's week start
     const normalizedWeekKey = normalizeToWeekStart(weekKey, weekStartDay);
+    
+    // DEV ASSERTION: Catch invalid week keys early
+    assertValidWeekKey(normalizedWeekKey, weekStartDay, 'deleteResourceAllocation');
     
     const { error } = await supabase
       .from('project_resource_allocations')
