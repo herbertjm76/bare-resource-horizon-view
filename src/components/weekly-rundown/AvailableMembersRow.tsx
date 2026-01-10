@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MemberAvailabilityCard } from './MemberAvailabilityCard';
 import { MemberVacationPopover } from './MemberVacationPopover';
@@ -87,6 +87,12 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
   } = useDragScroll();
   const [sortAscending, setSortAscending] = React.useState(true);
   const { workWeekHours, startOfWorkWeek } = useAppSettings();
+  const queryClient = useQueryClient();
+
+  const targetWeekStart = React.useMemo(
+    () => normalizeToWeekStart(weekStartDate, startOfWorkWeek),
+    [weekStartDate, startOfWorkWeek]
+  );
 
   // Fetch members internally if not provided externally
   const { members: fetchedMembers } = useWeekResourceTeamMembers();
@@ -149,6 +155,33 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
     },
     staleTime: 60_000
   });
+
+  // Instant refresh when allocations are edited in the scheduling grid (no page refresh needed).
+  React.useEffect(() => {
+    if (isDemoMode) return;
+
+    const onAllocationUpdated = (evt: Event) => {
+      const detail = (evt as CustomEvent).detail as
+        | { weekKey?: string; hours?: number; resourceId?: string }
+        | undefined;
+
+      const weekKey = detail?.weekKey;
+      if (!weekKey) return;
+
+      // Only refresh if the edit belongs to the week this avatar row represents.
+      const editedWeekStart = normalizeToWeekStart(weekKey, startOfWorkWeek);
+      if (editedWeekStart !== targetWeekStart) return;
+
+      queryClient.invalidateQueries({
+        queryKey: ['available-allocations', weekStartDate, isDemoMode],
+      });
+    };
+
+    window.addEventListener('allocation-updated', onAllocationUpdated as EventListener);
+    return () => {
+      window.removeEventListener('allocation-updated', onAllocationUpdated as EventListener);
+    };
+  }, [isDemoMode, queryClient, startOfWorkWeek, targetWeekStart, weekStartDate]);
 
   // Fetch annual leaves for the week
   const { data: leaves = [] } = useQuery({
