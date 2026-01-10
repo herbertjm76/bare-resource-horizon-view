@@ -13,16 +13,7 @@
   }
 }
 
-/* Disable on desktop */
-@media (hover: hover) and (pointer: fine) {
-  .pull-to-refresh-container {
-    pointer-events: none;
-  }
-  
-  .pull-to-refresh-container > div {
-    pointer-events: auto;
-  }
-}
+/* Desktop: pull-to-refresh disabled via isPullable prop, no pointer-events hack needed */
 
 /* Refreshing spinner styling */
 .pull-to-refresh-container .animate-spin {

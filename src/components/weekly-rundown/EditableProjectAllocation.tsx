@@ -221,7 +221,12 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
         onClick={() => !isEditing && setIsEditing(true)}
       >
         {isEditing ? (
-          <div className="flex items-center gap-1 px-2">
+          <div 
+            className="flex items-center gap-1 px-2"
+            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
             {warningStatus.level !== 'normal' && (
               <AlertTriangle className={`h-3 w-3 flex-shrink-0 ${warningStatus.level === 'warning' ? 'text-amber-500' : 'text-destructive'}`} />
             )}
@@ -238,7 +243,11 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
                     max={String(inputConfig.max)}
                     placeholder={inputConfig.placeholder}
                     autoFocus
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => {
+                      e.stopPropagation();
                       if (e.key === 'Enter') handleSave();
                       if (e.key === 'Escape') handleCancel();
                     }}
