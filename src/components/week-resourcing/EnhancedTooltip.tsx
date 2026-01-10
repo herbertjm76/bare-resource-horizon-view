@@ -3,6 +3,7 @@ import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
+import { getProjectDisplayName } from '@/utils/projectDisplay';
 
 interface ProjectBreakdown {
   projectName?: string;
@@ -40,7 +41,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
   projectBreakdown,
   weekLabel
 }) => {
-  const { displayPreference, workWeekHours } = useAppSettings();
+  const { displayPreference, workWeekHours, projectDisplayPreference } = useAppSettings();
   const capacity = weeklyCapacity || workWeekHours;
   
   let content = null;
@@ -123,15 +124,28 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
       break;
       
     case 'project':
+      // Use project display preference for consistent display
+      const projectDisplayText = getProjectDisplayName(
+        { code: projectBreakdown?.projectCode, name: projectBreakdown?.projectName },
+        projectDisplayPreference
+      );
       content = (
         <div className="space-y-2">
           <div className="font-bold mb-2 text-brand-secondary">
-            Project: {projectBreakdown?.projectName ?? '-'}
+            Project: {projectDisplayText || '-'}
           </div>
           <div className="text-xs space-y-1">
-            <div>
-              <span className="font-semibold">Code:</span> {projectBreakdown?.projectCode || '—'}
-            </div>
+            {/* Show both code and name for context */}
+            {projectBreakdown?.projectName && (
+              <div>
+                <span className="font-semibold">Name:</span> {projectBreakdown.projectName}
+              </div>
+            )}
+            {projectBreakdown?.projectCode && (
+              <div>
+                <span className="font-semibold">Code:</span> {projectBreakdown.projectCode}
+              </div>
+            )}
             <div>
               <span className="font-semibold">Stage:</span> {projectBreakdown?.projectStage || '—'}
             </div>
