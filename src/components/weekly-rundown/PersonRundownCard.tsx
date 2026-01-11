@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MapPin, Clock, AlertTriangle, CheckCircle, Calendar, TrendingUp, Pencil } from 'lucide-react';
-import { EditableProjectAllocation } from './EditableProjectAllocation';
+import { ProjectAllocationSegment } from './ProjectAllocationSegment';
 import { AddProjectAllocation } from './AddProjectAllocation';
 import { OtherLeaveSection } from './OtherLeaveSection';
 import { EditPersonAllocationsDialog } from './EditPersonAllocationsDialog';
@@ -146,27 +146,12 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
           <div className="w-full h-7 sm:h-8 bg-muted/20 rounded-md sm:rounded-lg overflow-hidden flex shadow-inner border border-border/30 flex-shrink-0">
             {/* Project Segments */}
             {person.projects && person.projects.length > 0 && person.projects.map((project: any, idx: number) => {
-              const percentage = (project.hours / person.capacity) * 100;
-              // Calculate other projects hours (excluding current project)
-              const otherProjectsHours = person.projects
-                .filter((p: any) => p.id !== project.id)
-                .reduce((sum: number, p: any) => sum + (p.hours || 0), 0);
-              
               return (
-                <EditableProjectAllocation
+                <ProjectAllocationSegment
                   key={`${project.id}-${refreshKey}`}
-                  memberId={person.id}
-                  projectId={project.id}
-                  projectName={project.name}
-                  projectCode={project.code}
-                  hours={project.hours}
-                  percentage={percentage}
-                  color={generateMonochromaticShades(idx, person.projects.length)}
-                  weekStartDate={weekStartDate}
+                  project={project}
                   capacity={person.capacity}
-                  totalOtherHours={otherProjectsHours}
-                  leaveHours={totalLeaveHours}
-                  onUpdate={handleDataChange}
+                  color={generateMonochromaticShades(idx, person.projects.length)}
                 />
               );
             })}
