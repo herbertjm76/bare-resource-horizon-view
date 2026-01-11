@@ -86,6 +86,19 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
 
     const newHours = parseInputToHours(inputValue, capacity, displayPreference);
 
+    console.debug('[alloc-debug] ResourceAllocationCell save', {
+      inputValue,
+      displayPreference,
+      capacity,
+      workWeekHours,
+      memberCapacity,
+      parsedHours: newHours,
+      prevHours: hours,
+      weekStartDate,
+      projectId,
+      resourceId,
+    });
+
     // Skip save if no change
     if (newHours === hours) {
       setIsEditing(false);

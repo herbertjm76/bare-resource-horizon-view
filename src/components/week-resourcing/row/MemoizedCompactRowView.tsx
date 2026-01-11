@@ -91,6 +91,19 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     if (isSavingRef.current) return;
 
     const newHours = parseInputToHours(editInputValue, weeklyCapacity, displayPreference);
+
+    console.debug('[alloc-debug] MemoizedCompactRowView save', {
+      editInputValue,
+      displayPreference,
+      weeklyCapacity,
+      workWeekHours,
+      memberWeeklyCapacity: member?.weekly_capacity,
+      parsedHours: newHours,
+      selectedWeek,
+      projectId,
+      memberId: member.id,
+    });
+
     const key = `${member.id}:${projectId}`;
     const currentHours = allocationMap.get(key) || 0;
 
