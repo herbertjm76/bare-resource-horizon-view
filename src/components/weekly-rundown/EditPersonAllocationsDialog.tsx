@@ -21,7 +21,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useResourceAllocationsDB } from '@/hooks/allocations/useResourceAllocationsDB';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Plus, Building2, Check, ChevronsUpDown, Trash2 } from 'lucide-react';
@@ -30,6 +29,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { cn } from '@/lib/utils';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
 
 interface EditPersonAllocationsDialogProps {
   open: boolean;
@@ -46,7 +46,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   projectId,
   selectedWeek
 }) => {
-  const [hours, setHours] = useState<Record<string, number>>({});
+  const [hours, setHours] = useState<Record<string, string>>({});
   const [showAddProject, setShowAddProject] = useState(false);
   const [showCreateNew, setShowCreateNew] = useState(false);
   const [comboboxOpen, setComboboxOpen] = useState(false);
@@ -138,21 +138,21 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
 
   const addAllocationMutation = useMutation({
     mutationFn: async ({ projectId, allocationHours }: { projectId: string; allocationHours: number }) => {
-      const { data, error } = await supabase
-        .from('project_resource_allocations')
-        .insert({
-          resource_id: person.id,
-          project_id: projectId,
-          allocation_date: weekKey,
-          hours: allocationHours,
-          company_id: company?.id,
-          resource_type: 'active'
-        })
-        .select()
-        .single();
+      if (!company?.id) throw new Error('Missing company');
 
-      if (error) throw error;
-      return data;
+      // Use the canonical saver (handles insert/update + week normalization)
+      const success = await saveResourceAllocation(
+        projectId,
+        person.id,
+        'active',
+        weekKey,
+        allocationHours,
+        company.id,
+        startOfWorkWeek
+      );
+
+      if (!success) throw new Error('Failed to save allocation');
+      return true;
     },
     onSuccess: () => {
       toast.success('Project allocation added');
@@ -163,9 +163,9 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       setSelectedNewProjectId('');
       setNewAllocationHours('');
     },
-    onError: (error) => {
-      toast.error('Failed to add allocation');
-      console.error('Add error:', error);
+    onError: (error: any) => {
+      toast.error(error?.message || 'Failed to add allocation');
+      console.error('Add allocation error:', error);
     }
   });
 
@@ -174,8 +174,8 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       toast.error('Please fill in all project fields');
       return;
     }
-    createProjectMutation.mutate({ 
-      code: newProjectCode, 
+    createProjectMutation.mutate({
+      code: newProjectCode,
       name: newProjectName,
       country: newProjectCountry
     });
@@ -191,26 +191,31 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       toast.error(`Please enter a valid ${displayPreference === 'percentage' ? 'percentage' : 'hours'}`);
       return;
     }
-    
+
     // Convert percentage to hours if needed
-    const allocationHours = displayPreference === 'percentage' 
-      ? (inputValue / 100) * capacity 
+    const allocationHours = displayPreference === 'percentage'
+      ? (inputValue / 100) * capacity
       : inputValue;
-    
+
     addAllocationMutation.mutate({ projectId: selectedNewProjectId, allocationHours });
   };
 
   const updateAllocationMutation = useMutation({
-    mutationFn: async ({ allocationId, newHours }: { allocationId: string; newHours: number }) => {
-      const { data, error } = await supabase
-        .from('project_resource_allocations')
-        .update({ hours: newHours })
-        .eq('id', allocationId)
-        .select()
-        .single();
+    mutationFn: async ({ projectId, newHours }: { projectId: string; newHours: number }) => {
+      if (!company?.id) throw new Error('Missing company');
 
-      if (error) throw error;
-      return data;
+      const success = await saveResourceAllocation(
+        projectId,
+        person.id,
+        'active',
+        weekKey,
+        newHours,
+        company.id,
+        startOfWorkWeek
+      );
+
+      if (!success) throw new Error('Failed to save allocation');
+      return true;
     },
     onSuccess: () => {
       toast.success('Allocation updated');
@@ -219,20 +224,27 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       setHours({});
     },
-    onError: (error) => {
-      toast.error('Failed to update allocation');
+    onError: (error: any) => {
+      toast.error(error?.message || 'Failed to update allocation');
       console.error('Update error:', error);
     }
   });
 
   const deleteAllocationMutation = useMutation({
-    mutationFn: async (allocationId: string) => {
-      const { error } = await supabase
-        .from('project_resource_allocations')
-        .delete()
-        .eq('id', allocationId);
+    mutationFn: async (projectId: string) => {
+      if (!company?.id) throw new Error('Missing company');
 
-      if (error) throw error;
+      const success = await deleteResourceAllocation(
+        projectId,
+        person.id,
+        'active',
+        weekKey,
+        company.id,
+        startOfWorkWeek
+      );
+
+      if (!success) throw new Error('Failed to delete allocation');
+      return true;
     },
     onSuccess: () => {
       toast.success('Allocation deleted');
@@ -240,30 +252,32 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
       queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
     },
-    onError: (error) => {
-      toast.error('Failed to delete allocation');
+    onError: (error: any) => {
+      toast.error(error?.message || 'Failed to delete allocation');
       console.error('Delete error:', error);
     }
   });
 
-  const handleSave = (allocationId: string, projectName: string, currentHours: number) => {
-    const inputValue = hours[allocationId];
-    if (inputValue === undefined || inputValue <= 0) {
+  const handleSave = (projectId: string) => {
+    const raw = hours[projectId];
+    const inputValue = raw === undefined || raw.trim() === '' ? NaN : parseFloat(raw);
+
+    if (isNaN(inputValue) || inputValue <= 0) {
       toast.error(`Please enter valid ${displayPreference === 'percentage' ? 'percentage' : 'hours'}`);
       return;
     }
-    
+
     // Convert percentage to hours if needed
-    const newHours = displayPreference === 'percentage' 
-      ? (inputValue / 100) * capacity 
+    const newHours = displayPreference === 'percentage'
+      ? (inputValue / 100) * capacity
       : inputValue;
-    
-    updateAllocationMutation.mutate({ allocationId, newHours });
+
+    updateAllocationMutation.mutate({ projectId, newHours });
   };
 
-  const handleDelete = (allocationId: string, projectName: string) => {
+  const handleDelete = (projectId: string, projectName: string) => {
     if (confirm(`Delete allocation for ${projectName}?`)) {
-      deleteAllocationMutation.mutate(allocationId);
+      deleteAllocationMutation.mutate(projectId);
     }
   };
 
@@ -297,8 +311,8 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                           placeholder={displayPreference === 'percentage' 
                             ? Math.round((project.hours / capacity) * 100).toString()
                             : project.hours.toString()}
-                          value={hours[project.allocationId || project.id] || ''}
-                          onChange={(e) => setHours({ ...hours, [project.allocationId || project.id]: parseFloat(e.target.value) || 0 })}
+                          value={hours[project.id] ?? ''}
+                          onChange={(e) => setHours({ ...hours, [project.id]: e.target.value })}
                           className="w-20"
                           step={displayPreference === 'percentage' ? '5' : '0.5'}
                         />
@@ -307,8 +321,8 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                         </span>
                         <Button 
                           size="sm" 
-                          onClick={() => handleSave(project.allocationId || project.id, project.name, project.hours)}
-                          disabled={!hours[project.allocationId || project.id] || updateAllocationMutation.isPending}
+                          onClick={() => handleSave(project.id)}
+                          disabled={!(hours[project.id]?.trim()) || updateAllocationMutation.isPending}
                           className="bg-gradient-start hover:bg-gradient-mid text-white"
                         >
                           {updateAllocationMutation.isPending ? 'Saving...' : 'Save'}
@@ -316,7 +330,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => handleDelete(project.allocationId || project.id, project.name)}
+                          onClick={() => handleDelete(project.id, project.name)}
                           disabled={deleteAllocationMutation.isPending}
                         >
                           <Trash2 className="h-4 w-4" />
