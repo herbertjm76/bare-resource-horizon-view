@@ -4,8 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
-import { format, startOfWeek, endOfWeek, addDays } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 import { 
   DEMO_TEAM_MEMBERS, 
   DEMO_PRE_REGISTERED, 
@@ -20,12 +22,15 @@ type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
 export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOption: SortOption = 'alphabetical') => {
   const { company } = useCompany();
   const { isDemoMode } = useDemoAuth();
-  
-  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
-  const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const { startOfWorkWeek } = useAppSettings();
+
+  // CRITICAL: Week boundaries must respect the company setting (startOfWorkWeek).
+  // Otherwise saved allocations (normalized to company week start) won't appear in the UI.
+  const weekStart = getWeekStartDate(selectedWeek, startOfWorkWeek);
+  const weekEnd = addDays(weekStart, 6);
   const weekStartString = format(weekStart, 'yyyy-MM-dd');
   const weekEndString = format(weekEnd, 'yyyy-MM-dd');
-  
+
   const companyId = isDemoMode ? DEMO_COMPANY_ID : company?.id;
 
   // Stable filters for data fetching

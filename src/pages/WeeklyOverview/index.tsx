@@ -16,7 +16,7 @@ import { useCardVisibility } from '@/hooks/useCardVisibility';
 import { useWeeklyOverviewData } from './hooks/useWeeklyOverviewData';
 import { useWeeklyOverviewState } from './hooks/useWeeklyOverviewState';
 import { OfficeSettingsProvider } from '@/context/officeSettings';
-import { startOfWeek, format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { Toaster, toast } from 'sonner';
 import { Calendar } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -110,9 +110,9 @@ const WeeklyOverview = () => {
   });
 
   const weekLabel = useMemo(() => {
-    const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
-    return `Week of ${format(weekStart, 'MMM d, yyyy')}`;
-  }, [selectedWeek]);
+    if (!weekStartString) return '';
+    return `Week of ${format(parseISO(weekStartString), 'MMM d, yyyy')}`;
+  }, [weekStartString]);
 
   // Create unfiltered members list for the avatar row (not affected by filters)
   // Use stable reference with useMemo to prevent unnecessary re-renders

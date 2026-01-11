@@ -1,17 +1,18 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { startOfWeek } from 'date-fns';
 import { ViewType, RundownMode, SortOption, TableOrientation } from '@/components/week-resourcing/UnifiedWeeklyControls';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 export const useWeeklyOverviewState = () => {
+  const { startOfWorkWeek } = useAppSettings();
+
   // View state - persist in localStorage
   const [viewType, setViewType] = useState<ViewType>(() => {
     const saved = localStorage.getItem('weekly-view-type');
     return (saved as ViewType) || 'table';
   });
-  
-  const [selectedWeek, setSelectedWeek] = useState<Date>(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
-  );
+
+  const [selectedWeek, setSelectedWeek] = useState<Date>(() => getWeekStartDate(new Date(), startOfWorkWeek));
   
   const [filters, setFilters] = useState({
     practiceArea: "all",
@@ -32,8 +33,9 @@ export const useWeeklyOverviewState = () => {
 
   // Handlers
   const handleWeekChange = useCallback((date: Date) => {
-    setSelectedWeek(date);
-  }, []);
+    // Always snap to the correct company week start for consistency across reads/writes.
+    setSelectedWeek(getWeekStartDate(date, startOfWorkWeek));
+  }, [startOfWorkWeek]);
 
   const handleFilterChange = useCallback((key: string, value: string) => {
     setFilters(prev => ({
@@ -81,6 +83,11 @@ export const useWeeklyOverviewState = () => {
     }
   }, [isFullscreen]);
 
+  // Keep selectedWeek aligned if company week start day changes.
+  useEffect(() => {
+    setSelectedWeek(prev => getWeekStartDate(prev, startOfWorkWeek));
+  }, [startOfWorkWeek]);
+
   // Sync app state when browser exits fullscreen (e.g., user presses ESC natively)
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -93,7 +100,7 @@ export const useWeeklyOverviewState = () => {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
+    }; 
   }, [isFullscreen]);
 
   const activeFiltersCount = useMemo(() => [
