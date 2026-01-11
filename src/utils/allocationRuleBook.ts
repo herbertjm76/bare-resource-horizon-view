@@ -42,7 +42,7 @@
  * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts (.eq('resource_type', 'active'))
  * - src/components/week-resourcing/hooks/useDetailedWeeklyAllocations.ts (.eq('resource_type', 'active'))
  * - src/components/week-resourcing/hooks/useWeekResourceAllocations.ts (.eq('resource_type', 'active'))
- * - src/components/dashboard/staff/useStaffAllocations.ts
+ * - src/components/dashboard/staff/useStaffAllocations.ts (.eq('resource_type', 'active'))
  * - src/components/dashboard/hooks/useResourceAllocationData.ts (.eq('resource_type', 'active'))
  * - src/components/dashboard/hooks/useIndividualUtilization.ts (dynamic resource_type based on isPending)
  * - src/components/weekly-rundown/AvailableMembersRow.tsx (.eq('resource_type', 'active'))
