@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import { formatDateKey } from './utils';
 import { toast } from 'sonner';
+import { addDays, format, parseISO } from 'date-fns';
 import { normalizeToWeekStart, assertIsWeekStart } from '@/utils/weekNormalization';
 import { assertValidWeekKey } from '@/utils/allocationWeek';
 import type { WeekStartDay } from '@/hooks/useAppSettings';
@@ -80,6 +80,10 @@ export const saveResourceAllocation = async (
     // Our reads normalize + aggregate by week start, so if we insert a new weekStart row without
     // cleaning up the old in-week rows, totals will jump ("I typed 20% but it saved as 90%").
     // To guarantee "set allocation for this week", we de-duplicate any in-week rows first.
+    // Also: scope the lookup to this week only (performance!).
+
+    const weekStartDate = parseISO(normalizedWeekKey);
+    const weekEndExclusive = format(addDays(weekStartDate, 7), 'yyyy-MM-dd');
 
     const { data: existingRows, error: existingRowsError } = await supabase
       .from('project_resource_allocations')
@@ -87,15 +91,15 @@ export const saveResourceAllocation = async (
       .eq('project_id', projectId)
       .eq('resource_id', resourceId)
       .eq('resource_type', resourceType)
-      .eq('company_id', companyId);
+      .eq('company_id', companyId)
+      .gte('allocation_date', normalizedWeekKey)
+      .lt('allocation_date', weekEndExclusive);
 
     if (existingRowsError) throw existingRowsError;
 
-    const weekRowIds = (existingRows || [])
-      .filter((row) => normalizeToWeekStart(row.allocation_date, weekStartDay) === normalizedWeekKey)
-      .map((row) => row.id);
+    const weekRowIds = (existingRows || []).map((row) => row.id);
 
-    // If there are multiple rows in the same normalized week, remove them all and insert a single canonical row.
+    // If there are multiple rows in this week, remove them all and insert a single canonical row.
     if (weekRowIds.length > 1) {
       const { error: deleteError } = await supabase
         .from('project_resource_allocations')
@@ -120,7 +124,7 @@ export const saveResourceAllocation = async (
       return true;
     }
 
-    // If there's exactly one row for this week, update it (even if its allocation_date isn't the week start).
+    // If there's exactly one row in this week, update it (and normalize its date to week start).
     if (weekRowIds.length === 1) {
       const updateResult = await supabase
         .from('project_resource_allocations')
