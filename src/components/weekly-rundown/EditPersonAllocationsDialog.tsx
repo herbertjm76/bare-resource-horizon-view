@@ -65,7 +65,8 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   const weekKey = format(weekStart, 'yyyy-MM-dd');
   const { company } = useCompany();
   const queryClient = useQueryClient();
-  const capacity = person.capacity || workWeekHours || 40;
+  // Phase 5: Use consistent capacity source - prefer person's weekly_capacity
+  const capacity = person.weekly_capacity || person.capacity || workWeekHours || 40;
   const inputConfig = getAllocationInputConfig(displayPreference, capacity);
 
 
