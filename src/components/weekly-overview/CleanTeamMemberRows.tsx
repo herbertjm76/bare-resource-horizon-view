@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Project, MemberAllocation } from './types';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue, formatCapacityValue } from '@/utils/allocationDisplay';
+import { getAllocationCapacity } from '@/utils/allocationCapacity';
 
 interface CleanTeamMemberRowsProps {
   filteredOffices: string[];
@@ -65,7 +66,12 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
               const allocation = getMemberAllocation(member.id);
               // Calculate total hours from project allocations
               const totalHours = allocation.projectAllocations.reduce((sum, project) => sum + project.hours, 0);
-              const weeklyCapacity = member.weekly_capacity || workWeekHours;
+              // IMPORTANT: Use getAllocationCapacity for consistent % <-> hours conversions
+              const weeklyCapacity = getAllocationCapacity({
+                displayPreference,
+                workWeekHours,
+                memberWeeklyCapacity: member.weekly_capacity,
+              });
               const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / weeklyCapacity) * 100) : 0;
               
               // Determine utilization color

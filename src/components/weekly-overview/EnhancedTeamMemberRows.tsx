@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Project, MemberAllocation } from './types';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue, formatCapacityValue, formatDualAllocationValue, getInputConfig, convertInputToHours, convertHoursToInputValue } from '@/utils/allocationDisplay';
+import { getAllocationCapacity } from '@/utils/allocationCapacity';
 
 interface EnhancedTeamMemberRowsProps {
   filteredOffices: string[];
@@ -61,9 +62,14 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
             {officeMembers.map((member, memberIndex) => {
               const allocation = getMemberAllocation(member.id);
               const totalHours = allocation.projectAllocations.reduce((sum, project) => sum + project.hours, 0);
-              const weeklyCapacity = member.weekly_capacity || workWeekHours;
+              // IMPORTANT: Use getAllocationCapacity for consistent % <-> hours conversions
+              const weeklyCapacity = getAllocationCapacity({
+                displayPreference,
+                workWeekHours,
+                memberWeeklyCapacity: member.weekly_capacity,
+              });
               const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / weeklyCapacity) * 100) : 0;
-              
+
               // Determine utilization color
               const getUtilizationColor = (percent: number) => {
                 if (percent < 80) return 'bg-green-100 text-green-800 border-green-200';
