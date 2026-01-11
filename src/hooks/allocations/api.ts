@@ -87,10 +87,13 @@ export const saveResourceAllocation = async (
 
     const { data: existingRows, error: existingRowsError } = await supabase
       .from('project_resource_allocations')
-      .select('id, allocation_date')
+      .select('id, allocation_date, resource_type')
       .eq('project_id', projectId)
       .eq('resource_id', resourceId)
-      .eq('resource_type', resourceType)
+      // NOTE: We intentionally do NOT filter by resource_type here.
+      // In real datasets we can end up with duplicate rows for the same resource_id/week
+      // across different resource_type values (legacy/corrupt data). If we don't clean them,
+      // reads that aggregate by resource_id will show inflated totals.
       .eq('company_id', companyId)
       .gte('allocation_date', normalizedWeekKey)
       .lt('allocation_date', weekEndExclusive);
@@ -125,10 +128,11 @@ export const saveResourceAllocation = async (
     }
 
     // If there's exactly one row in this week, update it (and normalize its date to week start).
+    // Also normalize its resource_type to the requested type.
     if (weekRowIds.length === 1) {
       const updateResult = await supabase
         .from('project_resource_allocations')
-        .update({ hours, allocation_date: normalizedWeekKey })
+        .update({ hours, allocation_date: normalizedWeekKey, resource_type: resourceType })
         .eq('id', weekRowIds[0])
         .select();
 
