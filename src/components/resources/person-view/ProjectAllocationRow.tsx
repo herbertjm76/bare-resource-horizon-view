@@ -8,6 +8,7 @@ import { toUTCDateKey } from '@/utils/dateKey';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
+import { deleteAllResourceAllocationsForProject } from '@/hooks/allocations/api';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -111,16 +112,15 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
     
     setIsDeleting(true);
     try {
-      // Delete all allocations for this person on this project
-      const { error: allocError } = await supabase
-        .from('project_resource_allocations')
-        .delete()
-        .eq('project_id', project.projectId)
-        .eq('resource_id', person.personId)
-        .eq('resource_type', person.resourceType)
-        .eq('company_id', company.id);
+      // RULEBOOK: Use canonical API for deleting all allocations
+      const success = await deleteAllResourceAllocationsForProject(
+        project.projectId,
+        person.personId,
+        person.resourceType,
+        company.id
+      );
 
-      if (allocError) throw allocError;
+      if (!success) throw new Error('Failed to delete allocations');
 
       // Also remove from project_resources if it's an active resource
       if (person.resourceType === 'active') {

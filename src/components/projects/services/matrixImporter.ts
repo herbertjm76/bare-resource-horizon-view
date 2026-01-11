@@ -158,19 +158,21 @@ export class MatrixImporter {
 
             if (existingAllocation) {
               // Update existing
+              // RULEBOOK: Always use resource_type='active' for active team members
               await supabase
                 .from('project_resource_allocations')
-                .update({ hours })
+                .update({ hours, resource_type: 'active' })
                 .eq('id', existingAllocation.id);
             } else {
               // Create new
+              // RULEBOOK: Always use resource_type='active' for active team members
               await supabase
                 .from('project_resource_allocations')
                 .insert({
                   company_id: companyId,
                   project_id: projectId,
                   resource_id: resourceId,
-                  resource_type: 'team_member',
+                  resource_type: 'active',
                   hours,
                   allocation_date: weekStartDate
                 });
