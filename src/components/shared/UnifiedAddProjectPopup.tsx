@@ -40,6 +40,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { cn } from '@/lib/utils';
+import { saveResourceAllocation } from '@/hooks/allocations/api';
 
 interface UnifiedAddProjectPopupProps {
   open: boolean;
@@ -81,7 +82,7 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
   const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const { company } = useCompany();
   const queryClient = useQueryClient();
-  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
+  const { projectDisplayPreference, displayPreference, workWeekHours, startOfWorkWeek } = useAppSettings();
 
   // Fetch available projects with department
   const { data: projects = [] } = useQuery({
@@ -223,21 +224,23 @@ export const UnifiedAddProjectPopup: React.FC<UnifiedAddProjectPopupProps> = ({
         throw new Error('Member ID and week start date are required for allocation');
       }
       
-      const { data, error } = await supabase
-        .from('project_resource_allocations')
-        .insert({
-          resource_id: memberId,
-          project_id: projectId,
-          allocation_date: weekStartDate,
-          hours: allocationHours,
-          company_id: company?.id,
-          resource_type: 'active'
-        })
-        .select()
-        .single();
+      if (!company?.id) {
+        throw new Error('Company ID is required');
+      }
+      
+      // RULEBOOK: Use canonical API for allocation writes
+      const success = await saveResourceAllocation(
+        projectId,
+        memberId,
+        'active',
+        weekStartDate,
+        allocationHours,
+        company.id,
+        startOfWorkWeek
+      );
 
-      if (error) throw error;
-      return data;
+      if (!success) throw new Error('Failed to save allocation');
+      return { success };
     },
     onSuccess: () => {
       toast.success('Project allocation added');

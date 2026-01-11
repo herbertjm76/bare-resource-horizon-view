@@ -25,31 +25,46 @@
  * - Never mix types when calculating totals for a single view
  * 
  * FILES THAT HAVE BEEN AUDITED AND ARE COMPLIANT:
+ * 
+ * === CANONICAL WRITE API (only file allowed to do direct writes) ===
+ * - src/hooks/allocations/api.ts (saveResourceAllocation, deleteResourceAllocation, deleteAllResourceAllocationsForProject)
+ * 
+ * === READ PATHS WITH CORRECT resource_type FILTER ===
  * - src/hooks/allocations/utils/fetchUtils.ts
- * - src/hooks/allocations/api.ts (canonical write functions)
- * - src/hooks/allocations/useResourceUtilization.ts (dynamic resource_type)
+ * - src/hooks/allocations/useResourceUtilization.ts (dynamic resource_type param)
+ * - src/hooks/useIndividualMemberUtilization.ts (.eq('resource_type', 'active'))
+ * - src/hooks/useTeamUtilization.ts (.eq('resource_type', 'active'))
+ * - src/hooks/useStandardizedUtilizationData.ts (.eq('resource_type', 'active'))
+ * - src/hooks/usePersonResourceData.ts (intentionally fetches both types for person view)
+ * - src/hooks/utilization/usePreRegisteredMembers.ts (.eq('resource_type', 'pre_registered'))
+ * - src/hooks/utilization/useActiveMembers.ts
  * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts
  * - src/components/dashboard/staff/useStaffAllocations.ts
- * - src/components/dashboard/hooks/useResourceAllocationData.ts
- * - src/hooks/useIndividualMemberUtilization.ts
- * - src/hooks/useTeamUtilization.ts
- * - src/hooks/usePersonResourceData.ts (intentionally fetches both types for person view)
- * - src/components/weekly-rundown/AvailableMembersRow.tsx
- * - src/components/weekly-rundown/EditableTeamMemberAllocation.tsx
- * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts
- * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts
- * - src/components/resource-planning/PipelineTimelineView.tsx
- * - src/hooks/useStandardizedUtilizationData.ts
- * - src/components/projects/services/matrixImporter.ts
- * - src/components/resources/person-view/ProjectAllocationRow.tsx
- * - src/components/resources/person-view/AddProjectRow.tsx
- * - src/components/resources/hooks/services/resourceDeletionService.ts
- * - src/components/workload/hooks/services/dataFetchers.ts
- * - src/components/profile/overview/CapacityCard.tsx
- * - src/components/profile/overview/hooks/useUserProjects.ts (intentionally fetches both types)
- * - src/components/team-member-detail/TeamMemberProjectOverview.tsx
+ * - src/components/dashboard/hooks/useResourceAllocationData.ts (.eq('resource_type', 'active'))
+ * - src/components/weekly-rundown/AvailableMembersRow.tsx (.eq('resource_type', 'active'))
+ * - src/components/weekly-rundown/EditableTeamMemberAllocation.tsx (uses canonical API)
+ * - src/components/team-member-detail/TeamMemberProjectOverview.tsx (.eq('resource_type', 'active'))
  * - src/components/team-member-detail/TeamMemberProjectAllocations.tsx
- * - src/hooks/utilization/useActiveMembers.ts
+ * - src/components/profile/overview/CapacityCard.tsx (.eq('resource_type', 'active'))
+ * - src/components/profile/overview/hooks/useUserProjects.ts (intentionally fetches both types)
+ * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts (.eq('resource_type', 'active'))
+ * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts (.eq('resource_type', 'active'))
+ * - src/pages/CapacityHeatmap.tsx (.eq('resource_type', 'active'))
+ * - src/components/resource-planning/PipelineTimelineView.tsx
+ * - src/components/workload/hooks/services/dataFetchers.ts (.eq('resource_type', 'active'))
+ * - src/services/unifiedInsightsService.ts (.eq('resource_type', 'active'))
+ * 
+ * === WRITE PATHS USING CANONICAL API ===
+ * - src/components/resources/person-view/ProjectAllocationRow.tsx (uses saveResourceAllocation)
+ * - src/components/resources/person-view/AddProjectRow.tsx (uses saveResourceAllocation)
+ * - src/components/resources/hooks/services/resourceDeletionService.ts (uses deleteAllResourceAllocationsForProject)
+ * - src/components/resources/dialogs/ResourceAllocationDialog.tsx (uses canonical save/remove)
+ * - src/components/shared/UnifiedAddProjectPopup.tsx (uses saveResourceAllocation)
+ * 
+ * === SPECIAL CASES (documented exceptions) ===
+ * - src/components/projects/services/matrixImporter.ts (bulk import uses direct DB with proper resource_type + unique constraint protection)
+ * - src/components/resources/hooks/services/allocationService.ts (project-level view intentionally fetches all resource types)
+ * - src/components/resources/hooks/useFetchResources.ts (orphan detection needs all resource types)
  */
 
 /**
