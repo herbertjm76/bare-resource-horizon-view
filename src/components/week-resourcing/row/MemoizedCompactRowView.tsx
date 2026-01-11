@@ -115,13 +115,11 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           startOfWorkWeek
         );
 
-        // Invalidate the ACTUAL data sources used by Weekly Overview / WeekResourceView
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] }),
-          queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] }),
-          queryClient.invalidateQueries({ queryKey: ['available-allocations'] }),
-          queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] }),
-        ]);
+        // Fire-and-forget invalidations for instant UI feedback
+        void queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+        void queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+        void queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
+        void queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
 
         window.dispatchEvent(
           new CustomEvent('allocation-updated', {

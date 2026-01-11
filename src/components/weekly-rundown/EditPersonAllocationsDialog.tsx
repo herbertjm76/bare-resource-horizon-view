@@ -339,45 +339,53 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
             <>
               {person.projects && person.projects.length > 0 ? (
                 <div className="space-y-3">
-                  {person.projects.map((project: any) => (
-                    <div key={project.allocationId || project.id} className="flex items-center justify-between gap-4 p-3 border rounded-lg">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{getProjectDisplayName(project, projectDisplayPreference)}</p>
-                        <p className="text-sm text-muted-foreground">Current: {formatAllocationValue(project.hours, capacity, displayPreference)}</p>
+                  {person.projects.map((project: any) => {
+                    const liveHours = (() => {
+                      const raw = (hours[project.id] ?? '').trim();
+                      if (raw !== '') return parseInputToHours(raw, capacity, displayPreference);
+                      return project.hours;
+                    })();
+
+                    return (
+                      <div key={project.allocationId || project.id} className="flex items-center justify-between gap-4 p-3 border rounded-lg">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{getProjectDisplayName(project, projectDisplayPreference)}</p>
+                          <p className="text-sm text-muted-foreground">Current: {formatAllocationValue(liveHours, capacity, displayPreference)}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min={inputConfig.min}
+                            max={inputConfig.max}
+                            step={inputConfig.step}
+                            placeholder={hoursToInputDisplay(project.hours, capacity, displayPreference) || inputConfig.placeholder}
+                            value={hours[project.id] ?? ''}
+                            onChange={(e) => setHours({ ...hours, [project.id]: e.target.value })}
+                            className="w-20"
+                          />
+                          <span className="text-sm text-muted-foreground">
+                            {displayPreference === 'percentage' ? '%' : 'hours'}
+                          </span>
+                          <Button
+                            size="sm"
+                            onClick={() => handleSave(project.id)}
+                            disabled={!(hours[project.id]?.trim()) || updateAllocationMutation.isPending}
+                            className="bg-gradient-start hover:bg-gradient-mid text-white"
+                          >
+                            {updateAllocationMutation.isPending ? 'Saving...' : 'Save'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDelete(project.id, project.name)}
+                            disabled={deleteAllocationMutation.isPending}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="number"
-                          min={inputConfig.min}
-                          max={inputConfig.max}
-                          step={inputConfig.step}
-                          placeholder={hoursToInputDisplay(project.hours, capacity, displayPreference) || inputConfig.placeholder}
-                          value={hours[project.id] ?? ''}
-                          onChange={(e) => setHours({ ...hours, [project.id]: e.target.value })}
-                          className="w-20"
-                        />
-                        <span className="text-sm text-muted-foreground">
-                          {displayPreference === 'percentage' ? '%' : 'hours'}
-                        </span>
-                        <Button 
-                          size="sm" 
-                          onClick={() => handleSave(project.id)}
-                          disabled={!(hours[project.id]?.trim()) || updateAllocationMutation.isPending}
-                          className="bg-gradient-start hover:bg-gradient-mid text-white"
-                        >
-                          {updateAllocationMutation.isPending ? 'Saving...' : 'Save'}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(project.id, project.name)}
-                          disabled={deleteAllocationMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
