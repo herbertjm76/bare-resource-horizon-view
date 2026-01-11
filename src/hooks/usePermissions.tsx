@@ -232,11 +232,12 @@ export function usePermissions() {
     return isRoleFetched; // Role query has completed
   }, [isDemoMode, authChecked, authUserId, isRoleFetched]);
 
-  // True while we know we're signed in but haven't resolved role yet
+  // True while permissions are resolving. Also treat "auth not checked yet" as bootstrapping
+  // so UI can render stable disabled controls immediately (no "pop in" after load).
   const permissionsBootstrapping = useMemo(() => {
     if (isDemoMode) return false;
-    return authChecked && !!authUserId && !isRoleFetched;
-  }, [isDemoMode, authChecked, authUserId, isRoleFetched]);
+    return !permissionsReady;
+  }, [isDemoMode, permissionsReady]);
 
   // For backwards compatibility
   const isLoading = !permissionsReady;
