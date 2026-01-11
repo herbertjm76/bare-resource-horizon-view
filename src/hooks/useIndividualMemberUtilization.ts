@@ -43,11 +43,13 @@ export const useIndividualMemberUtilization = (memberId: string, weeklyCapacity?
         logger.log('Weekly capacity:', effectiveWeeklyCapacity);
         
         // Fetch allocations for the past 90 days in one query
+        // RULEBOOK: Filter by resource_type='active' for active member views
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
           .select('hours, allocation_date')
           .eq('resource_id', memberId)
           .eq('company_id', company.id)
+          .eq('resource_type', 'active')
           .gte('allocation_date', format(twelveWeeksAgo, 'yyyy-MM-dd'))
           .lte('allocation_date', format(currentWeekStart, 'yyyy-MM-dd'));
 

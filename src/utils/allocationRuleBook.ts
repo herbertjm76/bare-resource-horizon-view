@@ -5,8 +5,32 @@
  * - DB stores hours only
  * - Each (company_id, project_id, resource_id, allocation_date) has ONE row
  * - allocation_date is normalized to company week start
- * - All writes go through canonical API (saveResourceAllocation/deleteResourceAllocation)
+ * - All writes go through canonical API (saveResourceAllocation/deleteResourceAllocation/deleteAllResourceAllocationsForProject)
  * - Weekly views read only resource_type='active'
+ * 
+ * CANONICAL WRITE FUNCTIONS (src/hooks/allocations/api.ts):
+ * - saveResourceAllocation(): Save/update a single week's allocation
+ * - deleteResourceAllocation(): Delete a single week's allocation
+ * - deleteAllResourceAllocationsForProject(): Delete all allocations for a resource on a project
+ * 
+ * READ PATHS MUST FILTER BY resource_type:
+ * - Active team views: .eq('resource_type', 'active')
+ * - Pre-registered views: .eq('resource_type', 'pre_registered')
+ * - Never mix types when calculating totals for a single view
+ * 
+ * FILES THAT HAVE BEEN AUDITED AND ARE COMPLIANT:
+ * - src/hooks/allocations/utils/fetchUtils.ts
+ * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts
+ * - src/components/dashboard/staff/useStaffAllocations.ts
+ * - src/hooks/useIndividualMemberUtilization.ts
+ * - src/hooks/useTeamUtilization.ts
+ * - src/components/weekly-rundown/AvailableMembersRow.tsx
+ * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts
+ * - src/components/resource-planning/PipelineTimelineView.tsx
+ * - src/hooks/useStandardizedUtilizationData.ts
+ * - src/components/projects/services/matrixImporter.ts
+ * - src/components/resources/person-view/ProjectAllocationRow.tsx
+ * - src/hooks/utilization/useActiveMembers.ts
  */
 
 /**

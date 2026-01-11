@@ -194,3 +194,35 @@ export const deleteResourceAllocation = async (
     return false;
   }
 };
+
+/**
+ * RULEBOOK: Canonical function to delete ALL allocations for a resource on a project.
+ * Use this when removing a person from a project entirely (all weeks).
+ */
+export const deleteAllResourceAllocationsForProject = async (
+  projectId: string,
+  resourceId: string,
+  resourceType: 'active' | 'pre_registered',
+  companyId: string
+): Promise<boolean> => {
+  try {
+    logger.debug(`RULEBOOK: Deleting all allocations for resource ${resourceId} on project ${projectId}`);
+    
+    const { error } = await supabase
+      .from('project_resource_allocations')
+      .delete()
+      .eq('project_id', projectId)
+      .eq('resource_id', resourceId)
+      .eq('resource_type', resourceType)
+      .eq('company_id', companyId);
+    
+    if (error) throw error;
+    
+    logger.debug(`RULEBOOK: Successfully deleted all allocations for resource ${resourceId} on project ${projectId}`);
+    return true;
+  } catch (error) {
+    console.error('Error deleting all allocations for project:', error);
+    toast.error('Failed to delete allocations');
+    return false;
+  }
+};

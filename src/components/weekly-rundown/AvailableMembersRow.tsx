@@ -149,6 +149,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
       if (!companyId) return [];
       
       // PERFORMANCE: Removed supabase.auth.getSession() - Supabase client handles auth
+      // RULEBOOK: Filter by resource_type='active' for active team views
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select(`
@@ -164,6 +165,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           )
         `)
         .eq('company_id', companyId)
+        .eq('resource_type', 'active')
         .eq('allocation_date', targetWeekStart);
       
       if (error) throw error;
