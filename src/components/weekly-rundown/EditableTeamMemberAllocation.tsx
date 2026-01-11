@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Edit2, Check, X, Trash2, MapPin, Clock } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { useCompany } from '@/context/CompanyContext';
+import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,7 +47,8 @@ export const EditableTeamMemberAllocation: React.FC<EditableTeamMemberAllocation
   const [editedHours, setEditedHours] = useState(member.hours.toString());
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
-  const { displayPreference } = useAppSettings();
+  const { displayPreference, startOfWorkWeek } = useAppSettings();
+  const { company } = useCompany();
 
   const getCapacityColor = (percentage: number) => {
     if (percentage > 100) return 'text-destructive';
@@ -57,20 +59,21 @@ export const EditableTeamMemberAllocation: React.FC<EditableTeamMemberAllocation
 
   const updateMutation = useMutation({
     mutationFn: async (newHours: number) => {
-      const { data, error } = await supabase
-        .from('project_resource_allocations')
-        .update({ 
-          hours: newHours,
-          updated_at: new Date().toISOString()
-        })
-        .eq('resource_id', member.id)
-        .eq('project_id', projectId)
-        .eq('allocation_date', weekStartDate)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      if (!company?.id) throw new Error('No company context');
+      
+      // Use canonical API for saving allocations
+      const success = await saveResourceAllocation(
+        projectId,
+        member.id,
+        'active',
+        weekStartDate,
+        newHours,
+        company.id,
+        startOfWorkWeek
+      );
+      
+      if (!success) throw new Error('Failed to save allocation');
+      return success;
     },
     onSuccess: () => {
       toast.success('Allocation updated');
@@ -86,14 +89,20 @@ export const EditableTeamMemberAllocation: React.FC<EditableTeamMemberAllocation
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from('project_resource_allocations')
-        .delete()
-        .eq('resource_id', member.id)
-        .eq('project_id', projectId)
-        .eq('allocation_date', weekStartDate);
-
-      if (error) throw error;
+      if (!company?.id) throw new Error('No company context');
+      
+      // Use canonical API for deleting allocations
+      const success = await deleteResourceAllocation(
+        projectId,
+        member.id,
+        'active',
+        weekStartDate,
+        company.id,
+        startOfWorkWeek
+      );
+      
+      if (!success) throw new Error('Failed to delete allocation');
+      return success;
     },
     onSuccess: () => {
       toast.success('Team member removed');

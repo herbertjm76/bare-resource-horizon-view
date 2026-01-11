@@ -66,6 +66,7 @@ export const fetchProjectAllocations = async (
       projects!inner(id, name, code)
     `)
     .eq('company_id', companyId)
+    .eq('resource_type', 'active')
     .in('resource_id', memberIds)
     .gt('hours', 0)
     .gte('allocation_date', startDateStr)
