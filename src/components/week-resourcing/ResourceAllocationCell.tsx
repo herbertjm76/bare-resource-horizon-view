@@ -109,7 +109,13 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
         // Dispatch event for avatar row sync
         window.dispatchEvent(
           new CustomEvent('allocation-updated', {
-            detail: { weekKey: weekStartDate, resourceId, hours: newHours },
+            detail: {
+              weekKey: weekStartDate,
+              resourceId,
+              memberId: resourceId,
+              projectId,
+              hours: newHours,
+            },
           })
         );
 

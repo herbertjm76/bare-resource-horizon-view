@@ -123,7 +123,13 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
 
         window.dispatchEvent(
           new CustomEvent('allocation-updated', {
-            detail: { memberId: member.id, projectId, hours: newHours },
+            detail: {
+              weekKey,
+              resourceId: member.id,
+              memberId: member.id,
+              projectId,
+              hours: newHours,
+            },
           })
         );
       } catch (error) {
