@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { format, startOfWeek } from 'date-fns';
+import { format } from 'date-fns';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
 import { RundownControls } from './RundownControls';
 import { RundownCarousel } from './RundownCarousel';
@@ -9,6 +9,8 @@ import { AvailableMembersRow } from './AvailableMembersRow';
 import { useRundownData } from './hooks/useRundownData';
 import { useCarouselNavigation } from './hooks/useCarouselNavigation';
 import { useCardVisibility } from '@/hooks/useCardVisibility';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 export type RundownMode = 'people' | 'projects';
 export type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
@@ -21,6 +23,9 @@ export const WeeklyRundownView: React.FC = () => {
   const [viewType, setViewType] = useState<ViewType>('carousel');
   const [isAutoAdvance, setIsAutoAdvance] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Get company settings for consistent week start
+  const { startOfWorkWeek } = useAppSettings();
 
   // Get card visibility preferences
   const { visibility: cardVisibility, cardOrder, toggleCard, moveCard, reorderCards } = useCardVisibility();
@@ -63,14 +68,14 @@ export const WeeklyRundownView: React.FC = () => {
   });
 
   const weekLabel = useMemo(() => {
-    const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+    const weekStart = getWeekStartDate(selectedWeek, startOfWorkWeek);
     return `Week of ${format(weekStart, 'MMM d, yyyy')}`;
-  }, [selectedWeek]);
+  }, [selectedWeek, startOfWorkWeek]);
 
   // Precompute week start string before any early returns to keep hooks order stable
   const weekStartString = useMemo(() => 
-    format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
-    [selectedWeek]
+    format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd'),
+    [selectedWeek, startOfWorkWeek]
   );
 
   // Get all member IDs for summary cards
