@@ -240,10 +240,12 @@ export const useDashboardMetrics = (companyId?: string, timeRange: TimeRange = '
           .eq('company_id', companyId)
           .gte('created_at', dateRange.startDate)
           .lte('created_at', dateRange.endDate),
+        // RULEBOOK: Filter by resource_type='active' for dashboard metrics
         supabase
           .from('project_resource_allocations')
           .select('hours, allocation_date, resource_id, project_id')
           .eq('company_id', companyId)
+          .eq('resource_type', 'active')
           .gte('allocation_date', dateRange.startDate)
           .lte('allocation_date', dateRange.endDate)
       ]);

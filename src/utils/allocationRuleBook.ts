@@ -37,23 +37,27 @@
  * - src/hooks/useStandardizedUtilizationData.ts (.eq('resource_type', 'active'))
  * - src/hooks/usePersonResourceData.ts (intentionally fetches both types for person view)
  * - src/hooks/utilization/usePreRegisteredMembers.ts (.eq('resource_type', 'pre_registered'))
- * - src/hooks/utilization/useActiveMembers.ts
- * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts
+ * - src/hooks/utilization/useActiveMembers.ts (.eq('resource_type', 'active'))
+ * - src/hooks/queries/useDashboardQueries.ts (.eq('resource_type', 'active'))
+ * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts (.eq('resource_type', 'active'))
+ * - src/components/week-resourcing/hooks/useDetailedWeeklyAllocations.ts (.eq('resource_type', 'active'))
+ * - src/components/week-resourcing/hooks/useWeekResourceAllocations.ts (.eq('resource_type', 'active'))
  * - src/components/dashboard/staff/useStaffAllocations.ts
  * - src/components/dashboard/hooks/useResourceAllocationData.ts (.eq('resource_type', 'active'))
+ * - src/components/dashboard/hooks/useIndividualUtilization.ts (dynamic resource_type based on isPending)
  * - src/components/weekly-rundown/AvailableMembersRow.tsx (.eq('resource_type', 'active'))
  * - src/components/weekly-rundown/EditableTeamMemberAllocation.tsx (uses canonical API)
  * - src/components/team-member-detail/TeamMemberProjectOverview.tsx (.eq('resource_type', 'active'))
  * - src/components/team-member-detail/TeamMemberProjectAllocations.tsx
+ * - src/components/team-member-detail/resource-planning/hooks/useResourcePlanningData.ts (.eq('resource_type', 'active'))
  * - src/components/profile/overview/CapacityCard.tsx (.eq('resource_type', 'active'))
  * - src/components/profile/overview/hooks/useUserProjects.ts (intentionally fetches both types)
+ * - src/components/resource-planning/PipelineTimelineView.tsx (.eq('resource_type', 'active'))
+ * - src/components/resources/dialogs/ResourceAllocationDialog.tsx (dynamic resource_type based on member.type)
+ * - src/components/workload/hooks/services/dataFetchers.ts (.eq('resource_type', 'active'))
  * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts (.eq('resource_type', 'active'))
  * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts (.eq('resource_type', 'active'))
  * - src/pages/CapacityHeatmap.tsx (.eq('resource_type', 'active'))
- * - src/components/resource-planning/PipelineTimelineView.tsx (.eq('resource_type', 'active'))
- * - src/components/workload/hooks/services/dataFetchers.ts (.eq('resource_type', 'active'))
- * - src/components/week-resourcing/hooks/useWeekResourceAllocations.ts (.eq('resource_type', 'active'))
- * - src/components/team-member-detail/resource-planning/hooks/useResourcePlanningData.ts (.eq('resource_type', 'active'))
  * - src/services/unifiedInsightsService.ts (.eq('resource_type', 'active'))
  *
  * === WRITE PATHS USING CANONICAL API ===
