@@ -25,11 +25,14 @@
  * - src/hooks/useIndividualMemberUtilization.ts
  * - src/hooks/useTeamUtilization.ts
  * - src/components/weekly-rundown/AvailableMembersRow.tsx
+ * - src/components/weekly-rundown/EditableTeamMemberAllocation.tsx
  * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts
+ * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts
  * - src/components/resource-planning/PipelineTimelineView.tsx
  * - src/hooks/useStandardizedUtilizationData.ts
  * - src/components/projects/services/matrixImporter.ts
  * - src/components/resources/person-view/ProjectAllocationRow.tsx
+ * - src/components/workload/hooks/services/dataFetchers.ts
  * - src/hooks/utilization/useActiveMembers.ts
  */
 
