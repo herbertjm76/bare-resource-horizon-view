@@ -72,32 +72,39 @@ export const saveResourceAllocation = async (
     // Always normalize the weekKey to company's week start
     const normalizedWeekKey = normalizeToWeekStart(weekKey, weekStartDay);
     assertIsWeekStart(normalizedWeekKey, weekStartDay, 'saveResourceAllocation');
-    
+
     logger.debug(`Saving allocation for week starting: ${normalizedWeekKey} (${weekStartDay})`);
-    
-    // Check if we already have an allocation for this week
-    const { data: existingData } = await supabase
+
+    // IMPORTANT:
+    // Some legacy/demo data may have allocations stored on arbitrary dates inside the week.
+    // Our reads normalize + aggregate by week start, so if we insert a new weekStart row without
+    // cleaning up the old in-week rows, totals will jump ("I typed 20% but it saved as 90%").
+    // To guarantee "set allocation for this week", we de-duplicate any in-week rows first.
+
+    const { data: existingRows, error: existingRowsError } = await supabase
       .from('project_resource_allocations')
-      .select('id')
+      .select('id, allocation_date')
       .eq('project_id', projectId)
       .eq('resource_id', resourceId)
       .eq('resource_type', resourceType)
-      .eq('allocation_date', normalizedWeekKey)
-      .eq('company_id', companyId)
-      .maybeSingle();
-    
-    let result;
-    
-    if (existingData) {
-      // Update existing allocation
-      result = await supabase
+      .eq('company_id', companyId);
+
+    if (existingRowsError) throw existingRowsError;
+
+    const weekRowIds = (existingRows || [])
+      .filter((row) => normalizeToWeekStart(row.allocation_date, weekStartDay) === normalizedWeekKey)
+      .map((row) => row.id);
+
+    // If there are multiple rows in the same normalized week, remove them all and insert a single canonical row.
+    if (weekRowIds.length > 1) {
+      const { error: deleteError } = await supabase
         .from('project_resource_allocations')
-        .update({ hours })
-        .eq('id', existingData.id)
-        .select();
-    } else {
-      // Insert new allocation (DB trigger will also normalize the date as safety net)
-      result = await supabase
+        .delete()
+        .in('id', weekRowIds);
+
+      if (deleteError) throw deleteError;
+
+      const insertResult = await supabase
         .from('project_resource_allocations')
         .insert({
           project_id: projectId,
@@ -105,12 +112,40 @@ export const saveResourceAllocation = async (
           resource_type: resourceType,
           allocation_date: normalizedWeekKey,
           hours,
-          company_id: companyId
+          company_id: companyId,
         })
         .select();
+
+      if (insertResult.error) throw insertResult.error;
+      return true;
     }
-    
-    if (result.error) throw result.error;
+
+    // If there's exactly one row for this week, update it (even if its allocation_date isn't the week start).
+    if (weekRowIds.length === 1) {
+      const updateResult = await supabase
+        .from('project_resource_allocations')
+        .update({ hours, allocation_date: normalizedWeekKey })
+        .eq('id', weekRowIds[0])
+        .select();
+
+      if (updateResult.error) throw updateResult.error;
+      return true;
+    }
+
+    // Otherwise insert a new allocation for this week
+    const insertResult = await supabase
+      .from('project_resource_allocations')
+      .insert({
+        project_id: projectId,
+        resource_id: resourceId,
+        resource_type: resourceType,
+        allocation_date: normalizedWeekKey,
+        hours,
+        company_id: companyId,
+      })
+      .select();
+
+    if (insertResult.error) throw insertResult.error;
     return true;
   } catch (error) {
     console.error('Error saving allocation:', error);
