@@ -4,12 +4,13 @@ import { TableRow, TableCell } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
+import { getAllocationCapacity } from '@/utils/allocationCapacity';
 import { ResourceAllocationCell } from '../ResourceAllocationCell';
-import { 
-  calculateMemberProjectHours, 
-  calculateUtilizationPercentage, 
+import {
+  calculateMemberProjectHours,
+  calculateUtilizationPercentage,
   getUtilizationColor,
-  calculateCapacityDisplay
+  calculateCapacityDisplay,
 } from '../utils/utilizationCalculations';
 import { format, startOfWeek } from 'date-fns';
 
@@ -58,10 +59,14 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
 
   const { workWeekHours, displayPreference, startOfWorkWeek } = useAppSettings();
 
-  // STANDARDIZED CALCULATIONS - Use the utility functions ONLY
-  const weeklyCapacity = member.weekly_capacity || workWeekHours;
+  // STANDARDIZED CALCULATIONS
+  // IMPORTANT: In percentage mode, capacity must be COMPANY work week hours for consistent input/output.
+  const weeklyCapacity = getAllocationCapacity({
+    displayPreference,
+    workWeekHours,
+    memberWeeklyCapacity: member.weekly_capacity,
+  });
   const capacityDisplay = calculateCapacityDisplay(member.id, allocationMap, weeklyCapacity);
-  const projectCount = getProjectCount(member.id);
 
   // Calculate weekStartDate for inline editing
   const weekStartDay = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;

@@ -1,5 +1,6 @@
 
 import React, { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react';
+
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
@@ -17,6 +18,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { getProjectDisplayName } from '@/utils/projectDisplay';
 import { formatAllocationValue, formatDualAllocationValue } from '@/utils/allocationDisplay';
 import { parseInputToHours, hoursToInputDisplay, getAllocationInputConfig } from '@/utils/allocationInput';
+import { getAllocationCapacity } from '@/utils/allocationCapacity';
 import { saveResourceAllocation } from '@/hooks/allocations/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
@@ -52,22 +54,31 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   const { company } = useCompany();
   const queryClient = useQueryClient();
   
-  // STANDARDIZED CALCULATIONS - Use the utility functions consistently
-  // NOTE: weeklyCapacity must be defined before callbacks that use it
-  const weeklyCapacity = useMemo(() => member?.weekly_capacity || workWeekHours, [member?.weekly_capacity, workWeekHours]);
-  
+  // STANDARDIZED CALCULATIONS
+  // IMPORTANT: In percentage mode, capacity must be COMPANY work week hours for consistent input/output.
+  const weeklyCapacity = useMemo(
+    () =>
+      getAllocationCapacity({
+        displayPreference,
+        workWeekHours,
+        memberWeeklyCapacity: member?.weekly_capacity,
+      }),
+    [displayPreference, workWeekHours, member?.weekly_capacity]
+  );
+
   // State for tracking which cell is being edited
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editInputValue, setEditInputValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const isSavingRef = useRef(false);
   const editInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Input configuration based on display preference
-  const inputConfig = useMemo(() => 
-    getAllocationInputConfig(displayPreference, workWeekHours),
-    [displayPreference, workWeekHours]
+  const inputConfig = useMemo(
+    () => getAllocationInputConfig(displayPreference, weeklyCapacity),
+    [displayPreference, weeklyCapacity]
   );
-  
+
   // Handle starting edit mode
   const handleStartEdit = useCallback((projectId: string, currentHours: number) => {
     setEditingProjectId(projectId);
@@ -76,17 +87,24 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   
   // Handle saving allocation
   const handleSaveAllocation = useCallback(async (projectId: string) => {
-    if (isSaving) return;
-    
+    // Guard against double-save (Enter triggers blur; blur calls save too)
+    if (isSavingRef.current) return;
+
     const newHours = parseInputToHours(editInputValue, weeklyCapacity, displayPreference);
     const key = `${member.id}:${projectId}`;
     const currentHours = allocationMap.get(key) || 0;
-    
+
     // Only save if value changed
     if (Math.abs(newHours - currentHours) > 0.01) {
+      isSavingRef.current = true;
       setIsSaving(true);
       try {
-        const weekKey = format(startOfWeek(selectedWeek, { weekStartsOn: startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1 }), 'yyyy-MM-dd');
+        const weekKey = format(
+          startOfWeek(selectedWeek, {
+            weekStartsOn: startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1,
+          }),
+          'yyyy-MM-dd'
+        );
         await saveResourceAllocation(
           projectId,
           member.id,
@@ -96,37 +114,48 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           company?.id || '',
           startOfWorkWeek
         );
-        
-        // Invalidate queries to refresh data
-        queryClient.invalidateQueries({ queryKey: ['weekly-allocations'] });
-        queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
-        
-        // Dispatch event for other components
-        window.dispatchEvent(new CustomEvent('allocation-updated', {
-          detail: { memberId: member.id, projectId, hours: newHours }
-        }));
+
+        // Invalidate the ACTUAL data sources used by Weekly Overview / WeekResourceView
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] }),
+          queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] }),
+          queryClient.invalidateQueries({ queryKey: ['available-allocations'] }),
+          queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] }),
+        ]);
+
+        window.dispatchEvent(
+          new CustomEvent('allocation-updated', {
+            detail: { memberId: member.id, projectId, hours: newHours },
+          })
+        );
       } catch (error) {
         console.error('Failed to save allocation:', error);
       } finally {
+        isSavingRef.current = false;
         setIsSaving(false);
       }
     }
-    
+
     setEditingProjectId(null);
     setEditInputValue('');
-  }, [isSaving, editInputValue, weeklyCapacity, displayPreference, member.id, allocationMap, selectedWeek, company?.id, queryClient, startOfWorkWeek]);
+  }, [editInputValue, weeklyCapacity, displayPreference, member.id, allocationMap, selectedWeek, company?.id, queryClient, startOfWorkWeek]);
   
   // Handle keyboard events
-  const handleKeyDown = useCallback((e: React.KeyboardEvent, projectId: string) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSaveAllocation(projectId);
-    } else if (e.key === 'Escape') {
-      setEditingProjectId(null);
-      setEditInputValue('');
-    }
-  }, [handleSaveAllocation]);
-  
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>, projectId: string) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        // Let blur be the single save path
+        e.currentTarget.blur();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        setEditingProjectId(null);
+        setEditInputValue('');
+      }
+    },
+    []
+  );
+
   // Focus input when editing starts
   useEffect(() => {
     if (editingProjectId && editInputRef.current) {
