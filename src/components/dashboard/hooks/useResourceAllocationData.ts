@@ -31,6 +31,7 @@ export const useResourceAllocationData = () => {
           projects!inner(name, status)
         `)
         .eq('company_id', company.id)
+        .eq('resource_type', 'active')
         .gte('allocation_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]); // Last 30 days
       
       if (error) throw error;

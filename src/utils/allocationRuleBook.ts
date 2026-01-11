@@ -1,8 +1,14 @@
 /**
  * Allocation Rule Book - Runtime Diagnostics
  * 
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  CRITICAL: ALL ALLOCATION WRITES MUST USE CANONICAL API FUNCTIONS BELOW      ║
+ * ║  Direct .insert()/.update()/.delete() on project_resource_allocations        ║
+ * ║  is FORBIDDEN outside of src/hooks/allocations/api.ts                        ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * 
  * RULE BOOK ENFORCEMENT:
- * - DB stores hours only
+ * - DB stores hours only (not percentages)
  * - Each (company_id, project_id, resource_id, allocation_date) has ONE row
  * - allocation_date is normalized to company week start
  * - All writes go through canonical API (saveResourceAllocation/deleteResourceAllocation/deleteAllResourceAllocationsForProject)
@@ -20,10 +26,14 @@
  * 
  * FILES THAT HAVE BEEN AUDITED AND ARE COMPLIANT:
  * - src/hooks/allocations/utils/fetchUtils.ts
+ * - src/hooks/allocations/api.ts (canonical write functions)
+ * - src/hooks/allocations/useResourceUtilization.ts (dynamic resource_type)
  * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts
  * - src/components/dashboard/staff/useStaffAllocations.ts
+ * - src/components/dashboard/hooks/useResourceAllocationData.ts
  * - src/hooks/useIndividualMemberUtilization.ts
  * - src/hooks/useTeamUtilization.ts
+ * - src/hooks/usePersonResourceData.ts (intentionally fetches both types for person view)
  * - src/components/weekly-rundown/AvailableMembersRow.tsx
  * - src/components/weekly-rundown/EditableTeamMemberAllocation.tsx
  * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts
@@ -32,7 +42,13 @@
  * - src/hooks/useStandardizedUtilizationData.ts
  * - src/components/projects/services/matrixImporter.ts
  * - src/components/resources/person-view/ProjectAllocationRow.tsx
+ * - src/components/resources/person-view/AddProjectRow.tsx
+ * - src/components/resources/hooks/services/resourceDeletionService.ts
  * - src/components/workload/hooks/services/dataFetchers.ts
+ * - src/components/profile/overview/CapacityCard.tsx
+ * - src/components/profile/overview/hooks/useUserProjects.ts (intentionally fetches both types)
+ * - src/components/team-member-detail/TeamMemberProjectOverview.tsx
+ * - src/components/team-member-detail/TeamMemberProjectAllocations.tsx
  * - src/hooks/utilization/useActiveMembers.ts
  */
 
