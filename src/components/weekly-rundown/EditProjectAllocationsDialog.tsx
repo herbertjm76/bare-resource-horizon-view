@@ -10,6 +10,7 @@ import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
 import { useCompany } from '@/context/CompanyContext';
 import { saveResourceAllocation } from '@/hooks/allocations/api';
+import { getAllocationCapacity } from '@/utils/allocationCapacity';
 import {
   getAllocationInputConfig,
   hoursToInputDisplay,
@@ -33,7 +34,12 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
   const queryClient = useQueryClient();
   const { company } = useCompany();
   const { displayPreference, workWeekHours, startOfWorkWeek } = useAppSettings();
-  const capacity = workWeekHours || 40;
+
+  // Canonical capacity for input behavior: in % mode, use company work week.
+  const capacity = getAllocationCapacity({
+    displayPreference,
+    workWeekHours,
+  });
 
   const inputConfig = useMemo(
     () => getAllocationInputConfig(displayPreference, capacity),
@@ -50,19 +56,18 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
   const [savingMemberId, setSavingMemberId] = useState<string | null>(null);
 
   // Initialize input values when dialog opens / project changes
-  // Use member-specific capacity for accurate display
+  // IMPORTANT: In % mode we intentionally use company capacity for stable % display.
   useEffect(() => {
     if (!open) return;
     const next: Record<string, string> = {};
     (project?.teamMembers || []).forEach((m: any) => {
-      const memberCapacity = m.weekly_capacity || m.capacity || workWeekHours || 40;
-      next[m.id] = hoursToInputDisplay(Number(m.hours || 0), memberCapacity, displayPreference);
+      next[m.id] = hoursToInputDisplay(Number(m.hours || 0), capacity, displayPreference);
     });
     setValues(next);
-  }, [open, project?.id, project?.teamMembers, workWeekHours, displayPreference]);
+  }, [open, project?.id, project?.teamMembers, capacity, displayPreference]);
 
-  // Get member-specific capacity (Phase 5: consistent capacity source)
-  const getMemberCapacity = (member: any) => 
+  // (Phase 5) Keep a helper for HOURS mode where we may want member capacity later.
+  const getMemberCapacityForHoursMode = (member: any) =>
     member.weekly_capacity || member.capacity || workWeekHours || 40;
 
   const handleSave = async (memberId: string, memberName: string, member: any) => {
@@ -76,9 +81,13 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
     }
 
     const input = values[memberId] ?? '';
-    // Use member-specific capacity for accurate % to hours conversion
-    const memberCapacity = getMemberCapacity(member);
-    const hoursValue = parseInputToHours(input, memberCapacity, displayPreference);
+
+    // For % mode, we use company capacity so "5" always means 5%.
+    // For hours mode, capacity only affects formatting/validation.
+    const effectiveCapacity =
+      displayPreference === 'percentage' ? capacity : getMemberCapacityForHoursMode(member);
+
+    const hoursValue = parseInputToHours(input, effectiveCapacity, displayPreference);
 
     if (!Number.isFinite(hoursValue) || hoursValue < 0) {
       toast.error('Please enter a valid number');
@@ -104,7 +113,7 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
       // Optimistic UI update - immediately reflect the saved value
       setValues((prev) => ({
         ...prev,
-        [memberId]: hoursToInputDisplay(hoursValue, memberCapacity, displayPreference)
+        [memberId]: hoursToInputDisplay(hoursValue, effectiveCapacity, displayPreference)
       }));
 
       // Dispatch event for other components
@@ -151,7 +160,7 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
                     <p className="font-medium truncate">{member.name}</p>
                     <p className="text-sm text-muted-foreground">
                       Current:{' '}
-                      {formatAllocationValue(member.hours || 0, getMemberCapacity(member), displayPreference)}
+                      {formatAllocationValue(member.hours || 0, capacity, displayPreference)}
                     </p>
                   </div>
 

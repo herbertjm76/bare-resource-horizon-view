@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useCompany } from '@/context/CompanyContext';
 import { parseInputToHours, hoursToInputDisplay, getAllocationInputConfig } from '@/utils/allocationInput';
+import { getAllocationCapacity } from '@/utils/allocationCapacity';
 import { saveResourceAllocation } from '@/hooks/allocations/api';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { useQueryClient } from '@tanstack/react-query';
@@ -37,7 +38,12 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   const { displayPreference, workWeekHours, startOfWorkWeek } = useAppSettings();
   const { company } = useCompany();
   const queryClient = useQueryClient();
-  const capacity = memberCapacity || workWeekHours;
+
+  const capacity = getAllocationCapacity({
+    displayPreference,
+    workWeekHours,
+    memberWeeklyCapacity: memberCapacity,
+  });
   
   // State for inline editing
   const [isEditing, setIsEditing] = useState(false);
