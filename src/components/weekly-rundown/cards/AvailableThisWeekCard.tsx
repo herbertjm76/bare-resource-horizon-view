@@ -65,6 +65,8 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
   });
 
   // Fetch allocations for the week
+  // RULEBOOK: Intentionally fetches both 'active' and 'pre_registered' allocations
+  // because this card shows availability for ALL members including pre-registered invites
   const { data: allocations = [] } = useQuery({
     queryKey: ['available-allocations', weekStartDate, company?.id],
     queryFn: async () => {

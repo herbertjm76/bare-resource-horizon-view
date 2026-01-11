@@ -77,11 +77,13 @@ export const useProjectStageProgress = (projectId: string, currentStage: string)
         // Fetch allocated hours for this stage within the timeline
         let allocatedHours = 0;
         if (stageStartDate && stageEndDate) {
+          // RULEBOOK: Filter by resource_type='active' for stage progress calculations
           const { data: allocations, error: allocError } = await supabase
             .from('project_resource_allocations')
             .select('hours, allocation_date')
             .eq('project_id', projectId)
             .eq('company_id', company.id)
+            .eq('resource_type', 'active')
             .gte('allocation_date', stageStartDate.toISOString().split('T')[0])
             .lte('allocation_date', stageEndDate.toISOString().split('T')[0]);
 
