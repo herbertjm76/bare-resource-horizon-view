@@ -62,6 +62,23 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   const queryClient = useQueryClient();
   const capacity = person.capacity || workWeekHours || 40;
 
+  // Pre-populate hours state when dialog opens with current values
+  React.useEffect(() => {
+    if (open && person.projects?.length > 0) {
+      const initialHours: Record<string, string> = {};
+      person.projects.forEach((project: any) => {
+        // Convert hours to display value (percentage or hours based on preference)
+        const displayVal = displayPreference === 'percentage'
+          ? Math.round((project.hours / capacity) * 100).toString()
+          : project.hours.toString();
+        initialHours[project.id] = displayVal;
+      });
+      setHours(initialHours);
+    } else if (!open) {
+      setHours({});
+    }
+  }, [open, person.projects, displayPreference, capacity]);
+
   // Fetch available projects
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', company?.id],
@@ -154,11 +171,12 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       if (!success) throw new Error('Failed to save allocation');
       return true;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       toast.success('Project allocation added');
-      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      window.dispatchEvent(new CustomEvent('allocation-updated', {
+        detail: { weekKey, resourceId: person.id, projectId: variables.projectId, hours: variables.allocationHours }
+      }));
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
-      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       setShowAddProject(false);
       setSelectedNewProjectId('');
       setNewAllocationHours('');
@@ -217,12 +235,14 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       if (!success) throw new Error('Failed to save allocation');
       return true;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       toast.success('Allocation updated');
-      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      // Dispatch event so other components can update without full refetch
+      window.dispatchEvent(new CustomEvent('allocation-updated', {
+        detail: { weekKey, resourceId: person.id, projectId: variables.projectId, hours: variables.newHours }
+      }));
+      // Invalidate only what's necessary
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
-      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
-      setHours({});
     },
     onError: (error: any) => {
       toast.error(error?.message || 'Failed to update allocation');
@@ -246,11 +266,12 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       if (!success) throw new Error('Failed to delete allocation');
       return true;
     },
-    onSuccess: () => {
+    onSuccess: (_data, projectId) => {
       toast.success('Allocation deleted');
-      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      window.dispatchEvent(new CustomEvent('allocation-updated', {
+        detail: { weekKey, resourceId: person.id, projectId, hours: 0 }
+      }));
       queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
-      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
     },
     onError: (error: any) => {
       toast.error(error?.message || 'Failed to delete allocation');
