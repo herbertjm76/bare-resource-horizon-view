@@ -30,6 +30,11 @@ import { useCompany } from '@/context/CompanyContext';
 import { cn } from '@/lib/utils';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
 import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
+import {
+  getAllocationInputConfig,
+  hoursToInputDisplay,
+  parseInputToHours,
+} from '@/utils/allocationInput';
 
 interface EditPersonAllocationsDialogProps {
   open: boolean;
@@ -61,17 +66,15 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   const { company } = useCompany();
   const queryClient = useQueryClient();
   const capacity = person.capacity || workWeekHours || 40;
+  const inputConfig = getAllocationInputConfig(displayPreference, capacity);
+
 
   // Pre-populate hours state when dialog opens with current values
   React.useEffect(() => {
     if (open && person.projects?.length > 0) {
       const initialHours: Record<string, string> = {};
       person.projects.forEach((project: any) => {
-        // Convert hours to display value (percentage or hours based on preference)
-        const displayVal = displayPreference === 'percentage'
-          ? Math.round((project.hours / capacity) * 100).toString()
-          : project.hours.toString();
-        initialHours[project.id] = displayVal;
+        initialHours[project.id] = hoursToInputDisplay(project.hours, capacity, displayPreference);
       });
       setHours(initialHours);
     } else if (!open) {
@@ -200,23 +203,21 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   };
 
   const handleAddAllocation = () => {
-    const inputValue = parseFloat(newAllocationHours);
     if (!selectedNewProjectId) {
       toast.error('Please select a project');
       return;
     }
-    if (isNaN(inputValue) || inputValue <= 0) {
+
+    const allocationHours = parseInputToHours(newAllocationHours, capacity, displayPreference);
+
+    if (!Number.isFinite(allocationHours) || allocationHours <= 0) {
       toast.error(`Please enter a valid ${displayPreference === 'percentage' ? 'percentage' : 'hours'}`);
       return;
     }
 
-    // Convert percentage to hours if needed
-    const allocationHours = displayPreference === 'percentage'
-      ? (inputValue / 100) * capacity
-      : inputValue;
-
     addAllocationMutation.mutate({ projectId: selectedNewProjectId, allocationHours });
   };
+
 
   const updateAllocationMutation = useMutation({
     mutationFn: async ({ projectId, newHours }: { projectId: string; newHours: number }) => {
@@ -281,20 +282,17 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
 
   const handleSave = (projectId: string) => {
     const raw = hours[projectId];
-    const inputValue = raw === undefined || raw.trim() === '' ? NaN : parseFloat(raw);
 
-    if (isNaN(inputValue) || inputValue <= 0) {
+    const newHours = parseInputToHours(raw ?? '', capacity, displayPreference);
+
+    if (!Number.isFinite(newHours) || newHours <= 0) {
       toast.error(`Please enter valid ${displayPreference === 'percentage' ? 'percentage' : 'hours'}`);
       return;
     }
 
-    // Convert percentage to hours if needed
-    const newHours = displayPreference === 'percentage'
-      ? (inputValue / 100) * capacity
-      : inputValue;
-
     updateAllocationMutation.mutate({ projectId, newHours });
   };
+
 
   const handleDelete = (projectId: string, projectName: string) => {
     if (confirm(`Delete allocation for ${projectName}?`)) {
@@ -327,15 +325,13 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                       <div className="flex items-center gap-2">
                         <Input
                           type="number"
-                          min="0"
-                          max={displayPreference === 'percentage' ? '100' : '168'}
-                          placeholder={displayPreference === 'percentage' 
-                            ? Math.round((project.hours / capacity) * 100).toString()
-                            : project.hours.toString()}
+                          min={inputConfig.min}
+                          max={inputConfig.max}
+                          step={inputConfig.step}
+                          placeholder={hoursToInputDisplay(project.hours, capacity, displayPreference) || inputConfig.placeholder}
                           value={hours[project.id] ?? ''}
                           onChange={(e) => setHours({ ...hours, [project.id]: e.target.value })}
                           className="w-20"
-                          step={displayPreference === 'percentage' ? '5' : '0.5'}
                         />
                         <span className="text-sm text-muted-foreground">
                           {displayPreference === 'percentage' ? '%' : 'hours'}
