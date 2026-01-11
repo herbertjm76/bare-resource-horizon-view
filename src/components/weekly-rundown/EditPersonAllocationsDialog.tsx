@@ -179,10 +179,11 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       window.dispatchEvent(new CustomEvent('allocation-updated', {
         detail: { weekKey, resourceId: person.id, projectId: variables.projectId, hours: variables.allocationHours }
       }));
-      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
-      queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
-      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
-      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
+      // Fire-and-forget invalidations for instant feedback
+      void queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      void queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      void queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      void queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
       setShowAddProject(false);
       setSelectedNewProjectId('');
       setNewAllocationHours('');
@@ -245,10 +246,16 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       window.dispatchEvent(new CustomEvent('allocation-updated', {
         detail: { weekKey, resourceId: person.id, projectId: variables.projectId, hours: variables.newHours }
       }));
-      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
-      queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
-      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
-      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
+      // Update local state immediately to reflect saved value
+      setHours(prev => ({
+        ...prev,
+        [variables.projectId]: hoursToInputDisplay(variables.newHours, capacity, displayPreference)
+      }));
+      // Fire-and-forget invalidations for instant feedback
+      void queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      void queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      void queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      void queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
     },
     onError: (error: any) => {
       toast.error(error?.message || 'Failed to update allocation');
@@ -277,10 +284,11 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       window.dispatchEvent(new CustomEvent('allocation-updated', {
         detail: { weekKey, resourceId: person.id, projectId, hours: 0 }
       }));
-      queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
-      queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
-      queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
-      queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
+      // Fire-and-forget invalidations for instant feedback
+      void queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      void queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      void queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      void queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
     },
     onError: (error: any) => {
       toast.error(error?.message || 'Failed to delete allocation');
