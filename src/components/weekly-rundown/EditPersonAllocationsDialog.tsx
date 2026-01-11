@@ -35,6 +35,7 @@ import {
   hoursToInputDisplay,
   parseInputToHours,
 } from '@/utils/allocationInput';
+import { getAllocationCapacity } from '@/utils/allocationCapacity';
 
 interface EditPersonAllocationsDialogProps {
   open: boolean;
@@ -65,8 +66,13 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   const weekKey = format(weekStart, 'yyyy-MM-dd');
   const { company } = useCompany();
   const queryClient = useQueryClient();
-  // Phase 5: Use consistent capacity source - prefer person's weekly_capacity
-  const capacity = person.weekly_capacity || person.capacity || workWeekHours || 40;
+  // Canonical capacity: in % mode, use company work week so "5" means 5% everywhere.
+  const capacity = getAllocationCapacity({
+    displayPreference,
+    workWeekHours,
+    memberWeeklyCapacity: person.weekly_capacity,
+    memberCapacityFallback: person.capacity,
+  });
   const inputConfig = getAllocationInputConfig(displayPreference, capacity);
 
 

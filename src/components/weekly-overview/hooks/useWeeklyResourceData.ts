@@ -17,6 +17,8 @@ import {
 } from '@/components/week-resourcing/hooks/weekResourceUtils';
 import { useCallback, useEffect, useState } from 'react';
 import { logger } from '@/utils/logger';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: string }) => {
   // Track loading state explicitly
@@ -101,9 +103,9 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
     return combined;
   }, [teamMembers, preRegisteredMembers])();
 
-  // Calculate week start date for comprehensive allocations
-  const weekStartDate = new Date(selectedWeek);
-  weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1); // Monday
+  // Calculate week start date for comprehensive allocations (respect company settings)
+  const { startOfWorkWeek } = useAppSettings();
+  const weekStartDate = getWeekStartDate(selectedWeek, startOfWorkWeek);
   const weekStartDateString = weekStartDate.toISOString().split('T')[0];
 
   // Get member IDs for comprehensive allocations
