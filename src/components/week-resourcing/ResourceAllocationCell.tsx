@@ -44,25 +44,24 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
     workWeekHours,
     memberWeeklyCapacity: memberCapacity,
   });
-  
+
   // State for inline editing
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const isSavingRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Get input configuration
   const inputConfig = getAllocationInputConfig(displayPreference, capacity);
 
   // Format display value
-  const displayValue = hours > 0 
-    ? formatAllocationValue(hours, capacity, displayPreference, false)
-    : '—';
+  const displayValue = hours > 0 ? formatAllocationValue(hours, capacity, displayPreference, false) : '—';
 
   // Initialize input value when entering edit mode
   const handleStartEdit = useCallback(() => {
     if (!editable || !resourceId || !projectId || !weekStartDate || !company?.id) return;
-    
+
     setInputValue(hours > 0 ? hoursToInputDisplay(hours, capacity, displayPreference) : '');
     setIsEditing(true);
   }, [editable, resourceId, projectId, weekStartDate, company?.id, hours, capacity, displayPreference]);
@@ -77,19 +76,23 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
 
   // Save allocation
   const handleSave = useCallback(async () => {
+    // Guard against double-save (Enter triggers blur; blur calls save too)
+    if (isSavingRef.current) return;
+
     if (!resourceId || !projectId || !weekStartDate || !company?.id) {
       setIsEditing(false);
       return;
     }
 
     const newHours = parseInputToHours(inputValue, capacity, displayPreference);
-    
+
     // Skip save if no change
     if (newHours === hours) {
       setIsEditing(false);
       return;
     }
 
+    isSavingRef.current = true;
     setIsSaving(true);
     try {
       const success = await saveResourceAllocation(
@@ -104,34 +107,42 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
 
       if (success) {
         // Dispatch event for avatar row sync
-        window.dispatchEvent(new CustomEvent('allocation-updated', {
-          detail: { weekKey: weekStartDate, resourceId, hours: newHours }
-        }));
+        window.dispatchEvent(
+          new CustomEvent('allocation-updated', {
+            detail: { weekKey: weekStartDate, resourceId, hours: newHours },
+          })
+        );
 
         // Invalidate queries
         queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
         queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
         queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
-        
+
         onAllocationChange?.(newHours);
       }
     } catch (error) {
       console.error('Error saving allocation:', error);
     } finally {
+      isSavingRef.current = false;
       setIsSaving(false);
       setIsEditing(false);
     }
   }, [resourceId, projectId, weekStartDate, company?.id, inputValue, capacity, displayPreference, hours, startOfWorkWeek, queryClient, onAllocationChange]);
 
   // Handle key events
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSave();
-    } else if (e.key === 'Escape') {
-      setIsEditing(false);
-    }
-  }, [handleSave]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        // Let blur be the single path that triggers save
+        e.currentTarget.blur();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        setIsEditing(false);
+      }
+    },
+    []
+  );
 
   // Check if editing is possible
   const canEdit = editable && resourceId && projectId && weekStartDate && company?.id;
@@ -153,10 +164,10 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
           disabled={isSaving}
           placeholder={inputConfig.placeholder}
           className={cn(
-            "w-full h-8 text-center text-sm font-medium border rounded",
-            "bg-background focus:ring-2 focus:ring-primary/30 focus:border-primary",
-            "transition-all duration-150",
-            isSaving && "opacity-50 cursor-wait"
+            'w-full h-8 text-center text-sm font-medium border rounded',
+            'bg-background focus:ring-2 focus:ring-primary/30 focus:border-primary',
+            'transition-all duration-150',
+            isSaving && 'opacity-50 cursor-wait'
           )}
         />
       </div>
@@ -167,26 +178,28 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   const filledClass = hours > 0 ? 'leave-cell-filled' : '';
 
   return (
-    <div 
+    <div
       className={cn(
-        "allocation-input-container w-full h-full",
+        'allocation-input-container w-full h-full',
         filledClass,
-        canEdit && "cursor-pointer hover:bg-accent/50 transition-colors"
+        canEdit && 'cursor-pointer hover:bg-accent/50 transition-colors'
       )}
       onClick={canEdit ? handleStartEdit : undefined}
-      onKeyDown={canEdit ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleStartEdit();
-        }
-      } : undefined}
+      onKeyDown={
+        canEdit
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleStartEdit();
+              }
+            }
+          : undefined
+      }
       tabIndex={canEdit ? 0 : undefined}
-      role={canEdit ? "button" : undefined}
+      role={canEdit ? 'button' : undefined}
       aria-label={canEdit ? `Edit allocation: ${displayValue}` : undefined}
     >
-      <div className="w-full h-8 flex items-center justify-center text-lg font-medium">
-        {displayValue}
-      </div>
+      <div className="w-full h-8 flex items-center justify-center text-lg font-medium">{displayValue}</div>
     </div>
   );
 };
