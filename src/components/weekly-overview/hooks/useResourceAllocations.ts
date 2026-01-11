@@ -7,6 +7,7 @@ import { logger } from '@/utils/logger';
 
 /**
  * Main hook that combines allocation state management and data fetching
+ * OPTIMIZED: Removed artificial delays to ensure instant UI updates
  */
 export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
   // Track if this is the initial load
@@ -24,25 +25,8 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
     setError
   } = useResourceAllocationState();
   
-  // Local loading state to prevent rapid changes
-  const [isLoading, setIsLoading] = useState(true);
-  
   // Get allocation data fetching function
   const { fetchAllocations } = useFetchAllocations();
-  
-  // Update isLoading based on allocationsStateLoading with a slight delay to prevent flickering
-  useEffect(() => {
-    // If allocationsStateLoading is false, add a slight delay before updating isLoading
-    if (!allocationsStateLoading && isLoading) {
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    } else if (allocationsStateLoading && !isLoading) {
-      // If allocationsStateLoading is true, update isLoading immediately
-      setIsLoading(true);
-    }
-  }, [allocationsStateLoading, isLoading]);
   
   // Fetch allocations when team members or selected week changes
   useEffect(() => {
@@ -50,14 +34,12 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
     logger.log('Team members count:', teamMembers.length);
     
     if (teamMembers.length === 0) {
-      setIsLoading(false);
       setAllocationsStateLoading(false);
       setIsInitialLoad(false);
       return;
     }
     
     // Set loading state
-    setIsLoading(true);
     setAllocationsStateLoading(true);
     
     const loadData = async () => {
@@ -70,14 +52,13 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
           setError
         );
         
-        // Mark that initial load is complete
+        // Mark that initial load is complete immediately
         setIsInitialLoad(false);
       } catch (err) {
         logger.error('Failed to load allocations:', err);
         const error = err instanceof Error ? err : new Error('Failed to load allocations');
         setError(error);
         setAllocationsStateLoading(false);
-        setIsLoading(false);
         setIsInitialLoad(false);
         toast.error('Failed to load allocations');
       }
@@ -89,7 +70,6 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
   // Function to manually refresh allocations
   const refreshAllocations = useCallback(() => {
     logger.log('Manual refresh of allocations triggered');
-    setIsLoading(true);
     setAllocationsStateLoading(true);
     
     fetchAllocations(
@@ -121,7 +101,7 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
     memberAllocations,
     getMemberAllocation,
     handleInputChange,
-    isLoading: isLoading || isInitialLoad,
+    isLoading: allocationsStateLoading || isInitialLoad,
     error,
     refreshAllocations,
     projectTotals

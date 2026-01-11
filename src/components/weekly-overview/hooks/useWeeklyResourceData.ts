@@ -155,7 +155,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
   // Get members organized by office
   const { membersByOffice, filteredOffices } = useOfficeMembers(allMembers, filters);
 
-  // Clear initialization state when data is loaded
+  // Clear initialization state when data is loaded - NO artificial delay
   useEffect(() => {
     // CRITICAL: Include companyLoading in the ready check
     const dataIsReady = !companyLoading && !isLoadingSession && !isLoadingMembers && 
@@ -163,12 +163,8 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
                         !isLoadingAllocations && Array.isArray(allMembers);
                          
     if (dataIsReady) {
-      // Use a short delay to ensure all data is properly initialized
-      const timer = setTimeout(() => {
-        setIsInitializing(false);
-      }, 300);
-      
-      return () => clearTimeout(timer);
+      // Set immediately - no delay needed
+      setIsInitializing(false);
     }
   }, [
     companyLoading,
