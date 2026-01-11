@@ -16,11 +16,13 @@ export const useWeekResourceAllocations = ({ weekStartDate }: UseWeekResourceAll
     queryFn: async () => {
       if (!company?.id) return [];
 
+      // RULEBOOK: Filter by resource_type='active' for active team views
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select('*')
         .eq('company_id', company.id)
-        .eq('allocation_date', weekStartDate);
+        .eq('allocation_date', weekStartDate)
+        .eq('resource_type', 'active');
 
       if (error) {
         throw error;

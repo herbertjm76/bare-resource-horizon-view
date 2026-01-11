@@ -50,10 +50,12 @@
  * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts (.eq('resource_type', 'active'))
  * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts (.eq('resource_type', 'active'))
  * - src/pages/CapacityHeatmap.tsx (.eq('resource_type', 'active'))
- * - src/components/resource-planning/PipelineTimelineView.tsx
+ * - src/components/resource-planning/PipelineTimelineView.tsx (.eq('resource_type', 'active'))
  * - src/components/workload/hooks/services/dataFetchers.ts (.eq('resource_type', 'active'))
+ * - src/components/week-resourcing/hooks/useWeekResourceAllocations.ts (.eq('resource_type', 'active'))
+ * - src/components/team-member-detail/resource-planning/hooks/useResourcePlanningData.ts (.eq('resource_type', 'active'))
  * - src/services/unifiedInsightsService.ts (.eq('resource_type', 'active'))
- * 
+ *
  * === WRITE PATHS USING CANONICAL API ===
  * - src/components/resources/person-view/ProjectAllocationRow.tsx (uses saveResourceAllocation)
  * - src/components/resources/person-view/AddProjectRow.tsx (uses saveResourceAllocation)

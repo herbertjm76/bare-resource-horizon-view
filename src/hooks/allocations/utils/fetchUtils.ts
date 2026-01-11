@@ -145,6 +145,7 @@ export async function fetchRecentAllocations(
     const latestWeekKey = dateData[0].allocation_date;
     logger.log(`Using most recent week key: ${latestWeekKey}`);
     
+    // RULEBOOK: Filter by resource_type='active' for active team views
     const { data } = await supabase
       .from('project_resource_allocations')
       .select(`
@@ -156,6 +157,7 @@ export async function fetchRecentAllocations(
       `)
       .eq('allocation_date', latestWeekKey)
       .eq('company_id', companyId)
+      .eq('resource_type', 'active')
       .in('resource_id', memberIds);
       
     return data || [];
