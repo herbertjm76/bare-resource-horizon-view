@@ -118,7 +118,19 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                           onChange={(e) => {
                             const inputValue = parseFloat(e.target.value) || 0;
                             const newHours = convertInputToHours(inputValue, weeklyCapacity, displayPreference);
-                            // Update the project allocations array
+
+                            console.debug('[alloc-debug] WeeklyOverview EnhancedTeamMemberRows change', {
+                              inputValue,
+                              displayPreference,
+                              weeklyCapacity,
+                              workWeekHours,
+                              memberWeeklyCapacity: member?.weekly_capacity,
+                              computedHours: newHours,
+                              priorProjectHours: projectHours,
+                              projectId: project.id,
+                              memberId: member.id,
+                            });
+
                             const updatedProjectAllocations = [...allocation.projectAllocations];
                             const existingIndex = updatedProjectAllocations.findIndex(pa => pa.projectId === project.id);
                             
