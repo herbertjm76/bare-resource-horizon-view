@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Resource } from '../types/resourceTypes';
 import { logger } from '@/utils/logger';
+import { deleteAllResourceAllocationsForProject } from '@/hooks/allocations/api';
 
 export const deleteResource = async (
   resourceId: string,
@@ -37,7 +38,8 @@ export const deleteResource = async (
           .eq('company_id', companyId);
       }
       
-      // Delete ALL allocations for this resource across all projects
+      // RULEBOOK: Delete ALL allocations for this resource across all projects
+      // This is a global delete, so we delete directly (no project scope)
       await supabase
         .from('project_resource_allocations')
         .delete()
@@ -63,13 +65,13 @@ export const deleteResource = async (
           .eq('company_id', companyId);
       }
       
-      // Only delete allocations for this specific project
-      await supabase
-        .from('project_resource_allocations')
-        .delete()
-        .eq('project_id', projectId)
-        .eq('resource_id', resourceId)
-        .eq('company_id', companyId);
+      // RULEBOOK: Use canonical API for project-specific allocation deletion
+      await deleteAllResourceAllocationsForProject(
+        projectId,
+        resourceId,
+        resourceType,
+        companyId
+      );
         
       toast.success(`${resourceToDelete?.name} removed from this project`);
     }

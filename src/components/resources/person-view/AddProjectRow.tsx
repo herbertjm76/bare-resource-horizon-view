@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { toUTCDateKey } from '@/utils/dateKey';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { toast } from 'sonner';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { UnifiedAddProjectPopup } from '@/components/shared/UnifiedAddProjectPopup';
+import { saveResourceAllocation } from '@/hooks/allocations/api';
 
 interface AddProjectRowProps {
   personId: string;
@@ -24,6 +25,7 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
   onProjectAdded
 }) => {
   const { company } = useCompany();
+  const { startOfWorkWeek } = useAppSettings();
   const [isAdding, setIsAdding] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
 
@@ -41,18 +43,18 @@ export const AddProjectRow: React.FC<AddProjectRowProps> = ({
       
       const allocationDateKey = toUTCDateKey(targetWeek.weekStartDate);
 
-      const { error } = await supabase
-        .from('project_resource_allocations')
-        .insert({
-          project_id: projectId,
-          resource_id: personId,
-          resource_type: resourceType,
-          allocation_date: allocationDateKey,
-          hours: 0,
-          company_id: company.id,
-        });
+      // RULEBOOK: Use canonical API for saving allocations
+      const success = await saveResourceAllocation(
+        projectId,
+        personId,
+        resourceType,
+        allocationDateKey,
+        0, // Initial allocation with 0 hours
+        company.id,
+        startOfWorkWeek
+      );
 
-      if (error) throw error;
+      if (!success) throw new Error('Failed to save allocation');
 
       toast.success('Project added');
       onProjectAdded();

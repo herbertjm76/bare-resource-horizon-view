@@ -34,7 +34,7 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
         .from('project_resource_allocations')
         .select('hours, allocation_date')
         .eq('resource_id', profile.id)
-        .eq('resource_type', 'team_member')
+        .eq('resource_type', 'active')
         .gte('allocation_date', quarterStart)
         .lte('allocation_date', quarterEnd);
 
