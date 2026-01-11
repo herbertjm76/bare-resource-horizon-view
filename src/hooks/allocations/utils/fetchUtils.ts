@@ -38,6 +38,8 @@ export async function fetchPreciseDateAllocations(
   logger.log('Fetching allocations for week key:', weekKey);
   
   try {
+    // RULE BOOK: Weekly overview shows ACTIVE team members only.
+    // Filter by resource_type='active' to avoid double-counting legacy/pre_registered rows.
     const { data, error } = await supabase
       .from('project_resource_allocations')
       .select(`
@@ -49,6 +51,7 @@ export async function fetchPreciseDateAllocations(
       `)
       .eq('allocation_date', weekKey)
       .eq('company_id', companyId)
+      .eq('resource_type', 'active')
       .in('resource_id', memberIds);
     
     if (error) {
@@ -84,6 +87,8 @@ export async function fetchDateRangeAllocations(
   logger.log(`Fetching allocations from ${startWeekKey} to ${endWeekKey}`);
   
   try {
+    // RULE BOOK: Weekly overview shows ACTIVE team members only.
+    // Filter by resource_type='active' to avoid double-counting legacy/pre_registered rows.
     const { data, error } = await supabase
       .from('project_resource_allocations')
       .select(`
@@ -96,6 +101,7 @@ export async function fetchDateRangeAllocations(
       .gte('allocation_date', startWeekKey)
       .lte('allocation_date', endWeekKey)
       .eq('company_id', companyId)
+      .eq('resource_type', 'active')
       .in('resource_id', memberIds);
       
     if (error) {

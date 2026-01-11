@@ -34,11 +34,14 @@ export const useComprehensiveAllocations = ({
         return [];
       }
       
+      // RULE BOOK: Weekly overview shows ACTIVE team members only.
+      // Filter by resource_type='active' to avoid double-counting legacy/pre_registered rows.
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select('*')
         .eq('company_id', company.id)
         .eq('allocation_date', weekStartDate)
+        .eq('resource_type', 'active')
         .in('resource_id', memberIds);
 
       if (error) {

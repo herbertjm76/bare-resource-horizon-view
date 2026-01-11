@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { Search, Calendar, Clock, Trash2 } from 'lucide-react';
@@ -20,6 +20,7 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { normalizeToWeekStart } from '@/utils/weekNormalization';
+import { useCanonicalAllocationSave } from '@/hooks/allocations/useCanonicalAllocationSave';
 
 interface ResourceAllocationDialogProps {
   open: boolean;
@@ -44,11 +45,16 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
 }) => {
   const { company } = useCompany();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { projectDisplayPreference, displayPreference, workWeekHours, startOfWorkWeek } = useAppSettings();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const [allocations, setAllocations] = useState<Record<string, number>>({});
+  const [originalAllocations, setOriginalAllocations] = useState<Record<string, number>>({});
   const [saving, setSaving] = useState(false);
+
+  // RULE BOOK: Use canonical allocation save hook
+  const { save: canonicalSave, remove: canonicalRemove } = useCanonicalAllocationSave();
 
   // Normalize the weekStartDate to ensure consistency
   const normalizedWeekStart = useMemo(() => 
@@ -80,8 +86,9 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
   });
 
   // Fetch existing allocations using normalized week start
+  // RULE BOOK: Filter by member.type to get only the correct resource_type
   const { data: existingAllocations } = useQuery({
-    queryKey: ['allocations', member.id, normalizedWeekStart],
+    queryKey: ['allocations', member.id, normalizedWeekStart, member.type],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('project_resource_allocations')
@@ -97,6 +104,7 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
         allocationMap[alloc.project_id] = alloc.hours;
       });
       setAllocations(allocationMap);
+      setOriginalAllocations(allocationMap);
       return allocationMap;
     },
     enabled: open,
@@ -125,32 +133,33 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
     }
   };
 
+  // RULE BOOK: Use canonical delete through the hook
   const handleDeleteAllocation = async (projectId: string) => {
     if (!company?.id) return;
 
     try {
-      // Delete from database immediately using normalized week start
-      const { error } = await supabase
-        .from('project_resource_allocations')
-        .delete()
-        .eq('resource_id', member.id)
-        .eq('project_id', projectId)
-        .eq('allocation_date', normalizedWeekStart)
-        .eq('resource_type', member.type);
+      const success = await canonicalRemove(
+        projectId,
+        member.id,
+        member.type,
+        normalizedWeekStart
+      );
 
-      if (error) throw error;
+      if (success) {
+        // Update local state
+        setAllocations((prev) => {
+          const updated = { ...prev };
+          delete updated[projectId];
+          return updated;
+        });
 
-      // Update local state
-      setAllocations((prev) => {
-        const updated = { ...prev };
-        delete updated[projectId];
-        return updated;
-      });
-
-      toast({
-        title: 'Deleted',
-        description: 'Allocation removed successfully',
-      });
+        toast({
+          title: 'Deleted',
+          description: 'Allocation removed successfully',
+        });
+      } else {
+        throw new Error('Delete failed');
+      }
     } catch (error) {
       console.error('Error deleting allocation:', error);
       toast({
@@ -161,42 +170,51 @@ export const ResourceAllocationDialog: React.FC<ResourceAllocationDialogProps> =
     }
   };
 
+  // RULE BOOK: Use canonical save for all allocations
   const handleSave = async () => {
     if (!company?.id) return;
 
     setSaving(true);
     try {
-      // Get all project IDs that have allocations
-      const projectsToUpdate = Object.keys(allocations).filter(
-        (projectId) => allocations[projectId] > 0
-      );
+      // Determine what changed
+      const allProjectIds = new Set([
+        ...Object.keys(allocations),
+        ...Object.keys(originalAllocations)
+      ]);
 
-      // Delete existing allocations for this member and week using normalized date
-      await supabase
-        .from('project_resource_allocations')
-        .delete()
-        .eq('resource_id', member.id)
-        .eq('allocation_date', normalizedWeekStart)
-        .eq('resource_type', member.type);
+      const savePromises: Promise<boolean>[] = [];
 
-      // Insert new allocations with normalized week start
-      // (DB trigger will also normalize as safety net)
-      if (projectsToUpdate.length > 0) {
-        const allocationsToInsert = projectsToUpdate.map((projectId) => ({
-          project_id: projectId,
-          resource_id: member.id,
-          resource_type: member.type,
-          allocation_date: normalizedWeekStart,
-          hours: allocations[projectId],
-          company_id: company.id,
-        }));
+      for (const projectId of allProjectIds) {
+        const newHours = allocations[projectId] || 0;
+        const originalHours = originalAllocations[projectId] || 0;
 
-        const { error } = await supabase
-          .from('project_resource_allocations')
-          .insert(allocationsToInsert);
-
-        if (error) throw error;
+        // Only update if changed
+        if (newHours !== originalHours) {
+          if (newHours > 0) {
+            // Save or update
+            savePromises.push(
+              canonicalSave(projectId, member.id, member.type, normalizedWeekStart, newHours)
+            );
+          } else if (originalHours > 0) {
+            // Delete (was non-zero, now zero)
+            savePromises.push(
+              canonicalRemove(projectId, member.id, member.type, normalizedWeekStart)
+            );
+          }
+        }
       }
+
+      if (savePromises.length > 0) {
+        const results = await Promise.all(savePromises);
+        const allSucceeded = results.every(r => r);
+
+        if (!allSucceeded) {
+          throw new Error('Some allocations failed to save');
+        }
+      }
+
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['allocations'] });
 
       toast({
         title: 'Success',
