@@ -7,6 +7,7 @@ import { Project, MemberAllocation } from './types';
 import { CapacityBar } from '@/components/week-resourcing/CapacityBar';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAvailableValue } from '@/utils/allocationDisplay';
+import { getAllocationCapacity } from '@/utils/allocationCapacity';
 import { logger } from '@/utils/logger';
 
 interface MemberTableRowProps {
@@ -52,7 +53,12 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   };
 
   // Use comprehensive data if available, otherwise fall back to legacy allocation
-  const weeklyCapacity = member.weekly_capacity || workWeekHours;
+  // IMPORTANT: Use getAllocationCapacity for consistent % <-> hours conversions
+  const weeklyCapacity = getAllocationCapacity({
+    displayPreference,
+    workWeekHours,
+    memberWeeklyCapacity: member.weekly_capacity,
+  });
   const totalWeeklyAllocatedHours = getMemberTotal ? getMemberTotal(member.id) : 
     (allocation.projectAllocations?.reduce((sum, proj) => sum + proj.hours, 0) || 0);
   const projectCount = getProjectCount ? getProjectCount(member.id) : 
