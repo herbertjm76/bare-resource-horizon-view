@@ -57,10 +57,12 @@
  * - src/components/workload/hooks/services/dataFetchers.ts (.eq('resource_type', 'active'))
  * - src/components/weekly-rundown/cards/AvailableThisWeekCard.tsx (intentionally fetches both types for combined availability view)
  * - src/hooks/useProjectStageProgress.ts (.eq('resource_type', 'active'))
+ * - src/hooks/project-financial/useBurnRateTracking.ts (.eq('resource_type', 'active'))
  * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts (.eq('resource_type', 'active'))
  * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts (.eq('resource_type', 'active'))
  * - src/pages/CapacityHeatmap.tsx (.eq('resource_type', 'active'))
  * - src/services/unifiedInsightsService.ts (.eq('resource_type', 'active'))
+ * - src/components/projects/services/matrixImporter.ts (bulk import uses direct DB with proper resource_type='active')
  *
  * === WRITE PATHS USING CANONICAL API ===
  * - src/components/resources/person-view/ProjectAllocationRow.tsx (uses saveResourceAllocation)

@@ -7,7 +7,8 @@ export const useUserProjects = (userId: string | undefined) => {
     queryFn: async () => {
       if (!userId) return { current: [], history: [] };
 
-      // Get current and past project allocations
+      // RULEBOOK: Intentionally fetches both 'active' and 'pre_registered' allocations
+      // because this shows ALL projects a user has been allocated to (profile view)
       const { data: allocations, error } = await supabase
         .from('project_resource_allocations')
         .select(`
