@@ -157,15 +157,17 @@ export class MatrixImporter {
               .maybeSingle();
 
             if (existingAllocation) {
-              // Update existing
-              // RULEBOOK: Always use resource_type='active' for active team members
+              // Update existing - use direct update since we have the specific ID
+              // RULEBOOK: Matrix import is a bulk operation that uses direct DB access
+              // but ensures proper resource_type and deduplication via unique constraint
               await supabase
                 .from('project_resource_allocations')
                 .update({ hours, resource_type: 'active' })
                 .eq('id', existingAllocation.id);
             } else {
-              // Create new
-              // RULEBOOK: Always use resource_type='active' for active team members
+              // Create new - DB trigger will normalize allocation_date to week start
+              // RULEBOOK: Matrix import uses direct insert with proper resource_type
+              // Unique constraint prevents duplicates
               await supabase
                 .from('project_resource_allocations')
                 .insert({

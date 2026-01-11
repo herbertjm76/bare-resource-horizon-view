@@ -34,10 +34,12 @@ const CapacityHeatmap: React.FC = () => {
       if (!company?.id || initializedRef.current) return;
 
       try {
+        // RULEBOOK: Filter by resource_type='active' for active team views
         const { data, error } = await supabase
           .from('project_resource_allocations')
           .select('allocation_date')
           .eq('company_id', company.id)
+          .eq('resource_type', 'active')
           .gt('hours', 0)
           .order('allocation_date', { ascending: false })
           .limit(1)

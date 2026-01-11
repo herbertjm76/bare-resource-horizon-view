@@ -15,9 +15,11 @@ export const initializeAllocations = async (
     logger.debug('initializeAllocations - Starting', { projectId, companyId, weekStartDay });
     
     // Fetch all resource allocations for this project from database
+    // Note: This is a project-level view that needs all resource types for the allocation grid
+    // RULEBOOK: This intentionally fetches both active and pre_registered for project resource management
     const { data, error } = await supabase
       .from('project_resource_allocations')
-      .select('resource_id, allocation_date, hours')
+      .select('resource_id, allocation_date, hours, resource_type')
       .eq('project_id', projectId)
       .eq('company_id', companyId);
       
