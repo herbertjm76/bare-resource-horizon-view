@@ -50,16 +50,22 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
   const [savingMemberId, setSavingMemberId] = useState<string | null>(null);
 
   // Initialize input values when dialog opens / project changes
+  // Use member-specific capacity for accurate display
   useEffect(() => {
     if (!open) return;
     const next: Record<string, string> = {};
     (project?.teamMembers || []).forEach((m: any) => {
-      next[m.id] = hoursToInputDisplay(Number(m.hours || 0), capacity, displayPreference);
+      const memberCapacity = m.weekly_capacity || m.capacity || workWeekHours || 40;
+      next[m.id] = hoursToInputDisplay(Number(m.hours || 0), memberCapacity, displayPreference);
     });
     setValues(next);
-  }, [open, project?.id, project?.teamMembers, capacity, displayPreference]);
+  }, [open, project?.id, project?.teamMembers, workWeekHours, displayPreference]);
 
-  const handleSave = async (memberId: string, memberName: string) => {
+  // Get member-specific capacity (Phase 5: consistent capacity source)
+  const getMemberCapacity = (member: any) => 
+    member.weekly_capacity || member.capacity || workWeekHours || 40;
+
+  const handleSave = async (memberId: string, memberName: string, member: any) => {
     if (!company?.id) {
       toast.error('Company context is missing');
       return;
@@ -70,7 +76,9 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
     }
 
     const input = values[memberId] ?? '';
-    const hoursValue = parseInputToHours(input, capacity, displayPreference);
+    // Use member-specific capacity for accurate % to hours conversion
+    const memberCapacity = getMemberCapacity(member);
+    const hoursValue = parseInputToHours(input, memberCapacity, displayPreference);
 
     if (!Number.isFinite(hoursValue) || hoursValue < 0) {
       toast.error('Please enter a valid number');
@@ -93,12 +101,22 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
 
       toast.success(`Updated allocation for ${memberName}`);
 
-      // Keep invalidation broad enough to refresh any view using these queries.
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] }),
-        queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] }),
-        queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] }),
-      ]);
+      // Optimistic UI update - immediately reflect the saved value
+      setValues((prev) => ({
+        ...prev,
+        [memberId]: hoursToInputDisplay(hoursValue, memberCapacity, displayPreference)
+      }));
+
+      // Dispatch event for other components
+      window.dispatchEvent(new CustomEvent('allocation-updated', {
+        detail: { weekKey: weekStartKey, resourceId: memberId, projectId: project.id, hours: hoursValue }
+      }));
+
+      // Fire-and-forget invalidations for instant feedback (Phase 2)
+      void queryClient.invalidateQueries({ queryKey: ['streamlined-week-resource-data'] });
+      void queryClient.invalidateQueries({ queryKey: ['detailed-weekly-allocations'] });
+      void queryClient.invalidateQueries({ queryKey: ['comprehensive-weekly-allocations'] });
+      void queryClient.invalidateQueries({ queryKey: ['available-allocations'] });
     } catch (e: any) {
       toast.error(e?.message || 'Failed to save allocation');
     } finally {
@@ -133,7 +151,7 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
                     <p className="font-medium truncate">{member.name}</p>
                     <p className="text-sm text-muted-foreground">
                       Current:{' '}
-                      {formatAllocationValue(member.hours || 0, capacity, displayPreference)}
+                      {formatAllocationValue(member.hours || 0, getMemberCapacity(member), displayPreference)}
                     </p>
                   </div>
 
@@ -150,7 +168,7 @@ export const EditProjectAllocationsDialog: React.FC<EditProjectAllocationsDialog
 
                     <Button
                       size="sm"
-                      onClick={() => handleSave(member.id, member.name)}
+                      onClick={() => handleSave(member.id, member.name, member)}
                       disabled={savingMemberId === member.id}
                     >
                       {savingMemberId === member.id ? 'Saving…' : 'Save'}
