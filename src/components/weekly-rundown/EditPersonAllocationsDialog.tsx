@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -583,6 +583,16 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
             </div>
           )}
         </div>
+
+        <DialogFooter className="pt-4 border-t">
+          <Button 
+            variant="default" 
+            onClick={() => onOpenChange(false)}
+            className="bg-gradient-start hover:bg-gradient-mid text-white"
+          >
+            Done
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
