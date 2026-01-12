@@ -19,7 +19,7 @@ import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { usePermissions } from '@/hooks/usePermissions';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
-import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { getWeekStartDate } from '@/utils/weekNormalization';
 import { formatAllocationValue, formatDualAllocationValue } from '@/utils/allocationDisplay';
 import * as LucideIcons from 'lucide-react';
 
