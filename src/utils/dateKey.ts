@@ -24,3 +24,22 @@ export const toUTCDateKey = (date: Date): string => {
 export const parseUTCDateKey = (dateKey: string): Date => {
   return new Date(dateKey + 'T00:00:00Z');
 };
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * Calculate the start of the week in UTC.
+ * Ensures consistent week boundaries regardless of timezone.
+ * @param date - The date to calculate week start for
+ * @param weekStartsOn - 0 = Sunday, 1 = Monday, 6 = Saturday
+ */
+export const startOfWeekUTC = (date: Date, weekStartsOn: 0 | 1 | 6 = 1): Date => {
+  // Anchor to midnight UTC first
+  const anchored = parseUTCDateKey(toUTCDateKey(date));
+  const dow = anchored.getUTCDay();
+
+  let diff = dow - weekStartsOn;
+  if (diff < 0) diff += 7;
+
+  return new Date(anchored.getTime() - diff * MS_PER_DAY);
+};
