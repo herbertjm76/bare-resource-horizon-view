@@ -43,6 +43,18 @@ export const useRundownData = ({
           0
         );
 
+        // DEV DIAGNOSTIC: verify allocations exist for the pre-registered Herbert used in the report.
+        // This will appear in console only in DEV builds.
+        if (import.meta.env.DEV && member.id === 'da3a7cc2-23a5-447f-b193-265ef3e71f2c') {
+          // eslint-disable-next-line no-console
+          console.log('[WeeklyOverview][rundown] Herbert allocations snapshot', {
+            memberId: member.id,
+            memberName: `${member.first_name} ${member.last_name}`,
+            memberTotal,
+            projectAllocations,
+          });
+        }
+
         // Some data sources don't populate `resourcedHours` consistently.
         // Prefer resourcedHours when present, otherwise derive it from project allocations.
         const baseResourcedHours =
