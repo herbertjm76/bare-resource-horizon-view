@@ -2,9 +2,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { format, addDays } from 'date-fns';
+import { addDays } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/utils/weekNormalization';
+import { toUTCDateKey } from '@/utils/dateKey';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { generateDemoAllocations, DEMO_PROJECTS, DEMO_COMPANY_ID } from '@/data/demoData';
 
@@ -48,8 +49,8 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
 
       const weekStart = getWeekStartDate(selectedWeek, effectiveWeekStart);
       const weekEnd = addDays(weekStart, 6);
-      const weekStartDate = format(weekStart, 'yyyy-MM-dd');
-      const weekEndDate = format(weekEnd, 'yyyy-MM-dd');
+      const weekStartDate = toUTCDateKey(weekStart);
+      const weekEndDate = toUTCDateKey(weekEnd);
 
       // Demo mode: Use demo allocations
       if (isDemoMode) {

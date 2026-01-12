@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { toUTCDateKey } from '@/utils/dateKey';
 import { StandardizedBadge } from '@/components/ui/standardized-badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Clock, Users, Calendar, Building, Pencil, Circle, Palmtree, Loader2 } from 'lucide-react';
@@ -144,7 +145,7 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date } & GridCardPer
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Calculate week start date string for MemberVacationPopover
-  const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
+  const weekStartDate = toUTCDateKey(getWeekStartDate(selectedWeek, startOfWorkWeek));
   const personName = `${person.first_name || ''} ${person.last_name || ''}`.trim() || person.name || 'Unknown';
   
   // Calculate total leave hours
