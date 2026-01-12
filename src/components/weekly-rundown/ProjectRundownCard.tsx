@@ -13,7 +13,13 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { formatDualAllocationValue } from '@/utils/allocationDisplay';
 
-interface ProjectRundownCardProps {
+// Permission props that can be passed from parent to avoid N separate permission queries
+interface PermissionProps {
+  canManageAllocations?: boolean;
+  permissionsBootstrapping?: boolean;
+}
+
+interface ProjectRundownCardProps extends PermissionProps {
   project: {
     id: string;
     name: string;
@@ -43,13 +49,17 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = React.memo(
   isActive,
   isFullscreen,
   selectedWeek,
-  onDataChange
+  onDataChange,
+  canManageAllocations: canManageAllocationsProp,
+  permissionsBootstrapping: permissionsBootstrappingProp
 }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
   const { projectDisplayPreference, startOfWorkWeek, workWeekHours, displayPreference } = useAppSettings();
-  const { isAtLeastRole } = usePermissions();
-  const canManageAllocations = isAtLeastRole('admin');
+  
+  // Use passed props if available, otherwise fall back to hook (for backwards compatibility)
+  const permissions = usePermissions();
+  const canManageAllocations = canManageAllocationsProp ?? permissions.isAtLeastRole('admin');
   const sortedMembers = [...project.teamMembers].sort((a, b) => b.hours - a.hours);
 
   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);

@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PersonRundownCard } from './PersonRundownCard';
 import { ProjectRundownCard } from './ProjectRundownCard';
 import { RundownMode } from './WeeklyRundownView';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface RundownCarouselProps {
   items: any[];
@@ -30,6 +31,10 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   onExitFullscreen,
   selectedWeek
 }) => {
+  // OPTIMIZATION: Single permissions check at parent level, passed down to all cards
+  // This prevents N separate permission queries (one per card) when the carousel loads
+  const { isAtLeastRole, permissionsReady, permissionsBootstrapping } = usePermissions();
+  const canManageAllocations = permissionsReady && isAtLeastRole('admin');
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     startIndex: currentIndex,
     loop: false,
@@ -171,6 +176,8 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
                         isActive={isActive}
                         isFullscreen={isFullscreen}
                         selectedWeek={selectedWeek}
+                        canManageAllocations={canManageAllocations}
+                        permissionsBootstrapping={permissionsBootstrapping}
                       />
                     ) : (
                       <ProjectRundownCard
@@ -179,6 +186,8 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
                         isFullscreen={isFullscreen}
                         selectedWeek={selectedWeek}
                         onDataChange={() => {}}
+                        canManageAllocations={canManageAllocations}
+                        permissionsBootstrapping={permissionsBootstrapping}
                       />
                     )}
                   </motion.div>
