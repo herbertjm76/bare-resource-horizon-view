@@ -18,7 +18,13 @@ import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectD
 import { formatAllocationValue, formatDualAllocationValue, formatAvailableValue } from '@/utils/allocationDisplay';
 import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
-interface PersonRundownCardProps {
+// Permission props that can be passed from parent to avoid N separate permission queries
+interface PermissionProps {
+  canManageAllocations?: boolean;
+  permissionsBootstrapping?: boolean;
+}
+
+interface PersonRundownCardProps extends PermissionProps {
   person: {
     id: string;
     first_name: string;
@@ -55,13 +61,18 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
   isActive,
   isFullscreen,
   selectedWeek = new Date(),
-  onDataChange
+  onDataChange,
+  canManageAllocations: canManageAllocationsProp,
+  permissionsBootstrapping: permissionsBootstrappingProp
 }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { projectDisplayPreference, displayPreference, startOfWorkWeek } = useAppSettings();
-  const { isAtLeastRole } = usePermissions();
-  const canManageAllocations = isAtLeastRole('admin');
+  
+  // Use passed props if available, otherwise fall back to hook (for backwards compatibility)
+  const permissions = usePermissions();
+  const canManageAllocations = canManageAllocationsProp ?? permissions.isAtLeastRole('admin');
+  const permissionsBootstrapping = permissionsBootstrappingProp ?? permissions.permissionsBootstrapping;
 
   const getUtilizationStatus = (percentage: number) => {
     if (percentage > 100) return { color: 'destructive', label: 'Overloaded', icon: AlertTriangle };
@@ -281,6 +292,8 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = React.memo(({
     prevProps.person.totalHours === nextProps.person.totalHours &&
     prevProps.isActive === nextProps.isActive &&
     prevProps.isFullscreen === nextProps.isFullscreen &&
+    prevProps.canManageAllocations === nextProps.canManageAllocations &&
+    prevProps.permissionsBootstrapping === nextProps.permissionsBootstrapping &&
     JSON.stringify(prevProps.person.projects) === JSON.stringify(nextProps.person.projects) &&
     JSON.stringify(prevProps.person.leave) === JSON.stringify(nextProps.person.leave)
   );

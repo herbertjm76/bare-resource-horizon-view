@@ -71,6 +71,11 @@ export const RundownGridView: React.FC<RundownGridViewProps> = React.memo(({
   isLoading = false
 }) => {
   const gridCols = isFullscreen ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+  
+  // OPTIMIZATION: Single permissions check at parent level, passed down to all cards
+  // This prevents N separate permission queries (one per card) when the grid loads
+  const { isAtLeastRole, permissionsReady, permissionsBootstrapping } = usePermissions();
+  const canManageAllocations = permissionsReady && isAtLeastRole('admin');
 
   // Show skeletons while loading
   if (isLoading) {
@@ -100,9 +105,19 @@ export const RundownGridView: React.FC<RundownGridViewProps> = React.memo(({
         {items.map((item) => (
           <div key={item.id}>
             {rundownMode === 'people' ? (
-              <PersonGridCard person={item} selectedWeek={selectedWeek} />
+              <PersonGridCard 
+                person={item} 
+                selectedWeek={selectedWeek} 
+                canManageAllocations={canManageAllocations}
+                permissionsBootstrapping={permissionsBootstrapping}
+              />
             ) : (
-              <ProjectGridCard project={item} selectedWeek={selectedWeek} />
+              <ProjectGridCard 
+                project={item} 
+                selectedWeek={selectedWeek}
+                canManageAllocations={canManageAllocations}
+                permissionsBootstrapping={permissionsBootstrapping}
+              />
             )}
           </div>
         ))}
@@ -111,10 +126,18 @@ export const RundownGridView: React.FC<RundownGridViewProps> = React.memo(({
   );
 });
 
-const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = React.memo(({ person, selectedWeek }) => {
+interface GridCardPermissionProps {
+  canManageAllocations: boolean;
+  permissionsBootstrapping: boolean;
+}
+
+const PersonGridCard: React.FC<{ person: any; selectedWeek: Date } & GridCardPermissionProps> = React.memo(({ 
+  person, 
+  selectedWeek,
+  canManageAllocations,
+  permissionsBootstrapping
+}) => {
   const { startOfWorkWeek, displayPreference, workWeekHours, projectDisplayPreference } = useAppSettings();
-  const { isAtLeastRole, permissionsReady, permissionsBootstrapping } = usePermissions();
-  const canManageAllocations = permissionsReady && isAtLeastRole('admin');
 
   const capacity = person.capacity || workWeekHours;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -337,12 +360,15 @@ const PersonGridCard: React.FC<{ person: any; selectedWeek: Date }> = React.memo
   );
 });
 
-const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date }> = React.memo(({ project, selectedWeek }) => {
+const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date } & GridCardPermissionProps> = React.memo(({ 
+  project, 
+  selectedWeek,
+  canManageAllocations,
+  permissionsBootstrapping
+}) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { departments } = useOfficeSettings();
   const { projectDisplayPreference, startOfWorkWeek, displayPreference, workWeekHours } = useAppSettings();
-  const { isAtLeastRole, permissionsReady, permissionsBootstrapping } = usePermissions();
-  const canManageAllocations = permissionsReady && isAtLeastRole('admin');
 
   // Calculate week start date string for MemberVacationPopover
   const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
