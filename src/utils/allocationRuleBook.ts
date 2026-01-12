@@ -102,6 +102,30 @@
  * - Resource Scheduling: Rows = Projects, Columns = Members/Weeks (grouped by project)
  * - Both use the same allocation data, just displayed differently
  * 
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  FILTER BEHAVIOR RULES                                                        ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * 
+ * The DEPARTMENT FILTER has different targets depending on the view orientation:
+ * 
+ * 1. BY PROJECT VIEWS (Resource Scheduling → By Project, Weekly Overview → Per Project):
+ *    - Department filter targets PROJECT.department
+ *    - Selecting "Hospitality" shows all Hospitality PROJECTS
+ *    - Shows ALL team members allocated to those projects (regardless of member's department)
+ *    - Member filters (practiceArea, location) can further filter team members WITHIN projects
+ * 
+ * 2. BY PERSON VIEWS (Resource Scheduling → By Person, Weekly Overview → Per Person):
+ *    - Department filter targets MEMBER.department (profile.department or invite.department)
+ *    - Selecting "Hospitality" shows all people IN the Hospitality department
+ *    - Shows all project allocations for those filtered members
+ *    - All filter types available: department, practiceArea, location
+ * 
+ * KEY IMPLEMENTATION DETAILS:
+ * - useStreamlinedWeekResourceData accepts `isProjectOriented` option
+ * - When isProjectOriented=true, member filtering is bypassed (return all members)
+ * - WorkloadStyleProjectRow excludes department from member filtering (line 75)
+ * - MemberFilterRow availableFilterTypes controls which filter types are shown
+ * 
  * SHARED DATA SOURCES:
  * - Allocations: `project_resource_allocations` table
  * - Active members: `profiles` table (company_id filtered)

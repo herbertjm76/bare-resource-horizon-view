@@ -18,8 +18,20 @@ import {
 } from '@/data/demoData';
 
 type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
+type TableOrientation = 'per-person' | 'per-project';
 
-export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOption: SortOption = 'alphabetical') => {
+interface UseWeeklyOverviewDataOptions {
+  /** Table orientation - controls whether member filtering is applied */
+  tableOrientation?: TableOrientation;
+}
+
+export const useWeeklyOverviewData = (
+  selectedWeek: Date, 
+  filters: any, 
+  sortOption: SortOption = 'alphabetical',
+  options: UseWeeklyOverviewDataOptions = {}
+) => {
+  const { tableOrientation = 'per-person' } = options;
   const { company } = useCompany();
   const { isDemoMode } = useDemoAuth();
   const { startOfWorkWeek } = useAppSettings();
@@ -42,7 +54,9 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
   }), [filters.practiceArea, filters.department, filters.location, filters.searchTerm]);
 
   // Core resource data (members, projects, allocations) - now with centralized sorting
-  const resourceData = useStreamlinedWeekResourceData(selectedWeek, stableFilters, sortOption);
+  // Pass isProjectOriented to disable member filtering when viewing by project
+  const isProjectOriented = tableOrientation === 'per-project';
+  const resourceData = useStreamlinedWeekResourceData(selectedWeek, stableFilters, sortOption, { isProjectOriented });
   
   const memberIds = useMemo(() => 
     resourceData.allMembers?.map(m => m.id) || [],
