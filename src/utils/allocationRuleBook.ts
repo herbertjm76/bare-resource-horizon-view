@@ -67,27 +67,38 @@
  * === CANONICAL WRITE API (only file allowed to do direct writes) ===
  * - src/hooks/allocations/api.ts (saveResourceAllocation, deleteResourceAllocation, deleteAllResourceAllocationsForProject)
  * 
- * === READ PATHS WITH CORRECT resource_type FILTER ===
- * - src/hooks/allocations/utils/fetchUtils.ts
- * - src/hooks/allocations/useResourceUtilization.ts (dynamic resource_type param)
- * - src/hooks/useIndividualMemberUtilization.ts (.eq('resource_type', 'active'))
- * - src/hooks/useTeamUtilization.ts (.eq('resource_type', 'active'))
- * - src/hooks/useStandardizedUtilizationData.ts (.eq('resource_type', 'active'))
- * - src/hooks/usePersonResourceData.ts (intentionally fetches both types for person view)
- * - src/hooks/utilization/usePreRegisteredMembers.ts (.eq('resource_type', 'pre_registered'))
- * - src/hooks/utilization/useActiveMembers.ts (.eq('resource_type', 'active'))
- * - src/hooks/queries/useDashboardQueries.ts (.eq('resource_type', 'active'))
- * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts (.in('resource_type', ['active', 'pre_registered']))
- * - src/components/week-resourcing/hooks/useDetailedWeeklyAllocations.ts (.in('resource_type', ['active', 'pre_registered']))
- * - src/components/week-resourcing/hooks/useWeekResourceAllocations.ts (.in('resource_type', ['active', 'pre_registered']))
- * - src/components/dashboard/staff/useStaffAllocations.ts (.eq('resource_type', 'active'))
- * - src/components/dashboard/hooks/useResourceAllocationData.ts (.eq('resource_type', 'active'))
- * - src/components/dashboard/hooks/useIndividualUtilization.ts (dynamic resource_type based on isPending)
- * - src/components/weekly-rundown/AvailableMembersRow.tsx (.eq('resource_type', 'active'))
- * - src/components/weekly-rundown/EditableTeamMemberAllocation.tsx (uses canonical API)
- * - src/components/team-member-detail/TeamMemberProjectOverview.tsx (.eq('resource_type', 'active'))
- * - src/components/team-member-detail/TeamMemberProjectAllocations.tsx (.eq('resource_type', 'active'))
- * - src/components/team-member-detail/resource-planning/hooks/useResourcePlanningData.ts (.eq('resource_type', 'active'))
+ * === COMBINED VIEWS (Weekly Overview, Resource Scheduling) - USE .in(['active', 'pre_registered']) ===
+ * These pages show BOTH active AND pre-registered members side-by-side:
+ * - src/hooks/allocations/utils/fetchUtils.ts ✅
+ * - src/hooks/usePersonResourceData.ts ✅
+ * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts ✅
+ * - src/components/week-resourcing/hooks/useDetailedWeeklyAllocations.ts ✅
+ * - src/components/week-resourcing/hooks/useWeekResourceAllocations.ts ✅
+ * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts ✅
+ * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts ✅
+ * - src/components/weekly-rundown/AvailableMembersRow.tsx ✅
+ * - src/components/workload/hooks/services/dataFetchers.ts ✅
+ * - src/components/profile/overview/hooks/useUserProjects.ts ✅
+ * 
+ * === ACTIVE-ONLY VIEWS (Dashboards, Utilization, Metrics) - USE .eq('resource_type', 'active') ===
+ * These pages measure productivity of real employees only:
+ * - src/hooks/useIndividualMemberUtilization.ts
+ * - src/hooks/useTeamUtilization.ts
+ * - src/hooks/useStandardizedUtilizationData.ts
+ * - src/hooks/utilization/useActiveMembers.ts
+ * - src/hooks/queries/useDashboardQueries.ts
+ * - src/components/dashboard/staff/useStaffAllocations.ts
+ * - src/components/dashboard/hooks/useResourceAllocationData.ts
+ * - src/components/dashboard/hooks/useIndividualUtilization.ts
+ * - src/components/team-member-detail/TeamMemberProjectOverview.tsx
+ * - src/components/team-member-detail/TeamMemberProjectAllocations.tsx
+ * - src/components/team-member-detail/resource-planning/hooks/useResourcePlanningData.ts
+ * - src/pages/CapacityHeatmap.tsx
+ * - src/components/profile/overview/CapacityCard.tsx
+ * - src/hooks/project-financial/useBurnRateTracking.ts
+ * 
+ * === PRE-REGISTERED ONLY VIEWS - USE .eq('resource_type', 'pre_registered') ===
+ * - src/hooks/utilization/usePreRegisteredMembers.ts
  * - src/components/profile/overview/CapacityCard.tsx (.eq('resource_type', 'active'))
  * - src/components/profile/overview/hooks/useUserProjects.ts (intentionally fetches both types)
  * - src/components/resource-planning/PipelineTimelineView.tsx (.eq('resource_type', 'active'))

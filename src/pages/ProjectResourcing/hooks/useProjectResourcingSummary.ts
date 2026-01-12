@@ -93,7 +93,7 @@ export const useProjectResourcingSummary = (
       const uniqueWeekKeys = Array.from(new Set(weekKeys));
 
       // Fetch all allocations for this period
-      // RULEBOOK: Filter by resource_type='active' for active team views
+      // RULEBOOK: Weekly views show BOTH active AND pre_registered members
       const { data: allocations, error } = await supabase
         .from('project_resource_allocations')
         .select(`
@@ -105,7 +105,7 @@ export const useProjectResourcingSummary = (
           projects(id, name)
         `)
         .eq('company_id', company.id)
-        .eq('resource_type', 'active')
+        .in('resource_type', ['active', 'pre_registered'])
         .in('allocation_date', uniqueWeekKeys);
 
       if (error) throw error;
