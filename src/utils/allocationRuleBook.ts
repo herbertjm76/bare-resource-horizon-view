@@ -33,10 +33,12 @@
  * - deleteResourceAllocation(): Delete a single week's allocation
  * - deleteAllResourceAllocationsForProject(): Delete all allocations for a resource on a project
  * 
- * READ PATHS MUST FILTER BY resource_type:
- * - Active team views: .eq('resource_type', 'active')
- * - Pre-registered views: .eq('resource_type', 'pre_registered')
- * - Never mix types when calculating totals for a single view
+ * READ PATHS MUST USE CORRECT resource_type FILTER:
+ * - Active-only views (dashboards, utilization): .eq('resource_type', 'active')
+ * - Pre-registered-only views: .eq('resource_type', 'pre_registered')
+ * - Combined views (Weekly Overview, Resource Scheduling): .in('resource_type', ['active', 'pre_registered'])
+ *   - These views show BOTH active AND pre-registered members, so they need BOTH allocation types
+ *   - No double-counting occurs because each member ID is unique to either profiles OR invites
  * 
  * FILES THAT HAVE BEEN AUDITED AND ARE COMPLIANT:
  * 
@@ -53,9 +55,9 @@
  * - src/hooks/utilization/usePreRegisteredMembers.ts (.eq('resource_type', 'pre_registered'))
  * - src/hooks/utilization/useActiveMembers.ts (.eq('resource_type', 'active'))
  * - src/hooks/queries/useDashboardQueries.ts (.eq('resource_type', 'active'))
- * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts (.eq('resource_type', 'active'))
- * - src/components/week-resourcing/hooks/useDetailedWeeklyAllocations.ts (.eq('resource_type', 'active'))
- * - src/components/week-resourcing/hooks/useWeekResourceAllocations.ts (.eq('resource_type', 'active'))
+ * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts (.in('resource_type', ['active', 'pre_registered']))
+ * - src/components/week-resourcing/hooks/useDetailedWeeklyAllocations.ts (.in('resource_type', ['active', 'pre_registered']))
+ * - src/components/week-resourcing/hooks/useWeekResourceAllocations.ts (.in('resource_type', ['active', 'pre_registered']))
  * - src/components/dashboard/staff/useStaffAllocations.ts (.eq('resource_type', 'active'))
  * - src/components/dashboard/hooks/useResourceAllocationData.ts (.eq('resource_type', 'active'))
  * - src/components/dashboard/hooks/useIndividualUtilization.ts (dynamic resource_type based on isPending)

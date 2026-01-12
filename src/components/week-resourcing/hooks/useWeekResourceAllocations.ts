@@ -16,13 +16,14 @@ export const useWeekResourceAllocations = ({ weekStartDate }: UseWeekResourceAll
     queryFn: async () => {
       if (!company?.id) return [];
 
-      // RULEBOOK: Filter by resource_type='active' for active team views
+      // RULEBOOK: Weekly views show BOTH active AND pre_registered members
+      // Fetch allocations for both resource types - no double-counting because member IDs are unique
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select('*')
         .eq('company_id', company.id)
         .eq('allocation_date', weekStartDate)
-        .eq('resource_type', 'active');
+        .in('resource_type', ['active', 'pre_registered']);
 
       if (error) {
         throw error;
