@@ -68,10 +68,12 @@ export const useStreamlinedWeekResourceData = (
     });
   }, [allFetchedMembers, filters?.department, filters?.location, filters?.practiceArea, isProjectOriented]);
   
-  // Fetch projects - independent of members
-  const { data: projects = [], isLoading: isLoadingProjects } = useWeekResourceProjects({ 
-    filters,
-    enabled: true // Always fetch projects
+  // Fetch projects
+  // IMPORTANT: In person-oriented views, department filter targets MEMBERS, not PROJECTS.
+  // So we only apply department filtering to projects when the view is project-oriented.
+  const { data: projects = [], isLoading: isLoadingProjects } = useWeekResourceProjects({
+    filters: isProjectOriented ? filters : undefined,
+    enabled: true,
   });
   
   // Fetch allocations for ALL members - FIXED: Use detailed allocations that fetch all 7 days of the week
