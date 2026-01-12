@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useProjects } from '@/hooks/useProjects';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { startOfWeek, addDays, format, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
 
 interface AvailableThisMonth {
@@ -71,6 +72,10 @@ export const useProjectResourcingSummary = (
   const { company } = useCompany();
   const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData();
   const { projects, isLoading: isLoadingProjects } = useProjects();
+  const { startOfWorkWeek } = useAppSettings();
+  
+  // RULEBOOK: Use company's week start preference for consistent week key generation
+  const weekStartsOn = startOfWorkWeek === 'Sunday' ? 0 : startOfWorkWeek === 'Saturday' ? 6 : 1;
 
   // Generate daily dates for the period
   const generatePeriodDates = useCallback(() => {
@@ -89,7 +94,8 @@ export const useProjectResourcingSummary = (
 
     try {
       const periodDates = generatePeriodDates();
-      const weekKeys = periodDates.map(date => format(startOfWeek(date, { weekStartsOn: 1 }), 'yyyy-MM-dd'));
+      // RULEBOOK: Use company's week start preference for consistent week key generation
+      const weekKeys = periodDates.map(date => format(startOfWeek(date, { weekStartsOn }), 'yyyy-MM-dd'));
       const uniqueWeekKeys = Array.from(new Set(weekKeys));
 
       // Fetch all allocations for this period
@@ -276,7 +282,7 @@ export const useProjectResourcingSummary = (
       console.error('Error calculating resource summary:', error);
       setSummaryData(prev => ({ ...prev, isLoading: false }));
     }
-  }, [company?.id, teamMembers, projects, selectedMonth, periodToShow, isLoadingMembers, isLoadingProjects, generatePeriodDates]);
+  }, [company?.id, teamMembers, projects, selectedMonth, periodToShow, isLoadingMembers, isLoadingProjects, generatePeriodDates, weekStartsOn]);
 
   useEffect(() => {
     setSummaryData(prev => ({ ...prev, isLoading: true }));
