@@ -86,10 +86,6 @@ export const ONBOARDING_STEPS: OnboardingTourStep[] = [
   }
 ];
 
-// Storage key for tracking if user has seen the tour
-const seenTourKey = (companyId: string, userId: string) =>
-  `onboarding:seen:${companyId}:${userId}`;
-
 export const useOnboardingTour = () => {
   const { company } = useCompany();
   const { role, hasPermission, permissionsReady } = usePermissions();
@@ -144,11 +140,10 @@ export const useOnboardingTour = () => {
     localStorage.removeItem(LEGACY_ONBOARDING_STORAGE_KEY);
     localStorage.removeItem(LEGACY_ONBOARDING_USER_KEY);
 
-    const hasSeen = localStorage.getItem(seenTourKey(company.id, userId)) === 'true';
     const dismissed = localStorage.getItem(dontShowAgainKey(company.id, userId)) === 'true';
 
-    // Only show if user hasn't seen it AND hasn't opted out
-    if (!hasSeen && !dismissed) {
+    // Show onboarding unless user explicitly checked "Don't show again"
+    if (!dismissed) {
       setShowOnboarding(true);
       setIsWelcomeStep(true);
       setCurrentStep(0);
@@ -178,30 +173,23 @@ export const useOnboardingTour = () => {
     }
   }, [filteredSteps.length]);
 
-  // Mark tour as seen when closing
-  const markAsSeen = useCallback(() => {
-    if (company?.id && userId) {
-      localStorage.setItem(seenTourKey(company.id, userId), 'true');
-    }
-  }, [company?.id, userId]);
-
-  const completeTour = useCallback(() => {
-    markAsSeen();
-    setShowOnboarding(false);
-  }, [markAsSeen]);
-
-  const skipTour = useCallback((dontShowAgain: boolean = false) => {
-    markAsSeen();
+  const completeTour = useCallback((dontShowAgain: boolean = false) => {
     if (dontShowAgain && company?.id && userId) {
       localStorage.setItem(dontShowAgainKey(company.id, userId), 'true');
     }
     setShowOnboarding(false);
-  }, [company?.id, userId, markAsSeen]);
+  }, [company?.id, userId]);
+
+  const skipTour = useCallback((dontShowAgain: boolean = false) => {
+    if (dontShowAgain && company?.id && userId) {
+      localStorage.setItem(dontShowAgainKey(company.id, userId), 'true');
+    }
+    setShowOnboarding(false);
+  }, [company?.id, userId]);
 
   const resetTour = useCallback(() => {
     if (company?.id && userId) {
       localStorage.removeItem(dontShowAgainKey(company.id, userId));
-      localStorage.removeItem(seenTourKey(company.id, userId));
     }
     localStorage.removeItem(LEGACY_ONBOARDING_STORAGE_KEY);
     localStorage.removeItem(LEGACY_ONBOARDING_USER_KEY);
