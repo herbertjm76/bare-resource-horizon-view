@@ -139,7 +139,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
           hours,
           allocation_date,
           resource_type,
-          projects!inner(
+          projects(
             id,
             name,
             code
@@ -167,6 +167,8 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
         const date = allocation.allocation_date;
         const hours = Number(allocation.hours) || 0;
         const project = allocation.projects;
+        const projectName = project?.name || 'Unknown Project';
+        const projectCode = (project?.code || project?.name || 'UNK') as string;
 
         if (!result[memberId]) {
           result[memberId] = {
@@ -180,8 +182,8 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
         result[memberId].daily_allocations.push({
           allocation_id: allocationId,
           project_id: projectId,
-          project_name: project.name,
-          project_code: project.code || project.name,
+          project_name: projectName,
+          project_code: projectCode,
           date: date,
           hours: hours
         });
@@ -192,8 +194,8 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
         if (!projectEntry) {
           projectEntry = {
             project_id: projectId,
-            project_name: project.name,
-            project_code: project.code || project.name,
+            project_name: projectName,
+            project_code: projectCode,
             total_hours: 0,
             allocation_id: allocationId,
             daily_breakdown: []
