@@ -12,8 +12,30 @@
  * - Each (company_id, project_id, resource_id, allocation_date) has ONE row
  * - allocation_date is normalized to company week start
  * - All writes go through canonical API (saveResourceAllocation/deleteResourceAllocation/deleteAllResourceAllocationsForProject)
- * - Weekly views read only resource_type='active'
+ *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  RESOURCE TYPE RULES                                                          ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
  * 
+ * resource_type determines whether an allocation belongs to an active or pending member:
+ * 
+ * - 'active'         → Member exists in `profiles` table (accepted invite, real user)
+ * - 'pre_registered' → Member exists in `invites` table with status='pending' (not yet accepted)
+ * 
+ * CRITICAL RULES:
+ * 1. When SAVING allocations, callers MUST pass the correct resource_type based on member status
+ * 2. Pre-registered members should NEVER have resource_type='active' allocations
+ * 3. Active members should NEVER have resource_type='pre_registered' allocations
+ * 4. When a member accepts their invite:
+ *    - Their profile is created in `profiles` table
+ *    - Their allocations migrate from pre_registered → active (handled by handle_new_user trigger)
+ *    - The invite status changes to 'accepted'
+ * 
+ * HOW TO DETERMINE resource_type IN CODE:
+ * - If resource_id exists in profiles → 'active'
+ * - If resource_id exists in invites with status='pending' → 'pre_registered'
+ * - UI components should track isPending/type on member objects
+ *
  * ╔══════════════════════════════════════════════════════════════════════════════╗
  * ║  RESOURCE NAMING CONVENTION                                                   ║
  * ╚══════════════════════════════════════════════════════════════════════════════╝
