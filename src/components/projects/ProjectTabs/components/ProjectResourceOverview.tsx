@@ -98,9 +98,12 @@ export const ProjectResourceOverview: React.FC<ProjectResourceOverviewProps> = (
                     let resourceName = "Unknown";
                     if (allocation.profiles) {
                       resourceName = `${allocation.profiles.first_name || ''} ${allocation.profiles.last_name || ''}`.trim();
-                      if (!resourceName) resourceName = "Unnamed";
+                      if (!resourceName) {
+                        // Fallback for pre-registered resources
+                        resourceName = allocation.resource_type === 'pre_registered' ? 'Pending invite' : 'Unknown';
+                      }
                     }
-                    
+
                     return (
                       <tr key={allocation.id} className="border-t">
                         <td className="py-2 px-3">

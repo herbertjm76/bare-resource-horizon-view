@@ -229,11 +229,21 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   const memberDetailedData = detailedAllocations?.[member.id];
 
   // Memoize member data to prevent recalculations
-  const memberData = useMemo(() => ({
-    initials: member ? `${(member.first_name || '').charAt(0)}${(member.last_name || '').charAt(0)}`.toUpperCase() : '??',
-    displayName: member ? `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed' : 'Unknown',
-    avatarUrl: member?.avatar_url
-  }), [member]);
+  const memberData = useMemo(() => {
+    const fullName = member ? `${member.first_name || ''} ${member.last_name || ''}`.trim() : '';
+    let displayName = fullName || 'Unknown';
+    if (!fullName && member) {
+      // Fallback for pre-registered or deleted resources
+      if (member.isPending) displayName = member.name || 'Pending invite';
+      else if (member.isDeleted) displayName = member.name || 'Deleted Resource';
+      else displayName = member.name || 'Unknown';
+    }
+    return {
+      initials: member ? `${(member.first_name || '').charAt(0)}${(member.last_name || '').charAt(0)}`.toUpperCase() || '??' : '??',
+      displayName,
+      avatarUrl: member?.avatar_url
+    };
+  }, [member]);
 
   // Get project allocations for tooltip
   const memberProjectAllocations = useMemo(() => {

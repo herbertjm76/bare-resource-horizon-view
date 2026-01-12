@@ -58,7 +58,12 @@ export const NameCell: React.FC<NameCellProps> = ({
   // Helper to get member display name
   const getMemberDisplayName = (): string => {
     if (!member) return 'Unknown';
-    return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
+    const fullName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
+    if (fullName) return fullName;
+    // Fallback to name property for pre-registered/deleted resources
+    if (member.isPending) return member.name || 'Pending invite';
+    if (member.isDeleted) return member.name || 'Deleted Resource';
+    return member.name || 'Unknown';
   };
 
   const memberTooltip = (

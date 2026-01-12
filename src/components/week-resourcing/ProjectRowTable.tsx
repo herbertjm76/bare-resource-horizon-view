@@ -74,7 +74,9 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
   };
 
   const getFirstName = (member: any): string => {
-    return member.first_name || 'Unnamed';
+    if (member.first_name) return member.first_name;
+    if (member.isPending || member.isDeleted) return member.name || 'Pending';
+    return member.name || 'Unknown';
   };
 
   return (

@@ -12,13 +12,21 @@ export const MemberNameCell: React.FC<MemberNameCellProps> = ({ member }) => {
   // Helper to get just the first name
   const getFirstName = (): string => {
     if (!member) return 'Unknown';
-    return member.first_name || 'Unnamed';
+    if (member.first_name) return member.first_name;
+    // Fallback to name property for pre-registered/deleted resources
+    if (member.isPending || member.isDeleted) return member.name || 'Pending';
+    return member.name || 'Unknown';
   };
 
   // Helper to get member display name for tooltip
   const getMemberName = (): string => {
     if (!member) return 'Unknown';
-    return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
+    const fullName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
+    if (fullName) return fullName;
+    // Fallback to name property for pre-registered/deleted resources
+    if (member.isPending) return member.name || 'Pending invite';
+    if (member.isDeleted) return member.name || 'Deleted Resource';
+    return member.name || 'Unknown';
   };
 
   // Helper to get user initials
