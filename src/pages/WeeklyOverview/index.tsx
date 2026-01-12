@@ -56,7 +56,8 @@ const WeeklyOverview = () => {
   const { visibility: cardVisibility, cardOrder, toggleCard, moveCard, reorderCards } = useCardVisibility();
 
   // Centralized data fetching with sorting - SINGLE SOURCE OF TRUTH
-  const data = useWeeklyOverviewData(selectedWeek, filters, sortOption);
+  // Pass tableOrientation so member filtering is applied correctly per view
+  const data = useWeeklyOverviewData(selectedWeek, filters, sortOption, { tableOrientation });
   const {
     allMembers,
     projects,

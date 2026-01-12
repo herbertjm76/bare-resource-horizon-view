@@ -12,7 +12,18 @@ import { getWeekStartDate } from '@/components/weekly-overview/utils';
 
 type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
 
-export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any, sortOption: SortOption = 'alphabetical') => {
+interface UseStreamlinedWeekResourceDataOptions {
+  /** When true, member filtering by department is disabled (use for project-oriented views) */
+  isProjectOriented?: boolean;
+}
+
+export const useStreamlinedWeekResourceData = (
+  selectedWeek: Date, 
+  filters: any, 
+  sortOption: SortOption = 'alphabetical',
+  options: UseStreamlinedWeekResourceDataOptions = {}
+) => {
+  const { isProjectOriented = false } = options;
   const { workWeekHours, startOfWorkWeek } = useAppSettings();
   // IMPORTANT: selectedWeek can be any day within the week; normalize to the COMPANY week start.
   const weekStartDate = useMemo(
@@ -30,9 +41,19 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
   const shouldFetchData = allMemberIds.length > 0 && !loadingMembers;
   
   // Apply filters client-side for instant filtering without refetching
+  // IMPORTANT: In project-oriented views, we do NOT filter members by department
+  // because department filter applies to PROJECTS, not people. All members
+  // allocated to filtered projects should be visible.
   const filteredMembers = useMemo(() => {
     if (!allFetchedMembers) return [];
     
+    // In project-oriented views, return all members unfiltered
+    // (filtering happens at the project level in those views)
+    if (isProjectOriented) {
+      return allFetchedMembers;
+    }
+    
+    // In person-oriented views, apply all member filters
     return allFetchedMembers.filter(member => {
       if (filters?.department && filters.department !== 'all' && member.department !== filters.department) {
         return false;
@@ -45,7 +66,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any,
       }
       return true;
     });
-  }, [allFetchedMembers, filters?.department, filters?.location, filters?.practiceArea]);
+  }, [allFetchedMembers, filters?.department, filters?.location, filters?.practiceArea, isProjectOriented]);
   
   // Fetch projects - independent of members
   const { data: projects = [], isLoading: isLoadingProjects } = useWeekResourceProjects({ 

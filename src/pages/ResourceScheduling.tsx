@@ -246,6 +246,8 @@ const ResourceScheduling = () => {
                         onFilterChange={handleMemberFilterChange}
                         activeFiltersCount={activeMemberFiltersCount}
                         clearFilters={clearMemberFilters}
+                        availableFilterTypes={['department', 'practiceArea', 'location']}
+                        searchPlaceholder="Search people..."
                       />
                     </div>
                   </div>
