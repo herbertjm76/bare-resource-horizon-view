@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,6 +68,11 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   const [comboboxOpen, setComboboxOpen] = useState(false);
   const [selectedNewProjectId, setSelectedNewProjectId] = useState<string>('');
   const [newAllocationHours, setNewAllocationHours] = useState<string>('');
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; projectId: string; projectName: string }>({
+    open: false,
+    projectId: '',
+    projectName: ''
+  });
   const [newProjectCode, setNewProjectCode] = useState('');
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectCountry, setNewProjectCountry] = useState('');
@@ -319,13 +334,19 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
   };
 
 
-  const handleDelete = (projectId: string, projectName: string) => {
-    if (confirm(`Delete allocation for ${projectName}?`)) {
-      deleteAllocationMutation.mutate(projectId);
+  const handleDeleteClick = (projectId: string, projectName: string) => {
+    setDeleteConfirm({ open: true, projectId, projectName });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteConfirm.projectId) {
+      deleteAllocationMutation.mutate(deleteConfirm.projectId);
     }
+    setDeleteConfirm({ open: false, projectId: '', projectName: '' });
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
@@ -379,7 +400,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => handleDelete(project.id, project.name)}
+                            onClick={() => handleDeleteClick(project.id, project.name)}
                             disabled={deleteAllocationMutation.isPending}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -597,5 +618,24 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    {/* Delete Confirmation Dialog */}
+    <AlertDialog open={deleteConfirm.open} onOpenChange={(open) => !open && setDeleteConfirm({ open: false, projectId: '', projectName: '' })}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Allocation</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete the allocation for {deleteConfirm.projectName}?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </>
   );
 };
