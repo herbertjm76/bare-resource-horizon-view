@@ -80,15 +80,12 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
     const normalize = (v: unknown) => String(v ?? '').trim().toLowerCase();
     const selectedNorm = normalize(selected);
 
-    // Departments are user-entered strings in many datasets (casing, spacing, suffixes like "Hospitality /MP").
-    // So we match loosely rather than exact equality.
+    // Use EXACT matching on department name (case-insensitive, trimmed).
+    // Previous loose matching with includes() caused false positives 
+    // (e.g., "Hospitality" matching projects with "Hospital" in name).
     const result = projects.filter((p: any) => {
       const deptNorm = normalize(p?.department);
-      return (
-        deptNorm === selectedNorm ||
-        deptNorm.includes(selectedNorm) ||
-        selectedNorm.includes(deptNorm)
-      );
+      return deptNorm === selectedNorm;
     });
     
     lastValidProjectsRef.current = result;
