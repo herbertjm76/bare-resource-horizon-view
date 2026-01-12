@@ -11,8 +11,7 @@ import { ResourceAllocationDialog } from '../dialogs/ResourceAllocationDialog';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getMemberCapacity } from '@/utils/capacityUtils';
-import { calculateUtilizationPercentage } from '@/components/week-resourcing/utils/utilizationCalculations';
-import { getUtilizationBgColor, getUtilizationTextColor } from '@/utils/utilizationColors';
+import { calculateUtilization, getUtilizationSolidBgColor, getUtilizationSolidTextColor } from '@/utils/utilizationColors';
 
 interface PersonRowProps {
   person: PersonResourceData;
@@ -180,8 +179,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
           }, 0);
           
           // Calculate utilization percentage for color coding
-          const utilizationPercentage = calculateUtilizationPercentage(weekTotal, capacity);
-          
+          const utilizationPercentage = calculateUtilization(weekTotal, capacity);
           
           return (
             <td 
@@ -196,7 +194,6 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
                 borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
                 verticalAlign: 'middle',
-                backgroundColor: week.isPreviousWeek ? 'rgba(0, 0, 0, 0.03)' : getUtilizationBgColor(utilizationPercentage),
                 ...(week.isPreviousWeek && {
                   opacity: 0.5
                 })
@@ -208,24 +205,18 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
                 justifyContent: 'center',
                 minHeight: '24px'
               }}>
-                {weekTotal > 0 ? (
-                  <span 
-                    style={{ 
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      color: getUtilizationTextColor(utilizationPercentage)
-                    }}
-                  >
-                    {formatAllocationValue(weekTotal, capacity, displayPreference)}
-                  </span>
-                ) : (
-                  <span style={{ 
-                    color: 'rgba(0, 0, 0, 0.4)',
-                    fontSize: '13px'
-                  }}>
-                    —
-                  </span>
-                )}
+                <div 
+                  className="inline-flex items-center justify-center rounded text-xs font-semibold"
+                  style={{
+                    minWidth: '36px',
+                    height: '24px',
+                    padding: '0 6px',
+                    backgroundColor: getUtilizationSolidBgColor(utilizationPercentage),
+                    color: getUtilizationSolidTextColor(utilizationPercentage)
+                  }}
+                >
+                  {weekTotal > 0 ? formatAllocationValue(weekTotal, capacity, displayPreference) : '—'}
+                </div>
               </div>
             </td>
           );
