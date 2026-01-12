@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { format, addDays } from 'date-fns';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { getWeekStartDate } from '@/utils/weekNormalization';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { generateDemoAllocations, DEMO_PROJECTS, DEMO_COMPANY_ID } from '@/data/demoData';
 
