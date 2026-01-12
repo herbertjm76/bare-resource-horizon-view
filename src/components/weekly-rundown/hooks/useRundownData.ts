@@ -89,6 +89,9 @@ export const useRundownData = ({
           department: member.department || 'Unknown',
           avatar_url: member.avatar_url,
           avatar: member.avatar_url,
+          // RULEBOOK: Preserve status for resource type detection in dialogs
+          status: member.status,
+          weekly_capacity: member.weekly_capacity,
           totalHours,
           resourcedHours: totalHours,
           capacity,
