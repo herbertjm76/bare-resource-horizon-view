@@ -34,14 +34,15 @@ export const useComprehensiveAllocations = ({
         return [];
       }
       
-      // RULE BOOK: Weekly overview shows ACTIVE team members only.
-      // Filter by resource_type='active' to avoid double-counting legacy/pre_registered rows.
+      // RULEBOOK: Weekly overview shows BOTH active (profiles) AND pre_registered (invites) members.
+      // We must fetch allocations for BOTH resource types to ensure consistency with Resource Scheduling.
+      // Each member's allocations are correctly typed - no double-counting because member IDs are unique.
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select('*')
         .eq('company_id', company.id)
         .eq('allocation_date', weekStartDate)
-        .eq('resource_type', 'active')
+        .in('resource_type', ['active', 'pre_registered'])
         .in('resource_id', memberIds);
 
       if (error) {
