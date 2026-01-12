@@ -62,7 +62,7 @@ export const useFetchResources = (projectId: string) => {
           .filter(Boolean)
           .map((m) => ({
             id: m!.id,
-            name: `${m!.first_name || ''} ${m!.last_name || ''}`.trim() || 'Unnamed',
+            name: `${m!.first_name || ''} ${m!.last_name || ''}`.trim() || (m as any).email?.split('@')[0] || 'Unknown',
             role: m!.job_title || 'Team Member',
             isPending: false,
             avatar_url: (m as any).avatar_url,
@@ -178,7 +178,7 @@ export const useFetchResources = (projectId: string) => {
         const profile = profileById.get(member.staff_id);
         return {
           id: member.staff_id,
-          name: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Unnamed',
+          name: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || profile?.email?.split('@')[0] || 'Unknown',
           role: profile?.job_title || 'Team Member',
           isPending: false,
           avatar_url: profile?.avatar_url,
@@ -261,7 +261,7 @@ export const useFetchResources = (projectId: string) => {
         if (profile) {
           orphanedResources.push({
             id,
-            name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Unnamed',
+            name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.email?.split('@')[0] || 'Unknown',
             role: profile.job_title || 'Team Member',
             isPending: false,
             avatar_url: profile.avatar_url,
@@ -285,11 +285,13 @@ export const useFetchResources = (projectId: string) => {
             location: invite.location,
           });
         } else {
+          // Orphaned allocation - no profile or invite found (likely deleted)
           orphanedResources.push({
             id,
-            name: 'Unnamed',
-            role: 'Team Member',
+            name: 'Deleted Resource',
+            role: 'Unknown',
             isPending: false,
+            isDeleted: true,
           });
         }
       });

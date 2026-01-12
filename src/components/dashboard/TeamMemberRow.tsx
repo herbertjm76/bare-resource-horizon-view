@@ -137,7 +137,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
             ) : (
               <>
                 <div className="font-medium text-foreground flex items-center gap-2">
-                  {`${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed'}
+                  {`${member.first_name || ''} ${member.last_name || ''}`.trim() || member.email?.split('@')[0] || 'Unknown'}
                   {showWarning && (
                     <TooltipProvider>
                       <Tooltip>

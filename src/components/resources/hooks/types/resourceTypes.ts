@@ -5,6 +5,7 @@ export interface Resource {
   role: string;
   allocations?: Record<string, number>;
   isPending?: boolean;
+  isDeleted?: boolean; // True if the resource has been deleted but allocations remain
   avatar_url?: string;
   first_name?: string;
   last_name?: string;

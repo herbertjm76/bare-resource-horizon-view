@@ -14,6 +14,20 @@
  * - All writes go through canonical API (saveResourceAllocation/deleteResourceAllocation/deleteAllResourceAllocationsForProject)
  * - Weekly views read only resource_type='active'
  * 
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  RESOURCE NAMING CONVENTION                                                   ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * 
+ * ALL members/resources MUST display a meaningful name. NEVER show "Unnamed".
+ * 
+ * Priority order for display name:
+ * 1. `${first_name} ${last_name}`.trim() - if profile/invite has name data
+ * 2. For pending/pre-registered: "Pending invite" 
+ * 3. For orphaned allocations (deleted profile/invite): "Deleted Resource"
+ * 4. As absolute last resort: Use email prefix or ID-based identifier
+ * 
+ * The word "Unnamed" should NEVER appear in the UI. It indicates a bug.
+ * 
  * CANONICAL WRITE FUNCTIONS (src/hooks/allocations/api.ts):
  * - saveResourceAllocation(): Save/update a single week's allocation
  * - deleteResourceAllocation(): Delete a single week's allocation
