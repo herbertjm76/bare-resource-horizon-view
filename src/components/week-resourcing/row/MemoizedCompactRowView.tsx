@@ -55,7 +55,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   const queryClient = useQueryClient();
   
   // STANDARDIZED CALCULATIONS
-  // IMPORTANT: In percentage mode, capacity must be COMPANY work week hours for consistent input/output.
+  // IMPORTANT:
+  // - weeklyCapacity is used for INPUT parsing/validation.
+  // - percentCapacity is used for DISPLAYING percentages so "%" is always based on COMPANY workWeekHours.
   const weeklyCapacity = useMemo(
     () =>
       getAllocationCapacity({
@@ -65,6 +67,8 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
       }),
     [displayPreference, workWeekHours, member?.weekly_capacity]
   );
+
+  const percentCapacity = useMemo(() => workWeekHours ?? 40, [workWeekHours]);
 
   // State for tracking which cell is being edited
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
@@ -267,7 +271,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     <div className="space-y-2">
       <div className="font-semibold text-sm text-foreground">{memberData.displayName}</div>
       <div className="text-xs text-muted-foreground">
-        {Math.round(capacityDisplay.utilizationPercentage)}% utilized • {formatDualAllocationValue(capacityDisplay.totalHours, weeklyCapacity, displayPreference)} allocated
+        {Math.round(capacityDisplay.utilizationPercentage)}% utilized • {formatDualAllocationValue(capacityDisplay.totalHours, percentCapacity, displayPreference)} allocated
       </div>
       
       {memberProjectAllocations.length > 0 ? (
@@ -278,7 +282,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
               <span className="text-foreground truncate max-w-[140px]">
                 {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
               </span>
-              <span className="text-muted-foreground font-medium ml-2">{formatDualAllocationValue(project.hours, weeklyCapacity, displayPreference)}</span>
+              <span className="text-muted-foreground font-medium ml-2">{formatDualAllocationValue(project.hours, percentCapacity, displayPreference)}</span>
             </div>
           ))}
         </div>
@@ -288,7 +292,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         </div>
       )}
     </div>
-  ), [memberData.displayName, capacityDisplay, memberProjectAllocations, projectDisplayPreference, displayPreference, weeklyCapacity]);
+  ), [memberData.displayName, capacityDisplay, memberProjectAllocations, projectDisplayPreference, displayPreference, percentCapacity]);
 
 
   return (
