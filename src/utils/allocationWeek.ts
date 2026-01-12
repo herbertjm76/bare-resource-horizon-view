@@ -1,16 +1,56 @@
 /**
- * ALLOCATION WEEK RULEBOOK
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ALLOCATION WEEK RULEBOOK (CANONICAL)
+ * ═══════════════════════════════════════════════════════════════════════════
  * 
  * This is the SINGLE SOURCE OF TRUTH for all allocation week key logic.
  * 
- * Rules:
+ * ─────────────────────────────────────────────────────────────────────────────
+ * CORE RULES
+ * ─────────────────────────────────────────────────────────────────────────────
  * 1. All allocation_date values are UTC date keys (YYYY-MM-DD)
  * 2. All allocation_date values must fall on the company's week start day
  * 3. The database trigger enforces normalization on insert/update
  * 4. Frontend must use these utilities for consistency
  * 
- * DO NOT use date-fns startOfWeek() directly for allocation logic.
- * Always use this module instead.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * TIMEZONE SAFETY RULES (CRITICAL)
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 
+ * NEVER use these date-fns functions directly for allocation/week logic:
+ *   ❌ startOfWeek()     - Uses local timezone, causes date drift
+ *   ❌ endOfWeek()       - Uses local timezone, causes date drift  
+ *   ❌ format(date, 'yyyy-MM-dd') - Uses local timezone for output
+ *   ❌ new Date().getDay() - Uses local timezone
+ * 
+ * ALWAYS use these UTC-safe utilities instead:
+ *   ✅ getAllocationWeekKey(date, weekStartDay) - Canonical week key
+ *   ✅ getWeekStartDate(date, weekStartDay)     - UTC-safe Date object
+ *   ✅ toUTCDateKey(date)                       - UTC-safe YYYY-MM-DD string
+ *   ✅ parseUTCDateKey(dateKey)                 - Parse as UTC midnight
+ *   ✅ date.getUTCDay()                         - UTC day of week
+ * 
+ * WHY THIS MATTERS:
+ * - A user in UTC-5 viewing "Monday Jan 12" at 11pm local = "Tuesday Jan 13" UTC
+ * - date-fns startOfWeek() would compute week start in local time → WRONG WEEK
+ * - This causes allocations to appear missing or duplicated across views
+ * 
+ * EXAMPLES OF BUGS CAUSED BY LOCAL TIMEZONE:
+ * - Weekly Overview shows different allocations than Resource Scheduling
+ * - Allocations "disappear" when viewed from different timezones
+ * - Week boundaries shift by ±1 day causing data mismatches
+ * 
+ * ─────────────────────────────────────────────────────────────────────────────
+ * IMPORT GUIDANCE
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 
+ * For any component/hook dealing with weeks or allocations, import from:
+ *   import { getAllocationWeekKey, getWeekStartDate, toUTCDateKey } from '@/utils/allocationWeek';
+ * 
+ * DO NOT import getWeekStartDate from '@/components/weekly-overview/utils'
+ * (that file uses local-time date-fns functions - legacy, avoid for week logic)
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
 import { toUTCDateKey, parseUTCDateKey } from './dateKey';
