@@ -29,15 +29,20 @@
  * 4. NEVER hardcode `weekStartsOn: 1` - always derive from company settings
  * 
  * FILES AUDITED FOR WEEK START ALIGNMENT:
- * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts ✅ (uses getWeekStartDate with startOfWorkWeek)
- * - src/components/week-resourcing/hooks/useStreamlinedWeekResourceData.ts ✅ (uses getWeekStartDate with startOfWorkWeek)
- * - src/components/week-resourcing/hooks/useDetailedWeeklyAllocations.ts ✅ (uses startOfWorkWeek)
+ * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts ✅ (uses getWeekStartDate from weekNormalization)
+ * - src/components/week-resourcing/hooks/useStreamlinedWeekResourceData.ts ✅ (uses getWeekStartDate from weekNormalization)
+ * - src/components/week-resourcing/hooks/useDetailedWeeklyAllocations.ts ✅ (uses getWeekStartDate from weekNormalization)
  * - src/components/weekly-rundown/AvailableMembersRow.tsx ✅ (uses getAllocationWeekKey)
  * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts ✅ (uses startOfWorkWeek)
  * - src/pages/ProjectResourcing/hooks/useProjectResourcingState.ts ✅ (uses getWeekStartsOn helper)
  * - src/hooks/allocations/utils/fetchUtils.ts ✅ (uses getAllocationWeekKey)
  * - src/hooks/allocations/useFetchAllocations.ts ✅ (uses getAllocationWeekKey)
- * - src/components/weekly-overview/utils.ts ✅ (getWeekStartDate respects weekStartDay)
+ * 
+ * CRITICAL DATE HANDLING RULE:
+ * - ALL week date calculations MUST use `getWeekStartDate` from `@/utils/weekNormalization`
+ * - NEVER use date-fns startOfWeek directly for allocation queries (it's timezone-sensitive)
+ * - The UTC-based weekNormalization ensures consistency across all views regardless of user timezone
+ * - src/components/weekly-overview/utils.ts has a timezone-sensitive version - DO NOT USE for allocations
  *
  * ╔══════════════════════════════════════════════════════════════════════════════╗
  * ║  RESOURCE TYPE RULES                                                          ║

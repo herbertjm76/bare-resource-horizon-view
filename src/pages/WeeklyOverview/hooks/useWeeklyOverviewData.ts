@@ -7,7 +7,7 @@ import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { format, addDays } from 'date-fns';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { getWeekStartDate } from '@/utils/weekNormalization';
 import { 
   DEMO_TEAM_MEMBERS, 
   DEMO_PRE_REGISTERED, 

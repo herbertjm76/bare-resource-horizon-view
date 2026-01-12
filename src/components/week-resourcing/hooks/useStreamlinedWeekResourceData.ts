@@ -8,7 +8,7 @@ import { useWeeklyLeaveDetails } from './useWeeklyLeaveDetails';
 import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { format } from 'date-fns';
-import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { getWeekStartDate } from '@/utils/weekNormalization';
 
 type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
 
