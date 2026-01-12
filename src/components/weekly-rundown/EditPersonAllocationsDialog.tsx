@@ -163,6 +163,9 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
     }
   });
 
+  // Determine resource type from person's status (pre_registered or active)
+  const resourceType: 'active' | 'pre_registered' = person.status === 'pre_registered' ? 'pre_registered' : 'active';
+
   const addAllocationMutation = useMutation({
     mutationFn: async ({ projectId, allocationHours }: { projectId: string; allocationHours: number }) => {
       if (!company?.id) throw new Error('Missing company');
@@ -171,7 +174,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       const success = await saveResourceAllocation(
         projectId,
         person.id,
-        'active',
+        resourceType,
         weekKey,
         allocationHours,
         company.id,
@@ -229,7 +232,6 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
     addAllocationMutation.mutate({ projectId: selectedNewProjectId, allocationHours });
   };
 
-
   const updateAllocationMutation = useMutation({
     mutationFn: async ({ projectId, newHours }: { projectId: string; newHours: number }) => {
       if (!company?.id) throw new Error('Missing company');
@@ -237,7 +239,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       const success = await saveResourceAllocation(
         projectId,
         person.id,
-        'active',
+        resourceType,
         weekKey,
         newHours,
         company.id,
@@ -277,7 +279,7 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
       const success = await deleteResourceAllocation(
         projectId,
         person.id,
-        'active',
+        resourceType,
         weekKey,
         company.id,
         startOfWorkWeek
