@@ -90,11 +90,18 @@
  * ║  READ PATH FILTER RULES                                                       ║
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  * 
- * - Active-only views (dashboards, utilization): .eq('resource_type', 'active')
- * - Pre-registered-only views: .eq('resource_type', 'pre_registered')
- * - Combined views (Weekly Overview, Resource Scheduling): .in('resource_type', ['active', 'pre_registered'])
- *   - These views show BOTH active AND pre-registered members, so they need BOTH allocation types
- *   - No double-counting occurs because each member ID is unique to either profiles OR invites
+ * UNIVERSAL RULE: ALL allocation reads MUST include BOTH resource types:
+ * 
+ *   .in('resource_type', ['active', 'pre_registered'])
+ * 
+ * There are NO exceptions. This ensures pre-registered invites are visible 
+ * everywhere - dashboards, utilization, burn rate, member details, etc.
+ * 
+ * No double-counting occurs because each member ID is unique to either profiles OR invites.
+ * 
+ * DEPRECATED PATTERNS (do NOT use):
+ * - .eq('resource_type', 'active') ← WRONG, excludes pre-registered
+ * - .eq('resource_type', 'pre_registered') ← WRONG, excludes active
  * 
  * ╔══════════════════════════════════════════════════════════════════════════════╗
  * ║  DATA SOURCE ALIGNMENT                                                        ║
@@ -143,8 +150,8 @@
  * === CANONICAL WRITE API (only file allowed to do direct writes) ===
  * - src/hooks/allocations/api.ts (saveResourceAllocation, deleteResourceAllocation, deleteAllResourceAllocationsForProject)
  * 
- * === COMBINED VIEWS (Weekly Overview, Resource Scheduling) - USE .in(['active', 'pre_registered']) ===
- * These pages show BOTH active AND pre-registered members side-by-side:
+ * === ALL ALLOCATION READS - USE .in(['active', 'pre_registered']) ===
+ * ALL files reading allocations MUST include both resource types:
  * - src/hooks/allocations/utils/fetchUtils.ts ✅
  * - src/hooks/usePersonResourceData.ts ✅
  * - src/components/week-resourcing/hooks/useComprehensiveAllocations.ts ✅
@@ -155,23 +162,23 @@
  * - src/components/weekly-rundown/AvailableMembersRow.tsx ✅
  * - src/components/workload/hooks/services/dataFetchers.ts ✅
  * - src/components/profile/overview/hooks/useUserProjects.ts ✅
- * 
- * === ACTIVE-ONLY VIEWS (Dashboards, Utilization, Metrics) - USE .eq('resource_type', 'active') ===
- * These pages measure productivity of real employees only:
- * - src/hooks/useIndividualMemberUtilization.ts
- * - src/hooks/useTeamUtilization.ts
- * - src/hooks/useStandardizedUtilizationData.ts
- * - src/hooks/utilization/useActiveMembers.ts
- * - src/hooks/queries/useDashboardQueries.ts
- * - src/components/dashboard/staff/useStaffAllocations.ts
- * - src/components/dashboard/hooks/useResourceAllocationData.ts
- * - src/components/dashboard/hooks/useIndividualUtilization.ts
- * - src/components/team-member-detail/TeamMemberProjectOverview.tsx
- * - src/components/team-member-detail/TeamMemberProjectAllocations.tsx
- * - src/components/team-member-detail/resource-planning/hooks/useResourcePlanningData.ts
- * - src/pages/CapacityHeatmap.tsx
- * - src/components/profile/overview/CapacityCard.tsx
- * - src/hooks/project-financial/useBurnRateTracking.ts
+ * - src/hooks/useIndividualMemberUtilization.ts ✅
+ * - src/hooks/useTeamUtilization.ts ✅
+ * - src/hooks/useStandardizedUtilizationData.ts ✅
+ * - src/hooks/utilization/useActiveMembers.ts ✅
+ * - src/hooks/queries/useDashboardQueries.ts ✅
+ * - src/components/dashboard/staff/useStaffAllocations.ts ✅
+ * - src/components/dashboard/hooks/useResourceAllocationData.ts ✅
+ * - src/components/dashboard/hooks/useIndividualUtilization.ts ✅
+ * - src/components/team-member-detail/TeamMemberProjectOverview.tsx ✅
+ * - src/components/team-member-detail/TeamMemberProjectAllocations.tsx ✅
+ * - src/components/team-member-detail/resource-planning/hooks/useResourcePlanningData.ts ✅
+ * - src/pages/CapacityHeatmap.tsx ✅
+ * - src/components/profile/overview/CapacityCard.tsx ✅
+ * - src/hooks/project-financial/useBurnRateTracking.ts ✅
+ * - src/hooks/useProjectStageProgress.ts ✅
+ * - src/components/resource-planning/PipelineTimelineView.tsx ✅
+ * - src/services/unifiedInsightsService.ts ✅
  * 
  * === WRITE PATHS USING CANONICAL API ===
  * - src/components/resources/person-view/ProjectAllocationRow.tsx (uses saveResourceAllocation)

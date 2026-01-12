@@ -245,7 +245,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   });
 
   // Fetch resource allocations for project stages
-  // RULEBOOK: Filter by resource_type='active' for active team views
+  // RULEBOOK: ALL allocation reads include both active and pre_registered
   const { data: stageAllocationsData = [] } = useQuery({
     queryKey: ['stage-allocations-timeline', company?.id, projects.map(p => p.id), isDemoMode],
     queryFn: async () => {
@@ -264,7 +264,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
           resource_type
         `)
         .eq('company_id', company.id)
-        .eq('resource_type', 'active')
+        .in('resource_type', ['active', 'pre_registered'])
         .in('project_id', projects.map(p => p.id));
       if (error) throw error;
       return data || [];

@@ -59,11 +59,12 @@ export const useTeamUtilization = (teamMembers: TeamMemberWithCapacity[]) => {
         
         // Fetch allocations for the past 90 days - we need to get from project_resource_allocations
         // which stores weekly allocations, not daily ones
+        // RULEBOOK: ALL allocation reads include both active and pre_registered
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
           .select('resource_id, hours, allocation_date, project_id')
           .eq('company_id', companyId)
-          .eq('resource_type', 'active')
+          .in('resource_type', ['active', 'pre_registered'])
           .in('resource_id', memberIds)
           .gte('allocation_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
           .lte('allocation_date', format(currentWeekStart, 'yyyy-MM-dd'));

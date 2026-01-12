@@ -19,6 +19,7 @@ export const useResourceAllocationData = () => {
   const { data: projects = [] } = useDashboardProjects(company?.id);
 
   // Fetch project resource allocations
+  // RULEBOOK: ALL allocation reads include both active and pre_registered
   const { data: allocations = [] } = useQuery({
     queryKey: ['resource-allocations', company?.id],
     queryFn: async () => {
@@ -31,7 +32,7 @@ export const useResourceAllocationData = () => {
           projects!inner(name, status)
         `)
         .eq('company_id', company.id)
-        .eq('resource_type', 'active')
+        .in('resource_type', ['active', 'pre_registered'])
         .gte('allocation_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]); // Last 30 days
       
       if (error) throw error;
