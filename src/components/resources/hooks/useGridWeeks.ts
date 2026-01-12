@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { format, addDays } from 'date-fns';
 import { logger } from '@/utils/logger';
-import { toUTCDateKey, parseUTCDateKey } from '@/utils/dateKey';
+import { toUTCDateKey, startOfWeekUTC } from '@/utils/dateKey';
 
 export interface WeekInfo {
   weekStartDate: Date; // midnight UTC
@@ -17,21 +17,10 @@ interface DisplayOptions {
   weekStartsOnSaturday?: boolean;
 }
 
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
 
 const getWeekStartsOn = (opts: DisplayOptions): 0 | 1 | 6 => {
   return opts.weekStartsOnSaturday ? 6 : opts.weekStartsOnSunday ? 0 : 1;
-};
-
-const startOfWeekUTC = (date: Date, weekStartsOn: 0 | 1 | 6): Date => {
-  // Anchor to midnight UTC first
-  const anchored = parseUTCDateKey(toUTCDateKey(date));
-  const dow = anchored.getUTCDay();
-
-  let diff = dow - weekStartsOn;
-  if (diff < 0) diff += 7;
-
-  return new Date(anchored.getTime() - diff * MS_PER_DAY);
 };
 
 export const useGridWeeks = (

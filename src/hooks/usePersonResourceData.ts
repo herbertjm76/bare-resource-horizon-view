@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { startOfWeek } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { toast } from 'sonner';
 import { logger } from '@/utils/logger';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
-import { toUTCDateKey, parseUTCDateKey } from '@/utils/dateKey';
+import { toUTCDateKey, parseUTCDateKey, startOfWeekUTC } from '@/utils/dateKey';
 import {
   DEMO_COMPANY_ID,
   DEMO_TEAM_MEMBERS,
@@ -59,7 +58,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         ];
 
         // Calculate date range using UTC-based keys (include previous week like grid does)
-        const adjustedStart = startOfWeek(startDate, { weekStartsOn });
+        const adjustedStart = startOfWeekUTC(startDate, weekStartsOn);
         const rangeStart = new Date(adjustedStart);
         rangeStart.setDate(rangeStart.getDate() - 7); // Include previous week
         const endDate = new Date(adjustedStart);
@@ -118,7 +117,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
 
           // Convert the date to the week start based on company settings (UTC-safe)
           const allocationDate = parseUTCDateKey(allocation.allocation_date);
-          const weekKey = toUTCDateKey(startOfWeek(allocationDate, { weekStartsOn }));
+          const weekKey = toUTCDateKey(startOfWeekUTC(allocationDate, weekStartsOn));
           // Aggregate hours by week
           projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });
@@ -175,7 +174,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
         // Calculate date range for allocations (must align with grid weeks).
         // The grid may render the first visible week starting BEFORE the selected month.
         // On desktop, useGridWeeks includes the previous week, so we must also query it.
-        const adjustedStart = startOfWeek(startDate, { weekStartsOn });
+        const adjustedStart = startOfWeekUTC(startDate, weekStartsOn);
         // Include one previous week to match useGridWeeks (which shows previous week on desktop)
         const rangeStart = new Date(adjustedStart);
         rangeStart.setDate(rangeStart.getDate() - 7);
@@ -257,7 +256,7 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
 
           // Convert the date to the week start based on company settings (UTC-safe)
           const allocationDate = parseUTCDateKey(allocation.allocation_date);
-          const weekKey = toUTCDateKey(startOfWeek(allocationDate, { weekStartsOn }));
+          const weekKey = toUTCDateKey(startOfWeekUTC(allocationDate, weekStartsOn));
           // Aggregate hours by week (sum up daily hours into weekly total)
           projectEntry.allocations[weekKey] = (projectEntry.allocations[weekKey] || 0) + allocation.hours;
         });
