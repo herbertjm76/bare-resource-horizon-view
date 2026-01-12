@@ -7,7 +7,7 @@ import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
 import { useWeeklyLeaveDetails } from './useWeeklyLeaveDetails';
 import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { format } from 'date-fns';
+import { toUTCDateKey } from '@/utils/dateKey';
 import { getWeekStartDate } from '@/utils/weekNormalization';
 
 type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
@@ -27,7 +27,7 @@ export const useStreamlinedWeekResourceData = (
   const { workWeekHours, startOfWorkWeek } = useAppSettings();
   // IMPORTANT: selectedWeek can be any day within the week; normalize to the COMPANY week start.
   const weekStartDate = useMemo(
-    () => format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd'),
+    () => toUTCDateKey(getWeekStartDate(selectedWeek, startOfWorkWeek)),
     [selectedWeek, startOfWorkWeek]
   );
   // Fetch team members first - this is the foundation (fetch ALL members, filtering happens in WeekResourceView)

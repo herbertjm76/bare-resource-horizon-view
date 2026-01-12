@@ -4,10 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
-import { format, addDays } from 'date-fns';
+import { addDays } from 'date-fns';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/utils/weekNormalization';
+import { toUTCDateKey } from '@/utils/dateKey';
 import { 
   DEMO_TEAM_MEMBERS, 
   DEMO_PRE_REGISTERED, 
@@ -40,8 +41,8 @@ export const useWeeklyOverviewData = (
   // Otherwise saved allocations (normalized to company week start) won't appear in the UI.
   const weekStart = getWeekStartDate(selectedWeek, startOfWorkWeek);
   const weekEnd = addDays(weekStart, 6);
-  const weekStartString = format(weekStart, 'yyyy-MM-dd');
-  const weekEndString = format(weekEnd, 'yyyy-MM-dd');
+  const weekStartString = toUTCDateKey(weekStart);
+  const weekEndString = toUTCDateKey(weekEnd);
 
   const companyId = isDemoMode ? DEMO_COMPANY_ID : company?.id;
 
@@ -129,7 +130,7 @@ export const useWeeklyOverviewData = (
     queryFn: async () => {
       if (isDemoMode) {
         const demoAllocations = generateDemoAllocations();
-        const weekEndDate = format(addDays(weekStart, 6), 'yyyy-MM-dd');
+        const weekEndDate = toUTCDateKey(addDays(weekStart, 6));
         
         return demoAllocations
           .filter(a => a.allocation_date >= weekStartString && a.allocation_date <= weekEndDate)
@@ -149,9 +150,7 @@ export const useWeeklyOverviewData = (
       
       if (!company?.id) return [];
       
-      const weekEndLocal = new Date(weekStart);
-      weekEndLocal.setDate(weekEndLocal.getDate() + 6);
-      const weekEndDate = format(weekEndLocal, 'yyyy-MM-dd');
+      const weekEndDate = toUTCDateKey(weekEnd);
       
       const { data, error } = await supabase
         .from('project_resource_allocations')
@@ -210,7 +209,7 @@ export const useWeeklyOverviewData = (
   });
 
   // Fetch holidays for summary cards - this week + upcoming (next 3 months)
-  const upcomingEndDate = format(addDays(weekEnd, 90), 'yyyy-MM-dd');
+  const upcomingEndDate = toUTCDateKey(addDays(weekEnd, 90));
   
   const { data: holidays = [] } = useQuery({
     queryKey: ['weekly-summary-holidays', weekStartString, upcomingEndDate, companyId, isDemoMode],
@@ -219,12 +218,12 @@ export const useWeeklyOverviewData = (
         // Convert DEMO_HOLIDAYS to the expected format
         return DEMO_HOLIDAYS
           .filter(h => {
-            const holidayDate = format(h.date, 'yyyy-MM-dd');
+            const holidayDate = toUTCDateKey(h.date);
             return holidayDate >= weekStartString && holidayDate <= upcomingEndDate;
           })
           .map(h => ({
             id: h.id,
-            date: format(h.date, 'yyyy-MM-dd'),
+            date: toUTCDateKey(h.date),
             name: h.name,
             end_date: null
           }));
