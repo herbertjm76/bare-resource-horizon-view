@@ -1,16 +1,18 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format, addWeeks, subWeeks, startOfWeek } from 'date-fns';
+import { toUTCDateKey } from '@/utils/dateKey';
 
 const getShortWeekLabel = (selectedWeek: Date, fullLabel: string) => {
   // On mobile, show shorter format like "Jun 9" instead of "Week of Jun 9, 2025"
-  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  // selectedWeek is already normalized to the week start (UTC-safe), so just format it
   const isMobile = window.innerWidth < 768;
   
   if (isMobile) {
-    return format(weekStart, 'MMM d');
+    // Format from UTC date key to avoid timezone drift
+    const [, month, day] = toUTCDateKey(selectedWeek).split('-');
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${monthNames[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`;
   }
   
   return fullLabel;

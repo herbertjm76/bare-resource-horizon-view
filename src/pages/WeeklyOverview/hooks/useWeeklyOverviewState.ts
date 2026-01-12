@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ViewType, RundownMode, SortOption, TableOrientation } from '@/components/week-resourcing/UnifiedWeeklyControls';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getWeekStartDate } from '@/components/weekly-overview/utils';
+import { getWeekStartDate } from '@/utils/weekNormalization';
 
 export const useWeeklyOverviewState = () => {
   const { startOfWorkWeek } = useAppSettings();

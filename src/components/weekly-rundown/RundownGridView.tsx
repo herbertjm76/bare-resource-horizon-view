@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { format } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -371,8 +370,8 @@ const ProjectGridCard: React.FC<{ project: any; selectedWeek: Date } & GridCardP
   const { departments } = useOfficeSettings();
   const { projectDisplayPreference, startOfWorkWeek, displayPreference, workWeekHours } = useAppSettings();
 
-  // Calculate week start date string for MemberVacationPopover
-  const weekStartDate = format(getWeekStartDate(selectedWeek, startOfWorkWeek), 'yyyy-MM-dd');
+  // Calculate week start date string for MemberVacationPopover (UTC-safe)
+  const weekStartDate = toUTCDateKey(getWeekStartDate(selectedWeek, startOfWorkWeek));
   
   const primaryDisplay = getProjectDisplayName(project, projectDisplayPreference);
   const secondaryDisplay = getProjectSecondaryText(project, projectDisplayPreference);
