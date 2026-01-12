@@ -12,6 +12,7 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getMemberCapacity } from '@/utils/capacityUtils';
 import { calculateUtilizationPercentage } from '@/components/week-resourcing/utils/utilizationCalculations';
+import { getUtilizationBgColor, getUtilizationTextColor } from '@/utils/utilizationColors';
 
 interface PersonRowProps {
   person: PersonResourceData;
@@ -181,22 +182,6 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
           // Calculate utilization percentage for color coding
           const utilizationPercentage = calculateUtilizationPercentage(weekTotal, capacity);
           
-          // Get utilization color based on percentage
-          const getUtilizationBgColor = (percentage: number) => {
-            if (percentage === 0) return 'transparent';
-            if (percentage > 100) return 'hsl(0 84% 95%)'; // red-100
-            if (percentage >= 80) return 'hsl(142 76% 92%)'; // green-100
-            if (percentage >= 50) return 'hsl(48 96% 92%)'; // yellow-100
-            return 'hsl(221 91% 95%)'; // blue-100
-          };
-          
-          const getUtilizationTextColor = (percentage: number) => {
-            if (percentage === 0) return 'rgba(0, 0, 0, 0.4)';
-            if (percentage > 100) return 'hsl(0 84% 40%)'; // red-700
-            if (percentage >= 80) return 'hsl(142 71% 30%)'; // green-700
-            if (percentage >= 50) return 'hsl(32 95% 35%)'; // amber-700
-            return 'hsl(221 83% 40%)'; // blue-700
-          };
           
           return (
             <td 
