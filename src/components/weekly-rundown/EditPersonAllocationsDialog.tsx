@@ -333,6 +333,31 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
     updateAllocationMutation.mutate({ projectId, newHours });
   };
 
+  // Check if any allocation values have changed from their original
+  const hasUnsavedChanges = person.projects?.some((project: any) => {
+    const currentInput = hours[project.id];
+    if (!currentInput?.trim()) return false;
+    const originalDisplay = hoursToInputDisplay(project.hours, capacity, displayPreference);
+    return currentInput !== originalDisplay;
+  }) ?? false;
+
+  const handleSaveAll = async () => {
+    if (!person.projects?.length) return;
+    
+    for (const project of person.projects) {
+      const raw = hours[project.id];
+      if (!raw?.trim()) continue;
+      
+      const originalDisplay = hoursToInputDisplay(project.hours, capacity, displayPreference);
+      if (raw === originalDisplay) continue; // Skip unchanged
+      
+      const newHours = parseInputToHours(raw, capacity, displayPreference);
+      if (Number.isFinite(newHours) && newHours > 0) {
+        updateAllocationMutation.mutate({ projectId: project.id, newHours });
+      }
+    }
+  };
+
 
   const handleDeleteClick = (projectId: string, projectName: string) => {
     setDeleteConfirm({ open: true, projectId, projectName });
@@ -389,14 +414,6 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
                           <span className="text-sm text-muted-foreground">
                             {displayPreference === 'percentage' ? '%' : 'hours'}
                           </span>
-                          <Button
-                            size="sm"
-                            onClick={() => handleSave(project.id)}
-                            disabled={!(hours[project.id]?.trim()) || updateAllocationMutation.isPending}
-                            className="bg-gradient-start hover:bg-gradient-mid text-white"
-                          >
-                            {updateAllocationMutation.isPending ? 'Saving...' : 'Save'}
-                          </Button>
                           <Button
                             size="sm"
                             variant="destructive"
@@ -607,7 +624,14 @@ export const EditPersonAllocationsDialog: React.FC<EditPersonAllocationsDialogPr
           )}
         </div>
 
-        <DialogFooter className="pt-4 border-t">
+        <DialogFooter className="pt-4 border-t flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleSaveAll}
+            disabled={updateAllocationMutation.isPending || !hasUnsavedChanges}
+          >
+            {updateAllocationMutation.isPending ? 'Saving...' : 'Save'}
+          </Button>
           <Button 
             variant="default" 
             onClick={() => onOpenChange(false)}
