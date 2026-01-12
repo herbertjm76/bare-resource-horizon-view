@@ -56,7 +56,7 @@ export const useStaffAllocations = (memberId: string | null, timeRange?: TimeRan
         logger.debug(`Fetching allocations for member ${memberId} for ${timeRange || 'week'} ${rangeStartStr} to ${rangeEndStr}`);
 
         // Query project_resource_allocations with project details
-        // RULEBOOK: Filter by resource_type='active' for active team views
+        // RULEBOOK: ALL allocation reads include both active and pre_registered
         const { data: allocationData, error } = await supabase
           .from('project_resource_allocations')
           .select(`
@@ -72,7 +72,7 @@ export const useStaffAllocations = (memberId: string | null, timeRange?: TimeRan
           `)
           .eq('resource_id', memberId)
           .eq('company_id', company.id)
-          .eq('resource_type', 'active')
+          .in('resource_type', ['active', 'pre_registered'])
           .gte('allocation_date', rangeStartStr)
           .lte('allocation_date', rangeEndStr)
           .gt('hours', 0);

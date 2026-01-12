@@ -44,6 +44,7 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
         const endWeek = addWeeks(currentWeek, 8); // Next 8 weeks
 
         // FIX: Fetch all allocations to prevent inconsistent data, then filter in frontend
+        // RULEBOOK: ALL allocation reads include both active and pre_registered
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
           .select(`
@@ -53,7 +54,7 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
           `)
           .eq('company_id', company.id)
           .eq('resource_id', memberId)
-          .eq('resource_type', 'active')
+          .in('resource_type', ['active', 'pre_registered'])
           .order('allocation_date', { ascending: true});
 
         if (error) throw error;

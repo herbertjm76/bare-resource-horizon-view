@@ -46,11 +46,12 @@ export const useResourcePlanningData = (memberId: string) => {
       const timeoutId = setTimeout(() => controller.abort(), 8000);
 
       try {
+        // RULEBOOK: ALL allocation reads include both active and pre_registered
         const { data, error } = await supabase
           .from('project_resource_allocations')
           .select('project:projects(id, name, status, contract_end_date, current_stage)')
           .eq('resource_id', memberId)
-          .eq('resource_type', 'active')
+          .in('resource_type', ['active', 'pre_registered'])
           .eq('company_id', company.id)
           .not('hours', 'is', null)
           .abortSignal(controller.signal)
@@ -96,12 +97,13 @@ export const useResourcePlanningData = (memberId: string) => {
         const startDateHistory = format(twoWeeksAgo, 'yyyy-MM-dd');
         const endDateHistory = format(currentWeekStart, 'yyyy-MM-dd');
         
+        // RULEBOOK: ALL allocation reads include both active and pre_registered
         const [futureResponse, historicalResponse] = await Promise.all([
           supabase
             .from('project_resource_allocations')
             .select('hours, allocation_date, project:projects!inner(id, name)')
             .eq('resource_id', memberId)
-            .eq('resource_type', 'active')
+            .in('resource_type', ['active', 'pre_registered'])
             .eq('company_id', company.id)
             .gte('allocation_date', startDateFuture)
             .lte('allocation_date', endDateFuture)
@@ -112,7 +114,7 @@ export const useResourcePlanningData = (memberId: string) => {
             .from('project_resource_allocations')
             .select('hours, allocation_date')
             .eq('resource_id', memberId)
-            .eq('resource_type', 'active')
+            .in('resource_type', ['active', 'pre_registered'])
             .eq('company_id', company.id)
             .gte('allocation_date', startDateHistory)
             .lt('allocation_date', endDateHistory)

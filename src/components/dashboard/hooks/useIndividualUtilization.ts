@@ -96,11 +96,12 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
             // For pre-registered members, check pending_resources and their allocations
             logger.debug('Checking pending resources allocations...');
             
+            // RULEBOOK: ALL allocation reads include both active and pre_registered
             const { data: allocations, error } = await supabase
               .from('project_resource_allocations')
               .select('hours')
               .eq('resource_id', member.id)
-              .eq('resource_type', 'pre_registered')
+              .in('resource_type', ['active', 'pre_registered'])
               .eq('company_id', company.id)
               .gte('allocation_date', startDate)
               .lte('allocation_date', endDate);
@@ -116,11 +117,12 @@ export const useIndividualUtilization = (teamMembers: TeamMember[], selectedTime
             // For active members, check project_resources and their allocations
             logger.debug('Checking active member allocations...');
             
+            // RULEBOOK: ALL allocation reads include both active and pre_registered
             const { data: allocations, error } = await supabase
               .from('project_resource_allocations')
               .select('hours')
               .eq('resource_id', member.id)
-              .eq('resource_type', 'active')
+              .in('resource_type', ['active', 'pre_registered'])
               .eq('company_id', company.id)
               .gte('allocation_date', startDate)
               .lte('allocation_date', endDate);

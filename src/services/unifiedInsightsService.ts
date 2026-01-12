@@ -68,13 +68,13 @@ export class UnifiedInsightsService {
     const fourWeeksOut = addWeeks(currentWeekStart, 4);
 
     // Fetch all allocation data in one query
-    // RULEBOOK: Filter by resource_type='active' for active member insights
+    // RULEBOOK: ALL allocation reads include both active and pre_registered
     const { data: allocations, error } = await supabase
       .from('project_resource_allocations')
       .select('hours, week_start_date, project:projects(id, name, status)')
       .eq('resource_id', memberId)
       .eq('company_id', companyId)
-      .eq('resource_type', 'active')
+      .in('resource_type', ['active', 'pre_registered'])
       .gte('week_start_date', format(twelveWeeksAgo, 'yyyy-MM-dd'))
       .lte('week_start_date', format(fourWeeksOut, 'yyyy-MM-dd'));
 

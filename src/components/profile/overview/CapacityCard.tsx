@@ -27,6 +27,7 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
   const quarterEnd = format(endOfQuarter(now), 'yyyy-MM-dd');
 
   // Fetch allocation data for this week, month, and quarter
+  // RULEBOOK: ALL allocation reads include both active and pre_registered
   const { data: allocations, isLoading } = useQuery({
     queryKey: ['profile-capacity-allocations', profile.id],
     queryFn: async () => {
@@ -34,7 +35,7 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({ profile }) => {
         .from('project_resource_allocations')
         .select('hours, allocation_date')
         .eq('resource_id', profile.id)
-        .eq('resource_type', 'active')
+        .in('resource_type', ['active', 'pre_registered'])
         .gte('allocation_date', quarterStart)
         .lte('allocation_date', quarterEnd);
 

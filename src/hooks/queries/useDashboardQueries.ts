@@ -240,12 +240,12 @@ export const useDashboardMetrics = (companyId?: string, timeRange: TimeRange = '
           .eq('company_id', companyId)
           .gte('created_at', dateRange.startDate)
           .lte('created_at', dateRange.endDate),
-        // RULEBOOK: Filter by resource_type='active' for dashboard metrics
+        // RULEBOOK: ALL allocation reads include both active and pre_registered
         supabase
           .from('project_resource_allocations')
           .select('hours, allocation_date, resource_id, project_id')
           .eq('company_id', companyId)
-          .eq('resource_type', 'active')
+          .in('resource_type', ['active', 'pre_registered'])
           .gte('allocation_date', dateRange.startDate)
           .lte('allocation_date', dateRange.endDate)
       ]);

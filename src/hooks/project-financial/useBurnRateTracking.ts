@@ -42,13 +42,13 @@ export const useBurnRateTracking = (projectId: string, stageId?: string) => {
       const { data: stages, error: stagesError } = await stageQuery;
       if (stagesError) throw stagesError;
 
-      // RULEBOOK: Filter by resource_type='active' for burn rate calculations
+      // RULEBOOK: ALL allocation reads include both active and pre_registered
       // Fetch resource allocations with amount calculations
       let allocationQuery = supabase
         .from('project_resource_allocations')
         .select('hours, allocation_amount, allocation_date')
         .eq('project_id', projectId)
-        .eq('resource_type', 'active');
+        .in('resource_type', ['active', 'pre_registered']);
 
       if (stageId) {
         allocationQuery = allocationQuery.eq('stage_id', stageId);

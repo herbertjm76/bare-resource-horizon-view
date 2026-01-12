@@ -102,12 +102,12 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers, time
           otherLeaveData
         ] = await Promise.allSettled([
           // Project allocations - now respects time range
-          // RULEBOOK: Filter by resource_type='active' for active team views
+          // RULEBOOK: ALL allocation reads include both active and pre_registered
           supabase
             .from('project_resource_allocations')
             .select('resource_id, hours, allocation_date')
             .eq('company_id', company.id)
-            .eq('resource_type', 'active')
+            .in('resource_type', ['active', 'pre_registered'])
             .gte('allocation_date', queryStartDate)
             .lt('allocation_date', queryEndDate)
             .in('resource_id', teamMembers.map(m => m.id)),
