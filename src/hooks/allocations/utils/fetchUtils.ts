@@ -38,8 +38,8 @@ export async function fetchPreciseDateAllocations(
   logger.log('Fetching allocations for week key:', weekKey);
   
   try {
-    // RULE BOOK: Weekly overview shows ACTIVE team members only.
-    // Filter by resource_type='active' to avoid double-counting legacy/pre_registered rows.
+    // RULEBOOK: Weekly views show BOTH active AND pre_registered members.
+    // Use .in() filter to include both resource types for consistent display.
     const { data, error } = await supabase
       .from('project_resource_allocations')
       .select(`
@@ -51,7 +51,7 @@ export async function fetchPreciseDateAllocations(
       `)
       .eq('allocation_date', weekKey)
       .eq('company_id', companyId)
-      .eq('resource_type', 'active')
+      .in('resource_type', ['active', 'pre_registered'])
       .in('resource_id', memberIds);
     
     if (error) {
@@ -87,8 +87,8 @@ export async function fetchDateRangeAllocations(
   logger.log(`Fetching allocations from ${startWeekKey} to ${endWeekKey}`);
   
   try {
-    // RULE BOOK: Weekly overview shows ACTIVE team members only.
-    // Filter by resource_type='active' to avoid double-counting legacy/pre_registered rows.
+    // RULEBOOK: Weekly views show BOTH active AND pre_registered members.
+    // Use .in() filter to include both resource types for consistent display.
     const { data, error } = await supabase
       .from('project_resource_allocations')
       .select(`
@@ -101,7 +101,7 @@ export async function fetchDateRangeAllocations(
       .gte('allocation_date', startWeekKey)
       .lte('allocation_date', endWeekKey)
       .eq('company_id', companyId)
-      .eq('resource_type', 'active')
+      .in('resource_type', ['active', 'pre_registered'])
       .in('resource_id', memberIds);
       
     if (error) {
@@ -145,7 +145,7 @@ export async function fetchRecentAllocations(
     const latestWeekKey = dateData[0].allocation_date;
     logger.log(`Using most recent week key: ${latestWeekKey}`);
     
-    // RULEBOOK: Filter by resource_type='active' for active team views
+    // RULEBOOK: Weekly views show BOTH active AND pre_registered members.
     const { data } = await supabase
       .from('project_resource_allocations')
       .select(`
@@ -157,7 +157,7 @@ export async function fetchRecentAllocations(
       `)
       .eq('allocation_date', latestWeekKey)
       .eq('company_id', companyId)
-      .eq('resource_type', 'active')
+      .in('resource_type', ['active', 'pre_registered'])
       .in('resource_id', memberIds);
       
     return data || [];

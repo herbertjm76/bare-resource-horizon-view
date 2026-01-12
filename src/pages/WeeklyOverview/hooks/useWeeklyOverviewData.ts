@@ -154,7 +154,7 @@ export const useWeeklyOverviewData = (selectedWeek: Date, filters: any, sortOpti
           )
         `)
         .eq('company_id', company.id)
-        .eq('resource_type', 'active')
+        .in('resource_type', ['active', 'pre_registered'])
         .gte('allocation_date', weekStartString)
         .lte('allocation_date', weekEndDate);
       if (error) throw error;

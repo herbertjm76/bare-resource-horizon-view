@@ -165,7 +165,7 @@ export const AvailableMembersRow: React.FC<AvailableMembersRowProps> = ({
           )
         `)
         .eq('company_id', companyId)
-        .eq('resource_type', 'active')
+        .in('resource_type', ['active', 'pre_registered'])
         .eq('allocation_date', targetWeekStart);
       
       if (error) throw error;
