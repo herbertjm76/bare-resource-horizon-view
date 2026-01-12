@@ -124,9 +124,11 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
       }
 
       // Real mode: Fetch from Supabase
-      // IMPORTANT: Week-resourcing shows allocations for ACTIVE team members (profiles).
-      // Legacy/corrupt data may include "pre_registered" rows that share the same resource_id;
-      // including them would double-count hours (e.g. 20% shows as 80%).
+      // RULEBOOK: Weekly overview shows BOTH active (profiles) AND pre_registered (invites) members.
+      // We must fetch allocations for BOTH resource types to ensure consistency with Resource Scheduling.
+      // Each member's allocations are correctly typed - active members have active allocations,
+      // pre_registered members have pre_registered allocations. No double-counting occurs
+      // because each member ID is unique to either profiles OR invites.
       const { data: allocations, error } = await supabase
         .from('project_resource_allocations')
         .select(`
@@ -144,7 +146,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
         `)
         .eq('company_id', companyId)
         .in('resource_id', memberIds)
-        .eq('resource_type', 'active')
+        .in('resource_type', ['active', 'pre_registered'])
         .gte('allocation_date', weekStartDate)
         .lte('allocation_date', weekEndDate)
         .gt('hours', 0);
