@@ -14,6 +14,32 @@
  * - All writes go through canonical API (saveResourceAllocation/deleteResourceAllocation/deleteAllResourceAllocationsForProject)
  *
  * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  WEEK START ALIGNMENT RULES                                                   ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * 
+ * ALL views MUST respect the company's `start_of_work_week` setting:
+ * 
+ * 1. Use `useAppSettings()` hook to get `startOfWorkWeek` from company settings
+ * 2. Use canonical week utilities from `src/utils/allocationWeek.ts`:
+ *    - `getAllocationWeekKey(date, weekStartDay)` for generating week keys
+ *    - `getWeekRange(weekKey)` for week boundaries
+ *    - `generateWeekKeysForPeriod(startDate, weekCount, weekStartDay)` for multi-week ranges
+ * 3. For date-fns usage, convert weekStartDay to weekStartsOn:
+ *    - 'Sunday' → 0, 'Saturday' → 6, 'Monday' → 1
+ * 4. NEVER hardcode `weekStartsOn: 1` - always derive from company settings
+ * 
+ * FILES AUDITED FOR WEEK START ALIGNMENT:
+ * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts ✅ (uses getWeekStartDate with startOfWorkWeek)
+ * - src/components/week-resourcing/hooks/useStreamlinedWeekResourceData.ts ✅ (uses getWeekStartDate with startOfWorkWeek)
+ * - src/components/week-resourcing/hooks/useDetailedWeeklyAllocations.ts ✅ (uses startOfWorkWeek)
+ * - src/components/weekly-rundown/AvailableMembersRow.tsx ✅ (uses getAllocationWeekKey)
+ * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts ✅ (uses startOfWorkWeek)
+ * - src/pages/ProjectResourcing/hooks/useProjectResourcingState.ts ✅ (uses getWeekStartsOn helper)
+ * - src/hooks/allocations/utils/fetchUtils.ts ✅ (uses getAllocationWeekKey)
+ * - src/hooks/allocations/useFetchAllocations.ts ✅ (uses getAllocationWeekKey)
+ * - src/components/weekly-overview/utils.ts ✅ (getWeekStartDate respects weekStartDay)
+ *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
  * ║  RESOURCE TYPE RULES                                                          ║
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  * 
@@ -55,12 +81,33 @@
  * - deleteResourceAllocation(): Delete a single week's allocation
  * - deleteAllResourceAllocationsForProject(): Delete all allocations for a resource on a project
  * 
- * READ PATHS MUST USE CORRECT resource_type FILTER:
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  READ PATH FILTER RULES                                                       ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * 
  * - Active-only views (dashboards, utilization): .eq('resource_type', 'active')
  * - Pre-registered-only views: .eq('resource_type', 'pre_registered')
  * - Combined views (Weekly Overview, Resource Scheduling): .in('resource_type', ['active', 'pre_registered'])
  *   - These views show BOTH active AND pre-registered members, so they need BOTH allocation types
  *   - No double-counting occurs because each member ID is unique to either profiles OR invites
+ * 
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  DATA SOURCE ALIGNMENT                                                        ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * 
+ * ALL views fetch from the SAME database table: `project_resource_allocations`
+ * 
+ * Weekly Overview and Resource Scheduling are "transposed views" of the same data:
+ * - Weekly Overview: Rows = Members, Columns = Projects (grouped by member)
+ * - Resource Scheduling: Rows = Projects, Columns = Members/Weeks (grouped by project)
+ * - Both use the same allocation data, just displayed differently
+ * 
+ * SHARED DATA SOURCES:
+ * - Allocations: `project_resource_allocations` table
+ * - Active members: `profiles` table (company_id filtered)
+ * - Pre-registered members: `invites` table (invitation_type='pre_registered', status='pending')
+ * - Projects: `projects` table (company_id filtered)
+ * - Company settings: `companies` table (work_week_hours, start_of_work_week, etc.)
  * 
  * FILES THAT HAVE BEEN AUDITED AND ARE COMPLIANT:
  * 
@@ -97,22 +144,6 @@
  * - src/components/profile/overview/CapacityCard.tsx
  * - src/hooks/project-financial/useBurnRateTracking.ts
  * 
- * === PRE-REGISTERED ONLY VIEWS - USE .eq('resource_type', 'pre_registered') ===
- * - src/hooks/utilization/usePreRegisteredMembers.ts
- * - src/components/profile/overview/CapacityCard.tsx (.eq('resource_type', 'active'))
- * - src/components/profile/overview/hooks/useUserProjects.ts (intentionally fetches both types)
- * - src/components/resource-planning/PipelineTimelineView.tsx (.eq('resource_type', 'active'))
- * - src/components/resources/dialogs/ResourceAllocationDialog.tsx (dynamic resource_type based on member.type)
- * - src/components/workload/hooks/services/dataFetchers.ts (.eq('resource_type', 'active'))
- * - src/components/weekly-rundown/cards/AvailableThisWeekCard.tsx (intentionally fetches both types for combined availability view)
- * - src/hooks/useProjectStageProgress.ts (.eq('resource_type', 'active'))
- * - src/hooks/project-financial/useBurnRateTracking.ts (.eq('resource_type', 'active'))
- * - src/pages/ProjectResourcing/hooks/useProjectResourcingSummary.ts (.eq('resource_type', 'active'))
- * - src/pages/WeeklyOverview/hooks/useWeeklyOverviewData.ts (.eq('resource_type', 'active'))
- * - src/pages/CapacityHeatmap.tsx (.eq('resource_type', 'active'))
- * - src/services/unifiedInsightsService.ts (.eq('resource_type', 'active'))
- * - src/components/projects/services/matrixImporter.ts (bulk import uses direct DB with proper resource_type='active')
- *
  * === WRITE PATHS USING CANONICAL API ===
  * - src/components/resources/person-view/ProjectAllocationRow.tsx (uses saveResourceAllocation)
  * - src/components/resources/person-view/AddProjectRow.tsx (uses saveResourceAllocation)
