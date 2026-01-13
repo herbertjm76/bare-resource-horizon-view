@@ -1,0 +1,51 @@
+
+/* Grid Table Wrapper - Horizontal Scrolling with Sticky Columns */
+
+/* Main container */
+.grid-table-wrapper-container {
+  width: 100%;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  background: hsl(var(--background));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Scrollable area */
+.grid-table-scroll-area {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom Scrollbar Styling */
+.grid-table-scroll-area::-webkit-scrollbar {
+  height: 12px;
+}
+
+.grid-table-scroll-area::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 6px;
+  margin: 0 4px;
+}
+
+.grid-table-scroll-area::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 6px;
+  border: 2px solid hsl(var(--muted));
+}
+
+.grid-table-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.6);
+}
+
+.grid-table-scroll-area::-webkit-scrollbar-corner {
+  background: hsl(var(--muted));
+}
+
+/* Firefox scrollbar */
+.grid-table-scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.4) hsl(var(--muted));
+}

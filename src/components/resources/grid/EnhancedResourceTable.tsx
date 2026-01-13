@@ -29,7 +29,7 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
         className="project-resourcing-table" 
         style={{ 
           width: `${calculatedWidth}px`,
-          maxWidth: '100%'
+          minWidth: `${calculatedWidth}px`
         }}
       >
         <colgroup>
