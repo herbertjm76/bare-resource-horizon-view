@@ -299,24 +299,22 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   // Show only grid if requested
   if (showOnlyGrid) {
     return (
-      <div className="w-full flex justify-center">
-        <div className="w-full max-w-[1400px] overflow-hidden">
-          <ModernResourceGrid
-            startDate={selectedMonth}
-            periodToShow={filters.periodToShow}
-            // Pass projects down to avoid a redundant refetch (prevents repeated "Failed to load projects" toasts)
-            projects={projects}
-            isLoading={isLoading}
-            filters={combinedFilters}
-            displayOptions={displayOptions}
-            sortBy={sortBy}
-            sortDirection={sortDirection}
-            expandedProjects={expandedProjects}
-            totalProjects={totalProjects}
-            onToggleProjectExpand={handleToggleProjectExpand}
-            memberFilters={memberFilters}
-          />
-        </div>
+      <div className="w-full">
+        <ModernResourceGrid
+          startDate={selectedMonth}
+          periodToShow={filters.periodToShow}
+          // Pass projects down to avoid a redundant refetch (prevents repeated "Failed to load projects" toasts)
+          projects={projects}
+          isLoading={isLoading}
+          filters={combinedFilters}
+          displayOptions={displayOptions}
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          expandedProjects={expandedProjects}
+          totalProjects={totalProjects}
+          onToggleProjectExpand={handleToggleProjectExpand}
+          memberFilters={memberFilters}
+        />
       </div>
     );
   }
@@ -352,23 +350,21 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         onExport={handleExport}
       />
 
-      {/* Centered main grid */}
-      <div className="w-full flex justify-center">
-        <div className="w-full max-w-[1400px] overflow-hidden">
-          <ModernResourceGrid
-            startDate={selectedMonth}
-            periodToShow={filters.periodToShow}
-            projects={projects}
-            isLoading={isLoading}
-            filters={combinedFilters}
-            displayOptions={displayOptions}
-            sortBy={sortBy}
-            sortDirection={sortDirection}
-            expandedProjects={expandedProjects}
-            totalProjects={totalProjects}
-            onToggleProjectExpand={handleToggleProjectExpand}
-          />
-        </div>
+      {/* Main grid */}
+      <div className="w-full">
+        <ModernResourceGrid
+          startDate={selectedMonth}
+          periodToShow={filters.periodToShow}
+          projects={projects}
+          isLoading={isLoading}
+          filters={combinedFilters}
+          displayOptions={displayOptions}
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          expandedProjects={expandedProjects}
+          totalProjects={totalProjects}
+          onToggleProjectExpand={handleToggleProjectExpand}
+        />
       </div>
     </div>
   );
