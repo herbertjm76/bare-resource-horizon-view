@@ -134,7 +134,7 @@ export const useFetchResources = (projectId: string) => {
       const inviteIds = Array.from(new Set((preRegisteredMembers || []).map((m) => m.invite_id).filter(Boolean)));
 
       const profileById = new Map<string, any>();
-      if (staffIds.length > 0) {
+      const hydrateProfiles = async () => {
         try {
           // SECURITY DEFINER function that returns company-scoped profiles (email masked for non-admins).
           const { data: profilesData, error: profilesError } = await supabase.rpc('get_profiles_secure', {
@@ -143,14 +143,21 @@ export const useFetchResources = (projectId: string) => {
 
           if (profilesError) {
             logger.warn('Could not fetch profiles via get_profiles_secure (continuing):', profilesError);
-          } else {
-            (profilesData || []).forEach((p: any) => {
-              profileById.set(p.id, p);
-            });
+            return;
           }
+
+          (profilesData || []).forEach((p: any) => {
+            profileById.set(p.id, p);
+          });
         } catch (e) {
           logger.warn('Could not fetch profiles (continuing):', e);
         }
+      };
+
+      // Only fetch profiles if we have to. If project_resources is empty but allocations exist,
+      // we still need profiles to resolve names and avoid the "Deleted Resource" placeholder.
+      if (staffIds.length > 0) {
+        await hydrateProfiles();
       }
 
       const inviteById = new Map<string, any>();
@@ -231,6 +238,16 @@ export const useFetchResources = (projectId: string) => {
           }
         }
       });
+
+      // If this project has allocations but no project_resources rows, we still need to resolve
+      // active member IDs to real profiles (otherwise they show up as "Deleted Resource").
+      const missingProfileIds = Array.from(orphanedResourceIds).filter((id) => !profileById.has(id));
+      const hasOrphanedActive = (orphanedAllocations || []).some(
+        (a: any) => a?.resource_type === 'active' && orphanedResourceIds.has(a?.resource_id)
+      );
+      if (hasOrphanedActive && missingProfileIds.length > 0) {
+        await hydrateProfiles();
+      }
 
       // Fetch missing invite details for orphaned pre-registered resources
       if (orphanedPreRegisteredIds.size > 0) {
