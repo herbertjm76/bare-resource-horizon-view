@@ -5,16 +5,15 @@
 .workload-resource-grid-container {
   width: 100%;
   position: relative;
-  background: white;
+  background: hsl(var(--background));
   border-radius: 8px;
-  overflow: hidden;
+  border: 1px solid hsl(var(--border));
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-/* Center alignment for 1-month views */
+/* Center alignment for shorter periods (1-2 months) */
 .workload-resource-grid-container.center-aligned {
-  display: flex;
-  justify-content: center;
+  /* Don't use flex centering - it breaks horizontal scroll */
 }
 
 /* Table Wrapper with Horizontal Scrolling */
@@ -25,32 +24,38 @@
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   position: relative;
-  background: white;
+  background: hsl(var(--background));
 }
 
-/* Center alignment for table wrapper */
-.center-aligned .workload-resource-table-wrapper {
-  display: inline-block;
-  min-width: min-content;
-  width: auto;
-  max-width: 100%;
-  overflow-x: visible;
+/* Scrollbar Styling for Table Wrapper */
+.workload-resource-table-wrapper::-webkit-scrollbar {
+  height: 12px;
+}
+
+.workload-resource-table-wrapper::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 6px;
+}
+
+.workload-resource-table-wrapper::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 6px;
+  border: 2px solid hsl(var(--muted));
+}
+
+.workload-resource-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.6);
 }
 
 /* Main Table */
 .workload-resource-table {
   border-collapse: separate;
   border-spacing: 0;
-  background: white;
+  background: hsl(var(--background));
   border-radius: 8px;
   overflow: hidden;
   margin: 0;
   table-layout: fixed;
-}
-
-/* Center alignment for table */
-.center-aligned .workload-resource-table {
-  margin: 0 auto;
 }
 
 /* Header Styles */
@@ -100,30 +105,30 @@
 
 /* Project Header Row - Clean & Readable */
 .workload-resource-row.project-header-row {
-  background: #f8fafc !important;
-  border-bottom: 2px solid #e2e8f0;
+  background: hsl(var(--muted)) !important;
+  border-bottom: 2px solid hsl(var(--border));
   border-left: 4px solid hsl(var(--primary));
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .workload-resource-row.project-header-row .workload-resource-cell {
-  background: #f8fafc !important;
-  color: #000000 !important;
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
   font-weight: 600 !important;
 }
 
 .workload-resource-row.project-header-row .workload-resource-cell.project-resource-column {
-  background: #f8fafc !important;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+  background: hsl(var(--muted)) !important;
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
 }
 
 .workload-resource-row.project-header-row:hover {
-  background: #f1f5f9 !important;
+  background: hsl(var(--muted) / 0.8) !important;
 }
 
 .workload-resource-row.project-header-row:hover .workload-resource-cell {
-  background: #f1f5f9 !important;
-  color: #000000 !important;
+  background: hsl(var(--muted) / 0.8) !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 /* Project Total Hours Badge - Override project row color inheritance */
@@ -144,22 +149,22 @@
 
 /* Resource Row - Indented and Lighter */
 .workload-resource-row.resource-row {
-  background-color: #fcfcfc;
+  background-color: hsl(var(--background));
 }
 
 .workload-resource-row.resource-row .workload-resource-cell.project-resource-column {
   padding-left: 32px !important; /* Indentation to show hierarchy */
-  border-left: 3px solid rgb(111, 75, 246) !important; /* Subtle color indicator */
-  background-color: #fcfcfc !important;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+  border-left: 3px solid hsl(var(--primary)) !important;
+  background-color: hsl(var(--background)) !important;
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
 }
 
 .workload-resource-row.resource-row:hover {
-  background-color: #f8f9fa !important;
+  background-color: hsl(var(--muted) / 0.5) !important;
 }
 
 .workload-resource-row.resource-row:hover .workload-resource-cell {
-  background-color: #f8f9fa !important;
+  background-color: hsl(var(--muted) / 0.5) !important;
 }
 
 /* Add Resource Row - Special Styling */
@@ -190,8 +195,8 @@
   position: sticky;
   left: 0;
   z-index: 20;
-  background: inherit;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+  background: hsl(var(--background));
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Day Column Cells */

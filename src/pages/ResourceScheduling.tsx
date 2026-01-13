@@ -127,8 +127,8 @@ const ResourceScheduling = () => {
 
   return (
     <StandardLayout>
-      <div className="w-full h-full flex flex-col">
-        <div className="max-w-[1600px] mx-auto w-full">
+      <div className="w-full h-full flex flex-col overflow-hidden">
+        <div className="w-full max-w-full">
           <div className="opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-0">
             <StandardizedPageHeader
               icon={GanttChartSquare}
@@ -150,7 +150,7 @@ const ResourceScheduling = () => {
               <TabsContent value="by-project" className="mt-0 py-3">
                 <div className="space-y-4">
                   {/* 1. Combined Controls + Member Filters - grouped in single card */}
-                  <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
+                  <div className="px-3 sm:px-6 max-w-[1600px] mx-auto opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
                     <div className="bg-card rounded-lg border shadow-sm">
                       <ProjectResourcingContent
                         selectedMonth={selectedMonth}
@@ -192,8 +192,8 @@ const ResourceScheduling = () => {
                     </div>
                   </div>
                   
-                  {/* 3. Grid below */}
-                  <div className="overflow-x-auto opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
+                  {/* 3. Grid below - full width with internal scrolling */}
+                  <div className="w-full opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
                     <div className="px-3 sm:px-6">
                       <ProjectResourcingContent
                         selectedMonth={selectedMonth}
@@ -231,7 +231,7 @@ const ResourceScheduling = () => {
               <TabsContent value="by-person" className="mt-0 py-3">
                 <div className="space-y-4">
                   {/* 1. Combined Controls + Member Filters - grouped in single card */}
-                  <div className="px-3 sm:px-6 opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
+                  <div className="px-3 sm:px-6 max-w-[1600px] mx-auto opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-200">
                     <div className="bg-card rounded-lg border shadow-sm">
                       <PersonResourceView
                         startDate={selectedMonth}
@@ -252,8 +252,8 @@ const ResourceScheduling = () => {
                     </div>
                   </div>
                   
-                  {/* 3. Grid below */}
-                  <div className="overflow-x-auto opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
+                  {/* 3. Grid below - full width with internal scrolling */}
+                  <div className="w-full opacity-0 animate-[cascadeUp_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] animation-delay-500">
                     <div className="px-3 sm:px-6">
                       <PersonResourceView
                         startDate={selectedMonth}
