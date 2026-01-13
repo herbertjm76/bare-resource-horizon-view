@@ -43,7 +43,7 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   const handleCopyGenericLink = () => {
     if (company?.subdomain) {
       // Use production domain instead of preview URL
-      const productionBaseUrl = 'https://app.bareresource.com';
+      const productionBaseUrl = 'https://www.bareresource.com';
       const genericLink = `${productionBaseUrl}/${company.subdomain}/join`;
       navigator.clipboard.writeText(genericLink);
       toast.success("Generic invite link copied to clipboard!");
