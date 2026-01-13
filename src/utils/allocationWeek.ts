@@ -11,6 +11,10 @@
  * 1. All allocation_date values are UTC date keys (YYYY-MM-DD)
  * 2. All allocation_date values must fall on the company's week start day
  * 3. The database trigger enforces normalization on insert/update
+ * 4. CRITICAL: Every allocation MUST have a corresponding entry in 
+ *    project_resources (for active) or pending_resources (for pre_registered).
+ *    The saveResourceAllocation() function auto-creates these entries.
+ *    Orphaned allocations will display as "Deleted Resource".
  * 4. Frontend must use these utilities for consistency
  * 
  * ─────────────────────────────────────────────────────────────────────────────
@@ -46,6 +50,12 @@
  * 
  * For any component/hook dealing with weeks or allocations, import from:
  *   import { getAllocationWeekKey, getWeekStartDate, toUTCDateKey } from '@/utils/allocationWeek';
+ * 
+ * For SAVING allocations, ALWAYS use the canonical API:
+ *   import { saveResourceAllocation, deleteResourceAllocation } from '@/hooks/allocations/api';
+ *   
+ * NEVER insert directly into project_resource_allocations without ensuring
+ * the corresponding project_resources/pending_resources entry exists!
  * 
  * DO NOT import getWeekStartDate from '@/components/weekly-overview/utils'
  * (that file uses local-time date-fns functions - legacy, avoid for week logic)
