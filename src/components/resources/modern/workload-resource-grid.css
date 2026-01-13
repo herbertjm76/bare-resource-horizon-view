@@ -30,6 +30,20 @@
   padding-bottom: 4px; /* Space for scrollbar */
 }
 
+/* Drag-to-scroll cursor states */
+.workload-resource-table-wrapper.can-scroll {
+  cursor: grab;
+}
+
+.workload-resource-table-wrapper.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.workload-resource-table-wrapper.is-dragging * {
+  user-select: none;
+}
+
 /* Scrollbar Styling for Table Wrapper */
 .workload-resource-table-wrapper::-webkit-scrollbar {
   height: 14px;
