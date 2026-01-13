@@ -38,16 +38,19 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
       
       logger.log('Fetched invites:', invites?.length || 0, 'for company:', companyId);
       
-      // Process invites into pendingMembers and emailInvites
+      // Process ALL invites (both pre_registered and email_invite) as pending members
       const pendingMembers: PendingMember[] = (invites || []).map(invite => ({
         ...invite,
         isPending: true
       }));
       
-      const preReg = pendingMembers.filter(member => member.invitation_type === 'pre_registered');
-      logger.log('Pre-registered members:', preReg.length);
+      // Include both pre_registered AND email_invite types as pre-registered members
+      const allPendingMembers = pendingMembers.filter(
+        member => member.invitation_type === 'pre_registered' || member.invitation_type === 'email_invite'
+      );
+      logger.log('All pending members (pre_registered + email_invite):', allPendingMembers.length);
       
-      setPreRegisteredMembers(preReg);
+      setPreRegisteredMembers(allPendingMembers);
       setEmailInvites((invites || []).filter(invite => invite.invitation_type === 'email_invite'));
       setIsLoadingInvites(false);
     };

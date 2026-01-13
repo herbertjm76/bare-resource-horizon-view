@@ -81,12 +81,12 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
           
         if (activeError) throw activeError;
         
-        // Fetch pre-registered team members from invites
+        // Fetch pre-registered team members from invites (both types)
         const { data: preregisteredMembers, error: inviteError } = await supabase
           .from('invites')
           .select('*')
           .eq('company_id', company.id)
-          .eq('invitation_type', 'pre_registered')
+          .in('invitation_type', ['pre_registered', 'email_invite'])
           .eq('status', 'pending');
           
         if (inviteError) throw inviteError;

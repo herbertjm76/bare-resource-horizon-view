@@ -139,7 +139,7 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
       .from('invites')
       .select('*')
       .eq('company_id', company.id)
-      .eq('invitation_type', 'pre_registered')
+      .in('invitation_type', ['pre_registered', 'email_invite'])
       .eq('status', 'pending');
     
     return [

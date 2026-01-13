@@ -56,7 +56,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
         .from('invites')
         .select('id, first_name, last_name, avatar_url, weekly_capacity')
         .eq('company_id', company.id)
-        .eq('invitation_type', 'pre_registered')
+        .in('invitation_type', ['pre_registered', 'email_invite'])
         .eq('status', 'pending');
       if (error) throw error;
       return data || [];

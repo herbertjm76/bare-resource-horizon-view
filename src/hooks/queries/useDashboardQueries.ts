@@ -62,7 +62,7 @@ export const useDashboardPreRegistered = (companyId?: string) => {
         .select('*')
         .eq('company_id', companyId)
         .eq('status', 'pending')
-        .eq('invitation_type', 'pre_registered');
+        .in('invitation_type', ['pre_registered', 'email_invite']);
       
       if (error) throw error;
       return data || [];
