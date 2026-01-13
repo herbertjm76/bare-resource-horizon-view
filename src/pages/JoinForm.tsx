@@ -147,7 +147,16 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          // Check if user already exists in Supabase Auth
+          if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+            toast.error('This email is already registered. Please sign in instead to join this company.');
+            handleAuthModeChange(false); // Switch to login mode
+            setLoading(false);
+            return;
+          }
+          throw error;
+        }
 
         if (data.user) {
           await ensureUserProfile(data.user.id, {
@@ -198,6 +207,22 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
 
         const loginData = loginValidation.data;
 
+        // Validate invite code if provided (for existing users joining new company)
+        let inviteRecord = null;
+        if (effectiveInviteCode) {
+          const { data: invites, error: inviteError } = await supabase
+            .rpc('get_invite_by_code', { invite_code: effectiveInviteCode });
+
+          const invite = invites?.[0];
+
+          if (!inviteError && invite) {
+            // Verify the invite belongs to the company from URL
+            if (company?.id && invite.company_id === company.id) {
+              inviteRecord = invite;
+            }
+          }
+        }
+
         // Login existing user
         const { data, error } = await supabase.auth.signInWithPassword({
           email: loginData.email,
@@ -206,7 +231,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
 
         if (error) throw error;
 
-        // Verify user belongs to this company
+        // Check if user has a profile
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('company_id')
@@ -214,14 +239,65 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
           .maybeSingle();
 
         if (profileError || !profile) {
+          // No profile exists, create one for this company
           await ensureUserProfile(data.user.id, {
-            email,
+            email: loginData.email,
             companyId: company?.id,
-            role: 'member'
+            role: inviteRecord?.role || 'member'
           });
         } else if (profile.company_id !== company?.id) {
-          await supabase.auth.signOut();
-          throw new Error('You are not a member of this company.');
+          // User belongs to a different company - check if they have a valid invite for this company
+          if (inviteRecord && inviteRecord.company_id === company?.id) {
+            // Valid invite exists - update their profile to join this company
+            const { error: updateError } = await supabase
+              .from('profiles')
+              .update({ company_id: company.id })
+              .eq('id', data.user.id);
+
+            if (updateError) {
+              console.error('Error updating profile company:', updateError);
+              await supabase.auth.signOut();
+              throw new Error('Failed to join company. Please try again.');
+            }
+
+            // Add role to user_roles table for new company
+            await supabase
+              .from('user_roles')
+              .upsert({
+                user_id: data.user.id,
+                role: (inviteRecord.role || 'member') as any,
+                company_id: company.id
+              });
+
+            // Mark invite as accepted
+            await supabase
+              .from('invites')
+              .update({
+                status: 'accepted',
+                accepted_by: data.user.id,
+                accepted_at: new Date().toISOString()
+              })
+              .eq('id', inviteRecord.id);
+
+            toast.success(`Successfully joined ${companyName}!`);
+          } else {
+            // No valid invite - they can't join this company
+            await supabase.auth.signOut();
+            throw new Error('You are not a member of this company. Please use a valid invite link.');
+          }
+        } else {
+          // User already belongs to this company - just login
+          // Mark invite as accepted if one was used
+          if (inviteRecord) {
+            await supabase
+              .from('invites')
+              .update({
+                status: 'accepted',
+                accepted_by: data.user.id,
+                accepted_at: new Date().toISOString()
+              })
+              .eq('id', inviteRecord.id);
+          }
         }
 
         toast.success('Login successful!');
