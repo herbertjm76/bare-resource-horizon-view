@@ -142,9 +142,9 @@ const handler = async (req: Request): Promise<Response> => {
         console.log(`Sending invite to ${invite.email}`);
 
         const emailResponse = await resend.emails.send({
-          from: "Bare Resource <no-reply@bareresource.com>",
+          from: "Resource <no-reply@bareresource.com>",
           to: [invite.email],
-          subject: `Join ${companyName}`,
+          subject: `Join ${companyName} on Resource`,
           html: `
             <!DOCTYPE html>
             <html>
@@ -161,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <p style="font-size: 16px; margin-bottom: 20px; color: #111827;">Hi${firstName ? ` ${firstName}` : ''},</p>
                   
                   <p style="font-size: 16px; margin-bottom: 30px; color: #374151; line-height: 1.6;">
-                    You've been pre-registered to join <strong>${companyName}</strong>. Click the button below to complete your registration and join the team.
+                    You've been invited to join <strong>${companyName}</strong> on Resource. Click the button below to complete your registration and join the team.
                   </p>
                   
                   <div style="text-align: center; margin: 35px 0;">
