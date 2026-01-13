@@ -75,7 +75,7 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
   }, []);
  
   return (
-    <div className="workload-resource-grid-container">
+    <div className="workload-resource-grid-container flex justify-center">
       <div 
         ref={wrapperRef}
         className={`workload-resource-table-wrapper ${isDragging ? 'is-dragging' : ''} ${needsScroll ? 'can-scroll' : ''}`}

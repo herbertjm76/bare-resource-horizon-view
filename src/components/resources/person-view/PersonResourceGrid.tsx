@@ -65,7 +65,7 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
   return (
     <div className="bg-background rounded-lg shadow-sm border border-border">
       <div className="p-4">
-        <div className="workload-resource-grid-container">
+        <div className="workload-resource-grid-container flex justify-center">
           <div 
             ref={wrapperRef}
             className={`workload-resource-table-wrapper ${isDragging ? 'is-dragging' : ''} ${needsScroll ? 'can-scroll' : ''}`}
