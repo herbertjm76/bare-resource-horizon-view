@@ -128,6 +128,28 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
           }
 
           inviteRecord = invite;
+        } else if (company?.id) {
+          // No invite code provided - check if there's a pending pre-registered invite matching this email
+          const { data: matchingInvites, error: matchError } = await supabase
+            .from('invites')
+            .select('*')
+            .eq('company_id', company.id)
+            .eq('email', validatedData.email)
+            .eq('status', 'pending')
+            .maybeSingle();
+
+          if (!matchError && matchingInvites) {
+            // Found a matching pre-registered invite - auto-claim it
+            inviteRecord = matchingInvites;
+            logger.debug('Auto-matched email to pending invite:', inviteRecord.id);
+          }
+        }
+
+        // Security check: require either a valid invite code OR a matching pre-registered email
+        if (!inviteRecord) {
+          toast.error('No valid invite found. Please use an invite link or enter a valid invite code.');
+          setLoading(false);
+          return;
         }
 
         // Use role from invite if available, otherwise default to member
@@ -316,16 +338,17 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
       {/* Only show invite code field if inviteCode is NOT present AND user is signing up */}
       {!inviteCode && isSignup && (
         <div>
-          <label htmlFor="inviteCode" className="block text-white/80 mb-2">Invite Code</label>
+          <label htmlFor="inviteCode" className="block text-white/80 mb-2">
+            Invite Code <span className="text-white/50 text-sm">(optional if email is pre-registered)</span>
+          </label>
           <input
             type="text"
             id="inviteCode"
             value={inviteCodeInput}
             onChange={(e) => setInviteCodeInput(e.target.value)}
             className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-            required
             autoComplete="off"
-            placeholder="Enter invite code"
+            placeholder="Enter invite code or leave blank"
           />
         </div>
       )}
