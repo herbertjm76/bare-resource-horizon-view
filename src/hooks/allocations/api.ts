@@ -75,6 +75,10 @@ export const saveResourceAllocation = async (
 
     logger.debug(`Saving allocation for week starting: ${normalizedWeekKey} (${weekStartDay})`);
 
+    // IMPORTANT: Ensure the resource exists in project_resources or pending_resources
+    // This prevents orphaned allocations that show as "Deleted Resource"
+    await ensureResourceExistsForProject(projectId, resourceId, resourceType, companyId);
+
     // IMPORTANT:
     // Some legacy/demo data may have allocations stored on arbitrary dates inside the week.
     // Our reads normalize + aggregate by week start, so if we insert a new weekStart row without
@@ -159,6 +163,64 @@ export const saveResourceAllocation = async (
     console.error('Error saving allocation:', error);
     toast.error('Failed to save allocation');
     return false;
+  }
+};
+
+/**
+ * Ensures a resource entry exists in project_resources or pending_resources.
+ * This prevents orphaned allocations that show as "Deleted Resource".
+ */
+const ensureResourceExistsForProject = async (
+  projectId: string,
+  resourceId: string,
+  resourceType: 'active' | 'pre_registered',
+  companyId: string
+): Promise<void> => {
+  try {
+    if (resourceType === 'pre_registered') {
+      // Check if pending_resources entry exists
+      const { data: existing } = await supabase
+        .from('pending_resources')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('invite_id', resourceId)
+        .eq('company_id', companyId)
+        .maybeSingle();
+
+      if (!existing) {
+        // Create the entry
+        logger.debug(`Creating missing pending_resources entry for invite ${resourceId} on project ${projectId}`);
+        await supabase.from('pending_resources').insert({
+          project_id: projectId,
+          invite_id: resourceId,
+          hours: 0,
+          company_id: companyId,
+        });
+      }
+    } else {
+      // Check if project_resources entry exists
+      const { data: existing } = await supabase
+        .from('project_resources')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('staff_id', resourceId)
+        .eq('company_id', companyId)
+        .maybeSingle();
+
+      if (!existing) {
+        // Create the entry
+        logger.debug(`Creating missing project_resources entry for staff ${resourceId} on project ${projectId}`);
+        await supabase.from('project_resources').insert({
+          project_id: projectId,
+          staff_id: resourceId,
+          hours: 0,
+          company_id: companyId,
+        });
+      }
+    }
+  } catch (error) {
+    // Log but don't fail - the allocation can still be saved
+    logger.warn('Could not ensure resource exists:', error);
   }
 };
 
