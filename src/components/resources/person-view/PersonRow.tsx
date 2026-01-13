@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { toUTCDateKey } from '@/utils/dateKey';
-import { ChevronDown, ChevronRight, Briefcase } from 'lucide-react';
+import { ChevronDown, ChevronRight, Briefcase, Eye } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProjectAllocationRow } from './ProjectAllocationRow';
 import { AddProjectRow } from './AddProjectRow';
@@ -12,6 +12,12 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getMemberCapacity } from '@/utils/capacityUtils';
 import { calculateUtilization, getUtilizationSolidBgColor, getUtilizationSolidTextColor } from '@/utils/utilizationColors';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface PersonRowProps {
   person: PersonResourceData;
@@ -37,6 +43,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
   const { displayPreference, workWeekHours } = useAppSettings();
   const capacity = getMemberCapacity(person.weeklyCapacity, workWeekHours);
   const [projectAllocations, setProjectAllocations] = useState(person.projects);
+  const [hiddenProjectIds, setHiddenProjectIds] = useState<Set<string>>(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // Get week start date from the first week in weeks array
@@ -65,6 +72,21 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
       )
     );
   };
+
+  const handleHideProject = (projectId: string) => {
+    setHiddenProjectIds(prev => new Set([...prev, projectId]));
+  };
+
+  const handleShowAllProjects = () => {
+    setHiddenProjectIds(new Set());
+  };
+
+  const visibleProjects = useMemo(() => 
+    projectAllocations.filter(p => !hiddenProjectIds.has(p.projectId)),
+    [projectAllocations, hiddenProjectIds]
+  );
+
+  const hiddenCount = hiddenProjectIds.size;
 
   return (
     <>
@@ -223,8 +245,8 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
         })}
       </tr>
       
-      {/* Project Rows (when expanded) */}
-      {isExpanded && projectAllocations.map((project, projectIndex) => (
+      {/* Project Rows (when expanded) - only show visible projects */}
+      {isExpanded && visibleProjects.map((project, projectIndex) => (
         <ProjectAllocationRow
           key={project.projectId}
           project={project}
@@ -237,8 +259,42 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
           onLocalAllocationChange={handleLocalAllocationChange}
           initialAllocations={project.allocations}
           onProjectRemoved={onRefresh}
+          onHideProject={handleHideProject}
         />
       ))}
+
+      {/* Show Hidden Projects Row */}
+      {isExpanded && hiddenCount > 0 && (
+        <tr className="workload-resource-row resource-row">
+          <td 
+            className="workload-resource-cell resource-name-column"
+            colSpan={weeks.length + 1}
+            style={{
+              padding: '8px 16px 8px 48px',
+              backgroundColor: '#fafafa',
+              borderRight: '2px solid rgba(156, 163, 175, 0.8)',
+              borderBottom: '1px solid rgba(229, 231, 235, 0.8)',
+            }}
+          >
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleShowAllProjects}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>Show {hiddenCount} hidden {hiddenCount === 1 ? 'row' : 'rows'}</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Show all hidden project rows</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </td>
+        </tr>
+      )}
       
       {/* Add Project Row */}
       {isExpanded && (
