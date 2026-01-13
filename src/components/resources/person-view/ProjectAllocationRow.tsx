@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, EyeOff } from 'lucide-react';
 import { WeekInfo } from '../hooks/useGridWeeks';
 import { PersonProject, PersonResourceData } from '@/hooks/usePersonResourceData';
 import { useAllocationInput } from '../hooks/useAllocationInput';
@@ -19,6 +19,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ProjectAllocationRowProps {
   project: PersonProject;
@@ -31,6 +37,8 @@ interface ProjectAllocationRowProps {
   onLocalAllocationChange?: (projectId: string, weekKey: string, hours: number) => void;
   initialAllocations?: Record<string, number>;
   onProjectRemoved?: () => void;
+  onHideProject?: (projectId: string) => void;
+  isHidden?: boolean;
 }
 
 export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
@@ -43,7 +51,9 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
   periodToShow,
   onLocalAllocationChange,
   initialAllocations,
-  onProjectRemoved
+  onProjectRemoved,
+  onHideProject,
+  isHidden = false
 }) => {
   const { company } = useCompany();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -215,13 +225,38 @@ export const ProjectAllocationRow: React.FC<ProjectAllocationRowProps> = ({
                 </div>
               )}
             </div>
-            <button
-              onClick={() => setShowDeleteDialog(true)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-              title="Remove project"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => onHideProject?.(project.projectId)}
+                      className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                    >
+                      <EyeOff className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Hide row (keeps data)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setShowDeleteDialog(true)}
+                      className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Delete (removes data)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
         </td>
       

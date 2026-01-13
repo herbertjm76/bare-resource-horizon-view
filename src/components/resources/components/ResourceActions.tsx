@@ -1,8 +1,14 @@
 
 import React, { useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, EyeOff } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ResourceDeleteDialog } from '../dialogs/ResourceDeleteDialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ResourceActionsProps {
   resourceId: string;
@@ -11,6 +17,7 @@ interface ResourceActionsProps {
   totalAllocatedHours: number;
   onDeleteResource: (resourceId: string, globalDelete?: boolean) => void;
   onCheckOtherProjects?: (resourceId: string, resourceType: 'active' | 'pre_registered') => Promise<{ hasOtherAllocations: boolean; projectCount: number; }>;
+  onHideResource?: (resourceId: string) => void;
 }
 
 export const ResourceActions: React.FC<ResourceActionsProps> = ({
@@ -19,7 +26,8 @@ export const ResourceActions: React.FC<ResourceActionsProps> = ({
   resourceType,
   totalAllocatedHours,
   onDeleteResource,
-  onCheckOtherProjects
+  onCheckOtherProjects,
+  onHideResource
 }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteDialogData, setDeleteDialogData] = useState({
@@ -67,16 +75,47 @@ export const ResourceActions: React.FC<ResourceActionsProps> = ({
 
   return (
     <>
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-muted-foreground hover:text-destructive"
-        onClick={handleDeleteClick}
-        disabled={deleteDialogData.isLoading}
-      >
-        <Trash2 className="h-3 w-3" />
-        <span className="sr-only">Delete resource</span>
-      </Button>
+      <div className="flex items-center gap-0.5">
+        {onHideResource && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-muted-foreground hover:text-foreground"
+                  onClick={() => onHideResource(resourceId)}
+                >
+                  <EyeOff className="h-3 w-3" />
+                  <span className="sr-only">Hide row</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Hide row (keeps data)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-muted-foreground hover:text-destructive"
+                onClick={handleDeleteClick}
+                disabled={deleteDialogData.isLoading}
+              >
+                <Trash2 className="h-3 w-3" />
+                <span className="sr-only">Delete resource</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Delete (removes data)</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
 
       <ResourceDeleteDialog
         isOpen={showDeleteDialog}
