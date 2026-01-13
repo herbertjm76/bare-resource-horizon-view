@@ -34,10 +34,18 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
 }) => {
   // Calculate total table width: project column (250px) + week columns (80px each)
   const tableWidth = 250 + weeks.length * 80;
+  
+  // Determine if we need to show scrollbar (more than ~10 weeks will overflow on most screens)
+  const needsScroll = weeks.length > 8;
  
   return (
-    <div className="workload-resource-grid-container center-aligned">
-      <div className="workload-resource-table-wrapper">
+    <div className="workload-resource-grid-container">
+      <div 
+        className="workload-resource-table-wrapper"
+        style={{
+          overflowX: needsScroll ? 'scroll' : 'auto'
+        }}
+      >
         <table 
           className="workload-resource-table modern-week-view-table"
           style={{ 

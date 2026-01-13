@@ -4,11 +4,13 @@
 /* Main Container */
 .workload-resource-grid-container {
   width: 100%;
+  max-width: 100%;
   position: relative;
   background: hsl(var(--background));
   border-radius: 8px;
   border: 1px solid hsl(var(--border));
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
 /* Center alignment for shorter periods (1-2 months) */
@@ -20,31 +22,41 @@
 .workload-resource-table-wrapper {
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
+  overflow-x: scroll; /* Force scrollbar to always show */
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   position: relative;
   background: hsl(var(--background));
+  padding-bottom: 4px; /* Space for scrollbar */
 }
 
 /* Scrollbar Styling for Table Wrapper */
 .workload-resource-table-wrapper::-webkit-scrollbar {
-  height: 12px;
+  height: 14px;
+  display: block;
 }
 
 .workload-resource-table-wrapper::-webkit-scrollbar-track {
   background: hsl(var(--muted));
-  border-radius: 6px;
+  border-radius: 7px;
+  margin: 0 8px;
 }
 
 .workload-resource-table-wrapper::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.4);
-  border-radius: 6px;
-  border: 2px solid hsl(var(--muted));
+  background: hsl(var(--primary) / 0.5);
+  border-radius: 7px;
+  border: 3px solid hsl(var(--muted));
+  min-width: 40px;
 }
 
 .workload-resource-table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.6);
+  background: hsl(var(--primary) / 0.7);
+}
+
+/* Firefox scrollbar styling */
+.workload-resource-table-wrapper {
+  scrollbar-width: auto;
+  scrollbar-color: hsl(var(--primary) / 0.5) hsl(var(--muted));
 }
 
 /* Main Table */
@@ -53,7 +65,6 @@
   border-spacing: 0;
   background: hsl(var(--background));
   border-radius: 8px;
-  overflow: hidden;
   margin: 0;
   table-layout: fixed;
 }
