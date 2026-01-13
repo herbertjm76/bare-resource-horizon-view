@@ -144,7 +144,7 @@ const handler = async (req: Request): Promise<Response> => {
         const emailResponse = await resend.emails.send({
           from: "Resource <no-reply@bareresource.com>",
           to: [invite.email],
-          subject: `Join ${companyName} on Resource`,
+          subject: `Join ${companyName} Resource`,
           html: `
             <!DOCTYPE html>
             <html>
