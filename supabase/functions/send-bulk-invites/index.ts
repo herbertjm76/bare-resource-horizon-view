@@ -170,32 +170,67 @@ const handler = async (req: Request): Promise<Response> => {
               <head>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta name="color-scheme" content="light">
+                <meta name="supported-color-schemes" content="light">
+                <style>
+                  :root { color-scheme: light; }
+                </style>
               </head>
-              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center; border-radius: 10px 10px 0 0;">
-                  <h1 style="color: white; margin: 0; font-size: 28px;">You're Invited!</h1>
-                </div>
-                
-                <div style="background: white; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
-                  <p style="font-size: 16px; margin-bottom: 20px; color: #111827;">Hi${firstName ? ` ${firstName}` : ''},</p>
-                  
-                  <p style="font-size: 16px; margin-bottom: 30px; color: #374151; line-height: 1.6;">
-                    You've been invited to join <strong>${companyName}</strong> on Resource. Click the button below to complete your registration and join the team.
-                  </p>
-                  
-                  <div style="text-align: center; margin: 35px 0;">
-                    <a href="${inviteUrl}" 
-                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);">
-                      Accept Invitation
-                    </a>
-                  </div>
-                  
-                  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-                  
-                  <p style="font-size: 12px; color: #9ca3af; margin: 0; text-align: center;">
-                    If you didn't expect this invitation, you can safely ignore this email.
-                  </p>
-                </div>
+              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1f2937 !important; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f3f4f6 !important;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6;">
+                  <tr>
+                    <td align="center" style="padding: 20px;">
+                      <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <!-- Header -->
+                        <tr>
+                          <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center;">
+                            <h1 style="color: #ffffff !important; margin: 0; font-size: 28px; font-weight: 700;">You're Invited!</h1>
+                          </td>
+                        </tr>
+                        
+                        <!-- Content -->
+                        <tr>
+                          <td style="background-color: #ffffff !important; padding: 40px;">
+                            <p style="font-size: 16px; margin: 0 0 20px 0; color: #1f2937 !important;">Hi${firstName ? ` ${firstName}` : ''},</p>
+                            
+                            <p style="font-size: 16px; margin: 0 0 30px 0; color: #4b5563 !important; line-height: 1.6;">
+                              You've been invited to join <strong style="color: #1f2937 !important;">${companyName}</strong> on Resource. Click the button below to complete your registration and join the team.
+                            </p>
+                            
+                            <!-- Button -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                              <tr>
+                                <td align="center" style="padding: 10px 0 30px 0;">
+                                  <table cellpadding="0" cellspacing="0">
+                                    <tr>
+                                      <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px;">
+                                        <a href="${inviteUrl}" 
+                                           style="display: inline-block; padding: 16px 40px; color: #ffffff !important; text-decoration: none; font-weight: 600; font-size: 16px;">
+                                          Accept Invitation
+                                        </a>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+                            
+                            <!-- Divider -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                              <tr>
+                                <td style="border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                                  <p style="font-size: 12px; color: #6b7280 !important; margin: 0; text-align: center;">
+                                    If you didn't expect this invitation, you can safely ignore this email.
+                                  </p>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
               </body>
             </html>
           `,
