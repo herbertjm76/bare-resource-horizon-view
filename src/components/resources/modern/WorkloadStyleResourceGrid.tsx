@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { WorkloadStyleWeekGridHeader } from './WorkloadStyleWeekGridHeader';
 import { WorkloadStyleProjectRow } from './WorkloadStyleProjectRow';
 import { WeekInfo } from '../hooks/useGridWeeks';
@@ -37,20 +37,63 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
   
   // Determine if we need to show scrollbar (more than ~10 weeks will overflow on most screens)
   const needsScroll = weeks.length > 8;
+
+  // Drag-to-scroll functionality
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Don't start drag if clicking on interactive elements
+    const target = e.target as HTMLElement;
+    if (target.closest('button, input, a, [role="button"]')) {
+      return;
+    }
+    
+    if (wrapperRef.current) {
+      setIsDragging(true);
+      setStartX(e.pageX - wrapperRef.current.offsetLeft);
+      setScrollLeft(wrapperRef.current.scrollLeft);
+    }
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging || !wrapperRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - wrapperRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5; // Multiply for faster scroll
+    wrapperRef.current.scrollLeft = scrollLeft - walk;
+  }, [isDragging, startX, scrollLeft]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsDragging(false);
+  }, []);
  
   return (
     <div className="workload-resource-grid-container">
       <div 
-        className="workload-resource-table-wrapper"
+        ref={wrapperRef}
+        className={`workload-resource-table-wrapper ${isDragging ? 'is-dragging' : ''} ${needsScroll ? 'can-scroll' : ''}`}
         style={{
-          overflowX: needsScroll ? 'scroll' : 'auto'
+          overflowX: needsScroll ? 'scroll' : 'auto',
+          cursor: needsScroll ? (isDragging ? 'grabbing' : 'grab') : 'default'
         }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
       >
         <table 
           className="workload-resource-table modern-week-view-table"
           style={{ 
             width: `${tableWidth}px`,
-            minWidth: `${tableWidth}px`
+            minWidth: `${tableWidth}px`,
+            userSelect: isDragging ? 'none' : 'auto'
           }}
         >
           <WorkloadStyleWeekGridHeader weeks={weeks} />
