@@ -8,6 +8,8 @@ import { TeamMember } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
+import { Badge } from '@/components/ui/badge';
+import { Users, Clock } from 'lucide-react';
 
 interface TeamMemberSectionProps {
   teamMembers: TeamMember[];
@@ -78,19 +80,26 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
     return count;
   }, [filters]);
 
-  // Filter team members based on active filters
-  const filteredTeamMembers = useMemo(() => {
-    let filtered = teamMembers.filter(member => {
-      // Practice Area filter - Note: Currently practice areas are associated with projects,
-      // not directly with team members. To implement this properly, you would need
-      // to fetch project allocations and filter based on project practice areas.
-      // For now, this filter won't have an effect unless you add practice area data to profiles.
-      if (filters.practiceArea !== 'all') {
-        // Placeholder for practice area filtering
-        // You may want to add a practice area field to the profiles table
-        // or filter based on project allocations
+  // Separate registered and pending members
+  const { registeredMembers, pendingMembers } = useMemo(() => {
+    const registered: TeamMember[] = [];
+    const pending: TeamMember[] = [];
+    
+    teamMembers.forEach(member => {
+      const isPending = 'isPending' in member && member.isPending;
+      if (isPending) {
+        pending.push(member);
+      } else {
+        registered.push(member);
       }
-      
+    });
+    
+    return { registeredMembers: registered, pendingMembers: pending };
+  }, [teamMembers]);
+
+  // Apply filters to both groups
+  const applyFilters = (members: TeamMember[]) => {
+    let filtered = members.filter(member => {
       // Department filter
       if (filters.department !== 'all' && member.department !== filters.department) {
         return false;
@@ -137,7 +146,17 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
     }
     
     return filtered;
-  }, [teamMembers, filters, sortBy, sortDirection]);
+  };
+
+  const filteredRegisteredMembers = useMemo(() => applyFilters(registeredMembers), [registeredMembers, filters, sortBy, sortDirection]);
+  const filteredPendingMembers = useMemo(() => applyFilters(pendingMembers), [pendingMembers, filters, sortBy, sortDirection]);
+
+  // Get selected pending member IDs only (for send invites)
+  const selectedPendingMemberIds = useMemo(() => {
+    return selectedMembers.filter(id => 
+      pendingMembers.some(m => m.id === id)
+    );
+  }, [selectedMembers, pendingMembers]);
 
   const handleFieldChange = (memberId: string, field: string, value: string) => {
     setPendingChanges(prev => ({
@@ -255,6 +274,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
 
   const handleCancelEdit = () => {
     setPendingChanges({});
+    setSelectedMembers([]);
     setEditMode(false);
   };
 
@@ -269,7 +289,8 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
             editMode={editMode} 
             setEditMode={setEditMode} 
             selectedCount={selectedMembers.length}
-            selectedMemberIds={selectedMembers}
+            selectedMemberIds={selectedPendingMemberIds}
+            selectedPendingCount={selectedPendingMemberIds.length}
             onBulkDelete={onBulkDelete} 
             onAdd={onAdd}
             onSaveAll={handleSaveAll}
@@ -279,7 +300,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
           />
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         {['owner', 'admin'].includes(userRole) && (
           <TeamMembersFilters
             filters={filters}
@@ -292,19 +313,63 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
             onSortDirectionChange={setSortDirection}
           />
         )}
-        <TeamMembersTable
-          teamMembers={filteredTeamMembers} 
-          userRole={userRole} 
-          editMode={editMode} 
-          selectedMembers={selectedMembers} 
-          setSelectedMembers={setSelectedMembers} 
-          onEditMember={onEditMember} 
-          onDeleteMember={onDeleteMember}
-          onSendInvite={onSendInvite}
-          onRefresh={onRefresh}
-          pendingChanges={pendingChanges}
-          onFieldChange={handleFieldChange}
-        />
+        
+        {/* Registered Members Section */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-green-600" />
+            <h3 className="text-sm font-medium text-foreground">Registered Members</h3>
+            <Badge variant="secondary" className="bg-green-100 text-green-700">
+              {filteredRegisteredMembers.length}
+            </Badge>
+          </div>
+          {filteredRegisteredMembers.length > 0 ? (
+            <TeamMembersTable
+              teamMembers={filteredRegisteredMembers} 
+              userRole={userRole} 
+              editMode={editMode} 
+              selectedMembers={selectedMembers} 
+              setSelectedMembers={setSelectedMembers} 
+              onEditMember={onEditMember} 
+              onDeleteMember={onDeleteMember}
+              onRefresh={onRefresh}
+              pendingChanges={pendingChanges}
+              onFieldChange={handleFieldChange}
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground py-4 text-center">No registered members found.</p>
+          )}
+        </div>
+
+        {/* Pending Invites Section */}
+        {(filteredPendingMembers.length > 0 || pendingMembers.length > 0) && (
+          <div className="space-y-3 pt-4 border-t">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-amber-600" />
+              <h3 className="text-sm font-medium text-foreground">Pending Invites</h3>
+              <Badge variant="secondary" className="bg-amber-100 text-amber-700">
+                {filteredPendingMembers.length}
+              </Badge>
+            </div>
+            {filteredPendingMembers.length > 0 ? (
+              <TeamMembersTable
+                teamMembers={filteredPendingMembers} 
+                userRole={userRole} 
+                editMode={editMode} 
+                selectedMembers={selectedMembers} 
+                setSelectedMembers={setSelectedMembers} 
+                onEditMember={onEditMember} 
+                onDeleteMember={onDeleteMember}
+                onSendInvite={onSendInvite}
+                onRefresh={onRefresh}
+                pendingChanges={pendingChanges}
+                onFieldChange={handleFieldChange}
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground py-4 text-center">No pending invites match the current filters.</p>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -9,6 +9,7 @@ interface TeamMembersToolbarProps {
   setEditMode: (mode: boolean) => void;
   selectedCount: number;
   selectedMemberIds?: string[];
+  selectedPendingCount?: number;
   onBulkDelete?: () => void;
   onAdd?: () => void;
   onSaveAll?: () => void;
@@ -22,6 +23,7 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   setEditMode,
   selectedCount,
   selectedMemberIds = [],
+  selectedPendingCount = 0,
   onBulkDelete,
   onAdd,
   onSaveAll,
@@ -34,6 +36,7 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   const handleSendInvites = async () => {
     await sendBulkInvites(selectedMemberIds);
   };
+
   return (
     <div className="flex items-center gap-2">
       {!editMode && onAdd && (
@@ -79,15 +82,18 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
       )}
       {editMode && selectedCount > 0 && (
         <>
-          <Button 
-            variant="outline"
-            size="sm"
-            onClick={handleSendInvites}
-            disabled={isSaving || isSending}
-          >
-            <Mail className="h-4 w-4 mr-1" />
-            {isSending ? "Sending..." : `Send Invites (${selectedCount})`}
-          </Button>
+          {/* Only show Send Invites if there are pending members selected */}
+          {selectedPendingCount > 0 && (
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={handleSendInvites}
+              disabled={isSaving || isSending}
+            >
+              <Mail className="h-4 w-4 mr-1" />
+              {isSending ? "Sending..." : `Send Invites (${selectedPendingCount})`}
+            </Button>
+          )}
           <Button 
             variant="destructive"
             size="sm"
