@@ -80,12 +80,13 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Processing ${inviteIds.length} invites for company ${userCompanyId}`);
 
     // Fetch invite details - CRITICAL: Filter by user's company_id
+    // Support both pre_registered and email_invite types
     const { data: invites, error: invitesError } = await supabase
       .from("invites")
       .select("id, email, first_name, last_name, code, invitation_type, company_id, companies(name, subdomain)")
       .in("id", inviteIds)
       .eq("company_id", userCompanyId) // Only allow invites from user's company
-      .eq("invitation_type", "pre_registered")
+      .in("invitation_type", ["pre_registered", "email_invite"])
       .eq("status", "pending");
 
     if (invitesError) {
