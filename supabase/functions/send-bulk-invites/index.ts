@@ -78,45 +78,65 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log(`Processing ${inviteIds.length} invites for company ${userCompanyId}`);
+    console.log(`Requested invite IDs: ${JSON.stringify(inviteIds)}`);
 
     // Fetch invite details - CRITICAL: Filter by user's company_id
     // Support both pre_registered and email_invite types
     const { data: invites, error: invitesError } = await supabase
       .from("invites")
-      .select("id, email, first_name, last_name, code, invitation_type, company_id, companies(name, subdomain)")
+      .select("id, email, first_name, last_name, code, invitation_type, company_id, status, companies(name, subdomain)")
       .in("id", inviteIds)
-      .eq("company_id", userCompanyId) // Only allow invites from user's company
-      .in("invitation_type", ["pre_registered", "email_invite"])
-      .eq("status", "pending");
+      .eq("company_id", userCompanyId); // Only allow invites from user's company
 
     if (invitesError) {
       console.error("Error fetching invites:", invitesError);
       throw invitesError;
     }
 
-    if (!invites || invites.length === 0) {
-      return new Response(
-        JSON.stringify({ error: "No valid pre-registered invites found for your company" }),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
+    console.log(`Found ${invites?.length || 0} invites matching requested IDs for company`);
+    
+    if (invites && invites.length > 0) {
+      console.log(`Invite details: ${JSON.stringify(invites.map(i => ({ id: i.id, status: i.status, type: i.invitation_type })))}`);
+    }
+
+    // Filter for valid invites (pending status and correct types)
+    const validInvites = (invites || []).filter(
+      invite => invite.status === 'pending' && 
+      (invite.invitation_type === 'pre_registered' || invite.invitation_type === 'email_invite')
+    );
+
+    if (validInvites.length === 0) {
+      // Provide more helpful error message
+      if (!invites || invites.length === 0) {
+        console.error(`No invites found with IDs: ${JSON.stringify(inviteIds)} for company ${userCompanyId}`);
+        return new Response(
+          JSON.stringify({ error: "The selected invites were not found. Please refresh the page and try again." }),
+          {
+            status: 404,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      } else {
+        // Invites exist but have wrong status or type
+        const statusInfo = invites.map(i => `${i.id}: status=${i.status}, type=${i.invitation_type}`).join(', ');
+        console.error(`Invites found but invalid: ${statusInfo}`);
+        return new Response(
+          JSON.stringify({ error: "The selected invites are not in pending status or have an invalid type." }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
     }
 
     // Security check: Ensure we found all requested invites in user's company
-    if (invites.length !== inviteIds.length) {
-      console.warn(`Security: User ${user.id} attempted to access ${inviteIds.length} invites but only ${invites.length} belong to their company`);
-      return new Response(
-        JSON.stringify({ error: "Some invite IDs do not belong to your company" }),
-        {
-          status: 403,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
+    if (validInvites.length !== inviteIds.length) {
+      console.warn(`Security: User ${user.id} attempted to access ${inviteIds.length} invites but only ${validInvites.length} are valid`);
+      // Don't fail, just proceed with valid ones
     }
 
-    console.log(`Found ${invites.length} valid invites to send for company ${userCompanyId}`);
+    console.log(`Found ${validInvites.length} valid invites to send for company ${userCompanyId}`);
 
     const results = {
       successful: 0,
@@ -124,8 +144,7 @@ const handler = async (req: Request): Promise<Response> => {
       errors: [] as string[],
     };
 
-    // Send emails
-    for (const invite of invites) {
+    for (const invite of validInvites) {
       if (!invite.email) {
         console.warn(`Skipping invite ${invite.id} - no email address`);
         results.failed++;
