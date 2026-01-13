@@ -142,7 +142,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.log(`Sending invite to ${invite.email}`);
 
         const emailResponse = await resend.emails.send({
-          from: "Team Invitation <invites@bareresource.com>",
+          from: "Bare Resource <no-reply@bareresource.com>",
           to: [invite.email],
           subject: `Join ${companyName}`,
           html: `
