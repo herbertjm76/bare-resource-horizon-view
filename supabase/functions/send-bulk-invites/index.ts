@@ -137,7 +137,7 @@ const handler = async (req: Request): Promise<Response> => {
         const companyName = invite.companies?.name || "the team";
         const companySubdomain = invite.companies?.subdomain || "";
         const firstName = invite.first_name || "";
-        const inviteUrl = `${req.headers.get("origin") || "https://app.example.com"}/join/${companySubdomain}/${invite.code}`;
+        const inviteUrl = `https://bareresource.com/join/${companySubdomain}/${invite.code}`;
 
         console.log(`Sending invite to ${invite.email}`);
 
