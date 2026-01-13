@@ -86,7 +86,7 @@ export const AddTeamMemberAllocation: React.FC<AddTeamMemberAllocationProps> = (
         .from('invites')
         .select('id, first_name, last_name, avatar_url, location, weekly_capacity')
         .eq('company_id', company.id)
-        .eq('invitation_type', 'pre_registered')
+        .in('invitation_type', ['pre_registered', 'email_invite'])
         .eq('status', 'pending')
         .order('first_name');
 

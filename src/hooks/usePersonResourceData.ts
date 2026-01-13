@@ -147,12 +147,12 @@ export const usePersonResourceData = (startDate: Date, periodToShow: number) => 
           throw profilesError;
         }
 
-        // Fetch pre-registered members (pending invites)
+        // Fetch pre-registered members (pending invites - both pre_registered and email_invite)
         const { data: invites, error: invitesError } = await supabase
           .from('invites')
           .select('id, first_name, last_name, avatar_url, location, job_title, weekly_capacity, department, practice_area')
           .eq('company_id', company.id)
-          .eq('invitation_type', 'pre_registered')
+          .in('invitation_type', ['pre_registered', 'email_invite'])
           .eq('status', 'pending')
           .order('first_name', { ascending: true });
 

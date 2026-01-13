@@ -57,14 +57,14 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
           return;
         }
 
-        // If no profile found, check if this is a pre-registered invite
+        // If no profile found, check if this is a pre-registered or email invite
         logger.debug('No profile found, checking invites table...');
         const { data: invite, error: inviteError } = await supabase
           .from('invites')
           .select('*')
           .eq('id', memberId)
           .eq('company_id', companyId)
-          .eq('invitation_type', 'pre_registered')
+          .in('invitation_type', ['pre_registered', 'email_invite'])
           .maybeSingle();
 
         if (inviteError) {

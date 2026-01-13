@@ -73,7 +73,7 @@ export const CardDetailDialog: React.FC<CardDetailDialogProps> = ({
         .from('invites')
         .select('id, first_name, last_name, weekly_capacity')
         .in('id', memberIds)
-        .eq('invitation_type', 'pre_registered');
+        .in('invitation_type', ['pre_registered', 'email_invite']);
       if (error) throw error;
       return inviteData || [];
     },

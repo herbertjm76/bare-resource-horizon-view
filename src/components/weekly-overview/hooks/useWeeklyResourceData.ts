@@ -73,7 +73,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
         .from('invites')
         .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
         .eq('company_id', companyId)
-        .eq('invitation_type', 'pre_registered')
+        .in('invitation_type', ['pre_registered', 'email_invite'])
         .eq('status', 'pending');
         
       if (error) {

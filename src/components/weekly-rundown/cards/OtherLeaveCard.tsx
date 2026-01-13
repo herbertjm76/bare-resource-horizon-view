@@ -56,7 +56,7 @@ export const OtherLeaveCard: React.FC<OtherLeaveCardProps> = ({ leaves }) => {
         .from('invites')
         .select('id, first_name, last_name')
         .in('id', memberIds)
-        .eq('invitation_type', 'pre_registered');
+        .in('invitation_type', ['pre_registered', 'email_invite']);
       
       if (error) throw error;
       return data || [];

@@ -102,7 +102,7 @@ export const useWeekResourceTeamMembers = () => {
         .from('invites')
         .select('id, first_name, last_name, email, department, location, practice_area, job_title, role, weekly_capacity, avatar_url')
         .eq('company_id', companyId)
-        .eq('invitation_type', 'pre_registered')
+        .in('invitation_type', ['pre_registered', 'email_invite'])
         .eq('status', 'pending');
 
       if (error) return [];

@@ -57,13 +57,13 @@ serve(async (req) => {
       .select('id, first_name, last_name')
       .eq('company_id', profile.company_id);
 
-    // Get all pending users (pre-registered invites) for the company
+    // Get all pending users (pre-registered and email_invite invites) for the company
     const { data: pendingMembers } = await supabaseClient
       .from('invites')
       .select('id, first_name, last_name')
       .eq('company_id', profile.company_id)
       .eq('status', 'pending')
-      .eq('invitation_type', 'pre_registered');
+      .in('invitation_type', ['pre_registered', 'email_invite']);
 
     // Combine active and pending members
     const allMembers = [
