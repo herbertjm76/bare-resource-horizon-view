@@ -9,7 +9,6 @@ import { Eye, Trash2, Mail, AlertTriangle, Send } from 'lucide-react';
 import { TeamMember } from './types';
 import { TeamMemberAvatar } from './TeamMemberAvatar';
 import { useOfficeSettings } from '@/context/officeSettings';
-import { usePermissions } from '@/hooks/usePermissions';
 import { 
   Select,
   SelectContent,
@@ -31,6 +30,8 @@ interface TeamMemberRowProps {
   onRefresh?: () => void;
   pendingChanges: Partial<TeamMember>;
   onFieldChange: (memberId: string, field: string, value: string) => void;
+  currentUserId?: string | null;
+  isAdmin: boolean;
 }
 
 export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
@@ -45,10 +46,11 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   onSendInvite,
   onRefresh,
   pendingChanges,
-  onFieldChange
+  onFieldChange,
+  currentUserId,
+  isAdmin
 }) => {
   const { locations, departments, practice_areas, loading } = useOfficeSettings();
-  const { isAdmin, isSuperAdmin } = usePermissions();
   
   const getValue = (field: keyof TeamMember): string => {
     if (pendingChanges[field] !== undefined) {
@@ -75,6 +77,19 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
 
   // Only admins can edit in edit mode
   const canEdit = editMode && isAdmin;
+  
+  // Determine if user can edit THIS specific member (admin or own profile)
+  const isOwnProfile = currentUserId === member.id;
+  const canEditThisMember = isAdmin || isOwnProfile;
+
+  // Handle avatar/name click - edit for admin or own profile, view-only for others
+  const handleMemberClick = () => {
+    if (canEditThisMember) {
+      onEditMember(member);
+    } else {
+      onViewMember(member.id);
+    }
+  };
 
   return (
     <tr key={member.id} className={`hover:bg-muted ${canEdit ? 'bg-blue-50/30' : ''}`}>
@@ -90,8 +105,8 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => onEditMember(member)}
-            className="focus:outline-none rounded-full cursor-pointer flex-shrink-0"
+            onClick={handleMemberClick}
+            className={`focus:outline-none rounded-full flex-shrink-0 ${canEditThisMember ? 'cursor-pointer' : 'cursor-pointer'}`}
           >
             <TeamMemberAvatar member={member} />
           </button>
@@ -171,35 +186,37 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
           </Badge>
         )}
       </td>
-      <td className="px-4 py-3">
-        {canEdit ? (
-          <Select
-            value={getValue('role') || 'member'}
-            onValueChange={(value) => handleChange('role', value)}
-          >
-            <SelectTrigger className="h-9 text-sm min-w-[140px]">
-              <SelectValue placeholder="Select role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="member">Member</SelectItem>
-              <SelectItem value="project_manager">PM (Project Manager)</SelectItem>
-              <SelectItem value="contractor">Contractor</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-              <SelectItem value="owner">Super Admin</SelectItem>
-            </SelectContent>
-          </Select>
-        ) : (
-          (() => {
-            const role = member.role || 'member';
-            const config = roleConfig[role] || { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Other' };
-            return (
-              <Badge className={`${config.bg} ${config.text} border border-current/20`}>
-                {config.label}
-              </Badge>
-            );
-          })()
-        )}
-      </td>
+      {isAdmin && (
+        <td className="px-4 py-3">
+          {canEdit ? (
+            <Select
+              value={getValue('role') || 'member'}
+              onValueChange={(value) => handleChange('role', value)}
+            >
+              <SelectTrigger className="h-9 text-sm min-w-[140px]">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="project_manager">PM (Project Manager)</SelectItem>
+                <SelectItem value="contractor">Contractor</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="owner">Super Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          ) : (
+            (() => {
+              const role = member.role || 'member';
+              const config = roleConfig[role] || { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Other' };
+              return (
+                <Badge className={`${config.bg} ${config.text} border border-current/20`}>
+                  {config.label}
+                </Badge>
+              );
+            })()
+          )}
+        </td>
+      )}
       <td className="px-4 py-3">
         {canEdit ? (
           <Select
@@ -275,51 +292,53 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
           </span>
         )}
       </td>
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-2">
-          {canEdit ? (
-            <>
-              {isPending && onSendInvite && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onSendInvite(member)}
-                        disabled={missingEmail}
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{missingEmail ? 'Email required' : 'Send invitation'}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
+      {isAdmin && (
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-2">
+            {canEdit ? (
+              <>
+                {isPending && onSendInvite && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onSendInvite(member)}
+                          disabled={missingEmail}
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{missingEmail ? 'Email required' : 'Send invitation'}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDeleteMember(member.id)}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onDeleteMember(member.id)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={() => onViewMember(member.id)}
+                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
               >
-                <Trash2 className="h-4 w-4" />
+                <Eye className="h-4 w-4" />
               </Button>
-            </>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onViewMember(member.id)}
-              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </td>
+            )}
+          </div>
+        </td>
+      )}
     </tr>
   );
 };

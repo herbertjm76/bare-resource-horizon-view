@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { TeamMember } from './types';
 import { TeamMemberTableHeader } from './TeamMemberTableHeader';
 import { TeamMemberRow } from './TeamMemberRow';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface TeamMembersTableProps {
   teamMembers: TeamMember[];
@@ -17,6 +18,7 @@ interface TeamMembersTableProps {
   onRefresh?: () => void;
   pendingChanges: Record<string, Partial<TeamMember>>;
   onFieldChange: (memberId: string, field: string, value: string) => void;
+  currentUserId?: string | null;
 }
 
 const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
@@ -30,9 +32,11 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   onSendInvite,
   onRefresh,
   pendingChanges,
-  onFieldChange
+  onFieldChange,
+  currentUserId
 }) => {
   const navigate = useNavigate();
+  const { isAdmin } = usePermissions();
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -71,6 +75,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
           teamMembers={teamMembers}
           selectedMembers={selectedMembers}
           onSelectAll={handleSelectAll}
+          isAdmin={isAdmin}
         />
         <tbody className="divide-y divide-gray-200">
           {teamMembers.map((member) => (
@@ -88,6 +93,8 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
               onRefresh={onRefresh}
               pendingChanges={pendingChanges[member.id] || {}}
               onFieldChange={onFieldChange}
+              currentUserId={currentUserId}
+              isAdmin={isAdmin}
             />
           ))}
         </tbody>

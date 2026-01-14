@@ -10,9 +10,15 @@ import { formatCapacityValue } from '@/utils/allocationDisplay';
 
 interface TeamMemberProfileCardProps {
   member: any;
+  isAdmin?: boolean;
+  isOwnProfile?: boolean;
 }
 
-export const TeamMemberProfileCard: React.FC<TeamMemberProfileCardProps> = ({ member }) => {
+export const TeamMemberProfileCard: React.FC<TeamMemberProfileCardProps> = ({ 
+  member, 
+  isAdmin = false, 
+  isOwnProfile = false 
+}) => {
   const { workWeekHours, displayPreference } = useAppSettings();
   const getUserInitials = () => {
     const firstName = member.first_name || '';
@@ -71,10 +77,12 @@ export const TeamMemberProfileCard: React.FC<TeamMemberProfileCardProps> = ({ me
                       )}
                     </div>
                   </div>
-                  <Badge className={`${getRoleBadgeColor(member.role)} border`}>
-                    <UserCheck className="h-3 w-3 mr-1" />
-                    {member.role?.charAt(0).toUpperCase() + member.role?.slice(1) || 'Member'}
-                  </Badge>
+                  {(isAdmin || isOwnProfile) && (
+                    <Badge className={`${getRoleBadgeColor(member.role)} border`}>
+                      <UserCheck className="h-3 w-3 mr-1" />
+                      {member.role?.charAt(0).toUpperCase() + member.role?.slice(1) || 'Member'}
+                    </Badge>
+                  )}
                 </div>
                 
                 {/* Contact & Basic Info */}
