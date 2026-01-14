@@ -68,6 +68,8 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
 
   const userRole = currentUserProfile?.role || 'member';
   const canViewManagementFeatures = ['owner', 'admin', 'pm'].includes(userRole.toLowerCase());
+  const isAdmin = ['owner', 'admin'].includes(userRole.toLowerCase());
+  const isOwnProfile = userId === memberData.id;
 
   // Show loading state while user profile is being fetched
   if (isLoadingUserProfile) {
@@ -87,7 +89,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
       <TeamMemberDetailHeader />
 
       {/* Member Profile Card */}
-      <TeamMemberProfileCard member={memberData} />
+      <TeamMemberProfileCard member={memberData} isAdmin={isAdmin} isOwnProfile={isOwnProfile} />
 
       {/* Management Features - Only for admin, owner, or PM */}
       {canViewManagementFeatures ? (

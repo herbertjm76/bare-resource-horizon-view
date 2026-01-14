@@ -8,6 +8,7 @@ import { TeamMember } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useUserSession } from '@/hooks/useUserSession';
 import { Badge } from '@/components/ui/badge';
 import { Users, Clock } from 'lucide-react';
 
@@ -41,6 +42,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
   onRefresh
 }) => {
   const { isAdmin } = usePermissions();
+  const currentUserId = useUserSession();
   const [pendingChanges, setPendingChanges] = useState<Record<string, Partial<TeamMember>>>({});
   const [isSaving, setIsSaving] = useState(false);
   
@@ -335,6 +337,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
               onRefresh={onRefresh}
               pendingChanges={pendingChanges}
               onFieldChange={handleFieldChange}
+              currentUserId={currentUserId}
             />
           ) : (
             <p className="text-sm text-muted-foreground py-4 text-center">No registered members found.</p>
@@ -364,6 +367,7 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
                 onRefresh={onRefresh}
                 pendingChanges={pendingChanges}
                 onFieldChange={handleFieldChange}
+                currentUserId={currentUserId}
               />
             ) : (
               <p className="text-sm text-muted-foreground py-4 text-center">No pending invites match the current filters.</p>
