@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TeamMember } from '@/components/dashboard/types';
 import { format, addDays, subDays, addMonths, eachDayOfInterval, getDay, startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from 'date-fns';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar } from 'lucide-react';
 import { LeaveDataByDate } from '@/hooks/useAnnualLeave';
 import { TimeRange } from './MonthSelector';
+import { EditLeaveCalendarDialog } from './EditLeaveCalendarDialog';
 
 interface LeaveCalendarProps {
   members: TeamMember[];
@@ -14,7 +15,8 @@ interface LeaveCalendarProps {
   leaveData: Record<string, Record<string, number>>;
   leaveDetails?: Record<string, Record<string, LeaveDataByDate>>;
   timeRange: TimeRange;
-  onLeaveChange?: (memberId: string, date: string, hours: number) => void;
+  isAdmin?: boolean;
+  onLeaveChange?: (memberId: string, date: string, hours: number, leaveTypeId?: string) => void;
 }
 
 export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
@@ -22,8 +24,17 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   selectedMonth,
   leaveData,
   leaveDetails,
-  timeRange
+  timeRange,
+  isAdmin = false,
+  onLeaveChange
 }) => {
+  // State for edit dialog
+  const [editingCell, setEditingCell] = useState<{
+    member: TeamMember;
+    date: string;
+    hours: number;
+    leaveTypeId?: string;
+  } | null>(null);
   // Calculate date range based on time range selection
   const today = new Date();
   
@@ -191,6 +202,18 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                     const details = memberLeaveDetails[day.date];
                     const hasLeave = hours > 0;
                     const fullDay = isFullDay(hours);
+                    const firstLeaveTypeId = details?.entries?.[0]?.leave_type_id;
+                    
+                    const handleCellClick = () => {
+                      if (isAdmin && onLeaveChange) {
+                        setEditingCell({
+                          member,
+                          date: day.date,
+                          hours,
+                          leaveTypeId: firstLeaveTypeId
+                        });
+                      }
+                    };
                     
                     return (
                       <td 
@@ -201,13 +224,15 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                           ${day.isSunday ? 'border-l-2 border-border' : ''}
                           ${day.isToday ? 'bg-primary/5' : ''}
                           ${day.isNewMonth && idx > 0 ? 'border-l-2 border-primary/30' : ''}
+                          ${isAdmin ? 'cursor-pointer hover:bg-primary/10 transition-colors' : ''}
                         `}
+                        onClick={handleCellClick}
                       >
                       {hasLeave ? (
                           <HoverCard openDelay={100} closeDelay={50}>
                             <HoverCardTrigger asChild>
                               <div 
-                                className="w-7 h-6 mx-auto rounded flex items-center justify-center text-sm font-bold cursor-default transition-transform leading-none hover:scale-110 hover:shadow-md"
+                                className={`w-7 h-6 mx-auto rounded flex items-center justify-center text-sm font-bold transition-transform leading-none hover:scale-110 hover:shadow-md ${isAdmin ? 'cursor-pointer' : 'cursor-default'}`}
                                 style={{ 
                                   backgroundColor: getLeaveTypeColor(member.id, day.date),
                                   opacity: fullDay ? 1 : 0.5,
@@ -284,11 +309,17 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                                     </div>
                                   )}
                                 </div>
+                                
+                                {isAdmin && (
+                                  <div className="border-t border-border pt-2">
+                                    <p className="text-xs text-primary font-medium text-center">Click to edit</p>
+                                  </div>
+                                )}
                               </div>
                             </HoverCardContent>
                           </HoverCard>
                         ) : (
-                          <div className="w-7 h-6 mx-auto" />
+                          <div className={`w-7 h-6 mx-auto rounded ${isAdmin ? 'hover:bg-muted/50' : ''}`} />
                         )}
                       </td>
                     );
@@ -311,6 +342,21 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
           </tbody>
         </table>
       </div>
+      
+      {/* Edit Leave Dialog */}
+      <EditLeaveCalendarDialog
+        open={!!editingCell}
+        onOpenChange={(open) => !open && setEditingCell(null)}
+        member={editingCell?.member || null}
+        date={editingCell?.date || ''}
+        currentHours={editingCell?.hours || 0}
+        currentLeaveTypeId={editingCell?.leaveTypeId}
+        onSave={(memberId, date, hours, leaveTypeId) => {
+          if (onLeaveChange) {
+            onLeaveChange(memberId, date, hours, leaveTypeId);
+          }
+        }}
+      />
     </div>
   );
 };

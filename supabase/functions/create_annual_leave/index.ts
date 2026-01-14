@@ -20,17 +20,24 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Parse the request body
-    const { member_id_param, date_param, hours_param, company_id_param } = await req.json();
+    const { member_id_param, date_param, hours_param, company_id_param, leave_type_id_param } = await req.json();
 
     // Create new annual leave entry
+    const insertData: Record<string, unknown> = {
+      member_id: member_id_param,
+      date: date_param,
+      hours: hours_param,
+      company_id: company_id_param
+    };
+    
+    // Add leave_type_id if provided
+    if (leave_type_id_param) {
+      insertData.leave_type_id = leave_type_id_param;
+    }
+
     const { error } = await supabase
       .from('annual_leaves')
-      .insert({
-        member_id: member_id_param,
-        date: date_param,
-        hours: hours_param,
-        company_id: company_id_param
-      });
+      .insert(insertData);
 
     if (error) {
       throw error;

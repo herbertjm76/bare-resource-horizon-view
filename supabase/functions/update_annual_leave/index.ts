@@ -20,12 +20,20 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Parse the request body
-    const { leave_id_param, hours_param } = await req.json();
+    const { leave_id_param, hours_param, leave_type_id_param } = await req.json();
+
+    // Build update data
+    const updateData: Record<string, unknown> = { hours: hours_param };
+    
+    // Add leave_type_id if provided
+    if (leave_type_id_param !== undefined) {
+      updateData.leave_type_id = leave_type_id_param;
+    }
 
     // Update annual leave entry
     const { error } = await supabase
       .from('annual_leaves')
-      .update({ hours: hours_param })
+      .update(updateData)
       .eq('id', leave_id_param);
 
     if (error) {
