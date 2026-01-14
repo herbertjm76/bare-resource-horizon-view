@@ -39,9 +39,7 @@ export const TeamMemberTableHeader: React.FC<TeamMemberTableHeaderProps> = ({
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Department</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Practice Area</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Location</th>
-        {isAdmin && (
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Insights</th>
-        )}
+        <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
       </tr>
     </thead>
   );
