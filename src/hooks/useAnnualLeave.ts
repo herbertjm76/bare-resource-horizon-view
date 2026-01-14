@@ -20,6 +20,7 @@ export interface LeaveEntry {
 
 export interface LeaveDetail {
   hours: number;
+  leave_type_id?: string;
   leave_type_name: string;
   leave_type_color: string;
 }
@@ -110,6 +111,7 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
         detailedData[leave.member_id][leave.date].totalHours += leave.hours;
         detailedData[leave.member_id][leave.date].entries.push({
           hours: leave.hours,
+          leave_type_id: leave.leave_type_id,
           leave_type_name: leaveTypeName,
           leave_type_color: leaveTypeColor
         });
@@ -178,6 +180,7 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
         detailedData[leave.member_id][leave.date].totalHours += leave.hours;
         detailedData[leave.member_id][leave.date].entries.push({
           hours: leave.hours,
+          leave_type_id: leave.leave_type_id,
           leave_type_name: leave.leave_type_name || 'Leave',
           leave_type_color: leave.leave_type_color || '#3B82F6'
         });
@@ -197,7 +200,8 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
   const updateLeaveHours = useCallback(async (
     memberId: string,
     date: string,
-    hours: number
+    hours: number,
+    leaveTypeId?: string
   ) => {
     // Demo mode: show notification and skip update
     if (isDemoMode) {
@@ -250,7 +254,8 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
           await supabase.functions.invoke('update_annual_leave', {
             body: {
               leave_id_param: existingData.id,
-              hours_param: hours
+              hours_param: hours,
+              leave_type_id_param: leaveTypeId
             }
           });
         } else {
@@ -259,7 +264,8 @@ export const useAnnualLeave = (month: Date, timeRange: TimeRangeType = 'month') 
               member_id_param: memberId,
               date_param: date,
               hours_param: hours,
-              company_id_param: company.id
+              company_id_param: company.id,
+              leave_type_id_param: leaveTypeId
             }
           });
         }

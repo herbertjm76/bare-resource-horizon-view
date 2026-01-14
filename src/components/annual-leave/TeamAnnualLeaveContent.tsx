@@ -14,13 +14,14 @@ interface TeamAnnualLeaveContentProps {
   filteredMembers: TeamMember[];
   leaveData: Record<string, Record<string, number>>;
   leaveDetails?: Record<string, Record<string, LeaveDataByDate>>;
-  onLeaveChange: (memberId: string, date: string, hours: number) => void;
+  onLeaveChange: (memberId: string, date: string, hours: number, leaveTypeId?: string) => void;
   filters: TeamFilters;
   onFilterChange: (key: string, value: string) => void;
   activeFiltersCount: number;
   clearFilters: () => void;
   timeRange: TimeRange;
   onTimeRangeChange: (range: TimeRange) => void;
+  isAdmin?: boolean;
 }
 
 export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
@@ -35,7 +36,8 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
   activeFiltersCount,
   clearFilters,
   timeRange,
-  onTimeRangeChange
+  onTimeRangeChange,
+  isAdmin = false
 }) => {
   return (
     <div className="mx-auto space-y-4">
@@ -76,6 +78,7 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
             leaveData={leaveData}
             leaveDetails={leaveDetails}
             timeRange={timeRange}
+            isAdmin={isAdmin}
             onLeaveChange={onLeaveChange}
           />
         )}

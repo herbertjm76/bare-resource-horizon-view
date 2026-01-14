@@ -6,6 +6,7 @@ import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
 import { useAnnualLeave } from '@/hooks/useAnnualLeave';
 import { useTeamFilters } from '@/hooks/useTeamFilters';
+import { usePermissions } from '@/hooks/usePermissions';
 import { TeamAnnualLeaveContent } from '@/components/annual-leave/TeamAnnualLeaveContent';
 import { LeaveApplicationForm } from '@/components/leave/LeaveApplicationForm';
 import { MyLeaveRequests } from '@/components/leave/MyLeaveRequests';
@@ -29,6 +30,9 @@ const TeamLeave = () => {
   // Get company context
   const { company } = useCompany();
   
+  // Get permissions to check if user is admin
+  const { isAdmin } = usePermissions();
+  
   // Fetch pre-registered members
   const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
   
@@ -48,8 +52,8 @@ const TeamLeave = () => {
   } = useTeamFilters(allMembers);
   
   // Handle leave hours change
-  const handleLeaveChange = (memberId: string, date: string, hours: number) => {
-    updateLeaveHours(memberId, date, hours);
+  const handleLeaveChange = (memberId: string, date: string, hours: number, leaveTypeId?: string) => {
+    updateLeaveHours(memberId, date, hours, leaveTypeId);
   };
   
   const isLoading = isLoadingTeamMembers || isLoadingLeave;
@@ -105,6 +109,7 @@ const TeamLeave = () => {
             clearFilters={clearFilters}
             timeRange={timeRange}
             onTimeRangeChange={setTimeRange}
+            isAdmin={isAdmin}
           />
         </TabsContent>
 
