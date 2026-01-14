@@ -10,6 +10,7 @@ interface TeamMemberTableHeaderProps {
   selectedMembers: string[];
   onSelectAll: (checked: boolean) => void;
   isAdmin: boolean;
+  canViewRoleAndInsights: boolean;
 }
 
 export const TeamMemberTableHeader: React.FC<TeamMemberTableHeaderProps> = ({
@@ -18,7 +19,8 @@ export const TeamMemberTableHeader: React.FC<TeamMemberTableHeaderProps> = ({
   teamMembers,
   selectedMembers,
   onSelectAll,
-  isAdmin
+  isAdmin,
+  canViewRoleAndInsights
 }) => {
   return (
     <thead>
@@ -33,13 +35,15 @@ export const TeamMemberTableHeader: React.FC<TeamMemberTableHeaderProps> = ({
         )}
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Member</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Type</th>
-        {isAdmin && (
+        {canViewRoleAndInsights && (
           <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Role</th>
         )}
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Department</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Practice Area</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Location</th>
-        <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
+        {canViewRoleAndInsights && (
+          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Insights</th>
+        )}
       </tr>
     </thead>
   );
