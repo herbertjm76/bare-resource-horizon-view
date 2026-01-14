@@ -36,7 +36,10 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   currentUserId
 }) => {
   const navigate = useNavigate();
-  const { isAdmin } = usePermissions();
+  const { isAdmin, role } = usePermissions();
+  
+  // Project managers, admins, and owners can view Role and Insights columns
+  const canViewRoleAndInsights = ['owner', 'admin', 'project_manager'].includes(role);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -76,6 +79,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
           selectedMembers={selectedMembers}
           onSelectAll={handleSelectAll}
           isAdmin={isAdmin}
+          canViewRoleAndInsights={canViewRoleAndInsights}
         />
         <tbody className="divide-y divide-gray-200">
           {teamMembers.map((member) => (
@@ -95,6 +99,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
               onFieldChange={onFieldChange}
               currentUserId={currentUserId}
               isAdmin={isAdmin}
+              canViewRoleAndInsights={canViewRoleAndInsights}
             />
           ))}
         </tbody>

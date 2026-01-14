@@ -32,6 +32,7 @@ interface TeamMemberRowProps {
   onFieldChange: (memberId: string, field: string, value: string) => void;
   currentUserId?: string | null;
   isAdmin: boolean;
+  canViewRoleAndInsights: boolean;
 }
 
 export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
@@ -48,7 +49,8 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   pendingChanges,
   onFieldChange,
   currentUserId,
-  isAdmin
+  isAdmin,
+  canViewRoleAndInsights
 }) => {
   const { locations, departments, practice_areas, loading } = useOfficeSettings();
   
@@ -191,7 +193,7 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
           </Badge>
         )}
       </td>
-      {isAdmin && (
+      {canViewRoleAndInsights && (
         <td className="px-4 py-3">
           {canEdit ? (
             <Select
@@ -297,51 +299,53 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
           </span>
         )}
       </td>
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-2">
-          {canEdit ? (
-            <>
-              {isPending && onSendInvite && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onSendInvite(member)}
-                        disabled={missingEmail}
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{missingEmail ? 'Email required' : 'Send invitation'}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
+      {canViewRoleAndInsights && (
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-2">
+            {canEdit ? (
+              <>
+                {isPending && onSendInvite && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onSendInvite(member)}
+                          disabled={missingEmail}
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{missingEmail ? 'Email required' : 'Send invitation'}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDeleteMember(member.id)}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onDeleteMember(member.id)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={() => onViewMember(member.id)}
+                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
               >
-                <Trash2 className="h-4 w-4" />
+                <Eye className="h-4 w-4" />
               </Button>
-            </>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onViewMember(member.id)}
-              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </td>
+            )}
+          </div>
+        </td>
+      )}
     </tr>
   );
 };
