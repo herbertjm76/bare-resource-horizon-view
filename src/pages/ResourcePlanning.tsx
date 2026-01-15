@@ -109,6 +109,10 @@ const ResourcePlanning: React.FC = () => {
     );
   };
 
+  const handleStatusFilterChange = (statuses: string[]) => {
+    setStatusFilter(statuses);
+  };
+
   const handleProjectClick = (
     project: any,
     tab: "info" | "team" = "info",
@@ -153,6 +157,7 @@ const ResourcePlanning: React.FC = () => {
                 departments={departments}
                 statusFilter={statusFilter}
                 onStatusToggle={toggleStatus}
+                onStatusFilterChange={handleStatusFilterChange}
                 statusOptions={statusOptions}
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
@@ -161,6 +166,7 @@ const ResourcePlanning: React.FC = () => {
                 onCreateProject={() => setShowCreateProject(true)}
                 showBudget={showBudget}
                 onShowBudgetChange={setShowBudget}
+                viewType="resource_planning"
               />
 
               {/* Project List */}
@@ -184,6 +190,7 @@ const ResourcePlanning: React.FC = () => {
                 departments={departments}
                 statusFilter={statusFilter}
                 onStatusToggle={toggleStatus}
+                onStatusFilterChange={handleStatusFilterChange}
                 statusOptions={statusOptions}
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
@@ -192,6 +199,7 @@ const ResourcePlanning: React.FC = () => {
                 onCreateProject={() => setShowCreateProject(true)}
                 showBudget={showBudget}
                 onShowBudgetChange={setShowBudget}
+                viewType="resource_planning"
               />
 
               <Card>

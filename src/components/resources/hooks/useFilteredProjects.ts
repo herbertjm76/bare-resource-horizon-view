@@ -26,7 +26,8 @@ interface ProjectFilters {
 export const useFilteredProjects = (
   projects: Project[],
   filters: ProjectFilters,
-  officeStages: any[] = []
+  officeStages: any[] = [],
+  pinnedIds: string[] = []
 ) => {
   return useMemo(() => {
     // Filter projects based on criteria
@@ -46,12 +47,31 @@ export const useFilteredProjects = (
       return true;
     });
 
-    // Enhance projects with office stages data
-    return filtered.map(project => {
+    // Enhance projects with office stages data and pinned status
+    const enhanced = filtered.map(project => {
       return {
         ...project,
-        officeStages: officeStages || []
+        officeStages: officeStages || [],
+        isPinned: pinnedIds.includes(project.id)
       };
     });
-  }, [projects, filters, officeStages]);
+
+    // Sort with pinned items first
+    if (pinnedIds.length > 0) {
+      enhanced.sort((a, b) => {
+        const aIsPinned = pinnedIds.includes(a.id);
+        const bIsPinned = pinnedIds.includes(b.id);
+        if (aIsPinned && !bIsPinned) return -1;
+        if (!aIsPinned && bIsPinned) return 1;
+        // Maintain pin order based on pinnedIds array order
+        if (aIsPinned && bIsPinned) {
+          return pinnedIds.indexOf(a.id) - pinnedIds.indexOf(b.id);
+        }
+        return 0;
+      });
+    }
+
+    return enhanced;
+  }, [projects, filters, officeStages, pinnedIds]);
 };
+

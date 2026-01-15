@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronRight, CalendarDays, Plus, Settings, Calendar, Users } from 'lucide-react';
+import { ChevronDown, ChevronRight, CalendarDays, Plus, Settings, Calendar, Users, Pin } from 'lucide-react';
 import { StageTeamCompositionEditor } from '@/components/projects/team-composition/StageTeamCompositionEditor';
 import { AddProjectStageDialog } from './AddProjectStageDialog';
 import { useQuery } from '@tanstack/react-query';
@@ -15,6 +15,7 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { DEMO_STAGES, DEMO_ROLES } from '@/data/demoData';
+import { cn } from '@/lib/utils';
 
 interface ProjectStage {
   id: string;
@@ -43,6 +44,8 @@ interface ProjectPlanningCardProps {
   availableStages: OfficeStage[];
   showBudget?: boolean;
   onUpdate?: () => void;
+  isPinned?: boolean;
+  onTogglePin?: (projectId: string) => void;
 }
 
 export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
@@ -50,7 +53,9 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
   stages,
   availableStages,
   showBudget = false,
-  onUpdate
+  onUpdate,
+  isPinned = false,
+  onTogglePin
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showStageDialog, setShowStageDialog] = useState(false);
@@ -191,12 +196,44 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
 
   return (
     <>
-      <Card className="overflow-hidden">
+      <Card className={cn(
+        "overflow-hidden group",
+        isPinned && "ring-1 ring-primary/30 bg-primary/[0.02]"
+      )}>
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild>
             <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors py-4">
               <div className="flex items-center justify-between gap-4 w-full">
                 <div className="flex items-center gap-3 min-w-0">
+                  {/* Pin button */}
+                  {onTogglePin && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onTogglePin(project.id);
+                            }}
+                            className={cn(
+                              "h-7 w-7 shrink-0",
+                              isPinned 
+                                ? "text-primary hover:text-primary/80" 
+                                : "text-muted-foreground/40 hover:text-muted-foreground opacity-0 group-hover:opacity-100",
+                              isPinned && "opacity-100"
+                            )}
+                          >
+                            <Pin className={cn("h-3.5 w-3.5", isPinned && "fill-current")} />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          {isPinned ? 'Unpin' : 'Pin to top'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                   {isOpen ? (
                     <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   ) : (
