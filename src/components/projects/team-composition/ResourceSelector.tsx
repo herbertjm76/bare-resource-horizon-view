@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import {
   Popover,
   PopoverContent,
@@ -15,12 +16,21 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { PlusCircle, DollarSign, Percent, ChevronsUpDown, Check } from 'lucide-react';
+import { PlusCircle, DollarSign, Percent, ChevronsUpDown, Check, X, Users } from 'lucide-react';
 import { useOfficeRoles } from '@/hooks/useOfficeRoles';
 import { useOfficeRates, getRateForReference } from '@/hooks/useOfficeRates';
 import { useResourceOptions } from '@/components/resources/dialogs/useResourceOptions';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { cn } from '@/lib/utils';
+
+interface SelectedResource {
+  value: string;
+  type: 'role' | 'member';
+  id: string;
+  name: string;
+  roleId: string;
+  rate: number;
+}
 
 interface ResourceSelectorProps {
   onAdd: (data: {
@@ -42,100 +52,128 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
 }) => {
   const { workWeekHours } = useAppSettings();
   const [open, setOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState('');
+  const [selectedResources, setSelectedResources] = useState<SelectedResource[]>([]);
   const [allocationPercent, setAllocationPercent] = useState(100);
 
   const { data: roles = [], isLoading: rolesLoading } = useOfficeRoles();
   const { data: rates = [] } = useOfficeRates();
   const { resourceOptions: members, loading: membersLoading } = useResourceOptions();
 
-  // Parse selected value to determine if it's a role or member
-  const selectionType = useMemo(() => {
-    if (!selectedValue) return null;
-    if (selectedValue.startsWith('role:')) return 'role';
-    if (selectedValue.startsWith('member:')) return 'member';
-    return null;
-  }, [selectedValue]);
-
-  const selectedId = selectedValue.split(':')[1] || '';
-
-  // Get the selected role (either directly or from member)
-  const selectedRoleId = useMemo(() => {
-    if (selectionType === 'role') return selectedId;
-    if (selectionType === 'member') {
-      const member = members.find(m => m.id === selectedId);
-      return member?.officeRoleId || '';
-    }
-    return '';
-  }, [selectionType, selectedId, members]);
-
-  const selectedRole = roles.find(r => r.id === selectedRoleId);
-
-  // Get display label for selected value
-  const selectedLabel = useMemo(() => {
-    if (!selectedValue) return '';
-    if (selectionType === 'role') {
-      const role = roles.find(r => r.id === selectedId);
-      return role?.name || '';
-    }
-    if (selectionType === 'member') {
-      const member = members.find(m => m.id === selectedId);
-      return member?.name || '';
-    }
-    return '';
-  }, [selectedValue, selectionType, selectedId, roles, members]);
-
-  // Get rate for selected role
-  const selectedRate = useMemo(() => {
-    if (!selectedRoleId) return 0;
-    return getRateForReference(rates, selectedRoleId, 'role');
-  }, [selectedRoleId, rates]);
-
   // Calculate hours based on allocation percentage and contracted weeks
   const weeklyHours = (allocationPercent / 100) * workWeekHours;
   const totalHours = contractedWeeks > 0 ? weeklyHours * contractedWeeks : weeklyHours;
-  const totalBudget = totalHours * selectedRate;
+
+  // Calculate totals for all selected resources
+  const selectionTotals = useMemo(() => {
+    const totalBudget = selectedResources.reduce((sum, res) => sum + (totalHours * res.rate), 0);
+    const avgRate = selectedResources.length > 0 
+      ? selectedResources.reduce((sum, res) => sum + res.rate, 0) / selectedResources.length 
+      : 0;
+    return { totalBudget, avgRate, count: selectedResources.length };
+  }, [selectedResources, totalHours]);
+
+  const toggleSelection = (value: string, type: 'role' | 'member', id: string, name: string, roleId: string) => {
+    const rate = roleId ? getRateForReference(rates, roleId, 'role') : 0;
+    
+    setSelectedResources(prev => {
+      const exists = prev.find(r => r.value === value);
+      if (exists) {
+        return prev.filter(r => r.value !== value);
+      }
+      return [...prev, { value, type, id, name, roleId, rate }];
+    });
+  };
+
+  const removeSelection = (value: string) => {
+    setSelectedResources(prev => prev.filter(r => r.value !== value));
+  };
+
+  const isSelected = (value: string) => selectedResources.some(r => r.value === value);
 
   const handleAdd = () => {
-    if (!selectedValue || !selectionType) return;
+    if (selectedResources.length === 0) return;
 
-    if (selectionType === 'member') {
-      onAdd({
-        referenceId: selectedId,
-        referenceType: 'member',
-        plannedQuantity: 1,
-        plannedHoursPerPerson: totalHours,
-        rateSnapshot: selectedRate,
-        assignedMemberId: selectedId
-      });
-    } else {
-      // Just a role placeholder
-      onAdd({
-        referenceId: selectedId,
-        referenceType: 'role',
-        plannedQuantity: 1,
-        plannedHoursPerPerson: totalHours,
-        rateSnapshot: selectedRate
-      });
-    }
+    // Add each selected resource
+    selectedResources.forEach(resource => {
+      if (resource.type === 'member') {
+        onAdd({
+          referenceId: resource.id,
+          referenceType: 'member',
+          plannedQuantity: 1,
+          plannedHoursPerPerson: totalHours,
+          rateSnapshot: resource.rate,
+          assignedMemberId: resource.id
+        });
+      } else {
+        onAdd({
+          referenceId: resource.id,
+          referenceType: 'role',
+          plannedQuantity: 1,
+          plannedHoursPerPerson: totalHours,
+          rateSnapshot: resource.rate
+        });
+      }
+    });
 
     // Reset form
-    setSelectedValue('');
+    setSelectedResources([]);
     setAllocationPercent(100);
   };
 
-  const isDisabled = !selectedValue || isLoading;
+  const isDisabled = selectedResources.length === 0 || isLoading;
   const isLoaderActive = rolesLoading || membersLoading;
+
+  // Display text for trigger button
+  const triggerLabel = useMemo(() => {
+    if (selectedResources.length === 0) return "Select roles or people...";
+    if (selectedResources.length === 1) return selectedResources[0].name;
+    return `${selectedResources.length} resources selected`;
+  }, [selectedResources]);
 
   return (
     <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
-      <Label className="text-sm font-medium">Add Resource</Label>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium">Add Resources</Label>
+        {selectedResources.length > 1 && (
+          <Badge variant="secondary" className="text-xs">
+            <Users className="h-3 w-3 mr-1" />
+            Bulk mode: {selectedResources.length} selected
+          </Badge>
+        )}
+      </div>
+
+      {/* Selected resources chips */}
+      {selectedResources.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {selectedResources.map(resource => (
+            <Badge 
+              key={resource.value} 
+              variant="secondary" 
+              className="pl-2 pr-1 py-1 flex items-center gap-1"
+            >
+              <span className="text-xs">{resource.name}</span>
+              {resource.rate > 0 && (
+                <span className="text-xs text-muted-foreground">(${resource.rate}/hr)</span>
+              )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-4 w-4 p-0 hover:bg-destructive/20"
+                onClick={() => removeSelection(resource.value)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-12 gap-3 items-end">
-        {/* Unified Role/Person selector with search */}
+        {/* Multi-select Role/Person selector */}
         <div className="col-span-8">
           <Label className="text-xs text-muted-foreground mb-1.5 block">
-            Role or Person <span className="text-destructive">*</span>
+            Roles or People <span className="text-destructive">*</span>
           </Label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -146,7 +184,7 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
                 aria-expanded={open}
                 className="w-full justify-between font-normal"
               >
-                {selectedLabel || "Select a role or person..."}
+                {triggerLabel}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -161,48 +199,48 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
                   {/* Roles section */}
                   {roles.length > 0 && (
                     <CommandGroup heading="Roles (unassigned)">
-                      {roles.map((role) => (
-                        <CommandItem
-                          key={`role:${role.id}`}
-                          value={`role:${role.id}:${role.name}`}
-                          onSelect={() => {
-                            setSelectedValue(`role:${role.id}`);
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              selectedValue === `role:${role.id}` ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {role.name}
-                        </CommandItem>
-                      ))}
+                      {roles.map((role) => {
+                        const value = `role:${role.id}`;
+                        return (
+                          <CommandItem
+                            key={value}
+                            value={`role:${role.id}:${role.name}`}
+                            onSelect={() => toggleSelection(value, 'role', role.id, role.name, role.id)}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                isSelected(value) ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {role.name}
+                          </CommandItem>
+                        );
+                      })}
                     </CommandGroup>
                   )}
                   
                   {/* People section */}
                   {members.length > 0 && (
                     <CommandGroup heading="Team Members">
-                      {members.map((member) => (
-                        <CommandItem
-                          key={`member:${member.id}`}
-                          value={`member:${member.id}:${member.name}`}
-                          onSelect={() => {
-                            setSelectedValue(`member:${member.id}`);
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              selectedValue === `member:${member.id}` ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {member.name}
-                        </CommandItem>
-                      ))}
+                      {members.map((member) => {
+                        const value = `member:${member.id}`;
+                        return (
+                          <CommandItem
+                            key={value}
+                            value={`member:${member.id}:${member.name}`}
+                            onSelect={() => toggleSelection(value, 'member', member.id, member.name, member.officeRoleId || '')}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                isSelected(value) ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {member.name}
+                          </CommandItem>
+                        );
+                      })}
                     </CommandGroup>
                   )}
                 </CommandList>
@@ -249,35 +287,43 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
             disabled={isDisabled}
           >
             <PlusCircle className="h-4 w-4 mr-1.5" />
-            Add
+            {selectedResources.length > 1 ? `Add (${selectedResources.length})` : 'Add'}
           </Button>
         </div>
       </div>
 
       {/* Preview calculation */}
-      {selectedValue && (
-        <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/50">
+      {selectedResources.length > 0 && (
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border/50">
           <div className="flex items-center gap-1">
-            {selectedRate > 0 ? (
+            {selectionTotals.avgRate > 0 ? (
               <>
                 <DollarSign className="h-3 w-3" />
                 <span>
-                  Rate: <span className="font-medium text-foreground">${selectedRate}/hr</span>
-                  {selectedRole && <span className="ml-1">({selectedRole.name})</span>}
+                  {selectedResources.length === 1 ? (
+                    <>Rate: <span className="font-medium text-foreground">${selectedResources[0].rate}/hr</span></>
+                  ) : (
+                    <>Avg rate: <span className="font-medium text-foreground">${Math.round(selectionTotals.avgRate)}/hr</span></>
+                  )}
                 </span>
               </>
             ) : (
               <span className="text-amber-500">
-                No rate configured for this role
+                No rates configured
               </span>
             )}
           </div>
           <div>
+            {selectedResources.length > 1 && (
+              <span className="mr-2">{selectedResources.length} × </span>
+            )}
             {allocationPercent}% × {contractedWeeks > 0 ? `${contractedWeeks} weeks` : '1 week'} = 
-            <span className="font-medium text-foreground ml-1">{Math.round(totalHours)} hrs</span>
-            {selectedRate > 0 && (
+            <span className="font-medium text-foreground ml-1">
+              {Math.round(totalHours * selectedResources.length)} hrs
+            </span>
+            {selectionTotals.totalBudget > 0 && (
               <span className="ml-2">
-                (${totalBudget.toLocaleString()})
+                (${selectionTotals.totalBudget.toLocaleString()})
               </span>
             )}
           </div>
