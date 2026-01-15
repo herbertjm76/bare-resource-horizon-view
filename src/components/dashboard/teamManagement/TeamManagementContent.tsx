@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { TeamMember, Invite } from '../types';
+import { TeamMember } from '../types';
 import TeamMemberSection from '../TeamMemberSection';
-import PendingInvitesSection from '../PendingInvitesSection';
 
 interface TeamManagementContentProps {
   allMembers: TeamMember[];
@@ -11,20 +10,11 @@ interface TeamManagementContentProps {
   setEditMode: (mode: boolean) => void;
   selectedMembers: string[];
   setSelectedMembers: (members: string[]) => void;
-  emailInvites: Invite[];
-  isAdminOrOwner: boolean;
-  inviteEditMode: boolean;
   onEditMember: (member: TeamMember) => void;
   onDeleteMember: (memberId: string) => void;
   onSendInvite?: (member: TeamMember) => void;
   onBulkDelete: () => void;
   onAdd: () => void;
-  onToggleInviteEditMode: () => void;
-  copyInviteCode: (code: string) => void;
-  onCopyInvite: () => void;
-  onInviteMember: () => void;
-  onResendInvite: (invite: Invite) => void;
-  onDeleteInvite: (inviteId: string) => void;
   onRefresh?: () => void;
 }
 
@@ -35,20 +25,11 @@ export const TeamManagementContent: React.FC<TeamManagementContentProps> = ({
   setEditMode,
   selectedMembers,
   setSelectedMembers,
-  emailInvites,
-  isAdminOrOwner,
-  inviteEditMode,
   onEditMember,
   onDeleteMember,
   onSendInvite,
   onBulkDelete,
   onAdd,
-  onToggleInviteEditMode,
-  copyInviteCode,
-  onCopyInvite,
-  onInviteMember,
-  onResendInvite,
-  onDeleteInvite,
   onRefresh
 }) => {
   return (
@@ -66,18 +47,6 @@ export const TeamManagementContent: React.FC<TeamManagementContentProps> = ({
         onBulkDelete={onBulkDelete}
         onAdd={onAdd}
         onRefresh={onRefresh}
-      />
-
-      <PendingInvitesSection 
-        invites={emailInvites}
-        copyInviteCode={copyInviteCode}
-        onCopyInvite={onCopyInvite}
-        onInviteMember={onInviteMember}
-        onResendInvite={onResendInvite}
-        onDeleteInvite={onDeleteInvite}
-        showControls={isAdminOrOwner}
-        editMode={inviteEditMode}
-        onToggleEditMode={onToggleInviteEditMode}
       />
     </div>
   );

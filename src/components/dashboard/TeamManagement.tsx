@@ -66,19 +66,10 @@ export const TeamManagement = ({
           setEditMode={setEditMode}
           selectedMembers={selectedMembers}
           setSelectedMembers={setSelectedMembers}
-          emailInvites={emailInvites}
-          isAdminOrOwner={isAdminOrOwner}
-          inviteEditMode={inviteEditMode}
           onEditMember={dialogsState.openEditDialog}
           onDeleteMember={handlers.handleDeleteMemberClick}
           onBulkDelete={handlers.handleBulkDelete}
           onAdd={dialogsState.openAddDialog}
-          onToggleInviteEditMode={toggleInviteEditMode}
-          copyInviteCode={inviteActions.copyInviteCode}
-          onCopyInvite={() => inviteActions.copyInviteUrl(inviteUrl)}
-          onInviteMember={dialogsState.openInviteDialog}
-          onResendInvite={inviteActions.resendInvite}
-          onDeleteInvite={inviteActions.deleteInvite}
           onRefresh={handleRefresh}
         />
 
@@ -111,20 +102,11 @@ export const TeamManagement = ({
         setEditMode={setEditMode}
         selectedMembers={selectedMembers}
         setSelectedMembers={setSelectedMembers}
-        emailInvites={emailInvites}
-        isAdminOrOwner={isAdminOrOwner}
-        inviteEditMode={inviteEditMode}
         onEditMember={handlers.handleEditMember}
         onDeleteMember={handlers.handleDeleteMember}
         onSendInvite={handlers.handleSendPreRegisteredInvite}
         onBulkDelete={handlers.handleBulkDelete}
         onAdd={dialogsState.openAddDialog}
-        onToggleInviteEditMode={toggleInviteEditMode}
-        copyInviteCode={inviteActions.copyInviteCode}
-        onCopyInvite={handlers.handleCopyInvite}
-        onInviteMember={dialogsState.openInviteDialog}
-        onResendInvite={inviteActions.resendInvite}
-        onDeleteInvite={inviteActions.deleteInvite}
         onRefresh={handleRefresh}
       />
 

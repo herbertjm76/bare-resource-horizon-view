@@ -11,6 +11,7 @@ type ResourceOption = {
   role?: string;
   department?: string;
   location?: string;
+  avatar_url?: string | null;
 };
 
 interface ResourceSelectOptionProps {
@@ -31,7 +32,7 @@ export const ResourceSelectOption: React.FC<ResourceSelectOptionProps> = ({ memb
     <>
       <div className="relative">
         <Avatar className="h-12 w-12">
-          <AvatarImage src="" alt={member.name} />
+          <AvatarImage src={member.avatar_url || undefined} alt={member.name} />
           <AvatarFallback className="text-sm">{initials}</AvatarFallback>
         </Avatar>
         {isSelected && (

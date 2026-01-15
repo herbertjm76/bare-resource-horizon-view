@@ -19,6 +19,7 @@ export type ResourceOption = {
   department?: string;
   location?: string;
   officeRoleId?: string | null;
+  avatar_url?: string | null;
 };
 
 export const useResourceOptions = () => {
@@ -40,6 +41,7 @@ export const useResourceOptions = () => {
           department: member.department || undefined,
           location: member.location || undefined,
           officeRoleId: member.office_role_id,
+          avatar_url: member.avatar_url,
         })),
         ...DEMO_PRE_REGISTERED.map((invite) => ({
           id: invite.id,
@@ -50,6 +52,7 @@ export const useResourceOptions = () => {
           department: invite.department || undefined,
           location: invite.location || undefined,
           officeRoleId: (invite as any).office_role_id ?? null,
+          avatar_url: (invite as any).avatar_url ?? null,
         })),
       ];
 
@@ -91,7 +94,8 @@ export const useResourceOptions = () => {
             role: member.job_title || undefined,
             department: member.department || undefined,
             location: member.location || undefined,
-            officeRoleId: member.office_role_id
+            officeRoleId: member.office_role_id,
+            avatar_url: member.avatar_url
           })),
           
           // Pre-registered members
@@ -103,7 +107,8 @@ export const useResourceOptions = () => {
             role: invite.job_title || undefined,
             department: invite.department || undefined,
             location: invite.location || undefined,
-            officeRoleId: invite.office_role_id
+            officeRoleId: invite.office_role_id,
+            avatar_url: invite.avatar_url
           }))
         ];
         

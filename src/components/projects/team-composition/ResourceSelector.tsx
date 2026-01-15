@@ -224,7 +224,11 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
               max={100}
               step={5}
               value={allocationPercent}
-              onChange={(e) => setAllocationPercent(Math.min(100, Math.max(5, parseInt(e.target.value) || 100)))}
+              onChange={(e) => setAllocationPercent(parseInt(e.target.value) || 0)}
+              onBlur={(e) => {
+                const value = parseInt(e.target.value) || 100;
+                setAllocationPercent(Math.min(100, Math.max(5, value)));
+              }}
               className="text-center pr-6"
             />
             <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">%</span>
