@@ -10,6 +10,7 @@ import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectRe
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
 import { PersonResourceView } from '@/components/resources/person-view/PersonResourceView';
 import { useProjects } from '@/hooks/useProjects';
+import { usePinnedItems } from '@/hooks/usePinnedItems';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
@@ -83,6 +84,12 @@ const ResourceScheduling = () => {
     memberFilters.searchTerm ? 'search' : ''
   ].filter(Boolean).length, [memberFilters.practiceArea, memberFilters.department, memberFilters.location, memberFilters.searchTerm]);
 
+  // Pinned items for projects
+  const { pinnedIds, isPinned, togglePin, sortWithPinnedFirst } = usePinnedItems({
+    viewContext: 'resource_scheduling',
+    itemType: 'project'
+  });
+
   // Lift expandedProjects state up so controls and grid share the same state
   const { projects, isLoading: projectsLoading, refetch: refetchProjects } = useProjects(sortBy, sortDirection);
 
@@ -107,6 +114,23 @@ const ResourceScheduling = () => {
     selectedMonth,
   ]);
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
+
+  // Sort projects with pinned first
+  const sortedProjects = useMemo(() => {
+    if (!projects) return projects;
+    return sortWithPinnedFirst(projects);
+  }, [projects, sortWithPinnedFirst]);
+
+  // Handler for applying presets
+  const handleApplyPreset = useCallback((presetFilters: Record<string, any>) => {
+    // Apply filters from preset
+    if (presetFilters.office) handleFilterChange('office', presetFilters.office);
+    if (presetFilters.country) handleFilterChange('country', presetFilters.country);
+    if (presetFilters.manager) handleFilterChange('manager', presetFilters.manager);
+    if (presetFilters.status) handleFilterChange('status', presetFilters.status);
+    if (presetFilters.periodToShow) handlePeriodChange(presetFilters.periodToShow);
+    if (presetFilters.searchTerm !== undefined) handleProjectSearchChange(presetFilters.searchTerm);
+  }, [handleFilterChange, handlePeriodChange, handleProjectSearchChange]);
 
 
   const expandAll = useCallback(() => {
@@ -176,8 +200,9 @@ const ResourceScheduling = () => {
                         onExpandAll={expandAll}
                         onCollapseAll={collapseAll}
                         onToggleProjectExpand={handleToggleProjectExpand}
-                        projects={projects}
+                        projects={sortedProjects}
                         isLoading={projectsLoading}
+                        onApplyPreset={handleApplyPreset}
                       />
                       <MemberFilterRow
                         filters={memberFilters}
@@ -220,8 +245,11 @@ const ResourceScheduling = () => {
                         onExpandAll={expandAll}
                         onCollapseAll={collapseAll}
                         onToggleProjectExpand={handleToggleProjectExpand}
-                        projects={projects}
+                        projects={sortedProjects}
                         isLoading={projectsLoading}
+                        onApplyPreset={handleApplyPreset}
+                        pinnedIds={pinnedIds}
+                        onTogglePin={togglePin}
                       />
                     </div>
                   </div>

@@ -32,6 +32,9 @@ interface ModernResourceGridProps {
   memberFilters?: MemberFilters;
   // External loading state (when projects passed from parent)
   isLoading?: boolean;
+  // Pinned items support
+  pinnedIds?: string[];
+  onTogglePin?: (projectId: string) => void;
 }
 
 export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
@@ -48,7 +51,9 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   totalProjects,
   onToggleProjectExpand,
   memberFilters,
-  isLoading: externalIsLoading
+  isLoading: externalIsLoading,
+  pinnedIds,
+  onTogglePin
 }) => {
   const shouldFetchProjects = !projectsProp;
   const { projects: fetchedProjects, isLoading: isLoadingProjects } = useProjects(sortBy, sortDirection, {
@@ -163,6 +168,8 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
       selectedDate={startDate}
       periodToShow={periodToShow}
       memberFilters={memberFilters}
+      pinnedIds={pinnedIds}
+      onTogglePin={onTogglePin}
     />
   );
 };

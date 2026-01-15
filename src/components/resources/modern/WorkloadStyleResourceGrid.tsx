@@ -21,6 +21,9 @@ interface WorkloadStyleResourceGridProps {
   selectedDate?: Date;
   periodToShow?: number;
   memberFilters?: MemberFilters;
+  // Pinned items support
+  pinnedIds?: string[];
+  onTogglePin?: (projectId: string) => void;
 }
 
 export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps> = ({
@@ -30,7 +33,9 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
   onToggleProjectExpand,
   selectedDate,
   periodToShow,
-  memberFilters
+  memberFilters,
+  pinnedIds = [],
+  onTogglePin
 }) => {
   // Calculate total table width: project column (250px) + week columns (80px each)
   const tableWidth = 250 + weeks.length * 80;
@@ -110,6 +115,8 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
                 selectedDate={selectedDate}
                 periodToShow={periodToShow}
                 memberFilters={memberFilters}
+                isPinned={pinnedIds.includes(project.id)}
+                onTogglePin={onTogglePin ? () => onTogglePin(project.id) : undefined}
               />
             ))}
           </tbody>

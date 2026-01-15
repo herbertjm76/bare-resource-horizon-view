@@ -66,6 +66,11 @@ interface ProjectResourcingContentProps {
   isLoading?: boolean;
   // External projects (when passed from parent to avoid double-fetch)
   projects?: any[];
+  // Presets support
+  onApplyPreset?: (filters: Record<string, any>) => void;
+  // Pinned items support
+  pinnedIds?: string[];
+  onTogglePin?: (projectId: string) => void;
 }
 
 // Inner component that uses office settings
@@ -98,7 +103,12 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onToggleProjectExpand: externalToggleProjectExpand,
   // External loading/projects props
   isLoading: externalIsLoading,
-  projects: externalProjects
+  projects: externalProjects,
+  // Presets support
+  onApplyPreset,
+  // Pinned items support
+  pinnedIds,
+  onTogglePin
 }) => {
   // Only fetch projects if not passed from parent
   const { projects: fetchedProjects, isLoading: fetchedIsLoading } = useProjects(sortBy, sortDirection, {
@@ -292,6 +302,8 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         expandedProjects={expandedProjects}
         totalProjects={totalProjects}
         onExport={handleExport}
+        viewType="resource_scheduling"
+        onApplyPreset={onApplyPreset}
       />
     );
   }
@@ -314,6 +326,8 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
           totalProjects={totalProjects}
           onToggleProjectExpand={handleToggleProjectExpand}
           memberFilters={memberFilters}
+          pinnedIds={pinnedIds}
+          onTogglePin={onTogglePin}
         />
       </div>
     );
