@@ -85,17 +85,21 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
     const normalize = (v: unknown) => String(v ?? '').trim().toLowerCase();
     const selectedNorm = normalize(selected);
 
+    // Pinned projects should ALWAYS show, even when department filter is active.
+    const pinnedSet = new Set((pinnedIds ?? []).map((id) => String(id)));
+
     // Use EXACT matching on department name (case-insensitive, trimmed).
     // Previous loose matching with includes() caused false positives 
     // (e.g., "Hospitality" matching projects with "Hospital" in name).
     const result = projects.filter((p: any) => {
+      if (pinnedSet.has(String(p?.id))) return true;
       const deptNorm = normalize(p?.department);
       return deptNorm === selectedNorm;
     });
-    
+
     lastValidProjectsRef.current = result;
     return result;
-  }, [projects, memberFilters?.department, isLoadingProjects, externalIsLoading]);
+  }, [projects, memberFilters?.department, pinnedIds, isLoadingProjects, externalIsLoading]);
 
   const filteredProjects = useFilteredProjects(projectsFilteredByDepartment || [], filters, [], pinnedIds || []);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
