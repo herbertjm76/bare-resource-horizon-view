@@ -223,8 +223,12 @@ export const ResourceSelector: React.FC<ResourceSelectorProps> = ({
               min={5}
               max={100}
               step={5}
-              value={allocationPercent}
-              onChange={(e) => setAllocationPercent(parseInt(e.target.value) || 0)}
+              value={allocationPercent || ''}
+              onChange={(e) => {
+                const rawValue = e.target.value;
+                const cleanValue = rawValue.replace(/^0+(?=\d)/, '');
+                setAllocationPercent(parseInt(cleanValue) || 0);
+              }}
               onBlur={(e) => {
                 const value = parseInt(e.target.value) || 100;
                 setAllocationPercent(Math.min(100, Math.max(5, value)));
