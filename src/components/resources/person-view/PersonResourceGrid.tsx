@@ -13,6 +13,8 @@ interface PersonResourceGridProps {
   selectedDate?: Date;
   periodToShow?: number;
   onRefresh: () => void;
+  pinnedIds?: string[];
+  onTogglePin?: (personId: string) => void;
 }
 
 export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
@@ -22,7 +24,9 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
   onTogglePersonExpand,
   selectedDate,
   periodToShow,
-  onRefresh
+  onRefresh,
+  pinnedIds = [],
+  onTogglePin
 }) => {
   const tableWidth = 250 + (weeks.length * 80);
   const needsScroll = weeks.length > 8;
@@ -100,6 +104,8 @@ export const PersonResourceGrid: React.FC<PersonResourceGridProps> = ({
                     selectedDate={selectedDate}
                     periodToShow={periodToShow}
                     onRefresh={onRefresh}
+                    isPinned={pinnedIds.includes(person.personId)}
+                    onTogglePin={onTogglePin ? () => onTogglePin(person.personId) : undefined}
                   />
                 ))}
               </tbody>
