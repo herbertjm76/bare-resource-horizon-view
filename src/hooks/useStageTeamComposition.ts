@@ -23,6 +23,8 @@ export interface TeamCompositionItem {
   rateSnapshot: number;
   totalPlannedHours: number;
   totalBudgetAmount: number;
+  assignedMemberId?: string | null;
+  assignedMemberName?: string | null;
 }
 
 export interface CompositionInput {
@@ -135,6 +137,7 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
       // Now fetch role and member names separately
       const roleIds = data?.filter(d => d.reference_type === 'role').map(d => d.reference_id) || [];
       const memberIds = data?.filter(d => d.reference_type === 'member').map(d => d.reference_id) || [];
+      const assignedMemberIds = data?.filter(d => d.assigned_member_id).map(d => d.assigned_member_id) || [];
 
       // Fetch all roles for lookup
       const { data: allRoles } = await supabase
@@ -154,13 +157,15 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
         });
       }
 
-      // Fetch active members from profiles
+      // Fetch active members from profiles (including assigned members)
+      const allMemberIds = [...new Set([...memberIds, ...assignedMemberIds.filter(Boolean)])];
       let membersMap: Record<string, { name: string; type: 'active' | 'pre_registered'; roleId?: string }> = {};
-      if (memberIds.length > 0) {
+      
+      if (allMemberIds.length > 0) {
         const { data: profiles } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, email, office_role_id')
-          .in('id', memberIds);
+          .in('id', allMemberIds);
         
         profiles?.forEach(p => {
           const name = `${p.first_name || ''} ${p.last_name || ''}`.trim() || p.email;
@@ -171,7 +176,7 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
         const { data: invites } = await supabase
           .from('invites')
           .select('id, first_name, last_name, email, office_role_id')
-          .in('id', memberIds);
+          .in('id', allMemberIds);
         
         invites?.forEach(i => {
           const name = `${i.first_name || ''} ${i.last_name || ''}`.trim() || i.email || 'Unknown';
@@ -183,6 +188,7 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
         let referenceName = 'Unknown';
         let memberType: 'active' | 'pre_registered' | undefined;
         let roleName: string | undefined;
+        let assignedMemberName: string | null = null;
 
         if (item.reference_type === 'role') {
           referenceName = rolesMap[item.reference_id] || 'Unknown Role';
@@ -197,6 +203,12 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
           }
         }
 
+        // Get assigned member name if exists
+        if (item.assigned_member_id) {
+          const assignedInfo = membersMap[item.assigned_member_id];
+          assignedMemberName = assignedInfo?.name || null;
+        }
+
         return {
           id: item.id,
           referenceId: item.reference_id,
@@ -208,7 +220,9 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
           plannedHoursPerPerson: item.planned_hours_per_person,
           rateSnapshot: item.rate_snapshot,
           totalPlannedHours: item.total_planned_hours || (item.planned_quantity * item.planned_hours_per_person),
-          totalBudgetAmount: item.total_budget_amount || 0
+          totalBudgetAmount: item.total_budget_amount || 0,
+          assignedMemberId: item.assigned_member_id,
+          assignedMemberName
         };
       });
 
@@ -287,6 +301,26 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
     }
   });
 
+  // Assign member to a role-based allocation
+  const assignMemberMutation = useMutation({
+    mutationFn: async ({ itemId, memberId }: { itemId: string; memberId: string | null }) => {
+      const { error } = await supabase
+        .from('project_stage_team_composition')
+        .update({ assigned_member_id: memberId })
+        .eq('id', itemId);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey });
+      toast.success(variables.memberId ? 'Member assigned' : 'Member unassigned');
+    },
+    onError: (error) => {
+      console.error('Error assigning member:', error);
+      toast.error('Failed to assign member');
+    }
+  });
+
   // Calculate stage totals
   const stageTotals = {
     totalHours: composition.reduce((sum, item) => sum + item.totalPlannedHours, 0),
@@ -299,9 +333,11 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
     isLoading,
     isSaving: saveMutation.isPending,
     isDeleting: deleteMutation.isPending,
+    isAssigning: assignMemberMutation.isPending,
     stageTotals,
     saveItem: saveMutation.mutate,
     deleteItem: deleteMutation.mutate,
+    assignMember: assignMemberMutation.mutate,
     refetch
   };
 };
