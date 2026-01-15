@@ -13,6 +13,7 @@ import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectD
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { getMemberCapacity } from '@/utils/capacityUtils';
 import { toUTCDateKey } from '@/utils/dateKey';
+import { PinButton } from '@/components/filters/PinButton';
 
 interface MemberFilters {
   practiceArea: string;
@@ -30,6 +31,9 @@ interface WorkloadStyleProjectRowProps {
   selectedDate?: Date;
   periodToShow?: number;
   memberFilters?: MemberFilters;
+  // Pinned items support
+  isPinned?: boolean;
+  onTogglePin?: () => void;
 }
 
 export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = React.memo(({
@@ -40,7 +44,9 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   isEven,
   selectedDate,
   periodToShow,
-  memberFilters
+  memberFilters,
+  isPinned = false,
+  onTogglePin
 }) => {
   const { projectDisplayPreference, workWeekHours, displayPreference } = useAppSettings();
   const { 
@@ -139,7 +145,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
   return (
     <>
       {/* Project Header Row */}
-      <tr className="workload-resource-row project-header-row">
+      <tr className="workload-resource-row project-header-row group">
         {/* Project info column - Fixed width, sticky */}
         <td 
           className="workload-resource-cell project-resource-column"
@@ -157,11 +163,11 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
             verticalAlign: 'middle'
           }}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
-              className="w-6 h-6 p-0 border border-border bg-muted hover:bg-muted/80 text-foreground cursor-pointer relative z-30"
+              className="w-6 h-6 p-0 border border-border bg-muted hover:bg-muted/80 text-foreground cursor-pointer relative z-30 shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleExpand();
@@ -174,6 +180,16 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
                 <ChevronRight className="w-3 h-3" />
               )}
             </Button>
+            
+            {/* Pin button */}
+            {onTogglePin && (
+              <PinButton
+                isPinned={isPinned}
+                onToggle={onTogglePin}
+                size="sm"
+                className="shrink-0"
+              />
+            )}
             
             <div className="flex-1 min-w-0">
               <h3 className="text-[15px] font-semibold text-foreground m-0 leading-tight overflow-hidden text-ellipsis whitespace-nowrap">
@@ -310,6 +326,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = R
     prevProps.memberFilters?.practiceArea === nextProps.memberFilters?.practiceArea &&
     prevProps.memberFilters?.department === nextProps.memberFilters?.department &&
     prevProps.memberFilters?.location === nextProps.memberFilters?.location &&
-    prevProps.memberFilters?.searchTerm === nextProps.memberFilters?.searchTerm
+    prevProps.memberFilters?.searchTerm === nextProps.memberFilters?.searchTerm &&
+    prevProps.isPinned === nextProps.isPinned
   );
 });

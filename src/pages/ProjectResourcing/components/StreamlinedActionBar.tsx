@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ProjectResourcingFilters } from './ProjectResourcingFilters';
 import { MobileResourceControls } from './MobileResourceControls';
+import { SavedPresetsDropdown } from '@/components/filters/SavedPresetsDropdown';
+import { ViewType } from '@/hooks/useViewPresets';
 
 interface StreamlinedActionBarProps {
   selectedDate: Date;
@@ -44,6 +46,9 @@ interface StreamlinedActionBarProps {
   expandedProjects: string[];
   totalProjects: number;
   onExport?: () => void;
+  // Presets support
+  viewType?: ViewType;
+  onApplyPreset?: (filters: Record<string, any>) => void;
 }
 
 export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
@@ -70,7 +75,9 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
   onCollapseAll,
   expandedProjects,
   totalProjects,
-  onExport
+  onExport,
+  viewType = 'resource_scheduling',
+  onApplyPreset
 }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   
@@ -234,6 +241,15 @@ export const StreamlinedActionBar: React.FC<StreamlinedActionBarProps> = ({
           >
             <ArrowUpDown className={`h-3.5 w-3.5 transition-transform ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
           </Button>
+
+          {/* Saved Presets */}
+          {onApplyPreset && (
+            <SavedPresetsDropdown
+              viewType={viewType}
+              currentFilters={{ ...filters, searchTerm }}
+              onApplyPreset={onApplyPreset}
+            />
+          )}
 
           {/* Expand/Collapse */}
           <Button
