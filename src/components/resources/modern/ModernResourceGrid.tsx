@@ -97,7 +97,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
     return result;
   }, [projects, memberFilters?.department, isLoadingProjects, externalIsLoading]);
 
-  const filteredProjects = useFilteredProjects(projectsFilteredByDepartment || [], filters);
+  const filteredProjects = useFilteredProjects(projectsFilteredByDepartment || [], filters, [], pinnedIds || []);
   const weeks = useGridWeeks(startDate, periodToShow, displayOptions);
 
   // Debug: see why results go empty after a brief render (DEV only)

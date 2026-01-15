@@ -49,7 +49,17 @@ export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
     );
   }
 
-  if (projects.length === 0) {
+  // Separate pinned vs non-pinned - pinned always show regardless of empty state
+  const pinnedProjects = projects.filter(p => isPinned(p.id));
+  const unpinnedProjects = projects.filter(p => !isPinned(p.id));
+
+  // Sort pinned by their display order
+  const sortedPinned = sortWithPinnedFirst(pinnedProjects);
+  
+  // Combine: pinned first, then unpinned
+  const sortedProjects = [...sortedPinned, ...unpinnedProjects];
+
+  if (sortedProjects.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <div className="rounded-full bg-muted p-4 mb-4">
@@ -62,9 +72,6 @@ export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
       </div>
     );
   }
-
-  // Sort with pinned projects first
-  const sortedProjects = sortWithPinnedFirst(projects);
 
   // Map project stages to office stages
   const getProjectStages = (project: Project) => {
