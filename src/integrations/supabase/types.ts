@@ -1338,6 +1338,7 @@ export type Database = {
       }
       project_stage_team_composition: {
         Row: {
+          assigned_member_id: string | null
           company_id: string
           created_at: string
           id: string
@@ -1353,6 +1354,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          assigned_member_id?: string | null
           company_id: string
           created_at?: string
           id?: string
@@ -1368,6 +1370,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          assigned_member_id?: string | null
           company_id?: string
           created_at?: string
           id?: string
@@ -1383,6 +1386,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "project_stage_team_composition_assigned_member_id_fkey"
+            columns: ["assigned_member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "project_stage_team_composition_project_id_fkey"
             columns: ["project_id"]

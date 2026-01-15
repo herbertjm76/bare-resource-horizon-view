@@ -119,9 +119,11 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
     isLoading,
     isSaving,
     isDeleting,
+    isAssigning,
     stageTotals,
     saveItem,
     deleteItem,
+    assignMember,
   } = useStageTeamComposition(projectId, selectedStageId);
 
   const selectedStage = stages.find(s => s.id === selectedStageId);
@@ -359,7 +361,9 @@ export const StageTeamCompositionEditor: React.FC<StageTeamCompositionEditorProp
               <TeamCompositionTable
                 items={composition}
                 onDelete={deleteItem}
+                onAssignMember={(itemId, memberId) => assignMember({ itemId, memberId })}
                 isDeleting={isDeleting}
+                isAssigning={isAssigning}
                 showBudget={showBudget}
                 contractedWeeks={contractedWeeks[stage.id] || 0}
               />
