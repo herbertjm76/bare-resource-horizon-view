@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { toUTCDateKey } from '@/utils/dateKey';
-import { ChevronDown, ChevronRight, Briefcase, Eye } from 'lucide-react';
+import { ChevronDown, ChevronRight, Briefcase, Eye, Pin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProjectAllocationRow } from './ProjectAllocationRow';
 import { AddProjectRow } from './AddProjectRow';
@@ -28,6 +28,8 @@ interface PersonRowProps {
   selectedDate?: Date;
   periodToShow?: number;
   onRefresh: () => void;
+  isPinned?: boolean;
+  onTogglePin?: () => void;
 }
 
 export const PersonRow: React.FC<PersonRowProps> = React.memo(({
@@ -38,7 +40,9 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
   isEven,
   selectedDate,
   periodToShow,
-  onRefresh
+  onRefresh,
+  isPinned = false,
+  onTogglePin
 }) => {
   const { displayPreference, workWeekHours } = useAppSettings();
   const capacity = getMemberCapacity(person.weeklyCapacity, workWeekHours);
@@ -157,18 +161,26 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
             </Avatar>
             
             <div style={{ flex: '1', minWidth: '0' }}>
-              <h3 style={{ 
-                fontSize: '15px', 
-                fontWeight: '600', 
-                color: 'black',
-                margin: '0',
-                lineHeight: '1.2',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }}>
-                {person.firstName} {person.lastName}
-              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h3 style={{ 
+                  fontSize: '15px', 
+                  fontWeight: '600', 
+                  color: 'black',
+                  margin: '0',
+                  lineHeight: '1.2',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {person.firstName} {person.lastName}
+                </h3>
+                {isPinned && (
+                  <Pin 
+                    className="h-3 w-3 text-primary flex-shrink-0" 
+                    style={{ transform: 'rotate(45deg)' }} 
+                  />
+                )}
+              </div>
               <div style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
@@ -187,6 +199,33 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
                 </span>
               </div>
             </div>
+
+            {/* Pin button */}
+            {onTogglePin && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`h-6 w-6 p-0 ${isPinned ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onTogglePin();
+                      }}
+                    >
+                      <Pin 
+                        className="h-3.5 w-3.5" 
+                        style={{ transform: isPinned ? 'rotate(45deg)' : 'none' }}
+                      />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isPinned ? 'Unpin from top' : 'Pin to top'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
         </td>
         
@@ -317,6 +356,7 @@ export const PersonRow: React.FC<PersonRowProps> = React.memo(({
     prevProps.isExpanded === nextProps.isExpanded &&
     prevProps.isEven === nextProps.isEven &&
     prevProps.weeks.length === nextProps.weeks.length &&
-    prevProjectIds === nextProjectIds
+    prevProjectIds === nextProjectIds &&
+    prevProps.isPinned === nextProps.isPinned
   );
 });

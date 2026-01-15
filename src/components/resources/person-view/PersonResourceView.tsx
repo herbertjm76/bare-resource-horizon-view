@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobilePersonControls } from './MobilePersonControls';
+import { usePinnedItems } from '@/hooks/usePinnedItems';
 
 interface MemberFilters {
   practiceArea: string;
@@ -44,11 +45,26 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
   const [expandedPeople, setExpandedPeople] = useState<string[]>([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  // Filter person data based on member filters
+  // Pinned people support
+  const { pinnedIds, togglePin } = usePinnedItems({
+    viewContext: 'resource-scheduling-person',
+    itemType: 'person'
+  });
+
+  // Filter person data based on member filters, but ALWAYS include pinned people
   const filteredPersonData = useMemo(() => {
-    if (!personData || !memberFilters) return personData;
+    if (!personData) return personData;
     
-    return personData.filter(person => {
+    const pinnedSet = new Set(pinnedIds);
+    
+    // Separate pinned and unpinned
+    const pinnedPeople = personData.filter(p => pinnedSet.has(p.personId));
+    const unpinnedPeople = personData.filter(p => !pinnedSet.has(p.personId));
+    
+    // Apply filters only to unpinned people
+    const filteredUnpinned = unpinnedPeople.filter(person => {
+      if (!memberFilters) return true;
+      
       if (memberFilters.practiceArea && memberFilters.practiceArea !== 'all') {
         if (person.practiceArea !== memberFilters.practiceArea) return false;
       }
@@ -63,9 +79,17 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
         const fullName = `${person.firstName} ${person.lastName}`.toLowerCase();
         if (!fullName.includes(searchLower)) return false;
       }
-    return true;
+      return true;
     });
-  }, [personData, memberFilters]);
+
+    // Sort pinned by their order in pinnedIds
+    pinnedPeople.sort((a, b) => {
+      return pinnedIds.indexOf(a.personId) - pinnedIds.indexOf(b.personId);
+    });
+
+    // Return pinned first, then filtered unpinned
+    return [...pinnedPeople, ...filteredUnpinned];
+  }, [personData, memberFilters, pinnedIds]);
 
   // Realtime subscription is now handled inside usePersonResourceData hook (single source)
 
@@ -256,6 +280,8 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
             selectedDate={startDate}
             periodToShow={periodToShow}
             onRefresh={refetch}
+            pinnedIds={pinnedIds}
+            onTogglePin={togglePin}
           />
         </div>
       </div>
@@ -287,6 +313,8 @@ export const PersonResourceView: React.FC<PersonResourceViewProps> = ({
             selectedDate={startDate}
             periodToShow={periodToShow}
             onRefresh={refetch}
+            pinnedIds={pinnedIds}
+            onTogglePin={togglePin}
           />
         </div>
       </div>
