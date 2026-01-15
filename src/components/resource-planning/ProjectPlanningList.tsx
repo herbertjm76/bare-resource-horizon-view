@@ -2,6 +2,7 @@ import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProjectPlanningCard } from './ProjectPlanningCard';
 import { FolderOpen } from 'lucide-react';
+import { usePinnedItems } from '@/hooks/usePinnedItems';
 
 interface Project {
   id: string;
@@ -33,6 +34,11 @@ export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
   showBudget = false,
   onUpdate
 }) => {
+  const { pinnedIds, togglePin, sortWithPinnedFirst, isPinned } = usePinnedItems({
+    viewContext: 'resource_planning',
+    itemType: 'project'
+  });
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -57,6 +63,9 @@ export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
     );
   }
 
+  // Sort with pinned projects first
+  const sortedProjects = sortWithPinnedFirst(projects);
+
   // Map project stages to office stages
   const getProjectStages = (project: Project) => {
     if (!project.stages || !Array.isArray(project.stages)) return [];
@@ -76,7 +85,7 @@ export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
 
   return (
     <div className="space-y-4">
-      {projects.map(project => (
+      {sortedProjects.map(project => (
         <ProjectPlanningCard
           key={project.id}
           project={project}
@@ -84,6 +93,8 @@ export const ProjectPlanningList: React.FC<ProjectPlanningListProps> = ({
           availableStages={officeStages}
           showBudget={showBudget}
           onUpdate={onUpdate}
+          isPinned={isPinned(project.id)}
+          onTogglePin={togglePin}
         />
       ))}
     </div>

@@ -1745,6 +1745,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_pinned_items: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          item_id: string
+          item_type: string
+          user_id: string
+          view_context: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          item_id: string
+          item_type: string
+          user_id: string
+          view_context: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          item_id?: string
+          item_type?: string
+          user_id?: string
+          view_context?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_pinned_items_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           company_id: string
@@ -1806,6 +1847,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "user_rundown_preferences_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_view_presets: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          filters: Json
+          id: string
+          is_default: boolean | null
+          name: string
+          updated_at: string | null
+          user_id: string
+          view_type: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          filters?: Json
+          id?: string
+          is_default?: boolean | null
+          name: string
+          updated_at?: string | null
+          user_id: string
+          view_type: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          filters?: Json
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+          view_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_view_presets_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"

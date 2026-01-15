@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { 
   Search, X, ChevronLeft, ChevronRight, Filter, Plus, FolderOpen
 } from 'lucide-react';
+import { SavedPresetsDropdown } from '@/components/filters/SavedPresetsDropdown';
+import { ViewType } from '@/hooks/useViewPresets';
 
 interface PlanningFilterRowProps {
   departmentFilter: string;
@@ -15,6 +17,7 @@ interface PlanningFilterRowProps {
   departments: Array<{ id: string; name: string }>;
   statusFilter: string[];
   onStatusToggle: (status: string) => void;
+  onStatusFilterChange?: (statuses: string[]) => void;
   statusOptions: string[];
   searchTerm: string;
   onSearchChange: (value: string) => void;
@@ -23,6 +26,7 @@ interface PlanningFilterRowProps {
   onCreateProject: () => void;
   showBudget: boolean;
   onShowBudgetChange: (show: boolean) => void;
+  viewType?: ViewType;
 }
 
 export const PlanningFilterRow: React.FC<PlanningFilterRowProps> = ({
@@ -31,6 +35,7 @@ export const PlanningFilterRow: React.FC<PlanningFilterRowProps> = ({
   departments,
   statusFilter,
   onStatusToggle,
+  onStatusFilterChange,
   statusOptions,
   searchTerm,
   onSearchChange,
@@ -38,7 +43,8 @@ export const PlanningFilterRow: React.FC<PlanningFilterRowProps> = ({
   totalProjects,
   onCreateProject,
   showBudget,
-  onShowBudgetChange
+  onShowBudgetChange,
+  viewType = 'resource_planning'
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -88,8 +94,39 @@ export const PlanningFilterRow: React.FC<PlanningFilterRowProps> = ({
     (searchTerm ? 1 : 0) + 
     (statusFilter.length !== statusOptions.length ? 1 : 0);
 
+  // Get current filters as object for presets
+  const currentFilters = {
+    departmentFilter,
+    statusFilter,
+    searchTerm,
+    showBudget
+  };
+
+  // Apply preset filters
+  const handleApplyPreset = (filters: Record<string, any>) => {
+    if (filters.departmentFilter !== undefined) {
+      onDepartmentChange(filters.departmentFilter);
+    }
+    if (filters.statusFilter !== undefined && onStatusFilterChange) {
+      onStatusFilterChange(filters.statusFilter);
+    }
+    if (filters.searchTerm !== undefined) {
+      onSearchChange(filters.searchTerm);
+    }
+    if (filters.showBudget !== undefined) {
+      onShowBudgetChange(filters.showBudget);
+    }
+  };
+
   return (
     <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg border border-border/50">
+      {/* Saved Presets */}
+      <SavedPresetsDropdown
+        viewType={viewType}
+        currentFilters={currentFilters}
+        onApplyPreset={handleApplyPreset}
+      />
+
       {/* Department Icon */}
       <div className="flex items-center justify-center w-8 h-8 rounded-md border border-border/60 bg-background">
         <FolderOpen className="h-4 w-4 text-muted-foreground" />
