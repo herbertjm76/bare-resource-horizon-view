@@ -196,26 +196,29 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                   onValueChange={setSearchTerm}
                 />
                 <CommandList className="max-h-[300px]">
-                  <CommandEmpty>
-                    {optionsLoading ? 'Loading...' : 'No team members found'}
-                  </CommandEmpty>
-                  <CommandGroup>
-                    <div className="grid grid-cols-5 gap-3 p-3">
-                      {filteredResources.map(member => (
-                        <div
-                          key={member.id}
-                          onClick={() => toggleResourceSelection(member.id)}
-                          className={cn(
-                            "flex flex-col items-center gap-2 p-2 rounded-lg cursor-pointer transition-all relative",
-                            "hover:bg-accent",
-                            selectedResources.includes(member.id) && "bg-accent ring-2 ring-primary"
-                          )}
-                        >
-                          <ResourceSelectOption member={member} isSelected={selectedResources.includes(member.id)} />
-                        </div>
-                      ))}
-                    </div>
-                  </CommandGroup>
+                  {optionsLoading ? (
+                    <div className="p-4 text-center text-muted-foreground">Loading...</div>
+                  ) : filteredResources.length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground">No team members found</div>
+                  ) : (
+                    <CommandGroup>
+                      <div className="grid grid-cols-5 gap-3 p-3">
+                        {filteredResources.map(member => (
+                          <div
+                            key={member.id}
+                            onClick={() => toggleResourceSelection(member.id)}
+                            className={cn(
+                              "flex flex-col items-center gap-2 p-2 rounded-lg cursor-pointer transition-all relative",
+                              "hover:bg-accent",
+                              selectedResources.includes(member.id) && "bg-accent ring-2 ring-primary"
+                            )}
+                          >
+                            <ResourceSelectOption member={member} isSelected={selectedResources.includes(member.id)} />
+                          </div>
+                        ))}
+                      </div>
+                    </CommandGroup>
+                  )}
                 </CommandList>
               </Command>
             </div>
