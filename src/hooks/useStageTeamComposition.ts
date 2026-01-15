@@ -224,9 +224,7 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
         throw new Error('Missing required data');
       }
 
-      const totalPlannedHours = input.plannedQuantity * input.plannedHoursPerPerson;
       const rateSnapshot = input.rateSnapshot || 0;
-      const totalBudgetAmount = totalPlannedHours * rateSnapshot;
 
       const { error } = await supabase
         .from('project_stage_team_composition')
@@ -238,8 +236,6 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
           planned_quantity: input.plannedQuantity,
           planned_hours_per_person: input.plannedHoursPerPerson,
           rate_snapshot: rateSnapshot,
-          total_planned_hours: totalPlannedHours,
-          total_budget_amount: totalBudgetAmount,
           company_id: company.id
         }, {
           onConflict: 'project_id,stage_id,reference_id,reference_type'
