@@ -201,7 +201,8 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
             firstName: validatedData.firstName,
             lastName: validatedData.lastName,
             companyId: company?.id,
-            role: inviteRole
+            role: inviteRole,
+            avatarUrl: inviteRecord?.avatar_url
           });
           
           // Add role to user_roles table

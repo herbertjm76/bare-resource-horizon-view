@@ -12,6 +12,7 @@ interface UserData {
   lastName?: string;
   companyId?: string;
   role?: string;
+  avatarUrl?: string | null;
 }
 
 interface ProfileData {
@@ -20,6 +21,7 @@ interface ProfileData {
   first_name: string | undefined;
   last_name: string | undefined;
   company_id: string | undefined;
+  avatar_url?: string | null;
 }
 
 /**
@@ -82,6 +84,7 @@ export const ensureUserProfile = async (userId: string, userData?: UserData): Pr
       first_name: userData?.firstName || metaData.first_name,
       last_name: userData?.lastName || metaData.last_name,
       company_id: userData?.companyId || metaData.company_id,
+      avatar_url: userData?.avatarUrl,
     };
     
     logger.debug('Creating profile with data:', profileData);
