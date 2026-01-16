@@ -44,8 +44,8 @@ export const useProjectManagers = () => {
           console.error('Error fetching pending invites:', pendingError);
         }
 
-        // Combine both lists
-        const allApprovers: Approver[] = [
+        // Combine both lists and deduplicate by ID
+        const combinedApprovers: Approver[] = [
           ...(activeUsers || []),
           ...(pendingInvites || []).map(invite => ({
             id: invite.id,
@@ -57,14 +57,22 @@ export const useProjectManagers = () => {
           }))
         ];
 
+        // Deduplicate by ID (keep first occurrence)
+        const uniqueApprovers = combinedApprovers.reduce((acc: Approver[], approver) => {
+          if (!acc.find(a => a.id === approver.id)) {
+            acc.push(approver);
+          }
+          return acc;
+        }, []);
+
         // Sort alphabetically by name
-        allApprovers.sort((a, b) => {
+        uniqueApprovers.sort((a, b) => {
           const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase().trim();
           const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase().trim();
           return nameA.localeCompare(nameB);
         });
 
-        setProjectManagers(allApprovers);
+        setProjectManagers(uniqueApprovers);
       } catch (error) {
         console.error('Error in fetchApprovers:', error);
         setProjectManagers([]);
