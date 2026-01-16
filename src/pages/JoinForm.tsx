@@ -31,13 +31,14 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
   // Pre-fill email from invite code if available
   useEffect(() => {
     const fetchInviteDetails = async () => {
-      if (!inviteCode) return;
+      const trimmed = (inviteCode ?? '').trim();
+      if (!trimmed) return;
 
-      logger.debug('Fetching invite details for code:', inviteCode);
+      logger.debug('Fetching invite details for code:', trimmed);
 
       // Use secure RPC function that only returns invite data when exact code matches
       const { data: invites, error } = await supabase
-        .rpc('get_invite_by_code', { invite_code: inviteCode });
+        .rpc('get_invite_by_code', { invite_code: trimmed });
 
       const invite = invites?.[0];
       logger.debug('Invite data:', invite);
@@ -70,7 +71,11 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
     e.preventDefault();
     setLoading(true);
 
-    const effectiveInviteCode = (inviteCode ?? inviteCodeInput.trim()) || undefined;
+    const effectiveInviteCode = (() => {
+      const raw = inviteCode ?? inviteCodeInput;
+      const trimmed = (raw ?? '').trim();
+      return trimmed.length ? trimmed : undefined;
+    })();
 
     try {
       if (isSignup) {
