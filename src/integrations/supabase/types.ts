@@ -2476,6 +2476,16 @@ export type Database = {
         Args: { user_id_1: string; user_id_2: string }
         Returns: boolean
       }
+      verify_user_role_setup: {
+        Args: { p_user_id: string }
+        Returns: {
+          has_profile: boolean
+          has_role: boolean
+          profile_company_id: string
+          role_company_id: string
+          role_value: string
+        }[]
+      }
     }
     Enums: {
       app_role: "owner" | "admin" | "member" | "project_manager" | "contractor"

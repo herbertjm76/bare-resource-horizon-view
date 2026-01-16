@@ -102,4 +102,44 @@ Use consistent query key patterns with TanStack Query.
 
 ---
 
-*Last updated: 2026-01-12*
+## 5. User Role Management (CRITICAL)
+
+### Problem
+User roles determine access to critical features (ALLOCATE, admin panels, etc.). 
+Roles MUST be persisted in `user_roles` table - NOT in profiles or localStorage.
+If roles are not properly assigned, users lose access to features they should have.
+
+### Architecture
+- Roles are stored in `user_roles` table (never in profiles)
+- RLS on `user_roles` prevents client-side inserts for new users
+- Database triggers handle role assignment automatically via `SECURITY DEFINER`
+
+### Role Assignment Flow
+| Scenario | Role Source | Mechanism |
+|----------|-------------|-----------|
+| Company owner signup | 'owner' | Trigger on profiles insert |
+| Invite acceptance | invite.role | Trigger reads from invites table |
+| Admin adding member | Specified role | Direct insert (admin has permissions) |
+
+### ❌ DON'T DO THIS
+```typescript
+// Client-side role insert will fail for new users due to RLS
+await supabase.from('user_roles').insert({ user_id, role, company_id });
+```
+
+### ✅ DO THIS
+```typescript
+// Roles are set automatically by database triggers
+// Just ensure the invite has the correct role before user claims it
+await supabase.from('invites').update({ role: 'admin' }).eq('id', inviteId);
+```
+
+### Debugging Role Issues
+1. Check `user_roles` table: `SELECT * FROM user_roles WHERE user_id = '<id>'`
+2. If empty, check if trigger failed in Supabase logs
+3. Use `verify_user_role_setup(user_id)` function to debug
+4. Manually fix with: `INSERT INTO user_roles (user_id, company_id, role) VALUES (...)`
+
+---
+
+*Last updated: 2026-01-16*
