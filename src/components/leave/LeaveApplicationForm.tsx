@@ -183,9 +183,9 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
             Apply on behalf of (optional)
           </Label>
           <Select
-            value={onBehalfOfId}
+            value={onBehalfOfId || '_self'}
             onValueChange={(value) => {
-              setOnBehalfOfId(value);
+              setOnBehalfOfId(value === '_self' ? '' : value);
               setMemberSearch('');
             }}
             disabled={isSubmitting}
@@ -206,7 +206,7 @@ export const LeaveApplicationForm: React.FC<LeaveApplicationFormProps> = ({ onSu
                   />
                 </div>
               </div>
-              <SelectItem value="">Myself (default)</SelectItem>
+              <SelectItem value="_self">Myself (default)</SelectItem>
               {teamMembers
                 .filter((member) => {
                   const fullName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
