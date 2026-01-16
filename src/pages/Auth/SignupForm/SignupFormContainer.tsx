@@ -171,14 +171,18 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
           company_id: companyId
         }, { onConflict: 'id' });
       
-      // 4. Add role to user_roles table
-      await supabase
+      // 4. Add role to user_roles table (best-effort; may require confirmed email/session)
+      const { error: roleInsertError } = await supabase
         .from('user_roles')
         .insert({
           user_id: authData.user.id,
           role: userRole,
           company_id: companyId
         });
+
+      if (roleInsertError) {
+        logger.warn('[SignupFormContainer] Could not write user_roles during signup (will be set on first login):', roleInsertError);
+      }
 
       // Show success message
       toast.success('Account created! Please check your email to confirm, then you can log in.');
