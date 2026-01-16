@@ -145,8 +145,18 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
           }
         }
 
-        // Security check: require either a valid invite code OR a matching pre-registered email
-        if (!inviteRecord) {
+        // If no invite found but company exists, allow joining as regular member
+        // This supports open-join companies where anyone can join via the /company/join URL
+        if (!inviteRecord && company?.id) {
+          // Create a virtual invite record for open join
+          inviteRecord = {
+            id: null,
+            company_id: company.id,
+            role: 'member',
+            email: null
+          };
+          logger.debug('Open join - no invite required for company:', company.subdomain);
+        } else if (!inviteRecord) {
           toast.error('No valid invite found. Please use an invite link or enter a valid invite code.');
           setLoading(false);
           return;
@@ -198,8 +208,8 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
               company_id: company?.id
             });
 
-          // Mark invite as accepted if it was used
-          if (inviteRecord) {
+          // Mark invite as accepted if it was a real invite (not open join)
+          if (inviteRecord && inviteRecord.id) {
             await supabase
               .from('invites')
               .update({
