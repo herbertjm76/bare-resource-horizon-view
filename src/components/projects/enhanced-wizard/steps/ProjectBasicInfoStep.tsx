@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProjectForm } from '../../hooks/useProjectForm';
+import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { ProjectWizardData } from '../ProjectSetupWizard';
 
 interface ProjectBasicInfoStepProps {
@@ -12,7 +13,8 @@ interface ProjectBasicInfoStepProps {
 }
 
 export const ProjectBasicInfoStep: React.FC<ProjectBasicInfoStepProps> = ({ data, onUpdate }) => {
-  const { managers, countries, offices } = useProjectForm(null, false, null);
+  const { managers, countries, offices } = useProjectForm(null, true, null);
+  const { project_statuses } = useOfficeSettings();
 
   return (
     <div className="space-y-6">
@@ -92,21 +94,26 @@ export const ProjectBasicInfoStep: React.FC<ProjectBasicInfoStepProps> = ({ data
           <div>
             <Label htmlFor="status">Status</Label>
             <Select 
-              value={data.status === 'In Progress' ? 'Active' : data.status} 
-              onValueChange={(value) => {
-                // Map "Active" display value to "In Progress" database value
-                const dbValue = value === 'Active' ? 'In Progress' : value;
-                onUpdate({ status: dbValue });
-              }}
+              value={data.status} 
+              onValueChange={(value) => onUpdate({ status: value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Planning">Planning</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="On Hold">On Hold</SelectItem>
-                <SelectItem value="Complete">Completed</SelectItem>
+                {project_statuses.length > 0 ? (
+                  project_statuses.map(status => (
+                    <SelectItem key={status.id} value={status.name}>
+                      {status.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="On Hold">On Hold</SelectItem>
+                    <SelectItem value="Completed">Completed</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>
