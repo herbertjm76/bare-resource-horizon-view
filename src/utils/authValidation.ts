@@ -168,11 +168,16 @@ export const joinSchema = z.object({
     .optional(),
   
   /** Invite code from join link (optional) */
-  inviteCode: z.string()
-    .trim()
-    .min(1, { message: "Invite code is required" })
-    .max(100, { message: "Invite code must be less than 100 characters" })
-    .optional(),
+  inviteCode: z.preprocess(
+    (v) => {
+      if (typeof v !== 'string') return v;
+      const trimmed = v.trim();
+      return trimmed.length ? trimmed : undefined;
+    },
+    z.string()
+      .max(100, { message: "Invite code must be less than 100 characters" })
+      .optional()
+  ),
 });
 
 /**
