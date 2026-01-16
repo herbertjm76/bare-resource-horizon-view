@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronRight, CalendarDays, Plus, Settings, Calendar, Users, Pin } from 'lucide-react';
+import { ChevronDown, ChevronRight, CalendarDays, Plus, Settings, Calendar, Users } from 'lucide-react';
+import { PinButton } from '@/components/filters/PinButton';
 import { StageTeamCompositionEditor } from '@/components/projects/team-composition/StageTeamCompositionEditor';
 import { AddProjectStageDialog } from './AddProjectStageDialog';
 import { useQuery } from '@tanstack/react-query';
@@ -207,32 +208,11 @@ export const ProjectPlanningCard: React.FC<ProjectPlanningCardProps> = ({
                 <div className="flex items-center gap-3 min-w-0">
                   {/* Pin button */}
                   {onTogglePin && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onTogglePin(project.id);
-                            }}
-                            className={cn(
-                              "h-7 w-7 shrink-0",
-                              isPinned 
-                                ? "text-primary hover:text-primary/80" 
-                                : "text-muted-foreground/40 hover:text-muted-foreground opacity-0 group-hover:opacity-100",
-                              isPinned && "opacity-100"
-                            )}
-                          >
-                            <Pin className={cn("h-3.5 w-3.5", isPinned && "fill-current")} />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                          {isPinned ? 'Unpin' : 'Pin to top'}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <PinButton
+                      isPinned={isPinned}
+                      onToggle={() => onTogglePin(project.id)}
+                      size="sm"
+                    />
                   )}
                   {isOpen ? (
                     <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
