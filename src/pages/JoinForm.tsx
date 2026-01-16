@@ -70,7 +70,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
     e.preventDefault();
     setLoading(true);
 
-    const effectiveInviteCode = inviteCode ?? inviteCodeInput;
+    const effectiveInviteCode = (inviteCode ?? inviteCodeInput.trim()) || undefined;
 
     try {
       if (isSignup) {
