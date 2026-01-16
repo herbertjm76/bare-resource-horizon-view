@@ -204,15 +204,33 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
             role: inviteRole,
             avatarUrl: inviteRecord?.avatar_url
           });
-          
-          // Add role to user_roles table
-          await supabase
-            .from('user_roles')
-            .insert({
-              user_id: data.user.id,
-              role: inviteRole as any,
-              company_id: company?.id
-            });
+
+          // IMPORTANT: user_roles insert can fail during signUp because email confirmation may mean no session yet.
+          // We do a best-effort insert here, and we will re-attempt on first successful login.
+          if (company?.id) {
+            const { data: existingRoleRow, error: roleCheckError } = await supabase
+              .from('user_roles')
+              .select('id, role')
+              .eq('user_id', data.user.id)
+              .eq('company_id', company.id)
+              .maybeSingle();
+
+            if (roleCheckError) {
+              logger.warn('Failed to check existing user_roles row:', roleCheckError);
+            } else if (!existingRoleRow) {
+              const { error: roleInsertError } = await supabase
+                .from('user_roles')
+                .insert({
+                  user_id: data.user.id,
+                  role: inviteRole as any,
+                  company_id: company.id
+                });
+
+              if (roleInsertError) {
+                logger.warn('Could not write user_roles during sign up (will retry on login):', roleInsertError);
+              }
+            }
+          }
 
           // Mark invite as accepted if it was a real invite (not open join)
           if (inviteRecord && inviteRecord.id) {
@@ -225,7 +243,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
               })
               .eq('id', inviteRecord.id);
           }
-          
+
           toast.success('Account created successfully! Please check your email for verification.');
           navigate(`/${company?.subdomain}/dashboard`);
         }
@@ -324,7 +342,29 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode, o
             throw new Error('You are not a member of this company. Please use a valid invite link.');
           }
         } else {
-          // User already belongs to this company - just login
+          // User already belongs to this company - ensure they have a role row
+          if (company?.id) {
+            const { data: existingRoleRow, error: roleCheckError } = await supabase
+              .from('user_roles')
+              .select('id, role')
+              .eq('user_id', data.user.id)
+              .eq('company_id', company.id)
+              .maybeSingle();
+
+            if (roleCheckError) {
+              logger.warn('Failed to check existing user_roles row:', roleCheckError);
+            } else if (!existingRoleRow) {
+              const desiredRole = (inviteRecord?.role || 'member') as any;
+              const { error: roleInsertError } = await supabase
+                .from('user_roles')
+                .insert({ user_id: data.user.id, company_id: company.id, role: desiredRole });
+
+              if (roleInsertError) {
+                logger.warn('Failed to create user_roles row on login:', roleInsertError);
+              }
+            }
+          }
+
           // Mark invite as accepted if one was used
           if (inviteRecord) {
             await supabase
