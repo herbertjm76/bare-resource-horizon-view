@@ -282,6 +282,10 @@ function AppWithTheme() {
         {/* Help center */}
         <Route path="/help-center" element={<HelpCenter />} />
         
+        {/* Company-scoped join route (alternate format) */}
+        <Route path="/:companySlug/join/:inviteCode?" element={<Join />} />
+        <Route path="/:companySlug/join" element={<Join />} />
+        
         {/* Company landing page with smart redirect */}
         <Route path="/:companySlug" element={<CompanyLanding />} />
         
