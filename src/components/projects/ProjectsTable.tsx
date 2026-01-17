@@ -41,6 +41,27 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   const { getProjectStageFee, isLoading: stagesLoading } = useProjectStages(projects, office_stages);
   const [expandedColumn, setExpandedColumn] = useState<ColumnKey | null>(null);
 
+  // Extract unique filter options - MUST be before early returns
+  const filterOptions = useMemo(() => {
+    const statuses = [...new Set(projects.map(p => p.status).filter(Boolean))];
+    const countries = [...new Set(projects.map(p => p.country).filter(Boolean))];
+    const departments = [...new Set(projects.map(p => p.department).filter(Boolean))];
+    const stages = [...new Set(projects.map(p => p.current_stage).filter(Boolean))];
+    const managers = [...new Set(projects.map(p => {
+      if (p.project_manager) {
+        return `${p.project_manager.first_name || ''} ${p.project_manager.last_name || ''}`.trim();
+      }
+      return null;
+    }).filter(Boolean))] as string[];
+    return { statuses, countries, departments, stages, managers };
+  }, [projects]);
+
+  const handleFilterChange = (key: string, value: string) => {
+    if (onFilterChange) {
+      onFilterChange(key, value);
+    }
+  };
+
   // Only show loading when essential data is loading
   const isTableLoading = loading || stagesLoading || officeLoading;
 
@@ -80,27 +101,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     const totalContraction = expandAmount;
     
     return Math.max(60, thisColumnBase - (totalContraction * contractionRatio));
-  };
-
-  // Extract unique filter options from all projects (not just filtered ones)
-  const filterOptions = useMemo(() => {
-    const statuses = [...new Set(projects.map(p => p.status).filter(Boolean))];
-    const countries = [...new Set(projects.map(p => p.country).filter(Boolean))];
-    const departments = [...new Set(projects.map(p => p.department).filter(Boolean))];
-    const stages = [...new Set(projects.map(p => p.current_stage).filter(Boolean))];
-    const managers = [...new Set(projects.map(p => {
-      if (p.project_manager) {
-        return `${p.project_manager.first_name || ''} ${p.project_manager.last_name || ''}`.trim();
-      }
-      return null;
-    }).filter(Boolean))] as string[];
-    return { statuses, countries, departments, stages, managers };
-  }, [projects]);
-
-  const handleFilterChange = (key: string, value: string) => {
-    if (onFilterChange) {
-      onFilterChange(key, value);
-    }
   };
 
   return (
