@@ -1,11 +1,11 @@
-
-import React, { useState } from 'react';
-import { Table, TableBody } from "@/components/ui/table";
+import React, { useState, useMemo } from 'react';
+import { Table, TableBody, TableHeader } from "@/components/ui/table";
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { useStageColorMap } from './hooks/useProjectColors';
 import { useProjectStages } from '@/hooks/useProjectStages';
 import { ProjectTableHeader } from './table/ProjectTableHeader';
 import { ProjectTableRow } from './table/ProjectTableRow';
+import { ProjectTableFilterRow } from './table/ProjectTableFilterRow';
 
 interface ProjectsTableProps {
   projects: any[];
@@ -17,6 +17,8 @@ interface ProjectsTableProps {
   onSelectProject: (projectId: string) => void;
   refetch: () => void;
   saveSignal?: number;
+  filters?: { [key: string]: string };
+  onFilterChange?: (key: string, value: string) => void;
 }
 
 type ColumnKey = 'code' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
@@ -30,7 +32,9 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   selectedProjects, 
   onSelectProject,
   refetch,
-  saveSignal
+  saveSignal,
+  filters = {},
+  onFilterChange
 }) => {
   const { office_stages = [], loading: officeLoading } = useOfficeSettings();
   const stageColorMap = useStageColorMap(office_stages);
@@ -78,6 +82,27 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     return Math.max(60, thisColumnBase - (totalContraction * contractionRatio));
   };
 
+  // Extract unique filter options from all projects (not just filtered ones)
+  const filterOptions = useMemo(() => {
+    const statuses = [...new Set(projects.map(p => p.status).filter(Boolean))];
+    const countries = [...new Set(projects.map(p => p.country).filter(Boolean))];
+    const departments = [...new Set(projects.map(p => p.department).filter(Boolean))];
+    const stages = [...new Set(projects.map(p => p.current_stage).filter(Boolean))];
+    const managers = [...new Set(projects.map(p => {
+      if (p.project_manager) {
+        return `${p.project_manager.first_name || ''} ${p.project_manager.last_name || ''}`.trim();
+      }
+      return null;
+    }).filter(Boolean))] as string[];
+    return { statuses, countries, departments, stages, managers };
+  }, [projects]);
+
+  const handleFilterChange = (key: string, value: string) => {
+    if (onFilterChange) {
+      onFilterChange(key, value);
+    }
+  };
+
   return (
     <div className="rounded-md border overflow-x-auto">
       <Table>
@@ -92,12 +117,24 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           <col style={{ width: `${getColumnWidth('stage')}px`, transition: 'width 0.3s ease' }} />
           {editMode && <col style={{ width: '96px' }} />}
         </colgroup>
-        <ProjectTableHeader 
-          editMode={editMode} 
-          office_stages={office_stages}
-          expandedColumn={expandedColumn}
-          onColumnClick={setExpandedColumn}
-        />
+        <TableHeader>
+          <ProjectTableHeader 
+            editMode={editMode} 
+            office_stages={office_stages}
+            expandedColumn={expandedColumn}
+            onColumnClick={setExpandedColumn}
+          />
+          <ProjectTableFilterRow
+            editMode={editMode}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            statuses={filterOptions.statuses}
+            countries={filterOptions.countries}
+            departments={filterOptions.departments}
+            stages={filterOptions.stages}
+            managers={filterOptions.managers}
+          />
+        </TableHeader>
         <TableBody>
           {projects.map((project) => (
             <ProjectTableRow

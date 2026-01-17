@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProjectsToolbar from './ProjectsToolbar';
 import ProjectsTable from './ProjectsTable';
 import { useProjects } from '@/hooks/useProjects';
-import { ProjectFilters } from './ProjectFilters';
 import { FilterPopover } from '@/components/filters/FilterPopover';
 import { QuickStatusManager } from '@/components/projects/QuickStatusManager';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,6 +44,27 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
     return projects.filter(project => {
       return Object.entries(filters).every(([key, value]) => {
         if (!value) return true; // Skip empty filters
+        
+        // Text search filters (case-insensitive contains)
+        if (key === 'code') {
+          return project.code?.toLowerCase().includes(value.toLowerCase());
+        }
+        if (key === 'name') {
+          return project.name?.toLowerCase().includes(value.toLowerCase());
+        }
+        
+        // PM filter - match by full name
+        if (key === 'pm') {
+          const pmName = project.project_manager 
+            ? `${project.project_manager.first_name || ''} ${project.project_manager.last_name || ''}`.trim()
+            : '';
+          return pmName === value;
+        }
+        
+        // Stage filter
+        if (key === 'stage') {
+          return project.current_stage === value;
+        }
         
         if (key === 'office') {
           return project.office?.name === value;
@@ -106,7 +126,15 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
     return allFilteredIds.length > 0 && allFilteredIds.every(id => selectedProjects.includes(id));
   }, [filteredProjects, selectedProjects]);
 
-  const handleFilterChange = (value: string, filterKey: string) => {
+  const handleFilterChange = (key: string, value: string) => {
+    const newFilters = {
+      ...filters,
+      [key]: value
+    };
+    setFilters(newFilters);
+  };
+
+  const handleSelectFilterChange = (value: string, filterKey: string) => {
     const newFilters = {
       ...filters,
       [filterKey]: value === "all" ? "" : value
@@ -212,7 +240,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Status</label>
                     <Select 
-                      onValueChange={(value) => handleFilterChange(value, 'status')}
+                      onValueChange={(value) => handleSelectFilterChange(value, 'status')}
                       value={filters.status || "all"}
                     >
                       <SelectTrigger className="w-full">
@@ -232,7 +260,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Country</label>
                     <Select 
-                      onValueChange={(value) => handleFilterChange(value, 'country')}
+                      onValueChange={(value) => handleSelectFilterChange(value, 'country')}
                       value={filters.country || "all"}
                     >
                       <SelectTrigger className="w-full">
@@ -252,7 +280,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Office</label>
                     <Select 
-                      onValueChange={(value) => handleFilterChange(value, 'office')}
+                      onValueChange={(value) => handleSelectFilterChange(value, 'office')}
                       value={filters.office || "all"}
                     >
                       <SelectTrigger className="w-full">
@@ -295,13 +323,6 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Desktop filters - only show on desktop */}
-          <div className="hidden lg:block">
-            <ProjectFilters 
-              onFilterChange={setFilters} 
-              currentFilters={filters}
-            />
-          </div>
           <ProjectsTable 
             projects={filteredProjects} 
             loading={isLoading} 
@@ -312,6 +333,8 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
             onSelectProject={handleSelectProject}
             refetch={refetch}
             saveSignal={saveSignal}
+            filters={filters}
+            onFilterChange={handleFilterChange}
           />
         </CardContent>
 
