@@ -219,23 +219,14 @@ const TeamMemberSection: React.FC<TeamMemberSectionProps> = ({
             return;
           }
 
-          // Replace role in user_roles for that company
+          // UPSERT role in user_roles (safe, atomic operation)
           savePromises.push(
-            (async () => {
-              const del = await supabase
-                .from('user_roles')
-                .delete()
-                .eq('user_id', memberId)
-                .eq('company_id', companyId);
-
-              if (del.error) return del;
-
-              const ins = await supabase
-                .from('user_roles')
-                .insert({ user_id: memberId, company_id: companyId, role: role as any });
-
-              return ins;
-            })()
+            supabase
+              .from('user_roles')
+              .upsert(
+                { user_id: memberId, company_id: companyId, role: role as any },
+                { onConflict: 'user_id,company_id' }
+              )
           );
         }
       });
