@@ -147,6 +147,33 @@ if (existingRole) {
 | Invite acceptance | invite.role | Trigger reads from invites table |
 | Admin adding member | Specified role | Direct insert (admin has permissions) |
 
+### Invite Role Requirements
+- ALL invites (email or pre-registered) MUST have a role assigned
+- Database enforces NOT NULL constraint on `invites.role` with default 'member'
+- Owner/admin can pre-assign any role ('member', 'admin') before user registers
+- When user claims invite via generic company link, they inherit the invite's role
+
+### Role Update Pattern
+- **NEVER** use delete-then-insert pattern for role changes (can leave users without roles)
+- **ALWAYS** use UPSERT with onConflict handling:
+
+```typescript
+// ✅ CORRECT - Use upsert to safely update roles
+await supabase
+  .from('user_roles')
+  .upsert({
+    user_id: memberData.id,
+    role: memberData.role,
+    company_id: companyId
+  }, { 
+    onConflict: 'user_id,company_id' 
+  });
+
+// ❌ FORBIDDEN - Never delete then insert
+await supabase.from('user_roles').delete().eq('user_id', id);
+await supabase.from('user_roles').insert({ user_id: id, role, company_id });
+```
+
 ### ❌ DON'T DO THIS
 ```typescript
 // Client-side role insert will fail for new users due to RLS
@@ -168,4 +195,4 @@ await supabase.from('invites').update({ role: 'admin' }).eq('id', inviteId);
 
 ---
 
-*Last updated: 2026-01-16*
+*Last updated: 2026-01-17*

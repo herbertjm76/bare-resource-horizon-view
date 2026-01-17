@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTeamInvites } from '@/hooks/useTeamInvites';
 import { toast } from 'sonner';
 import { Invite } from './types';
@@ -26,6 +27,7 @@ interface InviteeData {
   email: string;
   firstName: string;
   lastName: string;
+  role: 'member' | 'admin';
 }
 
 const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
@@ -34,7 +36,7 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
   companyId,
   currentInvite
 }) => {
-  const [invitees, setInvitees] = useState<InviteeData[]>([{ email: '', firstName: '', lastName: '' }]);
+  const [invitees, setInvitees] = useState<InviteeData[]>([{ email: '', firstName: '', lastName: '', role: 'member' }]);
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const { handleSendInvite, setInviteEmail, invLoading } = useTeamInvites(companyId);
@@ -44,11 +46,12 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
       setInvitees([{
         email: currentInvite.email || '',
         firstName: currentInvite.first_name || '',
-        lastName: currentInvite.last_name || ''
+        lastName: currentInvite.last_name || '',
+        role: (currentInvite.role as 'member' | 'admin') || 'member'
       }]);
       setIsEditing(true);
     } else {
-      setInvitees([{ email: '', firstName: '', lastName: '' }]);
+      setInvitees([{ email: '', firstName: '', lastName: '', role: 'member' }]);
       setIsEditing(false);
     }
   }, [currentInvite, isOpen]);
@@ -73,7 +76,8 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
         .update({
           email: invitees[0].email,
           first_name: invitees[0].firstName || null,
-          last_name: invitees[0].lastName || null
+          last_name: invitees[0].lastName || null,
+          role: invitees[0].role
         })
         .eq('id', currentInvite.id);
       
@@ -102,20 +106,20 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
     
     for (const invitee of validInvitees) {
       setInviteEmail(invitee.email.trim());
-      const success = await handleSendInvite(e, invitee.firstName.trim(), invitee.lastName.trim());
+      const success = await handleSendInvite(e, invitee.firstName.trim(), invitee.lastName.trim(), invitee.role);
       if (success) successCount++;
     }
     
     if (successCount > 0) {
       toast.success(`Successfully sent ${successCount} invitation${successCount > 1 ? 's' : ''}`);
-      setInvitees([{ email: '', firstName: '', lastName: '' }]);
+      setInvitees([{ email: '', firstName: '', lastName: '', role: 'member' }]);
       onClose();
     }
   };
 
   const addInvitee = () => {
     if (!isEditing) {
-      setInvitees([...invitees, { email: '', firstName: '', lastName: '' }]);
+      setInvitees([...invitees, { email: '', firstName: '', lastName: '', role: 'member' }]);
     }
   };
 
@@ -139,27 +143,44 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
         <form onSubmit={handleInvite} className="space-y-4">
           <div className="space-y-4">
             {invitees.map((invitee, index) => (
-              <div key={index} className="grid grid-cols-3 gap-2">
-                <Input
-                  placeholder="Email"
-                  type="email"
-                  value={invitee.email}
-                  onChange={(e) => updateInvitee(index, 'email', e.target.value)}
-                  className="col-span-3 sm:col-span-1"
-                  disabled={isEditing && currentInvite?.status !== 'pending'}
-                />
-                <Input
-                  placeholder="First Name"
-                  value={invitee.firstName}
-                  onChange={(e) => updateInvitee(index, 'firstName', e.target.value)}
-                  className="col-span-3 sm:col-span-1"
-                />
-                <Input
-                  placeholder="Last Name"
-                  value={invitee.lastName}
-                  onChange={(e) => updateInvitee(index, 'lastName', e.target.value)}
-                  className="col-span-3 sm:col-span-1"
-                />
+              <div key={index} className="space-y-2">
+                <div className="grid grid-cols-3 gap-2">
+                  <Input
+                    placeholder="Email"
+                    type="email"
+                    value={invitee.email}
+                    onChange={(e) => updateInvitee(index, 'email', e.target.value)}
+                    className="col-span-3 sm:col-span-1"
+                    disabled={isEditing && currentInvite?.status !== 'pending'}
+                  />
+                  <Input
+                    placeholder="First Name"
+                    value={invitee.firstName}
+                    onChange={(e) => updateInvitee(index, 'firstName', e.target.value)}
+                    className="col-span-3 sm:col-span-1"
+                  />
+                  <Input
+                    placeholder="Last Name"
+                    value={invitee.lastName}
+                    onChange={(e) => updateInvitee(index, 'lastName', e.target.value)}
+                    className="col-span-3 sm:col-span-1"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Role:</span>
+                  <Select 
+                    value={invitee.role} 
+                    onValueChange={(value) => updateInvitee(index, 'role', value)}
+                  >
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="member">Member</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             ))}
           </div>

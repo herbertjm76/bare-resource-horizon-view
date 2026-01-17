@@ -162,7 +162,7 @@ export type Database = {
           location: string | null
           office_role_id: string | null
           practice_area: string | null
-          role: string | null
+          role: string
           status: string
           updated_at: string | null
           weekly_capacity: number | null
@@ -185,7 +185,7 @@ export type Database = {
           location?: string | null
           office_role_id?: string | null
           practice_area?: string | null
-          role?: string | null
+          role?: string
           status?: string
           updated_at?: string | null
           weekly_capacity?: number | null
@@ -208,7 +208,7 @@ export type Database = {
           location?: string | null
           office_role_id?: string | null
           practice_area?: string | null
-          role?: string | null
+          role?: string
           status?: string
           updated_at?: string | null
           weekly_capacity?: number | null

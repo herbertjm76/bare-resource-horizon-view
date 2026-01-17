@@ -9,7 +9,7 @@ export const useTeamInvites = (companyId: string | undefined) => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [invLoading, setInvLoading] = useState(false);
 
-  const handleSendInvite = async (e: React.FormEvent, firstName?: string, lastName?: string) => {
+  const handleSendInvite = async (e: React.FormEvent, firstName?: string, lastName?: string, role: string = 'member') => {
     e.preventDefault();
     setInvLoading(true);
 
@@ -37,7 +37,8 @@ export const useTeamInvites = (companyId: string | undefined) => {
           first_name: firstName || null,
           last_name: lastName || null,
           invitation_type: 'email_invite',
-          status: 'pending'
+          status: 'pending',
+          role: role  // Use the provided role (default 'member')
         })
         .select()
         .single();
