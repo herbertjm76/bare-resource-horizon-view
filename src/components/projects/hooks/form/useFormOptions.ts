@@ -46,23 +46,23 @@ export const useFormOptions = (company: any, isOpen: boolean) => {
       }
       
       try {
-        // Fetch only users with project_manager role
-        const { data: projectManagerRoles } = await supabase
+        // Fetch users with project_manager, owner, or admin roles
+        const { data: managerRoles } = await supabase
           .from('user_roles')
           .select('user_id')
           .eq('company_id', company.id)
-          .eq('role', 'project_manager');
+          .in('role', ['project_manager', 'owner', 'admin']);
 
-        const projectManagerIds = (projectManagerRoles || []).map(r => r.user_id);
+        const managerIds = (managerRoles || []).map(r => r.user_id);
 
         let mgrs: Array<{ id: string; first_name: string | null; last_name: string | null }> = [];
         
-        if (projectManagerIds.length > 0) {
+        if (managerIds.length > 0) {
           const { data: profiles } = await supabase
             .from('profiles')
             .select('id, first_name, last_name')
             .eq('company_id', company.id)
-            .in('id', projectManagerIds);
+            .in('id', managerIds);
           
           mgrs = profiles || [];
         }
