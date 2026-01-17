@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useForm } from 'react-hook-form';
 import { Profile, PendingMember, TeamMember } from './types';
 import MemberForm from './memberDialog/MemberForm';
-import { MemberFormData } from './memberDialog/types';
+import { MemberFormData, AppRole } from './memberDialog/types';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { logger } from '@/utils/logger';
 
@@ -52,11 +52,13 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
       
       // Pre-fill form with member data if editing
       // weekly_capacity: null/undefined = use company default, number = exception
+      // role: use the actual role from member data (fetched from user_roles table)
+      const memberRole = (member.role as AppRole) || 'member';
       reset({
         first_name: member.first_name || '',
         last_name: member.last_name || '',
         email: member.email,
-        role: 'member', // Default role for form, actual role managed in user_roles table
+        role: memberRole, // Use actual role from user_roles, fallback to member
         department: member.department || '',
         location: member.location || 'Unassigned',
         job_title: member.job_title || '',

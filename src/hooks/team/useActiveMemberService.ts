@@ -40,23 +40,18 @@ export const useActiveMemberService = (companyId: string | undefined) => {
       }
 
       // Update role in user_roles table if role is provided
+      // Use UPSERT to prevent role loss (never delete-then-insert)
       if (memberData.role) {
         logger.log('Updating user role to:', memberData.role);
         
-        // First, delete existing roles for this user in this company
-        await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', memberData.id)
-          .eq('company_id', companyId);
-
-        // Then insert the new role
         const { error: roleError } = await supabase
           .from('user_roles')
-          .insert({
+          .upsert({
             user_id: memberData.id,
             role: memberData.role as AppRole,
             company_id: companyId
+          }, { 
+            onConflict: 'user_id,company_id' 
           });
 
         if (roleError) {
