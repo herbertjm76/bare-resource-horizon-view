@@ -46,12 +46,12 @@ export const useFormOptions = (company: any, isOpen: boolean) => {
       }
       
       try {
-        // Fetch users with project_manager, owner, or admin roles
+        // Fetch users with project_manager or owner roles
         const { data: managerRoles } = await supabase
           .from('user_roles')
           .select('user_id')
           .eq('company_id', company.id)
-          .in('role', ['project_manager', 'owner', 'admin']);
+          .in('role', ['project_manager', 'owner']);
 
         const managerIds = (managerRoles || []).map(r => r.user_id);
 
@@ -73,7 +73,7 @@ export const useFormOptions = (company: any, isOpen: boolean) => {
           .select('id, first_name, last_name, role')
           .eq('company_id', company.id)
           .eq('status', 'pending')
-          .in('role', ['project_manager', 'owner', 'admin']);
+          .in('role', ['project_manager', 'owner']);
 
         const pendingMgrs = (pendingManagerInvites || []).map(invite => ({
           id: invite.id,
