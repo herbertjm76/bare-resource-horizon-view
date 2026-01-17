@@ -46,17 +46,31 @@ export const useFormOptions = (company: any, isOpen: boolean) => {
       }
       
       try {
-        const { data: mgrs } = await supabase
-          .from('profiles')
-          .select('id, first_name, last_name')
-          .eq('company_id', company.id);
+        // Fetch only users with project_manager role
+        const { data: projectManagerRoles } = await supabase
+          .from('user_roles')
+          .select('user_id')
+          .eq('company_id', company.id)
+          .eq('role', 'project_manager');
 
-        setManagers(Array.isArray(mgrs)
-          ? mgrs.map(u => ({ 
-              id: u.id, 
-              name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() 
-            }))
-          : []);
+        const projectManagerIds = (projectManagerRoles || []).map(r => r.user_id);
+
+        let mgrs: Array<{ id: string; first_name: string | null; last_name: string | null }> = [];
+        
+        if (projectManagerIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, first_name, last_name')
+            .eq('company_id', company.id)
+            .in('id', projectManagerIds);
+          
+          mgrs = profiles || [];
+        }
+
+        setManagers(mgrs.map(u => ({ 
+          id: u.id, 
+          name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() 
+        })));
 
         const { data: projectAreas } = await supabase
           .from('project_areas')
