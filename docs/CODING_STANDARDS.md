@@ -109,6 +109,32 @@ User roles determine access to critical features (ALLOCATE, admin panels, etc.).
 Roles MUST be persisted in `user_roles` table - NOT in profiles or localStorage.
 If roles are not properly assigned, users lose access to features they should have.
 
+### ⚠️ ABSOLUTE RULE: NEVER MODIFY ROLES OF EXISTING PROFILES
+**Once a user has a role in `user_roles`, that role MUST NOT be changed or deleted by application code.**
+
+- Roles are assigned ONCE during user creation (via database trigger)
+- Role changes require explicit admin action through dedicated admin UI
+- NEVER overwrite, update, or delete existing role records in application logic
+- If a user already has a role, skip any role assignment code
+
+```typescript
+// ❌ FORBIDDEN - Never do this in application code
+await supabase.from('user_roles').update({ role: 'member' }).eq('user_id', id);
+await supabase.from('user_roles').delete().eq('user_id', id);
+
+// ✅ CORRECT - Check if role exists first, skip if it does
+const { data: existingRole } = await supabase
+  .from('user_roles')
+  .select('id')
+  .eq('user_id', userId)
+  .single();
+
+if (existingRole) {
+  // User already has a role - DO NOTHING
+  return;
+}
+```
+
 ### Architecture
 - Roles are stored in `user_roles` table (never in profiles)
 - RLS on `user_roles` prevents client-side inserts for new users
