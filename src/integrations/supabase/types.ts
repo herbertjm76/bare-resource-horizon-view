@@ -2326,6 +2326,10 @@ export type Database = {
           total_spent: number
         }[]
       }
+      check_is_admin_for_user_roles: {
+        Args: { check_company_id: string }
+        Returns: boolean
+      }
       check_subdomain_available: {
         Args: { subdomain_param: string }
         Returns: boolean
