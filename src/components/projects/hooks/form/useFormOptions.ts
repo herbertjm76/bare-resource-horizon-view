@@ -67,10 +67,27 @@ export const useFormOptions = (company: any, isOpen: boolean) => {
           mgrs = profiles || [];
         }
 
-        setManagers(mgrs.map(u => ({ 
-          id: u.id, 
-          name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() 
-        })));
+        // Also fetch pending/pre-registered invites with manager roles
+        const { data: pendingManagerInvites } = await supabase
+          .from('invites')
+          .select('id, first_name, last_name, role')
+          .eq('company_id', company.id)
+          .eq('status', 'pending')
+          .in('role', ['project_manager', 'owner', 'admin']);
+
+        const pendingMgrs = (pendingManagerInvites || []).map(invite => ({
+          id: invite.id,
+          name: `${invite.first_name ?? ''} ${invite.last_name ?? ''}`.trim()
+        }));
+
+        // Combine active managers and pre-registered managers
+        setManagers([
+          ...mgrs.map(u => ({ 
+            id: u.id, 
+            name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() 
+          })),
+          ...pendingMgrs
+        ]);
 
         const { data: projectAreas } = await supabase
           .from('project_areas')
