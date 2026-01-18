@@ -139,8 +139,11 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
       <div className="overflow-x-auto scrollbar-grey">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="border-b border-border bg-primary/5">
-              <th className="sticky left-0 z-20 w-40 min-w-40 bg-primary/10 text-left px-3 py-2 font-semibold text-sm text-foreground">
+            <tr className="border-b border-border" style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}>
+              <th 
+                className="sticky left-0 z-20 w-40 min-w-40 text-left px-3 py-2 font-semibold text-sm text-foreground"
+                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}
+              >
                 Team Member
               </th>
               {days.map((day, idx) => (
@@ -148,24 +151,37 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                   key={day.date} 
                   className={`
                     w-8 min-w-8 text-center font-medium px-0.5 py-1.5
-                    ${day.isWeekend ? 'bg-muted/50 text-muted-foreground' : 'bg-primary/5 text-foreground'}
+                    ${day.isWeekend ? 'bg-muted/50 text-muted-foreground' : 'text-foreground'}
                     ${day.isSunday ? 'border-l-2 border-border' : ''}
-                    ${day.isToday ? 'bg-primary/20' : ''}
-                    ${day.isNewMonth && idx > 0 ? 'border-l-2 border-primary/30' : ''}
+                    ${day.isNewMonth && idx > 0 ? 'border-l-2' : ''}
                   `}
+                  style={{
+                    backgroundColor: day.isToday 
+                      ? 'hsl(var(--theme-primary) / 0.2)' 
+                      : day.isWeekend 
+                        ? undefined 
+                        : 'hsl(var(--theme-primary) / 0.05)',
+                    borderColor: day.isNewMonth && idx > 0 ? 'hsl(var(--theme-primary) / 0.3)' : undefined
+                  }}
                 >
                   <div className="flex flex-col items-center leading-tight">
                     {day.isNewMonth && idx > 0 && (
-                      <span className="text-[8px] text-primary font-semibold">{day.month}</span>
+                      <span className="text-[8px] font-semibold" style={{ color: 'hsl(var(--theme-primary))' }}>{day.month}</span>
                     )}
                     <span className="text-[10px] opacity-60">{day.dayName}</span>
-                    <span className={`text-xs font-semibold ${day.isToday ? 'text-primary' : ''}`}>
+                    <span 
+                      className="text-xs font-semibold"
+                      style={{ color: day.isToday ? 'hsl(var(--theme-primary))' : undefined }}
+                    >
                       {day.day}
                     </span>
                   </div>
                 </th>
               ))}
-              <th className="w-14 min-w-14 bg-primary/10 text-center px-2 py-2 font-semibold text-xs text-foreground border-l border-border">
+              <th 
+                className="w-14 min-w-14 text-center px-2 py-2 font-semibold text-xs text-foreground border-l border-border"
+                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}
+              >
                 Total
               </th>
             </tr>
@@ -179,16 +195,31 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
               return (
                 <tr 
                   key={member.id} 
-                  className={`
-                    group hover:bg-primary/10 transition-colors
-                    ${memberIndex % 2 === 0 ? 'bg-background' : 'bg-primary/[0.02]'}
-                  `}
+                  className="group transition-colors"
+                  style={{ 
+                    backgroundColor: memberIndex % 2 === 0 
+                      ? 'hsl(var(--background))' 
+                      : 'hsl(var(--theme-primary) / 0.02)'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = memberIndex % 2 === 0 
+                    ? 'hsl(var(--background))' 
+                    : 'hsl(var(--theme-primary) / 0.02)'}
                 >
-                  <td className="sticky left-0 z-10 px-3 py-1.5 border-r border-border bg-primary/5">
+                  <td 
+                    className="sticky left-0 z-10 px-3 py-1.5 border-r border-border"
+                    style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}
+                  >
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6 shrink-0">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback className="bg-primary text-primary-foreground text-[10px] font-medium">
+                        <AvatarFallback 
+                          className="text-[10px] font-medium"
+                          style={{ 
+                            backgroundColor: 'hsl(var(--theme-primary))', 
+                            color: 'white' 
+                          }}
+                        >
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>
@@ -222,10 +253,15 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                           text-center p-0.5 h-8
                           ${day.isWeekend ? 'bg-muted/30' : ''}
                           ${day.isSunday ? 'border-l-2 border-border' : ''}
-                          ${day.isToday ? 'bg-primary/5' : ''}
-                          ${day.isNewMonth && idx > 0 ? 'border-l-2 border-primary/30' : ''}
-                          ${isAdmin ? 'cursor-pointer hover:bg-primary/10 transition-colors' : ''}
+                          ${day.isNewMonth && idx > 0 ? 'border-l-2' : ''}
+                          ${isAdmin ? 'cursor-pointer transition-colors' : ''}
                         `}
+                        style={{
+                          backgroundColor: day.isToday ? 'hsl(var(--theme-primary) / 0.08)' : undefined,
+                          borderColor: day.isNewMonth && idx > 0 ? 'hsl(var(--theme-primary) / 0.3)' : undefined
+                        }}
+                        onMouseEnter={isAdmin ? (e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.1)' : undefined}
+                        onMouseLeave={isAdmin ? (e) => e.currentTarget.style.backgroundColor = day.isToday ? 'hsl(var(--theme-primary) / 0.08)' : '' : undefined}
                         onClick={handleCellClick}
                       >
                       {hasLeave ? (
@@ -328,7 +364,11 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                     {totalHours > 0 ? (
                       <Badge 
                         variant="secondary" 
-                        className="text-xs px-1.5 py-0 bg-primary/10 text-primary font-bold"
+                        className="text-xs px-1.5 py-0 font-bold"
+                        style={{ 
+                          backgroundColor: 'hsl(var(--theme-primary) / 0.1)', 
+                          color: 'hsl(var(--theme-primary))' 
+                        }}
                       >
                         {totalHours}h
                       </Badge>
