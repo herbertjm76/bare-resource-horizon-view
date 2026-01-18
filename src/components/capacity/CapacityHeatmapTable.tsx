@@ -25,26 +25,24 @@ export const CapacityHeatmapTable: React.FC<CapacityHeatmapTableProps> = ({
   return (
     <TooltipProvider>
       <div 
-        className="workload-resource-grid-container center-aligned border rounded-lg bg-card shadow-sm overflow-hidden"
+        className="workload-resource-grid-container center-aligned border rounded-lg bg-card shadow-sm"
         style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'flex-start'
+          display: 'inline-block',
+          overflow: 'hidden'
         }}
       >
-        <div className="workload-resource-table-wrapper" style={{ width: 'auto', maxWidth: '100%', overflow: 'visible' }}>
-          <table 
-            className="workload-resource-table"
-            style={{ 
-              width: shouldCenterAlign ? `${tableWidth}px` : '100%',
-              minWidth: `${tableWidth}px`,
-              borderCollapse: 'separate',
-              borderSpacing: '0',
-              background: 'hsl(var(--card))',
-              margin: '0',
-              tableLayout: 'fixed'
-            }}
-          >
+        <table 
+          className="workload-resource-table"
+          style={{ 
+            width: `${tableWidth}px`,
+            minWidth: `${tableWidth}px`,
+            borderCollapse: 'separate',
+            borderSpacing: '0',
+            background: 'hsl(var(--card))',
+            margin: '0',
+            tableLayout: 'fixed'
+          }}
+        >
             <WorkloadCalendarHeader 
               weekStartDates={weekStartDates} 
               shouldCenterAlign={shouldCenterAlign}
@@ -63,11 +61,10 @@ export const CapacityHeatmapTable: React.FC<CapacityHeatmapTableProps> = ({
                     memberWeeklyData={memberWeeklyData}
                     shouldCenterAlign={shouldCenterAlign}
                   />
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </TooltipProvider>
   );
