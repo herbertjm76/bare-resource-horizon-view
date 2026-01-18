@@ -32,7 +32,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
             padding: '12px 16px',
             borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
             borderBottom: '1px solid hsl(var(--border))',
-            fontWeight: '600'
+            fontWeight: '600',
+            borderTopLeftRadius: '0.5rem'
           }}
         >
           Team Member
@@ -157,12 +158,12 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
             maxWidth: '120px',
             textAlign: 'center',
             padding: '12px 8px',
-            borderRight: '1px solid hsl(var(--border) / 0.5)',
             borderLeft: '2px solid hsl(var(--theme-primary) / 0.15)',
             borderBottom: '1px solid hsl(var(--border))',
             fontWeight: '600',
             backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
-            color: 'hsl(var(--foreground))'
+            color: 'hsl(var(--foreground))',
+            borderTopRightRadius: '0.5rem'
           }}
         >
           Total Utilization ({weekCount} {weekText})
