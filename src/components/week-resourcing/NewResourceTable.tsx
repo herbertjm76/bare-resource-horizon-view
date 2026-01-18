@@ -53,91 +53,55 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   }, [projects, members, allocationMap]);
   
   const tableClassName = viewMode === 'compact' 
-    ? 'resource-table-compact weekly-table' 
-    : 'resource-table-expanded weekly-table';
+    ? 'resource-table-compact weekly-table enhanced-table' 
+    : 'resource-table-expanded weekly-table enhanced-table';
 
-  const containerClassName = viewMode === 'compact'
-    ? 'resource-table-compact-container'
-    : 'resource-table-expanded-container';
-
-  // Header styles matching Team Leave benchmark
-  const headerStyle = {
-    backgroundColor: 'hsl(var(--theme-primary))',
-    color: 'white'
-  };
-
-  const stickyHeaderStyle = {
-    ...headerStyle,
-    backgroundColor: 'hsl(var(--theme-primary))',
-  };
-
+  // Use Team Leave benchmark container framing
   return (
-    <div className={containerClassName}>
-      <Table className={`${tableClassName} min-w-full`} style={{ minWidth: 1200 }}>
+    <div className="enhanced-table-scroll">
+      <div className="enhanced-table-container">
+        <Table className={`${tableClassName} min-w-full`} style={{ minWidth: 1200 }}>
           <TableHeader>
-            <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary))' }} className="border-b border-border">
+            <TableRow>
               {/* Team Member Column */}
-              <TableHead 
-                className="text-center font-semibold sticky left-0 z-20 border-r text-sm" 
-                style={{ 
-                  width: 180, 
-                  minWidth: 180, 
-                  ...stickyHeaderStyle,
-                  borderRightWidth: '2px',
-                  borderRightColor: 'rgba(255,255,255,0.2)'
-                }}
+              <TableHead
+                className="text-center font-semibold sticky left-0 z-20 border-r text-sm name-column"
+                style={{ width: 180, minWidth: 180 }}
               >
                 Team Member
               </TableHead>
-              
+
               {/* Utilization Column */}
-              <TableHead 
-                className="text-center font-semibold border-r text-sm" 
-                style={{ 
-                  width: 200, 
-                  minWidth: 200, 
-                  ...headerStyle,
-                  borderRightColor: 'rgba(255,255,255,0.2)'
-                }}
+              <TableHead
+                className="text-center font-semibold border-r text-sm"
+                style={{ width: 200, minWidth: 200 }}
               >
                 Total Utilization (1 week)
               </TableHead>
-              
+
               {/* Project Count Column */}
-              <TableHead 
-                className="text-center font-semibold border-r text-sm" 
-                style={{ 
-                  width: 35, 
-                  minWidth: 35, 
-                  ...headerStyle,
-                  borderRightColor: 'rgba(255,255,255,0.2)'
-                }}
+              <TableHead
+                className="text-center font-semibold border-r text-sm"
+                style={{ width: 35, minWidth: 35 }}
               >
                 Projects
               </TableHead>
-              
+
               {/* Project Columns with Rotated Text - Only show projects with hours */}
               {projectsWithHours.map((project) => (
-                <TableHead 
-                  key={project.id} 
+                <TableHead
+                  key={project.id}
                   className="text-center font-semibold border-r relative text-sm"
-                  style={{ 
-                    width: 35, 
-                    minWidth: 35, 
-                    height: 120, 
-                  ...headerStyle,
-                  borderRightColor: 'rgba(255,255,255,0.2)'
-                }}
-              >
+                  style={{ width: 35, minWidth: 35, height: 120 }}
+                >
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div 
+                    <div
                       className="transform -rotate-90 whitespace-nowrap text-xs font-medium"
-                      style={{ 
+                      style={{
                         transformOrigin: 'center',
                         maxWidth: '100px',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        color: 'white'
                       }}
                       title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
                     >
@@ -173,7 +137,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               members={members}
             />
           </TableBody>
-      </Table>
+        </Table>
+      </div>
     </div>
   );
 };
