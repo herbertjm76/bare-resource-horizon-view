@@ -66,12 +66,12 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     >
       <TableHeader>
         <TableRow className="border-b border-border bg-muted">
-          {/* Team Member Column - 50px */}
+          {/* Team Member Column - 150px */}
           <TableHead 
-            className="sticky left-0 z-20 text-center px-1 py-3 font-semibold text-sm text-foreground bg-muted"
-            style={{ width: 50, minWidth: 50, maxWidth: 50 }}
+            className="sticky left-0 z-20 text-left px-3 py-3 font-semibold text-sm text-foreground bg-muted"
+            style={{ width: 150, minWidth: 150, maxWidth: 150 }}
           >
-            Team
+            Team Member
           </TableHead>
 
           {/* Utilization Column - Fixed 120px */}
