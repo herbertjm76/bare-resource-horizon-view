@@ -52,8 +52,19 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
         return (
           <React.Fragment key={office}>
             {/* Office Header Row */}
-            <TableRow className="group-header-row">
-              <TableCell colSpan={5 + projects.length} className="font-semibold">
+            <TableRow 
+              className="group-header-row"
+              style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.08)' }}
+            >
+              <TableCell 
+                colSpan={5 + projects.length} 
+                className="font-semibold"
+                style={{ 
+                  backgroundColor: 'hsl(var(--theme-primary) / 0.08)',
+                  color: 'hsl(var(--foreground))',
+                  borderBottom: '1px solid hsl(var(--theme-primary) / 0.15)'
+                }}
+              >
                 {getOfficeDisplay(office)} ({officeMembers.length} members)
               </TableCell>
             </TableRow>
@@ -77,14 +88,34 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                 return 'bg-red-100 text-red-800 border-red-200';
               };
 
+              // Theme-based alternating row colors
+              const rowBgColor = memberIndex % 2 === 0 
+                ? 'hsl(var(--background))' 
+                : 'hsl(var(--theme-primary) / 0.02)';
+
               return (
-                <TableRow key={member.id} className={`member-row ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
+                <TableRow 
+                  key={member.id} 
+                  className="member-row transition-colors"
+                  style={{ backgroundColor: rowBgColor }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
+                >
                   {/* Member Name */}
-                  <TableCell className="sticky left-0 z-10 bg-inherit pl-3">
+                  <TableCell 
+                    className="sticky left-0 z-10 pl-3"
+                    style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}
+                  >
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback style={{ background: 'hsl(var(--gradient-start))' }} className="text-white text-xs">
+                        <AvatarFallback 
+                          className="text-xs"
+                          style={{ 
+                            backgroundColor: 'hsl(var(--theme-primary))',
+                            color: 'white'
+                          }}
+                        >
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>
@@ -92,7 +123,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                         <span className="font-medium text-sm">
                           {member.first_name} {member.last_name}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-muted-foreground">
                           {member.department || 'N/A'}
                         </span>
                       </div>

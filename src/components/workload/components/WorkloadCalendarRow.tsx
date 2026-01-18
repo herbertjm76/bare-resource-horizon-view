@@ -42,9 +42,23 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
     return utilization > 100;
   });
 
+  // Theme-based alternating row colors
+  const rowBgColor = memberIndex % 2 === 0 
+    ? 'hsl(var(--background))' 
+    : 'hsl(var(--theme-primary) / 0.02)';
+
   return (
     <TooltipProvider>
-      <tr className="workload-grid-row workload-grid-row-compact" style={{ height: '28px', minHeight: '28px' }}>
+      <tr 
+        className="workload-grid-row workload-grid-row-compact transition-colors" 
+        style={{ 
+          height: '28px', 
+          minHeight: '28px',
+          backgroundColor: rowBgColor
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
+      >
         <MemberInfoCell 
           member={member} 
           memberIndex={memberIndex} 

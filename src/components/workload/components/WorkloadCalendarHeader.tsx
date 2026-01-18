@@ -12,14 +12,16 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
 }) => {
   const weekCount = weekStartDates.length;
   const weekText = weekCount === 1 ? 'week' : 'weeks';
+  
   return (
     <thead>
-      <tr style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
+      <tr style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}>
         {/* Team Member column - Fixed width, conditionally sticky */}
         <th 
-          className="workload-grid-header member-column text-white"
+          className="workload-grid-header member-column"
           style={{ 
-            background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))',
+            backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
+            color: 'hsl(var(--foreground))',
             width: '250px',
             minWidth: '250px',
             maxWidth: '250px',
@@ -28,8 +30,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
             zIndex: shouldCenterAlign ? 25 : 30,
             textAlign: 'left',
             padding: '12px 16px',
-            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
+            borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
+            borderBottom: '1px solid hsl(var(--border))',
             fontWeight: '600'
           }}
         >
@@ -45,21 +47,25 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
           return (
             <th 
               key={week.key}
-              className="workload-grid-header week-column text-white"
+              className="workload-grid-header week-column"
               style={{ 
                 width: '30px', 
                 minWidth: '30px',
                 maxWidth: '30px',
                 textAlign: 'center',
                 padding: '4px 2px',
-                borderRight: '1px solid rgba(255, 255, 255, 0.2)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
-                borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined,
+                borderRight: '1px solid hsl(var(--border) / 0.5)',
+                borderBottom: '1px solid hsl(var(--border))',
+                borderLeft: isNewMonth ? '2px solid hsl(var(--theme-primary) / 0.4)' : undefined,
                 fontSize: '12px',
                 fontWeight: '600',
                 height: '80px',
                 position: 'relative',
-                overflow: 'visible'
+                overflow: 'visible',
+                backgroundColor: isTodayWeek 
+                  ? 'hsl(var(--theme-primary) / 0.2)' 
+                  : 'hsl(var(--theme-primary) / 0.05)',
+                color: 'hsl(var(--foreground))'
               }}
             >
               <div style={{ 
@@ -76,7 +82,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
                       fontWeight: '700', 
                       textTransform: 'uppercase', 
                       lineHeight: '1',
-                      color: '#fbbf24',
+                      color: 'hsl(var(--theme-primary))',
                       marginBottom: '4px'
                     }}>
                       {format(week.date, 'MMM')}
@@ -91,7 +97,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
                     }}>
                       <span style={{ 
                         fontSize: '10px', 
-                        opacity: '0.9', 
+                        opacity: '0.7', 
                         textTransform: 'uppercase', 
                         lineHeight: '1',
                         fontWeight: '500'
@@ -101,7 +107,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
                       <span style={{ 
                         fontSize: '12px', 
                         fontWeight: '700', 
-                        lineHeight: '1'
+                        lineHeight: '1',
+                        color: isTodayWeek ? 'hsl(var(--theme-primary))' : undefined
                       }}>
                         {format(week.date, 'd')}
                       </span>
@@ -119,7 +126,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
                   }}>
                     <span style={{ 
                       fontSize: '10px', 
-                      opacity: '0.9', 
+                      opacity: '0.7', 
                       textTransform: 'uppercase', 
                       lineHeight: '1',
                       fontWeight: '500'
@@ -129,7 +136,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
                     <span style={{ 
                       fontSize: '12px', 
                       fontWeight: '700', 
-                      lineHeight: '1'
+                      lineHeight: '1',
+                      color: isTodayWeek ? 'hsl(var(--theme-primary))' : undefined
                     }}>
                       {format(week.date, 'd')}
                     </span>
@@ -142,7 +150,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
 
         {/* Total column - Fixed width */}
         <th 
-          className="workload-grid-header total-column text-white"
+          className="workload-grid-header total-column"
           style={{ 
             width: '120px', 
             minWidth: '120px',
@@ -150,8 +158,10 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
             textAlign: 'center',
             padding: '12px 8px',
             borderRight: 'none',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
-            fontWeight: '600'
+            borderBottom: '1px solid hsl(var(--border))',
+            fontWeight: '600',
+            backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
+            color: 'hsl(var(--foreground))'
           }}
         >
           Total Utilization ({weekCount} {weekText})

@@ -15,12 +15,16 @@ export const WeekUtilizationCell: React.FC<WeekUtilizationCellProps> = ({
   memberIndex
 }) => {
   const weekTotal = weekData?.total || 0;
-  const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
+  
+  // Theme-based alternating row colors
+  const rowBgColor = memberIndex % 2 === 0 
+    ? 'hsl(var(--background))' 
+    : 'hsl(var(--theme-primary) / 0.02)';
   
   // Color-coding based on utilization percentage (assuming 40h capacity)
   const weeklyCapacity = 40;
   const getUtilizationColor = (hours: number) => {
-    if (hours === 0) return '#f3f4f6'; // Gray
+    if (hours === 0) return 'hsl(var(--muted))';
     const utilization = (hours / weeklyCapacity) * 100;
     if (utilization > 100) return '#ef4444'; // Red - over-allocated
     if (utilization >= 80) return '#22c55e'; // Green - optimal (80-100%)
@@ -31,7 +35,7 @@ export const WeekUtilizationCell: React.FC<WeekUtilizationCellProps> = ({
   return (
     <td 
       key={week.key} 
-      className="workload-grid-cell week-cell"
+      className="workload-grid-cell week-cell group transition-colors"
       style={{ 
         width: '30px', 
         minWidth: '30px',
@@ -39,25 +43,27 @@ export const WeekUtilizationCell: React.FC<WeekUtilizationCellProps> = ({
         backgroundColor: rowBgColor,
         textAlign: 'center',
         padding: '1px',
-        borderRight: '1px solid rgba(156, 163, 175, 0.2)',
-        borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
+        borderRight: '1px solid hsl(var(--border) / 0.3)',
+        borderBottom: '1px solid hsl(var(--border) / 0.3)',
         verticalAlign: 'middle'
       }}
+      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
+      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
     >
       {weekTotal > 0 ? (
         <Tooltip>
           <TooltipTrigger asChild>
             <div 
-              className="utilization-badge"
+              className="utilization-badge transition-transform hover:scale-110 hover:shadow-md"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: '24px',
                 height: '24px',
-                borderRadius: '4px',
+                borderRadius: '6px',
                 fontSize: '10px',
-                fontWeight: '600',
+                fontWeight: '700',
                 backgroundColor: getUtilizationColor(weekTotal),
                 color: 'white',
                 cursor: 'pointer'
@@ -82,11 +88,11 @@ export const WeekUtilizationCell: React.FC<WeekUtilizationCellProps> = ({
             justifyContent: 'center',
             width: '24px',
             height: '24px',
-            borderRadius: '4px',
+            borderRadius: '6px',
             fontSize: '10px',
             fontWeight: '500',
-            backgroundColor: '#f3f4f6',
-            color: '#9ca3af'
+            backgroundColor: 'hsl(var(--muted))',
+            color: 'hsl(var(--muted-foreground))'
           }}
         >
           0

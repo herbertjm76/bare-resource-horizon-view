@@ -26,7 +26,15 @@ export const CapacityHeatmapTable: React.FC<CapacityHeatmapTableProps> = ({
     <TooltipProvider>
       <div 
         className="workload-resource-grid-container center-aligned"
-        style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}
+        style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'flex-start',
+          border: '1px solid hsl(var(--border))',
+          borderRadius: '12px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+          overflow: 'hidden'
+        }}
       >
         <div className="workload-resource-table-wrapper" style={{ width: 'auto', maxWidth: '100%', overflow: 'visible' }}>
           <table 
@@ -36,8 +44,8 @@ export const CapacityHeatmapTable: React.FC<CapacityHeatmapTableProps> = ({
               minWidth: `${tableWidth}px`,
               borderCollapse: 'separate',
               borderSpacing: '0',
-              background: 'hsl(var(--card))',
-              borderRadius: '8px',
+              background: 'hsl(var(--background))',
+              borderRadius: '12px',
               overflow: 'hidden',
               margin: '0',
               tableLayout: 'fixed'
