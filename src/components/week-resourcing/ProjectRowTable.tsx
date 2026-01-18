@@ -194,86 +194,173 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {projects.map((project, index) => (
-            <TableRow 
-              key={project.id} 
-              className={`${index % 2 === 0 ? 'bg-background' : 'bg-muted/50'} hover:bg-accent/50 transition-all duration-150`}
-              style={{ height: 33, minHeight: 33 }}
-            >
-              <TableCell className="sticky left-0 z-20 border-r border-slate-200 px-3 py-1 shadow-[2px_0_4px_rgba(0,0,0,0.1)]" style={{ background: index % 2 === 0 ? 'white' : 'rgb(248 250 252 / 0.7)' }}>
-                <span className="text-sm font-semibold">
-                  {getProjectDisplayName(project, projectDisplayPreference)}
-                </span>
-              </TableCell>
-              <TableCell className="text-center border-r border-slate-200 p-0 align-middle" style={{ height: 33 }}>
-                <div className="flex items-center justify-center h-full">
-                  {getProjectTotal(project.id) > 0 ? (
-                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
-                      {(getProjectTotal(project.id) / workWeekHours).toFixed(1)}
-                    </div>
-                  ) : (
-                    <span className="text-transparent select-none">0</span>
-                  )}
-                </div>
-              </TableCell>
-              {members.map(member => {
-                const key = `${member.id}:${project.id}`;
-                const hours = allocationMap.get(key) || 0;
-                return (
-                  <TableCell
-                    key={member.id}
-                    className="text-center border-r border-slate-200 p-0 project-column bg-gradient-to-r from-purple-50 to-violet-50"
-                    style={{ width: 40, minWidth: 40 }}
-                  >
-                    {hours > 0 && (
-                      <span className="inline-flex items-center justify-center w-7 h-7 bg-emerald-500 text-white rounded-sm font-semibold text-xs hover:bg-emerald-600 transition-colors duration-100">
-                        {formatAllocationValue(hours, getMemberCapacity(member), displayPreference)}
-                      </span>
+          {projects.map((project, index) => {
+            // Theme-based alternating row colors (matching Capacity Heatmap/Team Leave)
+            const rowBgColor = index % 2 === 0 
+              ? 'hsl(var(--background))' 
+              : 'hsl(var(--theme-primary) / 0.02)';
+            
+            return (
+              <TableRow 
+                key={project.id} 
+                className="transition-all duration-150"
+                style={{ 
+                  height: 33, 
+                  minHeight: 33,
+                  backgroundColor: rowBgColor
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
+              >
+                <TableCell 
+                  className="sticky left-0 z-20 px-3 py-1"
+                  style={{ 
+                    backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
+                    borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
+                    borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                  }}
+                >
+                  <span className="text-sm font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
+                    {getProjectDisplayName(project, projectDisplayPreference)}
+                  </span>
+                </TableCell>
+                <TableCell 
+                  className="text-center p-0 align-middle" 
+                  style={{ 
+                    height: 33,
+                    borderRight: '1px solid hsl(var(--border) / 0.5)',
+                    borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                  }}
+                >
+                  <div className="flex items-center justify-center h-full">
+                    {getProjectTotal(project.id) > 0 ? (
+                      <div 
+                        className="inline-flex items-center justify-center font-bold rounded px-2.5 py-1 text-sm min-w-[36px]"
+                        style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }}
+                      >
+                        {(getProjectTotal(project.id) / workWeekHours).toFixed(1)}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
                     )}
-                  </TableCell>
-                );
-              })}
-              <TableCell className="text-center bg-slate-100/80 border-l-2 border-slate-300 p-0 align-middle" style={{ height: 33 }}>
-                <div className="flex items-center justify-center h-full">
-                  {getProjectTotal(project.id) > 0 ? (
-                    <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
-                      {formatAllocationValue(getProjectTotal(project.id), defaultWeeklyCapacity, displayPreference)}
-                    </div>
-                  ) : (
-                    <span className="text-transparent select-none">0</span>
-                  )}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+                  </div>
+                </TableCell>
+                {members.map((member, memberIndex) => {
+                  const key = `${member.id}:${project.id}`;
+                  const hours = allocationMap.get(key) || 0;
+                  // Alternating column backgrounds
+                  const columnBgColor = memberIndex % 2 === 0 
+                    ? 'transparent' 
+                    : 'hsl(var(--theme-primary) / 0.02)';
+                  
+                  return (
+                    <TableCell
+                      key={member.id}
+                      className="text-center p-0"
+                      style={{ 
+                        width: 40, 
+                        minWidth: 40,
+                        backgroundColor: columnBgColor,
+                        borderRight: '1px solid hsl(var(--border) / 0.5)',
+                        borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                      }}
+                    >
+                      {hours > 0 && (
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-sm font-semibold text-xs text-white" style={{ backgroundColor: '#22c55e' }}>
+                          {formatAllocationValue(hours, getMemberCapacity(member), displayPreference)}
+                        </span>
+                      )}
+                    </TableCell>
+                  );
+                })}
+                <TableCell 
+                  className="text-center p-0 align-middle" 
+                  style={{ 
+                    height: 33,
+                    backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
+                    borderLeft: '2px solid hsl(var(--theme-primary) / 0.15)',
+                    borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                  }}
+                >
+                  <div className="flex items-center justify-center h-full">
+                    {getProjectTotal(project.id) > 0 ? (
+                      <div 
+                        className="inline-flex items-center justify-center font-bold rounded px-2.5 py-1 text-sm min-w-[36px]"
+                        style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }}
+                      >
+                        {formatAllocationValue(getProjectTotal(project.id), defaultWeeklyCapacity, displayPreference)}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
           {/* Totals Row */}
-          <TableRow style={{ background: 'hsl(var(--gradient-start))', height: 33 }} className="border-t-2 border-slate-300">
-            <TableCell className="sticky left-0 z-30 text-left font-semibold text-white border-r border-white/20 px-1 shadow-[2px_0_4px_rgba(0,0,0,0.1)]" style={{ background: 'hsl(var(--gradient-start))', height: 33 }}>
+          <TableRow 
+            style={{ 
+              background: 'hsl(var(--theme-primary))', 
+              height: 33 
+            }} 
+            className="border-t-2"
+          >
+            <TableCell 
+              className="sticky left-0 z-30 text-left font-semibold text-white px-3"
+              style={{ 
+                background: 'hsl(var(--theme-primary))', 
+                height: 33,
+                borderRight: '2px solid hsl(var(--background) / 0.2)'
+              }}
+            >
               Weekly Total
             </TableCell>
-            <TableCell className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 33 }}>
+            <TableCell 
+              className="text-center p-0 align-middle" 
+              style={{ 
+                background: 'hsl(var(--theme-primary))', 
+                height: 33,
+                borderRight: '1px solid hsl(var(--background) / 0.2)'
+              }}
+            >
               <div className="flex items-center justify-center h-full">
-                <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
+                <div className="inline-flex items-center justify-center bg-white/20 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                   {(members.reduce((sum, member) => sum + getMemberTotal(member.id), 0) / workWeekHours).toFixed(1)}
                 </div>
               </div>
             </TableCell>
             {members.map(member => (
-              <TableCell key={member.id} className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 33 }}>
+              <TableCell 
+                key={member.id} 
+                className="text-center p-0 align-middle" 
+                style={{ 
+                  background: 'hsl(var(--theme-primary))', 
+                  height: 33,
+                  borderRight: '1px solid hsl(var(--background) / 0.2)'
+                }}
+              >
                 <div className="flex items-center justify-center h-full">
                   {getMemberTotal(member.id) > 0 ? (
-                    <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
+                    <div className="inline-flex items-center justify-center bg-white/20 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                       {formatAllocationValue(getMemberTotal(member.id), getMemberCapacity(member), displayPreference)}
                     </div>
                   ) : (
-                    <span className="text-transparent select-none">0</span>
+                    <span className="text-white/50">—</span>
                   )}
                 </div>
               </TableCell>
             ))}
-            <TableCell className="text-center border-l-2 border-white/40 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 33 }}>
+            <TableCell 
+              className="text-center p-0 align-middle" 
+              style={{ 
+                background: 'hsl(var(--theme-primary))', 
+                height: 33,
+                borderLeft: '2px solid hsl(var(--background) / 0.2)'
+              }}
+            >
               <div className="flex items-center justify-center h-full">
-                <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
+                <div className="inline-flex items-center justify-center bg-white/20 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                   {formatAllocationValue(members.reduce((sum, member) => sum + getMemberTotal(member.id), 0), defaultWeeklyCapacity * members.length, displayPreference)}
                 </div>
               </div>
