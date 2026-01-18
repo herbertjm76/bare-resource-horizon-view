@@ -1,55 +1,57 @@
 
-/* Weekly Overview Table - Clean Implementation with Unified Brand Color */
+/* Weekly Overview Table - Standardized Design System */
 
-/* Container */
+/* Container - Matches Team Leave table pattern */
 .enhanced-weekly-scroll {
   overflow-x: auto;
   width: 100%;
-  border-radius: 8px;
 }
 
 .enhanced-weekly-container {
   width: 100%;
-  background: white;
-  border-radius: 8px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .enhanced-weekly-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: white;
+  background: hsl(var(--card));
 }
 
-/* Header Styling - Unified Brand Purple */
+/* Header Styling - Theme-based */
 .enhanced-weekly-table thead {
-  background: hsl(var(--gradient-start));
+  background: hsl(var(--theme-primary) / 0.05);
 }
 
 .enhanced-weekly-table thead th {
-  background: hsl(var(--gradient-start)) !important;
-  color: white !important;
+  background: hsl(var(--theme-primary) / 0.1);
+  color: hsl(var(--foreground));
   padding: 12px 8px;
   font-weight: 600;
   font-size: 12px;
   text-align: center;
-  border-right: 1px solid rgba(255,255,255,0.2);
+  border-right: 1px solid hsl(var(--border) / 0.5);
+  border-bottom: 1px solid hsl(var(--border));
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
-/* First column header - Name column */
+/* First column header - Name column (sticky) */
 .enhanced-weekly-table thead th:first-child {
-  background: hsl(var(--gradient-start)) !important;
-  color: white !important;
+  background: hsl(var(--theme-primary) / 0.15);
+  color: hsl(var(--foreground));
   position: sticky;
   left: 0;
   z-index: 15;
   min-width: 150px;
   text-align: center;
+  border-right: 2px solid hsl(var(--theme-primary) / 0.15);
 }
 
 /* Project code headers - vertical text */
@@ -63,69 +65,79 @@
   justify-content: center;
   font-weight: 600;
   font-size: 11px;
-  color: white;
+  color: hsl(var(--foreground));
 }
 
-/* Body Rows */
+/* Body Rows - Theme-based alternating */
 .enhanced-weekly-table tbody tr {
-  background: white;
-  border-bottom: 1px solid #f1f5f9;
+  background: hsl(var(--background));
+  border-bottom: 1px solid hsl(var(--border) / 0.3);
+}
+
+.enhanced-weekly-table tbody tr:nth-child(even) {
+  background: hsl(var(--theme-primary) / 0.02);
 }
 
 .enhanced-weekly-table tbody tr:hover {
-  background: #f8fafc;
+  background: hsl(var(--theme-primary) / 0.08);
 }
 
 .enhanced-weekly-table tbody td {
   padding: 8px;
   text-align: center;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid hsl(var(--border) / 0.5);
+  border-bottom: 1px solid hsl(var(--border) / 0.3);
   font-size: 13px;
 }
 
-/* First column in body - sticky */
+/* Alternating column backgrounds for project cells */
+.enhanced-weekly-table tbody td:nth-child(even) {
+  background: hsl(var(--theme-primary) / 0.02);
+}
+
+/* First column in body - sticky with theme background */
 .enhanced-weekly-table tbody td:first-child {
   position: sticky;
   left: 0;
-  background: white;
+  background: hsl(var(--theme-primary) / 0.05);
   font-weight: 500;
   z-index: 5;
-  border-right: 2px solid #e2e8f0;
+  border-right: 2px solid hsl(var(--theme-primary) / 0.15);
 }
 
 .enhanced-weekly-table tbody tr:hover td:first-child {
-  background: #f8fafc;
+  background: hsl(var(--theme-primary) / 0.1);
 }
 
 /* Office header rows */
 .enhanced-weekly-table .office-header-row {
-  background: hsl(var(--gradient-start)) !important;
+  background: hsl(var(--theme-primary) / 0.1) !important;
 }
 
 .enhanced-weekly-table .office-header-row td {
-  background: hsl(var(--gradient-start)) !important;
-  color: white !important;
+  background: hsl(var(--theme-primary) / 0.1) !important;
+  color: hsl(var(--foreground)) !important;
   font-weight: 600;
   padding: 12px 8px;
 }
 
 /* Footer/Totals */
 .enhanced-weekly-table tfoot tr {
-  background: #f8fafc;
+  background: hsl(var(--theme-primary) / 0.05);
   font-weight: 600;
 }
 
 .enhanced-weekly-table tfoot td {
   padding: 12px 8px;
   text-align: center;
-  border-right: 1px solid #e2e8f0;
-  border-top: 2px solid #e2e8f0;
+  border-right: 1px solid hsl(var(--border) / 0.5);
+  border-top: 2px solid hsl(var(--border));
 }
 
 .enhanced-weekly-table tfoot td:first-child {
   position: sticky;
   left: 0;
-  background: #f8fafc;
+  background: hsl(var(--theme-primary) / 0.1);
   z-index: 5;
 }
 
@@ -135,25 +147,25 @@
   border-right: none;
 }
 
-/* Scrollbar - Force neutral gray colors */
+/* Scrollbar - Theme-based neutral colors */
 .enhanced-weekly-scroll::-webkit-scrollbar {
   height: 8px;
 }
 
 .enhanced-weekly-scroll::-webkit-scrollbar-track {
-  background: #f1f5f9 !important;
+  background: hsl(var(--muted));
   border-radius: 4px;
 }
 
 .enhanced-weekly-scroll::-webkit-scrollbar-thumb {
-  background: #94a3b8 !important;
+  background: hsl(var(--muted-foreground) / 0.3);
   border-radius: 4px;
 }
 
 .enhanced-weekly-scroll::-webkit-scrollbar-thumb:hover {
-  background: #64748b !important;
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 
 .enhanced-weekly-scroll::-webkit-scrollbar-corner {
-  background: #f1f5f9 !important;
+  background: hsl(var(--muted));
 }

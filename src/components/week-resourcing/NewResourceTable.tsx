@@ -72,7 +72,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
 
   return (
     <div className={containerClassName}>
-      <div className="overflow-x-auto" style={{ border: '1px solid hsl(var(--border))', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+      <div className="overflow-x-auto border rounded-lg bg-card shadow-sm">
         <Table className={`${tableClassName} min-w-full`}>
           <TableHeader>
             <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }} className="border-b border-border">
