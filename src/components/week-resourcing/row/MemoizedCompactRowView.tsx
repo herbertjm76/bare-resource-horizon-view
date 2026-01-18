@@ -317,13 +317,13 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
     >
-      {/* Team Member cell - fixed 70px with avatar + name */}
+      {/* Team Member cell - fixed 50px with avatar + name */}
       <TableCell
         className="px-1 py-1 name-column sticky left-0 z-10"
         style={{
-          width: 70,
-          minWidth: 70,
-          maxWidth: 70,
+          width: 50,
+          minWidth: 50,
+          maxWidth: 50,
           backgroundColor: rowBgColor,
           borderRight: '1px solid hsl(var(--border) / 0.3)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)',
