@@ -45,7 +45,8 @@ export const WeekUtilizationCell: React.FC<WeekUtilizationCellProps> = ({
         padding: '1px',
         borderRight: '1px solid hsl(var(--border) / 0.5)',
         borderBottom: '1px solid hsl(var(--border) / 0.3)',
-        verticalAlign: 'middle'
+        verticalAlign: 'middle',
+        height: '33px'
       }}
       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
