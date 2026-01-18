@@ -49,7 +49,7 @@ export const MemberNameCell: React.FC<MemberNameCellProps> = ({ member }) => {
   return (
     <TableCell 
       className="sticky-column sticky-left-0 border-r font-medium py-1 text-center"
-      style={{ width: 250, minWidth: 250, maxWidth: 250 }}
+      style={{ width: 150, minWidth: 150, maxWidth: 150 }}
     >
       <div className="flex items-center justify-center">
         <Tooltip>
