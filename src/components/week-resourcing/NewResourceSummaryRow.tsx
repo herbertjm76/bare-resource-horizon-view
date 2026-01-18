@@ -56,10 +56,10 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         Weekly Total
       </TableCell>
 
-      {/* Utilization Column - Fixed 180px */}
+      {/* Utilization Column - Fixed 120px */}
       <TableCell 
         className="text-center text-sm font-semibold"
-        style={{ width: 180, minWidth: 180, maxWidth: 180 }}
+        style={{ width: 120, minWidth: 120, maxWidth: 120 }}
       >
         <span className="text-muted-foreground">—</span>
       </TableCell>
