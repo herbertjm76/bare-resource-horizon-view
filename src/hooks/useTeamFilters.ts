@@ -24,7 +24,7 @@ export const useTeamFilters = (allMembers: TeamMember[]) => {
   
   // Filter members based on active filters
   const filteredMembers = useMemo(() => {
-    return allMembers.filter(member => {
+    const filtered = allMembers.filter(member => {
       // Filter by search term
       if (filters.searchTerm) {
         const memberName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
@@ -54,6 +54,25 @@ export const useTeamFilters = (allMembers: TeamMember[]) => {
       }
       
       return true;
+    });
+    
+    // Sort by department first, then by office role id
+    return filtered.sort((a, b) => {
+      // Sort by department (nulls/empty last)
+      const deptA = (a.department || '').toLowerCase();
+      const deptB = (b.department || '').toLowerCase();
+      if (deptA !== deptB) {
+        if (!deptA) return 1;
+        if (!deptB) return -1;
+        return deptA.localeCompare(deptB);
+      }
+      
+      // Then sort by office role id (nulls/empty last)
+      const roleA = (a.office_role_id || '').toLowerCase();
+      const roleB = (b.office_role_id || '').toLowerCase();
+      if (!roleA) return 1;
+      if (!roleB) return -1;
+      return roleA.localeCompare(roleB);
     });
   }, [allMembers, filters]);
   
