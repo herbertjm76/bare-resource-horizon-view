@@ -73,8 +73,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
 
   return (
     <div className={containerClassName}>
-      <div className="overflow-x-auto border rounded-lg bg-card shadow-sm">
-        <Table className={`${tableClassName} min-w-full`}>
+      <Table className={`${tableClassName} min-w-full`} style={{ minWidth: 1200 }}>
           <TableHeader>
             <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary))' }} className="border-b border-border">
               {/* Team Member Column */}
@@ -174,8 +173,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               members={members}
             />
           </TableBody>
-        </Table>
-      </div>
+      </Table>
     </div>
   );
 };
