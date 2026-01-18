@@ -73,8 +73,12 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  const getFirstName = (member: any): string => {
-    if (member.first_name) return member.first_name;
+  const getDisplayName = (member: any): string => {
+    if (!member) return 'Unknown';
+    if (member.first_name) {
+      const lastInitial = member.last_name?.charAt(0) || '';
+      return `${member.first_name} ${lastInitial}.`;
+    }
     if (member.isPending || member.isDeleted) return member.name || 'Pending';
     return member.name || 'Unknown';
   };
@@ -123,10 +127,10 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                               textOverflow: 'ellipsis',
                             }}
                           >
-                            {getFirstName(member)}
+                            {getDisplayName(member)}
                           </div>
                           <Avatar className="h-7 w-7 border border-border hover:ring-2 hover:ring-ring/30 transition-all">
-                            <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
+                            <AvatarImage src={getAvatarUrl(member)} alt={getDisplayName(member)} />
                             <AvatarFallback className="text-[10px] font-medium bg-muted text-foreground">
                               {getUserInitials(member.first_name, member.last_name)}
                             </AvatarFallback>
@@ -190,10 +194,10 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               style={{ backgroundColor: rowBg, height: 33 }}
             >
               <TableCell
-                className="sticky left-0 z-20 px-3 py-1.5 border-r border-border"
-                style={{ backgroundColor: rowBg }}
+                className="sticky left-0 z-20 px-3 py-1.5 border-r border-border overflow-hidden"
+                style={{ backgroundColor: rowBg, maxWidth: 224 }}
               >
-                <span className="text-sm font-semibold text-foreground">
+                <span className="block text-sm font-semibold text-foreground truncate whitespace-nowrap">
                   {getProjectDisplayName(project, projectDisplayPreference)}
                 </span>
               </TableCell>
