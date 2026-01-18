@@ -79,28 +79,29 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
     return member.name || 'Unknown';
   };
 
+  // Header styles matching Team Leave benchmark
   const headerStyle = {
-    backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
-    color: 'hsl(var(--foreground))'
+    backgroundColor: 'hsl(var(--theme-primary))',
+    color: 'white'
   };
 
   const stickyHeaderStyle = {
     ...headerStyle,
-    backgroundColor: 'hsl(var(--theme-primary) / 0.15)',
+    backgroundColor: 'hsl(var(--theme-primary))',
   };
 
   return (
     <div className="w-full overflow-x-auto" style={{ border: '1px solid hsl(var(--border))', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
       <Table className="weekly-table" style={{ width: 'auto', minWidth: '100%' }}>
         <TableHeader>
-          <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }} className="border-b border-border">
+          <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary))' }} className="border-b border-border">
             {/* Project Column */}
-            <TableHead className="text-left font-semibold sticky left-0 z-30 border-r text-sm px-1 shadow-[2px_0_4px_rgba(0,0,0,0.05)]" style={{ width: 220, minWidth: 220, ...stickyHeaderStyle, borderRightWidth: '2px', borderRightColor: 'hsl(var(--theme-primary) / 0.15)' }}>
+            <TableHead className="text-left font-semibold sticky left-0 z-30 border-r text-sm px-3" style={{ width: 220, minWidth: 220, ...stickyHeaderStyle, borderRightWidth: '2px', borderRightColor: 'rgba(255,255,255,0.2)' }}>
               Project
             </TableHead>
             
             {/* FTE Column */}
-            <TableHead className="text-center font-semibold border-r text-xs px-0" style={{ width: 80, minWidth: 80, ...headerStyle, borderRightColor: 'hsl(var(--border) / 0.5)' }}>
+            <TableHead className="text-center font-semibold border-r text-xs px-0" style={{ width: 80, minWidth: 80, ...headerStyle, borderRightColor: 'rgba(255,255,255,0.2)' }}>
               FTE
             </TableHead>
             
@@ -111,7 +112,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               const fullName = [member.first_name, member.last_name].filter(Boolean).join(' ') || 'Unknown';
               
               return (
-                <TableHead key={member.id} className="text-center font-semibold border-r text-xs px-0 align-bottom" style={{ width: 40, minWidth: 40, ...headerStyle, borderRightColor: 'hsl(var(--border) / 0.5)', verticalAlign: 'bottom' }}>
+                <TableHead key={member.id} className="text-center font-semibold border-r text-xs px-0 align-bottom" style={{ width: 40, minWidth: 40, ...headerStyle, borderRightColor: 'rgba(255,255,255,0.2)', verticalAlign: 'bottom' }}>
                   <MemberVacationPopover
                     memberId={member.id}
                     memberName={fullName}
@@ -137,9 +138,9 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                             </div>
                             <Avatar className="h-7 w-7 border border-white/30 hover:ring-2 hover:ring-white/50 transition-all">
                               <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
-                            <AvatarFallback style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }} className="text-[10px]">
-                              {getUserInitials(member.first_name, member.last_name)}
-                            </AvatarFallback>
+                              <AvatarFallback style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' }} className="text-[10px]">
+                                {getUserInitials(member.first_name, member.last_name)}
+                              </AvatarFallback>
                             </Avatar>
                           </div>
                         </TooltipTrigger>
@@ -188,7 +189,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             })}
             
             {/* Total Column */}
-            <TableHead className="text-center font-semibold border-l-2 text-xs px-0" style={{ width: 60, minWidth: 60, ...stickyHeaderStyle, borderLeftColor: 'hsl(var(--theme-primary) / 0.15)' }}>
+            <TableHead className="text-center font-semibold border-l-2 text-xs px-0" style={{ width: 60, minWidth: 60, ...stickyHeaderStyle, borderLeftColor: 'rgba(255,255,255,0.2)' }}>
               Total
             </TableHead>
           </TableRow>

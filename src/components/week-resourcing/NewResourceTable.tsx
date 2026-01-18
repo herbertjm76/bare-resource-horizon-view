@@ -60,14 +60,15 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     ? 'resource-table-compact-container'
     : 'resource-table-expanded-container';
 
+  // Header styles matching Team Leave benchmark
   const headerStyle = {
-    backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
-    color: 'hsl(var(--foreground))'
+    backgroundColor: 'hsl(var(--theme-primary))',
+    color: 'white'
   };
 
   const stickyHeaderStyle = {
     ...headerStyle,
-    backgroundColor: 'hsl(var(--theme-primary) / 0.15)',
+    backgroundColor: 'hsl(var(--theme-primary))',
   };
 
   return (
@@ -75,7 +76,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
       <div className="overflow-x-auto border rounded-lg bg-card shadow-sm">
         <Table className={`${tableClassName} min-w-full`}>
           <TableHeader>
-            <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }} className="border-b border-border">
+            <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary))' }} className="border-b border-border">
               {/* Team Member Column */}
               <TableHead 
                 className="text-center font-semibold sticky left-0 z-20 border-r text-sm" 
@@ -84,7 +85,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                   minWidth: 180, 
                   ...stickyHeaderStyle,
                   borderRightWidth: '2px',
-                  borderRightColor: 'hsl(var(--theme-primary) / 0.15)'
+                  borderRightColor: 'rgba(255,255,255,0.2)'
                 }}
               >
                 Team Member
@@ -97,7 +98,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                   width: 200, 
                   minWidth: 200, 
                   ...headerStyle,
-                  borderRightColor: 'hsl(var(--border) / 0.5)'
+                  borderRightColor: 'rgba(255,255,255,0.2)'
                 }}
               >
                 Total Utilization (1 week)
@@ -110,7 +111,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                   width: 35, 
                   minWidth: 35, 
                   ...headerStyle,
-                  borderRightColor: 'hsl(var(--border) / 0.5)'
+                  borderRightColor: 'rgba(255,255,255,0.2)'
                 }}
               >
                 Projects
@@ -125,10 +126,10 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                     width: 35, 
                     minWidth: 35, 
                     height: 120, 
-                    ...headerStyle,
-                    borderRightColor: 'hsl(var(--border) / 0.5)'
-                  }}
-                >
+                  ...headerStyle,
+                  borderRightColor: 'rgba(255,255,255,0.2)'
+                }}
+              >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div 
                       className="transform -rotate-90 whitespace-nowrap text-xs font-medium"
@@ -137,7 +138,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                         maxWidth: '100px',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        color: 'hsl(var(--foreground))'
+                        color: 'white'
                       }}
                       title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
                     >
