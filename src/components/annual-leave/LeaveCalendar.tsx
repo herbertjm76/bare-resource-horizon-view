@@ -139,8 +139,8 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
       <div className="overflow-x-auto scrollbar-grey">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="border-b border-border">
-              <th className="sticky left-0 z-20 w-40 min-w-40 bg-card text-left px-3 py-2 font-semibold text-sm text-foreground">
+            <tr className="border-b border-border bg-primary/5">
+              <th className="sticky left-0 z-20 w-40 min-w-40 bg-primary/10 text-left px-3 py-2 font-semibold text-sm text-foreground">
                 Team Member
               </th>
               {days.map((day, idx) => (
@@ -148,9 +148,9 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                   key={day.date} 
                   className={`
                     w-8 min-w-8 text-center font-medium px-0.5 py-1.5
-                    ${day.isWeekend ? 'bg-muted/50 text-muted-foreground' : 'text-foreground'}
+                    ${day.isWeekend ? 'bg-muted/50 text-muted-foreground' : 'bg-primary/5 text-foreground'}
                     ${day.isSunday ? 'border-l-2 border-border' : ''}
-                    ${day.isToday ? 'bg-primary/10' : ''}
+                    ${day.isToday ? 'bg-primary/20' : ''}
                     ${day.isNewMonth && idx > 0 ? 'border-l-2 border-primary/30' : ''}
                   `}
                 >
@@ -165,7 +165,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                   </div>
                 </th>
               ))}
-              <th className="w-14 min-w-14 bg-card text-center px-2 py-2 font-semibold text-xs text-muted-foreground border-l border-border">
+              <th className="w-14 min-w-14 bg-primary/10 text-center px-2 py-2 font-semibold text-xs text-foreground border-l border-border">
                 Total
               </th>
             </tr>
@@ -180,11 +180,11 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 <tr 
                   key={member.id} 
                   className={`
-                    group hover:bg-muted/20 transition-colors
-                    ${memberIndex % 2 === 0 ? 'bg-background' : 'bg-muted/5'}
+                    group hover:bg-primary/10 transition-colors
+                    ${memberIndex % 2 === 0 ? 'bg-background' : 'bg-primary/[0.02]'}
                   `}
                 >
-                  <td className="sticky left-0 z-10 bg-inherit px-3 py-1.5 border-r border-border">
+                  <td className="sticky left-0 z-10 px-3 py-1.5 border-r border-border bg-primary/5">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6 shrink-0">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
