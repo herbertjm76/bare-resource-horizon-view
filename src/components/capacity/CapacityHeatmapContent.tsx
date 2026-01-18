@@ -1,14 +1,16 @@
 import React from 'react';
-import { CenteredTabs, CenteredTabItem, TabsContent } from '@/components/ui/centered-tabs';
+import { CenteredTabs, TabsContent } from '@/components/ui/centered-tabs';
 import { TeamMember } from '@/components/dashboard/types';
 import { useUnifiedWorkloadData } from '@/components/workload/hooks/useUnifiedWorkloadData';
 import { useDemandProjection } from '@/hooks/useDemandProjection';
 import { Skeleton } from '@/components/ui/skeleton';
-import { WorkloadHeaderControls } from '@/components/workload/components/WorkloadHeaderControls';
-import { HeatmapViewMode } from '@/pages/CapacityHeatmap';
+import { HeatmapViewMode, HeatmapFilters } from '@/pages/CapacityHeatmap';
 import { CapacityHeatmapTable } from './CapacityHeatmapTable';
 import { ProjectedDemandView } from './ProjectedDemandView';
 import { GapAnalysisView } from './GapAnalysisView';
+import { CapacityHeatmapControls } from './CapacityHeatmapControls';
+import { MemberFilterRow } from '@/components/resources/MemberFilterRow';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { Activity, TrendingUp, Minus } from 'lucide-react';
 
 interface CapacityHeatmapContentProps {
@@ -18,14 +20,9 @@ interface CapacityHeatmapContentProps {
   onWeeksChange: (weeks: number) => void;
   isLoading: boolean;
   filteredMembers: TeamMember[];
-  departments: string[];
-  locations: string[];
-  activeFilter: string;
-  filterValue: string;
-  searchQuery: string;
-  setActiveFilter: (filter: string) => void;
-  setFilterValue: (value: string) => void;
-  setSearchQuery: (query: string) => void;
+  filters: HeatmapFilters;
+  onFilterChange: (key: string, value: string) => void;
+  activeFiltersCount: number;
   clearFilters: () => void;
   weekLabel: string;
   viewMode: HeatmapViewMode;
@@ -39,14 +36,9 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
   onWeeksChange,
   isLoading,
   filteredMembers,
-  departments,
-  locations,
-  activeFilter,
-  filterValue,
-  searchQuery,
-  setActiveFilter,
-  setFilterValue,
-  setSearchQuery,
+  filters,
+  onFilterChange,
+  activeFiltersCount,
   clearFilters,
   weekLabel,
   viewMode,
@@ -67,8 +59,6 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
 
   // Calculate team weekly capacity
   const weeklyCapacity = filteredMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
-
-  const activeFiltersCount = [activeFilter !== 'all' ? activeFilter : '', searchQuery].filter(Boolean).length;
   
   const showContentLoading = isLoading || isLoadingWorkload;
 
@@ -84,25 +74,28 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
           { value: 'gap', label: 'Gap Analysis', icon: Minus },
         ]}
       >
-        {/* Filter Controls - Below tabs */}
-        <div className="py-4">
-          <WorkloadHeaderControls
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            activeFilter={activeFilter}
-            setActiveFilter={setActiveFilter}
-            filterValue={filterValue}
-            setFilterValue={setFilterValue}
-            departments={departments}
-            locations={locations}
-            activeFiltersCount={activeFiltersCount}
-            clearFilters={clearFilters}
+        {/* Week Controls */}
+        <div className="py-4 px-4">
+          <CapacityHeatmapControls
             selectedWeek={selectedWeek}
             onWeekChange={onWeekChange}
             selectedWeeks={selectedWeeks}
             onWeeksChange={onWeeksChange}
           />
         </div>
+
+        {/* Filter Row - Badge-based like Team Leave */}
+        <TooltipProvider>
+          <MemberFilterRow
+            filters={filters}
+            onFilterChange={onFilterChange}
+            activeFiltersCount={activeFiltersCount}
+            clearFilters={clearFilters}
+            searchLabel="Search members"
+            searchPlaceholder="Search by name..."
+            availableFilterTypes={['department', 'location']}
+          />
+        </TooltipProvider>
 
         {/* Tab Content - Show skeleton while loading */}
         {showContentLoading ? (
