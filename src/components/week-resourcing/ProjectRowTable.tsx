@@ -91,8 +91,8 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
   };
 
   return (
-    <div className="w-full overflow-x-auto" style={{ border: '1px solid hsl(var(--border))', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
-      <Table className="weekly-table" style={{ width: 'auto', minWidth: '100%' }}>
+    <div className="resource-table-grid-container">
+      <Table className="weekly-table" style={{ width: 'auto', minWidth: 1200 }}>
         <TableHeader>
           <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary))' }} className="border-b border-border">
             {/* Project Column */}
@@ -267,7 +267,10 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                       }}
                     >
                       {hours > 0 && (
-                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-sm font-semibold text-xs text-white" style={{ backgroundColor: '#22c55e' }}>
+                        <span
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-sm font-semibold text-xs"
+                          style={{ backgroundColor: 'hsl(var(--success))', color: 'hsl(var(--success-foreground))' }}
+                        >
                           {formatAllocationValue(hours, getMemberCapacity(member), displayPreference)}
                         </span>
                       )}

@@ -63,21 +63,17 @@
   min-width: 35px;
 }
 
-/* Enhanced Table Container - Centered and properly sized with rounded corners */
+/* Enhanced Table Container - match Team Leave (full-width card) */
 .resource-table-compact-container {
-  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.8) 100%);
-  border-radius: 20px;
-  padding: 3px;
-  box-shadow: 0 4px 20px hsl(var(--foreground) / 0.08);
+  width: 100%;
   overflow-x: auto;
-  display: inline-block;
+  overflow-y: hidden;
 }
 
-/* Visually round the table itself so cells do not overhang the container corners */
+/* Table surface inherits border radius from container; prevent corner bleed */
 .resource-table-compact-container table.resource-table-compact {
-  background: hsl(var(--background));
-  border-radius: 20px;
-  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.10);
+  background: hsl(var(--card));
+  border-radius: 12px;
   overflow: hidden;
 }
 
