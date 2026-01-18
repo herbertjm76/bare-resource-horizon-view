@@ -84,35 +84,45 @@ export const CapacityHeatmapContent: React.FC<CapacityHeatmapContentProps> = ({
           />
         </div>
 
-        {/* Filter Row - Badge-based like Team Leave */}
-        <TooltipProvider>
-          <MemberFilterRow
-            filters={filters}
-            onFilterChange={onFilterChange}
-            activeFiltersCount={activeFiltersCount}
-            clearFilters={clearFilters}
-            searchLabel="Search members"
-            searchPlaceholder="Search by name..."
-            availableFilterTypes={['department', 'location']}
-          />
-        </TooltipProvider>
-
-        {/* Tab Content - Show skeleton while loading */}
-        {showContentLoading ? (
-          <div className="px-6 space-y-4">
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-64 w-full" />
-          </div>
-        ) : (
-          <>
-            <TabsContent value="actual" className="mt-0">
-              <CapacityHeatmapTable
-                members={filteredMembers}
-                weeklyWorkloadData={weeklyWorkloadData}
-                weekStartDates={weekStartDates}
+        {/* Filter Row and Table - Center aligned container */}
+        <div className="flex flex-col items-center w-full">
+          {/* Filter Row - Badge-based like Team Leave */}
+          <div className="w-full max-w-fit">
+            <TooltipProvider>
+              <MemberFilterRow
+                filters={filters}
+                onFilterChange={onFilterChange}
+                activeFiltersCount={activeFiltersCount}
+                clearFilters={clearFilters}
+                searchLabel="Search members"
+                searchPlaceholder="Search by name..."
+                availableFilterTypes={['department', 'location']}
               />
-            </TabsContent>
+            </TooltipProvider>
+          </div>
 
+          {/* Tab Content - Show skeleton while loading */}
+          {showContentLoading ? (
+            <div className="px-6 space-y-4 w-full max-w-4xl">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+          ) : (
+            <>
+              <TabsContent value="actual" className="mt-0">
+                <CapacityHeatmapTable
+                  members={filteredMembers}
+                  weeklyWorkloadData={weeklyWorkloadData}
+                  weekStartDates={weekStartDates}
+                />
+              </TabsContent>
+            </>
+          )}
+        </div>
+
+        {/* Other tab content - outside centered container */}
+        {!showContentLoading && (
+          <>
             <TabsContent value="projected" className="mt-0 px-6 pb-6">
               <ProjectedDemandView
                 weeklyDemand={weeklyDemand}
