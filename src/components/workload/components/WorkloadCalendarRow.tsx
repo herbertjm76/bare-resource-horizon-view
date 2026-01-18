@@ -52,8 +52,8 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
       <tr 
         className="workload-grid-row workload-grid-row-compact transition-colors" 
         style={{ 
-          height: '28px', 
-          minHeight: '28px',
+          height: '33px', 
+          minHeight: '33px',
           backgroundColor: rowBgColor
         }}
         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}

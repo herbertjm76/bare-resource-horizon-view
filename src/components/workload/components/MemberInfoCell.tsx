@@ -49,7 +49,7 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
         borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
         borderBottom: '1px solid hsl(var(--border) / 0.3)',
         verticalAlign: 'middle',
-        height: '28px'
+        height: '33px'
       }}
     >
       <div className="flex items-center gap-2 h-full" style={{ minHeight: 0 }}>

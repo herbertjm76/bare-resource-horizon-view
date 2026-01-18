@@ -29,7 +29,8 @@ export const TotalHoursCell: React.FC<TotalHoursCellProps> = ({
         borderRight: '1px solid hsl(var(--border) / 0.5)',
         borderBottom: '1px solid hsl(var(--border) / 0.3)',
         verticalAlign: 'middle',
-        borderLeft: '2px solid hsl(var(--theme-primary) / 0.15)'
+        borderLeft: '2px solid hsl(var(--theme-primary) / 0.15)',
+        height: '33px'
       }}
     >
       <StandardizedBadge 
