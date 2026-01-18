@@ -45,26 +45,29 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
     >
       {/* Team Member Column */}
       <TableCell 
-        className="sticky left-0 z-20 text-left px-3 py-2 font-semibold text-sm text-foreground w-[70px] min-w-[70px] max-w-[70px]"
+        className="sticky left-0 z-20 text-left px-3 py-2 font-semibold text-sm text-foreground"
         style={{ 
           backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
-          width: 70,
-          minWidth: 70,
-          maxWidth: 70
+          width: 250,
+          minWidth: 250,
+          maxWidth: 250
         }}
       >
         Weekly Total
       </TableCell>
 
-      {/* Utilization Column - FLEXIBLE (no fixed width) */}
-      <TableCell className="text-center text-sm font-semibold">
+      {/* Utilization Column - FLEXIBLE with max 500px */}
+      <TableCell 
+        className="text-center text-sm font-semibold"
+        style={{ maxWidth: 500 }}
+      >
         <span className="text-muted-foreground">—</span>
       </TableCell>
 
-      {/* Project Count Column - 64px fixed */}
+      {/* Project Count Column - 33px fixed */}
       <TableCell 
         className="text-center text-sm font-semibold"
-        style={{ width: 64, minWidth: 64, maxWidth: 64 }}
+        style={{ width: 33, minWidth: 33, maxWidth: 33 }}
       >
         <span 
           className="inline-flex items-center justify-center font-bold rounded px-2 py-1 text-sm"
@@ -74,7 +77,7 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         </span>
       </TableCell>
 
-      {/* Project Columns - 28px fixed */}
+      {/* Project Columns - 33px fixed */}
       {projects.map((project) => {
         const projectData = projectTotals.find((pt) => pt.projectId === project.id);
         const hours = projectData?.totalHours || 0;
@@ -83,7 +86,7 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
           <TableCell 
             key={project.id} 
             className="text-center text-sm font-semibold"
-            style={{ width: 28, minWidth: 28, maxWidth: 28 }}
+            style={{ width: 33, minWidth: 33, maxWidth: 33 }}
           >
             {hours > 0 ? (
               <span 
