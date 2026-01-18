@@ -27,14 +27,30 @@ export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeader
   return (
     <TableHeader>
       <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}>
-        <TableHead style={stickyHeaderStyle}>
+        <TableHead 
+          style={{
+            ...stickyHeaderStyle,
+            borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
+            borderBottom: '1px solid hsl(var(--border))'
+          }}
+        >
           <span className="font-bold text-center block">
             TEAM MEMBER
           </span>
         </TableHead>
         
-        {projects.map((project) => (
-          <TableHead key={project.id} style={headerStyle}>
+        {projects.map((project, index) => (
+          <TableHead 
+            key={project.id} 
+            style={{
+              ...headerStyle,
+              borderRight: '1px solid hsl(var(--border) / 0.5)',
+              borderBottom: '1px solid hsl(var(--border))',
+              backgroundColor: index % 2 === 0 
+                ? 'hsl(var(--theme-primary) / 0.1)' 
+                : 'hsl(var(--theme-primary) / 0.08)'
+            }}
+          >
             <div className="enhanced-project-code-header">
               <span className="font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                 {getDisplayText(project)}
@@ -43,19 +59,49 @@ export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeader
           </TableHead>
         ))}
         
-        <TableHead style={stickyHeaderStyle}>
+        <TableHead 
+          style={{
+            ...stickyHeaderStyle,
+            borderLeft: '2px solid hsl(var(--theme-primary) / 0.15)',
+            borderRight: '1px solid hsl(var(--border) / 0.5)',
+            borderBottom: '1px solid hsl(var(--border))'
+          }}
+        >
           <span className="font-bold">TOTAL</span>
         </TableHead>
-        <TableHead style={headerStyle}>
+        <TableHead 
+          style={{
+            ...headerStyle,
+            borderRight: '1px solid hsl(var(--border) / 0.5)',
+            borderBottom: '1px solid hsl(var(--border))'
+          }}
+        >
           <span className="font-bold">CAPACITY</span>
         </TableHead>
-        <TableHead style={headerStyle}>
+        <TableHead 
+          style={{
+            ...headerStyle,
+            borderRight: '1px solid hsl(var(--border) / 0.5)',
+            borderBottom: '1px solid hsl(var(--border))'
+          }}
+        >
           <span className="font-bold">UTILIZATION</span>
         </TableHead>
-        <TableHead style={headerStyle}>
+        <TableHead 
+          style={{
+            ...headerStyle,
+            borderRight: '1px solid hsl(var(--border) / 0.5)',
+            borderBottom: '1px solid hsl(var(--border))'
+          }}
+        >
           <span className="font-bold">LEAVE</span>
         </TableHead>
-        <TableHead style={headerStyle}>
+        <TableHead 
+          style={{
+            ...headerStyle,
+            borderBottom: '1px solid hsl(var(--border))'
+          }}
+        >
           <span className="font-bold">REMARKS</span>
         </TableHead>
       </TableRow>

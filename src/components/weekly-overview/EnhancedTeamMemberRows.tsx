@@ -104,7 +104,11 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                   {/* Member Name */}
                   <TableCell 
                     className="sticky left-0 z-10 pl-3"
-                    style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}
+                    style={{ 
+                      backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
+                      borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
+                      borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                    }}
                   >
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
@@ -138,8 +142,21 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                     const inputConfig = getInputConfig(displayPreference);
                     const displayValue = convertHoursToInputValue(projectHours, weeklyCapacity, displayPreference);
                     
+                    // Alternating column backgrounds
+                    const columnBgColor = projectIndex % 2 === 0 
+                      ? 'transparent' 
+                      : 'hsl(var(--theme-primary) / 0.02)';
+                    
                     return (
-                      <TableCell key={project.id} className="text-center">
+                      <TableCell 
+                        key={project.id} 
+                        className="text-center"
+                        style={{
+                          backgroundColor: columnBgColor,
+                          borderRight: '1px solid hsl(var(--border) / 0.5)',
+                          borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                        }}
+                      >
                         <input
                           type="number"
                           min={inputConfig.min}
@@ -189,21 +206,40 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                   })}
 
                   {/* Total Hours - Enhanced styling */}
-                  <TableCell className="text-center total-hours-column">
+                  <TableCell 
+                    className="text-center total-hours-column"
+                    style={{
+                      borderLeft: '2px solid hsl(var(--theme-primary) / 0.15)',
+                      borderRight: '1px solid hsl(var(--border) / 0.5)',
+                      borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                    }}
+                  >
                     <div className="enhanced-hours-pill">
                       {formatDualAllocationValue(totalHours, weeklyCapacity, displayPreference)}
                     </div>
                   </TableCell>
 
                   {/* Capacity - Enhanced styling with better spacing */}
-                  <TableCell className="text-center capacity-column">
+                  <TableCell 
+                    className="text-center capacity-column"
+                    style={{
+                      borderRight: '1px solid hsl(var(--border) / 0.5)',
+                      borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                    }}
+                  >
                     <div className="enhanced-capacity-pill">
                       {formatCapacityValue(weeklyCapacity, displayPreference)}
                     </div>
                   </TableCell>
 
                   {/* Utilization */}
-                  <TableCell className="text-center">
+                  <TableCell 
+                    className="text-center"
+                    style={{
+                      borderRight: '1px solid hsl(var(--border) / 0.5)',
+                      borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                    }}
+                  >
                     <Badge 
                       variant="outline" 
                       className={`${getUtilizationColor(utilizationPercent)} text-xs font-medium`}
@@ -213,14 +249,24 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                   </TableCell>
 
                   {/* Annual Leave - READ-ONLY display with gray styling */}
-                  <TableCell className="text-center">
+                  <TableCell 
+                    className="text-center"
+                    style={{
+                      borderRight: '1px solid hsl(var(--border) / 0.5)',
+                      borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                    }}
+                  >
                     <div className="inline-flex items-center justify-center w-auto px-2 h-6 text-xs font-medium rounded-lg bg-muted text-muted-foreground border border-border cursor-default">
                       {formatDualAllocationValue(allocation.annualLeave || 0, weeklyCapacity, displayPreference)}
                     </div>
                   </TableCell>
 
                   {/* Remarks */}
-                  <TableCell>
+                  <TableCell
+                    style={{
+                      borderBottom: '1px solid hsl(var(--border) / 0.3)'
+                    }}
+                  >
                     <textarea
                       value={allocation.remarks || ''}
                       onChange={(e) => handleInputChange(member.id, 'remarks', e.target.value)}
