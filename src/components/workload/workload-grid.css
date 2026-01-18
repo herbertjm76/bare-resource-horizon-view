@@ -136,24 +136,42 @@
 .member-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .member-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
   flex-shrink: 0;
 }
 
 .member-name {
   font-weight: 500;
   color: #111827;
-  font-size: 14px;
+  font-size: 13px;
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Compact row variant for heatmap */
+.workload-grid-row-compact {
+  height: 32px !important;
+  min-height: 32px !important;
+}
+
+.workload-grid-row-compact .member-cell {
+  padding: 6px 12px !important;
+}
+
+.workload-grid-row-compact .week-cell {
+  padding: 1px !important;
+}
+
+.workload-grid-row-compact .total-cell {
+  padding: 6px 8px !important;
 }
 
 /* Utilization badge */
