@@ -74,8 +74,8 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         return (
           <TableCell 
             key={project.id} 
-            className="text-center text-sm font-semibold"
-            style={{ width: 45, minWidth: 45, maxWidth: 45 }}
+            className="text-center text-sm font-semibold px-0"
+            style={{ width: 28, minWidth: 28, maxWidth: 28 }}
           >
             {hours > 0 ? (
               <span 

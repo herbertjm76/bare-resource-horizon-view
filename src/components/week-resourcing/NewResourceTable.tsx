@@ -77,8 +77,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           {projectsWithHours.map((project) => (
             <TableHead
               key={project.id}
-              className="text-center font-medium px-0.5 py-1.5 text-foreground bg-muted align-bottom overflow-hidden"
-              style={{ width: 45, minWidth: 45, maxWidth: 45 }}
+              className="text-center font-medium px-0 py-1.5 text-foreground bg-muted align-bottom overflow-hidden"
+              style={{ width: 28, minWidth: 28, maxWidth: 28 }}
             >
               <div className="flex items-end justify-center h-[120px] w-full overflow-hidden">
                 <div
