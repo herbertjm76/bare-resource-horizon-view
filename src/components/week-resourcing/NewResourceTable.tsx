@@ -56,45 +56,48 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     ? 'resource-table-compact weekly-table enhanced-table' 
     : 'resource-table-expanded weekly-table enhanced-table';
 
-  // Use Team Leave benchmark container framing
+  // Match Team Leave container styling exactly - clean white card with subtle themed headers
   return (
-    <div className="enhanced-table-scroll">
-      <div className="enhanced-table-container">
-        <Table className={`${tableClassName} min-w-full`} style={{ minWidth: 1200 }}>
+    <div className="w-full p-3">
+      <div className="overflow-x-auto scrollbar-grey">
+        <Table className="weekly-table w-full border-collapse" style={{ minWidth: 1200 }}>
           <TableHeader>
-            <TableRow>
+            <TableRow className="border-b border-border" style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}>
               {/* Team Member Column */}
               <TableHead
-                className="text-center font-semibold sticky left-0 z-20 border-r text-sm name-column"
-                style={{ width: 180, minWidth: 180 }}
+                className="sticky left-0 z-20 w-44 min-w-44 text-left px-3 py-3 font-semibold text-sm text-foreground"
+                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}
               >
                 Team Member
               </TableHead>
 
               {/* Utilization Column */}
               <TableHead
-                className="text-center font-semibold border-r text-sm"
-                style={{ width: 200, minWidth: 200 }}
+                className="w-52 min-w-52 text-center font-semibold text-sm px-2 py-3 text-foreground"
+                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}
               >
                 Total Utilization (1 week)
               </TableHead>
 
               {/* Project Count Column */}
               <TableHead
-                className="text-center font-semibold border-r text-sm"
-                style={{ width: 35, minWidth: 35 }}
+                className="w-16 min-w-16 text-center font-semibold text-sm px-1 py-3 text-foreground"
+                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}
               >
                 Projects
               </TableHead>
 
               {/* Project Columns with Rotated Text - Only show projects with hours */}
-              {projectsWithHours.map((project) => (
+              {projectsWithHours.map((project, idx) => (
                 <TableHead
                   key={project.id}
-                  className="text-center font-semibold border-r relative text-sm"
-                  style={{ width: 35, minWidth: 35, height: 120 }}
+                  className="w-10 min-w-10 text-center font-medium px-0.5 py-1.5 text-foreground"
+                  style={{ 
+                    backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
+                    height: 120 
+                  }}
                 >
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex items-center justify-center h-full">
                     <div
                       className="transform -rotate-90 whitespace-nowrap text-xs font-medium"
                       style={{

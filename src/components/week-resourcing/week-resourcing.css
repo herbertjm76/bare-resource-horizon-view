@@ -1,5 +1,5 @@
 
-/* Week Resourcing Table Styles */
+/* Week Resourcing Table Styles - Match Team Leave aesthetic */
 
 .week-resource-table-wrapper {
   width: 100%;
@@ -9,84 +9,52 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Specific targeting for ResourceTable headers only */
-.enhanced-table thead,
-.enhanced-table thead tr,
-.enhanced-table thead th {
-  background: #6465F0 !important;
-  color: white !important;
+/* Weekly table specific - Use Team Leave styling (soft themed, not bright purple) */
+.weekly-table thead th {
+  background: hsl(var(--theme-primary) / 0.05) !important;
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600;
 }
 
-/* Target the Name column header specifically */
-.enhanced-table thead th:first-child {
-  background: #6465F0 !important;
-  color: white !important;
-  border-top-left-radius: 12px;
+.weekly-table thead th:first-child {
+  background: hsl(var(--theme-primary) / 0.1) !important;
+  color: hsl(var(--foreground)) !important;
 }
 
-/* Last header column rounded corner */
-.enhanced-table thead th:last-child {
-  border-top-right-radius: 12px;
+/* Body cells - clean white background */
+.weekly-table tbody td {
+  background: transparent !important;
+  color: hsl(var(--foreground)) !important;
 }
 
-/* Project header cells with vertical text */
-.enhanced-table thead th.project-header,
-.enhanced-table thead th.project-header * {
-  background: #6465F0 !important;
-  color: white !important;
+/* Summary row styling */
+.weekly-table .summary-row,
+.weekly-table .summary-row td {
+  background: hsl(var(--theme-primary) / 0.1) !important;
+  color: hsl(var(--foreground)) !important;
 }
 
-/* Non-project column headers */
-.enhanced-table thead th.non-project-column,
-.enhanced-table thead th.non-project-column * {
-  background: #6465F0 !important;
-  color: white !important;
-}
-
-/* Body cells should stay white */
-.enhanced-table tbody td,
-.enhanced-table tbody td * {
-  background: white !important;
-  color: black !important;
-}
-
-.enhanced-table tbody tr:hover td {
-  background: #f8fafc !important;
-  color: black !important;
-}
-
-/* Last row rounded bottom corners */
-.enhanced-table tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 12px;
-}
-
-.enhanced-table tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 12px;
+/* Hover states */
+.weekly-table tbody tr:hover td {
+  background: hsl(var(--theme-primary) / 0.08) !important;
 }
 
 /* Capacity gauge and other components inside body */
-.enhanced-table tbody .capacity-gauge,
-.enhanced-table tbody .capacity-gauge *,
-.enhanced-table tbody .leave-tooltip,
-.enhanced-table tbody .leave-tooltip * {
+.weekly-table tbody .capacity-gauge,
+.weekly-table tbody .capacity-gauge *,
+.weekly-table tbody .leave-tooltip,
+.weekly-table tbody .leave-tooltip * {
   background: transparent !important;
 }
 
-/* Default light gray styling for display pills */
-.enhanced-table .inline-flex.items-center.justify-center.rounded-full {
-  background: #f3f4f6 !important;
-  border: 1px solid #d1d5db !important;
-  color: #374151 !important;
-}
-
 /* Gray styling for Holiday inputs */
-.enhanced-table input[type="number"] {
+.weekly-table input[type="number"] {
   background: #f9fafb !important;
   border: 2px solid #d1d5db !important;
   color: #374151 !important;
 }
 
-.enhanced-table input[type="number"]:focus {
+.weekly-table input[type="number"]:focus {
   background: #ffffff !important;
   border-color: #6b7280 !important;
   box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1) !important;

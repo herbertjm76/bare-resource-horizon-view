@@ -79,23 +79,26 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
     return member.name || 'Unknown';
   };
 
-  // Use Team Leave benchmark container framing
+  // Match Team Leave container styling exactly - clean white card with subtle themed headers
   return (
-    <div className="enhanced-table-scroll">
-      <div className="enhanced-table-container">
-        <Table className="weekly-table enhanced-table" style={{ width: 'auto', minWidth: 1200 }}>
+    <div className="w-full p-3">
+      <div className="overflow-x-auto scrollbar-grey">
+        <Table className="weekly-table w-full border-collapse" style={{ minWidth: 1200 }}>
           <TableHeader>
-            <TableRow>
+            <TableRow className="border-b border-border" style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}>
               {/* Project Column */}
               <TableHead
-                className="text-left font-semibold sticky left-0 z-30 border-r text-sm px-3 name-column"
-                style={{ width: 220, minWidth: 220 }}
+                className="sticky left-0 z-30 w-56 min-w-56 text-left px-3 py-3 font-semibold text-sm text-foreground"
+                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}
               >
                 Project
               </TableHead>
 
               {/* FTE Column */}
-              <TableHead className="text-center font-semibold border-r text-xs px-0" style={{ width: 80, minWidth: 80 }}>
+              <TableHead 
+                className="w-20 min-w-20 text-center font-semibold text-xs px-0 py-3 text-foreground"
+                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}
+              >
                 FTE
               </TableHead>
 
@@ -108,8 +111,8 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                 return (
                   <TableHead
                     key={member.id}
-                    className="text-center font-semibold border-r text-xs px-0 align-bottom"
-                    style={{ width: 40, minWidth: 40, verticalAlign: 'bottom' }}
+                    className="w-10 min-w-10 text-center font-medium px-0.5 py-1.5 text-foreground"
+                    style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)', verticalAlign: 'bottom' }}
                   >
                     <MemberVacationPopover memberId={member.id} memberName={fullName} weekStartDate={weekStartDate}>
                       <div className="cursor-pointer">
@@ -117,7 +120,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                           <TooltipTrigger asChild>
                             <div className="flex flex-col items-center gap-1 pb-1">
                               <div
-                                className="text-xs font-medium"
+                                className="text-xs font-medium text-foreground"
                                 style={{
                                   writingMode: 'vertical-rl',
                                   textOrientation: 'mixed',
@@ -132,7 +135,10 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                               </div>
                               <Avatar className="h-7 w-7 border border-border hover:ring-2 hover:ring-ring/30 transition-all">
                                 <AvatarImage src={getAvatarUrl(member)} alt={getFirstName(member)} />
-                                <AvatarFallback className="text-[10px] bg-muted text-foreground">
+                                <AvatarFallback 
+                                  className="text-[10px] font-medium"
+                                  style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }}
+                                >
                                   {getUserInitials(member.first_name, member.last_name)}
                                 </AvatarFallback>
                               </Avatar>
@@ -178,7 +184,10 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               })}
 
               {/* Total Column */}
-              <TableHead className="text-center font-semibold border-l-2 text-xs px-0" style={{ width: 60, minWidth: 60 }}>
+              <TableHead 
+                className="w-14 min-w-14 text-center font-semibold text-xs px-2 py-3 text-foreground border-l border-border"
+                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}
+              >
                 Total
               </TableHead>
             </TableRow>
@@ -188,11 +197,23 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             {projects.map((project, index) => (
               <TableRow
                 key={project.id}
-                className={`member-row ${index % 2 === 0 ? 'even-row' : 'odd-row'}`}
-                style={{ height: 33, minHeight: 33 }}
+                className="group transition-colors"
+                style={{ 
+                  backgroundColor: index % 2 === 0 
+                    ? 'hsl(var(--background))' 
+                    : 'hsl(var(--theme-primary) / 0.02)',
+                  height: 33
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 
+                  ? 'hsl(var(--background))' 
+                  : 'hsl(var(--theme-primary) / 0.02)'}
               >
-                <TableCell className="sticky left-0 z-20 px-3 py-1 name-column">
-                  <span className="text-sm font-semibold">
+                <TableCell 
+                  className="sticky left-0 z-20 px-3 py-1.5 border-r border-border"
+                  style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}
+                >
+                  <span className="text-sm font-semibold text-foreground">
                     {getProjectDisplayName(project, projectDisplayPreference)}
                   </span>
                 </TableCell>
@@ -217,8 +238,8 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                     <TableCell key={member.id} className="text-center p-0" style={{ width: 40, minWidth: 40 }}>
                       {hours > 0 && (
                         <span
-                          className="inline-flex items-center justify-center w-7 h-7 rounded-sm font-semibold text-xs"
-                          style={{ backgroundColor: 'hsl(var(--success))', color: 'hsl(var(--success-foreground))' }}
+                          className="inline-flex items-center justify-center w-7 h-6 rounded font-semibold text-xs"
+                          style={{ backgroundColor: 'hsl(var(--success))', color: 'white' }}
                         >
                           {formatAllocationValue(hours, getMemberCapacity(member), displayPreference)}
                         </span>
@@ -227,10 +248,13 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   );
                 })}
 
-                <TableCell className="text-center p-0 align-middle" style={{ height: 33 }}>
+                <TableCell className="text-center p-0 align-middle border-l border-border" style={{ height: 33 }}>
                   <div className="flex items-center justify-center h-full">
                     {getProjectTotal(project.id) > 0 ? (
-                      <div className="inline-flex items-center justify-center font-bold rounded px-2.5 py-1 text-sm min-w-[36px] bg-muted text-foreground">
+                      <div 
+                        className="inline-flex items-center justify-center font-bold rounded px-1.5 py-0.5 text-xs min-w-[36px]"
+                        style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)', color: 'hsl(var(--theme-primary))' }}
+                      >
                         {formatAllocationValue(getProjectTotal(project.id), defaultWeeklyCapacity, displayPreference)}
                       </div>
                     ) : (
@@ -242,33 +266,48 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             ))}
 
             {/* Totals Row */}
-            <TableRow className="enhanced-totals-row" style={{ height: 33 }}>
-              <TableCell className="sticky left-0 z-30 text-left font-semibold px-3 name-column">
+            <TableRow 
+              className="summary-row border-t border-border"
+              style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)', height: 40 }}
+            >
+              <TableCell 
+                className="sticky left-0 z-30 text-left px-3 py-2 font-semibold text-sm text-foreground"
+                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}
+              >
                 Weekly Total
               </TableCell>
-              <TableCell className="text-center p-0 align-middle" style={{ height: 33 }}>
+              <TableCell className="text-center p-0 align-middle" style={{ height: 40 }}>
                 <div className="flex items-center justify-center h-full">
-                  <div className="enhanced-pill">
+                  <div 
+                    className="inline-flex items-center justify-center font-bold rounded px-2 py-1 text-sm"
+                    style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }}
+                  >
                     {(members.reduce((sum, member) => sum + getMemberTotal(member.id), 0) / workWeekHours).toFixed(1)}
                   </div>
                 </div>
               </TableCell>
               {members.map((member) => (
-                <TableCell key={member.id} className="text-center p-0 align-middle" style={{ height: 33 }}>
+                <TableCell key={member.id} className="text-center p-0 align-middle" style={{ height: 40 }}>
                   <div className="flex items-center justify-center h-full">
                     {getMemberTotal(member.id) > 0 ? (
-                      <div className="enhanced-pill">
+                      <div 
+                        className="inline-flex items-center justify-center font-bold rounded px-1.5 py-0.5 text-xs"
+                        style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }}
+                      >
                         {formatAllocationValue(getMemberTotal(member.id), getMemberCapacity(member), displayPreference)}
                       </div>
                     ) : (
-                      <span className="text-white/50">—</span>
+                      <span className="text-muted-foreground">—</span>
                     )}
                   </div>
                 </TableCell>
               ))}
-              <TableCell className="text-center p-0 align-middle" style={{ height: 33 }}>
+              <TableCell className="text-center p-0 align-middle border-l border-border" style={{ height: 40 }}>
                 <div className="flex items-center justify-center h-full">
-                  <div className="enhanced-pill">
+                  <div 
+                    className="inline-flex items-center justify-center font-bold rounded px-2 py-1 text-sm"
+                    style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }}
+                  >
                     {formatAllocationValue(
                       members.reduce((sum, member) => sum + getMemberTotal(member.id), 0),
                       defaultWeeklyCapacity * members.length,
