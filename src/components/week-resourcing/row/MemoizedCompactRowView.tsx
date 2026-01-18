@@ -466,11 +466,11 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         return (
           <TableCell
             key={project.id}
-            className="text-center px-0 py-0.5 project-column overflow-hidden"
+            className="text-center px-0.5 py-0.5 project-column"
             style={{ 
-              width: 28, 
-              minWidth: 28, 
-              maxWidth: 28,
+              width: 45, 
+              minWidth: 45, 
+              maxWidth: 45,
               backgroundColor: columnBgColor,
               borderRight: '1px solid hsl(var(--border) / 0.5)',
               borderBottom: '1px solid hsl(var(--border) / 0.3)'

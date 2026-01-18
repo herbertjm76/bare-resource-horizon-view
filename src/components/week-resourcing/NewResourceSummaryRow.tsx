@@ -74,18 +74,18 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         return (
           <TableCell 
             key={project.id} 
-            className="text-center text-[10px] font-semibold px-0"
-            style={{ width: 28, minWidth: 28, maxWidth: 28 }}
+            className="text-center text-sm font-semibold"
+            style={{ width: 45, minWidth: 45, maxWidth: 45 }}
           >
             {hours > 0 ? (
               <span 
-                className="inline-flex items-center justify-center font-bold rounded text-[10px]"
+                className="inline-flex items-center justify-center font-bold rounded px-1.5 py-0.5 text-xs"
                 style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }}
               >
                 {formatAllocationValue(hours, workWeekHours, displayPreference)}
               </span>
             ) : (
-              <span className="text-muted-foreground text-[10px]">—</span>
+              <span className="text-muted-foreground">—</span>
             )}
           </TableCell>
         );
