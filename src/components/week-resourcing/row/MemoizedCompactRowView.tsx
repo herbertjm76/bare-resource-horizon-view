@@ -308,22 +308,22 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     <TableRow
       className="group transition-colors"
       style={{ 
-        fontSize: 12, 
-        minHeight: 33, 
-        height: 33, 
+        fontSize: 13, 
+        minHeight: 35, 
+        height: 35, 
         lineHeight: 1,
         backgroundColor: rowBgColor
       }}
       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
     >
-      {/* Team Member consolidated cell - 100px with name */}
+      {/* Team Member cell - 50px avatar only */}
       <TableCell
         className="px-1 py-0.5 name-column sticky left-0 z-10"
         style={{
-          width: 100,
-          minWidth: 100,
-          maxWidth: 100,
+          width: 50,
+          minWidth: 50,
+          maxWidth: 50,
           backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
           borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)',
@@ -334,17 +334,18 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           memberName={memberData.displayName}
           weekStartDate={format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd')}
         >
-          <div className="flex items-center gap-1.5 cursor-pointer">
+          <div className="flex items-center justify-center cursor-pointer">
             <TooltipProvider>
               <Tooltip delayDuration={200}>
                 <TooltipTrigger asChild>
                   <Avatar
-                    className="h-7 w-7 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                    className="cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                    style={{ width: 30, height: 30 }}
                     title={memberData.displayName}
                   >
                     <AvatarImage src={memberData.avatarUrl} alt={memberData.displayName} />
                     <AvatarFallback
-                      className="text-white text-[10px]"
+                      className="text-white text-[11px]"
                       style={{
                         background:
                           'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))',
@@ -368,9 +369,6 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <span className="text-[11px] font-medium truncate text-foreground leading-none">
-              {memberData.displayName}
-            </span>
           </div>
         </MemberVacationPopover>
       </TableCell>
