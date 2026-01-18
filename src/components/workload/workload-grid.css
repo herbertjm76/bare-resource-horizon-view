@@ -96,6 +96,9 @@
 .workload-grid-row {
   border-bottom: 1px solid rgba(156, 163, 175, 0.6);
   transition: background-color 0.15s ease;
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
 }
 
 .workload-grid-row:hover {
