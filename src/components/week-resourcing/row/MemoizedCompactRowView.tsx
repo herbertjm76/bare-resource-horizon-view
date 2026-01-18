@@ -317,13 +317,13 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
     >
-      {/* Team Member consolidated cell */}
+      {/* Team Member consolidated cell - 100px with name */}
       <TableCell
-        className="px-2 py-0.5 name-column sticky left-0 z-10"
+        className="px-1 py-0.5 name-column sticky left-0 z-10"
         style={{
-          width: 150,
-          minWidth: 150,
-          maxWidth: 150,
+          width: 100,
+          minWidth: 100,
+          maxWidth: 100,
           backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
           borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)',
@@ -334,17 +334,17 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           memberName={memberData.displayName}
           weekStartDate={format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd')}
         >
-          <div className="flex items-center justify-center cursor-pointer">
+          <div className="flex items-center gap-1.5 cursor-pointer">
             <TooltipProvider>
               <Tooltip delayDuration={200}>
                 <TooltipTrigger asChild>
                   <Avatar
-                    className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                    className="h-7 w-7 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
                     title={memberData.displayName}
                   >
                     <AvatarImage src={memberData.avatarUrl} alt={memberData.displayName} />
                     <AvatarFallback
-                      className="text-white text-xs"
+                      className="text-white text-[10px]"
                       style={{
                         background:
                           'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))',
@@ -368,6 +368,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            <span className="text-[11px] font-medium truncate text-foreground leading-none">
+              {memberData.displayName}
+            </span>
           </div>
         </MemberVacationPopover>
       </TableCell>

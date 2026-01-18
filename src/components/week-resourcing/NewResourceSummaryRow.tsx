@@ -43,17 +43,17 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
       className="summary-row border-t border-border"
       style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)', height: 40 }}
     >
-      {/* Team Member Column */}
+      {/* Team Member Column - 100px */}
       <TableCell 
-        className="sticky left-0 z-20 text-left px-3 py-2 font-semibold text-sm text-foreground"
+        className="sticky left-0 z-20 text-left px-2 py-2 font-semibold text-sm text-foreground"
         style={{ 
           backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
-          width: 150,
-          minWidth: 150,
-          maxWidth: 150
+          width: 100,
+          minWidth: 100,
+          maxWidth: 100
         }}
       >
-        Weekly Total
+        Total
       </TableCell>
 
       {/* Utilization Column - Fixed 120px */}
