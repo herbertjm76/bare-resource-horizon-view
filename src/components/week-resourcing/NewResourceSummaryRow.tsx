@@ -43,14 +43,14 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
       className="summary-row border-t border-border"
       style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)', height: 40 }}
     >
-      {/* Team Member Column - fixed 70px */}
+      {/* Team Member Column - fixed 50px */}
       <TableCell 
         className="sticky left-0 z-20 text-left px-2 py-2 font-semibold text-sm text-foreground"
         style={{ 
           backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
-          width: 70,
-          minWidth: 70,
-          maxWidth: 70
+          width: 50,
+          minWidth: 50,
+          maxWidth: 50
         }}
       >
         Total
@@ -64,10 +64,10 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         <span className="text-muted-foreground">—</span>
       </TableCell>
 
-      {/* Project Count Column - 33px fixed */}
+      {/* Project Count Column - 36px fixed */}
       <TableCell 
         className="text-center text-sm font-semibold"
-        style={{ width: 33, minWidth: 33, maxWidth: 33 }}
+        style={{ width: 36, minWidth: 36, maxWidth: 36 }}
       >
         <span 
           className="inline-flex items-center justify-center font-bold rounded px-2 py-1 text-sm"
