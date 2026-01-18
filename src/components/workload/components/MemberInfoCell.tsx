@@ -35,51 +35,44 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
       className="workload-grid-cell member-cell"
       style={{
         backgroundColor: rowBgColor,
-        width: '250px',
-        minWidth: '250px',
-        maxWidth: '250px',
+        width: '180px',
+        minWidth: '180px',
+        maxWidth: '180px',
         position: shouldCenterAlign ? 'static' : 'sticky',
         left: shouldCenterAlign ? 'auto' : '0',
         zIndex: shouldCenterAlign ? 'auto' : 20,
         textAlign: 'left',
-        padding: '2px 8px',
+        padding: '0 8px',
         borderRight: '2px solid rgba(156, 163, 175, 0.3)',
         borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
-        verticalAlign: 'middle'
+        verticalAlign: 'middle',
+        height: '28px'
       }}
     >
-      <div className="member-info">
-        <Avatar className="member-avatar h-[22px] w-[22px]">
+      <div className="flex items-center gap-2 h-full" style={{ minHeight: 0 }}>
+        <Avatar className="h-[22px] w-[22px] flex-shrink-0">
           <AvatarImage src={getAvatarUrl(member)} alt={displayName} />
-          <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white' }}>
+          <AvatarFallback 
+            className="text-[10px] text-white"
+            style={{ backgroundColor: '#6366f1' }}
+          >
             {initials}
           </AvatarFallback>
         </Avatar>
-        <div style={{ flex: '1', minWidth: '0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="member-name">
-            {displayName}
+        <span 
+          className="text-[13px] font-medium text-gray-900 truncate leading-none"
+          style={{ maxWidth: 'calc(100% - 30px)' }}
+        >
+          {displayName}
+        </span>
+        {isAtRisk && (
+          <span 
+            className="flex-shrink-0 inline-flex items-center bg-red-50 text-red-600 text-[9px] font-semibold px-1 rounded"
+          >
+            <AlertTriangle size={8} className="mr-0.5" />
+            !
           </span>
-          {isAtRisk && (
-            <span 
-              className="animate-pulse"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '3px',
-                backgroundColor: '#fef2f2',
-                color: '#dc2626',
-                fontSize: '10px',
-                fontWeight: 600,
-                padding: '2px 6px',
-                borderRadius: '4px',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              <AlertTriangle size={10} />
-              At Risk
-            </span>
-          )}
-        </div>
+        )}
       </div>
     </td>
   );
