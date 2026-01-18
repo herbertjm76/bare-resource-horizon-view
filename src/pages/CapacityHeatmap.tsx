@@ -157,13 +157,32 @@ const CapacityHeatmap: React.FC = () => {
       return true;
     });
     
-    logger.debug('📊 CAPACITY HEATMAP: Filtered members', {
+    // Sort by department first, then by office_role_id
+    const sorted = filtered.sort((a, b) => {
+      // Sort by department (nulls last)
+      const deptA = a.department || '';
+      const deptB = b.department || '';
+      if (deptA !== deptB) {
+        if (!deptA) return 1;
+        if (!deptB) return -1;
+        return deptA.localeCompare(deptB);
+      }
+      
+      // Then sort by office_role_id (nulls last)
+      const roleA = a.office_role_id || '';
+      const roleB = b.office_role_id || '';
+      if (!roleA) return 1;
+      if (!roleB) return -1;
+      return roleA.localeCompare(roleB);
+    });
+    
+    logger.debug('📊 CAPACITY HEATMAP: Filtered and sorted members', {
       allMembersCount: allMembers.length,
-      filteredCount: filtered.length,
+      filteredCount: sorted.length,
       filters
     });
     
-    return filtered;
+    return sorted;
   }, [allMembers, filters]);
 
   const weekLabel = useMemo(
