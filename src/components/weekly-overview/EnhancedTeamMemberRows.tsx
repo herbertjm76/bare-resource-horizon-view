@@ -121,7 +121,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="font-medium text-sm">
-                          {member.first_name} {member.last_name}
+                          {member.first_name} {member.last_name?.charAt(0)}.
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {member.department || 'N/A'}

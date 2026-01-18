@@ -9,10 +9,13 @@ interface MemberNameCellProps {
 }
 
 export const MemberNameCell: React.FC<MemberNameCellProps> = ({ member }) => {
-  // Helper to get just the first name
-  const getFirstName = (): string => {
+  // Helper to get display name (First Name + Last Initial)
+  const getDisplayName = (): string => {
     if (!member) return 'Unknown';
-    if (member.first_name) return member.first_name;
+    if (member.first_name) {
+      const lastInitial = member.last_name?.charAt(0) || '';
+      return `${member.first_name} ${lastInitial}.`;
+    }
     // Fallback to name property for pre-registered/deleted resources
     if (member.isPending || member.isDeleted) return member.name || 'Pending';
     return member.name || 'Unknown';
@@ -54,7 +57,7 @@ export const MemberNameCell: React.FC<MemberNameCellProps> = ({ member }) => {
         </Avatar>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="truncate cursor-pointer">{getFirstName()}</span>
+            <span className="truncate cursor-pointer">{getDisplayName()}</span>
           </TooltipTrigger>
           <TooltipContent>
             <p>{getMemberName()}</p>
