@@ -44,7 +44,7 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
 
   return (
     <TooltipProvider>
-      <tr className="workload-grid-row workload-grid-row-compact" style={{ height: '32px', minHeight: '32px' }}>
+      <tr className="workload-grid-row workload-grid-row-compact" style={{ height: '28px', minHeight: '28px' }}>
         <MemberInfoCell 
           member={member} 
           memberIndex={memberIndex} 
