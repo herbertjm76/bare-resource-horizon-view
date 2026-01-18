@@ -50,9 +50,9 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
               key={week.key}
               className="workload-grid-header week-column"
               style={{ 
-                width: '30px', 
-                minWidth: '30px',
-                maxWidth: '30px',
+                width: '25px', 
+                minWidth: '25px',
+                maxWidth: '25px',
                 textAlign: 'center',
                 padding: '4px 2px',
                 borderRight: '1px solid hsl(var(--border) / 0.5)',
