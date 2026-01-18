@@ -53,11 +53,28 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     });
   }, [projects, members, allocationMap]);
 
+  // Make column widths deterministic (prevents the first column from stretching)
+  const tableWidth = React.useMemo(() => {
+    const nameCol = 70;
+    const utilizationCol = 208; // w-52
+    const projectsCol = 64; // w-16
+    const projectCols = projectsWithHours.length * 28;
+    const total = nameCol + utilizationCol + projectsCol + projectCols;
+    // keep a sane minimum when there are many columns
+    return Math.max(400, total);
+  }, [projectsWithHours.length]);
+
   // NOTE: We intentionally do NOT apply the `weekly-table` class here.
   // That class is styled via aggressive CSS overrides and was causing the purple tint.
-  return <Table className="w-full border-collapse" style={{
-    minWidth: 1200
-  }}>
+  return (
+    <Table
+      className="border-collapse"
+      style={{
+        width: tableWidth,
+        minWidth: tableWidth,
+        tableLayout: 'fixed',
+      }}
+    >
       <TableHeader>
         <TableRow className="border-b border-border bg-muted">
           {/* Team Member Column */}
@@ -92,8 +109,26 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {members.map((member, index) => <NewResourceTableRow key={member.id} member={member} memberIndex={index} projects={projectsWithHours} allocationMap={allocationMap} annualLeaveData={annualLeaveData} holidaysData={holidaysData} otherLeaveData={otherLeaveData} getMemberTotal={getMemberTotal} getProjectCount={getProjectCount} getWeeklyLeave={getWeeklyLeave} updateOtherLeave={updateOtherLeave} viewMode={viewMode} selectedWeek={selectedWeek} />)}
+        {members.map((member, index) => (
+          <NewResourceTableRow
+            key={member.id}
+            member={member}
+            memberIndex={index}
+            projects={projectsWithHours}
+            allocationMap={allocationMap}
+            annualLeaveData={annualLeaveData}
+            holidaysData={holidaysData}
+            otherLeaveData={otherLeaveData}
+            getMemberTotal={getMemberTotal}
+            getProjectCount={getProjectCount}
+            getWeeklyLeave={getWeeklyLeave}
+            updateOtherLeave={updateOtherLeave}
+            viewMode={viewMode}
+            selectedWeek={selectedWeek}
+          />
+        ))}
         <NewResourceSummaryRow projects={projectsWithHours} allocationMap={allocationMap} members={members} />
       </TableBody>
-    </Table>;
+    </Table>
+  );
 };

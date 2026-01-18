@@ -317,16 +317,16 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
     >
-      {/* Team Member consolidated cell - 180px fixed */}
+      {/* Team Member consolidated cell - narrow (avatar only) */}
       <TableCell
         className="px-2 py-0.5 name-column sticky left-0 z-10"
-        style={{ 
-          width: 180, 
-          minWidth: 180, 
-          maxWidth: 180, 
+        style={{
+          width: 70,
+          minWidth: 70,
+          maxWidth: 70,
           backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
           borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
-          borderBottom: '1px solid hsl(var(--border) / 0.3)'
+          borderBottom: '1px solid hsl(var(--border) / 0.3)',
         }}
       >
         <MemberVacationPopover
@@ -334,52 +334,37 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           memberName={memberData.displayName}
           weekStartDate={format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd')}
         >
-          <div className="cursor-pointer">
+          <div className="flex items-center justify-center cursor-pointer">
             <TooltipProvider>
               <Tooltip delayDuration={200}>
                 <TooltipTrigger asChild>
-                  <div
-                    className="flex items-center w-full gap-2"
-                    style={{ width: '100%', minWidth: 0, height: '26px' }}
+                  <Avatar
+                    className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
                     title={memberData.displayName}
                   >
-                    <Avatar className="h-6 w-6 min-w-[24px] min-h-[24px] hover:ring-2 hover:ring-primary/50 transition-all" >
-                      <AvatarImage 
-                        src={memberData.avatarUrl} 
-                        alt={memberData.displayName}
-                      />
-                      <AvatarFallback className="text-white text-[11px]" style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))' }}>
-                        {memberData.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span
-                      className="font-semibold leading-tight"
+                    <AvatarImage src={memberData.avatarUrl} alt={memberData.displayName} />
+                    <AvatarFallback
+                      className="text-white text-xs"
                       style={{
-                        fontSize: '15px',
-                        lineHeight: '1.2',
-                        maxWidth: 'calc(100% - 32px)',
-                        display: 'block',
-                        wordWrap: 'break-word',
-                        whiteSpace: 'normal',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        maxHeight: '2.4em',
+                        background:
+                          'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))',
                       }}
-                      data-testid="compact-full-name"
                     >
-                      {memberData.displayName}
-                    </span>
-                  </div>
+                      {memberData.initials}
+                    </AvatarFallback>
+                  </Avatar>
                 </TooltipTrigger>
-                <TooltipContent 
-                  side="right" 
-                  align="start" 
+                <TooltipContent
+                  side="right"
+                  align="start"
                   sideOffset={8}
                   className="z-[200] max-w-xs"
                   avoidCollisions={true}
                 >
                   {memberTooltip}
-                  <p className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-2">Click to add hours or leave</p>
+                  <p className="text-xs text-muted-foreground/70 pt-1 border-t border-border/50 mt-2">
+                    Click to add hours or leave
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
