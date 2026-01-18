@@ -317,13 +317,13 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
     >
-      {/* Team Member consolidated cell - narrow (avatar only) */}
+      {/* Team Member consolidated cell */}
       <TableCell
         className="px-2 py-0.5 name-column sticky left-0 z-10"
         style={{
-          width: 70,
-          minWidth: 70,
-          maxWidth: 70,
+          width: 250,
+          minWidth: 250,
+          maxWidth: 250,
           backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
           borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)',
@@ -371,10 +371,11 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           </div>
         </MemberVacationPopover>
       </TableCell>
-      {/* Utilization: FLEXIBLE - fills remaining space */}
+      {/* Utilization: FLEXIBLE with max 500px */}
       <TableCell 
         className="text-center px-1 py-0.5 utilization-column"
         style={{ 
+          maxWidth: 500,
           borderRight: '1px solid hsl(var(--border) / 0.5)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)'
         }}
@@ -411,13 +412,13 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
       </TableCell>
       
 
-      {/* Project Count - 64px fixed */}
+      {/* Project Count - 33px fixed */}
       <TableCell 
         className="text-center px-1 py-0.5 count-column"
         style={{ 
-          width: 64, 
-          minWidth: 64, 
-          maxWidth: 64,
+          width: 33, 
+          minWidth: 33, 
+          maxWidth: 33,
           borderRight: '1px solid hsl(var(--border) / 0.5)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)'
         }}
@@ -433,7 +434,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         </span>
       </TableCell>
       
-      {/* Project Cells - all 28px fixed with inline editing */}
+      {/* Project Cells - all 33px fixed with inline editing */}
       {projects.map((project, projectIndex) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
@@ -450,9 +451,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
             key={project.id}
             className="text-center px-0.5 py-0.5 project-column"
             style={{ 
-              width: 28, 
-              minWidth: 28, 
-              maxWidth: 28,
+              width: 33, 
+              minWidth: 33, 
+              maxWidth: 33,
               backgroundColor: columnBgColor,
               borderRight: '1px solid hsl(var(--border) / 0.5)',
               borderBottom: '1px solid hsl(var(--border) / 0.3)'
