@@ -38,7 +38,7 @@ export const WeekUtilizationCell: React.FC<WeekUtilizationCellProps> = ({
         maxWidth: '30px',
         backgroundColor: rowBgColor,
         textAlign: 'center',
-        padding: '2px',
+        padding: '1px',
         borderRight: '1px solid rgba(156, 163, 175, 0.2)',
         borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
         verticalAlign: 'middle'

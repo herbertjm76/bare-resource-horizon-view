@@ -42,14 +42,14 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
         left: shouldCenterAlign ? 'auto' : '0',
         zIndex: shouldCenterAlign ? 'auto' : 20,
         textAlign: 'left',
-        padding: '12px 16px',
+        padding: '6px 12px',
         borderRight: '2px solid rgba(156, 163, 175, 0.3)',
         borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
         verticalAlign: 'middle'
       }}
     >
       <div className="member-info">
-        <Avatar className="member-avatar">
+        <Avatar className="member-avatar h-6 w-6">
           <AvatarImage src={getAvatarUrl(member)} alt={displayName} />
           <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white' }}>
             {initials}
