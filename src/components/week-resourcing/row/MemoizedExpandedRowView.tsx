@@ -88,10 +88,30 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
   // Calculate utilization percentage
   const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalHoursWithLeave / weeklyCapacity) * 100) : 0;
 
+  // Theme-based alternating row colors
+  const rowBgColor = memberIndex % 2 === 0 
+    ? 'hsl(var(--background))' 
+    : 'hsl(var(--theme-primary) / 0.02)';
+
   return (
-    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-muted/50' : 'bg-background'} hover:bg-accent/50 transition-colors duration-200 h-20 border-b border-border`}>
+    <TableRow 
+      className="transition-colors duration-200 h-20"
+      style={{ 
+        backgroundColor: rowBgColor,
+        borderBottom: '1px solid hsl(var(--border) / 0.3)'
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
+      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
+    >
       {/* Name Cell */}
-      <TableCell className="border-r border-gray-200 px-4 py-3 min-w-[180px]">
+      <TableCell 
+        className="px-4 py-3 min-w-[180px]"
+        style={{
+          backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
+          borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
+          borderBottom: '1px solid hsl(var(--border) / 0.3)'
+        }}
+      >
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
             <NameCell 
@@ -121,12 +141,24 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
       </TableCell>
       
       {/* Project Count */}
-      <TableCell className="text-center border-r border-gray-200 px-3 py-3">
+      <TableCell 
+        className="text-center px-3 py-3"
+        style={{
+          borderRight: '1px solid hsl(var(--border) / 0.5)',
+          borderBottom: '1px solid hsl(var(--border) / 0.3)'
+        }}
+      >
         {projectCount}
       </TableCell>
       
       {/* Utilization: Larger Progress Bar - Include leave hours */}
-      <TableCell className="text-center border-r border-gray-200 px-3 py-3">
+      <TableCell 
+        className="text-center px-3 py-3"
+        style={{
+          borderRight: '1px solid hsl(var(--border) / 0.5)',
+          borderBottom: '1px solid hsl(var(--border) / 0.3)'
+        }}
+      >
         <LongCapacityBar
           totalUsedHours={totalHoursWithLeave}
           totalCapacity={weeklyCapacity}
@@ -135,17 +167,34 @@ const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
       
       
       {/* Project allocation cells */}
-      {projects.map((project) => {
+      {projects.map((project, projectIndex) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
+        
+        // Alternating column backgrounds
+        const columnBgColor = projectIndex % 2 === 0 
+          ? 'transparent' 
+          : 'hsl(var(--theme-primary) / 0.02)';
+        
         return (
-          <TableCell key={project.id} className="text-center border-r border-gray-200 px-2 py-3">
+          <TableCell 
+            key={project.id} 
+            className="text-center px-2 py-3"
+            style={{
+              backgroundColor: columnBgColor,
+              borderRight: '1px solid hsl(var(--border) / 0.5)',
+              borderBottom: '1px solid hsl(var(--border) / 0.3)'
+            }}
+          >
             <EnhancedTooltip
               type="project"
               projectBreakdown={getProjectBreakdown(project, hours)}
             >
               {hours > 0 && (
-                <span className="inline-flex items-center justify-center w-10 h-8 bg-green-500 text-white rounded-lg font-semibold text-sm shadow-sm">
+                <span 
+                  className="inline-flex items-center justify-center w-10 h-8 text-white rounded-lg font-semibold text-sm shadow-sm"
+                  style={{ backgroundColor: 'hsl(var(--theme-primary))' }}
+                >
                   {formatAllocationValue(hours, weeklyCapacity, displayPreference)}
                 </span>
               )}
