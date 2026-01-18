@@ -234,17 +234,22 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
 
   // Memoize member data to prevent recalculations
   const memberData = useMemo(() => {
-    const fullName = member ? `${member.first_name || ''} ${member.last_name || ''}`.trim() : '';
-    let displayName = fullName || 'Unknown';
-    if (!fullName && member) {
+    // Format as "First L." to match Team Leave style
+    let displayName = 'Unknown';
+    if (member?.first_name) {
+      const lastInitial = member.last_name?.charAt(0) || '';
+      displayName = lastInitial ? `${member.first_name} ${lastInitial}.` : member.first_name;
+    } else if (member) {
       // Fallback for pre-registered or deleted resources
       if (member.isPending) displayName = member.name || 'Pending invite';
       else if (member.isDeleted) displayName = member.name || 'Deleted Resource';
       else displayName = member.name || 'Unknown';
     }
+    const fullName = member ? `${member.first_name || ''} ${member.last_name || ''}`.trim() : '';
     return {
       initials: member ? `${(member.first_name || '').charAt(0)}${(member.last_name || '').charAt(0)}`.toUpperCase() || '??' : '??',
       displayName,
+      fullName: fullName || displayName,
       avatarUrl: member?.avatar_url
     };
   }, [member]);
@@ -463,9 +468,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
             key={project.id}
             className="text-center px-0.5 py-0.5 project-column"
             style={{ 
-              width: 50, 
-              minWidth: 50, 
-              maxWidth: 50,
+              width: 45, 
+              minWidth: 45, 
+              maxWidth: 45,
               backgroundColor: columnBgColor,
               borderRight: '1px solid hsl(var(--border) / 0.5)',
               borderBottom: '1px solid hsl(var(--border) / 0.3)'
