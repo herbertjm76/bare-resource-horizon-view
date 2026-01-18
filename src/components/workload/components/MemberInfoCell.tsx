@@ -47,7 +47,7 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
         textAlign: 'left',
         padding: '0 8px',
         borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
-        borderBottom: '1px solid hsl(var(--border) / 0.5)',
+        borderBottom: '1px solid hsl(var(--border) / 0.3)',
         verticalAlign: 'middle',
         height: '28px'
       }}

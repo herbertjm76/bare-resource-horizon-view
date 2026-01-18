@@ -294,19 +294,35 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     </div>
   ), [memberData.displayName, capacityDisplay, memberProjectAllocations, projectDisplayPreference, displayPreference, percentCapacity]);
 
+  // Theme-based alternating row colors
+  const rowBgColor = memberIndex % 2 === 0 
+    ? 'hsl(var(--background))' 
+    : 'hsl(var(--theme-primary) / 0.02)';
 
   return (
     <TableRow
-      className={
-        `resource-table-row-compact ${memberIndex % 2 === 0 ? 'bg-background' : 'bg-muted/50'}
-        hover:bg-accent/50 transition-all duration-150 h-8 min-h-0`
-      }
-      style={{ fontSize: 12, minHeight: 28, height: 28, lineHeight: 1 }}
+      className="resource-table-row-compact transition-all duration-150 h-8 min-h-0"
+      style={{ 
+        fontSize: 12, 
+        minHeight: 28, 
+        height: 28, 
+        lineHeight: 1,
+        backgroundColor: rowBgColor
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'hsl(var(--theme-primary) / 0.08)'}
+      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowBgColor}
     >
       {/* Team Member consolidated cell - 180px fixed */}
       <TableCell
-        className="border-r border-gray-200 px-2 py-0.5 name-column bg-gradient-to-r from-blue-50 to-indigo-50"
-        style={{ width: 180, minWidth: 180, maxWidth: 180, zIndex: 5 }}
+        className="px-2 py-0.5 name-column sticky left-0 z-10"
+        style={{ 
+          width: 180, 
+          minWidth: 180, 
+          maxWidth: 180, 
+          backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
+          borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
+          borderBottom: '1px solid hsl(var(--border) / 0.3)'
+        }}
       >
         <MemberVacationPopover
           memberId={member.id}
@@ -365,11 +381,16 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           </div>
         </MemberVacationPopover>
       </TableCell>
-      
       {/* Utilization: 200px fixed Progress Bar with STANDARDIZED calculation */}
       <TableCell 
-        className="text-center border-r border-gray-200 px-1 py-0.5 utilization-column bg-gradient-to-r from-emerald-50 to-green-50"
-        style={{ width: 200, minWidth: 200, maxWidth: 200 }}
+        className="text-center px-1 py-0.5 utilization-column"
+        style={{ 
+          width: 200, 
+          minWidth: 200, 
+          maxWidth: 200,
+          borderRight: '1px solid hsl(var(--border) / 0.5)',
+          borderBottom: '1px solid hsl(var(--border) / 0.3)'
+        }}
       >
         <Popover>
           <PopoverTrigger asChild>
@@ -405,26 +426,50 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
 
       {/* Project Count - 35px fixed */}
       <TableCell 
-        className="text-center border-r border-gray-200 px-1 py-0.5 count-column bg-gradient-to-r from-gray-50 to-slate-50"
-        style={{ width: 35, minWidth: 35, maxWidth: 35 }}
+        className="text-center px-1 py-0.5 count-column"
+        style={{ 
+          width: 35, 
+          minWidth: 35, 
+          maxWidth: 35,
+          borderRight: '1px solid hsl(var(--border) / 0.5)',
+          borderBottom: '1px solid hsl(var(--border) / 0.3)'
+        }}
       >
-        <span className="inline-flex items-center justify-center w-7 h-6 bg-slate-500 text-white rounded-sm font-semibold text-[11px] shadow-sm">
+        <span 
+          className="inline-flex items-center justify-center w-7 h-6 rounded-sm font-semibold text-[11px] shadow-sm"
+          style={{
+            backgroundColor: 'hsl(var(--theme-primary))',
+            color: 'white'
+          }}
+        >
           {projectCount}
         </span>
       </TableCell>
       
       {/* Project Cells - all 50px fixed with inline editing */}
-      {projects.map((project) => {
+      {projects.map((project, projectIndex) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
         const projectDetailedData = memberDetailedData?.projects.find(p => p.project_id === project.id);
         const isEditing = editingProjectId === project.id;
         
+        // Alternating column backgrounds
+        const columnBgColor = projectIndex % 2 === 0 
+          ? 'transparent' 
+          : 'hsl(var(--theme-primary) / 0.02)';
+        
         return (
           <TableCell
             key={project.id}
-            className="text-center border-r border-gray-200 px-0.5 py-0.5 project-column bg-gradient-to-r from-purple-50 to-violet-50"
-            style={{ width: 50, minWidth: 50, maxWidth: 50 }}
+            className="text-center px-0.5 py-0.5 project-column"
+            style={{ 
+              width: 50, 
+              minWidth: 50, 
+              maxWidth: 50,
+              backgroundColor: columnBgColor,
+              borderRight: '1px solid hsl(var(--border) / 0.5)',
+              borderBottom: '1px solid hsl(var(--border) / 0.3)'
+            }}
           >
             {isEditing ? (
               <input

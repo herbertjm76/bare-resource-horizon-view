@@ -26,7 +26,7 @@ export const TotalHoursCell: React.FC<TotalHoursCellProps> = ({
         backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
         textAlign: 'center',
         padding: '2px 4px',
-        borderRight: 'none',
+        borderRight: '1px solid hsl(var(--border) / 0.5)',
         borderBottom: '1px solid hsl(var(--border) / 0.3)',
         verticalAlign: 'middle',
         borderLeft: '2px solid hsl(var(--theme-primary) / 0.15)'
