@@ -52,96 +52,76 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     });
   }, [projects, members, allocationMap]);
   
-  const tableClassName = viewMode === 'compact' 
-    ? 'resource-table-compact weekly-table enhanced-table' 
-    : 'resource-table-expanded weekly-table enhanced-table';
-
-  // Match Team Leave container styling exactly - clean white card with subtle themed headers
+  // NOTE: We intentionally do NOT apply the `weekly-table` class here.
+  // That class is styled via aggressive CSS overrides and was causing the purple tint.
   return (
-    <div className="w-full p-3">
-      <div className="overflow-x-auto scrollbar-grey">
-        <Table className="weekly-table w-full border-collapse" style={{ minWidth: 1200 }}>
-          <TableHeader>
-            <TableRow className="border-b border-border" style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}>
-              {/* Team Member Column */}
-              <TableHead
-                className="sticky left-0 z-20 w-44 min-w-44 text-left px-3 py-3 font-semibold text-sm text-foreground"
-                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}
-              >
-                Team Member
-              </TableHead>
+    <Table className="w-full border-collapse" style={{ minWidth: 1200 }}>
+      <TableHeader>
+        <TableRow className="border-b border-border bg-muted">
+          {/* Team Member Column */}
+          <TableHead className="sticky left-0 z-20 w-44 min-w-44 text-left px-3 py-3 font-semibold text-sm text-foreground bg-muted">
+            Team Member
+          </TableHead>
 
-              {/* Utilization Column */}
-              <TableHead
-                className="w-52 min-w-52 text-center font-semibold text-sm px-2 py-3 text-foreground"
-                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}
-              >
-                Total Utilization (1 week)
-              </TableHead>
+          {/* Utilization Column */}
+          <TableHead className="w-52 min-w-52 text-center font-semibold text-sm px-2 py-3 text-foreground bg-muted">
+            Total Utilization (1 week)
+          </TableHead>
 
-              {/* Project Count Column */}
-              <TableHead
-                className="w-16 min-w-16 text-center font-semibold text-sm px-1 py-3 text-foreground"
-                style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}
-              >
-                Projects
-              </TableHead>
+          {/* Project Count Column */}
+          <TableHead className="w-16 min-w-16 text-center font-semibold text-sm px-1 py-3 text-foreground bg-muted">
+            Projects
+          </TableHead>
 
-              {/* Project Columns with Rotated Text - Only show projects with hours */}
-              {projectsWithHours.map((project, idx) => (
-                <TableHead
-                  key={project.id}
-                  className="w-10 min-w-10 text-center font-medium px-0.5 py-1.5 text-foreground"
-                  style={{ 
-                    backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
-                    height: 120 
+          {/* Project Columns with Rotated Text - Only show projects with hours */}
+          {projectsWithHours.map((project) => (
+            <TableHead
+              key={project.id}
+              className="w-10 min-w-10 text-center font-medium px-0.5 py-1.5 text-foreground bg-muted align-bottom"
+            >
+              <div className="flex items-end justify-center h-[120px]">
+                <div
+                  className="-rotate-90 whitespace-nowrap text-xs font-medium"
+                  style={{
+                    transformOrigin: 'center',
+                    maxWidth: '100px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}
+                  title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
                 >
-                  <div className="flex items-center justify-center h-full">
-                    <div
-                      className="transform -rotate-90 whitespace-nowrap text-xs font-medium"
-                      style={{
-                        transformOrigin: 'center',
-                        maxWidth: '100px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                      title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
-                    >
-                      {getProjectDisplayName(project, projectDisplayPreference)}
-                    </div>
-                  </div>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {members.map((member, index) => (
-              <NewResourceTableRow
-                key={member.id}
-                member={member}
-                memberIndex={index}
-                projects={projectsWithHours}
-                allocationMap={allocationMap}
-                annualLeaveData={annualLeaveData}
-                holidaysData={holidaysData}
-                otherLeaveData={otherLeaveData}
-                getMemberTotal={getMemberTotal}
-                getProjectCount={getProjectCount}
-                getWeeklyLeave={getWeeklyLeave}
-                updateOtherLeave={updateOtherLeave}
-                viewMode={viewMode}
-                selectedWeek={selectedWeek}
-              />
-            ))}
-            <NewResourceSummaryRow
-              projects={projectsWithHours}
-              allocationMap={allocationMap}
-              members={members}
-            />
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+                  {getProjectDisplayName(project, projectDisplayPreference)}
+                </div>
+              </div>
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {members.map((member, index) => (
+          <NewResourceTableRow
+            key={member.id}
+            member={member}
+            memberIndex={index}
+            projects={projectsWithHours}
+            allocationMap={allocationMap}
+            annualLeaveData={annualLeaveData}
+            holidaysData={holidaysData}
+            otherLeaveData={otherLeaveData}
+            getMemberTotal={getMemberTotal}
+            getProjectCount={getProjectCount}
+            getWeeklyLeave={getWeeklyLeave}
+            updateOtherLeave={updateOtherLeave}
+            viewMode={viewMode}
+            selectedWeek={selectedWeek}
+          />
+        ))}
+        <NewResourceSummaryRow
+          projects={projectsWithHours}
+          allocationMap={allocationMap}
+          members={members}
+        />
+      </TableBody>
+    </Table>
   );
 };
