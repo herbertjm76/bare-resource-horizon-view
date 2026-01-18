@@ -21,10 +21,10 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
   // Theme-connected bar background
   const barBackground = 'hsl(var(--gradient-start))';
 
-  // Compact layout: small, subtle bar (no huge pill)
+  // Compact layout: taller bar for better visibility
   if (compact) {
     return (
-      <div className="long-bar w-full relative" style={{ height: 14 }}>
+      <div className="long-bar w-full relative" style={{ height: 22 }}>
         <div
           className="w-full h-full rounded-sm border bg-muted overflow-hidden relative"
           style={{ borderColor: 'hsl(var(--border))' }}
@@ -50,7 +50,7 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
 
           <div className="absolute inset-0 flex items-center justify-center">
             <span
-              className="text-[10px] font-semibold select-none"
+              className="text-[11px] font-semibold select-none"
               style={{ color: 'hsl(var(--foreground))' }}
             >
               {rate}%
