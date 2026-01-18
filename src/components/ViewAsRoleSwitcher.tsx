@@ -17,7 +17,6 @@ const ROLE_LABELS: Record<AppRole, string> = {
   admin: 'Admin',
   project_manager: 'Project Manager',
   member: 'Member',
-  contractor: 'Contractor',
 };
 
 export const ViewAsRoleSwitcher: React.FC = () => {

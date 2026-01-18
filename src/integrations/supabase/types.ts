@@ -2492,7 +2492,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "owner" | "admin" | "member" | "project_manager" | "contractor"
+      app_role: "owner" | "admin" | "project_manager" | "member"
       data_sensitivity: "public" | "internal" | "confidential" | "restricted"
       member_type: "active" | "pre_registered"
       user_role: "owner" | "admin" | "member"
@@ -2623,7 +2623,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner", "admin", "member", "project_manager", "contractor"],
+      app_role: ["owner", "admin", "project_manager", "member"],
       data_sensitivity: ["public", "internal", "confidential", "restricted"],
       member_type: ["active", "pre_registered"],
       user_role: ["owner", "admin", "member"],

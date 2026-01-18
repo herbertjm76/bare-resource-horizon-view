@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { logger } from '@/utils/logger';
 
-export type AppRole = 'owner' | 'admin' | 'project_manager' | 'member' | 'contractor';
+export type AppRole = 'owner' | 'admin' | 'project_manager' | 'member';
 
 // Context for "View As" role simulation (admin feature)
 interface ViewAsContextType {
@@ -32,13 +32,12 @@ export function useViewAs() {
 }
 
 // Define which roles can access which sections
-// Roles are hierarchical: owner > admin > project_manager > member/contractor
+// Roles are hierarchical: owner > admin > project_manager > member
 export const ROLE_HIERARCHY: Record<AppRole, number> = {
-  owner: 5,
-  admin: 4,
-  project_manager: 3,
-  member: 2,
-  contractor: 1,
+  owner: 4,
+  admin: 3,
+  project_manager: 2,
+  member: 1,
 };
 
 // Define permissions for different sections
@@ -68,9 +67,6 @@ const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'edit:projects', 'edit:scheduling'
   ],
   member: [
-    'view:overview', 'view:team'
-  ],
-  contractor: [
     'view:overview', 'view:team'
   ],
 };
@@ -301,7 +297,6 @@ export function usePermissions() {
     isAdmin: currentRole === 'admin' || currentRole === 'owner',
     isPM: currentRole === 'project_manager',
     isMember: currentRole === 'member',
-    isContractor: currentRole === 'contractor',
     // Debug helpers
     debugInfo,
     roleError: roleError?.message ?? null,
