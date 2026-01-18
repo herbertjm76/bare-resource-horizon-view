@@ -53,25 +53,14 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     });
   }, [projects, members, allocationMap]);
 
-  // Make column widths deterministic (prevents the first column from stretching)
-  const tableWidth = React.useMemo(() => {
-    const nameCol = 70;
-    const utilizationCol = 208; // w-52
-    const projectsCol = 64; // w-16
-    const projectCols = projectsWithHours.length * 28;
-    const total = nameCol + utilizationCol + projectsCol + projectCols;
-    // keep a sane minimum when there are many columns
-    return Math.max(400, total);
-  }, [projectsWithHours.length]);
-
   // NOTE: We intentionally do NOT apply the `weekly-table` class here.
   // That class is styled via aggressive CSS overrides and was causing the purple tint.
   return (
     <Table
       className="border-collapse"
       style={{
-        width: tableWidth,
-        minWidth: tableWidth,
+        width: '100%',
+        minWidth: 1200,
         tableLayout: 'fixed',
       }}
     >
@@ -82,22 +71,25 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
             Team Member
           </TableHead>
 
-          {/* Utilization Column */}
-          <TableHead className="w-52 min-w-52 text-center font-semibold text-sm px-2 py-3 text-foreground bg-muted">
+          {/* Utilization Column - FLEXIBLE (no fixed width) */}
+          <TableHead className="text-center font-semibold text-sm px-2 py-3 text-foreground bg-muted">
             Total Utilization (1 week)
           </TableHead>
 
           {/* Project Count Column */}
-          <TableHead className="w-16 min-w-16 text-center font-semibold text-sm px-1 py-3 text-foreground bg-muted">
+          <TableHead 
+            className="text-center font-semibold text-sm px-1 py-3 text-foreground bg-muted"
+            style={{ width: 64, minWidth: 64, maxWidth: 64 }}
+          >
             Projects
           </TableHead>
 
           {/* Project Columns with Rotated Text - Only show projects with hours */}
-          {projectsWithHours.map(project => <TableHead key={project.id} className="text-center font-medium px-0 py-1.5 text-foreground bg-muted align-bottom overflow-hidden" style={{
-          width: 28,
-          minWidth: 28,
-          maxWidth: 28
-        }}>
+          {projectsWithHours.map(project => <TableHead 
+            key={project.id} 
+            className="text-center font-medium px-0 py-1.5 text-foreground bg-muted align-bottom overflow-hidden" 
+            style={{ width: 28, minWidth: 28, maxWidth: 28 }}
+          >
               <div className="flex items-end justify-center h-[120px] w-full overflow-hidden">
                 <div className="-rotate-90 whitespace-nowrap text-xs font-medium max-w-[100px] overflow-hidden text-ellipsis" style={{
               transformOrigin: 'center'
