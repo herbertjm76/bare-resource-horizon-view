@@ -16,9 +16,9 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
   shouldCenterAlign = false,
   isAtRisk = false
 }) => {
-  const displayName = member.first_name && member.last_name 
-    ? `${member.first_name} ${member.last_name}`
-    : 'Unknown Member';
+  const displayName = member.first_name 
+    ? `${member.first_name} ${member.last_name?.charAt(0) || ''}.`
+    : 'Unknown';
 
   const initials = member.first_name && member.last_name
     ? `${member.first_name.charAt(0)}${member.last_name.charAt(0)}`
