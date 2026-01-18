@@ -74,21 +74,23 @@
   font-size: 9px !important;
 }
 
-/* Updated specific width overrides for ultra-compact mode */
+/* Column width overrides (match Weekly Overview compact table) */
 .resource-table-row-compact .name-column {
-  min-width: 180px !important;
-  width: 180px !important;
+  min-width: 150px !important;
+  width: 150px !important;
+  max-width: 150px !important;
+}
+
+.resource-table-row-compact .utilization-column {
+  min-width: 120px !important;
+  width: 120px !important;
+  max-width: 120px !important;
 }
 
 .resource-table-row-compact .count-column {
   min-width: 33px !important;
   width: 33px !important;
   max-width: 33px !important;
-}
-
-.resource-table-row-compact .utilization-column {
-  min-width: 200px !important;
-  width: 200px !important;
 }
 
 .resource-table-row-compact .leave-column {
@@ -98,6 +100,8 @@
 }
 
 .resource-table-row-compact .project-column {
-  flex: 1 1 auto !important;
-  min-width: 35px !important;
+  min-width: 36px !important;
+  width: 36px !important;
+  max-width: 36px !important;
 }
+
