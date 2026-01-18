@@ -28,13 +28,16 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
+  // Theme-based alternating row colors
+  const rowBgColor = memberIndex % 2 === 0 
+    ? 'hsl(var(--background))' 
+    : 'hsl(var(--theme-primary) / 0.02)';
 
   return (
     <td 
       className="workload-grid-cell member-cell"
       style={{
-        backgroundColor: rowBgColor,
+        backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
         width: '180px',
         minWidth: '180px',
         maxWidth: '180px',
@@ -43,8 +46,8 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
         zIndex: shouldCenterAlign ? 'auto' : 20,
         textAlign: 'left',
         padding: '0 8px',
-        borderRight: '2px solid rgba(156, 163, 175, 0.3)',
-        borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
+        borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
+        borderBottom: '1px solid hsl(var(--border) / 0.5)',
         verticalAlign: 'middle',
         height: '28px'
       }}
@@ -53,21 +56,31 @@ export const MemberInfoCell: React.FC<MemberInfoCellProps> = ({
         <Avatar className="h-[22px] w-[22px] flex-shrink-0">
           <AvatarImage src={getAvatarUrl(member)} alt={displayName} />
           <AvatarFallback 
-            className="text-[10px] text-white"
-            style={{ backgroundColor: '#6366f1' }}
+            className="text-[10px]"
+            style={{ 
+              backgroundColor: 'hsl(var(--theme-primary))',
+              color: 'white'
+            }}
           >
             {initials}
           </AvatarFallback>
         </Avatar>
         <span 
-          className="text-[13px] font-medium text-gray-900 truncate leading-none"
-          style={{ maxWidth: 'calc(100% - 30px)' }}
+          className="text-[13px] font-medium truncate leading-none"
+          style={{ 
+            maxWidth: 'calc(100% - 30px)',
+            color: 'hsl(var(--foreground))'
+          }}
         >
           {displayName}
         </span>
         {isAtRisk && (
           <span 
-            className="flex-shrink-0 inline-flex items-center bg-red-50 text-red-600 text-[9px] font-semibold px-1 rounded"
+            className="flex-shrink-0 inline-flex items-center text-[9px] font-semibold px-1 rounded"
+            style={{
+              backgroundColor: 'hsl(var(--destructive) / 0.1)',
+              color: 'hsl(var(--destructive))'
+            }}
           >
             <AlertTriangle size={8} className="mr-0.5" />
             !

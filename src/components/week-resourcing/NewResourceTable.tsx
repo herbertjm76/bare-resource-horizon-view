@@ -60,24 +60,59 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     ? 'resource-table-compact-container'
     : 'resource-table-expanded-container';
 
+  const headerStyle = {
+    backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
+    color: 'hsl(var(--foreground))'
+  };
+
+  const stickyHeaderStyle = {
+    ...headerStyle,
+    backgroundColor: 'hsl(var(--theme-primary) / 0.15)',
+  };
+
   return (
     <div className={containerClassName}>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto" style={{ border: '1px solid hsl(var(--border))', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
         <Table className={`${tableClassName} min-w-full`}>
           <TableHeader>
-            <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-b-2 border-slate-200">
+            <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }} className="border-b border-border">
               {/* Team Member Column */}
-              <TableHead className="text-center font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm" style={{ width: 180, minWidth: 180, background: 'hsl(var(--gradient-start))' }}>
+              <TableHead 
+                className="text-center font-semibold sticky left-0 z-20 border-r text-sm" 
+                style={{ 
+                  width: 180, 
+                  minWidth: 180, 
+                  ...stickyHeaderStyle,
+                  borderRightWidth: '2px',
+                  borderRightColor: 'hsl(var(--theme-primary) / 0.15)'
+                }}
+              >
                 Team Member
               </TableHead>
               
               {/* Utilization Column */}
-              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 200, minWidth: 200, background: 'hsl(var(--gradient-start))' }}>
+              <TableHead 
+                className="text-center font-semibold border-r text-sm" 
+                style={{ 
+                  width: 200, 
+                  minWidth: 200, 
+                  ...headerStyle,
+                  borderRightColor: 'hsl(var(--border) / 0.5)'
+                }}
+              >
                 Total Utilization (1 week)
               </TableHead>
               
               {/* Project Count Column */}
-              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 35, minWidth: 35, background: 'hsl(var(--gradient-start))' }}>
+              <TableHead 
+                className="text-center font-semibold border-r text-sm" 
+                style={{ 
+                  width: 35, 
+                  minWidth: 35, 
+                  ...headerStyle,
+                  borderRightColor: 'hsl(var(--border) / 0.5)'
+                }}
+              >
                 Projects
               </TableHead>
               
@@ -85,8 +120,14 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               {projectsWithHours.map((project) => (
                 <TableHead 
                   key={project.id} 
-                  className="text-center font-semibold text-white border-r border-white/20 relative text-sm"
-                  style={{ width: 35, minWidth: 35, height: 120, background: 'hsl(var(--gradient-start))' }}
+                  className="text-center font-semibold border-r relative text-sm"
+                  style={{ 
+                    width: 35, 
+                    minWidth: 35, 
+                    height: 120, 
+                    ...headerStyle,
+                    borderRightColor: 'hsl(var(--border) / 0.5)'
+                  }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div 
@@ -95,7 +136,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                         transformOrigin: 'center',
                         maxWidth: '100px',
                         overflow: 'hidden',
-                        textOverflow: 'ellipsis'
+                        textOverflow: 'ellipsis',
+                        color: 'hsl(var(--foreground))'
                       }}
                       title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
                     >

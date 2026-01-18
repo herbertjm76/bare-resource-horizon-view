@@ -13,39 +13,50 @@ export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeader
 }) => {
   const getDisplayText = useProjectDisplayText();
   
+  const headerStyle = {
+    backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
+    color: 'hsl(var(--foreground))',
+    borderBottom: '1px solid hsl(var(--border))'
+  };
+
+  const stickyHeaderStyle = {
+    ...headerStyle,
+    backgroundColor: 'hsl(var(--theme-primary) / 0.15)',
+  };
+  
   return (
     <TableHeader>
-      <TableRow style={{ background: 'hsl(var(--gradient-start))' }}>
-        <TableHead style={{ background: 'hsl(var(--gradient-start))' }}>
-          <span className="text-white font-bold text-center block">
+      <TableRow style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.05)' }}>
+        <TableHead style={stickyHeaderStyle}>
+          <span className="font-bold text-center block">
             TEAM MEMBER
           </span>
         </TableHead>
         
         {projects.map((project) => (
-          <TableHead key={project.id} style={{ background: 'hsl(var(--gradient-start))' }}>
+          <TableHead key={project.id} style={headerStyle}>
             <div className="enhanced-project-code-header">
-              <span className="text-white font-bold">
+              <span className="font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                 {getDisplayText(project)}
               </span>
             </div>
           </TableHead>
         ))}
         
-        <TableHead style={{ background: 'hsl(var(--gradient-start))' }}>
-          <span className="text-white font-bold">TOTAL</span>
+        <TableHead style={stickyHeaderStyle}>
+          <span className="font-bold">TOTAL</span>
         </TableHead>
-        <TableHead style={{ background: 'hsl(var(--gradient-start))' }}>
-          <span className="text-white font-bold">CAPACITY</span>
+        <TableHead style={headerStyle}>
+          <span className="font-bold">CAPACITY</span>
         </TableHead>
-        <TableHead style={{ background: 'hsl(var(--gradient-start))' }}>
-          <span className="text-white font-bold">UTILIZATION</span>
+        <TableHead style={headerStyle}>
+          <span className="font-bold">UTILIZATION</span>
         </TableHead>
-        <TableHead style={{ background: 'hsl(var(--gradient-start))' }}>
-          <span className="text-white font-bold">LEAVE</span>
+        <TableHead style={headerStyle}>
+          <span className="font-bold">LEAVE</span>
         </TableHead>
-        <TableHead style={{ background: 'hsl(var(--gradient-start))' }}>
-          <span className="text-white font-bold">REMARKS</span>
+        <TableHead style={headerStyle}>
+          <span className="font-bold">REMARKS</span>
         </TableHead>
       </TableRow>
     </TableHeader>

@@ -23,12 +23,13 @@ export const TotalHoursCell: React.FC<TotalHoursCellProps> = ({
         width: '120px', 
         minWidth: '120px',
         maxWidth: '120px',
-        backgroundColor: '#f8fafc',
+        backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
         textAlign: 'center',
         padding: '2px 4px',
         borderRight: 'none',
-        borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
+        borderBottom: '1px solid hsl(var(--border) / 0.3)',
         verticalAlign: 'middle',
+        borderLeft: '2px solid hsl(var(--theme-primary) / 0.15)'
       }}
     >
       <StandardizedBadge 
