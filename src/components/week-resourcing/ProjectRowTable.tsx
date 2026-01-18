@@ -198,14 +198,14 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             <TableRow 
               key={project.id} 
               className={`${index % 2 === 0 ? 'bg-background' : 'bg-muted/50'} hover:bg-accent/50 transition-all duration-150`}
-              style={{ height: 48, minHeight: 48 }}
+              style={{ height: 33, minHeight: 33 }}
             >
               <TableCell className="sticky left-0 z-20 border-r border-slate-200 px-3 py-1 shadow-[2px_0_4px_rgba(0,0,0,0.1)]" style={{ background: index % 2 === 0 ? 'white' : 'rgb(248 250 252 / 0.7)' }}>
                 <span className="text-sm font-semibold">
                   {getProjectDisplayName(project, projectDisplayPreference)}
                 </span>
               </TableCell>
-              <TableCell className="text-center border-r border-slate-200 p-0 align-middle" style={{ height: 48 }}>
+              <TableCell className="text-center border-r border-slate-200 p-0 align-middle" style={{ height: 33 }}>
                 <div className="flex items-center justify-center h-full">
                   {getProjectTotal(project.id) > 0 ? (
                     <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
@@ -233,7 +233,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                   </TableCell>
                 );
               })}
-              <TableCell className="text-center bg-slate-100/80 border-l-2 border-slate-300 p-0 align-middle" style={{ height: 48 }}>
+              <TableCell className="text-center bg-slate-100/80 border-l-2 border-slate-300 p-0 align-middle" style={{ height: 33 }}>
                 <div className="flex items-center justify-center h-full">
                   {getProjectTotal(project.id) > 0 ? (
                     <div className="inline-flex items-center justify-center bg-slate-500 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
@@ -247,11 +247,11 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
             </TableRow>
           ))}
           {/* Totals Row */}
-          <TableRow style={{ background: 'hsl(var(--gradient-start))', height: 48 }} className="border-t-2 border-slate-300">
-            <TableCell className="sticky left-0 z-30 text-left font-semibold text-white border-r border-white/20 px-1 shadow-[2px_0_4px_rgba(0,0,0,0.1)]" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
+          <TableRow style={{ background: 'hsl(var(--gradient-start))', height: 33 }} className="border-t-2 border-slate-300">
+            <TableCell className="sticky left-0 z-30 text-left font-semibold text-white border-r border-white/20 px-1 shadow-[2px_0_4px_rgba(0,0,0,0.1)]" style={{ background: 'hsl(var(--gradient-start))', height: 33 }}>
               Weekly Total
             </TableCell>
-            <TableCell className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
+            <TableCell className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 33 }}>
               <div className="flex items-center justify-center h-full">
                 <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                   {(members.reduce((sum, member) => sum + getMemberTotal(member.id), 0) / workWeekHours).toFixed(1)}
@@ -259,7 +259,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
               </div>
             </TableCell>
             {members.map(member => (
-              <TableCell key={member.id} className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
+              <TableCell key={member.id} className="text-center border-r border-white/20 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 33 }}>
                 <div className="flex items-center justify-center h-full">
                   {getMemberTotal(member.id) > 0 ? (
                     <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
@@ -271,7 +271,7 @@ export const ProjectRowTable: React.FC<ProjectRowTableProps> = ({
                 </div>
               </TableCell>
             ))}
-            <TableCell className="text-center border-l-2 border-white/40 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 48 }}>
+            <TableCell className="text-center border-l-2 border-white/40 p-0 align-middle" style={{ background: 'hsl(var(--gradient-start))', height: 33 }}>
               <div className="flex items-center justify-center h-full">
                 <div className="inline-flex items-center justify-center bg-slate-700 text-white font-bold rounded px-2.5 py-1 text-sm min-w-[36px]">
                   {formatAllocationValue(members.reduce((sum, member) => sum + getMemberTotal(member.id), 0), defaultWeeklyCapacity * members.length, displayPreference)}
