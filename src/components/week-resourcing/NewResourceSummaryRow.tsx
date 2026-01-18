@@ -72,7 +72,11 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         const hours = projectData?.totalHours || 0;
 
         return (
-          <TableCell key={project.id} className="text-center text-sm font-semibold">
+          <TableCell 
+            key={project.id} 
+            className="text-center text-sm font-semibold"
+            style={{ width: 45, minWidth: 45, maxWidth: 45 }}
+          >
             {hours > 0 ? (
               <span 
                 className="inline-flex items-center justify-center font-bold rounded px-1.5 py-0.5 text-xs"
