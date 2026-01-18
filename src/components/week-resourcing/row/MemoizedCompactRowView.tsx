@@ -466,7 +466,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         return (
           <TableCell
             key={project.id}
-            className="text-center px-0 py-0.5 project-column"
+            className="text-center px-0 py-0.5 project-column overflow-hidden"
             style={{ 
               width: 28, 
               minWidth: 28, 
