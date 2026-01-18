@@ -69,15 +69,15 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           {/* Team Member Column */}
           <TableHead 
             className="sticky left-0 z-20 text-center px-2 py-3 font-semibold text-sm text-foreground bg-muted"
-            style={{ width: 250, minWidth: 250, maxWidth: 250 }}
+            style={{ width: 150, minWidth: 150, maxWidth: 150 }}
           >
             Team Member
           </TableHead>
 
-          {/* Utilization Column - FLEXIBLE with max 500px */}
+          {/* Utilization Column - FLEXIBLE with max 200px */}
           <TableHead 
             className="text-center font-semibold text-sm px-2 py-3 text-foreground bg-muted"
-            style={{ maxWidth: 500 }}
+            style={{ maxWidth: 200 }}
           >
             Total Utilization (1 week)
           </TableHead>
@@ -94,7 +94,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           {projectsWithHours.map(project => <TableHead 
             key={project.id} 
             className="text-center font-medium px-0 py-1.5 text-foreground bg-muted align-bottom overflow-hidden" 
-            style={{ width: 33, minWidth: 33, maxWidth: 33 }}
+            style={{ width: 36, minWidth: 36, maxWidth: 36 }}
           >
               <div className="flex items-end justify-center h-[120px] w-full overflow-hidden">
                 <div className="-rotate-90 whitespace-nowrap text-xs font-medium max-w-[100px] overflow-hidden text-ellipsis" style={{

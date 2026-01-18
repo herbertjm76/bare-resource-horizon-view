@@ -48,18 +48,18 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         className="sticky left-0 z-20 text-left px-3 py-2 font-semibold text-sm text-foreground"
         style={{ 
           backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
-          width: 250,
-          minWidth: 250,
-          maxWidth: 250
+          width: 150,
+          minWidth: 150,
+          maxWidth: 150
         }}
       >
         Weekly Total
       </TableCell>
 
-      {/* Utilization Column - FLEXIBLE with max 500px */}
+      {/* Utilization Column - FLEXIBLE with max 200px */}
       <TableCell 
         className="text-center text-sm font-semibold"
-        style={{ maxWidth: 500 }}
+        style={{ maxWidth: 200 }}
       >
         <span className="text-muted-foreground">—</span>
       </TableCell>
@@ -77,7 +77,7 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         </span>
       </TableCell>
 
-      {/* Project Columns - 33px fixed */}
+      {/* Project Columns - 36px fixed */}
       {projects.map((project) => {
         const projectData = projectTotals.find((pt) => pt.projectId === project.id);
         const hours = projectData?.totalHours || 0;
@@ -86,7 +86,7 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
           <TableCell 
             key={project.id} 
             className="text-center text-sm font-semibold"
-            style={{ width: 33, minWidth: 33, maxWidth: 33 }}
+            style={{ width: 36, minWidth: 36, maxWidth: 36 }}
           >
             {hours > 0 ? (
               <span 

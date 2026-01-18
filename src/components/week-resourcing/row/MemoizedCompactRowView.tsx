@@ -321,9 +321,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
       <TableCell
         className="px-2 py-0.5 name-column sticky left-0 z-10"
         style={{
-          width: 250,
-          minWidth: 250,
-          maxWidth: 250,
+          width: 150,
+          minWidth: 150,
+          maxWidth: 150,
           backgroundColor: 'hsl(var(--theme-primary) / 0.05)',
           borderRight: '2px solid hsl(var(--theme-primary) / 0.15)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)',
@@ -371,11 +371,11 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           </div>
         </MemberVacationPopover>
       </TableCell>
-      {/* Utilization: FLEXIBLE with max 500px */}
+      {/* Utilization: FLEXIBLE with max 200px */}
       <TableCell 
         className="text-center px-1 py-0.5 utilization-column"
         style={{ 
-          maxWidth: 500,
+          maxWidth: 200,
           borderRight: '1px solid hsl(var(--border) / 0.5)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)'
         }}
@@ -434,7 +434,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         </span>
       </TableCell>
       
-      {/* Project Cells - all 33px fixed with inline editing */}
+      {/* Project Cells - all 36px fixed with inline editing */}
       {projects.map((project, projectIndex) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
@@ -451,9 +451,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
             key={project.id}
             className="text-center px-0.5 py-0.5 project-column"
             style={{ 
-              width: 33, 
-              minWidth: 33, 
-              maxWidth: 33,
+              width: 36, 
+              minWidth: 36, 
+              maxWidth: 36,
               backgroundColor: columnBgColor,
               borderRight: '1px solid hsl(var(--border) / 0.5)',
               borderBottom: '1px solid hsl(var(--border) / 0.3)'
