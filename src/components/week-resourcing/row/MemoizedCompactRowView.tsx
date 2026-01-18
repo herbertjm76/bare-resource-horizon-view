@@ -371,13 +371,10 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           </div>
         </MemberVacationPopover>
       </TableCell>
-      {/* Utilization: 200px fixed Progress Bar with STANDARDIZED calculation */}
+      {/* Utilization: FLEXIBLE - fills remaining space */}
       <TableCell 
         className="text-center px-1 py-0.5 utilization-column"
         style={{ 
-          width: 200, 
-          minWidth: 200, 
-          maxWidth: 200,
           borderRight: '1px solid hsl(var(--border) / 0.5)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)'
         }}
@@ -414,13 +411,13 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
       </TableCell>
       
 
-      {/* Project Count - 35px fixed */}
+      {/* Project Count - 64px fixed */}
       <TableCell 
         className="text-center px-1 py-0.5 count-column"
         style={{ 
-          width: 35, 
-          minWidth: 35, 
-          maxWidth: 35,
+          width: 64, 
+          minWidth: 64, 
+          maxWidth: 64,
           borderRight: '1px solid hsl(var(--border) / 0.5)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)'
         }}
@@ -436,7 +433,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         </span>
       </TableCell>
       
-      {/* Project Cells - all 50px fixed with inline editing */}
+      {/* Project Cells - all 28px fixed with inline editing */}
       {projects.map((project, projectIndex) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
@@ -453,9 +450,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
             key={project.id}
             className="text-center px-0.5 py-0.5 project-column"
             style={{ 
-              width: 45, 
-              minWidth: 45, 
-              maxWidth: 45,
+              width: 28, 
+              minWidth: 28, 
+              maxWidth: 28,
               backgroundColor: columnBgColor,
               borderRight: '1px solid hsl(var(--border) / 0.5)',
               borderBottom: '1px solid hsl(var(--border) / 0.3)'
