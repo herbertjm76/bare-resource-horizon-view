@@ -371,11 +371,13 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           </div>
         </MemberVacationPopover>
       </TableCell>
-      {/* Utilization: FLEXIBLE with max 200px */}
+      {/* Utilization: Fixed 180px */}
       <TableCell 
         className="text-center px-1 py-0.5 utilization-column"
         style={{ 
-          maxWidth: 200,
+          width: 180,
+          minWidth: 180,
+          maxWidth: 180,
           borderRight: '1px solid hsl(var(--border) / 0.5)',
           borderBottom: '1px solid hsl(var(--border) / 0.3)'
         }}

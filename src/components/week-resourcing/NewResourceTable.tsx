@@ -74,10 +74,10 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
             Team Member
           </TableHead>
 
-          {/* Utilization Column - FLEXIBLE with max 200px */}
+          {/* Utilization Column - Fixed 180px */}
           <TableHead 
             className="text-center font-semibold text-sm px-2 py-3 text-foreground bg-muted"
-            style={{ maxWidth: 200 }}
+            style={{ width: 180, minWidth: 180, maxWidth: 180 }}
           >
             Total Utilization (1 week)
           </TableHead>
