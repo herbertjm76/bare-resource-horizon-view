@@ -39,20 +39,29 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
   });
 
   return (
-    <TableRow className="enhanced-totals-row" style={{ height: 33 }}>
+    <TableRow 
+      className="summary-row border-t border-border"
+      style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)', height: 40 }}
+    >
       {/* Team Member Column */}
-      <TableCell className="sticky left-0 z-20 text-sm font-semibold px-3 name-column">
+      <TableCell 
+        className="sticky left-0 z-20 text-left px-3 py-2 font-semibold text-sm text-foreground"
+        style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}
+      >
         Weekly Total
       </TableCell>
 
       {/* Utilization Column */}
       <TableCell className="text-center text-sm font-semibold">
-        <span className="text-white/50">—</span>
+        <span className="text-muted-foreground">—</span>
       </TableCell>
 
       {/* Project Count Column */}
       <TableCell className="text-center text-sm font-semibold">
-        <span className="enhanced-pill">
+        <span 
+          className="inline-flex items-center justify-center font-bold rounded px-2 py-1 text-sm"
+          style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }}
+        >
           {formatAllocationValue(totalHours, workWeekHours, displayPreference)}
         </span>
       </TableCell>
@@ -65,11 +74,14 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         return (
           <TableCell key={project.id} className="text-center text-sm font-semibold">
             {hours > 0 ? (
-              <span className="enhanced-pill">
+              <span 
+                className="inline-flex items-center justify-center font-bold rounded px-1.5 py-0.5 text-xs"
+                style={{ backgroundColor: 'hsl(var(--theme-primary))', color: 'white' }}
+              >
                 {formatAllocationValue(hours, workWeekHours, displayPreference)}
               </span>
             ) : (
-              <span className="text-white/50">—</span>
+              <span className="text-muted-foreground">—</span>
             )}
           </TableCell>
         );

@@ -301,7 +301,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
 
   return (
     <TableRow
-      className="resource-table-row-compact transition-all duration-150 h-8 min-h-0"
+      className="group transition-colors"
       style={{ 
         fontSize: 12, 
         minHeight: 33, 
