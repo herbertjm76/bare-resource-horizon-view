@@ -13,6 +13,13 @@ import { logger } from '@/utils/logger';
 
 export type HeatmapViewMode = 'actual' | 'projected' | 'gap';
 
+export interface HeatmapFilters {
+  practiceArea: string;
+  department: string;
+  location: string;
+  searchTerm: string;
+}
+
 const CapacityHeatmap: React.FC = () => {
   const { company } = useCompany();
   const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
@@ -21,9 +28,12 @@ const CapacityHeatmap: React.FC = () => {
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
   const [selectedWeeks, setSelectedWeeks] = useState<number>(12);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<string>('all');
-  const [filterValue, setFilterValue] = useState<string>('all');
+  const [filters, setFilters] = useState<HeatmapFilters>({
+    practiceArea: 'all',
+    department: 'all',
+    location: 'all',
+    searchTerm: ''
+  });
   const [viewMode, setViewMode] = useState<HeatmapViewMode>('actual');
 
   const initializedRef = useRef(false);
@@ -67,11 +77,27 @@ const CapacityHeatmap: React.FC = () => {
     initializeWeekRange();
   }, [company?.id, selectedWeeks]);
 
-  const clearFilters = () => {
-    setActiveFilter('all');
-    setFilterValue('all');
-    setSearchQuery('');
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
+
+  const clearFilters = () => {
+    setFilters({
+      practiceArea: 'all',
+      department: 'all',
+      location: 'all',
+      searchTerm: ''
+    });
+  };
+
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filters.practiceArea !== 'all') count++;
+    if (filters.department !== 'all') count++;
+    if (filters.location !== 'all') count++;
+    if (filters.searchTerm) count++;
+    return count;
+  }, [filters]);
 
   // Combine active and pre-registered members for display
   const allMembers = useMemo(() => {
@@ -105,21 +131,27 @@ const CapacityHeatmap: React.FC = () => {
   const filteredMembers = useMemo(() => {
     const filtered = allMembers.filter(member => {
       // Search filter
-      if (searchQuery) {
-        const searchLower = searchQuery.toLowerCase();
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
         const fullName = `${member.first_name} ${member.last_name}`.toLowerCase();
         if (!fullName.includes(searchLower)) {
           return false;
         }
       }
 
-      // Department/Location filter
-      if (activeFilter === 'department' && filterValue !== 'all') {
-        if (member.department !== filterValue) return false;
+      // Department filter
+      if (filters.department !== 'all') {
+        if (member.department !== filters.department) return false;
       }
 
-      if (activeFilter === 'location' && filterValue !== 'all') {
-        if (member.location !== filterValue) return false;
+      // Location filter
+      if (filters.location !== 'all') {
+        if (member.location !== filters.location) return false;
+      }
+
+      // Practice area filter
+      if (filters.practiceArea !== 'all') {
+        if (member.practice_area !== filters.practiceArea) return false;
       }
 
       return true;
@@ -128,13 +160,11 @@ const CapacityHeatmap: React.FC = () => {
     logger.debug('📊 CAPACITY HEATMAP: Filtered members', {
       allMembersCount: allMembers.length,
       filteredCount: filtered.length,
-      searchQuery,
-      activeFilter,
-      filterValue
+      filters
     });
     
     return filtered;
-  }, [allMembers, searchQuery, activeFilter, filterValue]);
+  }, [allMembers, filters]);
 
   const weekLabel = useMemo(
     () => `${selectedWeeks} weeks from ${startOfWeek(selectedWeek, { weekStartsOn: 1 }).toLocaleDateString()}`,
@@ -157,14 +187,9 @@ const CapacityHeatmap: React.FC = () => {
           onWeeksChange={setSelectedWeeks}
           isLoading={isLoadingMembers || isLoadingInvites}
           filteredMembers={filteredMembers}
-          departments={departments}
-          locations={locations}
-          activeFilter={activeFilter}
-          filterValue={filterValue}
-          searchQuery={searchQuery}
-          setActiveFilter={setActiveFilter}
-          setFilterValue={setFilterValue}
-          setSearchQuery={setSearchQuery}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          activeFiltersCount={activeFiltersCount}
           clearFilters={clearFilters}
           weekLabel={weekLabel}
           viewMode={viewMode}
