@@ -49,7 +49,8 @@ const DEMO_PROFILE = {
   manager_id: null,
   start_date: DEMO_TEAM_MEMBERS[0].start_date,
   date_of_birth: DEMO_TEAM_MEMBERS[0].date_of_birth,
-  office_role_id: null
+  office_role_id: null,
+  end_date: null
 };
 
 export interface DemoAuthState {

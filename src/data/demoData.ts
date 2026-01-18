@@ -27,7 +27,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: null,
     start_date: '2020-03-15',
     date_of_birth: '1985-06-15',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000003',
@@ -47,7 +48,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000002',
     start_date: '2021-01-10',
     date_of_birth: '1988-12-20',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000004',
@@ -67,7 +69,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000002',
     start_date: '2022-06-01',
     date_of_birth: '1992-03-08',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000005',
@@ -87,7 +90,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000003',
     start_date: '2023-02-15',
     date_of_birth: '1990-07-22',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000006',
@@ -107,7 +111,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000002',
     start_date: '2022-09-01',
     date_of_birth: '1987-11-30',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000007',
@@ -127,7 +132,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000003',
     start_date: '2024-01-15',
     date_of_birth: '1996-04-12',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000008',
@@ -147,7 +153,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000002',
     start_date: '2019-08-01',
     date_of_birth: '1983-09-25',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000009',
@@ -167,7 +174,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000003',
     start_date: '2021-05-01',
     date_of_birth: '1989-08-14',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000010',
@@ -187,7 +195,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000002',
     start_date: '2020-11-15',
     date_of_birth: '1986-02-28',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000011',
@@ -207,7 +216,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000008',
     start_date: '2022-03-01',
     date_of_birth: '1991-10-05',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000012',
@@ -227,7 +237,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000008',
     start_date: '2021-08-15',
     date_of_birth: '1988-04-18',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000013',
@@ -247,7 +258,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000003',
     start_date: '2024-06-01',
     date_of_birth: '1998-01-22',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000014',
@@ -267,7 +279,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000002',
     start_date: '2020-02-01',
     date_of_birth: '1984-07-09',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000015',
@@ -287,7 +300,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000008',
     start_date: '2023-04-15',
     date_of_birth: '1993-11-12',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000016',
@@ -307,7 +321,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000002',
     start_date: '2022-01-10',
     date_of_birth: '1990-05-25',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000017',
@@ -327,7 +342,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000002',
     start_date: '2021-09-15',
     date_of_birth: '1989-03-17',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000018',
@@ -347,7 +363,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000003',
     start_date: '2022-11-01',
     date_of_birth: '1991-08-24',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000019',
@@ -367,7 +384,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000008',
     start_date: '2023-07-01',
     date_of_birth: '1994-12-03',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000020',
@@ -387,7 +405,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000011',
     start_date: '2024-03-01',
     date_of_birth: '1995-06-18',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000021',
@@ -407,7 +426,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000002',
     start_date: '2020-06-15',
     date_of_birth: '1986-10-09',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000022',
@@ -427,7 +447,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000014',
     start_date: '2023-01-10',
     date_of_birth: '1992-04-27',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000023',
@@ -447,7 +468,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000012',
     start_date: '2022-05-01',
     date_of_birth: '1990-11-14',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000024',
@@ -467,7 +489,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000009',
     start_date: '2024-08-15',
     date_of_birth: '1997-09-22',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000025',
@@ -487,7 +510,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000008',
     start_date: '2021-04-01',
     date_of_birth: '1987-02-11',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   },
   {
     id: '00000000-0000-0000-0000-000000000026',
@@ -507,7 +531,8 @@ export const DEMO_TEAM_MEMBERS = [
     manager_id: '00000000-0000-0000-0000-000000000003',
     start_date: '2023-09-01',
     date_of_birth: '1993-07-30',
-    office_role_id: null
+    office_role_id: null,
+    end_date: null
   }
 ];
 

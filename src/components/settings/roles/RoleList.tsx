@@ -92,8 +92,8 @@ export const RoleList: React.FC<RoleListProps> = ({
   }
 
   return (
-    <div className="space-y-1">
-      {roles.map((role, index) => {
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {roles.map((role) => {
         const isSelected = selectedRoles.includes(role.id);
         const isEditing = editingId === role.id;
         
@@ -101,10 +101,9 @@ export const RoleList: React.FC<RoleListProps> = ({
           <div
             key={role.id}
             className={cn(
-              "group flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-150",
+              "group flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-150 border",
               "hover:bg-muted/50",
-              isSelected && "bg-primary/5 hover:bg-primary/10",
-              index !== roles.length - 1 && "border-b border-border/50"
+              isSelected && "bg-primary/5 hover:bg-primary/10 border-primary/30"
             )}
           >
             {/* Checkbox for edit mode */}

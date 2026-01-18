@@ -39,7 +39,7 @@ export const CompanyTab: React.FC = () => {
   };
 
   const handleCopyUrl = async () => {
-    const url = `bareresource.com/join/${company?.subdomain}`;
+    const url = `${window.location.origin}/join/${company?.subdomain}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
