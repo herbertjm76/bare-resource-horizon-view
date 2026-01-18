@@ -935,6 +935,7 @@ export type Database = {
           date_of_birth: string | null
           department: string | null
           email: string
+          end_date: string | null
           first_name: string | null
           id: string
           job_title: string | null
@@ -955,6 +956,7 @@ export type Database = {
           date_of_birth?: string | null
           department?: string | null
           email: string
+          end_date?: string | null
           first_name?: string | null
           id: string
           job_title?: string | null
@@ -975,6 +977,7 @@ export type Database = {
           date_of_birth?: string | null
           department?: string | null
           email?: string
+          end_date?: string | null
           first_name?: string | null
           id?: string
           job_title?: string | null

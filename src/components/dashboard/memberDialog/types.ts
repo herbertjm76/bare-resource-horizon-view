@@ -14,4 +14,6 @@ export interface MemberFormData {
   job_title?: string;
   weekly_capacity?: number | null; // null = use company default
   office_role_id?: string;
+  start_date?: string | null;
+  end_date?: string | null;
 }

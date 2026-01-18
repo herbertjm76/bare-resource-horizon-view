@@ -140,6 +140,30 @@ const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, contr
           Leave empty to use company default. Only set for part-time or exceptions.
         </p>
       </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="start_date">Start Date</Label>
+          <Input 
+            id="start_date"
+            type="date"
+            {...register('start_date', {
+              setValueAs: (v) => v === '' ? null : v
+            })}
+          />
+          <p className="text-xs text-muted-foreground">When they joined</p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="end_date">End Date</Label>
+          <Input 
+            id="end_date"
+            type="date"
+            {...register('end_date', {
+              setValueAs: (v) => v === '' ? null : v
+            })}
+          />
+          <p className="text-xs text-muted-foreground">Optional - for departed members</p>
+        </div>
+      </div>
     </>
   );
 };
