@@ -136,12 +136,12 @@
 .member-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .member-avatar {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 4px;
   flex-shrink: 0;
 }
@@ -156,14 +156,23 @@
   white-space: nowrap;
 }
 
-/* Compact row variant for heatmap */
+/* Compact row variant for heatmap - matching Team Leave table */
 .workload-grid-row-compact {
-  height: 32px !important;
-  min-height: 32px !important;
+  height: 28px !important;
+  min-height: 28px !important;
 }
 
 .workload-grid-row-compact .member-cell {
-  padding: 6px 12px !important;
+  padding: 2px 8px !important;
+}
+
+.workload-grid-row-compact .member-avatar {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.workload-grid-row-compact .member-name {
+  font-size: 13px !important;
 }
 
 .workload-grid-row-compact .week-cell {
@@ -171,7 +180,7 @@
 }
 
 .workload-grid-row-compact .total-cell {
-  padding: 6px 8px !important;
+  padding: 2px 4px !important;
 }
 
 /* Utilization badge */
