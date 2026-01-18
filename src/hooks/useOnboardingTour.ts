@@ -36,10 +36,6 @@ export const ROLE_DESCRIPTIONS: Record<AppRole, { title: string; description: st
   member: {
     title: 'Team Member',
     description: 'You can view your dashboard, team information, and your own allocations and leave.'
-  },
-  contractor: {
-    title: 'Contractor',
-    description: 'You can view your dashboard, assigned projects, and your own allocations.'
   }
 };
 

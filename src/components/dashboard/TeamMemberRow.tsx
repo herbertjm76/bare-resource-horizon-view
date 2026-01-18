@@ -52,7 +52,10 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
   isAdmin,
   canViewRoleAndInsights
 }) => {
-  const { locations, departments, practice_areas, loading } = useOfficeSettings();
+  const { locations, departments, practice_areas, roles, loading } = useOfficeSettings();
+  
+  // Find office role name
+  const officeRoleName = roles.find(r => r.id === member.office_role_id)?.name;
   
   const getValue = (field: keyof TeamMember): string => {
     if (pendingChanges[field] !== undefined) {
@@ -74,7 +77,6 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
     admin: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Admin' },
     project_manager: { bg: 'bg-indigo-100', text: 'text-indigo-800', label: 'PM' },
     member: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Member' },
-    contractor: { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Contractor' },
   };
 
   // Only admins can edit in edit mode
@@ -206,7 +208,6 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
               <SelectContent>
                 <SelectItem value="member">Member</SelectItem>
                 <SelectItem value="project_manager">PM (Project Manager)</SelectItem>
-                <SelectItem value="contractor">Contractor</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="owner">Super Admin</SelectItem>
               </SelectContent>
@@ -221,6 +222,33 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
                 </Badge>
               );
             })()
+          )}
+        </td>
+      )}
+      {canViewRoleAndInsights && (
+        <td className="px-4 py-3">
+          {canEdit ? (
+            <Select
+              disabled={loading}
+              value={getValue('office_role_id') || 'not_assigned'}
+              onValueChange={(value) => handleChange('office_role_id', value === 'not_assigned' ? '' : value)}
+            >
+              <SelectTrigger className="h-9 text-sm min-w-[140px]">
+                <SelectValue placeholder="Select office role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="not_assigned">Not Assigned</SelectItem>
+                {roles.map((role) => (
+                  <SelectItem key={role.id} value={role.id}>
+                    {role.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <span className="text-sm text-gray-900">
+              {officeRoleName || '-'}
+            </span>
           )}
         </td>
       )}

@@ -38,6 +38,9 @@ export const TeamMemberTableHeader: React.FC<TeamMemberTableHeaderProps> = ({
         {canViewRoleAndInsights && (
           <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Role</th>
         )}
+        {canViewRoleAndInsights && (
+          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Office Role</th>
+        )}
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Department</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Practice Area</th>
         <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Location</th>
