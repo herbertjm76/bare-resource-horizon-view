@@ -37,9 +37,9 @@ export const WeekUtilizationCell: React.FC<WeekUtilizationCellProps> = ({
       key={week.key} 
       className="workload-grid-cell week-cell group transition-colors"
       style={{ 
-        width: '25px', 
-        minWidth: '25px',
-        maxWidth: '25px',
+        width: '30px', 
+        minWidth: '30px',
+        maxWidth: '30px',
         backgroundColor: rowBgColor,
         textAlign: 'center',
         padding: '1px',

@@ -150,7 +150,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 <th 
                   key={day.date} 
                   className={`
-                    w-[25px] min-w-[25px] text-center font-medium px-0 py-1.5
+                    w-8 min-w-8 text-center font-medium px-0.5 py-1.5
                     ${day.isWeekend ? 'bg-muted/50 text-muted-foreground' : 'text-foreground'}
                     ${day.isSunday ? 'border-l-2 border-border' : ''}
                     ${day.isNewMonth && idx > 0 ? 'border-l-2' : ''}
@@ -268,7 +268,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                           <HoverCard openDelay={100} closeDelay={50}>
                             <HoverCardTrigger asChild>
                               <div 
-                                className={`w-[22px] h-5 mx-auto rounded flex items-center justify-center text-[10px] font-bold transition-transform leading-none hover:scale-110 hover:shadow-md ${isAdmin ? 'cursor-pointer' : 'cursor-default'}`}
+                                className={`w-7 h-6 mx-auto rounded flex items-center justify-center text-sm font-bold transition-transform leading-none hover:scale-110 hover:shadow-md ${isAdmin ? 'cursor-pointer' : 'cursor-default'}`}
                                 style={{ 
                                   backgroundColor: getLeaveTypeColor(member.id, day.date),
                                   opacity: fullDay ? 1 : 0.5,
@@ -355,7 +355,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                             </HoverCardContent>
                           </HoverCard>
                         ) : (
-                          <div className={`w-[22px] h-5 mx-auto rounded ${isAdmin ? 'hover:bg-muted/50' : ''}`} />
+                          <div className={`w-7 h-6 mx-auto rounded ${isAdmin ? 'hover:bg-muted/50' : ''}`} />
                         )}
                       </td>
                     );

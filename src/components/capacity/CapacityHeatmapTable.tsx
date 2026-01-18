@@ -19,8 +19,8 @@ export const CapacityHeatmapTable: React.FC<CapacityHeatmapTableProps> = ({
   // Always center align the table
   const shouldCenterAlign = true;
   
-  // Calculate total table width: member column (250px) + week columns (25px each) + total column (120px)
-  const tableWidth = 250 + (weekStartDates.length * 25) + 120;
+  // Calculate total table width: member column (250px) + week columns (30px each) + total column (120px)
+  const tableWidth = 250 + (weekStartDates.length * 30) + 120;
 
   return (
     <TooltipProvider>
