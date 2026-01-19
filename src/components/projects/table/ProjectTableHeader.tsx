@@ -1,7 +1,7 @@
 import React from 'react';
 import { TableHead, TableRow } from "@/components/ui/table";
 
-type ColumnKey = 'code' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
+type ColumnKey = 'code' | 'abbreviation' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
 
 interface ProjectTableHeaderProps {
   editMode: boolean;
@@ -29,6 +29,13 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
         onClick={() => handleColumnClick('code')}
       >
         Code
+      </TableHead>
+      <TableHead 
+        className="cursor-pointer hover:opacity-80 transition-opacity" 
+        style={{ background: 'transparent', color: 'white' }}
+        onClick={() => handleColumnClick('abbreviation')}
+      >
+        Abbreviation
       </TableHead>
       <TableHead 
         className="cursor-pointer hover:opacity-80 transition-opacity" 

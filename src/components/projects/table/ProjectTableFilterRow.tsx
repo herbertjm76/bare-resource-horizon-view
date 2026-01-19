@@ -36,6 +36,7 @@ export const ProjectTableFilterRow: React.FC<ProjectTableFilterRowProps> = ({
 
   const handleClearAll = () => {
     onFilterChange('code', '');
+    onFilterChange('abbreviation', '');
     onFilterChange('name', '');
     onFilterChange('pm', '');
     onFilterChange('status', '');
@@ -54,6 +55,16 @@ export const ProjectTableFilterRow: React.FC<ProjectTableFilterRowProps> = ({
           placeholder="Code..."
           value={filters.code || ''}
           onChange={(e) => onFilterChange('code', e.target.value)}
+          className="h-8 text-xs"
+        />
+      </TableHead>
+      
+      {/* Abbreviation Filter */}
+      <TableHead className="p-1">
+        <Input
+          placeholder="Abbrev..."
+          value={filters.abbreviation || ''}
+          onChange={(e) => onFilterChange('abbreviation', e.target.value)}
           className="h-8 text-xs"
         />
       </TableHead>

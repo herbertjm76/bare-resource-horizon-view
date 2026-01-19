@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 
-type ColumnKey = 'code' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
+type ColumnKey = 'code' | 'abbreviation' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
 
 interface ProjectTableRowProps {
   project: any;
@@ -117,6 +117,25 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
             />
           ) : (
             <div className="px-4 py-3">{project.code}</div>
+          )}
+        </TableCell>
+        
+        {/* Abbreviation Column */}
+        <TableCell 
+          className="p-0 cursor-pointer hover:bg-muted/10 transition-colors"
+          onClick={() => handleColumnClick('abbreviation')}
+        >
+          {editMode ? (
+            <Input
+              value={editableFields[project.id]?.abbreviation ?? project.abbreviation ?? ''}
+              onChange={(e) => updateEditableField(project.id, 'abbreviation', e.target.value)}
+              placeholder="Short name..."
+              className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3"
+            />
+          ) : (
+            <div className="px-4 py-3">
+              <span className="text-muted-foreground text-xs">{project.abbreviation || '-'}</span>
+            </div>
           )}
         </TableCell>
         
