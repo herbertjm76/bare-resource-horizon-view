@@ -12,6 +12,7 @@ export interface StageFee {
 export interface FormState {
   code: string;
   name: string;
+  abbreviation?: string;
   manager: string;
   country: string;
   profit: string;

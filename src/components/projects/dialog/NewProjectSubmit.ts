@@ -27,10 +27,11 @@ export const submitNewProject = async (
 
   try {
     // Provide sensible defaults for non-required fields
-    const projectStatus = form.status === 'none' ? "Active" : (form.status || "Active");
-    const manager = form.manager === 'none' ? null : (form.manager === "not_assigned" ? null : (form.manager || null));
-    const country = form.country === 'none' ? "Not Specified" : (form.country || "Not Specified");
-    const officeLocationId = form.office === 'none' ? null : form.office;
+    // Handle all the "not selected" placeholder values from the form
+    const projectStatus = (!form.status || form.status === 'none' || form.status === 'no_status') ? "Active" : form.status;
+    const manager = (!form.manager || form.manager === 'none' || form.manager === 'no_manager' || form.manager === 'not_assigned') ? null : form.manager;
+    const country = (!form.country || form.country === 'none' || form.country === 'no_country') ? "Not Specified" : form.country;
+    const officeLocationId = (!form.office || form.office === 'none' || form.office === 'no_office') ? null : form.office;
     const targetProfit = form.profit ? Number(form.profit) : 0;
     
     // Set current_stage to the first selected stage name, or the first available stage name if no stages selected
@@ -109,6 +110,7 @@ export const submitNewProject = async (
     const { data, error } = await supabase.from('projects').insert({
       code: form.code,
       name: form.name,
+      abbreviation: form.abbreviation || null,
       company_id: companyId,
       project_manager_id: manager,
       office_id: defaultOfficeId,
@@ -118,7 +120,7 @@ export const submitNewProject = async (
       current_stage: currentStage,
       target_profit_percentage: targetProfit,
       stages: selectedStageNames,
-      department: form.department || null
+      department: (!form.department || form.department === 'no_dept') ? null : form.department
     }).select();
 
     if (error) {

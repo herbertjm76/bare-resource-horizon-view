@@ -62,18 +62,32 @@ export const NewProjectForm: React.FC<NewProjectFormProps> = ({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
+              <Label htmlFor="abbreviation" className="text-sm font-medium flex items-center gap-2">
                 <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-                Project Name
+                Abbreviation
               </Label>
               <Input
-                id="name"
-                placeholder="e.g. Website Redesign"
-                value={form.name}
-                onChange={(e) => handleChange("name", e.target.value)}
+                id="abbreviation"
+                placeholder="e.g. WRD"
+                value={form.abbreviation || ''}
+                onChange={(e) => handleChange("abbreviation", e.target.value)}
                 className="h-10 bg-muted/30 border-border/50 focus:bg-background transition-colors"
               />
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
+              <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+              Project Name
+            </Label>
+            <Input
+              id="name"
+              placeholder="e.g. Website Redesign"
+              value={form.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+              className="h-10 bg-muted/30 border-border/50 focus:bg-background transition-colors"
+            />
           </div>
         </section>
 
