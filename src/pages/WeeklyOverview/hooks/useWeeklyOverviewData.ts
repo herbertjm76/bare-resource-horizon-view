@@ -9,9 +9,8 @@ import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getWeekStartDate } from '@/utils/weekNormalization';
 import { toUTCDateKey } from '@/utils/dateKey';
+import { useProfiles, useInvites, CORE_DATA_STALE_TIME } from '@/hooks/useCoreData';
 import { 
-  DEMO_TEAM_MEMBERS, 
-  DEMO_PRE_REGISTERED, 
   generateDemoAllocations, 
   generateDemoAnnualLeaves,
   DEMO_HOLIDAYS,
@@ -64,65 +63,10 @@ export const useWeeklyOverviewData = (
     [resourceData.allMembers]
   );
 
-  // Fetch profiles for available members row
-  const { data: profiles = [] } = useQuery({
-    queryKey: ['available-members-profiles', companyId, isDemoMode],
-    queryFn: async () => {
-      if (isDemoMode) {
-        return DEMO_TEAM_MEMBERS.map(m => ({
-          id: m.id,
-          first_name: m.first_name,
-          last_name: m.last_name,
-          avatar_url: m.avatar_url,
-          weekly_capacity: m.weekly_capacity,
-          department: m.department,
-          practice_area: m.practice_area,
-          location: m.location
-        }));
-      }
-      
-      if (!company?.id) return [];
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location')
-        .eq('company_id', company.id);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: isDemoMode || !!company?.id,
-    staleTime: 2 * 60 * 1000,
-  });
-
-  // Fetch invites for available members row
-  const { data: invites = [] } = useQuery({
-    queryKey: ['available-members-invites', companyId, isDemoMode],
-    queryFn: async () => {
-      if (isDemoMode) {
-        return DEMO_PRE_REGISTERED.map(m => ({
-          id: m.id,
-          first_name: m.first_name,
-          last_name: m.last_name,
-          avatar_url: (m as any).avatar_url || null,
-          weekly_capacity: m.weekly_capacity,
-          department: m.department,
-          practice_area: (m as any).practice_area || null,
-          location: m.location
-        }));
-      }
-      
-      if (!company?.id) return [];
-      const { data, error } = await supabase
-        .from('invites')
-        .select('id, first_name, last_name, avatar_url, weekly_capacity, department, practice_area, location')
-        .eq('company_id', company.id)
-        .in('invitation_type', ['pre_registered', 'email_invite'])
-        .eq('status', 'pending');
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: isDemoMode || !!company?.id,
-    staleTime: 2 * 60 * 1000,
-  });
+  // OPTIMIZED: Use centralized profile/invite data from useCoreData hooks
+  // These are shared across the app and won't create duplicate requests
+  const { data: profiles = [] } = useProfiles();
+  const { data: invites = [] } = useInvites();
 
   // Fetch allocations for available members row
   const { data: availableMembersAllocations = [] } = useQuery({
