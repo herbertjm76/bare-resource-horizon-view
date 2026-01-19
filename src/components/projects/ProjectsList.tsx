@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ProjectsToolbar from './ProjectsToolbar';
 import ProjectsTable from './ProjectsTable';
+import { ProjectsSectionFilter } from './ProjectsSectionFilter';
 import { useProjects } from '@/hooks/useProjects';
 import { FilterPopover } from '@/components/filters/FilterPopover';
 import { QuickStatusManager } from '@/components/projects/QuickStatusManager';
@@ -40,14 +41,42 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
   const [saveSignal, setSaveSignal] = useState(0);
   const [showStatusManager, setShowStatusManager] = useState(false);
 
+  // Extract unique filter options
+  const filterOptions = useMemo(() => {
+    const statuses = [...new Set(projects.map(p => p.status).filter(Boolean))];
+    const countries = [...new Set(projects.map(p => p.country).filter(Boolean))];
+    const departments = [...new Set(projects.map(p => p.department).filter(Boolean))];
+    const stages = [...new Set(projects.map(p => p.current_stage).filter(Boolean))];
+    const managers = [...new Set(projects.map(p => {
+      if (p.project_manager) {
+        return `${p.project_manager.first_name || ''} ${p.project_manager.last_name || ''}`.trim();
+      }
+      return null;
+    }).filter(Boolean))] as string[];
+    const offices = [...new Set(projects.map(p => p.office?.name).filter(Boolean))];
+    return { statuses, countries, departments, stages, managers, offices };
+  }, [projects]);
+
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
       return Object.entries(filters).every(([key, value]) => {
         if (!value) return true; // Skip empty filters
         
+        // Global search filter
+        if (key === 'search') {
+          const searchLower = value.toLowerCase();
+          const code = project.code?.toLowerCase() || '';
+          const name = project.name?.toLowerCase() || '';
+          const abbreviation = project.abbreviation?.toLowerCase() || '';
+          return code.includes(searchLower) || name.includes(searchLower) || abbreviation.includes(searchLower);
+        }
+        
         // Text search filters (case-insensitive contains)
         if (key === 'code') {
           return project.code?.toLowerCase().includes(value.toLowerCase());
+        }
+        if (key === 'abbreviation') {
+          return project.abbreviation?.toLowerCase().includes(value.toLowerCase());
         }
         if (key === 'name') {
           return project.name?.toLowerCase().includes(value.toLowerCase());
@@ -75,11 +104,6 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
       });
     });
   }, [projects, filters]);
-
-  // Extract unique values for filters
-  const statuses = [...new Set(projects.map(p => p.status))];
-  const countries = [...new Set(projects.map(p => p.country).filter(Boolean))];
-  const offices = [...new Set(projects.map(p => p.office?.name).filter(Boolean))];
 
   const activeFiltersCount = Object.values(filters).filter(value => value && value !== '').length;
 
@@ -248,7 +272,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Statuses</SelectItem>
-                        {statuses.map((status) => (
+                        {filterOptions.statuses.map((status) => (
                           <SelectItem key={status} value={status}>
                             {status}
                           </SelectItem>
@@ -268,7 +292,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Countries</SelectItem>
-                        {countries.map((country) => (
+                        {filterOptions.countries.map((country) => (
                           <SelectItem key={country} value={country}>
                             {country}
                           </SelectItem>
@@ -288,7 +312,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Offices</SelectItem>
-                        {offices.map((office) => (
+                        {filterOptions.offices.map((office) => (
                           <SelectItem key={office} value={office}>
                             {office}
                           </SelectItem>
@@ -323,6 +347,15 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
           </div>
         </CardHeader>
         <CardContent>
+          <ProjectsSectionFilter
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            statuses={filterOptions.statuses}
+            countries={filterOptions.countries}
+            departments={filterOptions.departments}
+            stages={filterOptions.stages}
+            managers={filterOptions.managers}
+          />
           <ProjectsTable 
             projects={filteredProjects} 
             loading={isLoading} 
