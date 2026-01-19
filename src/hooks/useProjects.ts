@@ -43,6 +43,7 @@ export interface ProjectWithRelations {
   id: string;
   name: string;
   code: string;
+  abbreviation?: string | null;
   status: string;
   country: string;
   department: string | null;
@@ -154,6 +155,7 @@ export const useProjects = (
             id: p.id,
             name: p.name,
             code: p.code,
+            abbreviation: p.abbreviation || null,
             status: p.status,
             country: p.country,
             department: p.department || null,

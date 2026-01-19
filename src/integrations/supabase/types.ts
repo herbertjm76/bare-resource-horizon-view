@@ -1593,6 +1593,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          abbreviation: string | null
           average_rate: number | null
           blended_rate: number | null
           budget_amount: number | null
@@ -1621,6 +1622,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          abbreviation?: string | null
           average_rate?: number | null
           blended_rate?: number | null
           budget_amount?: number | null
@@ -1649,6 +1651,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          abbreviation?: string | null
           average_rate?: number | null
           blended_rate?: number | null
           budget_amount?: number | null

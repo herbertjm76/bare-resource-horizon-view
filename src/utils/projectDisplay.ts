@@ -33,6 +33,8 @@ interface ProjectDisplayData {
   code?: string;
   /** Project name (e.g., 'Website Redesign') */
   name?: string;
+  /** Project abbreviation for compact displays (e.g., 'Sky Tower') */
+  abbreviation?: string | null;
 }
 
 /**
@@ -126,4 +128,38 @@ export const getProjectFullDisplay = (
   }
   
   return primary || secondary;
+};
+
+/**
+ * Get abbreviated project name for space-constrained displays
+ * 
+ * Returns the abbreviation if available, otherwise falls back to primary display.
+ * Use this in table headers, compact cards, or any space-limited areas.
+ * 
+ * @param project - Project object with code, name, and/or abbreviation
+ * @param preference - Company's display preference ('code' or 'name')
+ * @returns The abbreviated display string
+ * 
+ * @example
+ * ```ts
+ * getProjectAbbreviation({ code: 'SKY-001', name: 'Skyline Tower', abbreviation: 'Sky Tower' }, 'name');
+ * // Returns: 'Sky Tower'
+ * 
+ * getProjectAbbreviation({ code: 'SKY-001', name: 'Skyline Tower' }, 'name');
+ * // Returns: 'Skyline Tower' (fallback when no abbreviation)
+ * ```
+ */
+export const getProjectAbbreviation = (
+  project: ProjectDisplayData | null | undefined,
+  preference: ProjectDisplayPreference
+): string => {
+  if (!project) return '';
+  
+  // If abbreviation exists, use it
+  if (project.abbreviation) {
+    return project.abbreviation;
+  }
+  
+  // Fall back to primary display based on preference
+  return getProjectDisplayName(project, preference);
 };

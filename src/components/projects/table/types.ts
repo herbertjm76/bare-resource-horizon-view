@@ -9,6 +9,7 @@ export interface Project {
   id: string;
   name: string;
   code: string;
+  abbreviation?: string | null;
   status: string;
   country: string;
   target_profit_percentage: number;

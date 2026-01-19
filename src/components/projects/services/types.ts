@@ -5,6 +5,7 @@ export interface MappedProject {
   updated_at: string;
   code?: string;
   name?: string;
+  abbreviation?: string;
   status?: string;
   current_stage?: string;
   target_profit_percentage?: number;

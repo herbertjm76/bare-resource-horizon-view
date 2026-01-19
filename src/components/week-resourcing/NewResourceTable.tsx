@@ -3,24 +3,7 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components
 import { NewResourceTableRow } from './NewResourceTableRow';
 import { NewResourceSummaryRow } from './NewResourceSummaryRow';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
-
-// Contract long project names to abbreviations (e.g., "Residential Development" -> "Res. Dev.")
-const contractProjectName = (name: string, maxLength: number = 12): string => {
-  if (!name || name.length <= maxLength) return name;
-  
-  const words = name.split(' ');
-  if (words.length === 1) {
-    // Single word - truncate with period
-    return name.substring(0, maxLength - 1) + '.';
-  }
-  
-  // Multiple words - abbreviate each word
-  return words.map(word => {
-    if (word.length <= 3) return word;
-    return word.substring(0, 3) + '.';
-  }).join(' ');
-};
+import { getProjectAbbreviation, getProjectFullDisplay } from '@/utils/projectDisplay';
 
 interface NewResourceTableProps {
   members: any[];
@@ -122,9 +105,9 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                   bottom: 4,
                   marginLeft: 4
                 }} 
-                title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
+                title={getProjectFullDisplay(project, projectDisplayPreference)}
               >
-                {getProjectDisplayName(project, projectDisplayPreference)}
+                {getProjectAbbreviation(project, projectDisplayPreference)}
               </div>
             </TableHead>
           ))}

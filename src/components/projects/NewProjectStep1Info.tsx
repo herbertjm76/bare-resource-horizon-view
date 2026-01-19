@@ -2,7 +2,7 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Users, FileText, Code } from "lucide-react";
+import { Users, FileText, Code, Type } from "lucide-react";
 
 type RoleOption = { id: string; name: string };
 
@@ -10,6 +10,7 @@ interface Props {
   form: {
     code: string;
     name: string;
+    abbreviation?: string;
     manager: string;
   };
   managers: RoleOption[];
@@ -44,7 +45,22 @@ const NewProjectStep1Info: React.FC<Props> = ({ form, managers, onChange }) => (
           className="text-base" 
         />
       </div>
-      <div className="sm:col-span-2">
+      <div>
+        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
+          <Type className="w-4 h-4" />Abbreviation
+        </label>
+        <Input 
+          value={form.abbreviation || ''} 
+          onChange={e => onChange('abbreviation', e.target.value)}
+          placeholder="e.g., Sky Tower"
+          className="text-base"
+          maxLength={25}
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Short form for compact views (optional)
+        </p>
+      </div>
+      <div>
         <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
           <Users className="w-4 h-4" />Project Manager<span className="text-destructive">*</span>
         </label>
