@@ -59,9 +59,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     <Table
       className="border-collapse"
       style={{
-        width: '100%',
-        minWidth: 1200,
-        tableLayout: 'fixed',
+        tableLayout: 'auto',
       }}
     >
       <TableHeader>
