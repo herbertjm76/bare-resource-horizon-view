@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ProjectsToolbar from './ProjectsToolbar';
 import ProjectsTable from './ProjectsTable';
-import { ProjectsSectionFilter } from './ProjectsSectionFilter';
 import { useProjects } from '@/hooks/useProjects';
 import { FilterPopover } from '@/components/filters/FilterPopover';
 import { QuickStatusManager } from '@/components/projects/QuickStatusManager';
@@ -347,16 +346,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
           </div>
         </CardHeader>
         <CardContent>
-          <ProjectsSectionFilter
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            statuses={filterOptions.statuses}
-            countries={filterOptions.countries}
-            departments={filterOptions.departments}
-            stages={filterOptions.stages}
-            managers={filterOptions.managers}
-          />
-          <ProjectsTable 
+          <ProjectsTable
             projects={filteredProjects} 
             loading={isLoading} 
             error={error ? error.message : ''}
