@@ -231,7 +231,7 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
     enabled: !!projectId && !!stageId,
   });
 
-  // Save or update composition item
+  // Save (insert) composition item - always creates a new row to allow multiple of same role
   const saveMutation = useMutation({
     mutationFn: async (input: CompositionInput) => {
       if (!company?.id || !projectId || !stageId) {
@@ -242,7 +242,7 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
 
       const { error } = await supabase
         .from('project_stage_team_composition')
-        .upsert({
+        .insert({
           project_id: projectId,
           stage_id: stageId,
           reference_id: input.referenceId,
@@ -251,8 +251,6 @@ export const useStageTeamComposition = (projectId: string, stageId: string) => {
           planned_hours_per_person: input.plannedHoursPerPerson,
           rate_snapshot: rateSnapshot,
           company_id: company.id
-        }, {
-          onConflict: 'project_id,stage_id,reference_id,reference_type'
         });
 
       if (error) throw error;
