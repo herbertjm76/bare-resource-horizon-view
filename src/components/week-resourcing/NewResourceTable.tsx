@@ -110,17 +110,21 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           {projectsWithHours.map(project => (
             <TableHead 
               key={project.id} 
-              className="text-center font-medium px-0 py-1.5 text-foreground bg-muted align-bottom relative overflow-visible" 
-              style={{ width: 36, minWidth: 36, maxWidth: 36 }}
+              className="text-center font-medium px-0 py-0 text-foreground bg-muted align-bottom" 
+              style={{ width: 36, minWidth: 36, maxWidth: 36, height: 120, position: 'relative' }}
             >
-              <div className="flex items-end justify-center h-[180px] w-full overflow-visible">
-                <div 
-                  className="-rotate-90 whitespace-nowrap text-[10px] font-medium leading-none" 
-                  style={{ transformOrigin: 'center' }} 
-                  title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
-                >
-                  {contractProjectName(getProjectDisplayName(project, projectDisplayPreference), 18)}
-                </div>
+              <div 
+                className="absolute whitespace-nowrap text-[11px] font-medium text-foreground"
+                style={{ 
+                  transform: 'rotate(-90deg)',
+                  transformOrigin: 'left bottom',
+                  left: '50%',
+                  bottom: 4,
+                  marginLeft: 4
+                }} 
+                title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
+              >
+                {getProjectDisplayName(project, projectDisplayPreference)}
               </div>
             </TableHead>
           ))}
