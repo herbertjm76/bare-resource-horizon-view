@@ -4,6 +4,24 @@ import { NewResourceTableRow } from './NewResourceTableRow';
 import { NewResourceSummaryRow } from './NewResourceSummaryRow';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { getProjectDisplayName, getProjectSecondaryText } from '@/utils/projectDisplay';
+
+// Contract long project names to abbreviations (e.g., "Residential Development" -> "Res. Dev.")
+const contractProjectName = (name: string, maxLength: number = 12): string => {
+  if (!name || name.length <= maxLength) return name;
+  
+  const words = name.split(' ');
+  if (words.length === 1) {
+    // Single word - truncate with period
+    return name.substring(0, maxLength - 1) + '.';
+  }
+  
+  // Multiple words - abbreviate each word
+  return words.map(word => {
+    if (word.length <= 3) return word;
+    return word.substring(0, 3) + '.';
+  }).join(' ');
+};
+
 interface NewResourceTableProps {
   members: any[];
   projects: any[];
@@ -99,9 +117,9 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                 <div 
                   className="-rotate-90 whitespace-nowrap text-xs font-medium" 
                   style={{ transformOrigin: 'center' }} 
-                  title={`${project.code} - ${project.name}`}
+                  title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
                 >
-                  {project.code}
+                  {contractProjectName(getProjectDisplayName(project, projectDisplayPreference))}
                 </div>
               </div>
             </TableHead>
