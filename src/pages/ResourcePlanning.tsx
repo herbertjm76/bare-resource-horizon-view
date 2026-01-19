@@ -17,7 +17,6 @@ import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { DEMO_DEPARTMENTS, DEMO_PRACTICE_AREAS } from '@/data/demoData';
 
-const statusOptions = ['Active', 'On Hold', 'Completed', 'Planning'];
 
 const ResourcePlanning: React.FC = () => {
   const { company } = useCompany();
@@ -79,6 +78,30 @@ const ResourcePlanning: React.FC = () => {
     },
     enabled: !!company?.id || isDemoMode
   });
+
+  // Fetch project statuses dynamically
+  const { data: projectStatuses = [] } = useQuery({
+    queryKey: ['project-statuses', company?.id, isDemoMode],
+    queryFn: async () => {
+      if (isDemoMode) {
+        return ['Active', 'On Hold', 'Completed', 'Planning', 'Archived'];
+      }
+      if (!company?.id) return [];
+      const { data, error } = await supabase
+        .from('project_statuses')
+        .select('name')
+        .eq('company_id', company.id)
+        .order('order_index');
+      if (error) throw error;
+      return data?.map(s => s.name) || [];
+    },
+    enabled: !!company?.id || isDemoMode
+  });
+
+  // Use fetched statuses or fallback
+  const statusOptions = projectStatuses.length > 0 
+    ? projectStatuses 
+    : ['Active', 'On Hold', 'Completed', 'Planning'];
 
   // Filter projects by search, department, and practice area
   const filteredProjects = useMemo(() => {
