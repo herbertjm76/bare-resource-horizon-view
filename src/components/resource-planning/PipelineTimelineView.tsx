@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useRef, useCallback } from 'react';
-import { format, addWeeks, startOfWeek, differenceInWeeks, parseISO, addDays } from 'date-fns';
+import { format, addWeeks, startOfWeek, differenceInWeeks, parseISO, addDays, subWeeks } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, Loader2, Calendar, GripVertical, Settings2, Pencil } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Calendar, GripVertical, Settings2, Pencil, Pin } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -13,12 +13,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { colors } from '@/styles/colors';
 import { toast } from 'sonner';
 import { AddProjectStageDialog } from './AddProjectStageDialog';
 import { UnscheduledStagesTray } from './UnscheduledStagesTray';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 import { DEMO_STAGES, DEMO_PROJECTS, DEMO_TEAM_MEMBERS, DEMO_COMPANY_ID } from '@/data/demoData';
+import { usePinnedItems } from '@/hooks/usePinnedItems';
 
 interface Project {
   id: string;
@@ -113,8 +113,15 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   } | null>(null);
   const [manageStagesProject, setManageStagesProject] = useState<Project | null>(null);
   const [expandedTrays, setExpandedTrays] = useState<Set<string>>(new Set());
-  const timelineStartDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const [timelineOffset, setTimelineOffset] = useState(0); // Weeks offset from current week (negative = past, positive = future)
+  const timelineStartDate = addWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), timelineOffset);
   const WEEK_WIDTH = 64; // Width of each week column in pixels
+  
+  // Pinned projects support
+  const { pinnedIds, isPinned, togglePin, sortWithPinnedFirst } = usePinnedItems({
+    viewContext: 'resource_planning_timeline',
+    itemType: 'project'
+  });
 
   // Generate demo project stages with start dates and contracted weeks
   const generateDemoProjectStages = useCallback(() => {
@@ -392,7 +399,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       .forEach(s => {
         const key = normalizeStageName(s.name);
         map[key] = {
-          color: s.color && s.color.trim() !== '' ? s.color : colors.defaults.stage,
+          color: s.color && s.color.trim() !== '' ? s.color : '#6b7280', // Default gray if no color set
           orderIndex: s.order_index,
           id: s.id,
           code: s.code || ''
@@ -405,7 +412,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
       .forEach(s => {
         const key = normalizeStageName(s.name);
         map[key] = {
-          color: s.color && s.color.trim() !== '' ? s.color : colors.defaults.stage,
+          color: s.color && s.color.trim() !== '' ? s.color : '#6b7280', // Default gray if no color set
           orderIndex: s.order_index,
           id: s.id,
           code: s.code || ''
@@ -457,6 +464,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   }, [groupBy, departments, practiceAreas]);
 
   // Group projects by department or practice area
+  // Group projects by department or practice area, with pinned projects sorted first
   const projectsByGroup = useMemo(() => {
     const grouped: Record<string, Project[]> = {};
     orderedGroups.forEach(name => {
@@ -464,7 +472,10 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     });
     grouped['Unassigned'] = [];
 
-    projects.forEach(project => {
+    // Sort all projects with pinned first
+    const sortedProjects = sortWithPinnedFirst(projects);
+
+    sortedProjects.forEach(project => {
       const groupValue = groupBy === 'department' ? project.department : project.practice_area;
       const groupName = groupValue || 'Unassigned';
       
@@ -476,7 +487,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     });
 
     return grouped;
-  }, [projects, orderedGroups, groupBy]);
+  }, [projects, orderedGroups, groupBy, sortWithPinnedFirst]);
 
   // Get stages for a project with their timeline positions
   // Uses projectStagesData as the source of truth for stage names (not project.stages which may be empty)
@@ -489,7 +500,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
         const info = stageInfoMap[normalizeStageName(stageName)];
 
         // Use stage color from office_stages, fallback to theme token only if not found
-        const stageColor = info?.color || colors.defaults.stage;
+        const stageColor = info?.color || '#6b7280'; // Default gray if no color set
 
         return {
           id: stageData.id,
@@ -525,7 +536,13 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     return { startWeek, width };
   };
 
-  // Scroll controls
+  // Navigate timeline by shifting the start date
+  const navigateTimeline = (direction: 'left' | 'right') => {
+    const weeksToShift = 4; // Shift by 4 weeks at a time
+    setTimelineOffset(prev => direction === 'left' ? prev - weeksToShift : prev + weeksToShift);
+  };
+
+  // Scroll controls (for horizontal scrolling within current view)
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 320; // 5 weeks worth
@@ -867,7 +884,8 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => scroll('left')}
+                onClick={() => navigateTimeline('left')}
+                title="Show earlier weeks"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -875,7 +893,8 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => scroll('right')}
+                onClick={() => navigateTimeline('right')}
+                title="Show later weeks"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -978,6 +997,26 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
                             {/* Project name */}
                             <div className="w-48 shrink-0 p-2 border-r border-border">
                               <div className="flex items-center gap-1">
+                                {/* Pin button */}
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      className={cn(
+                                        "p-1 rounded hover:bg-muted transition-opacity",
+                                        isPinned(project.id) ? "opacity-100 text-primary" : "opacity-0 group-hover:opacity-100"
+                                      )}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        togglePin(project.id);
+                                      }}
+                                    >
+                                      <Pin className={cn("h-3 w-3", isPinned(project.id) ? "fill-current" : "")} />
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-xs">{isPinned(project.id) ? 'Unpin project' : 'Pin project'}</p>
+                                  </TooltipContent>
+                                </Tooltip>
                                 <div className="text-xs font-medium truncate flex-1">
                                   {project.name}
                                 </div>
