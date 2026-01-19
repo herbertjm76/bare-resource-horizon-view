@@ -64,8 +64,9 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     }
   };
 
-  // Only show loading when essential data is loading
-  const isTableLoading = loading || stagesLoading || officeLoading;
+  // Only show loading when the actual projects query is loading.
+  // Office settings + per-project stage fees should not block first paint.
+  const isTableLoading = loading;
 
   if (isTableLoading) {
     return <div className="text-center p-8 border rounded-md border-dashed">Loading projects...</div>;
