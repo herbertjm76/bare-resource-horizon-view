@@ -11,7 +11,7 @@ interface EnhancedWeeklyResourceHeaderProps {
 export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeaderProps> = ({
   projects
 }) => {
-  const getDisplayText = useProjectDisplayText();
+  const { getDisplayText, getTooltipText } = useProjectDisplayText();
   
   const headerStyle = {
     backgroundColor: 'hsl(var(--theme-primary) / 0.1)',
@@ -51,7 +51,7 @@ export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeader
                 : 'hsl(var(--theme-primary) / 0.08)'
             }}
           >
-            <div className="enhanced-project-code-header">
+            <div className="enhanced-project-code-header" title={getTooltipText(project)}>
               <span className="font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                 {getDisplayText(project)}
               </span>

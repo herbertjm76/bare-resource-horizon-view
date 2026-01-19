@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { WorkloadBreakdown } from './hooks/types';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { getProjectAbbreviation, getProjectTooltip } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectAllocation {
@@ -30,7 +29,7 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
   date,
   capacity = 40
 }) => {
-  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
+  const { displayPreference, workWeekHours } = useAppSettings();
   const effectiveCapacity = capacity || workWeekHours;
   
   if (breakdown.total === 0) {
@@ -62,8 +61,11 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
                   <div className="font-medium text-blue-800 mb-1">Project Breakdown:</div>
                   {breakdown.projects.map((project, index) => (
                     <div key={project.project_id || index} className="flex justify-between items-center">
-                      <span className="text-blue-700 truncate max-w-[120px]" title={project.project_name}>
-                        {getProjectDisplayName({ code: project.project_code, name: project.project_name }, projectDisplayPreference)}
+                      <span 
+                        className="text-blue-700 truncate max-w-[120px]" 
+                        title={getProjectTooltip({ code: project.project_code, name: project.project_name })}
+                      >
+                        {getProjectAbbreviation({ code: project.project_code, name: project.project_name })}
                       </span>
                       <span className="font-medium text-blue-800 ml-2">
                         {formatAllocationValue(project.hours, effectiveCapacity, displayPreference)}

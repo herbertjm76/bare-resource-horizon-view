@@ -3,7 +3,7 @@ import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { formatAllocationValue, formatUtilizationSummary } from '@/utils/allocationDisplay';
-import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { getProjectAbbreviation, getProjectTooltip } from '@/utils/projectDisplay';
 
 interface ProjectBreakdown {
   projectName?: string;
@@ -124,15 +124,17 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
       break;
       
     case 'project':
-      // Use project display preference for consistent display
-      const projectDisplayText = getProjectDisplayName(
-        { code: projectBreakdown?.projectCode, name: projectBreakdown?.projectName },
-        projectDisplayPreference
+      // Use abbreviation for display, full tooltip for context
+      const projectDisplayText = getProjectAbbreviation(
+        { code: projectBreakdown?.projectCode, name: projectBreakdown?.projectName }
+      );
+      const projectTooltipText = getProjectTooltip(
+        { code: projectBreakdown?.projectCode, name: projectBreakdown?.projectName }
       );
       content = (
         <div className="space-y-2">
           <div className="font-bold mb-2 text-brand-secondary">
-            Project: {projectDisplayText || '-'}
+            Project: {projectTooltipText || '-'}
           </div>
           <div className="text-xs space-y-1">
             {/* Show both code and name for context */}

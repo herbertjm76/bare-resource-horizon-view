@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { getProjectAbbreviation, getProjectTooltip } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectAllocation {
@@ -54,7 +54,7 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = Rea
   disableDialog = false,
   capacity = 40,
 }) => {
-  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
+  const { displayPreference, workWeekHours } = useAppSettings();
   const effectiveCapacity = capacity || workWeekHours;
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'U';
@@ -145,8 +145,11 @@ export const MemberAvailabilityCard: React.FC<MemberAvailabilityCardProps> = Rea
                   </div>
                   {projectAllocations.map((project) => (
                     <div key={project.projectId} className="flex justify-between items-center text-xs pl-2">
-                      <span className="text-foreground truncate max-w-[130px]">
-                        {getProjectDisplayName({ code: project.projectCode, name: project.projectName }, projectDisplayPreference)}
+                      <span 
+                        className="text-foreground truncate max-w-[130px]"
+                        title={getProjectTooltip({ code: project.projectCode, name: project.projectName })}
+                      >
+                        {getProjectAbbreviation({ code: project.projectCode, name: project.projectName })}
                       </span>
                       <span className="text-muted-foreground ml-2">{formatAllocationValue(project.hours, effectiveCapacity, displayPreference)}</span>
                     </div>

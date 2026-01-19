@@ -133,25 +133,25 @@ export const getProjectFullDisplay = (
 /**
  * Get abbreviated project name for space-constrained displays
  * 
- * Returns the abbreviation if available, otherwise falls back to primary display.
+ * Returns the abbreviation if available, otherwise falls back to project name.
  * Use this in table headers, compact cards, or any space-limited areas.
  * 
  * @param project - Project object with code, name, and/or abbreviation
- * @param preference - Company's display preference ('code' or 'name')
+ * @param _preference - Unused, kept for API compatibility
  * @returns The abbreviated display string
  * 
  * @example
  * ```ts
- * getProjectAbbreviation({ code: 'SKY-001', name: 'Skyline Tower', abbreviation: 'Sky Tower' }, 'name');
+ * getProjectAbbreviation({ code: 'SKY-001', name: 'Skyline Tower', abbreviation: 'Sky Tower' });
  * // Returns: 'Sky Tower'
  * 
- * getProjectAbbreviation({ code: 'SKY-001', name: 'Skyline Tower' }, 'name');
+ * getProjectAbbreviation({ code: 'SKY-001', name: 'Skyline Tower' });
  * // Returns: 'Skyline Tower' (fallback when no abbreviation)
  * ```
  */
 export const getProjectAbbreviation = (
   project: ProjectDisplayData | null | undefined,
-  preference: ProjectDisplayPreference
+  _preference?: ProjectDisplayPreference
 ): string => {
   if (!project) return '';
   
@@ -160,6 +160,39 @@ export const getProjectAbbreviation = (
     return project.abbreviation;
   }
   
-  // Fall back to primary display based on preference
-  return getProjectDisplayName(project, preference);
+  // Fall back to name, then code
+  return project.name || project.code || '';
+};
+
+/**
+ * Get tooltip text for a project showing code and full name
+ * 
+ * Returns a consistent format: "CODE - Full Name" for tooltips.
+ * Use this for hover tooltips on project displays.
+ * 
+ * @param project - Project object with code and/or name
+ * @returns Tooltip string in format "CODE - Full Name"
+ * 
+ * @example
+ * ```ts
+ * getProjectTooltip({ code: 'SKY-001', name: 'Skyline Tower' });
+ * // Returns: 'SKY-001 - Skyline Tower'
+ * 
+ * getProjectTooltip({ name: 'Skyline Tower' });
+ * // Returns: 'Skyline Tower'
+ * ```
+ */
+export const getProjectTooltip = (
+  project: ProjectDisplayData | null | undefined
+): string => {
+  if (!project) return '';
+  
+  const code = project.code || '';
+  const name = project.name || '';
+  
+  if (code && name) {
+    return `${code} - ${name}`;
+  }
+  
+  return name || code;
 };
