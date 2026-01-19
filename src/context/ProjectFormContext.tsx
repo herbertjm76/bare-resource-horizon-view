@@ -124,6 +124,7 @@ export const ProjectFormProvider: React.FC<ProjectFormProviderProps> = ({
   const [form, setForm] = useState<ProjectFormState>({
     code: project?.code || '',
     name: project?.name || '',
+    abbreviation: project?.abbreviation || '',
     manager: project?.project_manager_id || '',
     country: project?.country || '',
     profit: project?.target_profit_percentage?.toString() || '',

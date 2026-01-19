@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { getProjectAbbreviation, getProjectFullDisplay } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectAllocationSegmentProps {
@@ -9,6 +9,7 @@ interface ProjectAllocationSegmentProps {
     id: string;
     name: string;
     code: string;
+    abbreviation?: string | null;
     hours: number;
   };
   /** Week capacity in hours */
@@ -34,7 +35,12 @@ export const ProjectAllocationSegment: React.FC<ProjectAllocationSegmentProps> =
   }, [project.hours, capacity]);
 
   const displayText = useMemo(
-    () => getProjectDisplayName({ code: project.code, name: project.name }, projectDisplayPreference),
+    () => getProjectAbbreviation({ code: project.code, name: project.name, abbreviation: project.abbreviation }, projectDisplayPreference),
+    [project.code, project.name, project.abbreviation, projectDisplayPreference]
+  );
+
+  const fullDisplayText = useMemo(
+    () => getProjectFullDisplay({ code: project.code, name: project.name }, projectDisplayPreference),
     [project.code, project.name, projectDisplayPreference]
   );
 
@@ -59,7 +65,7 @@ export const ProjectAllocationSegment: React.FC<ProjectAllocationSegmentProps> =
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        <p className="font-semibold">{project.name} ({project.code})</p>
+        <p className="font-semibold">{fullDisplayText}</p>
         <p className="text-xs">{formatted}</p>
       </TooltipContent>
     </Tooltip>

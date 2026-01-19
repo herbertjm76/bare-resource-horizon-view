@@ -26,6 +26,7 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
           id: p.id,
           code: p.code,
           name: p.name,
+          abbreviation: p.abbreviation || null,
           status: p.status,
           department: p.department
         }));
@@ -42,7 +43,7 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
 
       let query = supabase
         .from('projects')
-        .select('id, code, name, status, department')
+        .select('id, code, name, abbreviation, status, department')
         .eq('company_id', companyId);
 
       if (filters?.department && filters.department !== 'all') {

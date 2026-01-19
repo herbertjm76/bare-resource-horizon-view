@@ -75,6 +75,7 @@ export interface Project {
   id: string;
   code: string;
   name: string;
+  abbreviation?: string | null;
   country: string;
   status: string;
   current_stage: string;
@@ -148,6 +149,7 @@ export interface StageFee {
 export interface ProjectFormState {
   code: string;
   name: string;
+  abbreviation?: string;
   manager: string;
   country: string;
   profit: string;
