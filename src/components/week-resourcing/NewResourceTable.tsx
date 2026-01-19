@@ -89,19 +89,23 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           </TableHead>
 
           {/* Project Columns with Rotated Text - Only show projects with hours */}
-          {projectsWithHours.map(project => <TableHead 
-            key={project.id} 
-            className="text-center font-medium px-0 py-1.5 text-foreground bg-muted align-bottom overflow-hidden" 
-            style={{ width: 36, minWidth: 36, maxWidth: 36 }}
-          >
-              <div className="flex items-end justify-center h-[120px] w-full overflow-hidden">
-                <div className="-rotate-90 whitespace-nowrap text-xs font-medium max-w-[100px] overflow-hidden text-ellipsis" style={{
-              transformOrigin: 'center'
-            }} title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}>
+          {projectsWithHours.map(project => (
+            <TableHead 
+              key={project.id} 
+              className="text-center font-medium px-0 py-1.5 text-foreground bg-muted align-bottom overflow-hidden" 
+              style={{ width: 36, minWidth: 36, maxWidth: 36 }}
+            >
+              <div className="flex items-end justify-center h-[130px] w-full overflow-hidden">
+                <div 
+                  className="-rotate-90 whitespace-nowrap text-xs font-medium" 
+                  style={{ transformOrigin: 'center' }} 
+                  title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
+                >
                   {getProjectDisplayName(project, projectDisplayPreference)}
                 </div>
               </div>
-            </TableHead>)}
+            </TableHead>
+          ))}
         </TableRow>
       </TableHeader>
       <TableBody>
