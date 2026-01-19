@@ -329,15 +329,23 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [isDemoMode, location.pathname]);
 
   // Listen for auth state changes and refetch company
+  // OPTIMIZED: Skip refetch on TOKEN_REFRESHED to prevent unnecessary API calls
   useEffect(() => {
     logger.log('CompanyProvider: Setting up auth listener');
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       logger.log('CompanyProvider: Auth state changed:', event, session?.user?.id);
       
-      // Only refetch on SIGNED_IN / INITIAL_SESSION / TOKEN_REFRESHED with valid session
-      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session?.user) {
+      // Only refetch on actual auth changes (SIGNED_IN, INITIAL_SESSION)
+      // Skip TOKEN_REFRESHED - this happens hourly and doesn't require refetching data
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
         const currentSlug = extractCompanySlugFromPath();
         if (!currentSlug) {
+          // Skip if we already have company data loaded
+          if (company && !error) {
+            logger.log('CompanyProvider: Company already loaded, skipping refetch on auth change');
+            return;
+          }
+          
           logger.log('CompanyProvider: Auth changed, scheduling profile/company refetch...');
           // Defer Supabase calls to avoid auth deadlocks
           setTimeout(async () => {
@@ -354,7 +362,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       logger.log('CompanyProvider: Cleaning up auth listener');
       subscription.unsubscribe();
     };
-  }, []);
+  }, [company, error]);
 
  
   return (

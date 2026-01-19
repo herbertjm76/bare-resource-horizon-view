@@ -130,8 +130,11 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
     },
     enabled: isDemoMode || isReady,
     refetchInterval: false,
-    staleTime: isDemoMode ? Infinity : 0,
-    refetchOnWindowFocus: !isDemoMode,
+    // OPTIMIZED: Use 2 minute stale time to prevent constant refetches
+    staleTime: isDemoMode ? Infinity : 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   // Force refresh function - useful for debugging

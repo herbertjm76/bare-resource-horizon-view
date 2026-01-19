@@ -55,7 +55,22 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const Join = lazy(() => import("./pages/Join"));
 const Screenshots = lazy(() => import("./pages/Screenshots"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Data is fresh for 2 minutes - prevents unnecessary refetches
+      staleTime: 2 * 60 * 1000,
+      // Keep unused data in cache for 10 minutes
+      gcTime: 10 * 60 * 1000,
+      // Don't refetch on mount if data is fresh
+      refetchOnMount: false,
+      // Don't refetch when window regains focus
+      refetchOnWindowFocus: false,
+      // Only retry once on failure
+      retry: 1,
+    },
+  },
+});
 
 // Wrapper component to ensure theme hook has access to CompanyProvider
 function AppWithTheme() {
