@@ -205,9 +205,10 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
     return allocations;
   }, []);
 
-  // Fetch office stages for colors
+  // Fetch office stages for colors (including global defaults)
+  // Uses a unique query key to avoid cache conflicts with useOfficeStages hook
   const { data: officeStages = [] } = useQuery({
-    queryKey: ['office-stages', company?.id, isDemoMode],
+    queryKey: ['office-stages-with-globals', company?.id, isDemoMode],
     queryFn: async () => {
       if (isDemoMode) {
         return DEMO_STAGES.map(s => ({
@@ -226,7 +227,7 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
         .or(`company_id.eq.${company.id},company_id.is.null`)
         .order('order_index');
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: isDemoMode || !!company?.id
   });
@@ -393,31 +394,28 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
   const stageInfoMap = useMemo(() => {
     const map: Record<string, { color: string; orderIndex: number; id: string; code: string }> = {};
 
-    // Insert global defaults first...
-    officeStages
-      ?.filter(s => s.company_id == null)
-      .forEach(s => {
-        const key = normalizeStageName(s.name);
-        map[key] = {
-          color: s.color && s.color.trim() !== '' ? s.color : '#6b7280', // Default gray if no color set
-          orderIndex: s.order_index,
-          id: s.id,
-          code: s.code || ''
-        };
-      });
+    if (!officeStages || officeStages.length === 0) return map;
 
-    // ...then override with company-specific stages
-    officeStages
-      ?.filter(s => s.company_id != null)
-      .forEach(s => {
-        const key = normalizeStageName(s.name);
-        map[key] = {
-          color: s.color && s.color.trim() !== '' ? s.color : '#6b7280', // Default gray if no color set
-          orderIndex: s.order_index,
-          id: s.id,
-          code: s.code || ''
-        };
-      });
+    // Sort stages: global (no company_id) first, then company-specific
+    // This ensures company-specific stages override global ones
+    const sortedStages = [...officeStages].sort((a, b) => {
+      // Global stages first (null/undefined company_id)
+      if (!a.company_id && b.company_id) return -1;
+      if (a.company_id && !b.company_id) return 1;
+      return 0;
+    });
+
+    sortedStages.forEach(s => {
+      const key = normalizeStageName(s.name);
+      // Each stage with the same name will override the previous one
+      // Since company-specific come after global, they will win
+      map[key] = {
+        color: s.color && s.color.trim() !== '' ? s.color : '#6b7280',
+        orderIndex: s.order_index,
+        id: s.id,
+        code: s.code || ''
+      };
+    });
 
     return map;
   }, [officeStages, normalizeStageName]);
@@ -497,10 +495,12 @@ export const PipelineTimelineView: React.FC<PipelineTimelineViewProps> = ({
 
     return Object.entries(projectStagesList)
       .map(([stageName, stageData]) => {
-        const info = stageInfoMap[normalizeStageName(stageName)];
+        const normalizedName = normalizeStageName(stageName);
+        const info = stageInfoMap[normalizedName];
 
-        // Use stage color from office_stages, fallback to theme token only if not found
-        const stageColor = info?.color || '#6b7280'; // Default gray if no color set
+        // IMPORTANT: Use the exact color from office_stages database
+        // The color should come directly from the database
+        const stageColor = info?.color || '#6b7280';
 
         return {
           id: stageData.id,
