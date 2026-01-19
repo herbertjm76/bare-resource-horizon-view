@@ -18,41 +18,51 @@ export const useProjectStages = (projects: any[], office_stages: any[], refetchS
         setIsLoading(false);
         return;
       }
-      
+
       setIsLoading(true);
-      
+
+      // Pre-build lookup maps for speed
+      const stageIdByName = new Map<string, string>(
+        office_stages.map((s: any) => [String(s.name), String(s.id)])
+      );
+
+      const CHUNK_SIZE = 200;
+      const chunks: string[][] = [];
+      for (let i = 0; i < projectIds.length; i += CHUNK_SIZE) {
+        chunks.push(projectIds.slice(i, i + CHUNK_SIZE));
+      }
+
       try {
-        const { data: projectStagesData, error } = await supabase
-          .from('project_stages')
-          .select('project_id, stage_name, fee')
-          .in('project_id', projectIds);
-          
-        if (error) {
-          console.error('Error fetching project stages:', error);
-          setProjectStages({});
-          setIsLoading(false);
-          return;
-        }
+        const chunkResults = await Promise.all(
+          chunks.map(async (ids) => {
+            const { data, error } = await supabase
+              .from('project_stages')
+              .select('project_id, stage_name, fee')
+              .in('project_id', ids);
+
+            if (error) throw error;
+            return data || [];
+          })
+        );
+
+        const projectStagesData = chunkResults.flat();
 
         // Pre-build the stages map for better performance
         const stagesMap: Record<string, Record<string, number>> = {};
-        
-        projectIds.forEach(projectId => {
+        projectIds.forEach((projectId) => {
           stagesMap[projectId] = {};
         });
-        
-        if (projectStagesData) {
-          projectStagesData.forEach(stageData => {
-            if (stageData.fee !== null && stageData.fee > 0) {
-              // Find the matching office stage
-              const officeStage = office_stages.find(stage => stage.name === stageData.stage_name);
-              if (officeStage) {
-                stagesMap[stageData.project_id][officeStage.id] = Number(stageData.fee);
-              }
-            }
-          });
+
+        for (const stageData of projectStagesData as any[]) {
+          const fee = stageData?.fee;
+          if (fee === null || fee === undefined || Number(fee) <= 0) continue;
+
+          const officeStageId = stageIdByName.get(String(stageData.stage_name));
+          if (!officeStageId) continue;
+
+          stagesMap[String(stageData.project_id)][officeStageId] = Number(fee);
         }
-        
+
         setProjectStages(stagesMap);
       } catch (err) {
         console.error('Error in fetchAllProjectStages:', err);
@@ -61,7 +71,7 @@ export const useProjectStages = (projects: any[], office_stages: any[], refetchS
         setIsLoading(false);
       }
     };
-    
+
     fetchAllProjectStages();
   }, [projectIds, office_stages, refetchSignal]); // refetch when this changes!
 

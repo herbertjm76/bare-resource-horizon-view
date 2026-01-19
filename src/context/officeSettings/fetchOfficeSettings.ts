@@ -33,112 +33,101 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
   }
   
   try {
-    // Fetch roles data with timestamps
-    const { data: rolesData, error: rolesError } = await supabase
-      .from('office_roles')
-      .select('id, name, code, company_id, created_at, updated_at')
-      .eq('company_id', companyId);
+    // Run independent queries in parallel (huge win vs sequential awaits)
+    const [
+      rolesRes,
+      locationsRes,
+      departmentsRes,
+      practiceAreasRes,
+      ratesRes,
+      stagesRes,
+      statusesRes,
+      projectTypesRes,
+    ] = await Promise.all([
+      supabase
+        .from('office_roles')
+        .select('id, name, code, company_id, created_at, updated_at')
+        .eq('company_id', companyId),
 
-    if (rolesError) throw rolesError;
-
-    // Fetch locations data
-    let locationsData = [];
-    try {
-      const { data, error } = await supabase
+      supabase
         .from('office_locations')
         .select('id, city, country, code, emoji, company_id')
-        .eq('company_id', companyId);
-      
-      if (error) throw error;
-      locationsData = data || [];
-    } catch (locationError) {
-      logger.error('Error fetching locations:', locationError);
-      locationsData = [];
-    }
+        .eq('company_id', companyId),
 
-    // Fetch departments data
-    let departmentsData = [];
-    try {
-      const { data, error } = await supabase
+      supabase
         .from('office_departments')
         .select('id, name, company_id, icon')
-        .eq('company_id', companyId);
-      
-      if (error) throw error;
-      departmentsData = data || [];
-    } catch (deptError) {
-      logger.error('Error fetching departments:', deptError);
-      departmentsData = [];
-    }
+        .eq('company_id', companyId),
 
-    // Fetch practice areas data
-    let practiceAreasData = [];
-    try {
-      const { data, error } = await supabase
+      supabase
         .from('office_practice_areas')
         .select('id, name, company_id, icon')
-        .eq('company_id', companyId);
-      
-      if (error) throw error;
-      practiceAreasData = data || [];
-    } catch (practiceAreaError) {
-      logger.error('Error fetching practice areas:', practiceAreaError);
-      practiceAreasData = [];
-    }
+        .eq('company_id', companyId),
 
-    // Fetch rates data
-    const { data: ratesData, error: ratesError } = await supabase
-      .from('office_rates')
-      .select('id, type, reference_id, value, unit, company_id')
-      .eq('company_id', companyId);
+      supabase
+        .from('office_rates')
+        .select('id, type, reference_id, value, unit, company_id')
+        .eq('company_id', companyId),
 
-    if (ratesError) throw ratesError;
-    
-    // Fetch project stages data with colors
-    const { data: stagesData, error: stagesError } = await supabase
-      .from('office_stages')
-      .select('id, name, order_index, company_id, color')
-      .eq('company_id', companyId)
-      .order('order_index', { ascending: true });
-      
-    if (stagesError) throw stagesError;
+      supabase
+        .from('office_stages')
+        .select('id, name, order_index, company_id, color')
+        .eq('company_id', companyId)
+        .order('order_index', { ascending: true }),
 
-    // Fetch project statuses data with colors
-    const { data: statusesData, error: statusesError } = await supabase
-      .from('project_statuses')
-      .select('id, name, order_index, company_id, color')
-      .eq('company_id', companyId)
-      .order('order_index', { ascending: true });
-      
-    if (statusesError) throw statusesError;
+      supabase
+        .from('project_statuses')
+        .select('id, name, order_index, company_id, color')
+        .eq('company_id', companyId)
+        .order('order_index', { ascending: true }),
 
-    // Fetch project types data with colors
-    const { data: projectTypesData, error: projectTypesError } = await supabase
-      .from('office_project_types')
-      .select('id, name, order_index, company_id, icon, color')
-      .eq('company_id', companyId)
-      .order('order_index', { ascending: true });
-      
-    if (projectTypesError) throw projectTypesError;
+      supabase
+        .from('office_project_types')
+        .select('id, name, order_index, company_id, icon, color')
+        .eq('company_id', companyId)
+        .order('order_index', { ascending: true }),
+    ]);
 
-    logger.log("Roles data:", rolesData);
-    logger.log("Locations data:", locationsData);
-    logger.log("Departments data:", departmentsData);
-    logger.log("Practice Areas data:", practiceAreasData);
-    logger.log("Rates data:", ratesData);
-    logger.log("Stages data:", stagesData);
-    logger.log("Statuses data:", statusesData);
-    logger.log("Project Types data:", projectTypesData);
+    // Fail hard only for roles + rates + stages + statuses + types (core data); keep others soft.
+    if (rolesRes.error) throw rolesRes.error;
+    if (ratesRes.error) throw ratesRes.error;
+    if (stagesRes.error) throw stagesRes.error;
+    if (statusesRes.error) throw statusesRes.error;
+    if (projectTypesRes.error) throw projectTypesRes.error;
+
+    if (locationsRes.error) logger.error('Error fetching locations:', locationsRes.error);
+    if (departmentsRes.error) logger.error('Error fetching departments:', departmentsRes.error);
+    if (practiceAreasRes.error) logger.error('Error fetching practice areas:', practiceAreasRes.error);
+
+    const rolesData = rolesRes.data || [];
+    const locationsData = locationsRes.data || [];
+    const departmentsData = departmentsRes.data || [];
+    const practiceAreasData = practiceAreasRes.data || [];
+    const ratesData = ratesRes.data || [];
+    const stagesData = stagesRes.data || [];
+    const statusesData = statusesRes.data || [];
+    const projectTypesData = projectTypesRes.data || [];
+
+    logger.log('Office settings loaded:', {
+      roles: rolesData.length,
+      locations: locationsData.length,
+      departments: departmentsData.length,
+      practice_areas: practiceAreasData.length,
+      rates: ratesData.length,
+      stages: stagesData.length,
+      statuses: statusesData.length,
+      project_types: projectTypesData.length,
+    });
 
     // Process data
-    const processedRoles = Array.isArray(rolesData) 
+    const processedRoles = Array.isArray(rolesData)
       ? rolesData.map((r) => ({
           id: r.id,
           name: r.name,
           code: r.code,
           company_id: (r.company_id ?? companyId).toString(),
           created_at: r.created_at,
-          updated_at: r.updated_at
+          updated_at: r.updated_at,
         }))
       : [];
 
@@ -150,7 +139,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
           code: loc.code,
           emoji: loc.emoji,
           company_id: (loc.company_id ?? companyId).toString(),
-          color: "#E5DEFF" // Default color
+          color: "#E5DEFF", // Default color
         }))
       : [];
 
@@ -159,7 +148,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
           id: dept.id,
           name: dept.name,
           company_id: (dept.company_id ?? companyId).toString(),
-          icon: dept.icon || undefined
+          icon: dept.icon || undefined,
         }))
       : [];
 
@@ -168,17 +157,17 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
           id: practiceArea.id,
           name: practiceArea.name,
           company_id: (practiceArea.company_id ?? companyId).toString(),
-          icon: practiceArea.icon || undefined
+          icon: practiceArea.icon || undefined,
         }))
       : [];
-      
+
     const processedStages = Array.isArray(stagesData)
       ? stagesData.map((stage) => ({
           id: stage.id,
           name: stage.name,
           order_index: stage.order_index,
           company_id: (stage.company_id ?? companyId).toString(),
-          color: stage.color || "#E5DEFF" // Default color if none is set
+          color: stage.color || "#E5DEFF", // Default color if none is set
         }))
       : [];
 
@@ -188,7 +177,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
           name: status.name,
           order_index: status.order_index,
           company_id: (status.company_id ?? companyId).toString(),
-          color: status.color || "#6366f1" // Default color if none is set
+          color: status.color || "#6366f1", // Default color if none is set
         }))
       : [];
 
@@ -199,27 +188,27 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
           order_index: type.order_index,
           company_id: (type.company_id ?? companyId).toString(),
           icon: type.icon || undefined,
-          color: type.color || "#6366f1" // Default color if none is set
+          color: type.color || "#6366f1", // Default color if none is set
         }))
       : [];
 
     // Fix the TypeScript error by properly casting the type property
     const processedRates = Array.isArray(ratesData)
-      ? ratesData.map(r => {
+      ? ratesData.map((r) => {
           // Validate that type is either 'role' or 'location'
-          const rateType = r.type === "role" ? "role" as const : "location" as const;
+          const rateType = r.type === "role" ? ("role" as const) : ("location" as const);
           // Validate that unit is one of the allowed values
-          const rateUnit = r.unit === "hour" || r.unit === "day" || r.unit === "week" 
-            ? r.unit as "hour" | "day" | "week" 
-            : "hour" as const;
-            
+          const rateUnit = r.unit === "hour" || r.unit === "day" || r.unit === "week"
+            ? (r.unit as "hour" | "day" | "week")
+            : ("hour" as const);
+
           return {
             id: r.id,
             type: rateType,
             reference_id: r.reference_id,
             value: Number(r.value),
             unit: rateUnit,
-            company_id: (r.company_id ?? companyId).toString()
+            company_id: (r.company_id ?? companyId).toString(),
           };
         })
       : [];
@@ -232,7 +221,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       practice_areas: processedPracticeAreas,
       office_stages: processedStages,
       project_statuses: processedStatuses,
-      project_types: processedProjectTypes
+      project_types: processedProjectTypes,
     };
   } catch (error: any) {
     logger.error('Error fetching office settings:', error);
