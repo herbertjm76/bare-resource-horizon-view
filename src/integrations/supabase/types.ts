@@ -2409,6 +2409,7 @@ export type Database = {
       get_projects_secure: {
         Args: { p_company_id?: string }
         Returns: {
+          abbreviation: string
           average_rate: number
           blended_rate: number
           budget_amount: number
