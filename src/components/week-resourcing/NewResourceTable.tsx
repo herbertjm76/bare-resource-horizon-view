@@ -99,9 +99,9 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                 <div 
                   className="-rotate-90 whitespace-nowrap text-xs font-medium" 
                   style={{ transformOrigin: 'center' }} 
-                  title={`${getProjectDisplayName(project, projectDisplayPreference)} - ${getProjectSecondaryText(project, projectDisplayPreference)}`}
+                  title={`${project.code} - ${project.name}`}
                 >
-                  {getProjectDisplayName(project, projectDisplayPreference)}
+                  {project.code}
                 </div>
               </div>
             </TableHead>
