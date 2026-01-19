@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { logger } from '@/utils/logger';
@@ -7,8 +7,14 @@ import { logger } from '@/utils/logger';
 export const useProjectFields = (project: any, refetch: () => void) => {
   const [editableFields, setEditableFields] = useState<Record<string, any>>({});
   const [initialFields, setInitialFields] = useState<Record<string, any>>({});
+  const initializedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
+    // Only initialize once per project ID to prevent overwriting user edits
+    if (initializedRef.current.has(project.id)) {
+      return;
+    }
+
     const snapshot = {
       name: project.name,
       code: project.code,
@@ -17,12 +23,14 @@ export const useProjectFields = (project: any, refetch: () => void) => {
       country: project.country,
       department: project.department || '',
       status: project.status,
-      current_stage: project.current_stage || ''
+      current_stage: project.current_stage || '',
+      project_manager_id: project.project_manager_id || ''
     };
 
-    setEditableFields({ [project.id]: snapshot });
-    setInitialFields({ [project.id]: snapshot });
-  }, [project]);
+    setEditableFields(prev => ({ ...prev, [project.id]: snapshot }));
+    setInitialFields(prev => ({ ...prev, [project.id]: snapshot }));
+    initializedRef.current.add(project.id);
+  }, [project.id]);
 
   const handleFieldUpdate = async (projectId: string, field: string, value: any) => {
     try {
