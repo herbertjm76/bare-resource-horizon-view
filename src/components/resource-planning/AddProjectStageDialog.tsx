@@ -175,16 +175,17 @@ export const AddProjectStageDialog: React.FC<AddProjectStageDialogProps> = ({
             <ScrollArea className="h-48 border rounded-lg p-2">
               <div className="space-y-2">
                 {availableStages.map(stage => (
-                  <div
+                  <label
                     key={stage.id}
+                    htmlFor={`stage-${stage.id}`}
                     className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 cursor-pointer"
-                    onClick={() => toggleStage(stage.name)}
                   >
                     <Checkbox
+                      id={`stage-${stage.id}`}
                       checked={selectedStages.includes(stage.name)}
                       onCheckedChange={() => toggleStage(stage.name)}
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 flex items-center">
                       <span className="text-sm font-medium">{stage.name}</span>
                       {stage.code && (
                         <Badge variant="outline" className="ml-2 text-xs">
@@ -192,7 +193,7 @@ export const AddProjectStageDialog: React.FC<AddProjectStageDialogProps> = ({
                         </Badge>
                       )}
                     </div>
-                  </div>
+                  </label>
                 ))}
 
                 {availableStages.length === 0 && (
