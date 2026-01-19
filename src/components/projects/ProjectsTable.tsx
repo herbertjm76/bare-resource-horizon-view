@@ -21,7 +21,7 @@ interface ProjectsTableProps {
   onFilterChange?: (key: string, value: string) => void;
 }
 
-type ColumnKey = 'code' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
+type ColumnKey = 'code' | 'abbreviation' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ 
   projects, 
@@ -77,12 +77,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 
   const baseWidths: Record<ColumnKey, number> = {
     code: 80,
-    name: 200,
-    pm: 120,
-    status: 140,
-    country: 120,
-    department: 140,
-    stage: 160
+    abbreviation: 120,
+    name: 180,
+    pm: 100,
+    status: 120,
+    country: 100,
+    department: 120,
+    stage: 140
   };
 
   const expandAmount = 120; // Extra pixels for expanded column
@@ -109,6 +110,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         <colgroup>
           {editMode && <col style={{ width: '40px' }} />}
           <col style={{ width: `${getColumnWidth('code')}px`, transition: 'width 0.3s ease' }} />
+          <col style={{ width: `${getColumnWidth('abbreviation')}px`, transition: 'width 0.3s ease' }} />
           <col style={{ width: `${getColumnWidth('name')}px`, transition: 'width 0.3s ease' }} />
           <col style={{ width: `${getColumnWidth('pm')}px`, transition: 'width 0.3s ease' }} />
           <col style={{ width: `${getColumnWidth('status')}px`, transition: 'width 0.3s ease' }} />

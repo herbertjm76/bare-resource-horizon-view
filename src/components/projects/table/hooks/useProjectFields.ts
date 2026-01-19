@@ -12,6 +12,7 @@ export const useProjectFields = (project: any, refetch: () => void) => {
     const snapshot = {
       name: project.name,
       code: project.code,
+      abbreviation: project.abbreviation || '',
       profit: project.target_profit_percentage || 0,
       country: project.country,
       department: project.department || '',
@@ -33,6 +34,9 @@ export const useProjectFields = (project: any, refetch: () => void) => {
           break;
         case 'code':
           updateData.code = value;
+          break;
+        case 'abbreviation':
+          updateData.abbreviation = value;
           break;
         case 'profit':
           updateData.target_profit_percentage = value;
@@ -100,11 +104,13 @@ export const useProjectFields = (project: any, refetch: () => void) => {
 
     mapField('name');
     mapField('code');
+    mapField('abbreviation');
     mapField('profit', 'target_profit_percentage', (v) => (v === '' ? null : Number(v)));
     mapField('country');
     mapField('department');
     mapField('current_stage', 'current_stage', (v) => v ?? '');
     mapField('status');
+    mapField('project_manager_id');
 
     return updateData;
   };
