@@ -33,7 +33,8 @@ export const ProjectDialogActions: React.FC<ProjectDialogActionsProps> = ({
         Cancel
       </Button>
       <Button 
-        type="submit" 
+        type="button"
+        onClick={handleSubmit}
         disabled={isLoading}
         className="px-6 min-w-[140px]"
       >
