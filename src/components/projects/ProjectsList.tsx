@@ -347,7 +347,8 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onNewProject }) => {
         </CardHeader>
         <CardContent>
           <ProjectsTable
-            projects={filteredProjects} 
+            projects={filteredProjects}
+            totalProjectCount={projects.length}
             loading={isLoading} 
             error={error ? error.message : ''}
             editMode={editMode}

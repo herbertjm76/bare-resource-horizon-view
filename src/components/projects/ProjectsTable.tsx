@@ -9,6 +9,7 @@ import { ProjectTableFilterRow } from './table/ProjectTableFilterRow';
 
 interface ProjectsTableProps {
   projects: any[];
+  totalProjectCount?: number;
   loading: boolean;
   error?: string;
   editMode?: boolean;
@@ -25,6 +26,7 @@ type ColumnKey = 'code' | 'abbreviation' | 'name' | 'pm' | 'status' | 'country' 
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ 
   projects, 
+  totalProjectCount,
   loading, 
   error,
   editMode = false,
@@ -71,7 +73,9 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   if (error) {
     return <div className="p-8 border border-destructive/30 bg-destructive/10 text-destructive rounded-lg flex items-center gap-2">{error}</div>;
   }
-  if (!projects?.length) {
+  // Only show empty state if there are truly no projects (not just filtered out)
+  const hasTotalProjects = totalProjectCount !== undefined ? totalProjectCount > 0 : projects?.length > 0;
+  if (!hasTotalProjects) {
     return <div className="text-center p-8 border rounded-md border-dashed">No projects found. Click "New Project" to create your first project.</div>;
   }
 
@@ -138,23 +142,31 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           />
         </TableHeader>
         <TableBody>
-          {projects.map((project) => (
-            <ProjectTableRow
-              key={project.id}
-              project={project}
-              editMode={editMode}
-              onDelete={onDelete}
-              selected={selectedProjects.includes(project.id)}
-              onSelect={onSelectProject}
-              stageColorMap={stageColorMap}
-              office_stages={office_stages}
-              getProjectStageFee={getProjectStageFee}
-              refetch={refetch}
-              saveSignal={saveSignal}
-              expandedColumn={expandedColumn}
-              onColumnClick={setExpandedColumn}
-            />
-          ))}
+          {projects.length === 0 ? (
+            <tr>
+              <td colSpan={editMode ? 10 : 8} className="text-center py-8 text-muted-foreground">
+                No projects match your current filters
+              </td>
+            </tr>
+          ) : (
+            projects.map((project) => (
+              <ProjectTableRow
+                key={project.id}
+                project={project}
+                editMode={editMode}
+                onDelete={onDelete}
+                selected={selectedProjects.includes(project.id)}
+                onSelect={onSelectProject}
+                stageColorMap={stageColorMap}
+                office_stages={office_stages}
+                getProjectStageFee={getProjectStageFee}
+                refetch={refetch}
+                saveSignal={saveSignal}
+                expandedColumn={expandedColumn}
+                onColumnClick={setExpandedColumn}
+              />
+            ))
+          )}
         </TableBody>
       </Table>
     </div>
