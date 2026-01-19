@@ -9,7 +9,7 @@ interface CleanWeeklyHeaderProps {
 }
 
 export const CleanWeeklyHeader: React.FC<CleanWeeklyHeaderProps> = ({ projects }) => {
-  const getDisplayText = useProjectDisplayText();
+  const { getDisplayText, getTooltipText } = useProjectDisplayText();
   
   return (
     <TableHeader>
@@ -20,7 +20,7 @@ export const CleanWeeklyHeader: React.FC<CleanWeeklyHeaderProps> = ({ projects }
         
         {projects.map((project) => (
           <TableHead key={project.id}>
-            <div className="weekly-project-header">
+            <div className="weekly-project-header" title={getTooltipText(project)}>
               {getDisplayText(project)}
             </div>
           </TableHead>

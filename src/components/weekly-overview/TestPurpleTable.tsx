@@ -10,7 +10,7 @@ interface TestPurpleTableProps {
 }
 
 export const TestPurpleTable: React.FC<TestPurpleTableProps> = ({ projects }) => {
-  const getDisplayText = useProjectDisplayText();
+  const { getDisplayText, getTooltipText } = useProjectDisplayText();
   logger.debug("TestPurpleTable - Rendering with projects:", projects);
   
   return (
@@ -30,7 +30,7 @@ export const TestPurpleTable: React.FC<TestPurpleTableProps> = ({ projects }) =>
             
             {projects.map((project) => (
               <TableHead key={project.id} className="test-purple-project-cell">
-                <div className="test-purple-project-code">
+                <div className="test-purple-project-code" title={getTooltipText(project)}>
                   {getDisplayText(project)}
                 </div>
               </TableHead>

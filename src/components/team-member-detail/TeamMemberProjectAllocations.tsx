@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { FolderOpen, Clock, Briefcase } from 'lucide-react';
@@ -7,7 +6,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { startOfWeek, addWeeks } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { getProjectAbbreviation, getProjectTooltip } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 import { logger } from '@/utils/logger';
 
@@ -31,7 +30,7 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
   const [projectAllocations, setProjectAllocations] = useState<ProjectAllocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
-  const { displayPreference, workWeekHours, projectDisplayPreference } = useAppSettings();
+  const { displayPreference, workWeekHours } = useAppSettings();
   const capacity = weeklyCapacity || workWeekHours;
 
   useEffect(() => {
@@ -174,7 +173,12 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
                 <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-white/80 border border-brand-primary/10 hover:bg-white/90 transition-all duration-200">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-gray-900 truncate">{getProjectDisplayName(project, projectDisplayPreference)}</h4>
+                      <h4 
+                        className="font-medium text-gray-900 truncate" 
+                        title={getProjectTooltip(project)}
+                      >
+                        {getProjectAbbreviation(project)}
+                      </h4>
                       <Badge className={`${getStatusColor(project.status)} text-xs flex-shrink-0`}>
                         {project.status?.replace('_', ' ') || 'Unknown'}
                       </Badge>

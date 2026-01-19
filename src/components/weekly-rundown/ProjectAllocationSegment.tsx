@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getProjectAbbreviation, getProjectFullDisplay } from '@/utils/projectDisplay';
+import { getProjectAbbreviation, getProjectTooltip } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectAllocationSegmentProps {
@@ -27,7 +27,7 @@ export const ProjectAllocationSegment: React.FC<ProjectAllocationSegmentProps> =
   capacity,
   color,
 }) => {
-  const { projectDisplayPreference, displayPreference } = useAppSettings();
+  const { displayPreference } = useAppSettings();
 
   const percentage = useMemo(() => {
     if (!capacity) return 0;
@@ -35,13 +35,13 @@ export const ProjectAllocationSegment: React.FC<ProjectAllocationSegmentProps> =
   }, [project.hours, capacity]);
 
   const displayText = useMemo(
-    () => getProjectAbbreviation({ code: project.code, name: project.name, abbreviation: project.abbreviation }, projectDisplayPreference),
-    [project.code, project.name, project.abbreviation, projectDisplayPreference]
+    () => getProjectAbbreviation({ code: project.code, name: project.name, abbreviation: project.abbreviation }),
+    [project.code, project.name, project.abbreviation]
   );
 
-  const fullDisplayText = useMemo(
-    () => getProjectFullDisplay({ code: project.code, name: project.name }, projectDisplayPreference),
-    [project.code, project.name, projectDisplayPreference]
+  const tooltipText = useMemo(
+    () => getProjectTooltip({ code: project.code, name: project.name }),
+    [project.code, project.name]
   );
 
   const formatted = useMemo(
@@ -65,7 +65,7 @@ export const ProjectAllocationSegment: React.FC<ProjectAllocationSegmentProps> =
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        <p className="font-semibold">{fullDisplayText}</p>
+        <p className="font-semibold">{tooltipText}</p>
         <p className="text-xs">{formatted}</p>
       </TooltipContent>
     </Tooltip>

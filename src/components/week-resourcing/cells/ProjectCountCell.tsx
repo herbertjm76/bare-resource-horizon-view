@@ -3,7 +3,7 @@ import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { getProjectDisplayName } from '@/utils/projectDisplay';
+import { getProjectAbbreviation, getProjectTooltip } from '@/utils/projectDisplay';
 import { formatAllocationValue } from '@/utils/allocationDisplay';
 
 interface ProjectCountCellProps {
@@ -12,13 +12,15 @@ interface ProjectCountCellProps {
 }
 
 export const ProjectCountCell: React.FC<ProjectCountCellProps> = ({ projectCount, projects = [] }) => {
-  const { projectDisplayPreference, displayPreference, workWeekHours } = useAppSettings();
+  const { displayPreference, workWeekHours } = useAppSettings();
   const projectsTooltip = projects.length > 0 ? (
     <div className="space-y-1 text-xs max-w-xs">
       <p className="font-semibold">Assigned Projects:</p>
       {projects.map((project, idx) => (
         <div key={idx} className="flex justify-between gap-2">
-          <span className="truncate">{getProjectDisplayName(project, projectDisplayPreference)}</span>
+          <span className="truncate" title={getProjectTooltip({ code: project.project_code, name: project.name })}>
+            {getProjectAbbreviation({ code: project.project_code, name: project.name })}
+          </span>
           <span className="font-medium">{formatAllocationValue(project.hours, workWeekHours, displayPreference)}</span>
         </div>
       ))}

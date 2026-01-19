@@ -12,7 +12,7 @@ interface WeeklyResourceHeaderProps {
 export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
   projects
 }) => {
-  const getDisplayText = useProjectDisplayText();
+  const { getDisplayText, getTooltipText } = useProjectDisplayText();
   
   return (
     <TableHeader>
@@ -104,8 +104,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
                 </TooltipTrigger>
                 <TooltipContent>
                   <div className="text-sm font-medium">
-                    {project.name}
-                    <span className="text-muted-foreground ml-2">({project.code})</span>
+                    {getTooltipText(project)}
                   </div>
                 </TooltipContent>
               </Tooltip>
