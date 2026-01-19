@@ -10,6 +10,8 @@ export const useProjectFields = (project: any, refetch: () => void) => {
   const [editableFields, setEditableFields] = useState<Record<string, any>>({});
   const [initialFields, setInitialFields] = useState<Record<string, any>>({});
   const [isSaving, setIsSaving] = useState(false);
+  // Track which specific fields are currently being saved: { projectId: Set<fieldName> }
+  const [savingFields, setSavingFields] = useState<Record<string, Set<string>>>({});
   const initializedRef = useRef<Set<string>>(new Set());
   const autoSaveTimerRef = useRef<Record<string, NodeJS.Timeout>>({});
   const pendingFieldsRef = useRef<Record<string, Set<string>>>({});
@@ -127,6 +129,17 @@ export const useProjectFields = (project: any, refetch: () => void) => {
 
   const autoSave = useCallback(async (projectId: string) => {
     setIsSaving(true);
+    
+    // Get the fields that are pending save and mark them as saving
+    const fieldsToSave = pendingFieldsRef.current?.[projectId] 
+      ? new Set(pendingFieldsRef.current[projectId]) 
+      : new Set<string>();
+    
+    setSavingFields(prev => ({
+      ...prev,
+      [projectId]: fieldsToSave
+    }));
+    
     try {
       // Get latest editable fields from state
       let currentFields: Record<string, any> = {};
@@ -138,6 +151,11 @@ export const useProjectFields = (project: any, refetch: () => void) => {
       const updateData = getPendingUpdates(projectId, currentFields);
       if (Object.keys(updateData).length === 0) {
         setIsSaving(false);
+        setSavingFields(prev => {
+          const updated = { ...prev };
+          delete updated[projectId];
+          return updated;
+        });
         return;
       }
 
@@ -167,8 +185,14 @@ export const useProjectFields = (project: any, refetch: () => void) => {
       toast.error('Auto-save failed');
     } finally {
       setIsSaving(false);
+      // Clear saving fields indicator
+      setSavingFields(prev => {
+        const updated = { ...prev };
+        delete updated[projectId];
+        return updated;
+      });
       // Clear pending fields for this project
-      if (pendingFieldsRef.current[projectId]) {
+      if (pendingFieldsRef.current?.[projectId]) {
         pendingFieldsRef.current[projectId].clear();
       }
     }
@@ -249,12 +273,19 @@ export const useProjectFields = (project: any, refetch: () => void) => {
     }
   };
 
+  // Helper to check if a specific field is currently saving
+  const isFieldSaving = useCallback((projectId: string, field: string) => {
+    return savingFields[projectId]?.has(field) ?? false;
+  }, [savingFields]);
+
   return { 
     editableFields, 
     handleFieldUpdate, 
     updateEditableField, 
     setEditableFields, 
     flushPendingUpdates,
-    isSaving 
+    isSaving,
+    savingFields,
+    isFieldSaving
   };
 };

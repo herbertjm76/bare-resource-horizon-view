@@ -13,7 +13,7 @@ export const useProjectTableRow = (project: Project, refetch: () => void) => {
   const { company } = useCompany();
   const { locations, departments } = useOfficeSettings();
   const { projectAreas, getAreaByCountry } = useProjectAreas();
-  const { editableFields, handleFieldUpdate, updateEditableField, flushPendingUpdates } = useProjectFields(project, refetch);
+  const { editableFields, handleFieldUpdate, updateEditableField, flushPendingUpdates, isFieldSaving, isSaving } = useProjectFields(project, refetch);
   const { handleStatusChange, handleStageChange } = useProjectStatus(refetch);
   const [managers, setManagers] = useState<Array<{ id: string; name: string }>>([]);
 
@@ -49,6 +49,8 @@ export const useProjectTableRow = (project: Project, refetch: () => void) => {
     updateEditableField,
     flushPendingUpdates,
     managers,
-    projectAreas
+    projectAreas,
+    isFieldSaving,
+    isSaving
   };
 };
