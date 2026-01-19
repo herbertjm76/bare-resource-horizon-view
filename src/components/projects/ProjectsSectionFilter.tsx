@@ -41,15 +41,15 @@ export const ProjectsSectionFilter: React.FC<ProjectsSectionFilterProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 p-4 bg-muted/30 rounded-lg border mb-4">
+    <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg border mb-4 overflow-x-auto">
       {/* Search Input */}
-      <div className="relative flex-1 min-w-[200px] max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="relative flex-shrink-0 w-[160px]">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
         <Input
-          placeholder="Search projects..."
+          placeholder="Search..."
           value={filters.search || ''}
           onChange={(e) => onFilterChange('search', e.target.value)}
-          className="pl-9 h-9"
+          className="pl-8 h-8 text-xs"
         />
       </div>
 
@@ -58,10 +58,10 @@ export const ProjectsSectionFilter: React.FC<ProjectsSectionFilterProps> = ({
         value={filters.status || 'all'}
         onValueChange={(value) => onFilterChange('status', value === 'all' ? '' : value)}
       >
-        <SelectTrigger className="h-9 w-[130px]">
+        <SelectTrigger className="h-8 w-[100px] flex-shrink-0 text-xs">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover z-50">
           <SelectItem value="all">All Statuses</SelectItem>
           {statuses.map((status) => (
             <SelectItem key={status} value={status}>
@@ -76,10 +76,10 @@ export const ProjectsSectionFilter: React.FC<ProjectsSectionFilterProps> = ({
         value={filters.country || 'all'}
         onValueChange={(value) => onFilterChange('country', value === 'all' ? '' : value)}
       >
-        <SelectTrigger className="h-9 w-[130px]">
+        <SelectTrigger className="h-8 w-[100px] flex-shrink-0 text-xs">
           <SelectValue placeholder="Country" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover z-50">
           <SelectItem value="all">All Countries</SelectItem>
           {countries.map((country) => (
             <SelectItem key={country} value={country}>
@@ -94,10 +94,10 @@ export const ProjectsSectionFilter: React.FC<ProjectsSectionFilterProps> = ({
         value={filters.department || 'all'}
         onValueChange={(value) => onFilterChange('department', value === 'all' ? '' : value)}
       >
-        <SelectTrigger className="h-9 w-[140px]">
-          <SelectValue placeholder="Department" />
+        <SelectTrigger className="h-8 w-[100px] flex-shrink-0 text-xs">
+          <SelectValue placeholder="Dept" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover z-50">
           <SelectItem value="all">All Depts</SelectItem>
           {departments.map((dept) => (
             <SelectItem key={dept} value={dept}>
@@ -112,10 +112,10 @@ export const ProjectsSectionFilter: React.FC<ProjectsSectionFilterProps> = ({
         value={filters.stage || 'all'}
         onValueChange={(value) => onFilterChange('stage', value === 'all' ? '' : value)}
       >
-        <SelectTrigger className="h-9 w-[130px]">
+        <SelectTrigger className="h-8 w-[100px] flex-shrink-0 text-xs">
           <SelectValue placeholder="Stage" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover z-50">
           <SelectItem value="all">All Stages</SelectItem>
           {stages.map((stage) => (
             <SelectItem key={stage} value={stage}>
@@ -130,10 +130,10 @@ export const ProjectsSectionFilter: React.FC<ProjectsSectionFilterProps> = ({
         value={filters.pm || 'all'}
         onValueChange={(value) => onFilterChange('pm', value === 'all' ? '' : value)}
       >
-        <SelectTrigger className="h-9 w-[140px]">
+        <SelectTrigger className="h-8 w-[110px] flex-shrink-0 text-xs">
           <SelectValue placeholder="PM" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover z-50">
           <SelectItem value="all">All PMs</SelectItem>
           {managers.map((manager) => (
             <SelectItem key={manager} value={manager}>
@@ -149,9 +149,9 @@ export const ProjectsSectionFilter: React.FC<ProjectsSectionFilterProps> = ({
           variant="ghost"
           size="sm"
           onClick={handleClearAll}
-          className="h-9 text-muted-foreground hover:text-foreground"
+          className="h-8 px-2 flex-shrink-0 text-xs text-muted-foreground hover:text-foreground"
         >
-          <X className="h-4 w-4 mr-1" />
+          <X className="h-3.5 w-3.5 mr-1" />
           Clear
         </Button>
       )}
