@@ -5,7 +5,7 @@ import { useStageColorMap } from './hooks/useProjectColors';
 import { useProjectStages } from '@/hooks/useProjectStages';
 import { ProjectTableHeader } from './table/ProjectTableHeader';
 import { ProjectTableRow } from './table/ProjectTableRow';
-import { ProjectTableFilterRow } from './table/ProjectTableFilterRow';
+import { ProjectsTableFilters } from './ProjectsTableFilters';
 
 interface ProjectsTableProps {
   projects: any[];
@@ -110,38 +110,40 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   };
 
   return (
-    <div className="rounded-md border overflow-x-auto">
-      <Table>
-        <colgroup>
-          {editMode && <col style={{ width: '40px' }} />}
-          <col style={{ width: `${getColumnWidth('code')}px`, transition: 'width 0.3s ease' }} />
-          <col style={{ width: `${getColumnWidth('abbreviation')}px`, transition: 'width 0.3s ease' }} />
-          <col style={{ width: `${getColumnWidth('name')}px`, transition: 'width 0.3s ease' }} />
-          <col style={{ width: `${getColumnWidth('pm')}px`, transition: 'width 0.3s ease' }} />
-          <col style={{ width: `${getColumnWidth('status')}px`, transition: 'width 0.3s ease' }} />
-          <col style={{ width: `${getColumnWidth('country')}px`, transition: 'width 0.3s ease' }} />
-          <col style={{ width: `${getColumnWidth('department')}px`, transition: 'width 0.3s ease' }} />
-          <col style={{ width: `${getColumnWidth('stage')}px`, transition: 'width 0.3s ease' }} />
-          {editMode && <col style={{ width: '96px' }} />}
-        </colgroup>
-        <TableHeader>
-          <ProjectTableHeader 
-            editMode={editMode} 
-            office_stages={office_stages}
-            expandedColumn={expandedColumn}
-            onColumnClick={setExpandedColumn}
-          />
-          <ProjectTableFilterRow
-            editMode={editMode}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            statuses={filterOptions.statuses}
-            countries={filterOptions.countries}
-            departments={filterOptions.departments}
-            stages={filterOptions.stages}
-            managers={filterOptions.managers}
-          />
-        </TableHeader>
+    <div>
+      {/* Filters above the table, aligned to table width */}
+      <ProjectsTableFilters
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        statuses={filterOptions.statuses}
+        countries={filterOptions.countries}
+        departments={filterOptions.departments}
+        stages={filterOptions.stages}
+        managers={filterOptions.managers}
+      />
+      
+      <div className="rounded-md border overflow-x-auto">
+        <Table>
+          <colgroup>
+            {editMode && <col style={{ width: '40px' }} />}
+            <col style={{ width: `${getColumnWidth('code')}px`, transition: 'width 0.3s ease' }} />
+            <col style={{ width: `${getColumnWidth('abbreviation')}px`, transition: 'width 0.3s ease' }} />
+            <col style={{ width: `${getColumnWidth('name')}px`, transition: 'width 0.3s ease' }} />
+            <col style={{ width: `${getColumnWidth('pm')}px`, transition: 'width 0.3s ease' }} />
+            <col style={{ width: `${getColumnWidth('status')}px`, transition: 'width 0.3s ease' }} />
+            <col style={{ width: `${getColumnWidth('country')}px`, transition: 'width 0.3s ease' }} />
+            <col style={{ width: `${getColumnWidth('department')}px`, transition: 'width 0.3s ease' }} />
+            <col style={{ width: `${getColumnWidth('stage')}px`, transition: 'width 0.3s ease' }} />
+            {editMode && <col style={{ width: '96px' }} />}
+          </colgroup>
+          <TableHeader>
+            <ProjectTableHeader 
+              editMode={editMode} 
+              office_stages={office_stages}
+              expandedColumn={expandedColumn}
+              onColumnClick={setExpandedColumn}
+            />
+          </TableHeader>
         <TableBody>
           {projects.length === 0 ? (
             <tr>
@@ -169,7 +171,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             ))
           )}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
     </div>
   );
 };
