@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Loader2 } from "lucide-react";
 import { EditableProjectField } from '../components/EditableProjectField';
 import { useProjectTableRow } from './hooks/useProjectTableRow';
 import { EditProjectDialog } from '../EditProjectDialog';
@@ -15,6 +15,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+
+// Small inline saving indicator component
+const SavingIndicator = ({ isSaving }: { isSaving: boolean }) => {
+  if (!isSaving) return null;
+  return (
+    <span className="absolute right-2 top-1/2 -translate-y-1/2">
+      <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+    </span>
+  );
+};
 
 type ColumnKey = 'code' | 'abbreviation' | 'name' | 'pm' | 'status' | 'country' | 'department' | 'stage';
 
@@ -63,7 +73,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     updateEditableField,
     flushPendingUpdates,
     managers,
-    projectAreas
+    projectAreas,
+    isFieldSaving
   } = useProjectTableRow(project, refetch);
 
   const projectArea = getAreaByCountry(project.country);
@@ -110,11 +121,14 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           onClick={() => handleColumnClick('code')}
         >
           {editMode ? (
-            <Input
-              value={editableFields[project.id]?.code || project.code}
-              onChange={(e) => updateEditableField(project.id, 'code', e.target.value)}
-              className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs font-semibold px-4 py-3"
-            />
+            <div className="relative">
+              <Input
+                value={editableFields[project.id]?.code || project.code}
+                onChange={(e) => updateEditableField(project.id, 'code', e.target.value)}
+                className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs font-semibold px-4 py-3 pr-8"
+              />
+              <SavingIndicator isSaving={isFieldSaving(project.id, 'code')} />
+            </div>
           ) : (
             <div className="px-4 py-3">{project.code}</div>
           )}
@@ -126,12 +140,15 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           onClick={() => handleColumnClick('abbreviation')}
         >
           {editMode ? (
-            <Input
-              value={editableFields[project.id]?.abbreviation ?? project.abbreviation ?? ''}
-              onChange={(e) => updateEditableField(project.id, 'abbreviation', e.target.value)}
-              placeholder="Short name..."
-              className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3"
-            />
+            <div className="relative">
+              <Input
+                value={editableFields[project.id]?.abbreviation ?? project.abbreviation ?? ''}
+                onChange={(e) => updateEditableField(project.id, 'abbreviation', e.target.value)}
+                placeholder="Short name..."
+                className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3 pr-8"
+              />
+              <SavingIndicator isSaving={isFieldSaving(project.id, 'abbreviation')} />
+            </div>
           ) : (
             <div className="px-4 py-3">
               <span className="text-muted-foreground text-xs">{project.abbreviation || '-'}</span>
@@ -144,11 +161,14 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           onClick={() => handleColumnClick('name')}
         >
           {editMode ? (
-            <Input
-              value={editableFields[project.id]?.name || project.name}
-              onChange={(e) => updateEditableField(project.id, 'name', e.target.value)}
-              className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3"
-            />
+            <div className="relative">
+              <Input
+                value={editableFields[project.id]?.name || project.name}
+                onChange={(e) => updateEditableField(project.id, 'name', e.target.value)}
+                className="w-full h-full border-0 rounded-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary text-xs px-4 py-3 pr-8"
+              />
+              <SavingIndicator isSaving={isFieldSaving(project.id, 'name')} />
+            </div>
           ) : (
             <div className="px-4 py-3">
               <span className="font-bold">{project.name}</span>
