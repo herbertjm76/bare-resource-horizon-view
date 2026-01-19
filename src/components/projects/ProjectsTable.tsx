@@ -5,7 +5,6 @@ import { useStageColorMap } from './hooks/useProjectColors';
 import { useProjectStages } from '@/hooks/useProjectStages';
 import { ProjectTableHeader } from './table/ProjectTableHeader';
 import { ProjectTableRow } from './table/ProjectTableRow';
-import { ProjectTableFilterRow } from './table/ProjectTableFilterRow';
 
 interface ProjectsTableProps {
   projects: any[];
@@ -125,16 +124,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             office_stages={office_stages}
             expandedColumn={expandedColumn}
             onColumnClick={setExpandedColumn}
-          />
-          <ProjectTableFilterRow
-            editMode={editMode}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            statuses={filterOptions.statuses}
-            countries={filterOptions.countries}
-            departments={filterOptions.departments}
-            stages={filterOptions.stages}
-            managers={filterOptions.managers}
           />
         </TableHeader>
         <TableBody>
